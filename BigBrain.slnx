@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BigBrain.Api/BigBrain.Api.csproj" />
+    <Project Path="src/BigBrain.Modules/BigBrain.Modules.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj" />
+  </Folder>
+</Solution>
+
