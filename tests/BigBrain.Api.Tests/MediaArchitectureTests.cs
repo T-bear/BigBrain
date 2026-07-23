@@ -23,7 +23,10 @@ public sealed class MediaArchitectureTests
             "DriveInfo",
             "File.Read",
             "File.Write",
-            "Directory.Enumerate"
+            "Directory.Enumerate",
+            "api/v2/auth/login",
+            "QBittorrent.Username",
+            "QBittorrent.Password"
         ];
 
         foreach (var file in files)

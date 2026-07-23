@@ -2,6 +2,7 @@ using BigBrain.Modules;
 using BigBrain.Api.Media;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Net.Http.Headers;
 
 namespace BigBrain.Api;
 
@@ -25,7 +26,16 @@ public partial class Program
         AddMediaClient<ISonarrClient, SonarrClient>(builder.Services, options => options.Sonarr.BaseUrl);
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, options => options.Prowlarr.BaseUrl);
-        AddMediaClient<IQBittorrentClient, QBittorrentClient>(builder.Services, options => options.QBittorrent.BaseUrl);
+        builder.Services.AddHttpClient<IQBittorrentClient, QBittorrentClient>((serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<MediaOptions>();
+            ConfigureMediaClient(httpClient, options.QBittorrent.BaseUrl, options.TimeoutSeconds);
+            if (!string.IsNullOrWhiteSpace(options.QBittorrent.ApiKey))
+            {
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", options.QBittorrent.ApiKey);
+            }
+        });
         builder.Services.AddTransient<IMediaService, MediaService>();
         builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
@@ -108,8 +118,13 @@ public partial class Program
         services.AddHttpClient<TClient, TImplementation>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();
-            httpClient.BaseAddress = new Uri(getBaseUrl(options).TrimEnd('/') + "/", UriKind.Absolute);
-            httpClient.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            ConfigureMediaClient(httpClient, getBaseUrl(options), options.TimeoutSeconds);
         });
+    }
+
+    private static void ConfigureMediaClient(HttpClient httpClient, string baseUrl, int timeoutSeconds)
+    {
+        httpClient.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/", UriKind.Absolute);
+        httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
     }
 }

@@ -24,8 +24,7 @@ public sealed class MediaOptions
         || !string.IsNullOrWhiteSpace(Sonarr.ApiKey)
         || !string.IsNullOrWhiteSpace(Radarr.ApiKey)
         || !string.IsNullOrWhiteSpace(Prowlarr.ApiKey)
-        || (!string.IsNullOrWhiteSpace(QBittorrent.Username)
-            && !string.IsNullOrWhiteSpace(QBittorrent.Password));
+        || !string.IsNullOrWhiteSpace(QBittorrent.ApiKey);
 
     private static bool IsHttpUrl(string value) =>
         Uri.TryCreate(value, UriKind.Absolute, out var uri)
@@ -43,6 +42,5 @@ public sealed class MediaApiKeyOptions(string baseUrl)
 public sealed class QBittorrentOptions
 {
     public string BaseUrl { get; init; } = "http://qbittorrent:8080";
-    public string? Username { get; init; }
-    public string? Password { get; init; }
+    public string? ApiKey { get; init; }
 }

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net;
 using System.Text.Json;
 
 namespace BigBrain.Api.Media;
@@ -9,8 +8,7 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
 {
     public async Task<QBittorrentOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(options.QBittorrent.Username)
-            || string.IsNullOrWhiteSpace(options.QBittorrent.Password))
+        if (string.IsNullOrWhiteSpace(options.QBittorrent.ApiKey))
         {
             return Empty(NotConfigured());
         }
@@ -18,29 +16,6 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
         var timer = Stopwatch.StartNew();
         try
         {
-            using var loginContent = new FormUrlEncodedContent(
-            [
-                new KeyValuePair<string, string>("username", options.QBittorrent.Username),
-                new KeyValuePair<string, string>("password", options.QBittorrent.Password)
-            ]);
-            using var loginRequest = new HttpRequestMessage(HttpMethod.Post, "api/v2/auth/login")
-            {
-                Content = loginContent
-            };
-            loginRequest.Headers.Referrer = HttpClient.BaseAddress;
-            using var login = await HttpClient.SendAsync(loginRequest, cancellationToken);
-            if (login.StatusCode == HttpStatusCode.Forbidden)
-            {
-                throw new MediaAuthenticationException();
-            }
-
-            EnsureSuccess(login);
-            var loginResult = await login.Content.ReadAsStringAsync(cancellationToken);
-            if (!string.Equals(loginResult.Trim(), "Ok.", StringComparison.Ordinal))
-            {
-                throw new MediaAuthenticationException();
-            }
-
             using var versionResponse = await HttpClient.GetAsync("api/v2/app/version", cancellationToken);
             EnsureSuccess(versionResponse);
             var version = await versionResponse.Content.ReadAsStringAsync(cancellationToken);

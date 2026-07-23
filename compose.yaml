@@ -17,8 +17,7 @@ services:
       Media__Prowlarr__BaseUrl: ${MEDIA__PROWLARR__BASEURL:-http://prowlarr:9696}
       Media__Prowlarr__ApiKey: ${MEDIA__PROWLARR__APIKEY:-}
       Media__QBittorrent__BaseUrl: ${MEDIA__QBITTORRENT__BASEURL:-http://qbittorrent:8080}
-      Media__QBittorrent__Username: ${MEDIA__QBITTORRENT__USERNAME:-}
-      Media__QBittorrent__Password: ${MEDIA__QBITTORRENT__PASSWORD:-}
+      Media__QBittorrent__ApiKey: ${MEDIA__QBITTORRENT__APIKEY:-}
     networks:
       - default
       - media

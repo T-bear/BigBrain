@@ -6,7 +6,7 @@ The Media module provides a read-only, normalized dashboard view of Jellyfin, So
 
 Each upstream API is treated as untrusted. Typed clients translate allowlisted fields into BigBrain contracts, apply short timeouts and bounded lists, accept cancellation, and convert service-specific failures into sanitized status results. One failing service does not fail the aggregate response.
 
-The module does not mount the Docker socket or media directories, execute commands, access host inventory, log credentials, or expose upstream authentication material. The only upstream POST is qBittorrent's required session login; it authenticates a read-only collection session and does not mutate torrent state.
+The module does not mount the Docker socket or media directories, execute commands, access host inventory, log credentials, or expose upstream authentication material. qBittorrent 5.2.0+ is accessed statelessly with its official Bearer API key mechanism; the module does not call qBittorrent's login or logout endpoints.
 
 ## Configuration
 
@@ -23,8 +23,7 @@ The module does not mount the Docker socket or media directories, execute comman
 | `MEDIA__PROWLARR__BASEURL` | `http://prowlarr:9696` | No |
 | `MEDIA__PROWLARR__APIKEY` | unset | Yes |
 | `MEDIA__QBITTORRENT__BASEURL` | `http://qbittorrent:8080` | No |
-| `MEDIA__QBITTORRENT__USERNAME` | unset | Yes |
-| `MEDIA__QBITTORRENT__PASSWORD` | unset | Yes |
+| `MEDIA__QBITTORRENT__APIKEY` | unset | Yes |
 | `MEDIA__TIMEOUTSECONDS` | `3` | No |
 
 URLs must be absolute HTTP or HTTPS URLs without query strings or fragments. Timeout must be between 1 and 15 seconds. Credentials are optional so an unconfigured service becomes `notConfigured`; real values must be supplied through runtime secret injection and must never be committed.
@@ -68,7 +67,7 @@ No Media POST, PUT, PATCH or DELETE route exists.
 | Sonarr | `GET /api/v3/system/status`, `/series`, `/wanted/missing`, `/queue`, `/history`, `/health` |
 | Radarr | `GET /api/v3/system/status`, `/movie`, `/wanted/missing`, `/queue`, `/history`, `/health` |
 | Prowlarr | `GET /api/v1/system/status`, `/indexer`, `/health`, `/applications` |
-| qBittorrent | `POST /api/v2/auth/login` for SID authentication; then `GET /api/v2/app/version`, `/torrents/info`, `/transfer/info` |
+| qBittorrent | `GET /api/v2/app/version`, `/torrents/info`, `/transfer/info` with `Authorization: Bearer <API_KEY>` |
 
 Queue and torrent lists are limited to 25 entries, health/indexer output to 25 entries, application connections to 10 and history to 10. qBittorrent summary counts in Sprint 1 describe the bounded recent list returned by the upstream query; an exact, safely bounded global-count strategy remains technical debt.
 
@@ -82,6 +81,8 @@ Queue and torrent lists are limited to 25 entries, health/indexer output to 25 e
 - All services unconfigured: aggregate `notConfigured`.
 
 Messages are fixed, sanitized text and never include raw exception messages, URLs or credentials. No automatic retry loop is configured.
+
+qBittorrent API key authentication requires qBittorrent 5.2.0+ or WebAPI 2.14.1+. The key is valid for the WebAPI endpoints above but not for static WebUI assets or the authentication endpoints. See the [official qBittorrent API key contract](https://github.com/qbittorrent/qBittorrent/wiki/API-Key-Authentication-%28%E2%89%A5v5.2.0%29).
 
 ## Sprint 2 backlog
 

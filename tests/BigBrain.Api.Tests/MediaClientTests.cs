@@ -93,19 +93,24 @@ public sealed class MediaClientTests
             category = "media",
             eta = 120
         });
-        var client = new QBittorrentClient(CreateClient(request => request.RequestUri!.AbsolutePath switch
+        var client = new QBittorrentClient(CreateClient(request =>
         {
-            "/api/v2/auth/login" => Text("Ok."),
-            "/api/v2/app/version" => Text("v5.1.2"),
-            "/api/v2/torrents/info" => Json(JsonSerializer.Serialize(torrents)),
-            "/api/v2/transfer/info" => Json("""{"dl_info_speed":2048,"up_info_speed":1024}"""),
-            _ => throw new InvalidOperationException()
-        }), Options());
+            Assert.Equal(HttpMethod.Get, request.Method);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            return request.RequestUri!.AbsolutePath switch
+            {
+                "/api/v2/app/version" => Text("v5.2.3"),
+                "/api/v2/torrents/info" => Json(JsonSerializer.Serialize(torrents)),
+                "/api/v2/transfer/info" => Json("""{"dl_info_speed":2048,"up_info_speed":1024}"""),
+                _ => throw new InvalidOperationException()
+            };
+        }, "test-api-key"), Options());
 
         var result = await client.GetOverviewAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(MediaStatuses.Online, result.Service.Status);
-        Assert.Equal("v5.1.2", result.Service.Version);
+        Assert.Equal("v5.2.3", result.Service.Version);
         Assert.Equal(25, result.Torrents.Count);
         Assert.Equal(24, result.ActiveCount);
         Assert.Equal(1, result.PausedCount);
@@ -221,11 +226,26 @@ public sealed class MediaClientTests
         Sonarr = new MediaApiKeyOptions("http://test/") { ApiKey = apiKey },
         Radarr = new MediaApiKeyOptions("http://test/") { ApiKey = apiKey },
         Prowlarr = new MediaApiKeyOptions("http://test/") { ApiKey = apiKey },
-        QBittorrent = new QBittorrentOptions { BaseUrl = "http://test/", Username = "test-user", Password = "test-password" }
+        QBittorrent = new QBittorrentOptions { BaseUrl = "http://test/", ApiKey = apiKey }
     };
 
-    private static HttpClient CreateClient(Func<HttpRequestMessage, HttpResponseMessage> responder) =>
-        new(new StubHandler(responder)) { BaseAddress = new Uri("http://test/"), Timeout = TimeSpan.FromSeconds(1) };
+    private static HttpClient CreateClient(
+        Func<HttpRequestMessage, HttpResponseMessage> responder,
+        string? bearerToken = null)
+    {
+        var client = new HttpClient(new StubHandler(responder))
+        {
+            BaseAddress = new Uri("http://test/"),
+            Timeout = TimeSpan.FromSeconds(1)
+        };
+        if (bearerToken is not null)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+
+        return client;
+    }
 
     private static HttpResponseMessage Json(string json) =>
         new(HttpStatusCode.OK) { Content = new StringContent(json, Encoding.UTF8, "application/json") };

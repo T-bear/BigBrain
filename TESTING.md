@@ -34,8 +34,7 @@ MEDIA__JELLYFIN__APIKEY=<jellyfin-api-key>
 MEDIA__SONARR__APIKEY=<sonarr-api-key>
 MEDIA__RADARR__APIKEY=<radarr-api-key>
 MEDIA__PROWLARR__APIKEY=<prowlarr-api-key>
-MEDIA__QBITTORRENT__USERNAME=<qbittorrent-webui-username>
-MEDIA__QBITTORRENT__PASSWORD=<qbittorrent-webui-password>
+MEDIA__QBITTORRENT__APIKEY=<qbittorrent-api-key>
 ```
 
 Keep the supplied internal URLs unless the container names or ports differ. `MEDIA__TIMEOUTSECONDS` defaults to 3 and accepts 1–15 seconds.
@@ -46,7 +45,7 @@ Keep the supplied internal URLs unless the container names or ports differ. `MED
 - Sonarr: Settings → General → Security → API Key.
 - Radarr: Settings → General → Security → API Key.
 - Prowlarr: Settings → General → Security → API Key.
-- qBittorrent: use the configured Web UI credentials and keep the Web UI limited to trusted internal networks.
+- qBittorrent 5.2+: Preferences → WebUI → API Key. Generate a dedicated key and keep the Web UI limited to trusted internal networks.
 
 Use the least-privileged account available. The upstream products do not all provide read-only API scopes, so credentials must still be treated as sensitive even though BigBrain exposes only read operations.
 
@@ -117,7 +116,7 @@ The installed versions use these documented endpoints:
 - Sonarr 4: `GET /api/v3/system/status`, `/series`, `/wanted/missing`, `/queue`, `/history`, `/health`.
 - Radarr 6: `GET /api/v3/system/status`, `/movie`, `/wanted/missing`, `/queue`, `/history`, `/health`.
 - Prowlarr 2: `GET /api/v1/system/status`, `/indexer`, `/health`, `/applications`.
-- qBittorrent 5: `POST /api/v2/auth/login` only to establish the required SID session, followed by `GET /api/v2/app/version`, `/torrents/info` and `/transfer/info`.
+- qBittorrent 5.2+ / WebAPI 2.14.1+: `GET /api/v2/app/version`, `/torrents/info` and `/transfer/info` with the official `Authorization: Bearer <API_KEY>` mechanism. Login/logout are not called.
 
 No BigBrain POST, PUT, PATCH or DELETE Media route exists. No upstream mutation route is called.
 
@@ -125,7 +124,7 @@ No BigBrain POST, PUT, PATCH or DELETE Media route exists. No upstream mutation 
 
 ### `notConfigured`
 
-- Confirm all six credential variables in `.env` are non-empty.
+- Confirm all five credential variables in `.env` are non-empty.
 - Run `docker compose up -d --force-recreate api` after changing `.env`.
 - Use single quotes around `.env` values containing `$` or other interpolation characters; Compose removes the quotes and preserves the literal value.
 
@@ -144,7 +143,7 @@ No BigBrain POST, PUT, PATCH or DELETE Media route exists. No upstream mutation 
 ### `degraded` or authentication rejected
 
 - Regenerate or recopy the affected API key.
-- Confirm qBittorrent Web UI credentials and host-header/CSRF configuration permit requests from `http://qbittorrent:8080`.
+- Confirm the qBittorrent API key is current and the installed version is 5.2.0+ (WebAPI 2.14.1+).
 - Recreate only the API container after credential changes.
 - Review BigBrain's sanitized status message. Do not enable request-header or body logging.
 
