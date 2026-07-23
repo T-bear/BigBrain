@@ -5,6 +5,14 @@ namespace BigBrain.Api.Tests;
 public sealed class ModuleRegistryTests
 {
     [Fact]
+    public void SprintTwoRegistryContainsSystemAndDocker()
+    {
+        var registry = new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition]);
+
+        Assert.Equal(["docker", "system"], registry.GetModules().Select(module => module.Id));
+    }
+
+    [Fact]
     public void RegistryReturnsRegisteredModulesInStableOrder()
     {
         var alpha = SystemModule.Definition with { Id = "alpha", Name = "Alpha" };

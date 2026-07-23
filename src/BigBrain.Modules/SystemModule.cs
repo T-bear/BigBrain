@@ -7,14 +7,14 @@ public static class SystemModule
         Name: "System",
         Description: "Core system health and platform information.",
         Route: "/",
+        Status: "Unavailable",
         DashboardWidgets:
         [
             new DashboardWidgetDefinition(
-                Id: "system-health",
-                Title: "System health",
-                Kind: "health",
-                DataEndpoint: "/api/v1/system/health")
+                Id: "system-overview",
+                Title: "System overview",
+                Kind: "system-overview",
+                DataEndpoint: "/api/v1/system/overview")
         ],
-        Capabilities: ["system.health.read"]);
+        Capabilities: ["system.health.read", "system.overview.read"]);
 }
-

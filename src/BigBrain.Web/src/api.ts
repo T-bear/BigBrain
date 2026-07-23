@@ -1,4 +1,4 @@
-import type { ModuleDefinition, SystemHealth } from './types'
+import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal })
@@ -13,6 +13,8 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
 export const getModules = (signal?: AbortSignal) =>
   getJson<ModuleDefinition[]>('/api/v1/modules', signal)
 
-export const getSystemHealth = (endpoint: string, signal?: AbortSignal) =>
-  getJson<SystemHealth>(endpoint, signal)
+export const getSystemOverview = (signal?: AbortSignal) =>
+  getJson<SystemOverview>('/api/v1/system/overview', signal)
 
+export const getDockerContainers = (signal?: AbortSignal) =>
+  getJson<DockerInventory>('/api/v1/docker/containers', signal)

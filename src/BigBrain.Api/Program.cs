@@ -14,8 +14,10 @@ public partial class Program
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
+        builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
-            new InMemoryModuleRegistry([SystemModule.Definition]));
+            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition]));
 
         var app = builder.Build();
 
@@ -38,7 +40,36 @@ public partial class Program
 
         app.MapGet(
             "/api/v1/modules",
-            (IModuleRegistry registry) => Results.Ok(registry.GetModules()));
+            async (
+                IModuleRegistry registry,
+                ISystemMetricsProvider systemProvider,
+                IDockerInventoryProvider dockerProvider,
+                CancellationToken cancellationToken) =>
+            {
+                var systemOverview = await systemProvider.GetOverviewAsync(cancellationToken);
+                var inventory = await dockerProvider.GetContainersAsync(cancellationToken);
+                var dockerStatus = !inventory.Availability.Available
+                    ? "Unavailable"
+                    : string.IsNullOrWhiteSpace(inventory.Availability.Reason) ? "Available" : "Degraded";
+                var modules = registry.GetModules()
+                    .Select(module => module.Id switch
+                    {
+                        "system" => module with { Status = systemOverview.Status },
+                        "docker" => module with { Status = dockerStatus },
+                        _ => module
+                    });
+                return Results.Ok(modules);
+            });
+
+        app.MapGet(
+            "/api/v1/system/overview",
+            async (ISystemMetricsProvider provider, CancellationToken cancellationToken) =>
+                Results.Ok(await provider.GetOverviewAsync(cancellationToken)));
+
+        app.MapGet(
+            "/api/v1/docker/containers",
+            async (IDockerInventoryProvider provider, CancellationToken cancellationToken) =>
+                Results.Ok(await provider.GetContainersAsync(cancellationToken)));
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

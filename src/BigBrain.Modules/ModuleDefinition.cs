@@ -5,6 +5,7 @@ public sealed record ModuleDefinition(
     string Name,
     string Description,
     string Route,
+    string Status,
     IReadOnlyList<DashboardWidgetDefinition> DashboardWidgets,
     IReadOnlyList<string> Capabilities);
 
@@ -13,4 +14,3 @@ public sealed record DashboardWidgetDefinition(
     string Title,
     string Kind,
     string DataEndpoint);
-

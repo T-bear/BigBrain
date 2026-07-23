@@ -1,43 +1,132 @@
-import { render, screen } from '@testing-library/react'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { act, cleanup, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 
-beforeEach(() => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => [
-          {
-            id: 'system',
-            name: 'System',
-            description: 'Core system health.',
-            route: '/',
-            dashboardWidgets: [
-              {
-                id: 'system-health',
-                title: 'System health',
-                kind: 'health',
-                dataEndpoint: '/api/v1/system/health',
-              },
-            ],
-            capabilities: ['system.health.read'],
-          },
-        ],
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ status: 'Healthy', checkedAtUtc: new Date().toISOString() }),
-      }),
-  )
+const modules = [
+  { id: 'docker', name: 'Docker', description: '', route: '/#docker', status: 'Unavailable', dashboardWidgets: [], capabilities: [] },
+  { id: 'system', name: 'System', description: '', route: '/', status: 'Available', dashboardWidgets: [], capabilities: [] },
+]
+const overview = {
+  hostname: 'bigbrain-host',
+  operatingSystem: 'Linux',
+  architecture: 'X64',
+  uptimeSeconds: 93_780,
+  cpu: { usagePercent: 23.5, logicalProcessorCount: 8 },
+  memory: { totalBytes: 17_179_869_184, usedBytes: 8_589_934_592, availableBytes: 8_589_934_592, usagePercent: 50 },
+  disks: [{ mountPoint: '/', totalBytes: 1000, usedBytes: 400, availableBytes: 600, usagePercent: 40 }],
+  temperatureCelsius: null,
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  status: 'Degraded',
+  warnings: ['Temperature is unavailable.'],
+}
+const dockerUnavailable = {
+  availability: { available: false, reason: 'Docker inventory requires Sentinel integration.' },
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  containers: [],
+}
+const systemUnavailable = {
+  hostname: 'Unavailable',
+  operatingSystem: 'Unavailable',
+  architecture: 'Unavailable',
+  uptimeSeconds: null,
+  cpu: { usagePercent: null, logicalProcessorCount: 0 },
+  memory: { totalBytes: null, usedBytes: null, availableBytes: null, usagePercent: null },
+  disks: [],
+  temperatureCelsius: null,
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  status: 'Unavailable',
+  warnings: ['Host metrics require Sentinel integration.'],
+}
+
+function response(body: unknown) {
+  return { ok: true, json: async () => body }
+}
+
+function successfulFetch() {
+  return vi.fn((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url.endsWith('/api/v1/modules')) return Promise.resolve(response(modules))
+    if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
+    if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
+    return Promise.reject(new Error('Unexpected URL'))
+  })
+}
+
+beforeEach(() => vi.stubGlobal('fetch', successfulFetch()))
+afterEach(() => {
+  cleanup()
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
 })
 
-test('renders registered module navigation and widget', async () => {
+test('renders system values returned by the API', async () => {
   render(<App />)
 
-  expect(await screen.findByRole('link', { name: 'System' })).toBeInTheDocument()
-  expect(await screen.findByRole('heading', { name: 'System health' })).toBeInTheDocument()
-  expect(await screen.findByText('Healthy')).toBeInTheDocument()
+  expect(await screen.findByText('bigbrain-host')).toBeInTheDocument()
+  expect(screen.getByText('23.5%')).toBeInTheDocument()
+  expect(screen.getByText('50.0%')).toBeInTheDocument()
+  expect(screen.getByText('1d 2h')).toBeInTheDocument()
 })
 
+test('shows loading state while requests are pending', () => {
+  vi.stubGlobal('fetch', vi.fn(() => new Promise(() => undefined)))
+  render(<App />)
+
+  expect(screen.getByText('Loading system metrics…')).toBeInTheDocument()
+  expect(screen.getByText('Loading Docker inventory…')).toBeInTheDocument()
+})
+
+test('shows friendly errors when APIs fail', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('Network unavailable'))))
+  render(<App />)
+
+  expect(await screen.findByText('System metrics could not be refreshed.')).toBeInTheDocument()
+  expect(await screen.findByText('Docker inventory could not be loaded.')).toBeInTheDocument()
+})
+
+test('shows Docker unavailable state from provider response', async () => {
+  render(<App />)
+
+  expect(await screen.findByRole('heading', { name: 'Integration not connected' })).toBeInTheDocument()
+  expect(screen.getByText('Docker inventory requires Sentinel integration.')).toBeInTheDocument()
+})
+
+test('shows System unavailable state from provider response', async () => {
+  const fetchMock = successfulFetch()
+  fetchMock.mockImplementation((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url.endsWith('/api/v1/modules')) return Promise.resolve(response(modules))
+    if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(systemUnavailable))
+    if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
+    return Promise.reject(new Error('Unexpected URL'))
+  })
+  vi.stubGlobal('fetch', fetchMock)
+
+  render(<App />)
+
+  expect(await screen.findByRole('heading', { name: 'Host metrics not connected' })).toBeInTheDocument()
+  expect(screen.getByText('Host metrics require Sentinel integration.')).toBeInTheDocument()
+  expect(screen.getAllByText('Unavailable', { selector: '.metric-value' }).length).toBeGreaterThan(0)
+})
+
+test('polls system overview without discarding the latest successful data', async () => {
+  vi.useFakeTimers()
+  const fetchMock = successfulFetch()
+  vi.stubGlobal('fetch', fetchMock)
+  render(<App />)
+
+  await act(async () => { await Promise.resolve(); await Promise.resolve() })
+  expect(screen.getByText('bigbrain-host')).toBeInTheDocument()
+
+  fetchMock.mockImplementation((input: RequestInfo | URL) =>
+    String(input).endsWith('/api/v1/system/overview')
+      ? Promise.reject(new Error('Temporary failure'))
+      : Promise.resolve(response(dockerUnavailable)),
+  )
+  await act(async () => { await vi.advanceTimersByTimeAsync(5_000) })
+
+  const systemCalls = fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/api/v1/system/overview'))
+  expect(systemCalls).toHaveLength(2)
+  expect(screen.getByText(/Showing the latest successful update/)).toBeInTheDocument()
+  expect(screen.getByText('bigbrain-host')).toBeInTheDocument()
+})

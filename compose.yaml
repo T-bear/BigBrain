@@ -8,7 +8,7 @@ services:
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
     ports:
-      - "127.0.0.1:18080:8080"
+      - "18080:8080"
     healthcheck:
       test:
         [
@@ -31,7 +31,7 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "127.0.0.1:13000:8080"
+      - "13000:8080"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/"]
       interval: 10s
