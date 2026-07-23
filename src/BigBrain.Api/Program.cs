@@ -1,4 +1,5 @@
 using BigBrain.Modules;
+using BigBrain.Api.Media;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -14,10 +15,22 @@ public partial class Program
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        builder.Services.AddOptions<MediaOptions>()
+            .BindConfiguration(MediaOptions.SectionName)
+            .Validate(MediaOptions.IsValid, "Media URLs and timeout must be valid.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton(serviceProvider =>
+            serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MediaOptions>>().Value);
+        AddMediaClient<IJellyfinClient, JellyfinClient>(builder.Services, options => options.Jellyfin.BaseUrl);
+        AddMediaClient<ISonarrClient, SonarrClient>(builder.Services, options => options.Sonarr.BaseUrl);
+        AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, options => options.Radarr.BaseUrl);
+        AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, options => options.Prowlarr.BaseUrl);
+        AddMediaClient<IQBittorrentClient, QBittorrentClient>(builder.Services, options => options.QBittorrent.BaseUrl);
+        builder.Services.AddTransient<IMediaService, MediaService>();
         builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
-            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition]));
+            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition]));
 
         var app = builder.Build();
 
@@ -44,6 +57,7 @@ public partial class Program
                 IModuleRegistry registry,
                 ISystemMetricsProvider systemProvider,
                 IDockerInventoryProvider dockerProvider,
+                MediaOptions mediaOptions,
                 CancellationToken cancellationToken) =>
             {
                 var systemOverview = await systemProvider.GetOverviewAsync(cancellationToken);
@@ -56,6 +70,7 @@ public partial class Program
                     {
                         "system" => module with { Status = systemOverview.Status },
                         "docker" => module with { Status = dockerStatus },
+                        "media" => module with { Status = mediaOptions.IsAnyServiceConfigured ? "Available" : "NotConfigured" },
                         _ => module
                     });
                 return Results.Ok(modules);
@@ -71,11 +86,30 @@ public partial class Program
             async (IDockerInventoryProvider provider, CancellationToken cancellationToken) =>
                 Results.Ok(await provider.GetContainersAsync(cancellationToken)));
 
+        app.MapGet(
+            "/api/v1/modules/media",
+            async (IMediaService mediaService, CancellationToken cancellationToken) =>
+                Results.Ok(await mediaService.GetOverviewAsync(cancellationToken)));
+
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             Predicate = _ => true
         });
 
         app.Run();
+    }
+
+    private static void AddMediaClient<TClient, TImplementation>(
+        IServiceCollection services,
+        Func<MediaOptions, string> getBaseUrl)
+        where TClient : class
+        where TImplementation : class, TClient
+    {
+        services.AddHttpClient<TClient, TImplementation>((serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<MediaOptions>();
+            httpClient.BaseAddress = new Uri(getBaseUrl(options).TrimEnd('/') + "/", UriKind.Absolute);
+            httpClient.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+        });
     }
 }

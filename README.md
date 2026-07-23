@@ -14,12 +14,15 @@ Included:
 - `GET /api/v1/docker/containers` with an explicit unavailable result until Sentinel integration exists.
 - `GET /api/v1/modules`.
 - Responsive dashboard with live system values, provider-driven module status, clear unavailable/error states, and non-overlapping system polling approximately every five seconds.
+- Read-only Media dashboard foundation for normalized Jellyfin, Sonarr, Radarr, Prowlarr and qBittorrent status.
 - Docker Compose and container health checks.
 - Backend and frontend tests.
 
 The System and Docker modules are read-only. The Web API does not read host resources, mount the Docker socket, execute shell commands, or control the Docker daemon. Their provider contracts are prepared for a future approved Sentinel integration. Until then, System returns `status: "Unavailable"` with null/empty metrics and Docker returns `available: false` with an empty container list. See [ADR 0001](docs/adr/0001-web-api-must-not-control-docker.md).
 
-Explicitly deferred are Control Plane-to-Sentinel communication, real host metrics, real Docker inventory, every Docker mutation (including start, stop, restart, delete and exec), authentication, database persistence, AI, SignalR, Prometheus, external monitoring, media integrations, home automation and plugin loading.
+Explicitly deferred are Control Plane-to-Sentinel communication, real host metrics, real Docker inventory, every Docker mutation (including start, stop, restart, delete and exec), every media mutation, authentication, database persistence, AI, SignalR, Prometheus, external monitoring, home automation and plugin loading.
+
+Media Sprint 1 uses only documented application HTTP APIs and exposes `GET /api/v1/modules/media`. Credentials remain runtime configuration and all media mutations are deferred. See [Media Module documentation](docs/modules/media.md).
 
 ## Repository layout
 
@@ -47,6 +50,7 @@ curl http://localhost:18080/api/v1/system/health
 curl http://localhost:18080/api/v1/system/overview
 curl http://localhost:18080/api/v1/docker/containers
 curl http://localhost:18080/api/v1/modules
+curl http://localhost:18080/api/v1/modules/media
 ```
 
 Stop the BigBrain stack with:

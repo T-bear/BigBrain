@@ -50,3 +50,63 @@ export interface DockerInventory {
   collectedAtUtc: string
   containers: DockerContainer[]
 }
+
+export interface MediaServiceStatus {
+  serviceName: string
+  status: 'online' | 'degraded' | 'unavailable' | 'notConfigured'
+  version: string | null
+  responseTimeMs: number | null
+  checkedAtUtc: string
+  sanitizedMessage: string | null
+  isConfigured: boolean
+}
+
+export interface MediaQueueItem {
+  title: string
+  status: string
+  progressPercent: number | null
+}
+
+export interface MediaOverview {
+  status: MediaServiceStatus['status']
+  collectedAtUtc: string
+  services: MediaServiceStatus[]
+  qBittorrent: {
+    service: MediaServiceStatus
+    activeCount: number
+    pausedCount: number
+    completedCount: number
+    downloadSpeedBytesPerSecond: number
+    uploadSpeedBytesPerSecond: number
+    torrents: Array<{
+      name: string
+      progressPercent: number
+      state: string
+      category: string | null
+      etaSeconds: number | null
+    }>
+  }
+  sonarr: {
+    service: MediaServiceStatus
+    queueCount: number
+    queue: MediaQueueItem[]
+    healthWarnings: Array<{ source: string; message: string }>
+  }
+  radarr: {
+    service: MediaServiceStatus
+    queueCount: number
+    queue: MediaQueueItem[]
+    healthWarnings: Array<{ source: string; message: string }>
+  }
+  prowlarr: {
+    service: MediaServiceStatus
+    healthWarnings: Array<{ source: string; message: string }>
+  }
+  jellyfin: {
+    service: MediaServiceStatus
+    libraryCount: number
+    movieCount: number
+    seriesCount: number
+    activeSessionCount: number
+  }
+}

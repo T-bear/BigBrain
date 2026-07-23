@@ -7,9 +7,9 @@ public sealed class ModuleRegistryTests
     [Fact]
     public void SprintTwoRegistryContainsSystemAndDocker()
     {
-        var registry = new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition]);
+        var registry = new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition]);
 
-        Assert.Equal(["docker", "system"], registry.GetModules().Select(module => module.Id));
+        Assert.Equal(["docker", "media", "system"], registry.GetModules().Select(module => module.Id));
     }
 
     [Fact]

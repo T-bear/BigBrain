@@ -86,8 +86,9 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = Assert.IsType<ModuleResponse[]>(modules);
-        Assert.Equal(["docker", "system"], result.Select(module => module.Id));
+        Assert.Equal(["docker", "media", "system"], result.Select(module => module.Id));
         Assert.Equal("Unavailable", Assert.Single(result, module => module.Id == "docker").Status);
+        Assert.Equal("NotConfigured", Assert.Single(result, module => module.Id == "media").Status);
         var system = Assert.Single(result, module => module.Id == "system");
         Assert.Equal("Unavailable", system.Status);
         Assert.Contains(system.DashboardWidgets, widget => widget.Id == "system-overview");
@@ -104,6 +105,36 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         var response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MediaOverviewReturnsNotConfiguredWithoutCredentials()
+    {
+        var response = await _client.GetAsync("/api/v1/modules/media", TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadFromJsonAsync<MediaOverviewResponse>(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var overview = Assert.IsType<MediaOverviewResponse>(body);
+        Assert.Equal("notConfigured", overview.Status);
+        Assert.Equal(5, overview.Services.Count);
+        Assert.All(overview.Services, service =>
+        {
+            Assert.Equal("notConfigured", service.Status);
+            Assert.False(service.IsConfigured);
+        });
+    }
+
+    [Theory]
+    [InlineData("POST")]
+    [InlineData("PUT")]
+    [InlineData("PATCH")]
+    [InlineData("DELETE")]
+    public async Task MediaHasNoMutatingEndpoints(string method)
+    {
+        using var request = new HttpRequestMessage(new HttpMethod(method), "/api/v1/modules/media");
+        var response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.MethodNotAllowed, response.StatusCode);
     }
 
     [Fact]
@@ -133,4 +164,6 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         IReadOnlyList<string> Warnings);
     private sealed record AvailabilityResponse(bool Available, string Reason);
     private sealed record DockerInventoryResponse(AvailabilityResponse Availability, IReadOnlyList<object> Containers);
+    private sealed record MediaServiceResponse(string Status, bool IsConfigured);
+    private sealed record MediaOverviewResponse(string Status, IReadOnlyList<MediaServiceResponse> Services);
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getDockerContainers, getModules, getSystemOverview } from './api'
 import { DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadge } from './components'
+import { MediaDashboard } from './MediaDashboard'
 import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
 
 const POLL_INTERVAL_MS = 5_000
@@ -163,6 +164,8 @@ export default function App() {
             </>
           )}
         </section>
+
+        <MediaDashboard />
       </main>
     </div>
   )

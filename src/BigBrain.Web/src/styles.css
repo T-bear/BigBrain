@@ -43,12 +43,20 @@ progress::-moz-progress-bar { background: #7c6cff; }
 .status-badge--compact { padding: 3px 7px; font-size: .65rem; }
 .notice { padding: 14px 16px; border-radius: 10px; background: #172238; }
 .notice--error { border: 1px solid #783b44; color: #ffbdc4; }
-.docker-section { margin-top: 54px; }
+.docker-section, .media-section { margin-top: 54px; }
 .module-card { max-width: 720px; }
 .module-card p { margin: 18px 0 0; color: #b7c2d4; line-height: 1.6; }
 .container-list { display: grid; gap: 12px; padding: 0; list-style: none; }
 .container-list li { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .container-list span { color: #aebad0; }
+.section-actions { display: flex; align-items: center; gap: 12px; }
+.secondary-button { padding: 9px 13px; border: 1px solid #3b4d69; border-radius: 9px; background: #121d31; color: #e7edf7; cursor: pointer; }
+.secondary-button:disabled { opacity: .6; cursor: wait; }
+.service-grid, .media-summary { display: grid; gap: 14px; margin-top: 14px; }
+.media-list ul { display: grid; gap: 12px; padding: 0; list-style: none; }
+.media-list li { display: grid; gap: 6px; }
+.status-badge--online { border-color: #28734d; color: #8ce4b4; }
+.status-badge--notconfigured { color: #abb7ca; }
 
 @media (min-width: 650px) {
   .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -61,4 +69,6 @@ progress::-moz-progress-bar { background: #7c6cff; }
   .brand { margin-bottom: 44px; }
   .main { max-width: 1260px; padding: 48px clamp(32px, 5vw, 72px); }
   .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .service-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .media-summary { grid-template-columns: 2fr 1fr 1fr; }
 }

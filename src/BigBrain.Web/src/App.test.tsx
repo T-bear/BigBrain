@@ -4,6 +4,7 @@ import App from './App'
 
 const modules = [
   { id: 'docker', name: 'Docker', description: '', route: '/#docker', status: 'Unavailable', dashboardWidgets: [], capabilities: [] },
+  { id: 'media', name: 'Media', description: '', route: '/#media', status: 'NotConfigured', dashboardWidgets: [], capabilities: [] },
   { id: 'system', name: 'System', description: '', route: '/', status: 'Available', dashboardWidgets: [], capabilities: [] },
 ]
 const overview = {
@@ -37,6 +38,24 @@ const systemUnavailable = {
   status: 'Unavailable',
   warnings: ['Host metrics require Sentinel integration.'],
 }
+const mediaNotConfigured = {
+  status: 'notConfigured',
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  services: ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent'].map((serviceName) => ({
+    serviceName,
+    status: 'notConfigured',
+    version: null,
+    responseTimeMs: null,
+    checkedAtUtc: '2026-07-23T10:00:00Z',
+    sanitizedMessage: 'Service credentials are not configured.',
+    isConfigured: false,
+  })),
+  qBittorrent: { activeCount: 0, pausedCount: 0, completedCount: 0, downloadSpeedBytesPerSecond: 0, uploadSpeedBytesPerSecond: 0, torrents: [] },
+  sonarr: { queueCount: 0, queue: [], healthWarnings: [] },
+  radarr: { queueCount: 0, queue: [], healthWarnings: [] },
+  prowlarr: { healthWarnings: [] },
+  jellyfin: { libraryCount: 0, movieCount: 0, seriesCount: 0, activeSessionCount: 0 },
+}
 
 function response(body: unknown) {
   return { ok: true, json: async () => body }
@@ -48,6 +67,7 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/modules')) return Promise.resolve(response(modules))
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
+    if (url.endsWith('/api/v1/modules/media')) return Promise.resolve(response(mediaNotConfigured))
     return Promise.reject(new Error('Unexpected URL'))
   })
 }
@@ -98,6 +118,7 @@ test('shows System unavailable state from provider response', async () => {
     if (url.endsWith('/api/v1/modules')) return Promise.resolve(response(modules))
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(systemUnavailable))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
+    if (url.endsWith('/api/v1/modules/media')) return Promise.resolve(response(mediaNotConfigured))
     return Promise.reject(new Error('Unexpected URL'))
   })
   vi.stubGlobal('fetch', fetchMock)
