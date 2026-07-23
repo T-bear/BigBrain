@@ -178,6 +178,22 @@ public sealed class MediaClientTests
     }
 
     [Fact]
+    public async Task AggregatorReturnsUnavailableWhenEveryServiceIsOffline()
+    {
+        var service = new MediaService(
+            new StubJellyfin(Unavailable("Jellyfin")),
+            new StubSonarr(Unavailable("Sonarr")),
+            new StubRadarr(Unavailable("Radarr")),
+            new StubProwlarr(Unavailable("Prowlarr")),
+            new StubQBittorrent(Unavailable("qBittorrent")));
+
+        var result = await service.GetOverviewAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(MediaStatuses.Unavailable, result.Status);
+        Assert.All(result.Services, status => Assert.Equal(MediaStatuses.Unavailable, status.Status));
+    }
+
+    [Fact]
     public async Task MissingCredentialsReturnNotConfiguredWithoutRequests()
     {
         var requestCount = 0;

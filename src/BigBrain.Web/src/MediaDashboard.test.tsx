@@ -83,6 +83,16 @@ test('shows not configured services', async () => {
   expect(await screen.findAllByText('Service is notConfigured.')).toHaveLength(5)
 })
 
+test('keeps the dashboard usable when every service is offline', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview('unavailable')))))
+  render(<MediaDashboard />)
+
+  expect(await screen.findAllByText('Service is unavailable.')).toHaveLength(5)
+  expect(screen.getByRole('heading', { name: 'Active downloads' })).toBeInTheDocument()
+  expect(screen.getAllByText('Queue is empty.')).toHaveLength(2)
+  expect(screen.getByRole('button', { name: 'Refresh' })).toBeEnabled()
+})
+
 test('shows total API failure', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('network failure'))))
   render(<MediaDashboard />)
