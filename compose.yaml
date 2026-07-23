@@ -7,6 +7,21 @@ services:
       dockerfile: src/BigBrain.Api/Dockerfile
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
+      Media__TimeoutSeconds: ${MEDIA__TIMEOUTSECONDS:-3}
+      Media__Jellyfin__BaseUrl: ${MEDIA__JELLYFIN__BASEURL:-http://jellyfin:8096}
+      Media__Jellyfin__ApiKey: ${MEDIA__JELLYFIN__APIKEY:-}
+      Media__Sonarr__BaseUrl: ${MEDIA__SONARR__BASEURL:-http://sonarr:8989}
+      Media__Sonarr__ApiKey: ${MEDIA__SONARR__APIKEY:-}
+      Media__Radarr__BaseUrl: ${MEDIA__RADARR__BASEURL:-http://radarr:7878}
+      Media__Radarr__ApiKey: ${MEDIA__RADARR__APIKEY:-}
+      Media__Prowlarr__BaseUrl: ${MEDIA__PROWLARR__BASEURL:-http://prowlarr:9696}
+      Media__Prowlarr__ApiKey: ${MEDIA__PROWLARR__APIKEY:-}
+      Media__QBittorrent__BaseUrl: ${MEDIA__QBITTORRENT__BASEURL:-http://qbittorrent:8080}
+      Media__QBittorrent__Username: ${MEDIA__QBITTORRENT__USERNAME:-}
+      Media__QBittorrent__Password: ${MEDIA__QBITTORRENT__PASSWORD:-}
+    networks:
+      - default
+      - media
     ports:
       - "18080:8080"
     healthcheck:
@@ -39,3 +54,8 @@ services:
       retries: 5
       start_period: 5s
     restart: unless-stopped
+
+networks:
+  media:
+    name: ${MEDIA_DOCKER_NETWORK:-bigbrain_default}
+    external: true

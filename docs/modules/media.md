@@ -29,7 +29,7 @@ The module does not mount the Docker socket or media directories, execute comman
 
 URLs must be absolute HTTP or HTTPS URLs without query strings or fragments. Timeout must be between 1 and 15 seconds. Credentials are optional so an unconfigured service becomes `notConfigured`; real values must be supplied through runtime secret injection and must never be committed.
 
-BigBrain API must share an internal application network with a service for its Docker DNS name to resolve. This sprint does not guess or modify the externally managed media stack's network. Operators should attach BigBrain API using a deployment-specific Compose override after confirming the existing network name.
+BigBrain API shares the existing external `bigbrain_default` application network so the verified service names resolve. The network name can be overridden with `MEDIA_DOCKER_NETWORK`. Compose does not own or manage the media services or their network. See [`TESTING.md`](../../TESTING.md) for setup and verification.
 
 ## Public API
 
