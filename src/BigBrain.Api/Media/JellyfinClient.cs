@@ -16,15 +16,29 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         try
         {
             using var status = await GetJellyfinJsonAsync("System/Info", options.Jellyfin.ApiKey, cancellationToken);
-            using var libraries = await GetJellyfinJsonAsync("Library/VirtualFolders", options.Jellyfin.ApiKey, cancellationToken);
-            using var counts = await GetJellyfinJsonAsync("Items/Counts", options.Jellyfin.ApiKey, cancellationToken);
-            using var sessions = await GetJellyfinJsonAsync("Sessions", options.Jellyfin.ApiKey, cancellationToken);
-            using var recent = await GetJellyfinJsonAsync(
+            var version = GetString(status.RootElement, "Version");
+            var librariesResult = await TryGetSupplementalJsonAsync(
+                "Library/VirtualFolders",
+                options.Jellyfin.ApiKey,
+                cancellationToken);
+            using var libraries = librariesResult.Document;
+            var countsResult = await TryGetSupplementalJsonAsync(
+                "Items/Counts",
+                options.Jellyfin.ApiKey,
+                cancellationToken);
+            using var counts = countsResult.Document;
+            var sessionsResult = await TryGetSupplementalJsonAsync(
+                "Sessions",
+                options.Jellyfin.ApiKey,
+                cancellationToken);
+            using var sessions = sessionsResult.Document;
+            var recentResult = await TryGetSupplementalJsonAsync(
                 "Items/Latest?Limit=8&Fields=DateCreated&IncludeItemTypes=Movie,Series,Episode",
                 options.Jellyfin.ApiKey,
                 cancellationToken);
+            using var recent = recentResult.Document;
 
-            var sessionItems = sessions.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
+            var sessionItems = sessions?.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
                 ? sessions.RootElement.EnumerateArray().ToArray()
                 : [];
             var activeStreams = sessionItems.Count(item =>
@@ -36,18 +50,32 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
                 .Where(userId => userId is not null)
                 .Distinct(StringComparer.Ordinal)
                 .Count();
-            var recentlyAdded = recent.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
+            var recentlyAdded = recent?.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
                 ? recent.RootElement.EnumerateArray().Take(8).Select(item => new RecentlyAddedMedia(
                     GetString(item, "Name") ?? "Untitled",
                     GetString(item, "Type") ?? "Unknown",
                     DateTimeOffset.TryParse(GetString(item, "DateCreated"), out var date) ? date : null)).ToArray()
                 : [];
+            var supplementalDataComplete = librariesResult.Succeeded
+                && countsResult.Succeeded
+                && sessionsResult.Succeeded
+                && recentResult.Succeeded;
+            var serviceStatus = supplementalDataComplete
+                ? Online(version, timer)
+                : new MediaServiceStatus(
+                    ServiceName,
+                    MediaStatuses.Degraded,
+                    version,
+                    timer.ElapsedMilliseconds,
+                    DateTimeOffset.UtcNow,
+                    "Some Jellyfin dashboard data could not be loaded.",
+                    true);
             return new JellyfinOverview(
-                Online(GetString(status.RootElement, "Version"), timer),
-                ArrayLength(libraries.RootElement),
-                GetInt32(counts.RootElement, "MovieCount"),
-                GetInt32(counts.RootElement, "SeriesCount"),
-                GetInt32(counts.RootElement, "EpisodeCount"),
+                serviceStatus,
+                libraries is null ? 0 : ArrayLength(libraries.RootElement),
+                counts is null ? 0 : GetInt32(counts.RootElement, "MovieCount"),
+                counts is null ? 0 : GetInt32(counts.RootElement, "SeriesCount"),
+                counts is null ? 0 : GetInt32(counts.RootElement, "EpisodeCount"),
                 activeUsers,
                 activeStreams,
                 recentlyAdded);
@@ -55,6 +83,23 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return Empty(Failure(exception, timer));
+        }
+    }
+
+    private async Task<(System.Text.Json.JsonDocument? Document, bool Succeeded)> TryGetSupplementalJsonAsync(
+        string path,
+        string apiKey,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return (await GetJellyfinJsonAsync(path, apiKey, cancellationToken), true);
+        }
+        catch (Exception exception) when (
+            exception is not OperationCanceledException
+            || !cancellationToken.IsCancellationRequested)
+        {
+            return (null, false);
         }
     }
 

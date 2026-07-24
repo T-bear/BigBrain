@@ -35,6 +35,59 @@ public sealed class MediaClientTests
     }
 
     [Fact]
+    public async Task JellyfinRemainsOnlineWhenEveryDashboardReadSucceeds()
+    {
+        var requestedPaths = new List<string>();
+        var client = new JellyfinClient(CreateClient(request =>
+        {
+            requestedPaths.Add(request.RequestUri!.AbsolutePath);
+            return Json(request.RequestUri.AbsolutePath switch
+            {
+                "/System/Info" => """{"Version":"10.10.7"}""",
+                "/Library/VirtualFolders" => """[]""",
+                "/Items/Counts" => """{"MovieCount":1,"SeriesCount":2,"EpisodeCount":3}""",
+                "/Sessions" => """[]""",
+                "/Items/Latest" => """[]""",
+                _ => throw new InvalidOperationException()
+            });
+        }), Options());
+
+        var result = await client.GetOverviewAsync(TestContext.Current.CancellationToken);
+        var serialized = JsonSerializer.Serialize(result);
+
+        Assert.Equal(MediaStatuses.Online, result.Service.Status);
+        Assert.Equal("10.10.7", result.Service.Version);
+        Assert.Null(result.Service.SanitizedMessage);
+        Assert.Equal(
+            ["/System/Info", "/Library/VirtualFolders", "/Items/Counts", "/Sessions", "/Items/Latest"],
+            requestedPaths);
+        Assert.Contains("\"Status\":\"online\"", serialized, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task JellyfinSupplementalReadFailureIsDegradedInsteadOfUnavailable()
+    {
+        var client = new JellyfinClient(CreateClient(request =>
+            request.RequestUri!.AbsolutePath switch
+            {
+                "/System/Info" => Json("""{"Version":"10.10.7"}"""),
+                "/Library/VirtualFolders" => Json("""[{"Name":"Movies"}]"""),
+                "/Items/Counts" => throw new HttpRequestException("response body ended unexpectedly"),
+                "/Sessions" => Json("""[]"""),
+                "/Items/Latest" => Json("""[]"""),
+                _ => throw new InvalidOperationException()
+            }), Options());
+
+        var result = await client.GetOverviewAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(MediaStatuses.Degraded, result.Service.Status);
+        Assert.Equal("10.10.7", result.Service.Version);
+        Assert.Equal("Some Jellyfin dashboard data could not be loaded.", result.Service.SanitizedMessage);
+        Assert.Equal(1, result.LibraryCount);
+        Assert.Equal(0, result.MovieCount);
+    }
+
+    [Fact]
     public async Task SonarrMapsSuccessfulReadOnlyResponses()
     {
         var client = new SonarrClient(CreateClient(request => Json(ArrResponse(request.RequestUri!, true))), Options());
@@ -195,6 +248,27 @@ public sealed class MediaClientTests
         Assert.Equal("critical", result.Insights[0].Severity);
         Assert.Equal("Services unavailable", result.Insights[0].Title);
         Assert.DoesNotContain(result.Insights, insight => insight.Title == "All services healthy");
+    }
+
+    [Fact]
+    public async Task AggregatorPreservesSuccessfulJellyfinStatusThroughDashboardContract()
+    {
+        var service = new MediaService(
+            new StubJellyfin(Online("Jellyfin")),
+            new StubSonarr(Online("Sonarr")),
+            new StubRadarr(Online("Radarr")),
+            new StubProwlarr(Online("Prowlarr")),
+            new StubQBittorrent(Online("qBittorrent")),
+            new MediaHealthEngine());
+
+        var result = await service.GetOverviewAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(MediaStatuses.Online, result.Jellyfin.Service.Status);
+        Assert.Equal(MediaStatuses.Online, result.Status);
+        Assert.Equal(100, result.HealthScore);
+        Assert.Equal("excellent", result.HealthStatusLevel);
+        Assert.Contains(result.Insights, insight => insight.Title == "All services healthy");
+        Assert.DoesNotContain(result.Insights, insight => insight.Title == "Services unavailable");
     }
 
     [Fact]

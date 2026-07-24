@@ -69,6 +69,10 @@ test('shows loading and then online activity without write controls', async () =
   resolveRequest?.(response(overview()))
 
   expect(await screen.findByText('All services healthy')).toBeInTheDocument()
+  const jellyfinCard = screen.getByRole('heading', { name: 'Jellyfin' }).closest('article')
+  expect(jellyfinCard).not.toBeNull()
+  expect(within(jellyfinCard as HTMLElement).getByText('online')).toBeInTheDocument()
+  expect(within(jellyfinCard as HTMLElement).queryByText('unavailable')).not.toBeInTheDocument()
   expect(screen.getByText('New movie')).toBeInTheDocument()
   expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
