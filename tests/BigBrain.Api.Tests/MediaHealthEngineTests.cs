@@ -5,9 +5,9 @@ namespace BigBrain.Api.Tests;
 public sealed class MediaHealthEngineTests
 {
     [Theory]
-    [InlineData(MediaStatuses.Online, 100, "Everything looks great", "healthy")]
-    [InlineData(MediaStatuses.Degraded, 50, "Action recommended", "critical")]
-    [InlineData(MediaStatuses.Unavailable, 0, "Action recommended", "critical")]
+    [InlineData(MediaStatuses.Online, 100, "Everything looks great", "excellent")]
+    [InlineData(MediaStatuses.Degraded, 50, "Some services need attention", "actionRecommended")]
+    [InlineData(MediaStatuses.Unavailable, 0, "Immediate attention is recommended", "critical")]
     public void AssessmentMapsServiceStateToScoreAndPresentation(
         string status,
         int expectedScore,
@@ -38,8 +38,23 @@ public sealed class MediaHealthEngineTests
             QBittorrent(active: 1, speed: 0, freeSpace: 1024));
 
         Assert.Equal(58, assessment.Score);
-        Assert.Equal("Action recommended", assessment.Summary);
-        Assert.Equal("critical", assessment.StatusLevel);
+        Assert.Equal("Some services need attention", assessment.Summary);
+        Assert.Equal("actionRecommended", assessment.StatusLevel);
+    }
+
+    [Fact]
+    public void AssessmentReturnsNeutralStateWhenNothingIsConfigured()
+    {
+        var assessment = new MediaHealthEngine().Assess(
+            [Service(MediaStatuses.NotConfigured) with { IsConfigured = false }],
+            Sonarr(),
+            Radarr(),
+            Prowlarr(),
+            QBittorrent());
+
+        Assert.Equal(0, assessment.Score);
+        Assert.Equal("Configure media services to calculate health.", assessment.Summary);
+        Assert.Equal("notConfigured", assessment.StatusLevel);
     }
 
     private static MediaServiceStatus Service(string status) =>

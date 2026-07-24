@@ -192,6 +192,9 @@ public sealed class MediaClientTests
         Assert.InRange(result.HealthScore, 0, 99);
         Assert.Equal(MediaStatuses.Online, result.Jellyfin.Service.Status);
         Assert.Equal(MediaStatuses.Unavailable, result.Sonarr.Service.Status);
+        Assert.Equal("critical", result.Insights[0].Severity);
+        Assert.Equal("Services unavailable", result.Insights[0].Title);
+        Assert.DoesNotContain(result.Insights, insight => insight.Title == "All services healthy");
     }
 
     [Fact]
@@ -209,6 +212,7 @@ public sealed class MediaClientTests
 
         Assert.Equal(MediaStatuses.Unavailable, result.Status);
         Assert.Equal(0, result.HealthScore);
+        Assert.Equal("Services unavailable", result.Insights[0].Title);
         Assert.All(result.Services, status => Assert.Equal(MediaStatuses.Unavailable, status.Status));
     }
 

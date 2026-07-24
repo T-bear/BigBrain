@@ -50,8 +50,8 @@ const mediaServices = ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent'
 const mediaNotConfigured = {
   status: 'notConfigured',
   healthScore: 0,
-  healthSummary: 'Action recommended',
-  healthStatusLevel: 'critical',
+  healthSummary: 'Configure media services to calculate health.',
+  healthStatusLevel: 'notConfigured',
   insights: [],
   collectedAtUtc: '2026-07-23T10:00:00Z',
   services: mediaServices,

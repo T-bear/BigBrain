@@ -117,8 +117,8 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         var overview = Assert.IsType<MediaOverviewResponse>(body);
         Assert.Equal("notConfigured", overview.Status);
         Assert.Equal(0, overview.HealthScore);
-        Assert.Equal("Action recommended", overview.HealthSummary);
-        Assert.Equal("critical", overview.HealthStatusLevel);
+        Assert.Equal("Configure media services to calculate health.", overview.HealthSummary);
+        Assert.Equal("notConfigured", overview.HealthStatusLevel);
         Assert.Empty(overview.Insights);
         Assert.Equal(5, overview.Services.Count);
         Assert.All(overview.Services, service =>

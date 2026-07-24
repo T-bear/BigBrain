@@ -1,6 +1,7 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import { MediaDashboard } from './MediaDashboard'
+import type { MediaOverview, MediaServiceStatus } from './types'
 
 const checkedAtUtc = '2026-07-23T10:00:00Z'
 
@@ -13,18 +14,20 @@ function service(serviceName: string, status = 'online') {
     checkedAtUtc,
     sanitizedMessage: status === 'online' ? null : `Service is ${status}.`,
     isConfigured: status !== 'notConfigured',
-  }
+  } as MediaServiceStatus
 }
 
-function overview(status = 'online', serviceStatuses: Record<string, string> = {}) {
+function overview(status = 'online', serviceStatuses: Record<string, string> = {}): MediaOverview {
   const services = ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent']
     .map((name) => service(name, serviceStatuses[name] ?? status))
   return {
     status,
     healthScore: status === 'online' ? 100 : 40,
-    healthSummary: status === 'online' ? 'Everything looks great' : 'Action recommended',
-    healthStatusLevel: status === 'online' ? 'healthy' : 'critical',
-    insights: [{ severity: 'success', title: 'All services healthy', message: 'Everything is responding.' }],
+    healthSummary: status === 'online' ? 'Everything looks great' : status === 'notConfigured' ? 'Configure media services to calculate health.' : 'Immediate attention is recommended',
+    healthStatusLevel: status === 'online' ? 'excellent' : status === 'notConfigured' ? 'notConfigured' : 'critical',
+    insights: status === 'notConfigured' ? [] : status === 'online'
+      ? [{ severity: 'success', title: 'All services healthy', message: 'Everything is responding.' }]
+      : [{ severity: 'critical', title: 'Services unavailable', message: 'One service cannot be reached.' }],
     collectedAtUtc: checkedAtUtc,
     services,
     qBittorrent: {
@@ -45,7 +48,7 @@ function overview(status = 'online', serviceStatuses: Record<string, string> = {
     radarr: { service: services[2], movieCount: 50, monitoredMovieCount: 45, missingMovieCount: 2, qualityUpgradeCount: 4, queueCount: 0, queue: [], recentHistory: [], healthWarnings: [] },
     prowlarr: { service: services[3], indexerCount: 5, enabledIndexerCount: 4, onlineIndexerCount: 4, rssEnabledIndexerCount: 3, indexerStatuses: [], recentFailures: [], healthWarnings: [] },
     jellyfin: { service: services[0], libraryCount: 2, movieCount: 10, seriesCount: 5, episodeCount: 80, activeUserCount: 1, activeStreamCount: 1, recentlyAdded: [{ name: 'New movie', mediaType: 'Movie', dateCreatedUtc: checkedAtUtc }] },
-  }
+  } as MediaOverview
 }
 
 function response(body: unknown) {
@@ -67,7 +70,8 @@ test('shows loading and then online activity without write controls', async () =
 
   expect(await screen.findByText('All services healthy')).toBeInTheDocument()
   expect(screen.getByText('New movie')).toBeInTheDocument()
-  expect(screen.getAllByText('Queue is clear.')).toHaveLength(2)
+  expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
+  expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /pause|resume|delete|add|search/i })).not.toBeInTheDocument()
 })
 
@@ -79,10 +83,11 @@ test('shows partial success with degraded and unavailable services', async () =>
   })))))
   render(<MediaDashboard />)
 
-  expect(await screen.findByText('Action recommended')).toBeInTheDocument()
+  expect(await screen.findByText('Critical')).toBeInTheDocument()
+  expect(screen.getByText('Services unavailable')).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Jellyfin' })).toBeInTheDocument()
-  expect(screen.getByText('Service is unavailable.')).toBeInTheDocument()
-  expect(screen.getAllByText('Service is degraded.').length).toBeGreaterThan(0)
+  expect(screen.getByTitle('Service is unavailable.')).toBeInTheDocument()
+  expect(screen.getAllByTitle('Service is degraded.').length).toBeGreaterThan(0)
 })
 
 test('shows not configured services', async () => {
@@ -90,15 +95,20 @@ test('shows not configured services', async () => {
   render(<MediaDashboard />)
 
   expect(await screen.findAllByText('Service is notConfigured.')).toHaveLength(5)
+  expect(screen.getByRole('heading', { name: 'Not configured' })).toBeInTheDocument()
+  expect(screen.getByText('No score')).toBeInTheDocument()
+  expect(screen.queryByText('Critical')).not.toBeInTheDocument()
+  expect(screen.queryByText('All services healthy')).not.toBeInTheDocument()
 })
 
 test('keeps the dashboard usable when every service is offline', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview('unavailable')))))
   render(<MediaDashboard />)
 
-  expect(await screen.findAllByText('Service is unavailable.')).toHaveLength(5)
+  expect(await screen.findAllByTitle('Service is unavailable.')).toHaveLength(5)
   expect(screen.getByRole('heading', { name: 'qBittorrent' })).toBeInTheDocument()
-  expect(screen.getAllByText('Queue is clear.')).toHaveLength(2)
+  expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
+  expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Refresh' })).toBeEnabled()
 })
 
@@ -107,4 +117,59 @@ test('shows total API failure', async () => {
   render(<MediaDashboard />)
 
   expect(await screen.findByRole('alert')).toHaveTextContent('Media dashboard could not be loaded.')
+})
+
+test('limits long lists and supports accessible show all and collapse controls', async () => {
+  const data = overview()
+  data.sonarr.queueCount = 5
+  data.sonarr.queue = Array.from({ length: 5 }, (_, index) => ({
+    title: `Very long release name ${index} ${'x'.repeat(100)}`,
+    status: 'downloading',
+    progressPercent: index * 10,
+  }))
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(data))))
+  render(<MediaDashboard />)
+
+  const queue = await screen.findByRole('heading', { name: 'Sonarr queue' })
+  const card = queue.closest('article')
+  expect(card).not.toBeNull()
+  expect(within(card!).getAllByRole('listitem')).toHaveLength(3)
+  const showAll = within(card!).getByRole('button', { name: 'Show all 5 Sonarr queue items' })
+  expect(showAll).toHaveAttribute('aria-expanded', 'false')
+
+  fireEvent.click(showAll)
+  expect(within(card!).getAllByRole('listitem')).toHaveLength(5)
+  const collapse = within(card!).getByRole('button', { name: 'Show fewer Sonarr queue items' })
+  expect(collapse).toHaveAttribute('aria-expanded', 'true')
+  fireEvent.click(collapse)
+  expect(within(card!).getAllByRole('listitem')).toHaveLength(3)
+  expect(within(card!).getAllByTitle(/Very long release name/)[0].closest('.item-copy')).not.toBeNull()
+})
+
+test('separates active, paused and completed torrents', async () => {
+  const data = overview()
+  data.qBittorrent.torrents = [
+    { name: 'Downloading item', progressPercent: 20, state: 'downloading', category: null, etaSeconds: 60 },
+    { name: 'Stopped item', progressPercent: 50, state: 'stoppedDL', category: null, etaSeconds: null },
+    { name: 'Completed item', progressPercent: 100, state: 'stoppedUP', category: null, etaSeconds: null },
+  ]
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(data))))
+  render(<MediaDashboard />)
+
+  const activeHeading = await screen.findByRole('heading', { name: /Active/ })
+  const activeGroup = activeHeading.closest('.detail-group')
+  expect(activeGroup).not.toBeNull()
+  expect(within(activeGroup as HTMLElement).getByText('Downloading item')).toBeInTheDocument()
+  expect(within(activeGroup as HTMLElement).queryByText('Completed item')).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /Paused \/ stopped/ })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /Completed/ })).toBeInTheDocument()
+})
+
+test('renders registered production sections in information hierarchy order', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  const { container } = render(<MediaDashboard />)
+  await screen.findByText('Everything looks great')
+
+  expect([...container.querySelectorAll('[data-dashboard-section]')].map(element => element.getAttribute('data-dashboard-section')))
+    .toEqual(['hero', 'insights', 'widgets', 'activity', 'details'])
 })

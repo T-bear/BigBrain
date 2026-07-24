@@ -58,8 +58,17 @@ public sealed class MediaService(
     {
         var insights = new List<MediaInsight>();
         var configuredServices = services.Where(service => service.IsConfigured).ToArray();
-        if (configuredServices.Length > 0 && configuredServices.All(service => service.Status == MediaStatuses.Online))
-            insights.Add(new("success", "All services healthy", "Every configured media service is responding."));
+        if (configuredServices.Length == 0)
+        {
+            return [];
+        }
+
+        var unavailableCount = configuredServices.Count(service => service.Status == MediaStatuses.Unavailable);
+        var degradedCount = configuredServices.Count(service => service.Status == MediaStatuses.Degraded);
+        if (unavailableCount > 0)
+            insights.Add(new("critical", "Services unavailable", $"{unavailableCount} configured media service(s) cannot be reached."));
+        if (degradedCount > 0)
+            insights.Add(new("warning", "Services degraded", $"{degradedCount} configured media service(s) report a degraded state."));
         if (qBittorrent.ActiveCount > 0 && qBittorrent.DownloadSpeedBytesPerSecond == 0)
             insights.Add(new("warning", "Downloads stalled", "Active torrents are reporting no download traffic."));
         if (prowlarr.EnabledIndexerCount > prowlarr.OnlineIndexerCount)
@@ -70,8 +79,22 @@ public sealed class MediaService(
             insights.Add(new("warning", "Disk space low", "qBittorrent reports less than 10 GiB free."));
         if (sonarr.HealthWarnings.Count + radarr.HealthWarnings.Count + prowlarr.HealthWarnings.Count > 0)
             insights.Add(new("warning", "Service health warnings", "One or more media services require attention."));
-        return [.. insights];
+
+        var hasProblems = insights.Any(insight => insight.Severity is "critical" or "warning");
+        if (!hasProblems && configuredServices.All(service => service.Status == MediaStatuses.Online))
+            insights.Add(new("success", "All services healthy", "Every configured media service is responding normally."));
+
+        return [.. insights.OrderBy(insight => SeverityOrder(insight.Severity))];
     }
+
+    private static int SeverityOrder(string severity) => severity switch
+    {
+        "critical" => 0,
+        "warning" => 1,
+        "information" => 2,
+        "success" => 3,
+        _ => 4
+    };
 
     private static string AggregateStatus(IEnumerable<MediaServiceStatus> services)
     {

@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-export type DashboardSectionId = 'hero' | 'insights' | 'widgets' | 'activity' | (string & {})
+export type DashboardSectionId = 'hero' | 'insights' | 'widgets' | 'activity' | 'details' | (string & {})
 
 export interface WidgetProps<TData> {
   data: TData

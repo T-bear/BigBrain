@@ -22,10 +22,12 @@ public sealed class MediaHealthEngine : IMediaHealthEngine
         QBittorrentOverview qBittorrent)
     {
         var configured = services.Where(service => service.IsConfigured).ToArray();
-        var score = configured.Length == 0
-            ? 0
-            : configured.Sum(ServiceScore) / configured.Length;
+        if (configured.Length == 0)
+        {
+            return new(0, "Configure media services to calculate health.", "notConfigured");
+        }
 
+        var score = configured.Sum(ServiceScore) / configured.Length;
         score -= Math.Min(
             20,
             (sonarr.HealthWarnings.Count + radarr.HealthWarnings.Count + prowlarr.HealthWarnings.Count) * 4);
@@ -36,9 +38,10 @@ public sealed class MediaHealthEngine : IMediaHealthEngine
         score = Math.Clamp(score, 0, 100);
         return score switch
         {
-            >= 85 => new(score, "Everything looks great", "healthy"),
-            >= 60 => new(score, "Some attention needed", "attention"),
-            _ => new(score, "Action recommended", "critical")
+            >= 90 => new(score, "Everything looks great", "excellent"),
+            >= 75 => new(score, "Your media stack is in good shape", "good"),
+            >= 50 => new(score, "Some services need attention", "actionRecommended"),
+            _ => new(score, "Immediate attention is recommended", "critical")
         };
     }
 
