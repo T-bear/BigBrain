@@ -14,8 +14,9 @@ public sealed class MediaClientTests
         {
             "/System/Info" => """{"Version":"10.10.7"}""",
             "/Library/VirtualFolders" => """[{"Name":"Movies"},{"Name":"TV"}]""",
-            "/Items/Counts" => """{"MovieCount":12,"SeriesCount":4}""",
-            "/Sessions" => """[{"NowPlayingItem":{"Name":"Private title"}},{"UserName":"must not leak"}]""",
+            "/Items/Counts" => """{"MovieCount":12,"SeriesCount":4,"EpisodeCount":80}""",
+            "/Sessions" => """[{"UserId":"one","NowPlayingItem":{"Name":"Private title"}},{"UserId":"two","UserName":"must not leak"}]""",
+            "/Items/Latest" => """[{"Name":"New movie","Type":"Movie","DateCreated":"2026-07-23T10:00:00Z"}]""",
             _ => throw new InvalidOperationException()
         })), Options());
 
@@ -26,7 +27,10 @@ public sealed class MediaClientTests
         Assert.Equal(2, result.LibraryCount);
         Assert.Equal(12, result.MovieCount);
         Assert.Equal(4, result.SeriesCount);
-        Assert.Equal(1, result.ActiveSessionCount);
+        Assert.Equal(80, result.EpisodeCount);
+        Assert.Equal(2, result.ActiveUserCount);
+        Assert.Equal(1, result.ActiveStreamCount);
+        Assert.Single(result.RecentlyAdded);
         Assert.DoesNotContain("Private", JsonSerializer.Serialize(result), StringComparison.Ordinal);
     }
 
@@ -41,6 +45,7 @@ public sealed class MediaClientTests
         Assert.Equal(2, result.SeriesCount);
         Assert.Equal(1, result.MonitoredSeriesCount);
         Assert.Equal(3, result.MissingMonitoredEpisodes);
+        Assert.Single(result.Calendar);
         Assert.Equal(1, result.QueueCount);
         Assert.Single(result.Queue);
         Assert.Single(result.RecentHistory);
@@ -58,6 +63,7 @@ public sealed class MediaClientTests
         Assert.Equal(2, result.MovieCount);
         Assert.Equal(1, result.MonitoredMovieCount);
         Assert.Equal(3, result.MissingMovieCount);
+        Assert.Equal(1, result.QualityUpgradeCount);
         Assert.Single(result.Queue);
     }
 
@@ -68,8 +74,10 @@ public sealed class MediaClientTests
         {
             "/api/v1/system/status" => """{"version":"1.35.1"}""",
             "/api/v1/indexer" => """[{"name":"Public","enable":true},{"name":"Disabled","enable":false}]""",
+            "/api/v1/indexerstatus" => """[]""",
             "/api/v1/health" => """[{"message":"Indexer check failed"}]""",
             "/api/v1/applications" => """[{"name":"Sonarr"},{"name":"Radarr"},{"name":"Other"}]""",
+            "/api/v1/history" => """{"records":[{"sourceTitle":"Failed query","eventType":"indexerQueryFailure","date":"2026-07-23T10:00:00Z"}]}""",
             _ => throw new InvalidOperationException()
         })), Options());
 
@@ -78,6 +86,8 @@ public sealed class MediaClientTests
         Assert.Equal(MediaStatuses.Online, result.Service.Status);
         Assert.Equal(2, result.IndexerCount);
         Assert.Equal(1, result.EnabledIndexerCount);
+        Assert.Equal(1, result.OnlineIndexerCount);
+        Assert.Single(result.RecentFailures);
         Assert.Equal(["Sonarr", "Radarr"], result.ConnectedApplications);
         Assert.Single(result.HealthWarnings);
     }
@@ -173,11 +183,13 @@ public sealed class MediaClientTests
             new StubSonarr(Unavailable("Sonarr")),
             new StubRadarr(Online("Radarr")),
             new StubProwlarr(Online("Prowlarr")),
-            new StubQBittorrent(Online("qBittorrent")));
+            new StubQBittorrent(Online("qBittorrent")),
+            new MediaHealthEngine());
 
         var result = await service.GetOverviewAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(MediaStatuses.Degraded, result.Status);
+        Assert.InRange(result.HealthScore, 0, 99);
         Assert.Equal(MediaStatuses.Online, result.Jellyfin.Service.Status);
         Assert.Equal(MediaStatuses.Unavailable, result.Sonarr.Service.Status);
     }
@@ -190,11 +202,13 @@ public sealed class MediaClientTests
             new StubSonarr(Unavailable("Sonarr")),
             new StubRadarr(Unavailable("Radarr")),
             new StubProwlarr(Unavailable("Prowlarr")),
-            new StubQBittorrent(Unavailable("qBittorrent")));
+            new StubQBittorrent(Unavailable("qBittorrent")),
+            new MediaHealthEngine());
 
         var result = await service.GetOverviewAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(MediaStatuses.Unavailable, result.Status);
+        Assert.Equal(0, result.HealthScore);
         Assert.All(result.Services, status => Assert.Equal(MediaStatuses.Unavailable, status.Status));
     }
 
@@ -256,7 +270,9 @@ public sealed class MediaClientTests
     private static string ArrResponse(Uri uri, bool series) => uri.AbsolutePath switch
     {
         "/api/v3/system/status" => """{"version":"4.0.0"}""",
-        "/api/v3/series" or "/api/v3/movie" => """[{"monitored":true},{"monitored":false}]""",
+        "/api/v3/series" => """[{"monitored":true},{"monitored":false}]""",
+        "/api/v3/movie" => """[{"monitored":true,"movieFile":{"qualityCutoffNotMet":true}},{"monitored":false}]""",
+        "/api/v3/calendar" => """[{"title":"Next episode","airDateUtc":"2026-07-25T10:00:00Z"}]""",
         "/api/v3/wanted/missing" => """{"totalRecords":3,"records":[]}""",
         "/api/v3/queue" => """{"totalRecords":1,"records":[{"title":"Safe title","status":"downloading","size":100,"sizeleft":25}]}""",
         "/api/v3/history" => """{"records":[{"sourceTitle":"Safe history","eventType":"downloadFolderImported","date":"2026-07-23T10:00:00Z"}]}""",
@@ -279,30 +295,30 @@ public sealed class MediaClientTests
     private sealed class StubJellyfin(MediaServiceStatus status) : IJellyfinClient
     {
         public Task<JellyfinOverview> GetOverviewAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new JellyfinOverview(status, 0, 0, 0, 0));
+            Task.FromResult(new JellyfinOverview(status, 0, 0, 0, 0, 0, 0, []));
     }
 
     private sealed class StubSonarr(MediaServiceStatus status) : ISonarrClient
     {
         public Task<SonarrOverview> GetOverviewAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new SonarrOverview(status, 0, 0, 0, 0, [], [], []));
+            Task.FromResult(new SonarrOverview(status, 0, 0, 0, 0, [], [], [], []));
     }
 
     private sealed class StubRadarr(MediaServiceStatus status) : IRadarrClient
     {
         public Task<RadarrOverview> GetOverviewAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new RadarrOverview(status, 0, 0, 0, 0, [], [], []));
+            Task.FromResult(new RadarrOverview(status, 0, 0, 0, 0, 0, [], [], []));
     }
 
     private sealed class StubProwlarr(MediaServiceStatus status) : IProwlarrClient
     {
         public Task<ProwlarrOverview> GetOverviewAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new ProwlarrOverview(status, 0, 0, [], [], []));
+            Task.FromResult(new ProwlarrOverview(status, 0, 0, 0, 0, [], [], [], []));
     }
 
     private sealed class StubQBittorrent(MediaServiceStatus status) : IQBittorrentClient
     {
         public Task<QBittorrentOverview> GetOverviewAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new QBittorrentOverview(status, 0, 0, 0, 0, 0, []));
+            Task.FromResult(new QBittorrentOverview(status, 0, 0, 0, 0, 0, null, null, 0, 0, null, []));
     }
 }

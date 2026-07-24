@@ -38,23 +38,28 @@ const systemUnavailable = {
   status: 'Unavailable',
   warnings: ['Host metrics require Sentinel integration.'],
 }
+const mediaServices = ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent'].map((serviceName) => ({
+  serviceName,
+  status: 'notConfigured',
+  version: null,
+  responseTimeMs: null,
+  checkedAtUtc: '2026-07-23T10:00:00Z',
+  sanitizedMessage: 'Service credentials are not configured.',
+  isConfigured: false,
+}))
 const mediaNotConfigured = {
   status: 'notConfigured',
+  healthScore: 0,
+  healthSummary: 'Action recommended',
+  healthStatusLevel: 'critical',
+  insights: [],
   collectedAtUtc: '2026-07-23T10:00:00Z',
-  services: ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent'].map((serviceName) => ({
-    serviceName,
-    status: 'notConfigured',
-    version: null,
-    responseTimeMs: null,
-    checkedAtUtc: '2026-07-23T10:00:00Z',
-    sanitizedMessage: 'Service credentials are not configured.',
-    isConfigured: false,
-  })),
-  qBittorrent: { activeCount: 0, pausedCount: 0, completedCount: 0, downloadSpeedBytesPerSecond: 0, uploadSpeedBytesPerSecond: 0, torrents: [] },
-  sonarr: { queueCount: 0, queue: [], healthWarnings: [] },
-  radarr: { queueCount: 0, queue: [], healthWarnings: [] },
-  prowlarr: { healthWarnings: [] },
-  jellyfin: { libraryCount: 0, movieCount: 0, seriesCount: 0, activeSessionCount: 0 },
+  services: mediaServices,
+  qBittorrent: { service: mediaServices[4], activeCount: 0, pausedCount: 0, completedCount: 0, downloadSpeedBytesPerSecond: 0, uploadSpeedBytesPerSecond: 0, etaSeconds: null, averageRatio: null, totalDownloadedBytes: 0, totalUploadedBytes: 0, freeSpaceBytes: null, torrents: [] },
+  sonarr: { service: mediaServices[1], seriesCount: 0, monitoredSeriesCount: 0, missingMonitoredEpisodes: 0, queueCount: 0, queue: [], calendar: [], recentHistory: [], healthWarnings: [] },
+  radarr: { service: mediaServices[2], movieCount: 0, monitoredMovieCount: 0, missingMovieCount: 0, qualityUpgradeCount: 0, queueCount: 0, queue: [], recentHistory: [], healthWarnings: [] },
+  prowlarr: { service: mediaServices[3], indexerCount: 0, enabledIndexerCount: 0, onlineIndexerCount: 0, rssEnabledIndexerCount: 0, indexerStatuses: [], recentFailures: [], healthWarnings: [] },
+  jellyfin: { service: mediaServices[0], libraryCount: 0, movieCount: 0, seriesCount: 0, episodeCount: 0, activeUserCount: 0, activeStreamCount: 0, recentlyAdded: [] },
 }
 
 function response(body: unknown) {

@@ -116,6 +116,10 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var overview = Assert.IsType<MediaOverviewResponse>(body);
         Assert.Equal("notConfigured", overview.Status);
+        Assert.Equal(0, overview.HealthScore);
+        Assert.Equal("Action recommended", overview.HealthSummary);
+        Assert.Equal("critical", overview.HealthStatusLevel);
+        Assert.Empty(overview.Insights);
         Assert.Equal(5, overview.Services.Count);
         Assert.All(overview.Services, service =>
         {
@@ -165,5 +169,11 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     private sealed record AvailabilityResponse(bool Available, string Reason);
     private sealed record DockerInventoryResponse(AvailabilityResponse Availability, IReadOnlyList<object> Containers);
     private sealed record MediaServiceResponse(string Status, bool IsConfigured);
-    private sealed record MediaOverviewResponse(string Status, IReadOnlyList<MediaServiceResponse> Services);
+    private sealed record MediaOverviewResponse(
+        string Status,
+        int HealthScore,
+        string HealthSummary,
+        string HealthStatusLevel,
+        IReadOnlyList<object> Insights,
+        IReadOnlyList<MediaServiceResponse> Services);
 }

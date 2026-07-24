@@ -20,6 +20,10 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
             using var series = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
             using var missing = await GetJsonAsync("api/v3/wanted/missing?page=1&pageSize=1", options.Sonarr.ApiKey, cancellationToken);
             using var queue = await GetJsonAsync("api/v3/queue?page=1&pageSize=25", options.Sonarr.ApiKey, cancellationToken);
+            using var calendar = await GetJsonAsync(
+                $"api/v3/calendar?start={Uri.EscapeDataString(DateTimeOffset.UtcNow.Date.ToString("O"))}&end={Uri.EscapeDataString(DateTimeOffset.UtcNow.Date.AddDays(7).ToString("O"))}",
+                options.Sonarr.ApiKey,
+                cancellationToken);
             using var history = await GetJsonAsync("api/v3/history?page=1&pageSize=10&sortKey=date&sortDirection=descending", options.Sonarr.ApiKey, cancellationToken);
             using var health = await GetJsonAsync("api/v3/health", options.Sonarr.ApiKey, cancellationToken);
 
@@ -31,6 +35,7 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
                 GetInt32(missing.RootElement, "totalRecords"),
                 GetInt32(queue.RootElement, "totalRecords"),
                 MapQueue(Records(queue.RootElement)),
+                MapCalendar(calendar.RootElement),
                 MapHistory(Records(history.RootElement)),
                 HealthWarnings(health.RootElement, "Sonarr"));
         }
@@ -40,7 +45,13 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
         }
     }
 
-    private static SonarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, [], [], []);
+    private static SonarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, [], [], [], []);
+
+    private static MediaCalendarItem[] MapCalendar(JsonElement items) =>
+        items.ValueKind != JsonValueKind.Array ? [] : items.EnumerateArray().Take(14).Select(item =>
+            new MediaCalendarItem(
+                GetString(item, "title") ?? GetString(item, "seriesTitle") ?? "Untitled",
+                DateTimeOffset.TryParse(GetString(item, "airDateUtc"), out var date) ? date : null)).ToArray();
 
     private static MediaQueueItem[] MapQueue(JsonElement records) =>
         records.ValueKind != JsonValueKind.Array
@@ -85,11 +96,16 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
             using var health = await GetJsonAsync("api/v3/health", options.Radarr.ApiKey, cancellationToken);
 
             var movieItems = movies.RootElement.EnumerateArray().ToArray();
+            var qualityUpgrades = movieItems.Count(item =>
+                item.TryGetProperty("movieFile", out var movieFile)
+                && movieFile.ValueKind == JsonValueKind.Object
+                && Boolean(movieFile, "qualityCutoffNotMet"));
             return new RadarrOverview(
                 Online(GetString(status.RootElement, "version"), timer),
                 movieItems.Length,
                 movieItems.Count(item => Boolean(item, "monitored")),
                 GetInt32(missing.RootElement, "totalRecords"),
+                qualityUpgrades,
                 GetInt32(queue.RootElement, "totalRecords"),
                 MapQueue(Records(queue.RootElement)),
                 MapHistory(Records(history.RootElement)),
@@ -101,7 +117,7 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
         }
     }
 
-    private static RadarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, [], [], []);
+    private static RadarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, [], [], []);
 
     private static MediaQueueItem[] MapQueue(JsonElement records) =>
         records.ValueKind != JsonValueKind.Array

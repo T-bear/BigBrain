@@ -5,7 +5,8 @@ public sealed class MediaService(
     ISonarrClient sonarrClient,
     IRadarrClient radarrClient,
     IProwlarrClient prowlarrClient,
-    IQBittorrentClient qBittorrentClient) : IMediaService
+    IQBittorrentClient qBittorrentClient,
+    IMediaHealthEngine healthEngine) : IMediaService
 {
     public async Task<MediaOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
@@ -31,15 +32,45 @@ public sealed class MediaService(
             qBittorrent.Service
         ];
 
+        var health = healthEngine.Assess(services, sonarr, radarr, prowlarr, qBittorrent);
         return new MediaOverview(
             AggregateStatus(services),
+            health.Score,
+            health.Summary,
+            health.StatusLevel,
             DateTimeOffset.UtcNow,
+            BuildInsights(services, jellyfin, sonarr, radarr, prowlarr, qBittorrent),
             services,
             qBittorrent,
             sonarr,
             radarr,
             prowlarr,
             jellyfin);
+    }
+
+    private static MediaInsight[] BuildInsights(
+        IReadOnlyList<MediaServiceStatus> services,
+        JellyfinOverview jellyfin,
+        SonarrOverview sonarr,
+        RadarrOverview radarr,
+        ProwlarrOverview prowlarr,
+        QBittorrentOverview qBittorrent)
+    {
+        var insights = new List<MediaInsight>();
+        var configuredServices = services.Where(service => service.IsConfigured).ToArray();
+        if (configuredServices.Length > 0 && configuredServices.All(service => service.Status == MediaStatuses.Online))
+            insights.Add(new("success", "All services healthy", "Every configured media service is responding."));
+        if (qBittorrent.ActiveCount > 0 && qBittorrent.DownloadSpeedBytesPerSecond == 0)
+            insights.Add(new("warning", "Downloads stalled", "Active torrents are reporting no download traffic."));
+        if (prowlarr.EnabledIndexerCount > prowlarr.OnlineIndexerCount)
+            insights.Add(new("critical", "Indexers offline", $"{prowlarr.EnabledIndexerCount - prowlarr.OnlineIndexerCount} enabled indexer(s) are unavailable."));
+        if (jellyfin.RecentlyAdded.Count > 0)
+            insights.Add(new("information", "New media added", $"{jellyfin.RecentlyAdded.Count} recent library item(s) are available."));
+        if (qBittorrent.FreeSpaceBytes is > 0 and < 10L * 1024 * 1024 * 1024)
+            insights.Add(new("warning", "Disk space low", "qBittorrent reports less than 10 GiB free."));
+        if (sonarr.HealthWarnings.Count + radarr.HealthWarnings.Count + prowlarr.HealthWarnings.Count > 0)
+            insights.Add(new("warning", "Service health warnings", "One or more media services require attention."));
+        return [.. insights];
     }
 
     private static string AggregateStatus(IEnumerable<MediaServiceStatus> services)

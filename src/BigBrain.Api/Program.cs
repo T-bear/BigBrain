@@ -36,6 +36,7 @@ public partial class Program
                     new AuthenticationHeaderValue("Bearer", options.QBittorrent.ApiKey);
             }
         });
+        builder.Services.AddSingleton<IMediaHealthEngine, MediaHealthEngine>();
         builder.Services.AddTransient<IMediaService, MediaService>();
         builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();

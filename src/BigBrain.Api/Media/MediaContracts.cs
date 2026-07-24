@@ -19,6 +19,8 @@ public sealed record MediaServiceStatus(
 
 public sealed record MediaQueueItem(string Title, string Status, double? ProgressPercent);
 public sealed record MediaHistoryItem(string Title, string EventType, DateTimeOffset? DateUtc);
+public sealed record MediaCalendarItem(string Title, DateTimeOffset? AirDateUtc);
+public sealed record RecentlyAddedMedia(string Name, string MediaType, DateTimeOffset? DateCreatedUtc);
 public sealed record MediaHealthWarning(string Source, string Message);
 public sealed record TorrentItem(string Name, double ProgressPercent, string State, string? Category, long? EtaSeconds);
 
@@ -29,6 +31,11 @@ public sealed record QBittorrentOverview(
     int CompletedCount,
     long DownloadSpeedBytesPerSecond,
     long UploadSpeedBytesPerSecond,
+    long? EtaSeconds,
+    double? AverageRatio,
+    long TotalDownloadedBytes,
+    long TotalUploadedBytes,
+    long? FreeSpaceBytes,
     IReadOnlyList<TorrentItem> Torrents);
 
 public sealed record SonarrOverview(
@@ -38,6 +45,7 @@ public sealed record SonarrOverview(
     int MissingMonitoredEpisodes,
     int QueueCount,
     IReadOnlyList<MediaQueueItem> Queue,
+    IReadOnlyList<MediaCalendarItem> Calendar,
     IReadOnlyList<MediaHistoryItem> RecentHistory,
     IReadOnlyList<MediaHealthWarning> HealthWarnings);
 
@@ -46,6 +54,7 @@ public sealed record RadarrOverview(
     int MovieCount,
     int MonitoredMovieCount,
     int MissingMovieCount,
+    int QualityUpgradeCount,
     int QueueCount,
     IReadOnlyList<MediaQueueItem> Queue,
     IReadOnlyList<MediaHistoryItem> RecentHistory,
@@ -55,8 +64,11 @@ public sealed record ProwlarrOverview(
     MediaServiceStatus Service,
     int IndexerCount,
     int EnabledIndexerCount,
+    int OnlineIndexerCount,
+    int RssEnabledIndexerCount,
     IReadOnlyList<string> IndexerStatuses,
     IReadOnlyList<string> ConnectedApplications,
+    IReadOnlyList<MediaHistoryItem> RecentFailures,
     IReadOnlyList<MediaHealthWarning> HealthWarnings);
 
 public sealed record JellyfinOverview(
@@ -64,11 +76,20 @@ public sealed record JellyfinOverview(
     int LibraryCount,
     int MovieCount,
     int SeriesCount,
-    int ActiveSessionCount);
+    int EpisodeCount,
+    int ActiveUserCount,
+    int ActiveStreamCount,
+    IReadOnlyList<RecentlyAddedMedia> RecentlyAdded);
+
+public sealed record MediaInsight(string Severity, string Title, string Message);
 
 public sealed record MediaOverview(
     string Status,
+    int HealthScore,
+    string HealthSummary,
+    string HealthStatusLevel,
     DateTimeOffset CollectedAtUtc,
+    IReadOnlyList<MediaInsight> Insights,
     IReadOnlyList<MediaServiceStatus> Services,
     QBittorrentOverview QBittorrent,
     SonarrOverview Sonarr,

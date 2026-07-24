@@ -36,6 +36,12 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
                 items.Count(item => GetDouble(item, "progress") >= 1),
                 GetInt64(transfer.RootElement, "dl_info_speed"),
                 GetInt64(transfer.RootElement, "up_info_speed"),
+                mapped.Where(item => IsActive(item.State) && item.EtaSeconds is not null)
+                    .Select(item => item.EtaSeconds).Min(),
+                mapped.Length == 0 ? null : items.Average(item => GetDouble(item, "ratio")),
+                GetInt64(transfer.RootElement, "dl_info_data"),
+                GetInt64(transfer.RootElement, "up_info_data"),
+                GetInt64(transfer.RootElement, "free_space_on_disk"),
                 mapped);
         }
         catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
@@ -55,5 +61,5 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
         && (state.Contains("paused", StringComparison.OrdinalIgnoreCase)
             || state.Contains("stopped", StringComparison.OrdinalIgnoreCase));
 
-    private static QBittorrentOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, []);
+    private static QBittorrentOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, null, null, 0, 0, null, []);
 }

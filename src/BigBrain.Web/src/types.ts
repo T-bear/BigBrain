@@ -67,9 +67,19 @@ export interface MediaQueueItem {
   progressPercent: number | null
 }
 
+export interface MediaInsight {
+  severity: 'success' | 'information' | 'warning' | 'critical'
+  title: string
+  message: string
+}
+
 export interface MediaOverview {
   status: MediaServiceStatus['status']
+  healthScore: number
+  healthSummary: string
+  healthStatusLevel: string
   collectedAtUtc: string
+  insights: MediaInsight[]
   services: MediaServiceStatus[]
   qBittorrent: {
     service: MediaServiceStatus
@@ -78,6 +88,11 @@ export interface MediaOverview {
     completedCount: number
     downloadSpeedBytesPerSecond: number
     uploadSpeedBytesPerSecond: number
+    etaSeconds: number | null
+    averageRatio: number | null
+    totalDownloadedBytes: number
+    totalUploadedBytes: number
+    freeSpaceBytes: number | null
     torrents: Array<{
       name: string
       progressPercent: number
@@ -90,16 +105,32 @@ export interface MediaOverview {
     service: MediaServiceStatus
     queueCount: number
     queue: MediaQueueItem[]
+    seriesCount: number
+    monitoredSeriesCount: number
+    missingMonitoredEpisodes: number
+    calendar: Array<{ title: string; airDateUtc: string | null }>
+    recentHistory: Array<{ title: string; eventType: string; dateUtc: string | null }>
     healthWarnings: Array<{ source: string; message: string }>
   }
   radarr: {
     service: MediaServiceStatus
     queueCount: number
     queue: MediaQueueItem[]
+    movieCount: number
+    monitoredMovieCount: number
+    missingMovieCount: number
+    qualityUpgradeCount: number
+    recentHistory: Array<{ title: string; eventType: string; dateUtc: string | null }>
     healthWarnings: Array<{ source: string; message: string }>
   }
   prowlarr: {
     service: MediaServiceStatus
+    indexerCount: number
+    enabledIndexerCount: number
+    onlineIndexerCount: number
+    rssEnabledIndexerCount: number
+    indexerStatuses: string[]
+    recentFailures: Array<{ title: string; eventType: string; dateUtc: string | null }>
     healthWarnings: Array<{ source: string; message: string }>
   }
   jellyfin: {
@@ -107,6 +138,9 @@ export interface MediaOverview {
     libraryCount: number
     movieCount: number
     seriesCount: number
-    activeSessionCount: number
+    episodeCount: number
+    activeUserCount: number
+    activeStreamCount: number
+    recentlyAdded: Array<{ name: string; mediaType: string; dateCreatedUtc: string | null }>
   }
 }
