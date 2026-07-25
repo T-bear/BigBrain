@@ -4,6 +4,44 @@ using System.Text.Json;
 
 namespace BigBrain.Api.Media;
 
+public sealed class ProviderHttpLoggingHandler(
+    string provider,
+    ILogger<ProviderHttpLoggingHandler> logger) : DelegatingHandler
+{
+    private static readonly Action<ILogger, string, string, string, long, Exception?> ProviderRequestCompleted =
+        LoggerMessage.Define<string, string, string, long>(
+            LogLevel.Information,
+            new EventId(2301, nameof(ProviderRequestCompleted)),
+            "Provider request completed: provider={Provider} operation={Operation} status={Status} duration={Duration}");
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        var timer = Stopwatch.StartNew();
+        try
+        {
+            var response = await base.SendAsync(request, cancellationToken);
+            Log(request, ((int)response.StatusCode).ToString(System.Globalization.CultureInfo.InvariantCulture), timer);
+            return response;
+        }
+        catch
+        {
+            Log(request, "failed", timer);
+            throw;
+        }
+    }
+
+    private void Log(HttpRequestMessage request, string status, Stopwatch timer) =>
+        ProviderRequestCompleted(
+            logger,
+            provider,
+            request.Method.Method,
+            status,
+            timer.ElapsedMilliseconds,
+            null);
+}
+
 public abstract class MediaClientBase(HttpClient httpClient, string serviceName)
 {
     protected HttpClient HttpClient { get; } = httpClient;

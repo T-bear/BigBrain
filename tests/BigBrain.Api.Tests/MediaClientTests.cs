@@ -2,11 +2,42 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using BigBrain.Api.Media;
+using Microsoft.Extensions.Logging;
 
 namespace BigBrain.Api.Tests;
 
 public sealed class MediaClientTests
 {
+    [Fact]
+    public async Task ProviderHttpLoggingIsStructuredAndDoesNotExposeRequestDetails()
+    {
+        var logger = new CapturingLogger<ProviderHttpLoggingHandler>();
+        var handler = new ProviderHttpLoggingHandler("Sonarr", logger)
+        {
+            InnerHandler = new StubHandler(_ => Json("""{}"""))
+        };
+        using var client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("http://sonarr:8989/")
+        };
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/v3/series?apikey=must-not-leak");
+        request.Headers.TryAddWithoutValidation("X-Api-Key", "must-not-leak");
+
+        using var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var entry = Assert.Single(logger.Entries);
+        Assert.Equal("Sonarr", entry["Provider"]);
+        Assert.Equal("GET", entry["Operation"]);
+        Assert.Equal("200", entry["Status"]);
+        Assert.True(long.TryParse(entry["Duration"], out _));
+        Assert.Equal(4, entry.Count);
+        var serialized = string.Join(" ", entry.Select(item => $"{item.Key}={item.Value}"));
+        Assert.DoesNotContain("8989", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain("api/v3", serialized, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("must-not-leak", serialized, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task JellyfinMapsSuccessfulReadOnlyResponses()
     {
@@ -368,6 +399,29 @@ public sealed class MediaClientTests
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
             Task.FromResult(responder(request));
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public List<Dictionary<string, string>> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            var values = Assert.IsAssignableFrom<IEnumerable<KeyValuePair<string, object?>>>(state);
+            Entries.Add(values
+                .Where(item => item.Key != "{OriginalFormat}")
+                .ToDictionary(
+                    item => item.Key,
+                    item => Convert.ToString(item.Value, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty));
+        }
     }
 
     private sealed class StubJellyfin(MediaServiceStatus status) : IJellyfinClient
