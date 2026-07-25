@@ -10,6 +10,9 @@ public sealed record SystemHealthResponse(string Status, DateTimeOffset CheckedA
 
 public partial class Program
 {
+    private static readonly System.Text.Json.JsonSerializerOptions WebJsonOptions =
+        new(System.Text.Json.JsonSerializerDefaults.Web);
+
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +56,15 @@ public partial class Program
         builder.Services.AddTransient<IMediaLookupProvider>(serviceProvider =>
             (IMediaLookupProvider)serviceProvider.GetRequiredService<IRadarrClient>());
         builder.Services.AddTransient<IMediaLookupService, MediaLookupService>();
+        builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
+            (IMediaJobsProvider)serviceProvider.GetRequiredService<ISonarrClient>());
+        builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
+            (IMediaJobsProvider)serviceProvider.GetRequiredService<IRadarrClient>());
+        builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
+            (IMediaJobsProvider)serviceProvider.GetRequiredService<IQBittorrentClient>());
+        builder.Services.AddTransient<IMediaLibraryCatalog>(serviceProvider =>
+            (IMediaLibraryCatalog)serviceProvider.GetRequiredService<IJellyfinClient>());
+        builder.Services.AddSingleton<IMediaJobsService, MediaJobsService>();
         builder.Services.AddTransient<IMediaRequestProvider>(serviceProvider =>
             (IMediaRequestProvider)serviceProvider.GetRequiredService<ISonarrClient>());
         builder.Services.AddTransient<IMediaRequestProvider>(serviceProvider =>
@@ -165,6 +177,113 @@ public partial class Program
             });
 
         app.MapGet(
+            "/api/v1/modules/media/jobs",
+            async (
+                string? status,
+                string? mediaType,
+                string? provider,
+                bool? includeCompleted,
+                int? limit,
+                IMediaJobsService service,
+                CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    var response = await service.GetJobsAsync(
+                        new(status, mediaType, provider, includeCompleted ?? false, limit ?? 50),
+                        cancellationToken);
+                    return Results.Json(response, WebJsonOptions);
+                }
+                catch (MediaJobsException exception)
+                {
+                    return JobsProblem(exception);
+                }
+            });
+
+        app.MapGet(
+            "/api/v1/modules/media/jobs/events",
+            async (HttpContext context, IMediaJobsService service, CancellationToken cancellationToken) =>
+            {
+                context.Response.ContentType = "text/event-stream";
+                context.Response.Headers.CacheControl = "no-cache";
+                context.Response.Headers.Append("X-Accel-Buffering", "no");
+                try
+                {
+                    await context.Response.WriteAsync("retry: 5000\n\n", cancellationToken);
+                    await context.Response.Body.FlushAsync(cancellationToken);
+                    await foreach (var snapshot in service.StreamJobsAsync(cancellationToken))
+                    {
+                        var json = System.Text.Json.JsonSerializer.Serialize(
+                            snapshot,
+                            WebJsonOptions);
+                        await context.Response.WriteAsync($"event: jobs\ndata: {json}\n\n", cancellationToken);
+                        await context.Response.Body.FlushAsync(cancellationToken);
+                    }
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    // The browser disconnected.
+                }
+            });
+
+        app.MapGet(
+            "/api/v1/modules/media/jobs/{id}",
+            async (string id, IMediaJobsService service, CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    var job = await service.GetJobAsync(id, cancellationToken);
+                    return job is null
+                        ? ApiProblem("mediaJobNotFound", "The media job was not found.", StatusCodes.Status404NotFound)
+                        : Results.Ok(job);
+                }
+                catch (MediaJobsException exception)
+                {
+                    return JobsProblem(exception);
+                }
+            });
+
+        app.MapGet(
+            "/api/v1/modules/media/library-status",
+            async (
+                string? provider,
+                string? foreignId,
+                string? mediaType,
+                IMediaJobsService service,
+                CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    return Results.Ok(await service.GetLibraryStatusAsync(
+                        provider ?? string.Empty,
+                        foreignId ?? string.Empty,
+                        mediaType ?? string.Empty,
+                        cancellationToken));
+                }
+                catch (MediaJobsException exception)
+                {
+                    return JobsProblem(exception);
+                }
+            });
+
+        app.MapGet(
+            "/api/v1/modules/media/play/{id}",
+            async (string id, IMediaJobsService service, CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    var item = await service.GetPlayAsync(id, cancellationToken);
+                    return item is null
+                        ? ApiProblem("playItemNotFound", "The Jellyfin item was not found.", StatusCodes.Status404NotFound)
+                        : Results.Ok(item);
+                }
+                catch (MediaJobsException exception)
+                {
+                    return JobsProblem(exception);
+                }
+            });
+
+        app.MapGet(
             "/api/v1/modules/media/add-options/series",
             async (IMediaAddOptionsService service, CancellationToken cancellationToken) =>
             {
@@ -234,6 +353,9 @@ public partial class Program
     }
 
     private static IResult RequestProblem(MediaRequestException exception) =>
+        ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
+
+    private static IResult JobsProblem(MediaJobsException exception) =>
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
 
     private static IResult ApiProblem(string code, string detail, int statusCode) =>

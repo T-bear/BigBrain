@@ -4,8 +4,10 @@ using System.Text.Json;
 namespace BigBrain.Api.Media;
 
 public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "qBittorrent"), IQBittorrentClient
+    : MediaClientBase(httpClient, "qBittorrent"), IQBittorrentClient, IMediaJobsProvider
 {
+    string IMediaJobsProvider.MediaType => MediaTypes.Unknown;
+
     public async Task<QBittorrentOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(options.QBittorrent.ApiKey))
@@ -49,6 +51,90 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
             return Empty(Failure(exception, timer));
         }
     }
+
+    async Task<MediaJobsProviderSnapshot> IMediaJobsProvider.GetJobsSnapshotAsync(
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.QBittorrent.ApiKey))
+        {
+            throw new HttpRequestException("Provider is not configured.");
+        }
+
+        using var torrents = await GetJsonAsync(
+            "api/v2/torrents/info?limit=50&sort=added_on&reverse=true",
+            null,
+            cancellationToken);
+        var jobs = torrents.RootElement.ValueKind != JsonValueKind.Array
+            ? []
+            : torrents.RootElement.EnumerateArray().Take(50).Select(item =>
+            {
+                var rawTitle = GetString(item, "name") ?? "Untitled";
+                var parsed = MediaJobAggregator.ParseEpisode(rawTitle);
+                var canonicalTitle = MediaJobAggregator.CanonicalTitle(rawTitle);
+                var groupKey = parsed.Season is null
+                    ? $"qbittorrent:unknown:{canonicalTitle}"
+                    : $"qbittorrent:series:{canonicalTitle}:s{parsed.Season}";
+                var progress = ClampPercent(GetDouble(item, "progress") * 100);
+                var status = NormalizeJobStatus(GetString(item, "state"), progress);
+                var addedSeconds = GetInt64(item, "added_on");
+                return new ProviderMediaJob(
+                    string.Empty,
+                    groupKey,
+                    SafeDisplayTitle(rawTitle),
+                    parsed.Season is null ? null : $"Season {parsed.Season}",
+                    parsed.Season is null ? MediaTypes.Unknown : "season",
+                    status,
+                    progress,
+                    Positive(GetInt64(item, "size")),
+                    Positive(GetInt64(item, "dlspeed")),
+                    Positive(GetInt64(item, "upspeed")),
+                    ValidEta(GetInt64(item, "eta")),
+                    parsed.Episode,
+                    addedSeconds > 0 ? DateTimeOffset.FromUnixTimeSeconds(addedSeconds) : null,
+                    addedSeconds > 0 ? DateTimeOffset.FromUnixTimeSeconds(addedSeconds) : null,
+                    status == MediaJobStatuses.Failed ? "downloadFailed" : null,
+                    status == MediaJobStatuses.Stalled ? "The download is currently stalled." : null,
+                    parsed.Episode is null ? "Download detail" : $"Episode {parsed.Episode}");
+            }).ToArray();
+        return new(ServiceName, jobs, []);
+    }
+
+    internal static string NormalizeJobStatus(string? state, double progress)
+    {
+        if (string.IsNullOrWhiteSpace(state)) return MediaJobStatuses.Unknown;
+        if (state.Contains("error", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("missingFiles", StringComparison.OrdinalIgnoreCase))
+            return MediaJobStatuses.Failed;
+        if (state.Contains("stalledDL", StringComparison.OrdinalIgnoreCase))
+            return MediaJobStatuses.Stalled;
+        if (progress >= 100
+            || state.Contains("UP", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("upload", StringComparison.OrdinalIgnoreCase))
+            return MediaJobStatuses.Completed;
+        if (state.Contains("downloading", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("metaDL", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("forcedDL", StringComparison.OrdinalIgnoreCase))
+            return MediaJobStatuses.Downloading;
+        if (state.Contains("queued", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("checking", StringComparison.OrdinalIgnoreCase)
+            || state.Contains("stoppedDL", StringComparison.OrdinalIgnoreCase))
+            return MediaJobStatuses.Queued;
+        return MediaJobStatuses.Unknown;
+    }
+
+    private static string SafeDisplayTitle(string rawTitle)
+    {
+        var parsed = MediaJobAggregator.ParseEpisode(rawTitle);
+        var matchIndex = rawTitle.IndexOf(".S", StringComparison.OrdinalIgnoreCase);
+        var title = matchIndex > 0 ? rawTitle[..matchIndex] : rawTitle;
+        title = title.Replace('.', ' ').Replace('_', ' ').Trim();
+        return string.IsNullOrWhiteSpace(title)
+            ? parsed.Season is null ? "Media download" : "Series download"
+            : title.Length <= 120 ? title : string.Concat(title.AsSpan(0, 117), "...");
+    }
+
+    private static long? Positive(long value) => value > 0 ? value : null;
+    private static long? ValidEta(long value) => value is >= 0 and < 8_640_000 ? value : null;
 
     private static bool IsActive(string? state) =>
         state is not null

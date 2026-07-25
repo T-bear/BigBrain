@@ -38,6 +38,12 @@ export function MediaRequestDialog({
   const confirming = useRef(false)
 
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [])
+
+  useEffect(() => {
     const controller = new AbortController()
     void getMediaAddOptions(result.mediaType, controller.signal)
       .then(value => { setOptions(value); setBusy(false) })

@@ -2,7 +2,9 @@ import type {
   DockerInventory,
   MediaAddOptionsResponse,
   MediaLookupResponse,
+  MediaJobsResponse,
   MediaOverview,
+  MediaPlayResponse,
   MediaRequestConfirmResponse,
   MediaRequestPreviewResponse,
   MediaSearchResponse,
@@ -38,6 +40,60 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 
 export const getMediaOverview = (signal?: AbortSignal) =>
   getJson<MediaOverview>('/api/v1/modules/media', signal)
+
+export const getMediaJobs = (signal?: AbortSignal) =>
+  getJson<MediaJobsResponse>('/api/v1/modules/media/jobs?limit=50', signal)
+
+export const getMediaJob = (id: string, signal?: AbortSignal) =>
+  getJson<MediaJobsResponse['jobs'][number]>(
+    `/api/v1/modules/media/jobs/${encodeURIComponent(id)}`,
+    signal)
+
+export const getMediaPlay = (itemId: string, signal?: AbortSignal) =>
+  getJson<MediaPlayResponse>(`/api/v1/modules/media/play/${encodeURIComponent(itemId)}`, signal)
+
+export function subscribeMediaJobs(
+  onJobs: (jobs: MediaJobsResponse) => void,
+  onError: () => void,
+) {
+  if (typeof EventSource === 'undefined') return () => undefined
+  let source: EventSource | null = null
+  let retryTimer: ReturnType<typeof setTimeout> | null = null
+  let retryDelayMs = 5_000
+  let stopped = false
+
+  function connect() {
+    if (stopped) return
+    source = new EventSource('/api/v1/modules/media/jobs/events')
+    source.addEventListener('jobs', event => {
+      try {
+        onJobs(JSON.parse((event as MessageEvent<string>).data) as MediaJobsResponse)
+        retryDelayMs = 5_000
+      } catch {
+        onError()
+      }
+    })
+    source.onerror = () => {
+      source?.close()
+      source = null
+      onError()
+      if (!stopped && retryTimer === null) {
+        retryTimer = setTimeout(() => {
+          retryTimer = null
+          connect()
+        }, retryDelayMs)
+        retryDelayMs = Math.min(retryDelayMs * 2, 30_000)
+      }
+    }
+  }
+
+  connect()
+  return () => {
+    stopped = true
+    source?.close()
+    if (retryTimer !== null) clearTimeout(retryTimer)
+  }
+}
 
 export const searchMedia = (query: string, signal?: AbortSignal) =>
   getJson<MediaSearchResponse>(`/api/v1/modules/media/search?query=${encodeURIComponent(query.trim())}`, signal)

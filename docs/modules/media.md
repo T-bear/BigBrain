@@ -1,4 +1,4 @@
-# Media Module – Sprint 2.4
+# Media Module – Sprint 3
 
 ## Responsibility and boundary
 
@@ -100,15 +100,55 @@ single API instance. Restart invalidates outstanding previews safely. Multiple A
 replicas require a shared durable request store before this feature can be enabled
 across replicas.
 
+### Intelligent Media Manager
+
+- `GET /api/v1/modules/media/jobs`
+- `GET /api/v1/modules/media/jobs/{opaqueJobId}`
+- `GET /api/v1/modules/media/jobs/events`
+- `GET /api/v1/modules/media/library-status?provider={provider}&foreignId={id}&mediaType={series|movie}`
+- `GET /api/v1/modules/media/play/{jellyfinItemId}`
+
+Media Jobs is a separate read-only application contract inside the Media module.
+Sonarr, Radarr and qBittorrent records are normalized to `requested`, `searching`,
+`queued`, `downloading`, `stalled`, `completed`, `importing`, `available`,
+`failed` or the safe fallback `unknown`. The list supports bounded `status`,
+`mediaType`, `provider`, `includeCompleted` and `limit` filters. Details use a
+deterministic opaque job identifier and contain only normalized provider data.
+
+Arr episodes are grouped by stable foreign ID and season. qBittorrent records are
+attached to an Arr group only when a deterministic normalized title-and-season key
+matches; this fallback affects presentation only and is never used to authorize
+playback. Raw provider payloads, tracker data and magnet links are not returned.
+
+A stable TVDB/TMDB match in Jellyfin transitions a movie or series item to
+`available`. A series-level Jellyfin match deliberately does not make an
+unverified season playable. Recently added Jellyfin movies and series are included
+as bounded available results.
+
+The events endpoint uses Server-Sent Events. It sends an initial snapshot and then
+changed snapshots at a five-second observation interval. It does not introduce a
+background write, message broker or persistent job database. Provider reads share
+a three-second, process-local snapshot cache, run in parallel, propagate
+cancellation and isolate provider failures.
+
+The play endpoint returns metadata only. `playUrl` is a relative browser path and
+never contains a provider hostname, port, API key or token. `artwork` remains null
+until a bounded BigBrain image proxy is available. BigBrain does not redirect,
+autoplay or stream media.
+
+The normalized `IMediaLibraryCatalog` boundary is independent from dashboard
+components and Arr queue payloads. A future Smart Queue can build on this catalog
+without depending on the Media Jobs presentation model.
+
 ## Upstream read contract
 
 | Service | Endpoints used |
 |---|---|
-| Jellyfin | `GET /System/Info`, `/Library/VirtualFolders`, `/Items/Counts`, `/Sessions` |
-| Sonarr | Existing endpoints plus `GET /series/lookup`, `/rootfolder`, `/qualityprofile`; controlled `POST /series` only |
-| Radarr | Existing endpoints plus `GET /movie/lookup`, `/rootfolder`, `/qualityprofile`; controlled `POST /movie` only |
+| Jellyfin | Existing endpoints plus read-only `/Items`, `/Items/Latest` and `/Items/{id}` metadata |
+| Sonarr | Existing endpoints plus read-only `/queue`; controlled `POST /series` only |
+| Radarr | Existing endpoints plus read-only `/queue`; controlled `POST /movie` only |
 | Prowlarr | `GET /api/v1/system/status`, `/indexer`, `/health`, `/applications` |
-| qBittorrent | `GET /api/v2/app/version`, `/torrents/info`, `/transfer/info` with `Authorization: Bearer <API_KEY>` |
+| qBittorrent | `GET /api/v2/app/version`, `/torrents/info`, `/transfer/info` with the existing server-side credential |
 
 Queue and torrent lists are limited to 25 entries, health/indexer output to 25 entries, application connections to 10 and history to 10. qBittorrent summary counts in Sprint 1 describe the bounded recent list returned by the upstream query; an exact, safely bounded global-count strategy remains technical debt.
 
@@ -131,7 +171,7 @@ The following are explicitly deferred and require separate authorization, audit,
 
 - Search for missing episodes or movies.
 - Pause, resume or delete a torrent.
-- Open a title in Jellyfin.
+- Redirect, autoplay or stream a title in Jellyfin.
 - AI commands for media management.
 
 No delete, rename, move, edit, release, command or download-client operation exists.

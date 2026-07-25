@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace BigBrain.Api.Media;
 
 public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient, IMediaSearchProvider
+    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient, IMediaSearchProvider, IMediaLibraryCatalog
 {
     public async Task<MediaSearchProviderResult> SearchAsync(
         string query,
@@ -131,6 +131,80 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         }
     }
 
+    async Task<JellyfinCatalogItem?> IMediaLibraryCatalog.FindByForeignIdAsync(
+        string provider,
+        string foreignId,
+        string mediaType,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey))
+        {
+            return null;
+        }
+
+        var providerKey = string.Equals(provider, "Sonarr", StringComparison.OrdinalIgnoreCase)
+            ? "tvdb"
+            : string.Equals(provider, "Radarr", StringComparison.OrdinalIgnoreCase) ? "tmdb" : null;
+        if (providerKey is null)
+        {
+            return null;
+        }
+
+        var itemType = mediaType == MediaLookupTypes.Series ? "Series" : "Movie";
+        using var response = await GetJellyfinJsonAsync(
+            $"Items?Recursive=true&IncludeItemTypes={itemType}"
+            + $"&AnyProviderIdEquals={providerKey}.{Uri.EscapeDataString(foreignId)}"
+            + "&Fields=ProviderIds,DateCreated,ImageTags&Limit=1",
+            options.Jellyfin.ApiKey,
+            cancellationToken);
+        return Items(response.RootElement).Select(MapCatalogItem).FirstOrDefault();
+    }
+
+    async Task<JellyfinCatalogItem?> IMediaLibraryCatalog.GetPlayItemAsync(
+        string itemId,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var response = await GetJellyfinJsonAsync(
+                $"Items/{Uri.EscapeDataString(itemId)}?Fields=ProviderIds,DateCreated,ImageTags",
+                options.Jellyfin.ApiKey,
+                cancellationToken);
+            var item = response.RootElement;
+            var mediaType = NormalizeMediaType(GetString(item, "Type"));
+            return mediaType is MediaLookupTypes.Series or MediaLookupTypes.Movie
+                ? MapCatalogItem(item)
+                : null;
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+    }
+
+    async Task<IReadOnlyList<JellyfinCatalogItem>> IMediaLibraryCatalog.GetAvailableCatalogAsync(
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey))
+        {
+            return [];
+        }
+
+        using var response = await GetJellyfinJsonAsync(
+            "Items?Recursive=true&Limit=500&Fields=ProviderIds,DateCreated,ImageTags&IncludeItemTypes=Movie,Series",
+            options.Jellyfin.ApiKey,
+            cancellationToken);
+        return Items(response.RootElement)
+            .Select(MapCatalogItem)
+            .Where(item => item.MediaType is MediaLookupTypes.Series or MediaLookupTypes.Movie)
+            .ToArray();
+    }
+
     private async Task<(System.Text.Json.JsonDocument? Document, bool Succeeded)> TryGetSupplementalJsonAsync(
         string path,
         string apiKey,
@@ -183,4 +257,30 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         && tags.ValueKind == System.Text.Json.JsonValueKind.Object
         && tags.TryGetProperty("Primary", out var primary)
         && primary.ValueKind == System.Text.Json.JsonValueKind.String;
+
+    private static System.Text.Json.JsonElement[] Items(System.Text.Json.JsonElement root)
+    {
+        if (root.ValueKind == System.Text.Json.JsonValueKind.Array)
+        {
+            return root.EnumerateArray().ToArray();
+        }
+        return root.TryGetProperty("Items", out var items)
+            && items.ValueKind == System.Text.Json.JsonValueKind.Array
+            ? items.EnumerateArray().ToArray()
+            : [];
+    }
+
+    private static JellyfinCatalogItem MapCatalogItem(System.Text.Json.JsonElement item)
+    {
+        var providerIds = item.TryGetProperty("ProviderIds", out var values)
+            && values.ValueKind == System.Text.Json.JsonValueKind.Object ? values : default;
+        return new(
+            GetString(item, "Id") ?? string.Empty,
+            GetString(item, "Name") ?? "Untitled",
+            NormalizeMediaType(GetString(item, "Type")),
+            GetString(providerIds, "Tvdb"),
+            GetString(providerIds, "Tmdb"),
+            DateTimeOffset.TryParse(GetString(item, "DateCreated"), out var added) ? added : null,
+            HasPrimaryImage(item));
+    }
 }

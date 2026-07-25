@@ -201,6 +201,62 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task MediaJobsReturnsEmptyReadOnlySnapshotWhenProvidersAreNotConfigured()
+    {
+        var response = await _client.GetAsync(
+            "/api/v1/modules/media/jobs",
+            TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadFromJsonAsync<MediaJobsResponse>(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Empty(Assert.IsType<MediaJobsResponse>(body).Jobs);
+    }
+
+    [Theory]
+    [InlineData("/api/v1/modules/media/jobs?limit=101")]
+    [InlineData("/api/v1/modules/media/jobs?status=providerRawState")]
+    [InlineData("/api/v1/modules/media/jobs?mediaType=torrent")]
+    [InlineData("/api/v1/modules/media/jobs?provider=internalHost")]
+    public async Task MediaJobsRejectsInvalidFiltersWithProblemDetails(string path)
+    {
+        var response = await _client.GetAsync(path, TestContext.Current.CancellationToken);
+        var raw = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.DoesNotContain("exception", raw, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("http://", raw, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData("", "123", "series")]
+    [InlineData("Sonarr", "invalid", "series")]
+    [InlineData("Radarr", "123", "series")]
+    public async Task MediaLibraryStatusRejectsInvalidIdentity(
+        string provider,
+        string foreignId,
+        string mediaType)
+    {
+        var response = await _client.GetAsync(
+            $"/api/v1/modules/media/library-status?provider={provider}&foreignId={foreignId}&mediaType={mediaType}",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task MediaPlayRejectsUnsafeItemIdentifier()
+    {
+        var response = await _client.GetAsync(
+            "/api/v1/modules/media/play/unsafe%2Fitem",
+            TestContext.Current.CancellationToken);
+
+        Assert.True(response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task UnknownApiRouteReturnsProblemDetails()
     {
         var response = await _client.GetAsync("/api/v1/unknown", TestContext.Current.CancellationToken);

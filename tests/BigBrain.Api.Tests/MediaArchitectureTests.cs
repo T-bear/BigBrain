@@ -4,6 +4,8 @@ namespace BigBrain.Api.Tests;
 
 public sealed class MediaArchitectureTests
 {
+    private static readonly string[] FrontendMediaDirectories = ["media-search", "media-jobs"];
+
     [Fact]
     public void MediaProductionCodeHasNoHostOrDockerIntegration()
     {
@@ -47,6 +49,8 @@ public sealed class MediaArchitectureTests
         Assert.False(typeof(IMediaLookupProvider).IsAssignableFrom(typeof(IRadarrClient)));
         Assert.False(typeof(IMediaSearchProvider).IsAssignableFrom(typeof(IMediaLookupProvider)));
         Assert.False(typeof(IMediaRequestService).IsAssignableFrom(typeof(IMediaLookupService)));
+        Assert.False(typeof(IMediaJobsService).IsAssignableFrom(typeof(IMediaLookupService)));
+        Assert.False(typeof(IMediaJobsService).IsAssignableFrom(typeof(IMediaRequestService)));
 
         var root = FindRepositoryRoot();
         var mediaDirectory = Path.Combine(root.FullName, "src", "BigBrain.Api", "Media");
@@ -62,11 +66,27 @@ public sealed class MediaArchitectureTests
         Assert.DoesNotContain("HttpMethod.Put", arrSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Patch", arrSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Delete", arrSource, StringComparison.Ordinal);
+        var allMediaSource = string.Join(
+            Environment.NewLine,
+            Directory.GetFiles(mediaDirectory, "*.cs").Select(File.ReadAllText));
+        string[] forbiddenWriteTokens =
+        [
+            "HttpMethod.Put", "HttpMethod.Patch", "HttpMethod.Delete",
+            "PostAsync(", "PutAsync(", "PatchAsync(", "DeleteAsync(",
+            "\"api/v3/command", "\"api/v3/release"
+        ];
+        Assert.All(forbiddenWriteTokens, token =>
+            Assert.DoesNotContain(token, allMediaSource, StringComparison.OrdinalIgnoreCase));
 
         var lookupSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaLookup.cs"));
         Assert.DoesNotContain("HttpMethod.Post", lookupSource, StringComparison.Ordinal);
         var jellyfinSource = File.ReadAllText(Path.Combine(mediaDirectory, "JellyfinClient.cs"));
         Assert.DoesNotContain("HttpMethod.Post", jellyfinSource, StringComparison.Ordinal);
+        var jobsSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaJobs.cs"));
+        Assert.DoesNotContain("HttpMethod.Post", jobsSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("HttpMethod.Put", jobsSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("HttpMethod.Patch", jobsSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("HttpMethod.Delete", jobsSource, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -81,18 +101,31 @@ public sealed class MediaArchitectureTests
             typeof(MediaAddOption),
             typeof(MediaRequestPreviewResponse),
             typeof(MediaRequestSummary),
-            typeof(MediaRequestConfirmResponse)
+            typeof(MediaRequestConfirmResponse),
+            typeof(MediaJob),
+            typeof(MediaJobsResponse),
+            typeof(MediaLibraryStatusResponse),
+            typeof(MediaPlayResponse)
         ];
         string[] forbiddenNames = ["ApiKey", "Password", "BaseUrl", "Path", "InternalUrl", "StackTrace", "Exception"];
         Assert.All(publicDtos, type => Assert.All(
             type.GetProperties(),
-            property => Assert.DoesNotContain(forbiddenNames, name =>
-                property.Name.Contains(name, StringComparison.OrdinalIgnoreCase))));
+            property =>
+            {
+                if (type == typeof(MediaPlayResponse) && property.Name == nameof(MediaPlayResponse.PlayUrl))
+                {
+                    return;
+                }
+                Assert.DoesNotContain(forbiddenNames, name =>
+                    property.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+            }));
 
         var root = FindRepositoryRoot();
-        var frontend = Directory.GetFiles(
-                Path.Combine(root.FullName, "src", "BigBrain.Web", "src", "media-search"),
-                "*.tsx")
+        var frontendRoot = Path.Combine(root.FullName, "src", "BigBrain.Web", "src");
+        var frontend = FrontendMediaDirectories
+            .SelectMany(directory => Directory.GetFiles(
+                Path.Combine(frontendRoot, directory),
+                "*.tsx"))
             .Select(File.ReadAllText);
         Assert.All(frontend, source =>
         {

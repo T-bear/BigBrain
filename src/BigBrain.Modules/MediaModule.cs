@@ -14,7 +14,12 @@ public static class MediaModule
                 Id: "media-overview",
                 Title: "Media overview",
                 Kind: "media-overview",
-                DataEndpoint: "/api/v1/modules/media")
+                DataEndpoint: "/api/v1/modules/media"),
+            new DashboardWidgetDefinition(
+                Id: "media-jobs",
+                Title: "Media Jobs",
+                Kind: "media-jobs",
+                DataEndpoint: "/api/v1/modules/media/jobs")
         ],
-        Capabilities: ["media.overview.read"]);
+        Capabilities: ["media.overview.read", "media.jobs.read", "media.play-metadata.read"]);
 }

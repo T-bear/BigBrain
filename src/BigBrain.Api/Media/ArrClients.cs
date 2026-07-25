@@ -6,9 +6,10 @@ namespace BigBrain.Api.Media;
 
 public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
     : MediaClientBase(httpClient, "Sonarr"), ISonarrClient, IMediaSearchProvider,
-      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider
+      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider, IMediaJobsProvider
 {
     public string SupportedMediaType => MediaLookupTypes.Series;
+    string IMediaJobsProvider.MediaType => MediaLookupTypes.Series;
 
     public async Task<MediaLookupProviderResult> LookupAsync(
         string query,
@@ -201,6 +202,26 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
         }
     }
 
+    async Task<MediaJobsProviderSnapshot> IMediaJobsProvider.GetJobsSnapshotAsync(
+        CancellationToken cancellationToken)
+    {
+        EnsureSonarrConfigured();
+        using var series = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
+        using var queue = await GetJsonAsync(
+            "api/v3/queue?page=1&pageSize=50",
+            options.Sonarr.ApiKey,
+            cancellationToken);
+        return ArrJobMapper.Map(
+            ServiceName,
+            MediaLookupTypes.Series,
+            series.RootElement,
+            queue.RootElement,
+            "seriesId",
+            "tvdbId",
+            item => item.TryGetProperty("statistics", out var statistics)
+                && GetInt32(statistics, "episodeFileCount") > 0);
+    }
+
     private static SonarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, [], [], [], []);
 
     private static MediaCalendarItem[] MapCalendar(JsonElement items) =>
@@ -301,9 +322,10 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
 
 public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
     : MediaClientBase(httpClient, "Radarr"), IRadarrClient, IMediaSearchProvider,
-      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider
+      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider, IMediaJobsProvider
 {
     public string SupportedMediaType => MediaLookupTypes.Movie;
+    string IMediaJobsProvider.MediaType => MediaLookupTypes.Movie;
 
     public async Task<MediaLookupProviderResult> LookupAsync(
         string query,
@@ -495,6 +517,25 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
         {
             return Empty(Failure(exception, timer));
         }
+    }
+
+    async Task<MediaJobsProviderSnapshot> IMediaJobsProvider.GetJobsSnapshotAsync(
+        CancellationToken cancellationToken)
+    {
+        EnsureRadarrConfigured();
+        using var movies = await GetJsonAsync("api/v3/movie", options.Radarr.ApiKey, cancellationToken);
+        using var queue = await GetJsonAsync(
+            "api/v3/queue?page=1&pageSize=50",
+            options.Radarr.ApiKey,
+            cancellationToken);
+        return ArrJobMapper.Map(
+            ServiceName,
+            MediaLookupTypes.Movie,
+            movies.RootElement,
+            queue.RootElement,
+            "movieId",
+            "tmdbId",
+            item => Boolean(item, "hasFile"));
     }
 
     private static RadarrOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, [], [], []);

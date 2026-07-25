@@ -178,6 +178,62 @@ export interface MediaSearchResponse {
   providers: MediaSearchProviderResult[]
 }
 
+export type MediaJobStatus =
+  'requested' | 'searching' | 'queued' | 'downloading' | 'stalled' |
+  'completed' | 'importing' | 'available' | 'failed' | 'unknown'
+
+export interface MediaJob {
+  id: string
+  mediaType: 'series' | 'movie' | 'season' | 'episode' | 'unknown'
+  title: string
+  subtitle: string | null
+  provider: 'Sonarr' | 'Radarr' | 'qBittorrent'
+  status: MediaJobStatus
+  progressPercent: number | null
+  sizeBytes: number | null
+  downloadSpeedBytesPerSecond: number | null
+  uploadSpeedBytesPerSecond: number | null
+  etaSeconds: number | null
+  episodeCount: number | null
+  completedEpisodeCount: number | null
+  requestedAt: string | null
+  startedAt: string | null
+  updatedAt: string
+  availableAt: string | null
+  errorCode: string | null
+  userMessage: string | null
+  playItemId: string | null
+  canPlay: boolean
+  artwork: string | null
+  details: Array<{
+    provider: string
+    status: MediaJobStatus
+    progressPercent: number | null
+    subtitle: string | null
+    userMessage: string | null
+  }>
+}
+
+export interface MediaJobsResponse {
+  collectedAtUtc: string
+  status: 'complete' | 'degraded'
+  providers: Array<{
+    provider: string
+    status: MediaSearchProviderStatus
+    userMessage: string | null
+  }>
+  jobs: MediaJob[]
+}
+
+export interface MediaPlayResponse {
+  jellyfinItemId: string
+  title: string
+  mediaType: 'series' | 'movie'
+  artwork: string | null
+  playUrl: string
+  canPlay: boolean
+}
+
 export interface MediaLookupResult {
   provider: 'Sonarr' | 'Radarr'
   foreignId: string
