@@ -144,3 +144,36 @@ export interface MediaOverview {
     recentlyAdded: Array<{ name: string; mediaType: string; dateCreatedUtc: string | null }>
   }
 }
+
+export type MediaSearchProviderStatus = 'online' | 'degraded' | 'unavailable' | 'notConfigured'
+
+export interface MediaSearchResult {
+  sourceId: string
+  title: string
+  year: number | null
+  mediaType: 'movie' | 'series' | 'season' | 'episode' | 'unknown'
+  state: 'available' | 'monitored' | 'unmonitored' | 'missing' | 'unknown'
+  posterUrl: string | null
+  metadata: {
+    seasonCount: number | null
+    episodeCount: number | null
+    episodeFileCount: number | null
+    hasFile: boolean | null
+    availableInLibrary: boolean | null
+    imageAvailable: boolean | null
+  }
+}
+
+export interface MediaSearchProviderResult {
+  provider: string
+  status: MediaSearchProviderStatus
+  error: string | null
+  results: MediaSearchResult[]
+}
+
+export interface MediaSearchResponse {
+  query: string
+  searchedAtUtc: string
+  status: 'complete' | 'partial' | 'unavailable'
+  providers: MediaSearchProviderResult[]
+}

@@ -8,6 +8,7 @@ public abstract class MediaClientBase(HttpClient httpClient, string serviceName)
 {
     protected HttpClient HttpClient { get; } = httpClient;
     protected string ServiceName { get; } = serviceName;
+    public string ProviderName => ServiceName;
 
     protected async Task<JsonDocument> GetJsonAsync(
         string requestUri,
@@ -66,6 +67,25 @@ public abstract class MediaClientBase(HttpClient httpClient, string serviceName)
             DateTimeOffset.UtcNow,
             message,
             true);
+    }
+
+    protected MediaSearchProviderResult SearchFailure(Exception exception)
+    {
+        var status = exception switch
+        {
+            TaskCanceledException => MediaStatuses.Unavailable,
+            HttpRequestException => MediaStatuses.Unavailable,
+            _ => MediaStatuses.Degraded
+        };
+        var message = exception switch
+        {
+            MediaAuthenticationException => "Authentication was rejected by the provider.",
+            JsonException => "The provider returned an invalid response.",
+            TaskCanceledException => "The provider search timed out.",
+            HttpRequestException => "The provider could not be reached.",
+            _ => "The provider search failed."
+        };
+        return new MediaSearchProviderResult(ServiceName, status, message, []);
     }
 
     protected static int ArrayLength(JsonElement root) =>

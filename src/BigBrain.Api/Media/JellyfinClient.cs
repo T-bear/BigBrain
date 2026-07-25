@@ -3,8 +3,53 @@ using System.Diagnostics;
 namespace BigBrain.Api.Media;
 
 public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient
+    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient, IMediaSearchProvider
 {
+    public async Task<MediaSearchProviderResult> SearchAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey))
+        {
+            return new(ServiceName, MediaStatuses.NotConfigured, "Provider credentials are not configured.", []);
+        }
+
+        try
+        {
+            var requestUri = $"Items?Recursive=true&SearchTerm={Uri.EscapeDataString(query)}"
+                + $"&Limit={limit}&IncludeItemTypes=Movie,Series,Season,Episode"
+                + "&Fields=ProductionYear,ChildCount,RecursiveItemCount,ImageTags";
+            using var response = await GetJellyfinJsonAsync(requestUri, options.Jellyfin.ApiKey, cancellationToken);
+            var root = response.RootElement;
+            var items = root.TryGetProperty("Items", out var values)
+                && values.ValueKind == System.Text.Json.JsonValueKind.Array
+                ? values.EnumerateArray()
+                    .Take(limit)
+                    .Select(item => new MediaSearchResult(
+                        GetString(item, "Id") ?? string.Empty,
+                        GetString(item, "Name") ?? "Untitled",
+                        item.TryGetProperty("ProductionYear", out var year) && year.TryGetInt32(out var yearValue)
+                            ? yearValue
+                            : null,
+                        NormalizeMediaType(GetString(item, "Type")),
+                        MediaSearchStates.Available,
+                        null,
+                        new MediaSearchMetadata(
+                            SeasonCount: GetNullableInt32(item, "ChildCount"),
+                            EpisodeCount: GetNullableInt32(item, "RecursiveItemCount"),
+                            AvailableInLibrary: true,
+                            ImageAvailable: HasPrimaryImage(item))))
+                    .ToArray()
+                : [];
+            return new(ServiceName, MediaStatuses.Online, null, items);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            return SearchFailure(exception);
+        }
+    }
+
     public async Task<JellyfinOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey))
@@ -120,4 +165,22 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
     }
 
     private static JellyfinOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, 0, []);
+
+    private static string NormalizeMediaType(string? type) => type?.ToLowerInvariant() switch
+    {
+        "movie" => MediaTypes.Movie,
+        "series" => MediaTypes.Series,
+        "season" => MediaTypes.Season,
+        "episode" => MediaTypes.Episode,
+        _ => MediaTypes.Unknown
+    };
+
+    private static int? GetNullableInt32(System.Text.Json.JsonElement item, string property) =>
+        item.TryGetProperty(property, out var value) && value.TryGetInt32(out var result) ? result : null;
+
+    private static bool HasPrimaryImage(System.Text.Json.JsonElement item) =>
+        item.TryGetProperty("ImageTags", out var tags)
+        && tags.ValueKind == System.Text.Json.JsonValueKind.Object
+        && tags.TryGetProperty("Primary", out var primary)
+        && primary.ValueKind == System.Text.Json.JsonValueKind.String;
 }

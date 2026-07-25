@@ -76,7 +76,7 @@ test('shows loading and then online activity without write controls', async () =
   expect(screen.getByText('New movie')).toBeInTheDocument()
   expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: /pause|resume|delete|add|search/i })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /pause|resume|delete|add|play/i })).not.toBeInTheDocument()
 })
 
 test('shows partial success with degraded and unavailable services', async () => {

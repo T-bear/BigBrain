@@ -4,6 +4,7 @@ import { StatusBadge } from './components'
 import { DashboardSections } from './dashboard/DashboardSections'
 import { mediaWidgetRegistry } from './dashboard/mediaWidgets'
 import type { MediaOverview } from './types'
+import { MediaSearch } from './media-search/MediaSearch'
 
 export function MediaDashboard() {
   const [overview, setOverview] = useState<MediaOverview | null>(null)
@@ -38,6 +39,7 @@ export function MediaDashboard() {
     {loading && !overview && <p aria-live="polite">Loading media intelligence…</p>}
     {error && <p role="alert" className="notice notice--error">Media dashboard could not be loaded.{overview ? ' Showing the latest update.' : ''}</p>}
     {overview && <>
+      <MediaSearch />
       <DashboardSections data={overview} state={overview.status} registry={mediaWidgetRegistry} />
       <p className="last-updated">Updated <time dateTime={overview.collectedAtUtc}>{new Date(overview.collectedAtUtc).toLocaleTimeString()}</time></p>
     </>}

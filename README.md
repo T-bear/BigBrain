@@ -64,11 +64,24 @@ docker compose down
 
 ## Local development
 
-.NET 10 SDK is required for the backend and Node.js is required for the frontend.
+The .NET SDK is not installed on the Debian host. Backend builds, tests and analyzers
+run in the pinned .NET 10 SDK container. The temporary artifacts path avoids changing
+or depending on host-owned `bin` and `obj` directories.
 
 ```bash
-dotnet build BigBrain.slnx
-dotnet test BigBrain.slnx
+docker run --rm --user "$(id -u):$(id -g)" \
+  --volume "$PWD:/workspace" \
+  --workdir /workspace \
+  --env BIGBRAIN_REPOSITORY_ROOT=/workspace \
+  mcr.microsoft.com/dotnet/sdk:10.0 \
+  dotnet build BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
+
+docker run --rm --user "$(id -u):$(id -g)" \
+  --volume "$PWD:/workspace" \
+  --workdir /workspace \
+  --env BIGBRAIN_REPOSITORY_ROOT=/workspace \
+  mcr.microsoft.com/dotnet/sdk:10.0 \
+  dotnet test BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
 ```
 
 ```bash

@@ -40,12 +40,24 @@ public sealed class MediaArchitectureTests
 
     private static DirectoryInfo FindRepositoryRoot()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "BigBrain.slnx")))
+        var configuredRoot = Environment.GetEnvironmentVariable("BIGBRAIN_REPOSITORY_ROOT");
+        var startPaths = string.IsNullOrWhiteSpace(configuredRoot)
+            ? new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory }
+            : new[] { configuredRoot, Directory.GetCurrentDirectory(), AppContext.BaseDirectory };
+        foreach (var startPath in startPaths)
         {
-            directory = directory.Parent;
+            var directory = new DirectoryInfo(startPath);
+            while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "BigBrain.slnx")))
+            {
+                directory = directory.Parent;
+            }
+
+            if (directory is not null)
+            {
+                return directory;
+            }
         }
 
-        return directory ?? throw new InvalidOperationException("Repository root was not found.");
+        throw new InvalidOperationException("Repository root was not found.");
     }
 }

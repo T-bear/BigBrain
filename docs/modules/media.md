@@ -1,4 +1,4 @@
-# Media Module – Sprint 1
+# Media Module – Sprint 2.3
 
 ## Responsibility and boundary
 
@@ -59,6 +59,20 @@ The endpoint always returns normalized BigBrain DTOs. It never returns raw provi
 
 No Media POST, PUT, PATCH or DELETE route exists.
 
+### `GET /api/v1/modules/media/search?query={query}`
+
+Searches the existing Jellyfin, Sonarr and Radarr libraries in parallel. Queries are
+trimmed and must contain at least two characters. Each provider returns at most ten
+normalized results with allowlisted title, year, media type, state and typed media
+statistics. Provider failures remain isolated and produce a sanitized per-provider
+status while successful results remain visible.
+
+Jellyfin uses its bounded text-search endpoint. Sonarr and Radarr search only their
+registered series and movies; external lookup and adding media remain out of scope.
+Poster availability may be reported, but `posterUrl` remains `null` until BigBrain has
+an authenticated image proxy that can avoid exposing credentials or internal URLs.
+Local paths, upstream URLs and raw provider errors are never returned.
+
 ## Upstream read contract
 
 | Service | Endpoints used |
@@ -84,11 +98,10 @@ Messages are fixed, sanitized text and never include raw exception messages, URL
 
 qBittorrent API key authentication requires qBittorrent 5.2.0+ or WebAPI 2.14.1+. The key is valid for the WebAPI endpoints above but not for static WebUI assets or the authentication endpoints. See the [official qBittorrent API key contract](https://github.com/qbittorrent/qBittorrent/wiki/API-Key-Authentication-%28%E2%89%A5v5.2.0%29).
 
-## Sprint 2 backlog
+## Deferred write scope
 
 The following are explicitly deferred and require separate authorization, audit, confirmation and capability design:
 
-- Search for a movie or series.
 - Add a series to Sonarr or a movie to Radarr.
 - Search for missing episodes or movies.
 - Pause, resume or delete a torrent.

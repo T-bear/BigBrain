@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using BigBrain.Api;
+using BigBrain.Api.Media;
 using BigBrain.Modules;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -139,6 +140,37 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         var response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.MethodNotAllowed, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("a")]
+    [InlineData(" a ")]
+    public async Task MediaSearchRejectsQueriesShorterThanTwoCharacters(string query)
+    {
+        var response = await _client.GetAsync(
+            $"/api/v1/modules/media/search?query={Uri.EscapeDataString(query)}",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task MediaSearchReturnsAllNotConfiguredProviders()
+    {
+        var response = await _client.GetAsync(
+            "/api/v1/modules/media/search?query=Family%20Guy",
+            TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadFromJsonAsync<MediaSearchResponse>(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var search = Assert.IsType<MediaSearchResponse>(body);
+        Assert.Equal(MediaSearchStatuses.Unavailable, search.Status);
+        Assert.Equal(["Jellyfin", "Sonarr", "Radarr"], search.Providers.Select(provider => provider.Provider));
+        Assert.All(search.Providers, provider => Assert.Equal(MediaStatuses.NotConfigured, provider.Status));
     }
 
     [Fact]

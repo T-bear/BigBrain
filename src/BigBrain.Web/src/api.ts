@@ -1,4 +1,4 @@
-import type { DockerInventory, MediaOverview, ModuleDefinition, SystemOverview } from './types'
+import type { DockerInventory, MediaOverview, MediaSearchResponse, ModuleDefinition, SystemOverview } from './types'
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal })
@@ -21,3 +21,6 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 
 export const getMediaOverview = (signal?: AbortSignal) =>
   getJson<MediaOverview>('/api/v1/modules/media', signal)
+
+export const searchMedia = (query: string, signal?: AbortSignal) =>
+  getJson<MediaSearchResponse>(`/api/v1/modules/media/search?query=${encodeURIComponent(query.trim())}`, signal)

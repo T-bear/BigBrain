@@ -4,8 +4,53 @@ using System.Text.Json;
 namespace BigBrain.Api.Media;
 
 public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Sonarr"), ISonarrClient
+    : MediaClientBase(httpClient, "Sonarr"), ISonarrClient, IMediaSearchProvider
 {
+    public async Task<MediaSearchProviderResult> SearchAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Sonarr.ApiKey))
+        {
+            return new(ServiceName, MediaStatuses.NotConfigured, "Provider credentials are not configured.", []);
+        }
+
+        try
+        {
+            using var series = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
+            var results = series.RootElement.ValueKind == JsonValueKind.Array
+                ? series.RootElement.EnumerateArray()
+                    .Where(item => (GetString(item, "title") ?? string.Empty)
+                        .Contains(query, StringComparison.OrdinalIgnoreCase))
+                    .Take(limit)
+                    .Select(item =>
+                    {
+                        var statistics = item.TryGetProperty("statistics", out var value)
+                            && value.ValueKind == JsonValueKind.Object ? value : default;
+                        return new MediaSearchResult(
+                            GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            GetString(item, "title") ?? "Untitled",
+                            NullableInt32(item, "year"),
+                            MediaTypes.Series,
+                            Boolean(item, "monitored") ? MediaSearchStates.Monitored : MediaSearchStates.Unmonitored,
+                            null,
+                            new MediaSearchMetadata(
+                                SeasonCount: ArrayLength(item.TryGetProperty("seasons", out var seasons) ? seasons : default),
+                                EpisodeCount: NullableInt32(statistics, "episodeCount"),
+                                EpisodeFileCount: NullableInt32(statistics, "episodeFileCount"),
+                                ImageAvailable: HasPoster(item)));
+                    })
+                    .ToArray()
+                : [];
+            return new(ServiceName, MediaStatuses.Online, null, results);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            return SearchFailure(exception);
+        }
+    }
+
     public async Task<SonarrOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(options.Sonarr.ApiKey))
@@ -73,11 +118,68 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
                 GetString(item, "sourceTitle") ?? "Untitled",
                 GetString(item, "eventType") ?? "unknown",
                 DateTimeOffset.TryParse(GetString(item, "date"), out var date) ? date : null)).ToArray();
+
+    private static int? NullableInt32(JsonElement item, string property) =>
+        item.ValueKind == JsonValueKind.Object
+        && item.TryGetProperty(property, out var value)
+        && value.TryGetInt32(out var result) ? result : null;
+
+    private static bool HasPoster(JsonElement item) =>
+        item.TryGetProperty("images", out var images)
+        && images.ValueKind == JsonValueKind.Array
+        && images.EnumerateArray().Any(image =>
+            string.Equals(GetString(image, "coverType"), "poster", StringComparison.OrdinalIgnoreCase));
 }
 
 public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Radarr"), IRadarrClient
+    : MediaClientBase(httpClient, "Radarr"), IRadarrClient, IMediaSearchProvider
 {
+    public async Task<MediaSearchProviderResult> SearchAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Radarr.ApiKey))
+        {
+            return new(ServiceName, MediaStatuses.NotConfigured, "Provider credentials are not configured.", []);
+        }
+
+        try
+        {
+            using var movies = await GetJsonAsync("api/v3/movie", options.Radarr.ApiKey, cancellationToken);
+            var results = movies.RootElement.ValueKind == JsonValueKind.Array
+                ? movies.RootElement.EnumerateArray()
+                    .Where(item => (GetString(item, "title") ?? string.Empty)
+                        .Contains(query, StringComparison.OrdinalIgnoreCase))
+                    .Take(limit)
+                    .Select(item =>
+                    {
+                        var hasFile = Boolean(item, "hasFile");
+                        var monitored = Boolean(item, "monitored");
+                        var state = hasFile
+                            ? MediaSearchStates.Available
+                            : monitored ? MediaSearchStates.Monitored : MediaSearchStates.Unmonitored;
+                        return new MediaSearchResult(
+                            GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            GetString(item, "title") ?? "Untitled",
+                            NullableInt32(item, "year"),
+                            MediaTypes.Movie,
+                            state,
+                            null,
+                            new MediaSearchMetadata(
+                                HasFile: hasFile,
+                                ImageAvailable: HasPoster(item)));
+                    })
+                    .ToArray()
+                : [];
+            return new(ServiceName, MediaStatuses.Online, null, results);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            return SearchFailure(exception);
+        }
+    }
+
     public async Task<RadarrOverview> GetOverviewAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(options.Radarr.ApiKey))
@@ -139,4 +241,13 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
                 GetString(item, "sourceTitle") ?? "Untitled",
                 GetString(item, "eventType") ?? "unknown",
                 DateTimeOffset.TryParse(GetString(item, "date"), out var date) ? date : null)).ToArray();
+
+    private static int? NullableInt32(JsonElement item, string property) =>
+        item.TryGetProperty(property, out var value) && value.TryGetInt32(out var result) ? result : null;
+
+    private static bool HasPoster(JsonElement item) =>
+        item.TryGetProperty("images", out var images)
+        && images.ValueKind == JsonValueKind.Array
+        && images.EnumerateArray().Any(image =>
+            string.Equals(GetString(image, "coverType"), "poster", StringComparison.OrdinalIgnoreCase));
 }

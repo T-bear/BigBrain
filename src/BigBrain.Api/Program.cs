@@ -38,6 +38,13 @@ public partial class Program
         });
         builder.Services.AddSingleton<IMediaHealthEngine, MediaHealthEngine>();
         builder.Services.AddTransient<IMediaService, MediaService>();
+        builder.Services.AddTransient<IMediaSearchProvider>(serviceProvider =>
+            (IMediaSearchProvider)serviceProvider.GetRequiredService<IJellyfinClient>());
+        builder.Services.AddTransient<IMediaSearchProvider>(serviceProvider =>
+            (IMediaSearchProvider)serviceProvider.GetRequiredService<ISonarrClient>());
+        builder.Services.AddTransient<IMediaSearchProvider>(serviceProvider =>
+            (IMediaSearchProvider)serviceProvider.GetRequiredService<IRadarrClient>());
+        builder.Services.AddTransient<IMediaSearchService, MediaSearchService>();
         builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
@@ -101,6 +108,22 @@ public partial class Program
             "/api/v1/modules/media",
             async (IMediaService mediaService, CancellationToken cancellationToken) =>
                 Results.Ok(await mediaService.GetOverviewAsync(cancellationToken)));
+
+        app.MapGet(
+            "/api/v1/modules/media/search",
+            async (string? query, IMediaSearchService searchService, CancellationToken cancellationToken) =>
+            {
+                var normalizedQuery = query?.Trim() ?? string.Empty;
+                if (normalizedQuery.Length < 2)
+                {
+                    return Results.Problem(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        title: "Invalid media search query",
+                        detail: "The query must contain at least two characters.");
+                }
+
+                return Results.Ok(await searchService.SearchAsync(normalizedQuery, cancellationToken));
+            });
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
