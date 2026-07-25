@@ -1,11 +1,122 @@
+using System.Net.Http.Json;
 using System.Diagnostics;
 using System.Text.Json;
 
 namespace BigBrain.Api.Media;
 
 public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Sonarr"), ISonarrClient, IMediaSearchProvider
+    : MediaClientBase(httpClient, "Sonarr"), ISonarrClient, IMediaSearchProvider,
+      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider
 {
+    public string SupportedMediaType => MediaLookupTypes.Series;
+
+    public async Task<MediaLookupProviderResult> LookupAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Sonarr.ApiKey))
+            return new(ServiceName, MediaStatuses.NotConfigured, "Provider credentials are not configured.", []);
+        try
+        {
+            using var lookup = await GetJsonAsync(
+                $"api/v3/series/lookup?term={Uri.EscapeDataString(query)}",
+                options.Sonarr.ApiKey,
+                cancellationToken);
+            using var registered = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
+            var registeredItems = registered.RootElement.ValueKind == JsonValueKind.Array
+                ? registered.RootElement.EnumerateArray().ToArray()
+                : [];
+            var results = lookup.RootElement.ValueKind == JsonValueKind.Array
+                ? lookup.RootElement.EnumerateArray().Take(limit)
+                    .Select(item => MapLookup(item, registeredItems))
+                    .ToArray()
+                : [];
+            return new(ServiceName, MediaStatuses.Online, null, results);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            return LookupFailure(exception);
+        }
+    }
+
+    async Task<ProviderAddOptions> IMediaRequestProvider.GetAddOptionsAsync(CancellationToken cancellationToken)
+    {
+        EnsureSonarrConfigured();
+        using var roots = await GetJsonAsync("api/v3/rootfolder", options.Sonarr.ApiKey, cancellationToken);
+        using var qualities = await GetJsonAsync("api/v3/qualityprofile", options.Sonarr.ApiKey, cancellationToken);
+        return new(
+            ServiceName,
+            MediaLookupTypes.Series,
+            MapProviderOptions(roots.RootElement, "TV Library", includeValue: true),
+            MapProviderOptions(qualities.RootElement, "Quality profile", includeValue: false),
+            ["all", "future", "missing", "existing", "firstSeason", "lastSeason", "latestSeason", "pilot", "recent", "none"],
+            ["standard", "daily", "anime"]);
+    }
+
+    async Task<MediaLookupResult?> IMediaRequestProvider.GetLookupItemAsync(
+        string foreignId,
+        CancellationToken cancellationToken)
+    {
+        EnsureSonarrConfigured();
+        if (!int.TryParse(foreignId, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var tvdbId))
+            return null;
+        using var lookup = await GetJsonAsync(
+            $"api/v3/series/lookup?term=tvdb:{tvdbId}",
+            options.Sonarr.ApiKey,
+            cancellationToken);
+        var item = lookup.RootElement.ValueKind == JsonValueKind.Array
+            ? lookup.RootElement.EnumerateArray().FirstOrDefault(candidate => GetInt32(candidate, "tvdbId") == tvdbId)
+            : default;
+        return item.ValueKind == JsonValueKind.Object ? MapLookup(item, []) : null;
+    }
+
+    async Task<bool> IMediaRequestProvider.IsRegisteredAsync(
+        string foreignId,
+        string title,
+        int? year,
+        CancellationToken cancellationToken)
+    {
+        EnsureSonarrConfigured();
+        using var registered = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
+        if (registered.RootElement.ValueKind != JsonValueKind.Array) return false;
+        return registered.RootElement.EnumerateArray().Any(item =>
+            int.TryParse(foreignId, out var tvdbId) && tvdbId > 0
+                ? GetInt32(item, "tvdbId") == tvdbId
+                : SameTitleAndYear(item, title, year));
+    }
+
+    async Task<ProviderAddResult> IMediaAddProvider.AddAsync(
+        ProviderAddCommand command,
+        CancellationToken cancellationToken)
+    {
+        EnsureSonarrConfigured();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v3/series");
+        request.Headers.TryAddWithoutValidation("X-Api-Key", options.Sonarr.ApiKey);
+        request.Content = JsonContent.Create(new
+        {
+            tvdbId = int.Parse(command.ForeignId, System.Globalization.CultureInfo.InvariantCulture),
+            command.Title,
+            command.QualityProfileId,
+            rootFolderPath = command.RootFolderValue,
+            monitored = command.Monitor != "none",
+            seriesType = command.SeriesType ?? "standard",
+            seasonFolder = true,
+            addOptions = new
+            {
+                monitor = command.Monitor,
+                searchForMissingEpisodes = command.SearchAfterAdd,
+                searchForCutoffUnmetEpisodes = false
+            }
+        });
+        using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        EnsureSuccess(response);
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+        return new(
+            GetInt32(document.RootElement, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+            GetString(document.RootElement, "title") ?? command.Title);
+    }
     public async Task<MediaSearchProviderResult> SearchAsync(
         string query,
         int limit,
@@ -129,11 +240,178 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
         && images.ValueKind == JsonValueKind.Array
         && images.EnumerateArray().Any(image =>
             string.Equals(GetString(image, "coverType"), "poster", StringComparison.OrdinalIgnoreCase));
+
+    private MediaLookupProviderResult LookupFailure(Exception exception)
+    {
+        var failure = SearchFailure(exception);
+        return new(failure.Provider, failure.Status, failure.Error, []);
+    }
+
+    private static MediaLookupResult MapLookup(JsonElement item, IReadOnlyList<JsonElement> registered)
+    {
+        var tvdbId = GetInt32(item, "tvdbId");
+        var title = GetString(item, "title") ?? "Untitled";
+        var year = NullableInt32(item, "year");
+        var existing = registered.FirstOrDefault(candidate =>
+            tvdbId > 0 ? GetInt32(candidate, "tvdbId") == tvdbId : SameTitleAndYear(candidate, title, year));
+        var alreadyRegistered = existing.ValueKind == JsonValueKind.Object;
+        return new(
+            "Sonarr",
+            tvdbId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            title,
+            null,
+            year,
+            LimitOverview(GetString(item, "overview")),
+            GetString(item, "network"),
+            NullableInt32(item, "runtime"),
+            GetString(item, "status"),
+            MediaLookupTypes.Series,
+            alreadyRegistered ? MediaLookupStates.AlreadyRegistered : MediaLookupStates.External,
+            HasPoster(item),
+            alreadyRegistered,
+            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null);
+    }
+
+    private static ProviderOption[] MapProviderOptions(JsonElement root, string label, bool includeValue) =>
+        root.ValueKind != JsonValueKind.Array ? [] : root.EnumerateArray()
+            .Where(item => GetInt32(item, "id") > 0 && (!includeValue || Boolean(item, "accessible")))
+            .Select((item, index) => new ProviderOption(
+                GetInt32(item, "id"),
+                includeValue ? GetString(item, "path") ?? string.Empty : GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+                includeValue ? $"{label} {index + 1}" : GetString(item, "name") ?? $"{label} {index + 1}",
+                includeValue && item.TryGetProperty("freeSpace", out var free) && free.TryGetInt64(out var bytes) ? bytes : null))
+            .ToArray();
+
+    private static bool SameTitleAndYear(JsonElement item, string title, int? year) =>
+        string.Equals(GetString(item, "title"), title, StringComparison.OrdinalIgnoreCase)
+        && (year is null || NullableInt32(item, "year") == year);
+
+    private static string? LimitOverview(string? overview) =>
+        overview is null || overview.Length <= 500 ? overview : string.Concat(overview.AsSpan(0, 497), "...");
+
+    private void EnsureSonarrConfigured()
+    {
+        if (string.IsNullOrWhiteSpace(options.Sonarr.ApiKey))
+            throw new MediaRequestException(
+                MediaRequestErrors.ProviderUnavailable,
+                "Sonarr is not configured.",
+                StatusCodes.Status503ServiceUnavailable);
+    }
 }
 
 public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Radarr"), IRadarrClient, IMediaSearchProvider
+    : MediaClientBase(httpClient, "Radarr"), IRadarrClient, IMediaSearchProvider,
+      IMediaLookupProvider, IMediaRequestProvider, IMediaAddProvider
 {
+    public string SupportedMediaType => MediaLookupTypes.Movie;
+
+    public async Task<MediaLookupProviderResult> LookupAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.Radarr.ApiKey))
+            return new(ServiceName, MediaStatuses.NotConfigured, "Provider credentials are not configured.", []);
+        try
+        {
+            using var lookup = await GetJsonAsync(
+                $"api/v3/movie/lookup?term={Uri.EscapeDataString(query)}",
+                options.Radarr.ApiKey,
+                cancellationToken);
+            using var registered = await GetJsonAsync("api/v3/movie", options.Radarr.ApiKey, cancellationToken);
+            var registeredItems = registered.RootElement.ValueKind == JsonValueKind.Array
+                ? registered.RootElement.EnumerateArray().ToArray()
+                : [];
+            var results = lookup.RootElement.ValueKind == JsonValueKind.Array
+                ? lookup.RootElement.EnumerateArray().Take(limit)
+                    .Select(item => MapLookup(item, registeredItems))
+                    .ToArray()
+                : [];
+            return new(ServiceName, MediaStatuses.Online, null, results);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var failure = SearchFailure(exception);
+            return new(failure.Provider, failure.Status, failure.Error, []);
+        }
+    }
+
+    async Task<ProviderAddOptions> IMediaRequestProvider.GetAddOptionsAsync(CancellationToken cancellationToken)
+    {
+        EnsureRadarrConfigured();
+        using var roots = await GetJsonAsync("api/v3/rootfolder", options.Radarr.ApiKey, cancellationToken);
+        using var qualities = await GetJsonAsync("api/v3/qualityprofile", options.Radarr.ApiKey, cancellationToken);
+        return new(
+            ServiceName,
+            MediaLookupTypes.Movie,
+            MapProviderOptions(roots.RootElement, "Movie Library", includeValue: true),
+            MapProviderOptions(qualities.RootElement, "Quality profile", includeValue: false),
+            ["movieOnly", "movieAndCollection", "none"],
+            []);
+    }
+
+    async Task<MediaLookupResult?> IMediaRequestProvider.GetLookupItemAsync(
+        string foreignId,
+        CancellationToken cancellationToken)
+    {
+        EnsureRadarrConfigured();
+        if (!int.TryParse(foreignId, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var tmdbId))
+            return null;
+        using var lookup = await GetJsonAsync(
+            $"api/v3/movie/lookup?term=tmdb:{tmdbId}",
+            options.Radarr.ApiKey,
+            cancellationToken);
+        var item = lookup.RootElement.ValueKind == JsonValueKind.Array
+            ? lookup.RootElement.EnumerateArray().FirstOrDefault(candidate => GetInt32(candidate, "tmdbId") == tmdbId)
+            : default;
+        return item.ValueKind == JsonValueKind.Object ? MapLookup(item, []) : null;
+    }
+
+    async Task<bool> IMediaRequestProvider.IsRegisteredAsync(
+        string foreignId,
+        string title,
+        int? year,
+        CancellationToken cancellationToken)
+    {
+        EnsureRadarrConfigured();
+        using var registered = await GetJsonAsync("api/v3/movie", options.Radarr.ApiKey, cancellationToken);
+        if (registered.RootElement.ValueKind != JsonValueKind.Array) return false;
+        return registered.RootElement.EnumerateArray().Any(item =>
+            int.TryParse(foreignId, out var tmdbId) && tmdbId > 0
+                ? GetInt32(item, "tmdbId") == tmdbId
+                : SameTitleAndYear(item, title, year));
+    }
+
+    async Task<ProviderAddResult> IMediaAddProvider.AddAsync(
+        ProviderAddCommand command,
+        CancellationToken cancellationToken)
+    {
+        EnsureRadarrConfigured();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v3/movie");
+        request.Headers.TryAddWithoutValidation("X-Api-Key", options.Radarr.ApiKey);
+        request.Content = JsonContent.Create(new
+        {
+            tmdbId = int.Parse(command.ForeignId, System.Globalization.CultureInfo.InvariantCulture),
+            command.Title,
+            command.QualityProfileId,
+            rootFolderPath = command.RootFolderValue,
+            monitored = command.Monitor != "none",
+            minimumAvailability = "released",
+            addOptions = new
+            {
+                monitor = command.Monitor,
+                searchForMovie = command.SearchAfterAdd,
+                addMethod = "manual"
+            }
+        });
+        using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        EnsureSuccess(response);
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+        return new(
+            GetInt32(document.RootElement, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+            GetString(document.RootElement, "title") ?? command.Title);
+    }
     public async Task<MediaSearchProviderResult> SearchAsync(
         string query,
         int limit,
@@ -250,4 +528,55 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
         && images.ValueKind == JsonValueKind.Array
         && images.EnumerateArray().Any(image =>
             string.Equals(GetString(image, "coverType"), "poster", StringComparison.OrdinalIgnoreCase));
+
+    private static MediaLookupResult MapLookup(JsonElement item, IReadOnlyList<JsonElement> registered)
+    {
+        var tmdbId = GetInt32(item, "tmdbId");
+        var title = GetString(item, "title") ?? "Untitled";
+        var year = NullableInt32(item, "year");
+        var existing = registered.FirstOrDefault(candidate =>
+            tmdbId > 0 ? GetInt32(candidate, "tmdbId") == tmdbId : SameTitleAndYear(candidate, title, year));
+        var alreadyRegistered = existing.ValueKind == JsonValueKind.Object;
+        return new(
+            "Radarr",
+            tmdbId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            title,
+            GetString(item, "originalTitle"),
+            year,
+            LimitOverview(GetString(item, "overview")),
+            null,
+            NullableInt32(item, "runtime"),
+            GetString(item, "status"),
+            MediaLookupTypes.Movie,
+            alreadyRegistered ? MediaLookupStates.AlreadyRegistered : MediaLookupStates.External,
+            HasPoster(item),
+            alreadyRegistered,
+            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null);
+    }
+
+    private static ProviderOption[] MapProviderOptions(JsonElement root, string label, bool includeValue) =>
+        root.ValueKind != JsonValueKind.Array ? [] : root.EnumerateArray()
+            .Where(item => GetInt32(item, "id") > 0 && (!includeValue || Boolean(item, "accessible")))
+            .Select((item, index) => new ProviderOption(
+                GetInt32(item, "id"),
+                includeValue ? GetString(item, "path") ?? string.Empty : GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture),
+                includeValue ? $"{label} {index + 1}" : GetString(item, "name") ?? $"{label} {index + 1}",
+                includeValue && item.TryGetProperty("freeSpace", out var free) && free.TryGetInt64(out var bytes) ? bytes : null))
+            .ToArray();
+
+    private static bool SameTitleAndYear(JsonElement item, string title, int? year) =>
+        string.Equals(GetString(item, "title"), title, StringComparison.OrdinalIgnoreCase)
+        && (year is null || NullableInt32(item, "year") == year);
+
+    private static string? LimitOverview(string? overview) =>
+        overview is null || overview.Length <= 500 ? overview : string.Concat(overview.AsSpan(0, 497), "...");
+
+    private void EnsureRadarrConfigured()
+    {
+        if (string.IsNullOrWhiteSpace(options.Radarr.ApiKey))
+            throw new MediaRequestException(
+                MediaRequestErrors.ProviderUnavailable,
+                "Radarr is not configured.",
+                StatusCodes.Status503ServiceUnavailable);
+    }
 }

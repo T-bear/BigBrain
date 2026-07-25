@@ -1,4 +1,4 @@
-# Media Module – Sprint 2.3
+# Media Module – Sprint 2.4
 
 ## Responsibility and boundary
 
@@ -25,6 +25,10 @@ The module does not mount the Docker socket or media directories, execute comman
 | `MEDIA__QBITTORRENT__BASEURL` | `http://qbittorrent:8080` | No |
 | `MEDIA__QBITTORRENT__APIKEY` | unset | Yes |
 | `MEDIA__TIMEOUTSECONDS` | `3` | No |
+| `MEDIA__REQUESTS__ENABLED` | `true` | No |
+| `MEDIA__REQUESTS__DEFAULTSEARCHAFTERADD` | `false` | No |
+| `MEDIA__REQUESTS__PREVIEWTOKENLIFETIMEMINUTES` | `5` | No |
+| `MEDIA__REQUESTS__MAXIMUMCONCURRENTREQUESTS` | `1` | No |
 
 URLs must be absolute HTTP or HTTPS URLs without query strings or fragments. Timeout must be between 1 and 15 seconds. Credentials are optional so an unconfigured service becomes `notConfigured`; real values must be supplied through runtime secret injection and must never be committed.
 
@@ -57,7 +61,7 @@ Each service status contains only:
 
 The endpoint always returns normalized BigBrain DTOs. It never returns raw provider payloads, request headers, cookies, API keys, passwords, user names, IP addresses, device identifiers, local paths, download URLs or detailed viewing history.
 
-No Media POST, PUT, PATCH or DELETE route exists.
+The dashboard and library-search endpoints remain read-only.
 
 ### `GET /api/v1/modules/media/search?query={query}`
 
@@ -68,18 +72,41 @@ statistics. Provider failures remain isolated and produce a sanitized per-provid
 status while successful results remain visible.
 
 Jellyfin uses its bounded text-search endpoint. Sonarr and Radarr search only their
-registered series and movies; external lookup and adding media remain out of scope.
+registered series and movies.
 Poster availability may be reported, but `posterUrl` remains `null` until BigBrain has
 an authenticated image proxy that can avoid exposing credentials or internal URLs.
 Local paths, upstream URLs and raw provider errors are never returned.
+
+### External lookup and controlled requests
+
+- `GET /api/v1/modules/media/lookup?query={query}&mediaType={series|movie|all}`
+- `GET /api/v1/modules/media/add-options/series`
+- `GET /api/v1/modules/media/add-options/movie`
+- `POST /api/v1/modules/media/requests/preview`
+- `POST /api/v1/modules/media/requests/confirm`
+
+Lookup uses Sonarr's official series lookup and Radarr's official movie lookup. Stable
+TVDB/TMDB identifiers are compared with registered provider libraries before a result
+can be requested. Root folders and quality profiles are returned as opaque IDs; full
+provider paths never cross the API boundary.
+
+Preview is non-mutating and returns a random, five-minute opaque token. Confirm
+revalidates lookup identity, duplicate state and current provider options before the
+only permitted external writes: `POST /api/v3/series` or `POST /api/v3/movie`.
+`searchAfterAdd` is passed only through the add payload and defaults to false.
+
+Preview and idempotency state are held by a locked DI singleton for the current
+single API instance. Restart invalidates outstanding previews safely. Multiple API
+replicas require a shared durable request store before this feature can be enabled
+across replicas.
 
 ## Upstream read contract
 
 | Service | Endpoints used |
 |---|---|
 | Jellyfin | `GET /System/Info`, `/Library/VirtualFolders`, `/Items/Counts`, `/Sessions` |
-| Sonarr | `GET /api/v3/system/status`, `/series`, `/wanted/missing`, `/queue`, `/history`, `/health` |
-| Radarr | `GET /api/v3/system/status`, `/movie`, `/wanted/missing`, `/queue`, `/history`, `/health` |
+| Sonarr | Existing endpoints plus `GET /series/lookup`, `/rootfolder`, `/qualityprofile`; controlled `POST /series` only |
+| Radarr | Existing endpoints plus `GET /movie/lookup`, `/rootfolder`, `/qualityprofile`; controlled `POST /movie` only |
 | Prowlarr | `GET /api/v1/system/status`, `/indexer`, `/health`, `/applications` |
 | qBittorrent | `GET /api/v2/app/version`, `/torrents/info`, `/transfer/info` with `Authorization: Bearer <API_KEY>` |
 
@@ -102,13 +129,12 @@ qBittorrent API key authentication requires qBittorrent 5.2.0+ or WebAPI 2.14.1+
 
 The following are explicitly deferred and require separate authorization, audit, confirmation and capability design:
 
-- Add a series to Sonarr or a movie to Radarr.
 - Search for missing episodes or movies.
 - Pause, resume or delete a torrent.
 - Open a title in Jellyfin.
 - AI commands for media management.
 
-There are no placeholder write routes, inactive write buttons or write capabilities in Sprint 1.
+No delete, rename, move, edit, release, command or download-client operation exists.
 
 ## ADR impact
 

@@ -177,3 +177,80 @@ export interface MediaSearchResponse {
   status: 'complete' | 'partial' | 'unavailable'
   providers: MediaSearchProviderResult[]
 }
+
+export interface MediaLookupResult {
+  provider: 'Sonarr' | 'Radarr'
+  foreignId: string
+  title: string
+  originalTitle: string | null
+  year: number | null
+  overview: string | null
+  network: string | null
+  runtimeMinutes: number | null
+  status: string | null
+  mediaType: 'series' | 'movie'
+  lookupState: 'external' | 'alreadyRegistered' | 'unavailable' | 'unknown'
+  imageAvailable: boolean
+  alreadyRegistered: boolean
+  existingSourceId: string | null
+}
+
+export interface MediaLookupResponse {
+  query: string
+  mediaType: 'series' | 'movie' | 'all'
+  lookedUpAtUtc: string
+  status: 'complete' | 'partial' | 'unavailable'
+  requestsEnabled: boolean
+  providers: Array<{
+    provider: string
+    status: MediaSearchProviderStatus
+    error: string | null
+    results: MediaLookupResult[]
+  }>
+}
+
+export interface MediaAddOption {
+  id: string
+  displayName: string
+  freeSpaceBytes: number | null
+}
+
+export interface MediaAddOptionsResponse {
+  provider: string
+  mediaType: 'series' | 'movie'
+  requestsEnabled: boolean
+  rootFolders: MediaAddOption[]
+  qualityProfiles: MediaAddOption[]
+  monitoringOptions: MediaAddOption[]
+  seriesTypes: MediaAddOption[]
+  defaultRootFolderId: string | null
+  defaultQualityProfileId: string | null
+  defaultMonitoringOptionId: string
+  defaultSeriesTypeId: string | null
+  defaultSearchAfterAdd: boolean
+}
+
+export interface MediaRequestPreviewResponse {
+  requestToken: string
+  expiresAtUtc: string
+  status: 'previewReady'
+  summary: {
+    title: string
+    year: number | null
+    provider: string
+    mediaType: 'series' | 'movie'
+    rootFolder: string
+    qualityProfile: string
+    monitoring: string
+    seriesType: string | null
+    searchAfterAdd: boolean
+  }
+}
+
+export interface MediaRequestConfirmResponse {
+  status: 'created' | 'alreadyExists'
+  provider: string
+  mediaType: 'series' | 'movie'
+  sourceId: string
+  title: string
+}

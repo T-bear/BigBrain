@@ -5,5 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="../BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="BigBrain.Api.Tests" />
+  </ItemGroup>
 </Project>
-

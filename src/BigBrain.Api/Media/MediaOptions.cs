@@ -9,6 +9,7 @@ public sealed class MediaOptions
     public MediaApiKeyOptions Radarr { get; init; } = new("http://radarr:7878");
     public MediaApiKeyOptions Prowlarr { get; init; } = new("http://prowlarr:9696");
     public QBittorrentOptions QBittorrent { get; init; } = new();
+    public MediaRequestOptions Requests { get; init; } = new();
     public int TimeoutSeconds { get; init; } = 3;
 
     public static bool IsValid(MediaOptions options) =>
@@ -17,7 +18,9 @@ public sealed class MediaOptions
         && IsHttpUrl(options.Sonarr.BaseUrl)
         && IsHttpUrl(options.Radarr.BaseUrl)
         && IsHttpUrl(options.Prowlarr.BaseUrl)
-        && IsHttpUrl(options.QBittorrent.BaseUrl);
+        && IsHttpUrl(options.QBittorrent.BaseUrl)
+        && options.Requests.PreviewTokenLifetimeMinutes is >= 1 and <= 15
+        && options.Requests.MaximumConcurrentRequests is >= 1 and <= 4;
 
     public bool IsAnyServiceConfigured =>
         !string.IsNullOrWhiteSpace(Jellyfin.ApiKey)
@@ -31,6 +34,14 @@ public sealed class MediaOptions
         && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
         && string.IsNullOrEmpty(uri.Query)
         && string.IsNullOrEmpty(uri.Fragment);
+}
+
+public sealed class MediaRequestOptions
+{
+    public bool Enabled { get; init; } = true;
+    public bool DefaultSearchAfterAdd { get; init; }
+    public int PreviewTokenLifetimeMinutes { get; init; } = 5;
+    public int MaximumConcurrentRequests { get; init; } = 1;
 }
 
 public sealed class MediaApiKeyOptions(string baseUrl)

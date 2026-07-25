@@ -173,6 +173,33 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.All(search.Providers, provider => Assert.Equal(MediaStatuses.NotConfigured, provider.Status));
     }
 
+    [Theory]
+    [InlineData("", "all")]
+    [InlineData("a", "all")]
+    [InlineData("title", "invalid")]
+    public async Task MediaLookupValidatesQueryAndMediaType(string query, string mediaType)
+    {
+        var response = await _client.GetAsync(
+            $"/api/v1/modules/media/lookup?query={Uri.EscapeDataString(query)}&mediaType={mediaType}",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task MediaLookupKeepsProvidersSeparateWhenNotConfigured()
+    {
+        var response = await _client.GetAsync(
+            "/api/v1/modules/media/lookup?query=Expanse&mediaType=all",
+            TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadFromJsonAsync<MediaLookupResponse>(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(["Sonarr", "Radarr"], Assert.IsType<MediaLookupResponse>(body).Providers.Select(item => item.Provider));
+    }
+
     [Fact]
     public async Task UnknownApiRouteReturnsProblemDetails()
     {
