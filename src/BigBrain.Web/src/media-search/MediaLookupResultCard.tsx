@@ -1,4 +1,12 @@
 import type { MediaLookupResult } from '../types'
+import { MediaPoster } from './MediaPoster'
+
+const statusText = (result: MediaLookupResult) => {
+  if (result.alreadyExists || result.alreadyRegistered)
+    return result.monitored === false ? 'Tillagd, ej bevakad' : 'Redan tillagd'
+  if (result.canRequest !== false) return 'Kan läggas till'
+  return 'Inte tillgänglig'
+}
 
 export function MediaLookupResultCard({
   result,
@@ -10,20 +18,21 @@ export function MediaLookupResultCard({
   onPrepare: (result: MediaLookupResult, trigger: HTMLButtonElement) => void
 }) {
   return <article className="media-lookup-result-card">
-    <div className="media-search-poster-placeholder" aria-hidden="true">No poster</div>
+    <MediaPoster title={result.title} url={result.posterUrl} />
     <div className="media-search-result-copy">
       <h5 title={result.title}>{result.title}</h5>
-      <p>{result.mediaType}{result.year !== null ? ` · ${result.year}` : ''}</p>
+      <p>{result.mediaType === 'series' ? 'Serie' : 'Film'}{result.year !== null ? ` · ${result.year}` : ''}</p>
       {result.overview && <p className="media-lookup-overview">{result.overview}</p>}
-      {result.alreadyRegistered
-        ? <strong className="media-search-state">Already registered</strong>
-        : requestsEnabled && <button
+      <div className="media-result-actions">
+        <strong className="media-search-state">{statusText(result)}</strong>
+        {!result.alreadyRegistered && requestsEnabled && result.canRequest !== false && <button
             type="button"
             className="secondary-button media-prepare-button"
             onClick={event => onPrepare(result, event.currentTarget)}
           >
-            {result.mediaType === 'series' ? 'Add to Sonarr' : 'Add to Radarr'}
+            {result.mediaType === 'series' ? 'Lägg till serie' : 'Lägg till film'}
           </button>}
+      </div>
     </div>
   </article>
 }

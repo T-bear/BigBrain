@@ -264,8 +264,8 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
 
     private MediaLookupProviderResult LookupFailure(Exception exception)
     {
-        var failure = SearchFailure(exception);
-        return new(failure.Provider, failure.Status, failure.Error, []);
+        var (code, message, status) = MediaProviderFailures.Map(exception);
+        return new(ServiceName, status, message, [], code);
     }
 
     private static MediaLookupResult MapLookup(JsonElement item, IReadOnlyList<JsonElement> registered)
@@ -290,7 +290,12 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
             alreadyRegistered ? MediaLookupStates.AlreadyRegistered : MediaLookupStates.External,
             HasPoster(item),
             alreadyRegistered,
-            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null);
+            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
+            tvdbId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            PosterUrl(item),
+            alreadyRegistered ? Boolean(existing, "monitored") : null,
+            !alreadyRegistered,
+            alreadyRegistered ? MediaProviderErrorCodes.AlreadyExists : "canRequest");
     }
 
     private static ProviderOption[] MapProviderOptions(JsonElement root, string label, bool includeValue) =>
@@ -309,6 +314,8 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
 
     private static string? LimitOverview(string? overview) =>
         overview is null || overview.Length <= 500 ? overview : string.Concat(overview.AsSpan(0, 497), "...");
+
+    private static string? PosterUrl(JsonElement item) => MediaPosterToken.Create(ArrPosterUrl.Get(item));
 
     private void EnsureSonarrConfigured()
     {
@@ -353,8 +360,8 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
         }
         catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            var failure = SearchFailure(exception);
-            return new(failure.Provider, failure.Status, failure.Error, []);
+            var (code, message, status) = MediaProviderFailures.Map(exception);
+            return new(ServiceName, status, message, [], code);
         }
     }
 
@@ -592,7 +599,12 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
             alreadyRegistered ? MediaLookupStates.AlreadyRegistered : MediaLookupStates.External,
             HasPoster(item),
             alreadyRegistered,
-            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null);
+            alreadyRegistered ? GetInt32(existing, "id").ToString(System.Globalization.CultureInfo.InvariantCulture) : null,
+            tmdbId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            PosterUrl(item),
+            alreadyRegistered ? Boolean(existing, "monitored") : null,
+            !alreadyRegistered,
+            alreadyRegistered ? MediaProviderErrorCodes.AlreadyExists : "canRequest");
     }
 
     private static ProviderOption[] MapProviderOptions(JsonElement root, string label, bool includeValue) =>
@@ -612,6 +624,8 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
     private static string? LimitOverview(string? overview) =>
         overview is null || overview.Length <= 500 ? overview : string.Concat(overview.AsSpan(0, 497), "...");
 
+    private static string? PosterUrl(JsonElement item) => MediaPosterToken.Create(ArrPosterUrl.Get(item));
+
     private void EnsureRadarrConfigured()
     {
         if (string.IsNullOrWhiteSpace(options.Radarr.ApiKey))
@@ -620,4 +634,32 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
                 "Radarr is not configured.",
                 StatusCodes.Status503ServiceUnavailable);
     }
+}
+
+internal static class ArrPosterUrl
+{
+    public static string? Get(JsonElement item)
+    {
+        if (!item.TryGetProperty("images", out var images) || images.ValueKind != JsonValueKind.Array)
+            return null;
+        var value = images.EnumerateArray()
+            .Where(image => string.Equals(String(image, "coverType"), "poster", StringComparison.OrdinalIgnoreCase))
+            .Select(image => String(image, "remoteUrl"))
+            .FirstOrDefault(url => !string.IsNullOrWhiteSpace(url));
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri)
+            || uri.Scheme != Uri.UriSchemeHttps
+            || !string.IsNullOrEmpty(uri.UserInfo)
+            || uri.IsLoopback
+            || string.IsNullOrWhiteSpace(uri.Host)
+            || !string.IsNullOrEmpty(uri.Fragment)
+            || System.Net.IPAddress.TryParse(uri.Host, out _)
+            || uri.Host.EndsWith(".local", StringComparison.OrdinalIgnoreCase))
+            return null;
+        return uri.AbsoluteUri;
+    }
+
+    private static string? String(JsonElement element, string property) =>
+        element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
 }

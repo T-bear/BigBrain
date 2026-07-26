@@ -39,6 +39,20 @@ MEDIA__QBITTORRENT__APIKEY=<qbittorrent-api-key>
 
 Keep the supplied internal URLs unless the container names or ports differ. `MEDIA__TIMEOUTSECONDS` defaults to 3 and accepts 1–15 seconds.
 
+### Optional browser-facing service links
+
+Service links are separate from internal adapter URLs. Configure only HTTP or HTTPS
+URLs that the user's browser can safely reach, for example:
+
+```dotenv
+MEDIA__SERVICELINKS__JELLYFIN__URL=https://media.example.test/jellyfin
+MEDIA__SERVICELINKS__JELLYFIN__ENABLED=true
+```
+
+Equivalent variables exist for Radarr, Sonarr, Prowlarr and qBittorrent in
+`.env.example`. URLs containing credentials, query strings or fragments are rejected.
+API keys must never be placed in these URLs.
+
 ### Where to obtain credentials
 
 - Jellyfin: Dashboard → Advanced → API Keys. Create a dedicated BigBrain key.

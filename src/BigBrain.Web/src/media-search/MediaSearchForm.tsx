@@ -25,7 +25,7 @@ export function MediaSearchForm({
   }
 
   return <form className="media-search-form" role="search" onSubmit={submit}>
-    <label htmlFor="media-search-query">Search title</label>
+    <label htmlFor="media-search-query">Titel</label>
     <div className="media-search-controls">
       <input
         id="media-search-query"
@@ -34,10 +34,10 @@ export function MediaSearchForm({
         value={query}
         onChange={event => onQueryChange(event.target.value)}
         onKeyDown={submitOnEnter}
-        placeholder="Try Family Guy"
+        placeholder="Sök efter en film eller serie"
         autoComplete="off"
       />
-      <button type="submit" disabled={!canSubmit}>{loading ? 'Searching…' : 'Search'}</button>
+      <button type="submit" disabled={!canSubmit}>{loading ? 'Söker…' : 'Sök'}</button>
     </div>
   </form>
 }

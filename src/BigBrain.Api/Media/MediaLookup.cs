@@ -19,6 +19,17 @@ public static class MediaLookupStates
     public const string Unknown = "unknown";
 }
 
+public static class MediaProviderErrorCodes
+{
+    public const string Timeout = "timeout";
+    public const string AuthenticationFailure = "authenticationFailure";
+    public const string ProviderUnavailable = "providerUnavailable";
+    public const string ValidationError = "validationError";
+    public const string RootFolderUnavailable = "rootFolderUnavailable";
+    public const string AlreadyExists = "alreadyExists";
+    public const string UnknownError = "unknownError";
+}
+
 public sealed record MediaLookupResult(
     string Provider,
     string ForeignId,
@@ -33,13 +44,24 @@ public sealed record MediaLookupResult(
     string LookupState,
     bool ImageAvailable,
     bool AlreadyRegistered,
-    string? ExistingSourceId);
+    string? ExistingSourceId,
+    string ProviderId = "",
+    string? PosterUrl = null,
+    bool? Monitored = null,
+    bool CanRequest = false,
+    string? RequestState = null,
+    string? ErrorCode = null,
+    string? ErrorMessage = null)
+{
+    public bool AlreadyExists => AlreadyRegistered;
+}
 
 public sealed record MediaLookupProviderResult(
     string Provider,
     string Status,
     string? Error,
-    IReadOnlyList<MediaLookupResult> Results);
+    IReadOnlyList<MediaLookupResult> Results,
+    string? ErrorCode = null);
 
 public sealed record MediaLookupResponse(
     string Query,
@@ -117,9 +139,12 @@ public sealed class MediaLookupService(
         {
             throw;
         }
-        catch
+        catch (Exception exception)
         {
-            return new(provider.ProviderName, MediaStatuses.Degraded, "The provider lookup failed.", []);
+            var (code, message, status) = MediaProviderFailures.Map(exception);
+            if (code == MediaProviderErrorCodes.UnknownError)
+                message = "The provider lookup failed.";
+            return new(provider.ProviderName, status, message, [], code);
         }
     }
 }

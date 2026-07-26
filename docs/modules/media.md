@@ -1,5 +1,20 @@
 # Media Module – Sprint 3
 
+## Sprint 4 – Media Experience
+
+**Goal:** Improve the existing BigBrain 1.0 media search, request, status and mobile
+experience without adding a new platform, client type or module architecture.
+
+**Definition of Done:**
+
+- Film, Serie and Båda select only the intended lookup providers.
+- Movie and series results share normalized status, poster fallback and request UX.
+- Optional service Web UI links expose no credentials or internal adapter URLs.
+- Mobile users have stable Home, Search, Queue and Services navigation.
+- Queue and service status polling pauses while the page is hidden and never overlaps.
+- Provider errors have safe stable categories and Swedish UI messages.
+- Backend/frontend tests and Release builds pass without breaking preview/confirm.
+
 ## Responsibility and boundary
 
 The Media module provides a read-only, normalized dashboard view of Jellyfin, Sonarr, Radarr, Prowlarr and qBittorrent. These are application services, so their documented HTTP APIs are accessed through Control Plane adapters. Sentinel remains the exclusive boundary for operating-system resources, Docker, processes and filesystems; the Media module does not use those interfaces.
@@ -73,13 +88,18 @@ status while successful results remain visible.
 
 Jellyfin uses its bounded text-search endpoint. Sonarr and Radarr search only their
 registered series and movies.
-Poster availability may be reported, but `posterUrl` remains `null` until BigBrain has
-an authenticated image proxy that can avoid exposing credentials or internal URLs.
-Local paths, upstream URLs and raw provider errors are never returned.
+Library-search poster URLs remain null. External lookup maps provider `images` entries
+with `coverType=poster` and a permitted public HTTPS `remoteUrl` to a signed relative
+BigBrain poster URL. The browser loads the image through BigBrain, not from Radarr,
+Sonarr or the public artwork host directly. The proxy allows only known TMDB, TVDB and
+Fanart hosts, follows no redirects, accepts bounded JPEG/PNG/WebP responses and never
+forwards provider credentials. Internal URLs, local paths and raw provider errors are
+never returned.
 
 ### External lookup and controlled requests
 
 - `GET /api/v1/modules/media/lookup?query={query}&mediaType={series|movie|all}`
+- `GET /api/v1/modules/media/service-links`
 - `GET /api/v1/modules/media/add-options/series`
 - `GET /api/v1/modules/media/add-options/movie`
 - `POST /api/v1/modules/media/requests/preview`
@@ -89,6 +109,19 @@ Lookup uses Sonarr's official series lookup and Radarr's official movie lookup. 
 TVDB/TMDB identifiers are compared with registered provider libraries before a result
 can be requested. Root folders and quality profiles are returned as opaque IDs; full
 provider paths never cross the API boundary.
+
+`series` selects only Sonarr, `movie` selects only Radarr and `all` selects both
+concurrently. Omitting `mediaType` retains the backward-compatible `all` behavior.
+Invalid values return Problem Details with `code: invalidMediaType`.
+
+Lookup results retain the earlier request fields and add normalized `providerId`,
+`posterUrl`, `monitored`, `canRequest`, `requestState`, `errorCode` and
+`errorMessage`. Provider failures use stable safe categories such as `timeout`,
+`authenticationFailure`, `providerUnavailable` and `unknownError`.
+
+The service-links endpoint returns only `id`, `displayName`, `url` and `enabled`.
+Browser-facing links are configured separately under `Media:ServiceLinks`; adapter
+base URLs and authentication material are never returned.
 
 Preview is non-mutating and returns a random, five-minute opaque token. Confirm
 revalidates lookup identity, duplicate state and current provider options before the
@@ -125,10 +158,11 @@ A stable TVDB/TMDB match in Jellyfin transitions a movie or series item to
 unverified season playable. Recently added Jellyfin movies and series are included
 as bounded available results.
 
-The events endpoint uses Server-Sent Events. It sends an initial snapshot and then
-changed snapshots at a five-second observation interval. It does not introduce a
-background write, message broker or persistent job database. Provider reads share
-a three-second, process-local snapshot cache, run in parallel, propagate
+The events endpoint remains available for compatibility. Sprint 4's React client uses
+simple polling: Media Jobs refreshes about every 12 seconds and media service status
+about every 45 seconds while the page is visible. Polling pauses while hidden,
+refreshes when visibility returns and prevents overlapping requests. Provider reads
+share a three-second, process-local snapshot cache, run in parallel, propagate
 cancellation and isolate provider failures.
 
 The play endpoint returns metadata only. `playUrl` is a relative browser path and
@@ -139,6 +173,16 @@ autoplay or stream media.
 The normalized `IMediaLibraryCatalog` boundary is independent from dashboard
 components and Arr queue payloads. A future Smart Queue can build on this catalog
 without depending on the Media Jobs presentation model.
+
+### Sprint 4 limitations
+
+- Posters depend on a safe public HTTPS image supplied by a provider and supported by
+  the bounded BigBrain proxy; otherwise the UI shows a placeholder. Poster tokens are
+  process-local and old search results should be refreshed after an API restart.
+- Service Web UI links are optional and disabled until explicitly configured.
+- Mobile navigation targets stable sections in the existing hash view. It is not a
+  TV interface or a general multi-client platform.
+- Polling is intentionally used instead of adding a new real-time transport.
 
 ## Upstream read contract
 

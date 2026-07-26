@@ -6,6 +6,9 @@ import { mediaWidgetRegistry } from './dashboard/mediaWidgets'
 import type { MediaOverview } from './types'
 import { MediaSearch } from './media-search/MediaSearch'
 import { MediaJobs } from './media-jobs/MediaJobs'
+import { MediaServiceLinks } from './media-services/MediaServiceLinks'
+
+const MEDIA_STATUS_POLL_MS = 45_000
 
 export function MediaDashboard() {
   const [overview, setOverview] = useState<MediaOverview | null>(null)
@@ -30,7 +33,18 @@ export function MediaDashboard() {
 
   useEffect(() => {
     void refresh()
-    return () => controllerRef.current?.abort()
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') void refresh()
+    }, MEDIA_STATUS_POLL_MS)
+    const visible = () => {
+      if (document.visibilityState === 'visible') void refresh()
+    }
+    document.addEventListener('visibilitychange', visible)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', visible)
+      controllerRef.current?.abort()
+    }
   }, [refresh])
 
   return <section id="media" aria-labelledby="media-heading" className="media-section">
@@ -40,8 +54,9 @@ export function MediaDashboard() {
     {loading && !overview && <p aria-live="polite">Loading media intelligence…</p>}
     {error && <p role="alert" className="notice notice--error">Media dashboard could not be loaded.{overview ? ' Showing the latest update.' : ''}</p>}
     {overview && <>
-      <MediaSearch />
-      <MediaJobs />
+      <MediaServiceLinks />
+      <div id="search"><MediaSearch /></div>
+      <div id="queue"><MediaJobs /></div>
       <DashboardSections data={overview} state={overview.status} registry={mediaWidgetRegistry} />
       <p className="last-updated">Updated <time dateTime={overview.collectedAtUtc}>{new Date(overview.collectedAtUtc).toLocaleTimeString()}</time></p>
     </>}

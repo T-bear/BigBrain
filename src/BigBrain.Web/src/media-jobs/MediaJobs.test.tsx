@@ -3,22 +3,12 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { MediaJobs } from './MediaJobs'
 import type { MediaJob, MediaJobsResponse } from '../types'
 
-let publish: ((response: MediaJobsResponse) => void) | undefined
-let disconnect: (() => void) | undefined
 const getMediaJobs = vi.fn()
 const getMediaPlay = vi.fn()
 
 vi.mock('../api', () => ({
   getMediaJobs: (...args: unknown[]) => getMediaJobs(...args),
   getMediaPlay: (...args: unknown[]) => getMediaPlay(...args),
-  subscribeMediaJobs: (
-    onJobs: (response: MediaJobsResponse) => void,
-    onError: () => void,
-  ) => {
-    publish = onJobs
-    disconnect = onError
-    return vi.fn()
-  },
 }))
 
 const importingJob: MediaJob = {
@@ -66,8 +56,6 @@ const importing: MediaJobsResponse = {
 }
 
 beforeEach(() => {
-  publish = undefined
-  disconnect = undefined
   getMediaJobs.mockReset()
   getMediaPlay.mockReset()
   getMediaJobs.mockResolvedValue(importing)
@@ -97,12 +85,10 @@ test('renders jobs, progress, episode aggregation and expandable provider detail
   expect(container.querySelector('.media-job__identity')).toBeInTheDocument()
 })
 
-test('live transition to available resolves Jellyfin play metadata without reload', async () => {
-  render(<MediaJobs />)
-  await screen.findByRole('heading', { name: 'The Expanse' })
-
-  act(() => {
-    publish?.({
+test('polling transition to available resolves Jellyfin play metadata without reload', async () => {
+  getMediaJobs
+    .mockResolvedValueOnce(importing)
+    .mockResolvedValue({
       ...importing,
       jobs: [{
         ...importingJob,
@@ -114,7 +100,12 @@ test('live transition to available resolves Jellyfin play metadata without reloa
         canPlay: true,
       }],
     })
-  })
+  render(<MediaJobs />)
+  await screen.findByRole('heading', { name: 'The Expanse' })
+
+  act(() => window.dispatchEvent(new Event('focus')))
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' })
+  act(() => document.dispatchEvent(new Event('visibilitychange')))
   fireEvent.click(within(screen.getByLabelText('Filter media jobs')).getByRole('button', { name: 'Available' }))
 
   expect(await screen.findByText('Available', { selector: '.media-job__status' })).toBeInTheDocument()
@@ -139,13 +130,15 @@ test('Jellyfin degraded state retains jobs and never shows an unverified play ac
   expect(screen.queryByRole('link', { name: /play in jellyfin/i })).not.toBeInTheDocument()
 })
 
-test('connection failure keeps the latest snapshot and shows degraded update state', async () => {
+test('polling failure keeps the latest snapshot and shows degraded update state', async () => {
+  getMediaJobs.mockResolvedValueOnce(importing).mockRejectedValueOnce(new Error('offline'))
   render(<MediaJobs />)
   await screen.findByRole('heading', { name: 'The Expanse' })
 
-  act(() => disconnect?.())
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' })
+  act(() => document.dispatchEvent(new Event('visibilitychange')))
 
-  expect(screen.getByText('Live updates are temporarily unavailable. Showing the latest status.')).toBeInTheDocument()
+  expect(await screen.findByText('Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.')).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'The Expanse' })).toBeInTheDocument()
 })
 

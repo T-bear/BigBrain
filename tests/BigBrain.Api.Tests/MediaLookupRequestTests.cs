@@ -29,6 +29,39 @@ public sealed class MediaLookupRequestTests
         Assert.All(response.Providers, provider => Assert.True(provider.Results.Count <= 10));
     }
 
+    [Theory]
+    [InlineData(MediaLookupTypes.Series, 1, 0)]
+    [InlineData(MediaLookupTypes.Movie, 0, 1)]
+    [InlineData(MediaLookupTypes.All, 1, 1)]
+    public async Task LookupNeverCallsAnUnselectedProvider(
+        string mediaType,
+        int expectedSonarrCalls,
+        int expectedRadarrCalls)
+    {
+        var sonarr = new LookupStub("Sonarr", MediaLookupTypes.Series);
+        var radarr = new LookupStub("Radarr", MediaLookupTypes.Movie);
+        var service = new MediaLookupService([sonarr, radarr], new MediaOptions(), NullLogger<MediaLookupService>.Instance);
+
+        await service.LookupAsync("title", mediaType, TestContext.Current.CancellationToken);
+
+        Assert.Equal(expectedSonarrCalls, sonarr.Calls);
+        Assert.Equal(expectedRadarrCalls, radarr.Calls);
+    }
+
+    [Fact]
+    public async Task LookupMapsProviderTimeoutToStableErrorCode()
+    {
+        var provider = new LookupStub("Sonarr", MediaLookupTypes.Series, timeout: true);
+        var service = new MediaLookupService([provider], new MediaOptions(), NullLogger<MediaLookupService>.Instance);
+
+        var response = await service.LookupAsync("title", MediaLookupTypes.Series, TestContext.Current.CancellationToken);
+
+        var failure = Assert.Single(response.Providers);
+        Assert.Equal(MediaProviderErrorCodes.Timeout, failure.ErrorCode);
+        Assert.Equal(MediaStatuses.Unavailable, failure.Status);
+        Assert.DoesNotContain("exception", failure.Error!, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public async Task LookupIsPartialWhenOneProviderFailsAndSanitizesException()
     {
@@ -59,6 +92,77 @@ public sealed class MediaLookupRequestTests
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
         Assert.True(provider.CancellationObserved);
+    }
+
+    [Fact]
+    public void PosterUrlAcceptsOnlySafePublicHttpsImages()
+    {
+        using var safe = System.Text.Json.JsonDocument.Parse(
+            """{"images":[{"coverType":"poster","remoteUrl":"https://image.tmdb.org/t/p/w500/poster.jpg"}]}""");
+        using var internalUrl = System.Text.Json.JsonDocument.Parse(
+            """{"images":[{"coverType":"poster","remoteUrl":"http://sonarr:8989/MediaCover/1/poster.jpg"}]}""");
+        using var secretUrl = System.Text.Json.JsonDocument.Parse(
+            """{"images":[{"coverType":"poster","remoteUrl":"https://user:secret@example.test/poster.jpg"}]}""");
+
+        Assert.Equal("https://image.tmdb.org/t/p/w500/poster.jpg", ArrPosterUrl.Get(safe.RootElement));
+        Assert.Null(ArrPosterUrl.Get(internalUrl.RootElement));
+        Assert.Null(ArrPosterUrl.Get(secretUrl.RootElement));
+    }
+
+    [Fact]
+    public async Task PosterProxyReturnsAllowedImageWithoutExposingSourceOrSecrets()
+    {
+        const string source = "https://image.tmdb.org/t/p/w500/poster.jpg";
+        var route = MediaPosterToken.Create(source);
+        var handler = new PosterHandler(HttpStatusCode.OK, "image/jpeg", [1, 2, 3]);
+        var service = new MediaPosterService(
+            new PosterClientFactory(handler),
+            NullLogger<MediaPosterService>.Instance);
+
+        var poster = await service.GetAsync(
+            Assert.IsType<string>(route).Split('/').Last(),
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(poster);
+        Assert.Equal("image/jpeg", poster.Value.ContentType);
+        Assert.Equal([1, 2, 3], poster.Value.Bytes);
+        Assert.Equal(source, Assert.Single(handler.RequestUris));
+        Assert.DoesNotContain(source, route, StringComparison.Ordinal);
+        Assert.DoesNotContain("apiKey", route, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData("http://image.tmdb.org/poster.jpg")]
+    [InlineData("https://127.0.0.1/poster.jpg")]
+    [InlineData("https://user:secret@image.tmdb.org/poster.jpg")]
+    [InlineData("https://untrusted.example.test/poster.jpg")]
+    public void PosterProxyRejectsUnsafeSources(string source)
+    {
+        Assert.Null(MediaPosterToken.Create(source));
+    }
+
+    [Fact]
+    public void ServiceLinksExposeOnlyAllowlistedPublicFields()
+    {
+        var options = new MediaOptions
+        {
+            Jellyfin = new MediaApiKeyOptions("http://jellyfin:8096") { ApiKey = "secret-key" },
+            ServiceLinks = new MediaServiceLinksOptions
+            {
+                Jellyfin = new MediaServiceLinkOptions
+                {
+                    Enabled = true,
+                    Url = "https://media.example.test/jellyfin"
+                }
+            }
+        };
+
+        var serialized = System.Text.Json.JsonSerializer.Serialize(MediaServiceLinks.From(options));
+
+        Assert.Contains("https://media.example.test/jellyfin", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain("secret-key", serialized, StringComparison.Ordinal);
+        Assert.DoesNotContain("ApiKey", serialized, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("BaseUrl", serialized, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -282,9 +386,11 @@ public sealed class MediaLookupRequestTests
         string provider,
         string mediaType,
         bool throwRaw = false,
-        bool waitForCancellation = false) : IMediaLookupProvider
+        bool waitForCancellation = false,
+        bool timeout = false) : IMediaLookupProvider
     {
         public bool CancellationObserved { get; private set; }
+        public int Calls { get; private set; }
         public string ProviderName => provider;
         public string SupportedMediaType => mediaType;
 
@@ -293,7 +399,9 @@ public sealed class MediaLookupRequestTests
             int limit,
             CancellationToken cancellationToken)
         {
+            Calls++;
             if (throwRaw) throw new InvalidOperationException("raw secret /srv/private");
+            if (timeout) throw new TaskCanceledException("provider timeout");
             if (waitForCancellation)
             {
                 using var registration = cancellationToken.Register(() => CancellationObserved = true);
@@ -365,6 +473,30 @@ public sealed class MediaLookupRequestTests
             {
                 Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
             });
+        }
+    }
+
+    private sealed class PosterClientFactory(HttpMessageHandler handler) : IHttpClientFactory
+    {
+        public HttpClient CreateClient(string name) => new(handler, disposeHandler: false);
+    }
+
+    private sealed class PosterHandler(
+        HttpStatusCode status,
+        string contentType,
+        byte[] content) : HttpMessageHandler
+    {
+        public List<string> RequestUris { get; } = [];
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            RequestUris.Add(request.RequestUri?.AbsoluteUri ?? string.Empty);
+            var response = new HttpResponseMessage(status) { Content = new ByteArrayContent(content) };
+            response.Content.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            return Task.FromResult(response);
         }
     }
 }

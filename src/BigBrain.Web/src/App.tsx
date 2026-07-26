@@ -3,6 +3,7 @@ import { getDockerContainers, getModules, getSystemOverview } from './api'
 import { DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadge } from './components'
 import { MediaDashboard } from './MediaDashboard'
 import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
+import { MobileNavigation } from './MobileNavigation'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -90,7 +91,7 @@ export default function App() {
         </nav>
       </aside>
 
-      <main className="main">
+      <main className="main" id="home">
         <header className="page-header">
           <div>
             <p className="eyebrow">Control plane</p>
@@ -167,6 +168,7 @@ export default function App() {
 
         <MediaDashboard />
       </main>
+      <MobileNavigation />
     </div>
   )
 }

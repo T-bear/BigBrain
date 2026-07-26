@@ -10,6 +10,7 @@ public sealed class MediaOptions
     public MediaApiKeyOptions Prowlarr { get; init; } = new("http://prowlarr:9696");
     public QBittorrentOptions QBittorrent { get; init; } = new();
     public MediaRequestOptions Requests { get; init; } = new();
+    public MediaServiceLinksOptions ServiceLinks { get; init; } = new();
     public int TimeoutSeconds { get; init; } = 3;
 
     public static bool IsValid(MediaOptions options) =>
@@ -19,6 +20,7 @@ public sealed class MediaOptions
         && IsHttpUrl(options.Radarr.BaseUrl)
         && IsHttpUrl(options.Prowlarr.BaseUrl)
         && IsHttpUrl(options.QBittorrent.BaseUrl)
+        && options.ServiceLinks.All.All(IsValidServiceLink)
         && options.Requests.PreviewTokenLifetimeMinutes is >= 1 and <= 15
         && options.Requests.MaximumConcurrentRequests is >= 1 and <= 4;
 
@@ -34,6 +36,9 @@ public sealed class MediaOptions
         && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
         && string.IsNullOrEmpty(uri.Query)
         && string.IsNullOrEmpty(uri.Fragment);
+
+    private static bool IsValidServiceLink(MediaServiceLinkOptions link) =>
+        !link.Enabled || IsHttpUrl(link.Url);
 }
 
 public sealed class MediaRequestOptions
@@ -54,4 +59,39 @@ public sealed class QBittorrentOptions
 {
     public string BaseUrl { get; init; } = "http://qbittorrent:8080";
     public string? ApiKey { get; init; }
+}
+
+public sealed class MediaServiceLinksOptions
+{
+    public MediaServiceLinkOptions Jellyfin { get; init; } = new();
+    public MediaServiceLinkOptions Radarr { get; init; } = new();
+    public MediaServiceLinkOptions Sonarr { get; init; } = new();
+    public MediaServiceLinkOptions Prowlarr { get; init; } = new();
+    public MediaServiceLinkOptions QBittorrent { get; init; } = new();
+
+    internal IReadOnlyList<MediaServiceLinkOptions> All =>
+        [Jellyfin, Radarr, Sonarr, Prowlarr, QBittorrent];
+}
+
+public sealed class MediaServiceLinkOptions
+{
+    public string Url { get; init; } = string.Empty;
+    public bool Enabled { get; init; }
+}
+
+public sealed record MediaServiceLink(string Id, string DisplayName, string Url, bool Enabled);
+
+public static class MediaServiceLinks
+{
+    public static IReadOnlyList<MediaServiceLink> From(MediaOptions options) =>
+    [
+        Create("jellyfin", "Jellyfin", options.ServiceLinks.Jellyfin),
+        Create("radarr", "Radarr", options.ServiceLinks.Radarr),
+        Create("sonarr", "Sonarr", options.ServiceLinks.Sonarr),
+        Create("prowlarr", "Prowlarr", options.ServiceLinks.Prowlarr),
+        Create("qbittorrent", "qBittorrent", options.ServiceLinks.QBittorrent)
+    ];
+
+    private static MediaServiceLink Create(string id, string name, MediaServiceLinkOptions options) =>
+        new(id, name, options.Enabled ? options.Url : string.Empty, options.Enabled);
 }

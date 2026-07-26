@@ -8,6 +8,7 @@ import type {
   MediaRequestConfirmResponse,
   MediaRequestPreviewResponse,
   MediaSearchResponse,
+  MediaServiceLink,
   ModuleDefinition,
   SystemOverview,
 } from './types'
@@ -40,6 +41,9 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 
 export const getMediaOverview = (signal?: AbortSignal) =>
   getJson<MediaOverview>('/api/v1/modules/media', signal)
+
+export const getMediaServiceLinks = (signal?: AbortSignal) =>
+  getJson<MediaServiceLink[]>('/api/v1/modules/media/service-links', signal)
 
 export const getMediaJobs = (signal?: AbortSignal) =>
   getJson<MediaJobsResponse>('/api/v1/modules/media/jobs?limit=50', signal)
@@ -102,6 +106,21 @@ export const lookupMedia = (query: string, mediaType = 'all', signal?: AbortSign
   getJson<MediaLookupResponse>(
     `/api/v1/modules/media/lookup?query=${encodeURIComponent(query.trim())}&mediaType=${encodeURIComponent(mediaType)}`,
     signal)
+
+export function mediaErrorMessage(code: string | null | undefined) {
+  switch (code) {
+    case 'timeout': return 'Tjänsten svarade inte i tid. Försök igen.'
+    case 'authenticationFailure':
+    case 'providerConfigurationInvalid': return 'Tjänstens autentisering misslyckades.'
+    case 'providerUnavailable': return 'Tjänsten är inte tillgänglig just nu.'
+    case 'validationError': return 'Kontrollera de angivna uppgifterna.'
+    case 'rootFolderUnavailable':
+    case 'invalidRootFolder': return 'Den valda rotmappen är inte längre tillgänglig.'
+    case 'alreadyExists':
+    case 'alreadyRegistered': return 'Titeln är redan tillagd.'
+    default: return 'Åtgärden kunde inte slutföras. Försök igen.'
+  }
+}
 
 export const getMediaAddOptions = (mediaType: 'series' | 'movie', signal?: AbortSignal) =>
   getJson<MediaAddOptionsResponse>(`/api/v1/modules/media/add-options/${mediaType}`, signal)

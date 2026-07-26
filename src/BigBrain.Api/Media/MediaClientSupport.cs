@@ -4,6 +4,33 @@ using System.Text.Json;
 
 namespace BigBrain.Api.Media;
 
+public static class MediaProviderFailures
+{
+    public static (string Code, string Message, string Status) Map(Exception exception) => exception switch
+    {
+        MediaAuthenticationException => (
+            MediaProviderErrorCodes.AuthenticationFailure,
+            "Authentication was rejected by the provider.",
+            MediaStatuses.Degraded),
+        TaskCanceledException => (
+            MediaProviderErrorCodes.Timeout,
+            "The provider request timed out.",
+            MediaStatuses.Unavailable),
+        HttpRequestException => (
+            MediaProviderErrorCodes.ProviderUnavailable,
+            "The provider could not be reached.",
+            MediaStatuses.Unavailable),
+        JsonException => (
+            MediaProviderErrorCodes.UnknownError,
+            "The provider returned an invalid response.",
+            MediaStatuses.Degraded),
+        _ => (
+            MediaProviderErrorCodes.UnknownError,
+            "The provider request failed.",
+            MediaStatuses.Degraded)
+    };
+}
+
 public sealed class ProviderHttpLoggingHandler(
     string provider,
     ILogger<ProviderHttpLoggingHandler> logger) : DelegatingHandler
@@ -128,20 +155,7 @@ public abstract class MediaClientBase(HttpClient httpClient, string serviceName)
 
     protected MediaSearchProviderResult SearchFailure(Exception exception)
     {
-        var status = exception switch
-        {
-            TaskCanceledException => MediaStatuses.Unavailable,
-            HttpRequestException => MediaStatuses.Unavailable,
-            _ => MediaStatuses.Degraded
-        };
-        var message = exception switch
-        {
-            MediaAuthenticationException => "Authentication was rejected by the provider.",
-            JsonException => "The provider returned an invalid response.",
-            TaskCanceledException => "The provider search timed out.",
-            HttpRequestException => "The provider could not be reached.",
-            _ => "The provider search failed."
-        };
+        var (_, message, status) = MediaProviderFailures.Map(exception);
         return new MediaSearchProviderResult(ServiceName, status, message, []);
     }
 

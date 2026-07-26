@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { getMediaJobs, subscribeMediaJobs } from '../api'
+import { getMediaJobs } from '../api'
 import type { MediaJobsResponse } from '../types'
 import { MediaJobCard } from './MediaJobCard'
 
 type JobFilter = 'active' | 'importing' | 'available' | 'failed' | 'all'
+const JOB_POLL_MS = 12_000
 const filters: Array<{ id: JobFilter; label: string }> = [
   { id: 'active', label: 'Active' },
   { id: 'importing', label: 'Importing' },
@@ -22,29 +23,33 @@ export function MediaJobs() {
   useEffect(() => {
     mounted.current = true
     const controller = new AbortController()
-    void getMediaJobs(controller.signal)
-      .then(result => {
+    let requestActive = false
+    const refresh = async () => {
+      if (requestActive || document.visibilityState !== 'visible') return
+      requestActive = true
+      try {
+        const result = await getMediaJobs(controller.signal)
         if (mounted.current) {
           setSnapshot(result)
           setFailed(false)
         }
-      })
-      .catch(error => {
+      } catch (error) {
         if (mounted.current && (!(error instanceof Error) || error.name !== 'AbortError')) setFailed(true)
-      })
-    const unsubscribe = subscribeMediaJobs(
-      result => {
-        if (mounted.current) {
-          setSnapshot(result)
-          setFailed(false)
-        }
-      },
-      () => { if (mounted.current) setFailed(true) },
-    )
+      } finally {
+        requestActive = false
+      }
+    }
+    void refresh()
+    const interval = window.setInterval(() => void refresh(), JOB_POLL_MS)
+    const visible = () => {
+      if (document.visibilityState === 'visible') void refresh()
+    }
+    document.addEventListener('visibilitychange', visible)
     return () => {
       mounted.current = false
       controller.abort()
-      unsubscribe()
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', visible)
     }
   }, [])
 
@@ -60,11 +65,11 @@ export function MediaJobs() {
   return <section className="media-jobs-section" aria-labelledby="media-jobs-heading">
     <header className="media-jobs-heading">
       <div><p className="eyebrow">Live activity</p><h3 id="media-jobs-heading">Media Jobs</h3></div>
-      <span aria-live="polite">{failed ? 'Updates interrupted' : 'Live updates'}</span>
+      <span aria-live="polite">{failed ? 'Uppdatering avbruten' : 'Uppdateras automatiskt'}</span>
     </header>
     {!snapshot && !failed && <p aria-live="polite">Loading media jobs…</p>}
     {failed && !snapshot && <p role="alert" className="notice notice--error">Media jobs could not be loaded.</p>}
-    {failed && snapshot && <p role="status" className="notice notice--warning">Live updates are temporarily unavailable. Showing the latest status.</p>}
+    {failed && snapshot && <p role="status" className="notice notice--warning">Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.</p>}
     {unavailableProviders.length > 0 && <p role="status" className="notice notice--warning">
       {unavailableProviders.some(provider => provider.provider === 'Jellyfin')
         ? 'Jellyfin is currently unavailable. Download and import status is still shown.'

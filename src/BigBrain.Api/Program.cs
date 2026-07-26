@@ -56,6 +56,14 @@ public partial class Program
         builder.Services.AddTransient<IMediaLookupProvider>(serviceProvider =>
             (IMediaLookupProvider)serviceProvider.GetRequiredService<IRadarrClient>());
         builder.Services.AddTransient<IMediaLookupService, MediaLookupService>();
+        builder.Services.AddSingleton<MediaPosterService>();
+        builder.Services.AddHttpClient("MediaPosters")
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+                UseCookies = false
+            })
+            .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(5));
         builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
             (IMediaJobsProvider)serviceProvider.GetRequiredService<ISonarrClient>());
         builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
@@ -140,6 +148,24 @@ public partial class Program
             "/api/v1/modules/media",
             async (IMediaService mediaService, CancellationToken cancellationToken) =>
                 Results.Ok(await mediaService.GetOverviewAsync(cancellationToken)));
+
+        app.MapGet(
+            "/api/v1/modules/media/service-links",
+            (MediaOptions options) => Results.Ok(MediaServiceLinks.From(options)));
+
+        app.MapGet(
+            "/api/v1/modules/media/posters/{token}",
+            async (
+                string token,
+                HttpContext context,
+                MediaPosterService posters,
+                CancellationToken cancellationToken) =>
+            {
+                var poster = await posters.GetAsync(token, cancellationToken);
+                if (poster is null) return Results.NotFound();
+                context.Response.Headers.CacheControl = "public,max-age=3600";
+                return Results.File(poster.Value.Bytes, poster.Value.ContentType);
+            });
 
         app.MapGet(
             "/api/v1/modules/media/search",

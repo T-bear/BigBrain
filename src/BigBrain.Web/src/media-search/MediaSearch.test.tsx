@@ -40,9 +40,10 @@ test('renders accessible search controls and prevents short queries', () => {
   const fetch = vi.fn()
   vi.stubGlobal('fetch', fetch)
   const { container } = render(<MediaSearch />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 
-  const input = screen.getByRole('searchbox', { name: 'Search title' })
-  const button = screen.getByRole('button', { name: 'Search' })
+  const input = screen.getByRole('searchbox', { name: 'Titel' })
+  const button = screen.getByRole('button', { name: 'Sök' })
   expect(button).toBeDisabled()
   fireEvent.change(input, { target: { value: 'a' } })
   fireEvent.submit(container.querySelector('form')!)
@@ -55,12 +56,13 @@ test('Enter starts search and shows loading state', async () => {
   const fetch = vi.fn(() => new Promise(resolve => { resolveRequest = resolve }))
   vi.stubGlobal('fetch', fetch)
   render(<MediaSearch />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 
-  fireEvent.change(screen.getByRole('searchbox', { name: 'Search title' }), { target: { value: 'Family Guy' } })
+  fireEvent.change(screen.getByRole('searchbox', { name: 'Titel' }), { target: { value: 'Family Guy' } })
   fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Enter', code: 'Enter' })
 
   expect(screen.getByText('Searching media services…')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Searching…' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Söker…' })).toBeDisabled()
   resolveRequest?.(response(result))
   expect(await screen.findByText('Results for “Family Guy”')).toBeInTheDocument()
 })
@@ -68,9 +70,10 @@ test('Enter starts search and shows loading state', async () => {
 test('groups results, empty state and partial provider failure without actions', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(result))))
   const { container } = render(<MediaSearch />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Family Guy' } })
-  fireEvent.click(screen.getByRole('button', { name: 'Search' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
 
   const jellyfin = (await screen.findByRole('heading', { name: 'Jellyfin' })).closest('section')
   const sonarr = screen.getByRole('heading', { name: 'Sonarr' }).closest('section')
@@ -87,10 +90,11 @@ test('groups results, empty state and partial provider failure without actions',
 test('shows request failure', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('raw provider error'))))
   render(<MediaSearch />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Family Guy' } })
-  fireEvent.click(screen.getByRole('button', { name: 'Search' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('Media search could not be completed. Try again.')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Åtgärden kunde inte slutföras. Försök igen.')
   expect(screen.queryByText('raw provider error')).not.toBeInTheDocument()
 })

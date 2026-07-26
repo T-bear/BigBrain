@@ -81,10 +81,9 @@ afterEach(() => {
 async function openExternalResult(fetch: ReturnType<typeof vi.fn>) {
   vi.stubGlobal('fetch', fetch)
   render(<MediaSearch />)
-  fireEvent.click(screen.getByRole('button', { name: 'External catalog' }))
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'The Expanse' } })
-  fireEvent.click(screen.getByRole('button', { name: 'Search' }))
-  return screen.findByRole('button', { name: 'Add to Sonarr' })
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  return screen.findByRole('button', { name: 'Lägg till serie' })
 }
 
 test('switches to grouped external lookup and blocks already registered results', async () => {
@@ -93,8 +92,8 @@ test('switches to grouped external lookup and blocks already registered results'
 
   expect(screen.getByRole('heading', { name: 'Sonarr' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Radarr' })).toBeInTheDocument()
-  expect(screen.getByText('Already registered')).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: 'Add to Radarr' })).not.toBeInTheDocument()
+  expect(screen.getByText('Redan tillagd')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Lägg till film' })).not.toBeInTheDocument()
 })
 
 test('requires options and preview review before one explicit confirm', async () => {

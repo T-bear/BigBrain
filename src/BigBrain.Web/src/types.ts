@@ -248,7 +248,15 @@ export interface MediaLookupResult {
   lookupState: 'external' | 'alreadyRegistered' | 'unavailable' | 'unknown'
   imageAvailable: boolean
   alreadyRegistered: boolean
+  alreadyExists: boolean
   existingSourceId: string | null
+  providerId: string
+  posterUrl: string | null
+  monitored: boolean | null
+  canRequest: boolean
+  requestState: string | null
+  errorCode: string | null
+  errorMessage: string | null
 }
 
 export interface MediaLookupResponse {
@@ -261,8 +269,16 @@ export interface MediaLookupResponse {
     provider: string
     status: MediaSearchProviderStatus
     error: string | null
+    errorCode: string | null
     results: MediaLookupResult[]
   }>
+}
+
+export interface MediaServiceLink {
+  id: 'jellyfin' | 'radarr' | 'sonarr' | 'prowlarr' | 'qbittorrent'
+  displayName: string
+  url: string
+  enabled: boolean
 }
 
 export interface MediaAddOption {

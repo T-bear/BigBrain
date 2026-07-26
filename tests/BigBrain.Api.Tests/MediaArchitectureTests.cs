@@ -105,7 +105,8 @@ public sealed class MediaArchitectureTests
             typeof(MediaJob),
             typeof(MediaJobsResponse),
             typeof(MediaLibraryStatusResponse),
-            typeof(MediaPlayResponse)
+            typeof(MediaPlayResponse),
+            typeof(MediaServiceLink)
         ];
         string[] forbiddenNames = ["ApiKey", "Password", "BaseUrl", "Path", "InternalUrl", "StackTrace", "Exception"];
         Assert.All(publicDtos, type => Assert.All(

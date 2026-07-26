@@ -22,6 +22,16 @@ services:
       Media__Prowlarr__ApiKey: ${MEDIA__PROWLARR__APIKEY:-}
       Media__QBittorrent__BaseUrl: ${MEDIA__QBITTORRENT__BASEURL:-http://qbittorrent:8080}
       Media__QBittorrent__ApiKey: ${MEDIA__QBITTORRENT__APIKEY:-}
+      Media__ServiceLinks__Jellyfin__Url: ${MEDIA__SERVICELINKS__JELLYFIN__URL:-}
+      Media__ServiceLinks__Jellyfin__Enabled: ${MEDIA__SERVICELINKS__JELLYFIN__ENABLED:-false}
+      Media__ServiceLinks__Radarr__Url: ${MEDIA__SERVICELINKS__RADARR__URL:-}
+      Media__ServiceLinks__Radarr__Enabled: ${MEDIA__SERVICELINKS__RADARR__ENABLED:-false}
+      Media__ServiceLinks__Sonarr__Url: ${MEDIA__SERVICELINKS__SONARR__URL:-}
+      Media__ServiceLinks__Sonarr__Enabled: ${MEDIA__SERVICELINKS__SONARR__ENABLED:-false}
+      Media__ServiceLinks__Prowlarr__Url: ${MEDIA__SERVICELINKS__PROWLARR__URL:-}
+      Media__ServiceLinks__Prowlarr__Enabled: ${MEDIA__SERVICELINKS__PROWLARR__ENABLED:-false}
+      Media__ServiceLinks__QBittorrent__Url: ${MEDIA__SERVICELINKS__QBITTORRENT__URL:-}
+      Media__ServiceLinks__QBittorrent__Enabled: ${MEDIA__SERVICELINKS__QBITTORRENT__ENABLED:-false}
     networks:
       - default
       - media
