@@ -172,11 +172,13 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         try
         {
             using var response = await GetJellyfinJsonAsync(
-                $"Items/{Uri.EscapeDataString(itemId)}?Fields=ProviderIds,DateCreated,ImageTags",
+                $"Items?Ids={Uri.EscapeDataString(itemId)}&Fields=ProviderIds,DateCreated,ImageTags&Limit=1",
                 options.Jellyfin.ApiKey,
                 cancellationToken);
-            var item = response.RootElement;
-            var mediaType = NormalizeMediaType(GetString(item, "Type"));
+            var item = Items(response.RootElement).FirstOrDefault();
+            var mediaType = item.ValueKind == System.Text.Json.JsonValueKind.Object
+                ? NormalizeMediaType(GetString(item, "Type"))
+                : MediaTypes.Unknown;
             return mediaType is MediaLookupTypes.Series or MediaLookupTypes.Movie
                 ? MapCatalogItem(item)
                 : null;

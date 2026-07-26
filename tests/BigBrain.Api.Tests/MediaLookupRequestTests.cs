@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Net;
 using BigBrain.Api.Media;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BigBrain.Api.Tests;
@@ -142,6 +143,30 @@ public sealed class MediaLookupRequestTests
         Assert.Equal(MediaRequestStatuses.PreviewReady, preview.Status);
         Assert.Equal(MediaLookupTypes.Movie, preview.Summary.MediaType);
         Assert.Equal(0, provider.AddCalls);
+    }
+
+    [Fact]
+    public async Task ConfirmClassifiesRejectedProviderCredentials()
+    {
+        var provider = new RequestProviderStub { AddException = new MediaAuthenticationException() };
+        var protector = new MediaOpaqueIdProtector();
+        var options = Options();
+        var available = await new MediaAddOptionsService([provider], protector, options)
+            .GetAsync(MediaLookupTypes.Series, TestContext.Current.CancellationToken);
+        var service = new MediaRequestService(
+            [provider], [provider], protector, new MediaRequestStore(), options, NullLogger<MediaRequestService>.Instance);
+        var preview = await service.PreviewAsync(new(
+            "Sonarr", MediaLookupTypes.Series, "123",
+            available.RootFolders[0].Id, available.QualityProfiles[0].Id,
+            "all", "standard", false), TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<MediaRequestException>(() =>
+            service.ConfirmAsync(
+                new(preview.RequestToken, "request-configuration-error"),
+                TestContext.Current.CancellationToken));
+
+        Assert.Equal(MediaRequestErrors.ProviderConfigurationInvalid, exception.Code);
+        Assert.Equal(StatusCodes.Status502BadGateway, exception.StatusCode);
     }
 
     [Fact]
@@ -291,6 +316,7 @@ public sealed class MediaLookupRequestTests
         public int AddCalls { get; private set; }
         public int DuplicateChecks { get; private set; }
         public bool Registered { get; set; }
+        public Exception? AddException { get; set; }
 
         public Task<ProviderAddOptions> GetAddOptionsAsync(CancellationToken cancellationToken) =>
             Task.FromResult(new ProviderAddOptions(
@@ -319,6 +345,7 @@ public sealed class MediaLookupRequestTests
         public Task<ProviderAddResult> AddAsync(ProviderAddCommand command, CancellationToken cancellationToken)
         {
             AddCalls++;
+            if (AddException is not null) throw AddException;
             return Task.FromResult(new ProviderAddResult("99", command.Title));
         }
     }

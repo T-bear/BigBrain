@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { ApiError, confirmMediaRequest, getMediaAddOptions, previewMediaRequest } from '../api'
+import { ApiError, confirmMediaRequest, createIdempotencyKey, getMediaAddOptions, previewMediaRequest } from '../api'
 import type {
   MediaAddOptionsResponse,
   MediaLookupResult,
@@ -14,6 +14,8 @@ function friendlyError(error: unknown) {
     if (error.code === 'requestExpired') return 'This preview expired. Prepare the addition again.'
     if (error.code === 'alreadyRegistered') return 'This title is already registered.'
     if (error.code === 'providerUnavailable') return 'The provider is currently unavailable.'
+    if (error.code === 'providerConfigurationInvalid') return 'The provider configuration was rejected.'
+    if (error.code === 'providerRejectedRequest') return 'The provider rejected the request as invalid.'
     return error.message
   }
   return 'The media request could not be completed.'
@@ -101,7 +103,7 @@ export function MediaRequestDialog({
     setBusy(true)
     setError(null)
     try {
-      const response = await confirmMediaRequest(preview.requestToken, crypto.randomUUID())
+      const response = await confirmMediaRequest(preview.requestToken, createIdempotencyKey())
       setCreated(response)
       setPhase('success')
     } catch (requestError) {

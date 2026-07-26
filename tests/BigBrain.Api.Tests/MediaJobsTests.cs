@@ -106,15 +106,46 @@ public sealed class MediaJobsTests
             new StubCatalog([item]));
 
         var response = await service.GetJobsAsync(AllJobs, Token);
-        var play = await service.GetPlayAsync("abc123", Token);
-
         var result = Assert.Single(response.Jobs);
+        var play = await service.GetPlayAsync(result.PlayItemId!, Token);
         Assert.Equal(MediaJobStatuses.Available, result.Status);
         Assert.Equal(100, result.ProgressPercent);
         Assert.True(result.CanPlay);
-        Assert.Equal("abc123", result.PlayItemId);
+        Assert.Matches("^[a-f0-9]{24}$", result.PlayItemId);
+        Assert.NotEqual("abc123", result.PlayItemId);
         Assert.NotNull(play);
+        Assert.Equal(result.PlayItemId, play.JellyfinItemId);
         Assert.Equal("/jellyfin/web/index.html#!/details?id=abc123", play.PlayUrl);
+    }
+
+    [Fact]
+    public async Task InvalidOrStalePlayIdDoesNotResolve()
+    {
+        var service = Service(
+            new StubJobsProvider("Radarr", "movie", [Job(
+                "27205", "Radarr:movie:27205", "Inception", MediaJobStatuses.Importing, "movie")]),
+            new StubCatalog([CatalogItem("abc123", "Inception", "movie", tmdbId: "27205")]));
+
+        await service.GetJobsAsync(AllJobs, Token);
+
+        Assert.Null(await service.GetPlayAsync("0123456789abcdef01234567", Token));
+    }
+
+    [Fact]
+    public async Task SearchResultWithoutJellyfinMatchCannotPlay()
+    {
+        var service = Service(
+            new StubJobsProvider(
+                "Radarr",
+                "movie",
+                [Job("27205", "Radarr:movie:27205", "Inception", MediaJobStatuses.Completed, "movie")],
+                [new("27205", "Inception", "movie", true)]),
+            new StubCatalog());
+
+        var result = Assert.Single((await service.GetJobsAsync(AllJobs, Token)).Jobs);
+
+        Assert.False(result.CanPlay);
+        Assert.Null(result.PlayItemId);
     }
 
     [Fact]

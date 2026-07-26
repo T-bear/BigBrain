@@ -171,6 +171,8 @@ internal sealed class MediaJobsService(
     private readonly IMediaJobsProvider[] providers = providers.ToArray();
     private readonly SemaphoreSlim refreshLock = new(1, 1);
     private MediaJobsResponse? cached;
+    private Dictionary<string, string> playItemsByOpaqueId =
+        new Dictionary<string, string>(StringComparer.Ordinal);
     private DateTimeOffset cacheExpiresAtUtc;
 
     public async Task<MediaJobsResponse> GetJobsAsync(
@@ -263,9 +265,13 @@ internal sealed class MediaJobsService(
         ValidateOpaqueId(itemId);
         try
         {
-            var item = await jellyfinCatalog.GetPlayItemAsync(itemId, cancellationToken);
+            var snapshot = await GetSnapshotAsync(cancellationToken);
+            if (!snapshot.Jobs.Any(job => job.CanPlay && job.PlayItemId == itemId)
+                || !playItemsByOpaqueId.TryGetValue(itemId, out var jellyfinItemId))
+                return null;
+            var item = await jellyfinCatalog.GetPlayItemAsync(jellyfinItemId, cancellationToken);
             return item is null ? null : new(
-                item.ItemId,
+                itemId,
                 item.Title,
                 item.MediaType,
                 null,
@@ -365,11 +371,25 @@ internal sealed class MediaJobsService(
             grouped.Add(AvailableJob(id, provider, foreignId, item));
         }
 
+        var publicJobs = grouped.Select(job =>
+        {
+            if (!job.CanPlay || string.IsNullOrWhiteSpace(job.PlayItemId))
+                return job with { PlayItemId = null, CanPlay = false };
+            var opaqueId = OpaqueId($"Jellyfin:{job.PlayItemId}");
+            return job with { PlayItemId = opaqueId };
+        }).ToArray();
+        playItemsByOpaqueId = grouped
+            .Where(job => job.CanPlay && !string.IsNullOrWhiteSpace(job.PlayItemId))
+            .ToDictionary(
+                job => OpaqueId($"Jellyfin:{job.PlayItemId}"),
+                job => job.PlayItemId!,
+                StringComparer.Ordinal);
+
         return new(
             DateTimeOffset.UtcNow,
             providerStatuses.All(status => status.Status == MediaStatuses.Online) ? "complete" : "degraded",
             providerStatuses,
-            grouped.OrderBy(job => StatusOrder(job.Status))
+            publicJobs.OrderBy(job => StatusOrder(job.Status))
                 .ThenBy(job => job.Title, StringComparer.OrdinalIgnoreCase)
                 .ToArray());
     }

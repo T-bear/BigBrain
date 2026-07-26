@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { subscribeMediaJobs } from './api'
+import { createIdempotencyKey, subscribeMediaJobs } from './api'
 
 class FakeEventSource {
   static instances: FakeEventSource[] = []
@@ -52,4 +52,16 @@ test('media jobs stream reconnects with bounded backoff and cleans up', () => {
 
   unsubscribe()
   expect(FakeEventSource.instances[2].closed).toBe(true)
+})
+
+test('creates a UUID idempotency key when randomUUID is unavailable', () => {
+  vi.stubGlobal('crypto', {
+    getRandomValues: (bytes: Uint8Array) => {
+      bytes.fill(1)
+      return bytes
+    },
+  })
+
+  expect(createIdempotencyKey()).toMatch(
+    /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/)
 })

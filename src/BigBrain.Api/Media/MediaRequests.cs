@@ -25,6 +25,7 @@ public static class MediaRequestErrors
     public const string RequestExpired = "requestExpired";
     public const string DuplicateRequest = "duplicateRequest";
     public const string ProviderUnavailable = "providerUnavailable";
+    public const string ProviderConfigurationInvalid = "providerConfigurationInvalid";
     public const string ProviderRejectedRequest = "providerRejectedRequest";
     public const string RequestsDisabled = "requestsDisabled";
 }
@@ -493,7 +494,32 @@ internal sealed class MediaRequestService(
                 "The media provider timed out.",
                 StatusCodes.Status503ServiceUnavailable);
         }
-        catch
+        catch (MediaAuthenticationException)
+        {
+            store.Release(tokenHash);
+            RequestRejected(
+                logger,
+                request.Provider,
+                request.MediaType,
+                request.ForeignId,
+                MediaRequestErrors.ProviderConfigurationInvalid,
+                null);
+            throw new MediaRequestException(
+                MediaRequestErrors.ProviderConfigurationInvalid,
+                "The media provider rejected its configured credentials.",
+                StatusCodes.Status502BadGateway);
+        }
+        catch (HttpRequestException exception) when (exception.StatusCode is null
+            || (int)exception.StatusCode >= StatusCodes.Status500InternalServerError)
+        {
+            store.Release(tokenHash);
+            ProviderUnavailable(logger, request.Provider, request.MediaType, request.ForeignId, null);
+            throw new MediaRequestException(
+                MediaRequestErrors.ProviderUnavailable,
+                "The media provider is unavailable.",
+                StatusCodes.Status503ServiceUnavailable);
+        }
+        catch (HttpRequestException)
         {
             store.Release(tokenHash);
             RequestRejected(

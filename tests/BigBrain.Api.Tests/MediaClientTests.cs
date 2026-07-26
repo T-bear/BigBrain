@@ -30,12 +30,34 @@ public sealed class MediaClientTests
         Assert.Equal("Sonarr", entry["Provider"]);
         Assert.Equal("GET", entry["Operation"]);
         Assert.Equal("200", entry["Status"]);
+        Assert.Equal("none", entry["ErrorCategory"]);
+        Assert.NotEmpty(entry["CorrelationId"]);
         Assert.True(long.TryParse(entry["Duration"], out _));
-        Assert.Equal(4, entry.Count);
+        Assert.Equal(6, entry.Count);
         var serialized = string.Join(" ", entry.Select(item => $"{item.Key}={item.Value}"));
         Assert.DoesNotContain("8989", serialized, StringComparison.Ordinal);
         Assert.DoesNotContain("api/v3", serialized, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("must-not-leak", serialized, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task JellyfinPlayLookupUsesCatalogRouteWithoutUserContext()
+    {
+        Uri? requestedUri = null;
+        var client = new JellyfinClient(CreateClient(request =>
+        {
+            requestedUri = request.RequestUri;
+            return Json("""{"Items":[{"Id":"abc123","Name":"Inception","Type":"Movie","ProviderIds":{"Tmdb":"27205"}}]}""");
+        }), Options());
+
+        var result = await ((IMediaLibraryCatalog)client).GetPlayItemAsync(
+            "abc123",
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(result);
+        Assert.Equal("abc123", result.ItemId);
+        Assert.Equal("/Items", requestedUri!.AbsolutePath);
+        Assert.Contains("Ids=abc123", requestedUri.Query, StringComparison.Ordinal);
     }
 
     [Fact]

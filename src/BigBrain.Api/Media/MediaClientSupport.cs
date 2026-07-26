@@ -8,11 +8,11 @@ public sealed class ProviderHttpLoggingHandler(
     string provider,
     ILogger<ProviderHttpLoggingHandler> logger) : DelegatingHandler
 {
-    private static readonly Action<ILogger, string, string, string, long, Exception?> ProviderRequestCompleted =
-        LoggerMessage.Define<string, string, string, long>(
+    private static readonly Action<ILogger, string, string, string, string, long, string, Exception?> ProviderRequestCompleted =
+        LoggerMessage.Define<string, string, string, string, long, string>(
             LogLevel.Information,
             new EventId(2301, nameof(ProviderRequestCompleted)),
-            "Provider request completed: provider={Provider} operation={Operation} status={Status} duration={Duration}");
+            "Provider request completed: provider={Provider} operation={Operation} status={Status} errorCategory={ErrorCategory} duration={Duration} correlationId={CorrelationId}");
 
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
@@ -22,24 +22,43 @@ public sealed class ProviderHttpLoggingHandler(
         try
         {
             var response = await base.SendAsync(request, cancellationToken);
-            Log(request, ((int)response.StatusCode).ToString(System.Globalization.CultureInfo.InvariantCulture), timer);
+            Log(
+                request,
+                ((int)response.StatusCode).ToString(System.Globalization.CultureInfo.InvariantCulture),
+                Category(response.StatusCode),
+                timer);
             return response;
         }
-        catch
+        catch (Exception exception)
         {
-            Log(request, "failed", timer);
+            Log(
+                request,
+                "failed",
+                exception is TaskCanceledException ? "timeout" : "transport",
+                timer);
             throw;
         }
     }
 
-    private void Log(HttpRequestMessage request, string status, Stopwatch timer) =>
+    private void Log(HttpRequestMessage request, string status, string errorCategory, Stopwatch timer) =>
         ProviderRequestCompleted(
             logger,
             provider,
             request.Method.Method,
             status,
+            errorCategory,
             timer.ElapsedMilliseconds,
+            Activity.Current?.TraceId.ToString() ?? "none",
             null);
+
+    private static string Category(HttpStatusCode statusCode) => statusCode switch
+    {
+        HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => "configuration",
+        HttpStatusCode.Conflict => "duplicate",
+        >= HttpStatusCode.BadRequest and < HttpStatusCode.InternalServerError => "validation",
+        >= HttpStatusCode.InternalServerError => "upstream",
+        _ => "none"
+    };
 }
 
 public abstract class MediaClientBase(HttpClient httpClient, string serviceName)
