@@ -4,6 +4,8 @@
 **Målgrupp:** Arkitekter, utvecklare, DevOps och produktansvariga  
 **Tidshorisont:** Flerårig utveckling
 
+> **Proposed Sentinel amendment:** The accepted baseline below uses the historical term `Host Agent`. ADR 0002 proposes replacing that narrower concept with `BigBrain Sentinel` as the exclusive boundary for node-local system access. Until ADR 0002 and its prerequisite PKI, transport, policy, privilege, schema, and v1 threat-model decisions are accepted, this note records the proposed direction without retroactively changing the accepted baseline. ADR 0001 remains the accepted minimum rule that Web API must not directly control Docker.
+
 ## Syfte
 
 BigBrain ska vara en modulär plattform för administration och automatisering av en hemserver. Plattformen ska kunna växa utan att kärnan blir beroende av enskilda produkter som Jellyfin, Sonarr eller Home Assistant.

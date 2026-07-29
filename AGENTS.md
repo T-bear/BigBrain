@@ -15,6 +15,7 @@
 - Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag.
 - Skapa inte abstraktioner, lager eller generell infrastruktur utan ett konkret och verifierat ansvar.
 - Undvik microservices, message brokers, Redis, Kubernetes och dynamiska plugins tills ett verifierat behov finns och arkitekturbeslutet har dokumenterats.
+- Varje sprint ska ha ett tydligt mål och en tydlig Definition of Done. Om en ny idé uppstår under sprinten och inte krävs för att uppnå sprintmålet ska den dokumenteras som en framtida förbättring i stället för att implementeras direkt.
 
 ## Säkerhet och data
 
