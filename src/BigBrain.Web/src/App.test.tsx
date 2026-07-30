@@ -1,6 +1,7 @@
-import { act, cleanup, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
+import { DASHBOARD_LAYOUT_STORAGE_KEY } from './dashboard/dashboardLayout'
 
 const modules = [
   { id: 'docker', name: 'Docker', description: '', route: '/#docker', status: 'Unavailable', dashboardWidgets: [], capabilities: [] },
@@ -80,7 +81,13 @@ function successfulFetch() {
   })
 }
 
-beforeEach(() => vi.stubGlobal('fetch', successfulFetch()))
+beforeEach(() => {
+  window.localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, JSON.stringify({
+    version: 1,
+    expanded: { system: true, docker: true },
+  }))
+  vi.stubGlobal('fetch', successfulFetch())
+})
 afterEach(() => {
   cleanup()
   vi.useRealTimers()
@@ -168,4 +175,39 @@ test('polls system overview without discarding the latest successful data', asyn
   expect(systemCalls).toHaveLength(2)
   expect(screen.getByText(/Showing the latest successful update/)).toBeInTheDocument()
   expect(screen.getByText('bigbrain-host')).toBeInTheDocument()
+})
+
+test('prioritizes search and quick actions before system and Docker modules', async () => {
+  const { container } = render(<App />)
+  await screen.findByRole('heading', { name: 'Hitta film och serier' })
+
+  expect([...container.querySelectorAll('[data-dashboard-module]')].map(element => element.getAttribute('data-dashboard-module')))
+    .toEqual([
+      'media-search',
+      'quick-actions',
+      'media-jobs',
+      'media-health',
+      'insights',
+      'services',
+      'system',
+      'docker',
+      'activity',
+      'details',
+    ])
+})
+
+test('uses collapsed defaults for low-priority infrastructure modules', async () => {
+  window.localStorage.clear()
+  render(<App />)
+  await screen.findByRole('heading', { name: 'System status' })
+
+  const systemToggle = screen.getByRole('button', { name: 'Expandera System status' })
+  const dockerToggle = screen.getByRole('button', { name: 'Expandera Docker overview' })
+  expect(systemToggle).toHaveAttribute('aria-expanded', 'false')
+  expect(systemToggle).toHaveAttribute('aria-controls', 'system-content')
+  expect(dockerToggle).toHaveAttribute('aria-expanded', 'false')
+
+  fireEvent.click(systemToggle)
+  expect(screen.getByRole('button', { name: 'Minimera System status' })).toHaveAttribute('aria-expanded', 'true')
+  expect(screen.getByRole('progressbar', { name: 'CPU usage' })).toBeInTheDocument()
 })

@@ -4,7 +4,7 @@ const items = [
   { id: 'home', label: 'Hem', icon: '⌂' },
   { id: 'search', label: 'Sök', icon: '⌕' },
   { id: 'queue', label: 'Kö', icon: '↧' },
-  { id: 'services', label: 'Tjänster', icon: '▦' },
+  { id: 'quick-actions', label: 'Tjänster', icon: '▦' },
 ]
 
 export function MobileNavigation() {

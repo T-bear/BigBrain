@@ -4,6 +4,8 @@ import { DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadg
 import { MediaDashboard } from './MediaDashboard'
 import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
 import { MobileNavigation } from './MobileNavigation'
+import { CollapsibleModule } from './dashboard/CollapsibleModule'
+import { useDashboardLayout } from './dashboard/dashboardLayout'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -36,6 +38,7 @@ export default function App() {
   const [docker, setDocker] = useState<DockerInventory | null>(null)
   const [dockerError, setDockerError] = useState(false)
   const systemRequestActive = useRef(false)
+  const { expanded, toggle } = useDashboardLayout()
 
   useEffect(() => {
     const controller = new AbortController()
@@ -101,73 +104,73 @@ export default function App() {
           <span className="sprint-badge">Sprint 2</span>
         </header>
 
-        <section aria-labelledby="system-heading">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">System module</p>
-              <h2 id="system-heading">System status</h2>
-            </div>
-            <StatusBadge status={systemStatus} />
-          </div>
+        <MediaDashboard expanded={expanded} onToggle={toggle}>
+          <CollapsibleModule
+            actions={<StatusBadge status={systemStatus} />}
+            eyebrow="System module"
+            expanded={expanded.system}
+            moduleId="system"
+            onToggle={() => toggle('system')}
+            title="System status"
+          >
 
-          {!system && !systemError && <p aria-live="polite">Loading system metrics…</p>}
-          {systemError && (
-            <p role="alert" className="notice notice--error">
-              System metrics could not be refreshed.{system ? ' Showing the latest successful update.' : ''}
-            </p>
-          )}
-          {system?.status.toLowerCase() === 'unavailable' && (
-            <ModuleCard title="Host metrics not connected" status="Unavailable">
-              <p>{system.warnings[0] ?? 'Host metrics are unavailable.'}</p>
-            </ModuleCard>
-          )}
-          {system && (
-            <>
-              <div className="metric-grid">
-                <ProgressMetric label="CPU usage" value={system.cpu.usagePercent} detail={`${system.cpu.logicalProcessorCount} logical processors`} />
-                <ProgressMetric label="RAM usage" value={system.memory.usagePercent} detail={`${formatBytes(system.memory.usedBytes)} of ${formatBytes(system.memory.totalBytes)}`} />
-                {system.disks.map((disk) => (
-                  <ProgressMetric key={disk.filesystemId} label={disk.displayName} value={disk.usagePercent} detail={`${formatBytes(disk.usedBytes)} used of ${formatBytes(disk.totalBytes)} · ${formatBytes(disk.availableBytes)} free`} />
-                ))}
-                <MetricCard label="System uptime" value={formatUptime(system.uptimeSeconds)} />
-                <MetricCard label="Hostname" value={system.hostname} />
-                <MetricCard label="Temperature" value={system.temperatureCelsius === null ? 'Unavailable' : `${system.temperatureCelsius.toFixed(1)} °C`} />
-              </div>
-              <p className="last-updated">
-                Last updated <time dateTime={system.collectedAtUtc}>{new Date(system.collectedAtUtc).toLocaleTimeString()}</time>
+            {!system && !systemError && <p aria-live="polite">Loading system metrics…</p>}
+            {systemError && (
+              <p role="alert" className="notice notice--error">
+                System metrics could not be refreshed.{system ? ' Showing the latest successful update.' : ''}
               </p>
-              {system.status.toLowerCase() !== 'unavailable' && system.warnings.length > 0 && (
-                <p className="muted">{system.warnings.join(' ')}</p>
-              )}
-            </>
-          )}
-        </section>
+            )}
+            {system?.status.toLowerCase() === 'unavailable' && (
+              <ModuleCard title="Host metrics not connected" status="Unavailable">
+                <p>{system.warnings[0] ?? 'Host metrics are unavailable.'}</p>
+              </ModuleCard>
+            )}
+            {system && (
+              <>
+                <div className="metric-grid">
+                  <ProgressMetric label="CPU usage" value={system.cpu.usagePercent} detail={`${system.cpu.logicalProcessorCount} logical processors`} />
+                  <ProgressMetric label="RAM usage" value={system.memory.usagePercent} detail={`${formatBytes(system.memory.usedBytes)} of ${formatBytes(system.memory.totalBytes)}`} />
+                  {system.disks.map((disk) => (
+                    <ProgressMetric key={disk.filesystemId} label={disk.displayName} value={disk.usagePercent} detail={`${formatBytes(disk.usedBytes)} used of ${formatBytes(disk.totalBytes)} · ${formatBytes(disk.availableBytes)} free`} />
+                  ))}
+                  <MetricCard label="System uptime" value={formatUptime(system.uptimeSeconds)} />
+                  <MetricCard label="Hostname" value={system.hostname} />
+                  <MetricCard label="Temperature" value={system.temperatureCelsius === null ? 'Unavailable' : `${system.temperatureCelsius.toFixed(1)} °C`} />
+                </div>
+                <p className="last-updated">
+                  Last updated <time dateTime={system.collectedAtUtc}>{new Date(system.collectedAtUtc).toLocaleTimeString()}</time>
+                </p>
+                {system.status.toLowerCase() !== 'unavailable' && system.warnings.length > 0 && (
+                  <p className="muted">{system.warnings.join(' ')}</p>
+                )}
+              </>
+            )}
+          </CollapsibleModule>
 
-        <section id="docker" aria-labelledby="docker-heading" className="docker-section">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Docker module</p>
-              <h2 id="docker-heading">Docker overview</h2>
-            </div>
-            <StatusBadge status={dockerStatus} />
-          </div>
-          {dockerError ? (
-            <p role="alert" className="notice notice--error">Docker inventory could not be loaded.</p>
-          ) : !docker ? (
-            <p aria-live="polite">Loading Docker inventory…</p>
-          ) : !docker.availability.available ? (
-            <ModuleCard title="Integration not connected" status="Unavailable">
-              <p>{docker.availability.reason}</p>
-            </ModuleCard>
-          ) : (
-            <>
-              <MetricCard label="Containers" value={String(docker.containers.length)} />
-              <DockerContainerList containers={docker.containers} />
-            </>
-          )}
-        </section>
-
-        <MediaDashboard />
+          <CollapsibleModule
+            actions={<StatusBadge status={dockerStatus} />}
+            eyebrow="Docker module"
+            expanded={expanded.docker}
+            moduleId="docker"
+            onToggle={() => toggle('docker')}
+            title="Docker overview"
+          >
+            {dockerError ? (
+              <p role="alert" className="notice notice--error">Docker inventory could not be loaded.</p>
+            ) : !docker ? (
+              <p aria-live="polite">Loading Docker inventory…</p>
+            ) : !docker.availability.available ? (
+              <ModuleCard title="Integration not connected" status="Unavailable">
+                <p>{docker.availability.reason}</p>
+              </ModuleCard>
+            ) : (
+              <>
+                <MetricCard label="Containers" value={String(docker.containers.length)} />
+                <DockerContainerList containers={docker.containers} />
+              </>
+            )}
+          </CollapsibleModule>
+        </MediaDashboard>
       </main>
       <MobileNavigation />
     </div>

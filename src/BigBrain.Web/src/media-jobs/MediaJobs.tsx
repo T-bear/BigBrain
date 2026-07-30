@@ -13,7 +13,7 @@ const filters: Array<{ id: JobFilter; label: string }> = [
   { id: 'all', label: 'All' },
 ]
 
-export function MediaJobs() {
+export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
   const [snapshot, setSnapshot] = useState<MediaJobsResponse | null>(null)
   const [failed, setFailed] = useState(false)
   const [filter, setFilter] = useState<JobFilter>('active')
@@ -62,11 +62,12 @@ export function MediaJobs() {
   const unavailableProviders = (Array.isArray(snapshot?.providers) ? snapshot.providers : [])
     .filter(provider => provider.status !== 'online')
 
-  return <section className="media-jobs-section" aria-labelledby="media-jobs-heading">
-    <header className="media-jobs-heading">
+  return <section className="media-jobs-section" aria-label={showHeading ? undefined : 'Media Jobs'} aria-labelledby={showHeading ? 'media-jobs-heading' : undefined}>
+    {showHeading && <header className="media-jobs-heading">
       <div><p className="eyebrow">Live activity</p><h3 id="media-jobs-heading">Media Jobs</h3></div>
       <span aria-live="polite">{failed ? 'Uppdatering avbruten' : 'Uppdateras automatiskt'}</span>
-    </header>
+    </header>}
+    {!showHeading && <p className="media-jobs-update-status" aria-live="polite">{failed ? 'Uppdatering avbruten' : 'Uppdateras automatiskt'}</p>}
     {!snapshot && !failed && <p aria-live="polite">Loading media jobs…</p>}
     {failed && !snapshot && <p role="alert" className="notice notice--error">Media jobs could not be loaded.</p>}
     {failed && snapshot && <p role="status" className="notice notice--warning">Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.</p>}

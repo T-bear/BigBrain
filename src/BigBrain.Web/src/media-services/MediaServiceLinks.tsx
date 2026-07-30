@@ -22,7 +22,7 @@ export function MediaServiceLinks() {
     prowlarr: '⌕',
     qbittorrent: '⇩',
   }
-  return <section id="services" className="media-service-links card" aria-labelledby="service-links-heading">
+  return <section id="quick-actions" className="media-service-links card" aria-labelledby="service-links-heading" data-dashboard-module="quick-actions">
     <div><p className="eyebrow">Snabbval</p><h3 id="service-links-heading">Mediatjänster</h3></div>
     {!loaded && <p className="muted" aria-live="polite">Laddar tjänstelänkar…</p>}
     {loaded && links.length === 0 && <p className="muted">Tjänstelänkarna kunde inte hämtas.</p>}

@@ -61,7 +61,7 @@ test('mobile navigation has stable destinations and marks the active view', () =
   render(<MobileNavigation />)
   expect(screen.getByRole('link', { name: /Kö/ })).toHaveAttribute('href', '#queue')
   expect(screen.getByRole('link', { name: /Kö/ })).toHaveAttribute('aria-current', 'page')
-  expect(screen.getByRole('link', { name: /Tjänster/ })).toHaveAttribute('href', '#services')
+  expect(screen.getByRole('link', { name: /Tjänster/ })).toHaveAttribute('href', '#quick-actions')
 })
 
 test('provider timeout is shown with a Swedish safe message', async () => {

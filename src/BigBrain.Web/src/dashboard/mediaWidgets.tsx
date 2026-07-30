@@ -120,7 +120,7 @@ function TorrentGroup({
 }
 
 const widgets: WidgetRegistration<MediaOverview>[] = [
-  { id: 'media-health', title: 'Media Health', section: 'hero', order: 10, supportedStates: allStates, component: ({ data }) => {
+  { id: 'media-health-summary', title: 'Media Health', section: 'media-health', order: 10, supportedStates: allStates, component: ({ data }) => {
     const notConfigured = data.healthStatusLevel === 'notConfigured'
     return <article className={`health-hero card health-hero--${data.healthStatusLevel}`}>
       <div className={`health-score ${notConfigured ? 'health-score--neutral' : ''}`} style={{ '--score': `${data.healthScore * 3.6}deg` } as React.CSSProperties}>
@@ -140,15 +140,15 @@ const widgets: WidgetRegistration<MediaOverview>[] = [
       ? data.insights.map((insight, index) => <Insight insight={insight} key={`${insight.title}:${index}`} />)
       : <article className="insight insight--information insight--quiet"><span aria-hidden="true">●</span><div><strong>{data.status === 'notConfigured' ? 'Ready when you are' : 'Nothing needs attention'}</strong><p>{data.status === 'notConfigured' ? 'Configure a media service to begin collecting insights.' : 'No actionable media insights were found.'}</p></div></article>}</>
   },
-  { id: 'jellyfin', title: 'Jellyfin', section: 'widgets', order: 10, supportedStates: allStates, component: ({ data }) =>
+  { id: 'jellyfin', title: 'Jellyfin', section: 'services', order: 10, supportedStates: allStates, component: ({ data }) =>
     <ServiceWidget service={data.jellyfin.service}><Stat label="Movies" value={data.jellyfin.movieCount} /><Stat label="Series" value={data.jellyfin.seriesCount} /><Stat label="Episodes" value={data.jellyfin.episodeCount} /><Stat label="Streams" value={data.jellyfin.activeStreamCount} /></ServiceWidget> },
-  { id: 'sonarr', title: 'Sonarr', section: 'widgets', order: 20, supportedStates: allStates, component: ({ data }) =>
+  { id: 'sonarr', title: 'Sonarr', section: 'services', order: 20, supportedStates: allStates, component: ({ data }) =>
     <ServiceWidget service={data.sonarr.service}><Stat label="Series" value={data.sonarr.seriesCount} /><Stat label="Monitored" value={data.sonarr.monitoredSeriesCount} /><Stat label="Missing" value={data.sonarr.missingMonitoredEpisodes} /><Stat label="Queue" value={data.sonarr.queueCount} /></ServiceWidget> },
-  { id: 'radarr', title: 'Radarr', section: 'widgets', order: 30, supportedStates: allStates, component: ({ data }) =>
+  { id: 'radarr', title: 'Radarr', section: 'services', order: 30, supportedStates: allStates, component: ({ data }) =>
     <ServiceWidget service={data.radarr.service}><Stat label="Movies" value={data.radarr.movieCount} /><Stat label="Missing" value={data.radarr.missingMovieCount} /><Stat label="Queue" value={data.radarr.queueCount} /><Stat label="Upgrades" value={data.radarr.qualityUpgradeCount} /></ServiceWidget> },
-  { id: 'prowlarr', title: 'Prowlarr', section: 'widgets', order: 40, supportedStates: allStates, component: ({ data }) =>
+  { id: 'prowlarr', title: 'Prowlarr', section: 'services', order: 40, supportedStates: allStates, component: ({ data }) =>
     <ServiceWidget service={data.prowlarr.service}><Stat label="Indexers" value={data.prowlarr.indexerCount} /><Stat label="Online" value={`${data.prowlarr.onlineIndexerCount}/${data.prowlarr.enabledIndexerCount}`} /><Stat label="RSS" value={data.prowlarr.rssEnabledIndexerCount} /><Stat label="Failures" value={data.prowlarr.recentFailures.length} /></ServiceWidget> },
-  { id: 'qbittorrent', title: 'qBittorrent', section: 'widgets', order: 50, supportedStates: allStates, component: ({ data }) =>
+  { id: 'qbittorrent', title: 'qBittorrent', section: 'services', order: 50, supportedStates: allStates, component: ({ data }) =>
     <ServiceWidget service={data.qBittorrent.service}><Stat label="Active" value={data.qBittorrent.activeCount} /><Stat label="Paused" value={data.qBittorrent.pausedCount} /><Stat label="Download" value={formatBytes(data.qBittorrent.downloadSpeedBytesPerSecond, '/s')} /><Stat label="Free space" value={formatBytes(data.qBittorrent.freeSpaceBytes)} /></ServiceWidget> },
   { id: 'sonarr-queue', title: 'Sonarr queue', section: 'activity', order: 10, supportedStates: allStates, component: ({ data }) =>
     <ActivityCard accessibleName="Sonarr queue items" emptyMessage="Sonarr queue is clear." items={data.sonarr.queue} title="Sonarr queue" totalCount={data.sonarr.queueCount} /> },
@@ -179,11 +179,11 @@ const widgets: WidgetRegistration<MediaOverview>[] = [
 ]
 
 const sections: DashboardSectionRegistration[] = [
-  { id: 'hero', order: 10, className: 'dashboard-hero' },
-  { id: 'insights', order: 20, className: 'insights-grid', label: 'BigBrain Insights', title: 'What deserves your attention' },
-  { id: 'widgets', order: 30, className: 'widget-grid', label: 'Service overview', title: 'Your connected services' },
-  { id: 'activity', order: 40, className: 'activity-grid', label: 'Activity', title: 'What is happening now' },
-  { id: 'details', order: 50, className: 'details-grid', label: 'Details', title: 'Queues, downloads and warnings' },
+  { id: 'media-health', order: 10, className: 'dashboard-hero', label: 'Health summary', title: 'Media Health', defaultExpanded: false },
+  { id: 'insights', order: 20, className: 'insights-grid', label: 'Prioriterade signaler', title: 'BigBrain Insights', defaultExpanded: true },
+  { id: 'services', order: 30, className: 'widget-grid', label: 'Anslutna tjänster', title: 'Service Overview', defaultExpanded: true },
+  { id: 'activity', order: 40, className: 'activity-grid', label: 'Senaste aktivitet', title: 'Activity', defaultExpanded: false },
+  { id: 'details', order: 50, className: 'details-grid', label: 'Fördjupning', title: 'Detaljer · köer, nedladdningar och varningar', defaultExpanded: false },
 ]
 
 export const mediaWidgetRegistry = new WidgetRegistry(widgets, sections)

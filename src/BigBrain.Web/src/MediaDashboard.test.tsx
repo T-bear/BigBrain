@@ -1,7 +1,8 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { MediaDashboard } from './MediaDashboard'
 import type { MediaOverview, MediaServiceStatus } from './types'
+import { DASHBOARD_LAYOUT_STORAGE_KEY } from './dashboard/dashboardLayout'
 
 const checkedAtUtc = '2026-07-23T10:00:00Z'
 
@@ -55,6 +56,20 @@ function response(body: unknown) {
   return { ok: true, json: async () => body }
 }
 
+beforeEach(() => {
+  window.localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, JSON.stringify({
+    version: 1,
+    expanded: {
+      'media-jobs': true,
+      'media-health': true,
+      insights: true,
+      services: true,
+      activity: true,
+      details: true,
+    },
+  }))
+})
+
 afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
@@ -76,7 +91,7 @@ test('shows loading and then online activity without write controls', async () =
   expect(screen.getByText('New movie')).toBeInTheDocument()
   expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: /pause|resume|delete|add|play/i })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /\b(pause|resume|delete|add|play)\b/i })).not.toBeInTheDocument()
 })
 
 test('shows partial success with degraded and unavailable services', async () => {
@@ -175,5 +190,47 @@ test('renders registered production sections in information hierarchy order', as
   await screen.findByText('Everything looks great')
 
   expect([...container.querySelectorAll('[data-dashboard-section]')].map(element => element.getAttribute('data-dashboard-section')))
-    .toEqual(['hero', 'insights', 'widgets', 'activity', 'details'])
+    .toEqual(['media-health', 'insights', 'services', 'activity', 'details'])
+})
+
+test('collapses and expands a module with accessible state', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  render(<MediaDashboard />)
+  await screen.findByText('All services healthy')
+
+  const collapse = screen.getByRole('button', { name: 'Minimera BigBrain Insights' })
+  expect(collapse).toHaveAttribute('aria-expanded', 'true')
+  expect(collapse).toHaveAttribute('aria-controls', 'insights-content')
+
+  fireEvent.click(collapse)
+  const expand = screen.getByRole('button', { name: 'Expandera BigBrain Insights' })
+  expect(expand).toHaveAttribute('aria-expanded', 'false')
+  expect(document.getElementById('insights-content')).toHaveAttribute('hidden')
+
+  fireEvent.click(expand)
+  expect(screen.getByRole('button', { name: 'Minimera BigBrain Insights' })).toHaveAttribute('aria-expanded', 'true')
+  expect(document.getElementById('insights-content')).not.toHaveAttribute('hidden')
+})
+
+test('restores persisted module state after a new render', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  const firstRender = render(<MediaDashboard />)
+  await screen.findByText('All services healthy')
+  fireEvent.click(screen.getByRole('button', { name: 'Minimera BigBrain Insights' }))
+  firstRender.unmount()
+
+  render(<MediaDashboard />)
+  expect(await screen.findByRole('button', { name: 'Expandera BigBrain Insights' }))
+    .toHaveAttribute('aria-expanded', 'false')
+})
+
+test('falls back safely when persisted module state is invalid', async () => {
+  window.localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, '{invalid json')
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  render(<MediaDashboard />)
+
+  expect(await screen.findByRole('button', { name: 'Minimera Media Jobs' }))
+    .toHaveAttribute('aria-expanded', 'true')
+  expect(screen.getByRole('button', { name: 'Expandera Media Health' }))
+    .toHaveAttribute('aria-expanded', 'false')
 })

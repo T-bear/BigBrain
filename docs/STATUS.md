@@ -3,7 +3,7 @@
 ## Projektstatus
 
 - Version: `0.1.0-alpha`
-- Senaste uppdatering: 2026-07-30
+- Senaste uppdatering: 2026-07-31
 - Senaste commit: `ce05f0c323ae78d2b08efd8791b019e7353089dc`
 - Aktiv branch: `main`
 - Senaste verifierade build: 2026-07-30, Release och samtliga Compose-images OK
@@ -14,8 +14,8 @@
 
 Kort sammanfattning:
 
-- Arbete: konfigurera och verifiera FlareSolverr som indexer proxy i Prowlarr.
-- Klart: Prowlarr använder FlareSolverr för Torrent[CORE]; Cloudflare-challenge och samtliga indexertester är verifierade.
+- Arbete: förbättra dashboardens informationshierarki och införa minimerbara moduler.
+- Klart: mediasökning och snabbval prioriteras före systemtelemetri; huvudmoduler kan minimeras och användarens val återställs lokalt.
 - Återstår: inget inom sprintens avgränsning.
 
 ---
@@ -32,6 +32,8 @@ Kort sammanfattning:
 - Media Jobs med köer, filter, detaljvy, SSE/polling och verifierad Jellyfin-uppspelning.
 - Förhandsgranskade och explicit bekräftade Sonarr-/Radarr-begäranden med kortlivad token och idempotens.
 - Service Overview, media health score och regelbaserade insights.
+- Prioriterad dashboard med Media Search och snabbval före detaljerad system- och Dockertelemetri.
+- Minimerbara dashboardmoduler med tillgängliga kontroller och versionssatt lokal layout-persistence.
 - Docker-, API- och Web-images med health checks för API och Web.
 - FlareSolverr `3.5.0` som Compose-tjänst med healthcheck, konfigurerbar hostport/loggnivå och anslutning till medianätverket.
 - Prowlarr indexer proxy `FlareSolverr` på `http://flaresolverr:8191/`, avgränsad med matchande tagg till Torrent[CORE].
@@ -62,14 +64,15 @@ Beskrivning: Prowlarr är online men rapporterar att version `2.5.2.5491` finns 
 
 ## Senaste verifiering
 
-Datum: 2026-07-30
+Datum: 2026-07-31
 
 Verifierat:
 
 - Backend build: Release OK i .NET 10 SDK-container.
 - Backend tester: 157 OK, 0 failed, 0 skipped.
-- Frontend tester: 37 OK i 8 testfiler.
+- Frontend tester: 42 OK i 8 testfiler, inklusive modulordning, expandering, minimering, ARIA och lokal persistence.
 - Frontend production build: OK.
+- Mobil verifiering: 390 × 844 viewport utan horisontell scroll eller överlappande kontroller; sökningen visas i första vyn och bottennavigationen täcker inte innehåll.
 - Compose production build: Sentinel, API och Web OK.
 - Compose-konfiguration: giltig med Sentinel, API, Web och FlareSolverr.
 - Runtime: Sentinel, API, Web och FlareSolverr kör; API, Web och FlareSolverr är healthy.
@@ -92,7 +95,7 @@ Verifierat:
 - Web: Healthy.
 - FlareSolverr: Healthy; nåbar från Prowlarr på det externa medianätverket.
 - Prowlarr: Online; FlareSolverr-proxy aktiv för Torrent[CORE].
-- Senast verifierad: 2026-07-30.
+- Senast verifierad: 2026-07-31.
 
 ---
 
@@ -104,6 +107,8 @@ Nästa sprint är inte beslutad i repositoryt. Verifierade öppna kandidater, ut
 2. Jellyfin diagnostics.
 3. Autentisering och auktorisering.
 4. Persistent audit och idempotens för mediabegäranden.
+5. Drag-and-drop för användarstyrd modulordning.
+6. PWA update-flöde med service worker och tydlig användarkontroll.
 
 ---
 
@@ -114,6 +119,8 @@ Nästa sprint är inte beslutad i repositoryt. Verifierade öppna kandidater, ut
 - Autentisering, auktorisering, användare och generell auditlogg saknas.
 - Mediabegärandetokens och idempotensresultat lagras endast i minnet.
 - Browser-E2E och verkliga integrationstester mot mediatjänster saknas.
+- Dashboardlayouten lagras endast lokalt per webbläsare och saknar användarbunden synkronisering.
+- Drag-and-drop för modulordning och PWA auto-update är inte implementerade.
 - Brain, Worker och databas är inte implementerade.
 - Cloudflare-challenges kan vara intermittenta; första Torrent[CORE]-testet nådde 60 sekunders timeout, medan fyra efterföljande försök lyckades på cirka 15–16 sekunder.
 
@@ -121,8 +128,8 @@ Nästa sprint är inte beslutad i repositoryt. Verifierade öppna kandidater, ut
 
 ## Senaste Codex-session
 
-- Datum: 2026-07-30
-- Syfte: konfigurera och verifiera FlareSolverr i Prowlarr.
-- Resultat: Torrent[CORE] använder FlareSolverr och samtliga fem indexers passerar Prowlarrs test.
-- Commit: `feat(prowlarr): configure FlareSolverr integration`.
-- Nästa rekommenderade steg: felsök Jellyfins degraderade status.
+- Datum: 2026-07-31
+- Syfte: prioritera dashboardens mediaflöden och införa minimerbara moduler.
+- Resultat: Media Search och snabbval visas först; åtta huvudmoduler har tillgänglig expandering/minimering med robust lokal persistence.
+- Commit: `feat(ui): improve dashboard hierarchy and collapsible modules`.
+- Nästa rekommenderade steg: inför drag-and-drop för den befintliga stabila modulordningen i en separat UX-sprint.

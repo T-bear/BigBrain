@@ -21,6 +21,7 @@ export interface DashboardSectionRegistration {
   className: string
   label?: string
   title?: string
+  defaultExpanded?: boolean
 }
 
 export class WidgetRegistry<TData> {
