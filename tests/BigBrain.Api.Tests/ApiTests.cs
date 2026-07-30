@@ -43,6 +43,33 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task SentinelPingReturnsProblemDetailsWhenLocalTransportIsDisabled()
+    {
+        var response = await _client.GetAsync(
+            "/api/v1/system/sentinel/ping",
+            TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("sentinelUnavailable", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task SentinelMetricsSkeletonReturnsProblemDetailsWhenLocalTransportIsDisabled()
+    {
+        var response = await _client.PostAsync(
+            "/api/v1/system/sentinel/read-system-metrics",
+            content: null,
+            TestContext.Current.CancellationToken);
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("sentinelUnavailable", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task UnavailableTemperatureDoesNotCauseServerError()
     {
         var response = await _client.GetAsync("/api/v1/system/overview", TestContext.Current.CancellationToken);

@@ -11,6 +11,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="../../src/BigBrain.Api/BigBrain.Api.csproj" />
     <ProjectReference Include="../../src/BigBrain.Sentinel/BigBrain.Sentinel.csproj" />
   </ItemGroup>
 </Project>

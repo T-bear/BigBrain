@@ -3,6 +3,7 @@
     <Project Path="src/BigBrain.Api/BigBrain.Api.csproj" />
     <Project Path="src/BigBrain.Modules/BigBrain.Modules.csproj" />
     <Project Path="src/BigBrain.Sentinel/BigBrain.Sentinel.csproj" />
+    <Project Path="src/BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj" />

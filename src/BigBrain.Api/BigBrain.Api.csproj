@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../BigBrain.Modules/BigBrain.Modules.csproj" />
+    <ProjectReference Include="../BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="BigBrain.Api.Tests" />

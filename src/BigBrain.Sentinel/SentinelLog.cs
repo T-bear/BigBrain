@@ -10,4 +10,14 @@ internal static partial class SentinelLog
         ILogger logger,
         string sentinelVersion,
         int capabilityCount);
+
+    [LoggerMessage(
+        EventId = 1001,
+        Level = LogLevel.Information,
+        Message = "Sentinel capability {CapabilityName}@{CapabilityVersion} completed with outcome {Outcome}.")]
+    public static partial void CapabilityCompleted(
+        ILogger logger,
+        string capabilityName,
+        int capabilityVersion,
+        string outcome);
 }

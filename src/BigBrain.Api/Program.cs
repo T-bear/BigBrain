@@ -1,7 +1,10 @@
 using BigBrain.Modules;
 using BigBrain.Api.Media;
+using BigBrain.Api.Sentinel;
+using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 
 namespace BigBrain.Api;
@@ -19,6 +22,23 @@ public partial class Program
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        builder.Services
+            .AddOptions<SentinelClientOptions>()
+            .BindConfiguration(SentinelClientOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<SentinelClientOptions>, SentinelClientOptionsValidator>();
+        var sentinelOptions = builder.Configuration
+            .GetSection(SentinelClientOptions.SectionName)
+            .Get<SentinelClientOptions>() ?? new SentinelClientOptions();
+        if (sentinelOptions.Enabled)
+        {
+            builder.Services.AddSingleton<ISentinelClient, LocalSentinelClient>();
+        }
+        else
+        {
+            builder.Services.AddSingleton<ISentinelClient, DisabledSentinelClient>();
+        }
         builder.Services.AddOptions<MediaOptions>()
             .BindConfiguration(MediaOptions.SectionName)
             .Validate(MediaOptions.IsValid, "Media URLs and timeout must be valid.")
@@ -138,6 +158,44 @@ public partial class Program
             "/api/v1/system/overview",
             async (ISystemMetricsProvider provider, CancellationToken cancellationToken) =>
                 Results.Ok(await provider.GetOverviewAsync(cancellationToken)));
+
+        app.MapGet(
+            "/api/v1/system/sentinel/ping",
+            async (ISentinelClient sentinel, CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    return Results.Ok(await sentinel.PingAsync(cancellationToken));
+                }
+                catch (SentinelClientUnavailableException)
+                {
+                    return SentinelProblem(
+                        "sentinelUnavailable",
+                        "Sentinel communication is unavailable.",
+                        StatusCodes.Status503ServiceUnavailable);
+                }
+            });
+
+        app.MapPost(
+            "/api/v1/system/sentinel/read-system-metrics",
+            async (ISentinelClient sentinel, CancellationToken cancellationToken) =>
+            {
+                try
+                {
+                    var error = await sentinel.ReadSystemMetricsAsync(cancellationToken);
+                    return SentinelProblem(
+                        error.Code,
+                        error.Message,
+                        StatusCodes.Status501NotImplemented);
+                }
+                catch (SentinelClientUnavailableException)
+                {
+                    return SentinelProblem(
+                        "sentinelUnavailable",
+                        "Sentinel communication is unavailable.",
+                        StatusCodes.Status503ServiceUnavailable);
+                }
+            });
 
         app.MapGet(
             "/api/v1/docker/containers",
@@ -383,6 +441,13 @@ public partial class Program
 
     private static IResult JobsProblem(MediaJobsException exception) =>
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
+
+    private static IResult SentinelProblem(string code, string detail, int statusCode) =>
+        Results.Problem(
+            statusCode: statusCode,
+            title: "Sentinel request could not be completed",
+            detail: detail,
+            extensions: new Dictionary<string, object?> { ["code"] = code });
 
     private static IResult ApiProblem(string code, string detail, int statusCode) =>
         Results.Problem(

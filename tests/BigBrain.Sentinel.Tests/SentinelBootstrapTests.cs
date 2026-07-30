@@ -68,6 +68,9 @@ public sealed class SentinelBootstrapTests : IClassFixture<WebApplicationFactory
     [InlineData("/api/v1/sentinel")]
     [InlineData("/capabilities")]
     [InlineData("/version")]
+    [InlineData("/sentinel/v1/ping")]
+    [InlineData("/sentinel/v1/capabilities")]
+    [InlineData("/sentinel/v1/capabilities/inventory.read-snapshot")]
     public async Task BootstrapExposesNoManagementEndpoints(string path)
     {
         using var client = _factory.CreateClient();
