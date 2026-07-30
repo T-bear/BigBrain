@@ -22,19 +22,19 @@ public sealed class SentinelProtocolIntegrationTests
 
         Assert.Equal("Healthy", ping.Status);
         Assert.Equal(environment.NodeId, ping.NodeId);
-        Assert.Equal(4, ping.CapabilityCount);
+        Assert.Equal(5, ping.CapabilityCount);
         Assert.True(ping.CheckedAtUtc <= DateTimeOffset.UtcNow);
     }
 
     [Fact]
-    public async Task SystemMetricsRequestReturnsHostUptimeCpuAndMemoryWithUnavailableDisk()
+    public async Task SystemMetricsRequestReturnsAllConfiguredHostMetrics()
     {
         await using var environment = await SentinelProtocolTestEnvironment.StartAsync();
 
         var snapshot = await environment.Client.ReadSystemMetricsAsync(
             TestContext.Current.CancellationToken);
 
-        Assert.Equal("partial", snapshot.Status);
+        Assert.Equal("available", snapshot.Status);
         Assert.Equal(310_920, snapshot.Sections.Uptime.Data?.UptimeSeconds);
         Assert.Equal("available", snapshot.Sections.Uptime.Status);
         Assert.Equal("available", snapshot.Sections.Cpu.Status);
@@ -52,7 +52,15 @@ public sealed class SentinelProtocolIntegrationTests
                 - snapshot.Sections.Memory.Data.AvailableBytes,
             snapshot.Sections.Memory.Data.UsedBytes);
         Assert.InRange(snapshot.Sections.Memory.Data.UsagePercent, 0, 100);
-        Assert.Equal("unavailable", snapshot.Sections.Disks.Status);
+        Assert.Equal("available", snapshot.Sections.Disks.Status);
+        var disk = Assert.Single(snapshot.Sections.Disks.Items);
+        Assert.Equal("integration", disk.FilesystemId);
+        Assert.Equal("Integration Storage", disk.DisplayName);
+        Assert.Equal("available", disk.Status);
+        Assert.True(disk.TotalBytes > 0);
+        Assert.Equal(disk.TotalBytes - disk.AvailableBytes, disk.UsedBytes);
+        Assert.InRange(disk.UsagePercent!.Value, 0, 100);
+        Assert.Empty(snapshot.Warnings);
     }
 
     [Fact]
@@ -119,7 +127,10 @@ public sealed class SentinelProtocolIntegrationTests
                     $"--{SentinelProtocolOptions.SectionName}:ServerCertificatePath={serverCertificatePath}",
                     $"--{SentinelProtocolOptions.SectionName}:TrustedClientCertificatePath={clientCertificatePath}",
                     $"--{SentinelProtocolOptions.SectionName}:ProofPublicKeyPath={proofPublicKeyPath}",
-                    $"--{SentinelProtocolOptions.SectionName}:ProofKeyId=integration-test"
+                    $"--{SentinelProtocolOptions.SectionName}:ProofKeyId=integration-test",
+                    $"--{SentinelProtocolOptions.SectionName}:Filesystems:0:FilesystemId=integration",
+                    $"--{SentinelProtocolOptions.SectionName}:Filesystems:0:DisplayName=Integration Storage",
+                    $"--{SentinelProtocolOptions.SectionName}:Filesystems:0:SentinelPath={directory}"
                 ]);
                 builder.Services.RemoveAll<IHostUptimeReader>();
                 builder.Services.AddSingleton<IHostUptimeReader>(new FixedHostUptimeReader(310_920));

@@ -18,6 +18,8 @@ public static class SentinelProtocol
     public const int HostReadCpuVersion = 1;
     public const string HostReadMemory = "Host.ReadMemory";
     public const int HostReadMemoryVersion = 1;
+    public const string HostReadDisk = "Host.ReadDisk";
+    public const int HostReadDiskVersion = 1;
     public const string CapabilityUnavailable = "CAPABILITY_UNAVAILABLE";
 }
 
@@ -95,10 +97,20 @@ public sealed record SentinelUnavailableSection(
     string Status,
     SentinelProtocolError Error);
 
+public sealed record SentinelDiskItem(
+    string FilesystemId,
+    string DisplayName,
+    string Status,
+    long? TotalBytes,
+    long? UsedBytes,
+    long? AvailableBytes,
+    double? UsagePercent,
+    SentinelProtocolError? Error);
+
 public sealed record SentinelDiskSection(
     string Status,
-    IReadOnlyList<object> Items,
-    SentinelProtocolError Error);
+    IReadOnlyList<SentinelDiskItem> Items,
+    SentinelProtocolError? Error);
 
 public sealed record SentinelSnapshotSections(
     SentinelUptimeSection Uptime,

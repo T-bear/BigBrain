@@ -25,6 +25,17 @@ public sealed class SentinelProtocolOptions
     [Required]
     [StringLength(64, MinimumLength = 1)]
     public string ProofKeyId { get; init; } = "local-control-plane";
+
+    public IReadOnlyList<SentinelFilesystemOptions> Filesystems { get; init; } = [];
+}
+
+public sealed class SentinelFilesystemOptions
+{
+    public string FilesystemId { get; init; } = string.Empty;
+
+    public string DisplayName { get; init; } = string.Empty;
+
+    public string SentinelPath { get; init; } = string.Empty;
 }
 
 public sealed class SentinelProtocolOptionsValidator : IValidateOptions<SentinelProtocolOptions>
@@ -44,6 +55,32 @@ public sealed class SentinelProtocolOptionsValidator : IValidateOptions<Sentinel
             nameof(options.TrustedClientCertificatePath),
             failures);
         RequireAbsolutePath(options.ProofPublicKeyPath, nameof(options.ProofPublicKeyPath), failures);
+        var filesystemIds = new HashSet<string>(StringComparer.Ordinal);
+        for (var index = 0; index < options.Filesystems.Count; index++)
+        {
+            var filesystem = options.Filesystems[index];
+            var prefix = $"{nameof(options.Filesystems)}[{index}]";
+            if (string.IsNullOrWhiteSpace(filesystem.FilesystemId))
+            {
+                failures.Add($"{prefix}.FilesystemId is required.");
+            }
+            else if (!filesystemIds.Add(filesystem.FilesystemId))
+            {
+                failures.Add($"{prefix}.FilesystemId must be unique.");
+            }
+            if (string.IsNullOrWhiteSpace(filesystem.DisplayName))
+            {
+                failures.Add($"{prefix}.DisplayName is required.");
+            }
+            if (!Path.IsPathFullyQualified(filesystem.SentinelPath))
+            {
+                failures.Add($"{prefix}.SentinelPath must be an absolute path.");
+            }
+            else if (!Directory.Exists(filesystem.SentinelPath))
+            {
+                failures.Add($"{prefix}.SentinelPath must exist.");
+            }
+        }
 
         return failures.Count == 0
             ? ValidateOptionsResult.Success

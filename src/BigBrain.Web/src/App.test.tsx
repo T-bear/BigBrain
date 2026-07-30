@@ -14,7 +14,10 @@ const overview = {
   uptimeSeconds: 310_920,
   cpu: { usagePercent: 23.5, logicalProcessorCount: 8 },
   memory: { totalBytes: 17_179_869_184, usedBytes: 8_589_934_592, availableBytes: 8_589_934_592, usagePercent: 50 },
-  disks: [{ mountPoint: '/', totalBytes: 1000, usedBytes: 400, availableBytes: 600, usagePercent: 40 }],
+  disks: [
+    { filesystemId: 'system', displayName: 'System Storage', totalBytes: 1_000_000_000_000, usedBytes: 400_000_000_000, availableBytes: 600_000_000_000, usagePercent: 40 },
+    { filesystemId: 'media', displayName: 'Media Storage', totalBytes: 2_000_000_000_000, usedBytes: 500_000_000_000, availableBytes: 1_500_000_000_000, usagePercent: 25 },
+  ],
   temperatureCelsius: null,
   collectedAtUtc: '2026-07-23T10:00:00Z',
   status: 'Degraded',
@@ -94,6 +97,12 @@ test('renders system values returned by the API', async () => {
   expect(screen.getByText('50.0%')).toBeInTheDocument()
   expect(screen.getByText('8.0 GiB of 16.0 GiB')).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'RAM usage' })).toHaveAttribute('value', '50')
+  expect(screen.getByText('System Storage')).toBeInTheDocument()
+  expect(screen.getByText('Media Storage')).toBeInTheDocument()
+  expect(screen.getByText('372.5 GiB used of 931.3 GiB · 558.8 GiB free')).toBeInTheDocument()
+  expect(screen.getByText('465.7 GiB used of 1.8 TiB · 1.4 TiB free')).toBeInTheDocument()
+  expect(screen.getByRole('progressbar', { name: 'System Storage' })).toHaveAttribute('value', '40')
+  expect(screen.getByRole('progressbar', { name: 'Media Storage' })).toHaveAttribute('value', '25')
   expect(screen.getByText('3 dagar 14 timmar 22 minuter')).toBeInTheDocument()
 })
 

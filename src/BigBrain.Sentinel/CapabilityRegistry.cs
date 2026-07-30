@@ -51,8 +51,15 @@ public sealed class SystemMetricsCapabilityRegistry : ICapabilityRegistry
             "read",
             "available");
 
+    private static readonly SentinelCapabilityDescriptor Disk =
+        new(
+            SentinelProtocol.HostReadDisk,
+            SentinelProtocol.HostReadDiskVersion,
+            "read",
+            "available");
+
     private static readonly ReadOnlyCollection<SentinelCapabilityDescriptor> Capabilities =
-        Array.AsReadOnly([Uptime, Cpu, Memory, Snapshot]);
+        Array.AsReadOnly([Uptime, Cpu, Memory, Disk, Snapshot]);
 
     public int Count => Capabilities.Count;
 

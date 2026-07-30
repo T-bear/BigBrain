@@ -22,7 +22,7 @@ export interface SystemOverview {
   uptimeSeconds: number | null
   cpu: { usagePercent: number | null; logicalProcessorCount: number }
   memory: { totalBytes: number | null; usedBytes: number | null; availableBytes: number | null; usagePercent: number | null }
-  disks: Array<{ mountPoint: string; totalBytes: number | null; usedBytes: number | null; availableBytes: number | null; usagePercent: number | null }>
+  disks: Array<{ filesystemId: string; displayName: string; totalBytes: number | null; usedBytes: number | null; availableBytes: number | null; usagePercent: number | null }>
   temperatureCelsius: number | null
   collectedAtUtc: string
   status: string

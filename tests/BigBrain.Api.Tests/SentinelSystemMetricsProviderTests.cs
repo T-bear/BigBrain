@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BigBrain.Api.Sentinel;
 using BigBrain.Modules;
 using BigBrain.Sentinel.Contracts;
@@ -27,12 +28,19 @@ public sealed class SentinelSystemMetricsProviderTests
                     8_589_934_592,
                     8_589_934_592,
                     50),
+                null),
+            new SentinelDiskSection(
+                "available",
+                [
+                    AvailableDisk("system", "System Storage", 1_000, 400, 600, 40),
+                    AvailableDisk("media", "Media Storage", 2_000, 500, 1_500, 25)
+                ],
                 null));
         var provider = new SentinelSystemMetricsProvider(new StubSentinelClient(snapshot));
 
         var result = await provider.GetOverviewAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal("Degraded", result.Status);
+        Assert.Equal("Healthy", result.Status);
         Assert.Equal(collectedAtUtc, result.CollectedAtUtc);
         Assert.Equal(310_920, result.UptimeSeconds);
         Assert.Equal(23.5, result.Cpu.UsagePercent);
@@ -41,7 +49,29 @@ public sealed class SentinelSystemMetricsProviderTests
         Assert.Equal(8_589_934_592, result.Memory.UsedBytes);
         Assert.Equal(8_589_934_592, result.Memory.AvailableBytes);
         Assert.Equal(50, result.Memory.UsagePercent);
-        Assert.Empty(result.Disks);
+        Assert.Collection(
+            result.Disks,
+            system =>
+            {
+                Assert.Equal("system", system.FilesystemId);
+                Assert.Equal("System Storage", system.DisplayName);
+                Assert.Equal(1_000, system.TotalBytes);
+                Assert.Equal(400, system.UsedBytes);
+                Assert.Equal(600, system.AvailableBytes);
+                Assert.Equal(40, system.UsagePercent);
+            },
+            media =>
+            {
+                Assert.Equal("media", media.FilesystemId);
+                Assert.Equal("Media Storage", media.DisplayName);
+                Assert.Equal(2_000, media.TotalBytes);
+                Assert.Equal(500, media.UsedBytes);
+                Assert.Equal(1_500, media.AvailableBytes);
+                Assert.Equal(25, media.UsagePercent);
+            });
+        var json = JsonSerializer.Serialize(result, JsonSerializerOptions.Web);
+        Assert.DoesNotContain("mountPoint", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("sentinelPath", json, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -60,25 +90,36 @@ public sealed class SentinelSystemMetricsProviderTests
         DateTimeOffset collectedAtUtc,
         SentinelUptimeSection uptime,
         SentinelCpuSection cpu,
-        SentinelMemorySection memory)
-    {
-        var unavailable = new SentinelProtocolError(
-            "CAPABILITY_UNAVAILABLE",
-            "Capability is not available.",
-            false);
-
-        return new SentinelSnapshotResponse(
+        SentinelMemorySection memory,
+        SentinelDiskSection disks) =>
+        new(
             "snapshot-1",
             "node-1",
             collectedAtUtc,
-            "partial",
+            "available",
             new SentinelSnapshotSections(
                 uptime,
                 cpu,
                 memory,
-                new SentinelDiskSection("unavailable", [], unavailable)),
-            ["Disk metrics are not implemented."]);
-    }
+                disks),
+            []);
+
+    private static SentinelDiskItem AvailableDisk(
+        string filesystemId,
+        string displayName,
+        long totalBytes,
+        long usedBytes,
+        long availableBytes,
+        double usagePercent) =>
+        new(
+            filesystemId,
+            displayName,
+            "available",
+            totalBytes,
+            usedBytes,
+            availableBytes,
+            usagePercent,
+            null);
 
     private sealed class StubSentinelClient : ISentinelClient
     {

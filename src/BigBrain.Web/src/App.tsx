@@ -127,7 +127,7 @@ export default function App() {
                 <ProgressMetric label="CPU usage" value={system.cpu.usagePercent} detail={`${system.cpu.logicalProcessorCount} logical processors`} />
                 <ProgressMetric label="RAM usage" value={system.memory.usagePercent} detail={`${formatBytes(system.memory.usedBytes)} of ${formatBytes(system.memory.totalBytes)}`} />
                 {system.disks.map((disk) => (
-                  <ProgressMetric key={disk.mountPoint} label={`Disk ${disk.mountPoint}`} value={disk.usagePercent} detail={`${formatBytes(disk.usedBytes)} of ${formatBytes(disk.totalBytes)}`} />
+                  <ProgressMetric key={disk.filesystemId} label={disk.displayName} value={disk.usagePercent} detail={`${formatBytes(disk.usedBytes)} used of ${formatBytes(disk.totalBytes)} · ${formatBytes(disk.availableBytes)} free`} />
                 ))}
                 <MetricCard label="System uptime" value={formatUptime(system.uptimeSeconds)} />
                 <MetricCard label="Hostname" value={system.hostname} />

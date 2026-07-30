@@ -2,7 +2,13 @@ namespace BigBrain.Modules;
 
 public sealed record CpuMetrics(double? UsagePercent, int LogicalProcessorCount);
 public sealed record MemoryMetrics(long? TotalBytes, long? UsedBytes, long? AvailableBytes, double? UsagePercent);
-public sealed record DiskMetrics(string MountPoint, long? TotalBytes, long? UsedBytes, long? AvailableBytes, double? UsagePercent);
+public sealed record DiskMetrics(
+    string FilesystemId,
+    string DisplayName,
+    long? TotalBytes,
+    long? UsedBytes,
+    long? AvailableBytes,
+    double? UsagePercent);
 public sealed record SystemOverview(
     string Hostname,
     string OperatingSystem,

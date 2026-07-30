@@ -18,6 +18,17 @@ public sealed class SentinelSystemMetricsProvider(ISentinelClient sentinel) : IS
             var memory = snapshot.Sections.Memory.Status == "available"
                 ? snapshot.Sections.Memory.Data
                 : null;
+            var disks = snapshot.Sections.Disks.Items
+                .Where(item => item.Status == "available")
+                .Select(
+                    item => new DiskMetrics(
+                        item.FilesystemId,
+                        item.DisplayName,
+                        item.TotalBytes,
+                        item.UsedBytes,
+                        item.AvailableBytes,
+                        item.UsagePercent))
+                .ToArray();
 
             return new SystemOverview(
                 "Unavailable",
@@ -30,10 +41,14 @@ public sealed class SentinelSystemMetricsProvider(ISentinelClient sentinel) : IS
                     memory?.UsedBytes,
                     memory?.AvailableBytes,
                     memory?.UsagePercent),
-                [],
+                disks,
                 null,
                 snapshot.CollectedAtUtc,
-                uptimeSeconds is null ? "Unavailable" : "Degraded",
+                snapshot.Status == "available"
+                    ? "Healthy"
+                    : snapshot.Status == "unavailable"
+                        ? "Unavailable"
+                        : "Degraded",
                 snapshot.Warnings);
         }
         catch (SentinelClientUnavailableException)

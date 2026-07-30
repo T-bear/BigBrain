@@ -15,11 +15,6 @@ public sealed class SystemMetricsSnapshotService(
     IOptions<SentinelProtocolOptions> options) : ISystemMetricsSnapshotService
 {
     private static readonly TimeSpan CpuSampleWindow = TimeSpan.FromMilliseconds(250);
-    private static readonly SentinelProtocolError NotImplemented =
-        new(
-            SentinelProtocol.CapabilityUnavailable,
-            "The metric is not implemented.",
-            false);
 
     public async Task<SentinelSnapshotResponse> ReadSnapshotAsync(
         CancellationToken cancellationToken)
@@ -40,6 +35,7 @@ public sealed class SystemMetricsSnapshotService(
 
         var cpu = await ReadCpuAsync(cancellationToken);
         var memory = await ReadMemoryAsync(cancellationToken);
+        var disks = ReadDisks(options.Value.Filesystems);
         var warnings = new List<string>();
         if (uptime.Status != "available")
         {
@@ -53,18 +49,30 @@ public sealed class SystemMetricsSnapshotService(
         {
             warnings.Add("Memory metrics are unavailable.");
         }
-        warnings.Add("Disk metrics are not implemented.");
+        if (disks.Status == "partial")
+        {
+            warnings.Add("One or more configured filesystem metrics are unavailable.");
+        }
+        else if (disks.Status == "unavailable")
+        {
+            warnings.Add("Configured filesystem metrics are unavailable.");
+        }
+
+        var allAvailable = uptime.Status == "available"
+            && cpu.Status == "available"
+            && memory.Status == "available"
+            && disks.Status == "available";
 
         return new SentinelSnapshotResponse(
             $"snapshot:{Guid.NewGuid():N}",
             options.Value.NodeId,
             DateTimeOffset.UtcNow,
-            "partial",
+            allAvailable ? "available" : "partial",
             new SentinelSnapshotSections(
                 uptime,
                 cpu,
                 memory,
-                new SentinelDiskSection("unavailable", [], NotImplemented)),
+                disks),
             warnings);
     }
 
@@ -180,6 +188,91 @@ public sealed class SystemMetricsSnapshotService(
         {
             return false;
         }
+    }
+
+    internal static bool TryCreateDiskItem(
+        SentinelFilesystemOptions filesystem,
+        long totalBytes,
+        long availableBytes,
+        out SentinelDiskItem? item)
+    {
+        item = null;
+        if (totalBytes <= 0 || availableBytes < 0 || availableBytes > totalBytes)
+        {
+            return false;
+        }
+
+        var usedBytes = totalBytes - availableBytes;
+        var usagePercent = usedBytes * 100d / totalBytes;
+        item = new SentinelDiskItem(
+            filesystem.FilesystemId,
+            filesystem.DisplayName,
+            "available",
+            totalBytes,
+            usedBytes,
+            availableBytes,
+            usagePercent,
+            null);
+        return true;
+    }
+
+    internal static SentinelDiskSection ReadDisks(
+        IReadOnlyList<SentinelFilesystemOptions> filesystems)
+    {
+        var items = new List<SentinelDiskItem>(filesystems.Count);
+        foreach (var filesystem in filesystems)
+        {
+            try
+            {
+                var drive = new DriveInfo(filesystem.SentinelPath);
+                if (drive.IsReady
+                    && TryCreateDiskItem(
+                        filesystem,
+                        drive.TotalSize,
+                        drive.AvailableFreeSpace,
+                        out var item))
+                {
+                    items.Add(item!);
+                    continue;
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+
+            items.Add(
+                new SentinelDiskItem(
+                    filesystem.FilesystemId,
+                    filesystem.DisplayName,
+                    "unavailable",
+                    null,
+                    null,
+                    null,
+                    null,
+                    new SentinelProtocolError(
+                        "DEPENDENCY_UNAVAILABLE",
+                        "The filesystem metric is unavailable.",
+                        true)));
+        }
+
+        var availableCount = items.Count(item => item.Status == "available");
+        var status = availableCount == items.Count && items.Count > 0
+            ? "available"
+            : availableCount > 0
+                ? "partial"
+                : "unavailable";
+        return new SentinelDiskSection(
+            status,
+            items,
+            status == "unavailable"
+                ? new SentinelProtocolError(
+                    "DEPENDENCY_UNAVAILABLE",
+                    "No configured filesystem metric is available.",
+                    true)
+                : null);
     }
 
     private static async Task<SentinelMemorySection> ReadMemoryAsync(
