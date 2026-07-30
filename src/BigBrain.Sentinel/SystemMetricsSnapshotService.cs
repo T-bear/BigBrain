@@ -39,6 +39,7 @@ public sealed class SystemMetricsSnapshotService(
                     false));
 
         var cpu = await ReadCpuAsync(cancellationToken);
+        var memory = await ReadMemoryAsync(cancellationToken);
         var warnings = new List<string>();
         if (uptime.Status != "available")
         {
@@ -48,7 +49,11 @@ public sealed class SystemMetricsSnapshotService(
         {
             warnings.Add("CPU metrics are unavailable.");
         }
-        warnings.Add("Memory and disk metrics are not implemented.");
+        if (memory.Status != "available")
+        {
+            warnings.Add("Memory metrics are unavailable.");
+        }
+        warnings.Add("Disk metrics are not implemented.");
 
         return new SentinelSnapshotResponse(
             $"snapshot:{Guid.NewGuid():N}",
@@ -58,7 +63,7 @@ public sealed class SystemMetricsSnapshotService(
             new SentinelSnapshotSections(
                 uptime,
                 cpu,
-                new SentinelUnavailableSection("unavailable", NotImplemented),
+                memory,
                 new SentinelDiskSection("unavailable", [], NotImplemented)),
             warnings);
     }
@@ -127,6 +132,97 @@ public sealed class SystemMetricsSnapshotService(
                 "DEPENDENCY_UNAVAILABLE",
                 "CPU metrics are unavailable.",
                 true));
+    }
+
+    internal static bool TryParseMemorySnapshot(
+        string snapshot,
+        out SentinelMemoryData? data)
+    {
+        data = null;
+        long? totalKilobytes = null;
+        long? availableKilobytes = null;
+
+        foreach (var line in snapshot.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (line.StartsWith("MemTotal:", StringComparison.Ordinal))
+            {
+                totalKilobytes = ParseMemoryKilobytes(line);
+            }
+            else if (line.StartsWith("MemAvailable:", StringComparison.Ordinal))
+            {
+                availableKilobytes = ParseMemoryKilobytes(line);
+            }
+        }
+
+        if (totalKilobytes is null
+            || availableKilobytes is null
+            || totalKilobytes <= 0
+            || availableKilobytes < 0
+            || availableKilobytes > totalKilobytes)
+        {
+            return false;
+        }
+
+        try
+        {
+            var totalBytes = checked(totalKilobytes.Value * 1024);
+            var availableBytes = checked(availableKilobytes.Value * 1024);
+            var usedBytes = totalBytes - availableBytes;
+            var usagePercent = usedBytes * 100d / totalBytes;
+            data = new SentinelMemoryData(
+                totalBytes,
+                usedBytes,
+                availableBytes,
+                usagePercent);
+            return true;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+    }
+
+    private static async Task<SentinelMemorySection> ReadMemoryAsync(
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var snapshot = await File.ReadAllTextAsync("/proc/meminfo", cancellationToken);
+            if (TryParseMemorySnapshot(snapshot, out var data))
+            {
+                return new SentinelMemorySection("available", data, null);
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+
+        return new SentinelMemorySection(
+            "unavailable",
+            null,
+            new SentinelProtocolError(
+                "DEPENDENCY_UNAVAILABLE",
+                "Memory metrics are unavailable.",
+                true));
+    }
+
+    private static long? ParseMemoryKilobytes(string line)
+    {
+        var fields = line.Split(
+            ' ',
+            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return fields.Length == 3
+            && string.Equals(fields[2], "kB", StringComparison.Ordinal)
+            && long.TryParse(
+                fields[1],
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out var kilobytes)
+            ? kilobytes
+            : null;
     }
 
     private static bool TryParseCpuSnapshot(string snapshot, out CpuSnapshot parsed)

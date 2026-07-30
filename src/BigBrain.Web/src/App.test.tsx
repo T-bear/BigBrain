@@ -92,6 +92,8 @@ test('renders system values returned by the API', async () => {
   expect(screen.getByText('8 logical processors')).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'CPU usage' })).toHaveAttribute('value', '23.5')
   expect(screen.getByText('50.0%')).toBeInTheDocument()
+  expect(screen.getByText('8.0 GiB of 16.0 GiB')).toBeInTheDocument()
+  expect(screen.getByRole('progressbar', { name: 'RAM usage' })).toHaveAttribute('value', '50')
   expect(screen.getByText('3 dagar 14 timmar 22 minuter')).toBeInTheDocument()
 })
 

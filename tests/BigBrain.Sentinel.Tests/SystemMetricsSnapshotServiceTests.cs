@@ -43,4 +43,41 @@ public sealed class SystemMetricsSnapshotServiceTests
         Assert.False(success);
         Assert.Null(data);
     }
+
+    [Fact]
+    public void TryParseMemorySnapshotCalculatesBytesAndUsage()
+    {
+        const string snapshot =
+            """
+            MemTotal:       16777216 kB
+            MemFree:         1048576 kB
+            MemAvailable:    8388608 kB
+            """;
+
+        var success = SystemMetricsSnapshotService.TryParseMemorySnapshot(
+            snapshot,
+            out var data);
+
+        Assert.True(success);
+        Assert.NotNull(data);
+        Assert.Equal(17_179_869_184, data.TotalBytes);
+        Assert.Equal(8_589_934_592, data.UsedBytes);
+        Assert.Equal(8_589_934_592, data.AvailableBytes);
+        Assert.Equal(50, data.UsagePercent);
+    }
+
+    [Theory]
+    [InlineData("MemTotal: -1 kB\nMemAvailable: 0 kB")]
+    [InlineData("MemTotal: 100 kB\nMemAvailable: 101 kB")]
+    [InlineData("MemTotal: 0 kB\nMemAvailable: 0 kB")]
+    [InlineData("MemTotal: 100 kB")]
+    public void TryParseMemorySnapshotRejectsInvalidValues(string snapshot)
+    {
+        var success = SystemMetricsSnapshotService.TryParseMemorySnapshot(
+            snapshot,
+            out var data);
+
+        Assert.False(success);
+        Assert.Null(data);
+    }
 }

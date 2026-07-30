@@ -22,12 +22,12 @@ public sealed class SentinelProtocolIntegrationTests
 
         Assert.Equal("Healthy", ping.Status);
         Assert.Equal(environment.NodeId, ping.NodeId);
-        Assert.Equal(3, ping.CapabilityCount);
+        Assert.Equal(4, ping.CapabilityCount);
         Assert.True(ping.CheckedAtUtc <= DateTimeOffset.UtcNow);
     }
 
     [Fact]
-    public async Task SystemMetricsRequestReturnsHostUptimeAndCpuWithUnavailableSiblingMetrics()
+    public async Task SystemMetricsRequestReturnsHostUptimeCpuAndMemoryWithUnavailableDisk()
     {
         await using var environment = await SentinelProtocolTestEnvironment.StartAsync();
 
@@ -41,7 +41,17 @@ public sealed class SentinelProtocolIntegrationTests
         Assert.InRange(snapshot.Sections.Cpu.Data!.UsagePercent, 0, 100);
         Assert.True(snapshot.Sections.Cpu.Data.LogicalProcessorCount > 0);
         Assert.True(snapshot.Sections.Cpu.Data.SampleWindowMilliseconds > 0);
-        Assert.Equal("unavailable", snapshot.Sections.Memory.Status);
+        Assert.Equal("available", snapshot.Sections.Memory.Status);
+        Assert.True(snapshot.Sections.Memory.Data!.TotalBytes > 0);
+        Assert.InRange(
+            snapshot.Sections.Memory.Data.AvailableBytes,
+            0,
+            snapshot.Sections.Memory.Data.TotalBytes);
+        Assert.Equal(
+            snapshot.Sections.Memory.Data.TotalBytes
+                - snapshot.Sections.Memory.Data.AvailableBytes,
+            snapshot.Sections.Memory.Data.UsedBytes);
+        Assert.InRange(snapshot.Sections.Memory.Data.UsagePercent, 0, 100);
         Assert.Equal("unavailable", snapshot.Sections.Disks.Status);
     }
 

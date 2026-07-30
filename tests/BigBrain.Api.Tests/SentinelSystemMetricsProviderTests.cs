@@ -19,6 +19,14 @@ public sealed class SentinelSystemMetricsProviderTests
             new SentinelCpuSection(
                 "available",
                 new SentinelCpuData(8, 23.5, 250),
+                null),
+            new SentinelMemorySection(
+                "available",
+                new SentinelMemoryData(
+                    17_179_869_184,
+                    8_589_934_592,
+                    8_589_934_592,
+                    50),
                 null));
         var provider = new SentinelSystemMetricsProvider(new StubSentinelClient(snapshot));
 
@@ -29,7 +37,10 @@ public sealed class SentinelSystemMetricsProviderTests
         Assert.Equal(310_920, result.UptimeSeconds);
         Assert.Equal(23.5, result.Cpu.UsagePercent);
         Assert.Equal(8, result.Cpu.LogicalProcessorCount);
-        Assert.Null(result.Memory.TotalBytes);
+        Assert.Equal(17_179_869_184, result.Memory.TotalBytes);
+        Assert.Equal(8_589_934_592, result.Memory.UsedBytes);
+        Assert.Equal(8_589_934_592, result.Memory.AvailableBytes);
+        Assert.Equal(50, result.Memory.UsagePercent);
         Assert.Empty(result.Disks);
     }
 
@@ -48,7 +59,8 @@ public sealed class SentinelSystemMetricsProviderTests
     private static SentinelSnapshotResponse CreateSnapshot(
         DateTimeOffset collectedAtUtc,
         SentinelUptimeSection uptime,
-        SentinelCpuSection cpu)
+        SentinelCpuSection cpu,
+        SentinelMemorySection memory)
     {
         var unavailable = new SentinelProtocolError(
             "CAPABILITY_UNAVAILABLE",
@@ -63,9 +75,9 @@ public sealed class SentinelSystemMetricsProviderTests
             new SentinelSnapshotSections(
                 uptime,
                 cpu,
-                new SentinelUnavailableSection("unavailable", unavailable),
+                memory,
                 new SentinelDiskSection("unavailable", [], unavailable)),
-            ["Memory and disk metrics are not implemented."]);
+            ["Disk metrics are not implemented."]);
     }
 
     private sealed class StubSentinelClient : ISentinelClient

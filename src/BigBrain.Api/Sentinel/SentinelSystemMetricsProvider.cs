@@ -15,6 +15,9 @@ public sealed class SentinelSystemMetricsProvider(ISentinelClient sentinel) : IS
             var cpu = snapshot.Sections.Cpu.Status == "available"
                 ? snapshot.Sections.Cpu.Data
                 : null;
+            var memory = snapshot.Sections.Memory.Status == "available"
+                ? snapshot.Sections.Memory.Data
+                : null;
 
             return new SystemOverview(
                 "Unavailable",
@@ -22,7 +25,11 @@ public sealed class SentinelSystemMetricsProvider(ISentinelClient sentinel) : IS
                 "Unavailable",
                 uptimeSeconds,
                 new CpuMetrics(cpu?.UsagePercent, cpu?.LogicalProcessorCount ?? 0),
-                new MemoryMetrics(null, null, null, null),
+                new MemoryMetrics(
+                    memory?.TotalBytes,
+                    memory?.UsedBytes,
+                    memory?.AvailableBytes,
+                    memory?.UsagePercent),
                 [],
                 null,
                 snapshot.CollectedAtUtc,

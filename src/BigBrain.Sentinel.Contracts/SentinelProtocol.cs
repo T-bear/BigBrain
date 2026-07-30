@@ -16,6 +16,8 @@ public static class SentinelProtocol
     public const int HostReadUptimeVersion = 1;
     public const string HostReadCpu = "Host.ReadCpu";
     public const int HostReadCpuVersion = 1;
+    public const string HostReadMemory = "Host.ReadMemory";
+    public const int HostReadMemoryVersion = 1;
     public const string CapabilityUnavailable = "CAPABILITY_UNAVAILABLE";
 }
 
@@ -78,6 +80,17 @@ public sealed record SentinelCpuSection(
     SentinelCpuData? Data,
     SentinelProtocolError? Error);
 
+public sealed record SentinelMemoryData(
+    long TotalBytes,
+    long UsedBytes,
+    long AvailableBytes,
+    double UsagePercent);
+
+public sealed record SentinelMemorySection(
+    string Status,
+    SentinelMemoryData? Data,
+    SentinelProtocolError? Error);
+
 public sealed record SentinelUnavailableSection(
     string Status,
     SentinelProtocolError Error);
@@ -90,7 +103,7 @@ public sealed record SentinelDiskSection(
 public sealed record SentinelSnapshotSections(
     SentinelUptimeSection Uptime,
     SentinelCpuSection Cpu,
-    SentinelUnavailableSection Memory,
+    SentinelMemorySection Memory,
     SentinelDiskSection Disks);
 
 public sealed record SentinelSnapshotResponse(
