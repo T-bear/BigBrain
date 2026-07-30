@@ -14,8 +14,8 @@
 
 Kort sammanfattning:
 
-- Arbete: etablera `docs/STATUS.md` som enda källa för aktuell implementationsstatus.
-- Klart: nuläget har verifierats mot kod, tester, Git, Compose och körande API/frontend.
+- Arbete: lägga till FlareSolverr som Docker-tjänst för Prowlarr-indexers med JavaScript- eller Cloudflare-hantering.
+- Klart: FlareSolverr kör healthy, svarar på port 8191 och är nåbar från Prowlarr via det gemensamma medianätverket.
 - Återstår: inget inom sprintens avgränsning.
 
 ---
@@ -33,6 +33,7 @@ Kort sammanfattning:
 - Förhandsgranskade och explicit bekräftade Sonarr-/Radarr-begäranden med kortlivad token och idempotens.
 - Service Overview, media health score och regelbaserade insights.
 - Docker-, API- och Web-images med health checks för API och Web.
+- FlareSolverr `3.5.0` som Compose-tjänst med healthcheck, konfigurerbar hostport/loggnivå och anslutning till medianätverket.
 
 ---
 
@@ -69,9 +70,12 @@ Verifierat:
 - Frontend tester: 37 OK i 8 testfiler.
 - Frontend production build: OK.
 - Compose production build: Sentinel, API och Web OK.
-- Runtime: Sentinel, API och Web kör; API och Web är healthy.
+- Compose-konfiguration: giltig med Sentinel, API, Web och FlareSolverr.
+- Runtime: Sentinel, API, Web och FlareSolverr kör; API, Web och FlareSolverr är healthy.
+- FlareSolverr: `/health` svarar på hostport 8191 och från Prowlarr via `http://flaresolverr:8191/health`.
 - API: health, System, Docker och Media svarar.
 - Frontend: svarar och renderar BigBrain-applikationen.
+- Regression: befintliga Jellyfin-, Sonarr-, Radarr-, Prowlarr- och qBittorrent-containrar är fortsatt running.
 
 ---
 
@@ -83,6 +87,7 @@ Verifierat:
 - Sentinel: Running.
 - API: Healthy.
 - Web: Healthy.
+- FlareSolverr: Healthy; nåbar från Prowlarr på det externa medianätverket.
 - Senast verifierad: 2026-07-30.
 
 ---
@@ -95,6 +100,7 @@ Nästa sprint är inte beslutad i repositoryt. Verifierade öppna kandidater, ut
 2. Jellyfin diagnostics.
 3. Autentisering och auktorisering.
 4. Persistent audit och idempotens för mediabegäranden.
+5. Konfigurera och verifiera FlareSolverr som indexer proxy i Prowlarr.
 
 ---
 
@@ -106,13 +112,14 @@ Nästa sprint är inte beslutad i repositoryt. Verifierade öppna kandidater, ut
 - Mediabegärandetokens och idempotensresultat lagras endast i minnet.
 - Browser-E2E och verkliga integrationstester mot mediatjänster saknas.
 - Brain, Worker och databas är inte implementerade.
+- Prowlarrs indexer proxy måste fortfarande konfigureras i Prowlarr; sprinten ändrar inte annan containers användardata.
 
 ---
 
 ## Senaste Codex-session
 
 - Datum: 2026-07-30
-- Syfte: etablera en levande och verifierad projektstatus.
-- Resultat: `docs/STATUS.md` skapad; inga kodändringar gjorda.
-- Commit: ingen commit skapad; baserad på `ce05f0c323ae78d2b08efd8791b019e7353089dc`.
-- Nästa rekommenderade steg: låt produktägaren besluta nästa sprint och uppdatera endast förändrade statussektioner när den avslutas.
+- Syfte: lägga till FlareSolverr som Docker-tjänst.
+- Resultat: FlareSolverr `3.5.0` kör healthy på port 8191 och är verifierat nåbar från Prowlarr.
+- Commit: `feat(docker): add FlareSolverr service`.
+- Nästa rekommenderade steg: konfigurera och verifiera FlareSolverr som indexer proxy i Prowlarr.

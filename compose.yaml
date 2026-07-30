@@ -102,6 +102,22 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  flaresolverr:
+    image: flaresolverr/flaresolverr:v3.5.0
+    environment:
+      LOG_LEVEL: ${FLARESOLVERR_LOG_LEVEL:-info}
+    networks:
+      - media
+    ports:
+      - "${FLARESOLVERR_PORT:-8191}:8191"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8191/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
 networks:
   media:
     name: ${MEDIA_DOCKER_NETWORK:-bigbrain_default}
