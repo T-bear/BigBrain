@@ -1,12 +1,43 @@
 name: bigbrain-sprint1
 
 services:
+  sentinel:
+    build:
+      context: .
+      dockerfile: src/BigBrain.Sentinel/Dockerfile
+    environment:
+      SentinelProtocol__Enabled: "true"
+      SentinelProtocol__NodeId: node:local
+      SentinelProtocol__SocketPath: /run/bigbrain/sentinel.sock
+      SentinelProtocol__ServerCertificatePath: /run/bigbrain/identity/server-identity.p12
+      SentinelProtocol__TrustedClientCertificatePath: /run/bigbrain/identity/client-trust.p12
+      SentinelProtocol__ProofPublicKeyPath: /run/bigbrain/identity/proof-public.pem
+      SentinelProtocol__ProofKeyId: local-control-plane
+      SentinelProtocol__Filesystems__0__FilesystemId: bigbrain
+      SentinelProtocol__Filesystems__0__DisplayName: BigBrain Storage
+      SentinelProtocol__Filesystems__0__SentinelPath: /var/lib/bigbrain/filesystems/bigbrain
+    volumes:
+      - sentinel-runtime:/run/bigbrain
+      - ./.sentinel/server:/run/bigbrain/identity:ro
+      - ./.sentinel/storage-probes/bigbrain:/var/lib/bigbrain/filesystems/bigbrain:ro
+    restart: unless-stopped
+
   api:
     build:
       context: .
       dockerfile: src/BigBrain.Api/Dockerfile
+    depends_on:
+      sentinel:
+        condition: service_started
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
+      Sentinel__Enabled: "true"
+      Sentinel__NodeId: node:local
+      Sentinel__SocketPath: /run/bigbrain/sentinel.sock
+      Sentinel__ClientCertificatePath: /run/bigbrain/identity/client-identity.p12
+      Sentinel__TrustedServerCertificatePath: /run/bigbrain/identity/server-trust.p12
+      Sentinel__ProofPrivateKeyPath: /run/bigbrain/identity/proof-private.pem
+      Sentinel__ProofKeyId: local-control-plane
       Media__TimeoutSeconds: ${MEDIA__TIMEOUTSECONDS:-3}
       Media__Requests__Enabled: ${MEDIA__REQUESTS__ENABLED:-true}
       Media__Requests__DefaultSearchAfterAdd: ${MEDIA__REQUESTS__DEFAULTSEARCHAFTERADD:-false}
@@ -32,6 +63,9 @@ services:
       Media__ServiceLinks__Prowlarr__Enabled: ${MEDIA__SERVICELINKS__PROWLARR__ENABLED:-false}
       Media__ServiceLinks__QBittorrent__Url: ${MEDIA__SERVICELINKS__QBITTORRENT__URL:-}
       Media__ServiceLinks__QBittorrent__Enabled: ${MEDIA__SERVICELINKS__QBITTORRENT__ENABLED:-false}
+    volumes:
+      - sentinel-runtime:/run/bigbrain
+      - ./.sentinel/client:/run/bigbrain/identity:ro
     networks:
       - default
       - media
@@ -72,3 +106,6 @@ networks:
   media:
     name: ${MEDIA_DOCKER_NETWORK:-bigbrain_default}
     external: true
+
+volumes:
+  sentinel-runtime:
