@@ -3,6 +3,8 @@ using System.Security.Cryptography.X509Certificates;
 using BigBrain.Api.Sentinel;
 using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using ApiSentinelClientOptions = BigBrain.Api.Sentinel.SentinelClientOptions;
 using SentinelProtocolOptions = BigBrain.Sentinel.SentinelProtocolOptions;
@@ -20,21 +22,24 @@ public sealed class SentinelProtocolIntegrationTests
 
         Assert.Equal("Healthy", ping.Status);
         Assert.Equal(environment.NodeId, ping.NodeId);
-        Assert.Equal(1, ping.CapabilityCount);
+        Assert.Equal(2, ping.CapabilityCount);
         Assert.True(ping.CheckedAtUtc <= DateTimeOffset.UtcNow);
     }
 
     [Fact]
-    public async Task SystemMetricsRequestIsAuthenticatedAndReturnsNotImplemented()
+    public async Task SystemMetricsRequestReturnsHostUptimeAndUnavailableSiblingMetrics()
     {
         await using var environment = await SentinelProtocolTestEnvironment.StartAsync();
 
-        var error = await environment.Client.ReadSystemMetricsAsync(
+        var snapshot = await environment.Client.ReadSystemMetricsAsync(
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(SentinelProtocol.CapabilityUnavailable, error.Code);
-        Assert.Equal("System Metrics collection is not implemented.", error.Message);
-        Assert.False(error.Retryable);
+        Assert.Equal("partial", snapshot.Status);
+        Assert.Equal(310_920, snapshot.Sections.Uptime.Data?.UptimeSeconds);
+        Assert.Equal("available", snapshot.Sections.Uptime.Status);
+        Assert.Equal("unavailable", snapshot.Sections.Cpu.Status);
+        Assert.Equal("unavailable", snapshot.Sections.Memory.Status);
+        Assert.Equal("unavailable", snapshot.Sections.Disks.Status);
     }
 
     [Fact]
@@ -103,6 +108,8 @@ public sealed class SentinelProtocolIntegrationTests
                     $"--{SentinelProtocolOptions.SectionName}:ProofPublicKeyPath={proofPublicKeyPath}",
                     $"--{SentinelProtocolOptions.SectionName}:ProofKeyId=integration-test"
                 ]);
+                builder.Services.RemoveAll<IHostUptimeReader>();
+                builder.Services.AddSingleton<IHostUptimeReader>(new FixedHostUptimeReader(310_920));
                 var application = SentinelHost.Build(builder);
                 await application.StartAsync(TestContext.Current.CancellationToken);
 
@@ -175,6 +182,11 @@ public sealed class SentinelProtocolIntegrationTests
             using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
             File.WriteAllText(privatePath, key.ExportPkcs8PrivateKeyPem());
             File.WriteAllText(publicPath, key.ExportSubjectPublicKeyInfoPem());
+        }
+
+        private sealed class FixedHostUptimeReader(double uptimeSeconds) : IHostUptimeReader
+        {
+            public double ReadUptimeSeconds() => uptimeSeconds;
         }
     }
 }

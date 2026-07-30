@@ -24,7 +24,8 @@ function formatUptime(seconds: number | null) {
   const days = Math.floor(seconds / 86_400)
   const hours = Math.floor((seconds % 86_400) / 3_600)
   const minutes = Math.floor((seconds % 3_600) / 60)
-  return days > 0 ? `${days}d ${hours}h` : `${hours}h ${minutes}m`
+  const dayPart = days > 0 ? `${days} ${days === 1 ? 'dag' : 'dagar'} ` : ''
+  return `${dayPart}${hours} ${hours === 1 ? 'timme' : 'timmar'} ${minutes} ${minutes === 1 ? 'minut' : 'minuter'}`
 }
 
 export default function App() {
@@ -128,7 +129,7 @@ export default function App() {
                 {system.disks.map((disk) => (
                   <ProgressMetric key={disk.mountPoint} label={`Disk ${disk.mountPoint}`} value={disk.usagePercent} detail={`${formatBytes(disk.usedBytes)} of ${formatBytes(disk.totalBytes)}`} />
                 ))}
-                <MetricCard label="Uptime" value={formatUptime(system.uptimeSeconds)} />
+                <MetricCard label="System uptime" value={formatUptime(system.uptimeSeconds)} />
                 <MetricCard label="Hostname" value={system.hostname} />
                 <MetricCard label="Temperature" value={system.temperatureCelsius === null ? 'Unavailable' : `${system.temperatureCelsius.toFixed(1)} °C`} />
               </div>

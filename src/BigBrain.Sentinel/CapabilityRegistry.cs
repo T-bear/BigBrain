@@ -23,21 +23,30 @@ public sealed class EmptyCapabilityRegistry : ICapabilityRegistry
 
 public sealed class SystemMetricsCapabilityRegistry : ICapabilityRegistry
 {
+    private static readonly SentinelCapabilityDescriptor Uptime =
+        new(
+            SentinelProtocol.HostReadUptime,
+            SentinelProtocol.HostReadUptimeVersion,
+            "read",
+            "available");
+
     private static readonly SentinelCapabilityDescriptor Snapshot =
         new(
             SentinelProtocol.InventoryReadSnapshot,
             SentinelProtocol.InventoryReadSnapshotVersion,
             "read",
-            "notImplemented");
+            "partial");
 
     private static readonly ReadOnlyCollection<SentinelCapabilityDescriptor> Capabilities =
-        Array.AsReadOnly([Snapshot]);
+        Array.AsReadOnly([Uptime, Snapshot]);
 
     public int Count => Capabilities.Count;
 
     public IReadOnlyList<SentinelCapabilityDescriptor> GetCapabilities() => Capabilities;
 
     public bool Contains(string name, int version) =>
-        string.Equals(name, Snapshot.Name, StringComparison.Ordinal)
-        && version == Snapshot.Version;
+        Capabilities.Any(
+            capability =>
+                string.Equals(name, capability.Name, StringComparison.Ordinal)
+                && version == capability.Version);
 }

@@ -14,7 +14,7 @@ public interface ISentinelClient
 {
     Task<SentinelPingResponse> PingAsync(CancellationToken cancellationToken);
 
-    Task<SentinelProtocolError> ReadSystemMetricsAsync(CancellationToken cancellationToken);
+    Task<SentinelSnapshotResponse> ReadSystemMetricsAsync(CancellationToken cancellationToken);
 }
 
 public sealed class SentinelClientUnavailableException : Exception
@@ -36,8 +36,8 @@ public sealed class DisabledSentinelClient : ISentinelClient
         Task.FromException<SentinelPingResponse>(
             new SentinelClientUnavailableException("Sentinel communication is not configured."));
 
-    public Task<SentinelProtocolError> ReadSystemMetricsAsync(CancellationToken cancellationToken) =>
-        Task.FromException<SentinelProtocolError>(
+    public Task<SentinelSnapshotResponse> ReadSystemMetricsAsync(CancellationToken cancellationToken) =>
+        Task.FromException<SentinelSnapshotResponse>(
             new SentinelClientUnavailableException("Sentinel communication is not configured."));
 }
 
@@ -86,7 +86,7 @@ public sealed class LocalSentinelClient : ISentinelClient, IDisposable
         }
     }
 
-    public async Task<SentinelProtocolError> ReadSystemMetricsAsync(
+    public async Task<SentinelSnapshotResponse> ReadSystemMetricsAsync(
         CancellationToken cancellationToken)
     {
         var arguments = SentinelSnapshotRequest.CreateArguments();
@@ -115,17 +115,18 @@ public sealed class LocalSentinelClient : ISentinelClient, IDisposable
                 SentinelProtocol.ReadSnapshotPath,
                 request,
                 cancellationToken);
-            var error = await response.Content.ReadFromJsonAsync<SentinelProtocolError>(
+            response.EnsureSuccessStatusCode();
+            var snapshot = await response.Content.ReadFromJsonAsync<SentinelSnapshotResponse>(
                 cancellationToken);
 
-            if (response.StatusCode != HttpStatusCode.NotImplemented
-                || error?.Code != SentinelProtocol.CapabilityUnavailable)
+            if (snapshot is null
+                || !string.Equals(snapshot.NodeId, _options.NodeId, StringComparison.Ordinal))
             {
                 throw new SentinelClientUnavailableException(
                     "Sentinel returned an unexpected System Metrics response.");
             }
 
-            return error;
+            return snapshot;
         }
         catch (SentinelClientUnavailableException)
         {

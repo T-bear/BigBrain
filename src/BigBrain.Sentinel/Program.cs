@@ -52,6 +52,8 @@ public static class SentinelHost
             ConfigureProtocolTransport(builder, protocolOptions);
             builder.Services.AddSingleton<ICapabilityRegistry, SystemMetricsCapabilityRegistry>();
             builder.Services.AddSingleton<ISentinelRequestAuthorizer, SentinelRequestAuthorizer>();
+            builder.Services.AddSingleton<IHostUptimeReader, HostUptimeReader>();
+            builder.Services.AddSingleton<ISystemMetricsSnapshotService, SystemMetricsSnapshotService>();
         }
         else
         {
@@ -155,6 +157,7 @@ public static class SentinelHost
                 SentinelCapabilityRequest request,
                 ICapabilityRegistry capabilities,
                 ISentinelRequestAuthorizer authorizer,
+                ISystemMetricsSnapshotService snapshots,
                 ILogger<Program> logger) =>
             {
                 var validationError = SentinelSnapshotRequestValidator.Validate(request, capabilities, options);
@@ -176,14 +179,9 @@ public static class SentinelHost
                     logger,
                     request.Capability,
                     request.Version,
-                    "NotImplemented");
+                    "Partial");
 
-                return Results.Json(
-                    new SentinelProtocolError(
-                        SentinelProtocol.CapabilityUnavailable,
-                        "System Metrics collection is not implemented.",
-                        false),
-                    statusCode: StatusCodes.Status501NotImplemented);
+                return Results.Ok(snapshots.ReadSnapshot());
             });
     }
 }

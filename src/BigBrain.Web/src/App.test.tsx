@@ -11,7 +11,7 @@ const overview = {
   hostname: 'bigbrain-host',
   operatingSystem: 'Linux',
   architecture: 'X64',
-  uptimeSeconds: 93_780,
+  uptimeSeconds: 310_920,
   cpu: { usagePercent: 23.5, logicalProcessorCount: 8 },
   memory: { totalBytes: 17_179_869_184, usedBytes: 8_589_934_592, availableBytes: 8_589_934_592, usagePercent: 50 },
   disks: [{ mountPoint: '/', totalBytes: 1000, usedBytes: 400, availableBytes: 600, usagePercent: 40 }],
@@ -90,7 +90,7 @@ test('renders system values returned by the API', async () => {
   expect(await screen.findByText('bigbrain-host')).toBeInTheDocument()
   expect(screen.getByText('23.5%')).toBeInTheDocument()
   expect(screen.getByText('50.0%')).toBeInTheDocument()
-  expect(screen.getByText('1d 2h')).toBeInTheDocument()
+  expect(screen.getByText('3 dagar 14 timmar 22 minuter')).toBeInTheDocument()
 })
 
 test('shows loading state while requests are pending', () => {

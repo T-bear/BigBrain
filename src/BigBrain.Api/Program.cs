@@ -34,10 +34,12 @@ public partial class Program
         if (sentinelOptions.Enabled)
         {
             builder.Services.AddSingleton<ISentinelClient, LocalSentinelClient>();
+            builder.Services.AddSingleton<ISystemMetricsProvider, SentinelSystemMetricsProvider>();
         }
         else
         {
             builder.Services.AddSingleton<ISentinelClient, DisabledSentinelClient>();
+            builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         }
         builder.Services.AddOptions<MediaOptions>()
             .BindConfiguration(MediaOptions.SectionName)
@@ -105,7 +107,6 @@ public partial class Program
         builder.Services.AddSingleton<MediaRequestStore>();
         builder.Services.AddTransient<IMediaAddOptionsService, MediaAddOptionsService>();
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
-        builder.Services.AddSingleton<ISystemMetricsProvider, UnavailableSystemMetricsProvider>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition]));
@@ -182,11 +183,7 @@ public partial class Program
             {
                 try
                 {
-                    var error = await sentinel.ReadSystemMetricsAsync(cancellationToken);
-                    return SentinelProblem(
-                        error.Code,
-                        error.Message,
-                        StatusCodes.Status501NotImplemented);
+                    return Results.Ok(await sentinel.ReadSystemMetricsAsync(cancellationToken));
                 }
                 catch (SentinelClientUnavailableException)
                 {

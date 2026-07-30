@@ -12,6 +12,8 @@ public static class SentinelProtocol
     public const string ReadSnapshotPath = "/sentinel/v1/capabilities/inventory.read-snapshot";
     public const string InventoryReadSnapshot = "Inventory.ReadSnapshot";
     public const int InventoryReadSnapshotVersion = 1;
+    public const string HostReadUptime = "Host.ReadUptime";
+    public const int HostReadUptimeVersion = 1;
     public const string CapabilityUnavailable = "CAPABILITY_UNAVAILABLE";
 }
 
@@ -56,6 +58,36 @@ public sealed record SentinelProtocolError(
     string Code,
     string Message,
     bool Retryable);
+
+public sealed record SentinelUptimeData(double UptimeSeconds);
+
+public sealed record SentinelUptimeSection(
+    string Status,
+    SentinelUptimeData? Data,
+    SentinelProtocolError? Error);
+
+public sealed record SentinelUnavailableSection(
+    string Status,
+    SentinelProtocolError Error);
+
+public sealed record SentinelDiskSection(
+    string Status,
+    IReadOnlyList<object> Items,
+    SentinelProtocolError Error);
+
+public sealed record SentinelSnapshotSections(
+    SentinelUptimeSection Uptime,
+    SentinelUnavailableSection Cpu,
+    SentinelUnavailableSection Memory,
+    SentinelDiskSection Disks);
+
+public sealed record SentinelSnapshotResponse(
+    string SnapshotId,
+    string NodeId,
+    DateTimeOffset CollectedAtUtc,
+    string Status,
+    SentinelSnapshotSections Sections,
+    IReadOnlyList<string> Warnings);
 
 public static class SentinelSnapshotRequest
 {
