@@ -153,11 +153,12 @@ public static class SentinelHost
 
         app.MapPost(
             SentinelProtocol.ReadSnapshotPath,
-            (
+            async (
                 SentinelCapabilityRequest request,
                 ICapabilityRegistry capabilities,
                 ISentinelRequestAuthorizer authorizer,
                 ISystemMetricsSnapshotService snapshots,
+                HttpContext context,
                 ILogger<Program> logger) =>
             {
                 var validationError = SentinelSnapshotRequestValidator.Validate(request, capabilities, options);
@@ -181,7 +182,7 @@ public static class SentinelHost
                     request.Version,
                     "Partial");
 
-                return Results.Ok(snapshots.ReadSnapshot());
+                return Results.Ok(await snapshots.ReadSnapshotAsync(context.RequestAborted));
             });
     }
 }

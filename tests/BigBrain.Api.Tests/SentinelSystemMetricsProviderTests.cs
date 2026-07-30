@@ -15,6 +15,10 @@ public sealed class SentinelSystemMetricsProviderTests
             new SentinelUptimeSection(
                 "available",
                 new SentinelUptimeData(310_920),
+                null),
+            new SentinelCpuSection(
+                "available",
+                new SentinelCpuData(8, 23.5, 250),
                 null));
         var provider = new SentinelSystemMetricsProvider(new StubSentinelClient(snapshot));
 
@@ -23,7 +27,8 @@ public sealed class SentinelSystemMetricsProviderTests
         Assert.Equal("Degraded", result.Status);
         Assert.Equal(collectedAtUtc, result.CollectedAtUtc);
         Assert.Equal(310_920, result.UptimeSeconds);
-        Assert.Null(result.Cpu.UsagePercent);
+        Assert.Equal(23.5, result.Cpu.UsagePercent);
+        Assert.Equal(8, result.Cpu.LogicalProcessorCount);
         Assert.Null(result.Memory.TotalBytes);
         Assert.Empty(result.Disks);
     }
@@ -42,7 +47,8 @@ public sealed class SentinelSystemMetricsProviderTests
 
     private static SentinelSnapshotResponse CreateSnapshot(
         DateTimeOffset collectedAtUtc,
-        SentinelUptimeSection uptime)
+        SentinelUptimeSection uptime,
+        SentinelCpuSection cpu)
     {
         var unavailable = new SentinelProtocolError(
             "CAPABILITY_UNAVAILABLE",
@@ -56,10 +62,10 @@ public sealed class SentinelSystemMetricsProviderTests
             "partial",
             new SentinelSnapshotSections(
                 uptime,
-                new SentinelUnavailableSection("unavailable", unavailable),
+                cpu,
                 new SentinelUnavailableSection("unavailable", unavailable),
                 new SentinelDiskSection("unavailable", [], unavailable)),
-            ["Only uptime is available."]);
+            ["Memory and disk metrics are not implemented."]);
     }
 
     private sealed class StubSentinelClient : ISentinelClient

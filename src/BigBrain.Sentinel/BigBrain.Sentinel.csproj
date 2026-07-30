@@ -6,4 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="../BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="BigBrain.Sentinel.Tests" />
+  </ItemGroup>
 </Project>

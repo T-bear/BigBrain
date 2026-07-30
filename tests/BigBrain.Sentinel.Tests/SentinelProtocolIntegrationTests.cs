@@ -22,12 +22,12 @@ public sealed class SentinelProtocolIntegrationTests
 
         Assert.Equal("Healthy", ping.Status);
         Assert.Equal(environment.NodeId, ping.NodeId);
-        Assert.Equal(2, ping.CapabilityCount);
+        Assert.Equal(3, ping.CapabilityCount);
         Assert.True(ping.CheckedAtUtc <= DateTimeOffset.UtcNow);
     }
 
     [Fact]
-    public async Task SystemMetricsRequestReturnsHostUptimeAndUnavailableSiblingMetrics()
+    public async Task SystemMetricsRequestReturnsHostUptimeAndCpuWithUnavailableSiblingMetrics()
     {
         await using var environment = await SentinelProtocolTestEnvironment.StartAsync();
 
@@ -37,7 +37,10 @@ public sealed class SentinelProtocolIntegrationTests
         Assert.Equal("partial", snapshot.Status);
         Assert.Equal(310_920, snapshot.Sections.Uptime.Data?.UptimeSeconds);
         Assert.Equal("available", snapshot.Sections.Uptime.Status);
-        Assert.Equal("unavailable", snapshot.Sections.Cpu.Status);
+        Assert.Equal("available", snapshot.Sections.Cpu.Status);
+        Assert.InRange(snapshot.Sections.Cpu.Data!.UsagePercent, 0, 100);
+        Assert.True(snapshot.Sections.Cpu.Data.LogicalProcessorCount > 0);
+        Assert.True(snapshot.Sections.Cpu.Data.SampleWindowMilliseconds > 0);
         Assert.Equal("unavailable", snapshot.Sections.Memory.Status);
         Assert.Equal("unavailable", snapshot.Sections.Disks.Status);
     }

@@ -12,13 +12,16 @@ public sealed class SentinelSystemMetricsProvider(ISentinelClient sentinel) : IS
             var uptimeSeconds = snapshot.Sections.Uptime.Status == "available"
                 ? snapshot.Sections.Uptime.Data?.UptimeSeconds
                 : null;
+            var cpu = snapshot.Sections.Cpu.Status == "available"
+                ? snapshot.Sections.Cpu.Data
+                : null;
 
             return new SystemOverview(
                 "Unavailable",
                 "Unavailable",
                 "Unavailable",
                 uptimeSeconds,
-                new CpuMetrics(null, 0),
+                new CpuMetrics(cpu?.UsagePercent, cpu?.LogicalProcessorCount ?? 0),
                 new MemoryMetrics(null, null, null, null),
                 [],
                 null,
