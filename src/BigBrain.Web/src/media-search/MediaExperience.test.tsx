@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import { MobileNavigation } from '../MobileNavigation'
 import { MediaPoster } from './MediaPoster'
@@ -8,6 +8,7 @@ import { MediaLookupResultCard } from './MediaLookupResultCard'
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
   window.location.hash = ''
 })
@@ -58,13 +59,58 @@ test('puts search first, ranks the best result and keeps additional results coll
   fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
   expect(await screen.findByRole('heading', { name: 'Alien' })).toBeInTheDocument()
   expect(screen.queryByRole('heading', { name: 'Alien: Romulus' })).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Visa fler resultat' }))
+  expect(screen.getByRole('button', { name: 'Visa 2 fler träffar' })).toHaveAttribute('aria-expanded', 'false')
+  fireEvent.click(screen.getByRole('button', { name: 'Visa 2 fler träffar' }))
   expect(screen.getByRole('heading', { name: 'Alien: Romulus' })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Visa färre' }))
   expect(screen.queryByRole('heading', { name: 'Alien: Romulus' })).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Rensa' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Rensa sökning' }))
   expect(screen.getByRole('searchbox')).toHaveValue('')
   expect(container.querySelector('.media-search-results')).toBeNull()
+})
+
+test('shows contextual search actions only after results have scrolled away', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({
+    ...emptyLookup,
+    providers: [{ provider: 'Radarr', status: 'online', error: null, results: [
+      { provider: 'Radarr', foreignId: '1', title: 'Alien', originalTitle: null, year: 1979, overview: null, network: null, runtimeMinutes: 117, status: 'released', mediaType: 'movie', lookupState: 'external', imageAvailable: false, alreadyRegistered: false, existingSourceId: null },
+      { provider: 'Radarr', foreignId: '2', title: 'Aliens', originalTitle: null, year: 1986, overview: null, network: null, runtimeMinutes: 137, status: 'released', mediaType: 'movie', lookupState: 'external', imageAvailable: false, alreadyRegistered: false, existingSourceId: null },
+    ] }],
+  }) })))
+  const { container } = render(<MediaSearch />)
+  const formAnchor = container.querySelector('.media-search-form-anchor')!
+  const formRect = vi.spyOn(formAnchor, 'getBoundingClientRect').mockReturnValue({ bottom: 200 } as DOMRect)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Alien' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  await screen.findByRole('heading', { name: 'Alien' })
+  expect(screen.queryByRole('button', { name: 'Sökåtgärder' })).not.toBeInTheDocument()
+  formRect.mockReturnValue({ bottom: 0 } as DOMRect)
+  fireEvent.scroll(window)
+  const fab = await screen.findByRole('button', { name: 'Sökåtgärder' })
+  fireEvent.click(fab)
+  expect(fab).toHaveAttribute('aria-expanded', 'true')
+  expect(screen.getByRole('menuitem', { name: 'Visa 1 fler träffar' })).toBeVisible()
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Visa 1 fler träffar' }))
+  expect(screen.getByRole('heading', { name: 'Aliens' })).toBeInTheDocument()
+  fireEvent.click(fab)
+  expect(screen.getByRole('menuitem', { name: 'Visa färre' })).toBeVisible()
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Till sökfältet' }))
+  await waitFor(() => expect(screen.getByRole('searchbox')).toHaveFocus())
+  fireEvent.scroll(window)
+  fireEvent.click(await screen.findByRole('button', { name: 'Sökåtgärder' }))
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Rensa sökning' }))
+  expect(screen.getByRole('searchbox')).toHaveValue('')
+  expect(container.querySelector('.media-search-results')).toBeNull()
+})
+
+test('does not show contextual search actions for an empty result', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => emptyLookup })))
+  render(<MediaSearch />)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Saknas' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  await screen.findByText(/Resultat för/)
+  fireEvent.scroll(window)
+  expect(screen.queryByRole('button', { name: 'Sökåtgärder' })).not.toBeInTheDocument()
 })
 
 test('poster falls back without leaving a broken image', () => {
@@ -89,6 +135,8 @@ test('valid poster is lazy loaded and missing poster uses placeholder', () => {
 test('mobile navigation has stable destinations and marks the active view', () => {
   window.location.hash = '#queue'
   render(<MobileNavigation />)
+  expect(screen.getByRole('link', { name: /Hem/ })).toHaveAttribute('href', '#home')
+  expect(screen.getByRole('link', { name: /Sök/ })).toHaveAttribute('href', '#search')
   expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('href', '#queue')
   expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('aria-current', 'page')
   expect(screen.getByRole('link', { name: /Admin/ })).toHaveAttribute('href', '#administration')

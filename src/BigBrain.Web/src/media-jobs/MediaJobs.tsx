@@ -12,12 +12,21 @@ const filters: Array<{ id: JobFilter; label: string }> = [
   { id: 'failed', label: 'Problem' },
   { id: 'all', label: 'Alla' },
 ]
+const compactStatus: Record<string, string> = {
+  queued: 'I kö', requested: 'Förbereds', searching: 'Söker', downloading: 'Laddar ner',
+  stalled: 'Har stannat', importing: 'Bearbetas', unknown: 'Status väntar',
+}
+function compactTitle(title: string) {
+  const normalized = title.match(/^(.*?)\s+((?:19|20)\d{2})\s+(?=(?:EXTRAS|2160p|1080p|720p|480p|UHD|BluRay|WEB[- .]?DL|WEBRip|HDTV)\b)/i)
+  return normalized ? `${normalized[1].trim()} (${normalized[2]})` : title
+}
 
 export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
   const [snapshot, setSnapshot] = useState<MediaJobsResponse | null>(null)
   const [failed, setFailed] = useState(false)
   const [filter, setFilter] = useState<JobFilter>('active')
   const [visibleCount, setVisibleCount] = useState(8)
+  const [jobsExpanded, setJobsExpanded] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -59,6 +68,7 @@ export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
     return job.status === filter
   })
   const visibleJobs = jobs.slice(0, visibleCount)
+  const compactActive = filter === 'active' && jobs.length > 1
   const unavailableProviders = (Array.isArray(snapshot?.providers) ? snapshot.providers : [])
     .filter(provider => provider.status !== 'online')
 
@@ -79,12 +89,16 @@ export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
         aria-pressed={filter === item.id}
         className={filter === item.id ? 'media-job-filter media-job-filter--active' : 'media-job-filter'}
         key={item.id}
-        onClick={() => { setFilter(item.id); setVisibleCount(8) }}
+        onClick={() => { setFilter(item.id); setVisibleCount(8); setJobsExpanded(false) }}
         type="button">{item.label}</button>)}
     </div>
     {snapshot && jobs.length === 0 && <p className="media-jobs-empty">Inget pågår i den här vyn.</p>}
-    {jobs.length > 0 &&
-      <div className="media-jobs-grid">{visibleJobs.map(job => <MediaJobCard job={job} key={job.id} />)}</div>}
+    {compactActive && <section aria-labelledby="media-jobs-compact-heading" className="media-jobs-compact">
+      <header><h4 id="media-jobs-compact-heading">{jobs.length} pågående nedladdningar</h4><button aria-controls="media-jobs-expanded" aria-expanded={jobsExpanded} className="secondary-button" onClick={() => setJobsExpanded(value => !value)} type="button">{jobsExpanded ? 'Dölj nedladdningar' : 'Visa nedladdningar'}</button></header>
+      <ul>{visibleJobs.map(job => <li key={job.id}><span><strong title={job.title}>{compactTitle(job.title)}</strong><small>{compactStatus[job.status] ?? job.status}</small></span>{job.progressPercent !== null && <b>{Math.max(0, Math.min(100, job.progressPercent)).toFixed(0)}%</b>}</li>)}</ul>
+    </section>}
+    {jobs.length > 0 && (!compactActive || jobsExpanded) &&
+      <div className="media-jobs-grid" id={compactActive ? 'media-jobs-expanded' : undefined}>{visibleJobs.map(job => <MediaJobCard job={job} key={job.id} />)}</div>}
     {visibleCount < jobs.length &&
       <button className="secondary-button media-jobs-more" type="button" onClick={() => setVisibleCount(count => count + 8)}>
         Visa fler

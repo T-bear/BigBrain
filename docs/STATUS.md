@@ -14,9 +14,9 @@
 
 Kort sammanfattning:
 
-- Mål: leverera Matlista med permanenta familjematsedlar och helgluncher samt förenkla BigBrains familje-UX enligt KISS-principen utan ny routing, behörighetsmodell eller backendplattform.
-- Definition of Done: Matlista inklusive SQLite schema 2 bevarad, vardagsflöden prioriterade, diagnostik nåbar via stängd Administration, mobilproblemen korrigerade och full build-, test-, runtime- och browsergrind grön.
-- Resultat: klart. Matlista är runtimeverifierad med nio måltider per vecka och den vanliga startsidan visar handlingar och resultat före teknisk diagnostik.
+- Mål: avsluta UX-arbetet med fyra små förbättringar för navigation, kontextuella sökåtgärder, tydligare resultatexpansion och kompakta samtidiga nedladdningar.
+- Definition of Done: inga duplicerade mobillänkar, lokal och tillgänglig FAB/rensning, korrekta dolda träffantal, kompaktvy för minst två aktiva jobb samt grön full test-, runtime- och browsergrind.
+- Resultat: klart. UX går efter denna leverans in i feature-freeze.
 
 ---
 
@@ -73,6 +73,18 @@ Status: Implementerad och verifierad 2026-08-01
 - Matlistas maträttsbibliotek har en kompakt `+ Lägg till`-åtgärd och en grupperad filterpanel för Måltid, Antal personer, Tillfälle och Övrigt. Panelen har valt antal, `Rensa filter`, tydlig stängning och Escape-stöd; textsökning och taggfilter kombineras som tidigare.
 - Alla `input`, `select` och `textarea` beräknas till minst 16 px på mobil. Viewporten tillåter fortsatt användarzoom.
 
+### Slutlig UX-polering och feature-freeze
+
+Status: Implementerad och verifierad 2026-08-01
+
+- Mobilens redundanta modulnavigation i sidhuvudet är dold; BigBrain-identiteten finns kvar. Bottennavigationen når fortsatt `Hem`, `Sök`, `Pågår` och `Admin`. Desktopnavigationen finns kvar.
+- Mediesökningen visar ett lokalt rensningskryss när text, resultat eller sökfel finns. Rensning avbryter pågående sökanrop och återställer endast söktext, resultat, expansion, lokalt fel, laddningsstatus och FAB-state; bibliotek, providers och jobb påverkas inte.
+- Varje provider visar faktisk mängd dolda resultat som `Visa N fler träffar`; bästa träffen ligger kvar först. Expanderat läge heter `Visa färre`.
+- En lokal sök-FAB visas endast på mobil när resultat finns och sökfältet har scrollats ur direkt räckhåll. Menyn erbjuder `Till sökfältet`, `Rensa sökning` och relevant fler/färre-handling, kan stängas med FAB, Escape, val eller klick utanför och ligger ovanför bottennavigationen.
+- Ett aktivt mediajobb visas fortsatt direkt som befintligt jobbkort. Minst två aktiva jobb visas initialt som en kompakt, expanderbar sammanfattning med antal, normaliserad titel, status och procent. Fulla jobbkort och deras stängda tekniska detaljer är fortsatt nåbara via `Visa nedladdningar`.
+- Kompakt titel normaliserar välkända releaseformat med årtal och teknisk suffixmarkör. Om API:t endast levererar ett okänt format behålls originaltiteln för att undvika felaktig trunkering; full originaltitel finns alltid i `title`-attribut och i expanderat jobbkort.
+- UX är nu feature-fryst. Fortsatt UX-arbete ska baseras på ett konkret användartest, ett reproducerbart fel eller ett tydligt nytt användarbehov, inte allmän polering.
+
 Framtida planer, inte implementerade i denna sprint:
 
 - recept;
@@ -128,7 +140,7 @@ Verifierat:
 
 - Backend build: Release OK i .NET 10 SDK-container, 0 varningar och 0 fel.
 - Backend tester: 186 OK, 0 failed, 0 skipped (154 API/modul + 32 Sentinel), inklusive 28 fokuserade Matlista-testfall för familjeschema, nio måltider, lunchurval, exakt byte, schema 1→2, CRUD, exempeldata och API-fel.
-- Frontend tester: 56 OK i 9 testfiler. Utöver Matlistas vardags-/helg-, bytes-, genererings-, schema-, exempeldata- och utskriftstester täcks sökfältets ordning, resultatranking, visa fler/färre, rensning, stängda Administration-/avancerade-/tekniska detaljer, standardaktiverad filsökning, svenska jobbfilter och den viewport-säkra filterpanelen.
+- Frontend tester: 59 OK i 9 testfiler. Utöver tidigare Matlista-, mediarequest-, Administration- och mobilregression täcks dynamiskt `N`-antal, rensningskryss, villkorad FAB inklusive tomt resultatsvar, FAB-meny/fokus/rensning/fler-färre samt ett kontra flera aktiva jobb och kompaktvyns expansion.
 - Frontend production build: OK.
 - Matlista runtime: modulen rapporterar `Available`; schema 1 migrerades automatiskt till schema 2. Den befintliga matsedelns 14 poster och användarrätter bevarades, samtliga äldre poster läses som `dinner`, och den sjätte skyddade standardtaggen `Lunch` finns genom både direkt API och frontendproxy.
 - Matlista mobil: verifierad i riktig Chromium vid 390 × 844 med isolerad mockdata; dokumentbredd och viewport är båda 390 px. Minimerat helgläge visar lunch och middag, veckovyn har sju dagsrader, lördagens kompakta dubbelpost är 111 px hög och endast lunchens bytesyta öppnades (`dinner` förblev stängd).
@@ -136,13 +148,16 @@ Verifierat:
 - Matlista utskrift: Chromium print-media visar nio måltidsrader för en full vald vecka inklusive måltidstyp; dashboardnavigationen är dold och CSS behåller A4-layout och sidbrytning per vecka.
 - KISS UX browser: riktig Chromium vid 390 × 844 gav viewport/dokumentbredd `390/390`, visuell skala `1` före och efter fokus samt beräknad fältstorlek `16px`. Filterpanelen låg inom viewporten (`366px` bred), dialogen låg inom viewporten (`366px` bred), Administration var stängd initialt och öppnades via Admin, bästa medieträffen var ensam initialt och fler träffar kunde visas.
 - Desktop browser: riktig Chromium vid 1440 × 1000 gav viewport/dokumentbredd `1440/1440`; Administration var stängd initialt.
+- UX-freeze mobil: riktig Chromium vid 390 × 844 gav viewport/dokumentbredd `390/390`; headernavigationen var dold och bottennavigationens fyra ankare var nåbara. FAB låg på `y=716..768`, bottennavigationen började på `y=781`, och menyn låg helt inom viewporten. `Visa 2 fler träffar` expanderade till tre kort, sökfokus återställdes och lokal rensning gav tom text och noll resultat.
+- UX-freeze jobb: två verkliga read-only runtimejobb visades kompakt som `Mamma Mia (2008)` och `Mamma Mia Here We Go Again (2018)` med status/procent; inga fulla kort syntes före expansion, två syntes efter expansion och tekniska detaljer var stängda.
+- UX-freeze desktop: riktig Chromium vid 1440 × 1000 gav viewport/dokumentbredd `1440/1440`; desktopnavigationen var synlig, bottennavigationen dold och ingen FAB renderades utan relevant sökkontext.
 - Matlista kompaktvy: isolerad browserdata visade lördagens lunch och middag i minimerat läge; helgens dubbelrad var `103px` hög. Print-media visade nio rader och dold mobilnavigation.
 - Jellyfin direkt: `/health` svarade `200 Healthy`; `System/Info` svarade med version `10.11.11`; den nya `/Items`-frågan svarade `200` med åtta sorterade poster.
 - BigBrain API: `/api/v1/modules/media` rapporterade Jellyfin `online`, åtta nyligen tillagda poster och Media overall `online`.
 - Frontendproxy: samma mediaendpoint via Web rapporterade Jellyfin och Media overall `online`.
 - Providerregression: Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent rapporterade samtliga `online`; provideranropen svarade `200`.
 - Mobil verifiering: 2026-08-01, 390 × 844 utan horisontell scroll; filterpanel, mediedialog, bottennavigation, minimerad/expanderad Matlista och utskriftsläge verifierade.
-- Compose build: API- och Web-images byggdes om och endast API/Web återskapades; båda startade healthy.
+- Compose build: Web-imagen byggdes om och endast Web återskapades för den frontend-only slutpoleringen; API och Web startade healthy.
 - Compose-konfiguration: verifierad 2026-08-01 med `docker compose config --quiet`.
 - Runtime: Sentinel, API, Web och FlareSolverr kör; API, Web och FlareSolverr är healthy.
 - FlareSolverr: `/health` svarar på hostport 8191 och från Prowlarr via `http://flaresolverr:8191/health`.
@@ -171,7 +186,7 @@ Verifierat:
 
 ## Nästa sprint
 
-Rekommenderat nästa lilla mål: en avgränsad språk- och tomlägesgenomgång av de kvarvarande engelska systemtexterna inne i Administration, utan att ändra API eller arkitektur. För Matlista bör nästa separata datamål vara backup/restore för modulens SQLite-data.
+UX är feature-fryst. Nästa UX-mål ska endast öppnas av konkret användartest, reproducerbart fel eller tydligt nytt användarbehov. För Matlista är nästa separata datamål fortsatt backup/restore för modulens SQLite-data.
 
 Övriga verifierade öppna kandidater, utan inbördes prioritering:
 
@@ -200,7 +215,7 @@ Rekommenderat nästa lilla mål: en avgränsad språk- och tomlägesgenomgång a
 ## Senaste Codex-session
 
 - Datum: 2026-08-01
-- Syfte: slutföra Matlista och genomföra en KISS-fokuserad UX-sprint för familjens vanligaste handlingar.
-- Resultat: Matlistas SQLite schema 2, helgluncher och befintliga flöden är bevarade. Startsidan prioriterar Matlista, sökning och Pågående; teknisk information är samlad i stängd Administration; mediesökning, lägg-till-dialog, jobbkort och Matlistas filter är mobilförenklade. Full build/test och runtime-/browser-/printverifiering är godkända.
-- Commitmeddelande: `feat(ui): simplify BigBrain family experience`.
-- Nästa rekommenderade steg: en liten språk- och tomlägesgenomgång inne i Administration; därefter avgränsad backup/restore för Matlista.
+- Syfte: sista avgränsade UX-polering före feature-freeze.
+- Resultat: duplicerad mobil headernavigation är borttagen, sökningen har lokal rensning och villkorad FAB, fler-resultat visar korrekt antal och minst två aktiva jobb sammanfattas kompakt. Full build/test och runtime-/browserverifiering är godkända utan backend- eller API-kontraktsändring.
+- Commitmeddelande: `feat(ui): finalize compact family navigation`.
+- Nästa rekommenderade steg: inga generella UX-poleringar under feature-freeze; invänta konkret användartest, reproducerbart fel eller tydligt nytt användarbehov.

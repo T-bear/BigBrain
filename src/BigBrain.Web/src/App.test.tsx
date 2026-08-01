@@ -195,6 +195,7 @@ test('prioritizes search and quick actions before system and Docker modules', as
       'activity',
       'details',
     ])
+  expect(screen.getByRole('navigation', { name: 'Moduler' })).toHaveClass('desktop-navigation')
 })
 
 test('uses collapsed defaults for low-priority infrastructure modules', async () => {

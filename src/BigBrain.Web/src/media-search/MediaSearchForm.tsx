@@ -3,12 +3,16 @@ import type { FormEvent, KeyboardEvent } from 'react'
 export function MediaSearchForm({
   loading,
   query,
+  showClear,
   onQueryChange,
+  onClear,
   onSubmit,
 }: {
   loading: boolean
   query: string
+  showClear: boolean
   onQueryChange: (query: string) => void
+  onClear: () => void
   onSubmit: () => void
 }) {
   const canSubmit = query.trim().length >= 2 && !loading
@@ -37,6 +41,7 @@ export function MediaSearchForm({
         placeholder="Sök efter en film eller serie"
         autoComplete="off"
       />
+      {showClear && <button aria-label="Rensa sökning" className="media-search-clear-control" onClick={onClear} type="button">×</button>}
       <button type="submit" disabled={!canSubmit}>{loading ? 'Söker…' : 'Sök'}</button>
     </div>
   </form>

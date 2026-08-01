@@ -84,7 +84,7 @@ export default function App() {
           <span className="brand__mark">B</span>
           <span>BigBrain</span>
         </a>
-        <nav aria-label="Moduler">
+        <nav aria-label="Moduler" className="desktop-navigation">
           <p className="nav-label">Moduler</p>
           {moduleError && <p role="alert" className="muted">Module registry unavailable.</p>}
           {modules.filter(module => module.id === 'meal-planner' || module.id === 'media').map((module) => (

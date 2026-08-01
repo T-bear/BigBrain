@@ -87,6 +87,26 @@ test('renders jobs, progress, episode aggregation and expandable provider detail
   expect(container.querySelector('.media-job__identity')).toBeInTheDocument()
 })
 
+test('summarizes multiple active jobs compactly and expands their full cards', async () => {
+  getMediaJobs.mockResolvedValue({ ...importing, jobs: [
+    importingJob,
+    { ...importingJob, id: '918c6e2a440b345bf8cd73c2', title: 'Alien 1979 2160p UHD BluRay X265-GROUP', progressPercent: 42 },
+  ] })
+  render(<MediaJobs />)
+  expect(await screen.findByRole('heading', { name: '2 pågående nedladdningar' })).toBeInTheDocument()
+  expect(screen.getByText('The Expanse')).toBeInTheDocument()
+  expect(screen.getByText('Alien (1979)')).toHaveAttribute('title', 'Alien 1979 2160p UHD BluRay X265-GROUP')
+  expect(screen.getByText('42%')).toBeInTheDocument()
+  expect(screen.queryAllByRole('article')).toHaveLength(0)
+  const show = screen.getByRole('button', { name: 'Visa nedladdningar' })
+  expect(show).toHaveAttribute('aria-expanded', 'false')
+  fireEvent.click(show)
+  expect(screen.getAllByRole('article')).toHaveLength(2)
+  expect(screen.getAllByText('Visa tekniska detaljer')[0].closest('details')).not.toHaveAttribute('open')
+  fireEvent.click(screen.getByRole('button', { name: 'Dölj nedladdningar' }))
+  expect(screen.queryAllByRole('article')).toHaveLength(0)
+})
+
 test('polling transition to available resolves Jellyfin play metadata without reload', async () => {
   getMediaJobs
     .mockResolvedValueOnce(importing)

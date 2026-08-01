@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import type { MediaLookupResponse, MediaLookupResult } from '../types'
 import { MediaLookupResultCard } from './MediaLookupResultCard'
 import { mediaErrorMessage } from '../api'
@@ -6,12 +5,14 @@ import { mediaErrorMessage } from '../api'
 export function MediaLookupResults({
   response,
   onPrepare,
+  expandedProviders,
+  onExpandedProvidersChange,
 }: {
   response: MediaLookupResponse
   onPrepare: (result: MediaLookupResult, trigger: HTMLButtonElement) => void
+  expandedProviders: string[]
+  onExpandedProvidersChange: (providers: string[]) => void
 }) {
-  const [expandedProviders, setExpandedProviders] = useState<string[]>([])
-  useEffect(() => setExpandedProviders([]), [response.query, response.lookedUpAtUtc])
   const normalizedQuery = response.query.trim().toLocaleLowerCase('sv-SE')
   const ranked = (provider: MediaLookupResponse['providers'][number]) => provider.results
     .map((result, index) => ({ result, index, rank: result.title.trim().toLocaleLowerCase('sv-SE') === normalizedQuery ? 0 : result.title.toLocaleLowerCase('sv-SE').includes(normalizedQuery) ? 1 : 2 }))
@@ -41,7 +42,7 @@ export function MediaLookupResults({
           onPrepare={onPrepare}
         />)}
       </div>
-      {results.length > 1 && <button className="secondary-button media-results-toggle" aria-expanded={expanded} type="button" onClick={() => setExpandedProviders(current => expanded ? current.filter(value => value !== provider.provider) : [...current, provider.provider])}>{expanded ? 'Visa färre' : 'Visa fler resultat'}</button>}
+      {results.length > 1 && <button className="secondary-button media-results-toggle" aria-expanded={expanded} type="button" onClick={() => onExpandedProvidersChange(expanded ? expandedProviders.filter(value => value !== provider.provider) : [...expandedProviders, provider.provider])}>{expanded ? 'Visa färre' : `Visa ${results.length - 1} fler träffar`}</button>}
     </section>})}
   </div>
 }
