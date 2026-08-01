@@ -196,6 +196,7 @@ test('prioritizes search and quick actions before system and Docker modules', as
       'details',
     ])
   expect(screen.getByRole('navigation', { name: 'Moduler' })).toHaveClass('desktop-navigation')
+  expect(screen.getByRole('link', { name: 'BigBrain home' }).querySelector('img')).toHaveAttribute('src', '/icons/bigbrain-192.png')
 })
 
 test('uses collapsed defaults for low-priority infrastructure modules', async () => {

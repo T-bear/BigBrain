@@ -20,7 +20,7 @@ h3 { margin-bottom: 0; color: #aebad0; font-size: .9rem; font-weight: 600; }
 .shell { min-height: 100vh; }
 .sidebar { padding: 20px; border-bottom: 1px solid #1d2a3d; background: #0e1625; }
 .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 1.1rem; font-weight: 700; }
-.brand__mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: #6d5dfc; }
+.brand__mark { display: block; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; object-fit: cover; }
 .nav-label, .eyebrow { margin: 0 0 10px; color: #8291a7; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .nav-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 8px; }
 .nav-link:hover { background: #182339; }

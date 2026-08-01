@@ -81,7 +81,7 @@ export default function App() {
     <div className="shell">
       <aside className="sidebar">
         <a className="brand" href="/" aria-label="BigBrain home">
-          <span className="brand__mark">B</span>
+          <img className="brand__mark" src="/icons/bigbrain-192.png" alt="" width="34" height="34" />
           <span>BigBrain</span>
         </a>
         <nav aria-label="Moduler" className="desktop-navigation">

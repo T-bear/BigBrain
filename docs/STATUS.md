@@ -4,7 +4,7 @@
 
 - Version: `0.1.0-alpha`
 - Senaste uppdatering: 2026-08-01
-- Senaste commit före denna sprint: `c1358d6d89a3954175eb040dbfbf5149bf71f95f`
+- Senaste commit före denna sprint: `b19bfe083b2b7e9b03473064b9129e40c8537e91`
 - Aktiv branch: `main`
 - Senaste verifierade build: 2026-08-01, backend Release, BigBrain API-image och frontend production build OK
 
@@ -14,9 +14,9 @@
 
 Kort sammanfattning:
 
-- Mål: avsluta UX-arbetet med fyra små förbättringar för navigation, kontextuella sökåtgärder, tydligare resultatexpansion och kompakta samtidiga nedladdningar.
-- Definition of Done: inga duplicerade mobillänkar, lokal och tillgänglig FAB/rensning, korrekta dolda träffantal, kompaktvy för minst två aktiva jobb samt grön full test-, runtime- och browsergrind.
-- Resultat: klart. UX går efter denna leverans in i feature-freeze.
+- Mål: införa den officiella BigBrain-ikonen i header, favicon, Apple touch icon och PWA-manifest utan annan UX- eller funktionsändring.
+- Definition of Done: optimerade standard- och maskable-ikoner, giltigt manifest och HTML-head samt grön frontend-, runtime- och browserverifiering.
+- Resultat: klart. Brandingen är uppdaterad och UX-feature-freeze är fortsatt oförändrad.
 
 ---
 
@@ -85,6 +85,15 @@ Status: Implementerad och verifierad 2026-08-01
 - Kompakt titel normaliserar välkända releaseformat med årtal och teknisk suffixmarkör. Om API:t endast levererar ett okänt format behålls originaltiteln för att undvika felaktig trunkering; full originaltitel finns alltid i `title`-attribut och i expanderat jobbkort.
 - UX är nu feature-fryst. Fortsatt UX-arbete ska baseras på ett konkret användartest, ett reproducerbart fel eller ett tydligt nytt användarbehov, inte allmän polering.
 
+### Officiell BigBrain-ikon
+
+Status: Implementerad och verifierad 2026-08-01
+
+- Den blå–lila neonikonen med hjärna och B är BigBrains officiella huvudikon och ersätter den tidigare textbaserade B-symbolen i headern utan ändrad headerhöjd.
+- Webbassets finns som PNG i `32×32`, `180×180`, `192×192` och `512×512`. En separat `512×512` maskable-version centrerar samma oförändrade motiv med extra säkerhetsmarginal på konsekvent svart bakgrund.
+- Browserfliken använder `32×32`-favicon, iOS använder `180×180` Apple touch icon och webbmanifestet deklarerar `192×192` och `512×512` med `purpose: any` samt maskable-versionen med `purpose: maskable`.
+- Redan installerade PWA-versioner kan behålla den gamla ikonen i operativsystemets cache. På iPhone kan appen därför behöva tas bort från hemskärmen och installeras om manuellt för att den nya ikonen ska visas.
+
 Framtida planer, inte implementerade i denna sprint:
 
 - recept;
@@ -142,6 +151,8 @@ Verifierat:
 - Backend tester: 186 OK, 0 failed, 0 skipped (154 API/modul + 32 Sentinel), inklusive 28 fokuserade Matlista-testfall för familjeschema, nio måltider, lunchurval, exakt byte, schema 1→2, CRUD, exempeldata och API-fel.
 - Frontend tester: 59 OK i 9 testfiler. Utöver tidigare Matlista-, mediarequest-, Administration- och mobilregression täcks dynamiskt `N`-antal, rensningskryss, villkorad FAB inklusive tomt resultatsvar, FAB-meny/fokus/rensning/fler-färre samt ett kontra flera aktiva jobb och kompaktvyns expansion.
 - Frontend production build: OK.
+- Branding: samtliga fem PNG-filer och `manifest.webmanifest` svarade `200` från Web. Manifestets ikonposter, favicon, Apple touch icon och headerreferens verifierades i körande app.
+- Branding browser: riktig Chromium vid 390 × 844 och 1440 × 1000 gav dokumentbredd lika med viewport, inga konsolfel och en skarp `192×192` headerbild renderad i oförändrade `34×34`; brandradens höjd var fortsatt 34 px.
 - Matlista runtime: modulen rapporterar `Available`; schema 1 migrerades automatiskt till schema 2. Den befintliga matsedelns 14 poster och användarrätter bevarades, samtliga äldre poster läses som `dinner`, och den sjätte skyddade standardtaggen `Lunch` finns genom både direkt API och frontendproxy.
 - Matlista mobil: verifierad i riktig Chromium vid 390 × 844 med isolerad mockdata; dokumentbredd och viewport är båda 390 px. Minimerat helgläge visar lunch och middag, veckovyn har sju dagsrader, lördagens kompakta dubbelpost är 111 px hög och endast lunchens bytesyta öppnades (`dinner` förblev stängd).
 - Matlista bibliotek: browserflödet lade 24 exempelrätter i en isolerad mock, kombinerade textsökning med `Lättlagat` och visade `1 av 24 maträtter` utan runtime-mutation.
@@ -215,7 +226,7 @@ UX är feature-fryst. Nästa UX-mål ska endast öppnas av konkret användartest
 ## Senaste Codex-session
 
 - Datum: 2026-08-01
-- Syfte: sista avgränsade UX-polering före feature-freeze.
-- Resultat: duplicerad mobil headernavigation är borttagen, sökningen har lokal rensning och villkorad FAB, fler-resultat visar korrekt antal och minst två aktiva jobb sammanfattas kompakt. Full build/test och runtime-/browserverifiering är godkända utan backend- eller API-kontraktsändring.
-- Commitmeddelande: `feat(ui): finalize compact family navigation`.
+- Syfte: separat brandingändring för BigBrains officiella huvudikon.
+- Resultat: favicon, Apple touch icon, PWA-standardikoner, maskable-ikon och headerbranding använder den nya ikonen. Frontendtest, production build, Web-runtime och mobil-/desktopbrowser är verifierade utan annan UX- eller backendändring.
+- Commitmeddelande: `feat(brand): add official BigBrain app icon`.
 - Nästa rekommenderade steg: inga generella UX-poleringar under feature-freeze; invänta konkret användartest, reproducerbart fel eller tydligt nytt användarbehov.
