@@ -69,7 +69,7 @@ public sealed class MediaClientTests
             "/Library/VirtualFolders" => """[{"Name":"Movies"},{"Name":"TV"}]""",
             "/Items/Counts" => """{"MovieCount":12,"SeriesCount":4,"EpisodeCount":80}""",
             "/Sessions" => """[{"UserId":"one","NowPlayingItem":{"Name":"Private title"}},{"UserId":"two","UserName":"must not leak"}]""",
-            "/Items/Latest" => """[{"Name":"New movie","Type":"Movie","DateCreated":"2026-07-23T10:00:00Z"}]""",
+            "/Items" => """{"Items":[{"Name":"New movie","Type":"Movie","DateCreated":"2026-07-23T10:00:00Z"}]}""",
             _ => throw new InvalidOperationException()
         })), Options());
 
@@ -91,16 +91,18 @@ public sealed class MediaClientTests
     public async Task JellyfinRemainsOnlineWhenEveryDashboardReadSucceeds()
     {
         var requestedPaths = new List<string>();
+        var requestedQueries = new List<string>();
         var client = new JellyfinClient(CreateClient(request =>
         {
             requestedPaths.Add(request.RequestUri!.AbsolutePath);
+            requestedQueries.Add(request.RequestUri.Query);
             return Json(request.RequestUri.AbsolutePath switch
             {
                 "/System/Info" => """{"Version":"10.10.7"}""",
                 "/Library/VirtualFolders" => """[]""",
                 "/Items/Counts" => """{"MovieCount":1,"SeriesCount":2,"EpisodeCount":3}""",
                 "/Sessions" => """[]""",
-                "/Items/Latest" => """[]""",
+                "/Items" => """{"Items":[]}""",
                 _ => throw new InvalidOperationException()
             });
         }), Options());
@@ -112,8 +114,11 @@ public sealed class MediaClientTests
         Assert.Equal("10.10.7", result.Service.Version);
         Assert.Null(result.Service.SanitizedMessage);
         Assert.Equal(
-            ["/System/Info", "/Library/VirtualFolders", "/Items/Counts", "/Sessions", "/Items/Latest"],
+            ["/System/Info", "/Library/VirtualFolders", "/Items/Counts", "/Sessions", "/Items"],
             requestedPaths);
+        Assert.Contains("Recursive=true", requestedQueries[^1], StringComparison.Ordinal);
+        Assert.Contains("SortBy=DateCreated", requestedQueries[^1], StringComparison.Ordinal);
+        Assert.Contains("SortOrder=Descending", requestedQueries[^1], StringComparison.Ordinal);
         Assert.Contains("\"Status\":\"online\"", serialized, StringComparison.Ordinal);
     }
 
@@ -127,7 +132,7 @@ public sealed class MediaClientTests
                 "/Library/VirtualFolders" => Json("""[{"Name":"Movies"}]"""),
                 "/Items/Counts" => throw new HttpRequestException("response body ended unexpectedly"),
                 "/Sessions" => Json("""[]"""),
-                "/Items/Latest" => Json("""[]"""),
+                "/Items" => Json("""{"Items":[]}"""),
                 _ => throw new InvalidOperationException()
             }), Options());
 
@@ -138,6 +143,32 @@ public sealed class MediaClientTests
         Assert.Equal("Some Jellyfin dashboard data could not be loaded.", result.Service.SanitizedMessage);
         Assert.Equal(1, result.LibraryCount);
         Assert.Equal(0, result.MovieCount);
+    }
+
+    [Fact]
+    public async Task JellyfinRecentlyAddedReadFailureIsDegradedAndKeepsOtherDashboardData()
+    {
+        var client = new JellyfinClient(CreateClient(request =>
+            request.RequestUri!.AbsolutePath switch
+            {
+                "/System/Info" => Json("""{"Version":"10.11.11"}"""),
+                "/Library/VirtualFolders" => Json("""[{"Name":"Movies"}]"""),
+                "/Items/Counts" => Json("""{"MovieCount":12,"SeriesCount":4,"EpisodeCount":80}"""),
+                "/Sessions" => Json("""[]"""),
+                "/Items" => new HttpResponseMessage(HttpStatusCode.BadRequest),
+                _ => throw new InvalidOperationException()
+            }), Options());
+
+        var result = await client.GetOverviewAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(MediaStatuses.Degraded, result.Service.Status);
+        Assert.Equal("10.11.11", result.Service.Version);
+        Assert.Equal("Some Jellyfin dashboard data could not be loaded.", result.Service.SanitizedMessage);
+        Assert.Equal(1, result.LibraryCount);
+        Assert.Equal(12, result.MovieCount);
+        Assert.Equal(4, result.SeriesCount);
+        Assert.Equal(80, result.EpisodeCount);
+        Assert.Empty(result.RecentlyAdded);
     }
 
     [Fact]

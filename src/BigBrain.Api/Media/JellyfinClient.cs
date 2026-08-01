@@ -78,7 +78,8 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
                 cancellationToken);
             using var sessions = sessionsResult.Document;
             var recentResult = await TryGetSupplementalJsonAsync(
-                "Items/Latest?Limit=8&Fields=DateCreated&IncludeItemTypes=Movie,Series,Episode",
+                "Items?Recursive=true&Limit=8&Fields=DateCreated&IncludeItemTypes=Movie,Series,Episode"
+                    + "&SortBy=DateCreated&SortOrder=Descending",
                 options.Jellyfin.ApiKey,
                 cancellationToken);
             using var recent = recentResult.Document;
@@ -95,8 +96,8 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
                 .Where(userId => userId is not null)
                 .Distinct(StringComparer.Ordinal)
                 .Count();
-            var recentlyAdded = recent?.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
-                ? recent.RootElement.EnumerateArray().Take(8).Select(item => new RecentlyAddedMedia(
+            var recentlyAdded = recent is not null
+                ? Items(recent.RootElement).Take(8).Select(item => new RecentlyAddedMedia(
                     GetString(item, "Name") ?? "Untitled",
                     GetString(item, "Type") ?? "Unknown",
                     DateTimeOffset.TryParse(GetString(item, "DateCreated"), out var date) ? date : null)).ToArray()
