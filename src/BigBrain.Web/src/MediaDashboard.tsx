@@ -64,29 +64,32 @@ export function MediaDashboard({
   }, [refresh])
 
   return <section id="media" aria-labelledby="media-heading" className="media-section">
-    <div className="section-heading"><div><p className="eyebrow">Media intelligence</p><h2 id="media-heading">Your media ecosystem</h2></div>
-      <div className="section-actions"><StatusBadge status={overview?.status ?? (error ? 'error' : 'loading')} /><button type="button" className="secondary-button" onClick={() => void refresh()} disabled={loading}>Refresh</button></div>
+    <div className="section-heading"><div><p className="eyebrow">Film och serier</p><h2 id="media-heading">Hitta något att titta på</h2></div>
     </div>
-    {loading && !overview && <p aria-live="polite">Loading media intelligence…</p>}
-    {error && <p role="alert" className="notice notice--error">Media dashboard could not be loaded.{overview ? ' Showing the latest update.' : ''}</p>}
+    {loading && !overview && <p aria-live="polite">Laddar film och serier…</p>}
+    {error && <p role="alert" className="notice notice--error">Film och serier kunde inte laddas.{overview ? ' Senaste tillgängliga uppdatering visas.' : ''}</p>}
     {overview && <>
       <div id="search" data-dashboard-module="media-search"><MediaSearch /></div>
-      <MediaServiceLinks />
       <CollapsibleModule
         eyebrow="Pågående aktivitet"
         expanded={layoutExpanded['media-jobs']}
         moduleId="media-jobs"
         onToggle={() => toggleModule('media-jobs')}
-        title="Media Jobs"
+        title="Pågående"
       >
         <div id="queue"><MediaJobs showHeading={false} /></div>
       </CollapsibleModule>
-      <DashboardSections data={overview} expanded={layoutExpanded} onToggle={toggleModule} state={overview.status} registry={mediaWidgetRegistry} sectionIds={primarySections} />
     </>}
-    {children}
-    {overview && <>
-      <DashboardSections data={overview} expanded={layoutExpanded} onToggle={toggleModule} state={overview.status} registry={mediaWidgetRegistry} sectionIds={secondarySections} />
-      <p className="last-updated">Updated <time dateTime={overview.collectedAtUtc}>{new Date(overview.collectedAtUtc).toLocaleTimeString()}</time></p>
-    </>}
+    <details className="administration" id="administration">
+      <summary><span><strong>Administration</strong><small>Systemstatus, tjänster och diagnostik</small></span></summary>
+      <div className="administration__content">
+        <div className="administration__heading"><div><p className="eyebrow">Teknisk översikt</p><h2>Administration</h2></div><div className="section-actions"><StatusBadge status={overview?.status ?? (error ? 'error' : 'loading')} /><button type="button" className="secondary-button" onClick={() => void refresh()} disabled={loading}>Uppdatera</button></div></div>
+        <MediaServiceLinks />
+        {overview && <DashboardSections data={overview} expanded={layoutExpanded} onToggle={toggleModule} state={overview.status} registry={mediaWidgetRegistry} sectionIds={primarySections} />}
+        {children}
+        {overview && <DashboardSections data={overview} expanded={layoutExpanded} onToggle={toggleModule} state={overview.status} registry={mediaWidgetRegistry} sectionIds={secondarySections} />}
+        {overview && <p className="last-updated">Uppdaterad <time dateTime={overview.collectedAtUtc}>{new Date(overview.collectedAtUtc).toLocaleTimeString()}</time></p>}
+      </div>
+    </details>
   </section>
 }

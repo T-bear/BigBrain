@@ -147,6 +147,49 @@ export interface MediaOverview {
 
 export type MediaSearchProviderStatus = 'online' | 'degraded' | 'unavailable' | 'notConfigured'
 
+export interface MealPlannerTag {
+  id: string
+  name: string
+  category: 'portion' | 'occasion' | 'mealType' | 'custom'
+  createdAtUtc: string
+  isProtected: boolean
+}
+
+export interface MealPlannerMeal {
+  id: string
+  name: string
+  tagIds: string[]
+  createdAtUtc: string
+  updatedAtUtc: string
+}
+
+export interface MealPlannerDay {
+  date: string
+  mealType: 'lunch' | 'dinner'
+  dayOfWeek: string
+  peopleCount: number
+  mealId: string
+  mealName: string
+  tagSummary: string[]
+  isManuallyReplaced: boolean
+}
+
+export interface MealPlannerSchedule {
+  id: string
+  startDate: string
+  endDate: string
+  createdAtUtc: string
+  updatedAtUtc: string
+  days: MealPlannerDay[]
+  title: string | null
+  generationVersion: number
+}
+
+export interface MealPlannerSeedResult {
+  createdCount: number
+  ignoredCount: number
+}
+
 export interface MediaSearchResult {
   sourceId: string
   title: string

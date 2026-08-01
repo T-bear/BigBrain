@@ -36,7 +36,6 @@ export function MediaRequestDialog({
   const [created, setCreated] = useState<MediaRequestConfirmResponse | null>(null)
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const firstControl = useRef<HTMLSelectElement>(null)
   const confirming = useRef(false)
 
   useEffect(() => {
@@ -52,10 +51,6 @@ export function MediaRequestDialog({
       .catch(requestError => { setError(friendlyError(requestError)); setBusy(false) })
     return () => controller.abort()
   }, [result.mediaType])
-
-  useEffect(() => {
-    if (options && phase === 'options' && !busy) firstControl.current?.focus()
-  }, [options, phase, busy])
 
   function close() {
     if (busy) return
@@ -116,44 +111,49 @@ export function MediaRequestDialog({
 
   return <dialog open aria-modal="true" aria-labelledby="media-request-title" className="media-request-dialog" onKeyDown={escape}>
     <div className="media-request-dialog-content">
-      <header><div><p className="eyebrow">Controlled media request</p><h3 id="media-request-title">{result.title}</h3></div>
-        <button type="button" aria-label="Close media request" onClick={close} disabled={busy}>×</button>
+      <header><div><p className="eyebrow">Lägg till</p><h3 id="media-request-title">{result.title}</h3></div>
+        <button type="button" aria-label="Stäng" onClick={close} disabled={busy}>×</button>
       </header>
-      <p>BigBrain will only send this request to {result.provider} after you review and confirm it.</p>
-      {busy && <p aria-live="polite">Loading request step…</p>}
+      <p>Granska först. Ingenting läggs till förrän du bekräftar nästa steg.</p>
+      {busy && <p aria-live="polite">Laddar…</p>}
       {error && <p className="notice notice--error" role="alert">{error}</p>}
       {phase === 'options' && options && <form className="media-request-form" onSubmit={event => void previewRequest(event)}>
-        <label>Root folder<select ref={firstControl} name="rootFolderId" defaultValue={options.defaultRootFolderId ?? ''} required>
+        <p>BigBrain använder rekommenderade inställningar. Du kan ändra dem om det behövs.</p>
+        <details className="media-request-advanced"><summary>Avancerade inställningar</summary><div>
+        <label>Rotmapp<select name="rootFolderId" defaultValue={options.defaultRootFolderId ?? ''} required>
           {options.rootFolders.map(option => <option value={option.id} key={option.id}>{option.displayName}</option>)}
         </select></label>
-        <label>Quality profile<select name="qualityProfileId" defaultValue={options.defaultQualityProfileId ?? ''} required>
+        <label>Kvalitetsprofil<select name="qualityProfileId" defaultValue={options.defaultQualityProfileId ?? ''} required>
           {options.qualityProfiles.map(option => <option value={option.id} key={option.id}>{option.displayName}</option>)}
         </select></label>
-        <label>Monitoring<select name="monitor" defaultValue={options.defaultMonitoringOptionId} required>
+        <label>Bevakning<select name="monitor" defaultValue={options.defaultMonitoringOptionId} required>
           {options.monitoringOptions.map(option => <option value={option.id} key={option.id}>{option.displayName}</option>)}
         </select></label>
-        {result.mediaType === 'series' && <label>Series type<select name="seriesType" defaultValue={options.defaultSeriesTypeId ?? ''} required>
+        {result.mediaType === 'series' && <label>Serietyp<select name="seriesType" defaultValue={options.defaultSeriesTypeId ?? ''} required>
           {options.seriesTypes.map(option => <option value={option.id} key={option.id}>{option.displayName}</option>)}
         </select></label>}
-        <label className="media-request-checkbox"><input name="searchAfterAdd" type="checkbox" defaultChecked={options.defaultSearchAfterAdd} /> Search after adding</label>
-        <button type="submit" disabled={busy}>Review addition</button>
+        <label className="media-request-checkbox"><input name="searchAfterAdd" type="checkbox" defaultChecked /> Börja söka efter filer direkt</label>
+        </div></details>
+        <button type="submit" disabled={busy}>Granska</button>
       </form>}
       {phase === 'review' && preview && <form className="media-request-review" onSubmit={event => void confirm(event)}>
-        <h4>Review before adding</h4>
-        <dl>
+        <h4>Det här händer när du bekräftar</h4>
+        <p>Objektet läggs till i bibliotekshanteringen. {preview.summary.searchAfterAdd ? 'BigBrain börjar sedan söka efter tillgängliga filer. En eventuell nedladdning visas under Pågående och blir tillgänglig i Jellyfin efter lyckad nedladdning och import.' : 'Ingen filsökning startas automatiskt.'}</p>
+        <p>Resultatet beror på vad som finns tillgängligt och kan därför inte garanteras.</p>
+        <details className="media-request-technical"><summary>Tekniska detaljer</summary><dl>
           <div><dt>Provider</dt><dd>{preview.summary.provider}</dd></div>
           <div><dt>Root folder</dt><dd>{preview.summary.rootFolder}</dd></div>
           <div><dt>Quality</dt><dd>{preview.summary.qualityProfile}</dd></div>
           <div><dt>Monitoring</dt><dd>{preview.summary.monitoring}</dd></div>
           <div><dt>Search after add</dt><dd>{preview.summary.searchAfterAdd ? 'Yes' : 'No'}</dd></div>
-        </dl>
+        </dl></details>
         <button type="submit" disabled={busy}>
-          {result.mediaType === 'series' ? 'Add series to Sonarr' : 'Add movie to Radarr'}
+          {preview.summary.searchAfterAdd ? 'Bekräfta och börja söka' : 'Lägg till utan att söka'}
         </button>
       </form>}
       {phase === 'success' && created && <div className="media-request-success" role="status">
-        <h4>Request completed</h4><p>{created.title} was added to {created.provider}.</p>
-        <button type="button" onClick={close}>Close</button>
+        <h4>Klart</h4><p>{created.title} har lagts till.</p>
+        <button type="button" onClick={close}>Stäng</button>
       </div>}
     </div>
   </dialog>

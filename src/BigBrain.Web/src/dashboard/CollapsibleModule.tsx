@@ -3,6 +3,7 @@ export function CollapsibleModule({
   actions,
   children,
   className,
+  collapsedSummary,
   eyebrow,
   expanded,
   headingLevel = 2,
@@ -13,6 +14,7 @@ export function CollapsibleModule({
   actions?: ReactNode
   children: ReactNode
   className?: string
+  collapsedSummary?: ReactNode
   eyebrow?: string
   expanded: boolean
   headingLevel?: 2 | 3
@@ -50,6 +52,7 @@ export function CollapsibleModule({
           </button>
         </div>
       </header>
+      {!expanded && collapsedSummary && <div className="dashboard-module__summary">{collapsedSummary}</div>}
       <div className="dashboard-module__content" hidden={!expanded} id={contentId}>
         {children}
       </div>

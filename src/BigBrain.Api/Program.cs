@@ -1,5 +1,6 @@
 using BigBrain.Modules;
 using BigBrain.Api.Media;
+using BigBrain.Api.MealPlanner;
 using BigBrain.Api.Sentinel;
 using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -22,6 +23,15 @@ public partial class Program
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        var mealPlannerOptions = builder.Configuration
+            .GetSection(MealPlannerOptions.SectionName)
+            .Get<MealPlannerOptions>() ?? new MealPlannerOptions();
+        builder.Services.AddSingleton(mealPlannerOptions);
+        builder.Services.AddSingleton<MealPlannerStore>();
+        builder.Services.AddSingleton<IFamilySchedule, TwoWeekFamilySchedule>();
+        builder.Services.AddSingleton<IMealSelectionRandomFactory, SeededMealSelectionRandomFactory>();
+        builder.Services.AddSingleton<MealPlanGenerator>();
+        builder.Services.AddSingleton<MealPlannerService>();
         builder.Services
             .AddOptions<SentinelClientOptions>()
             .BindConfiguration(SentinelClientOptions.SectionName)
@@ -109,7 +119,7 @@ public partial class Program
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
-            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition]));
+            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition]));
 
         var app = builder.Build();
 
@@ -137,6 +147,7 @@ public partial class Program
                 ISystemMetricsProvider systemProvider,
                 IDockerInventoryProvider dockerProvider,
                 MediaOptions mediaOptions,
+                MealPlannerStore mealPlannerStore,
                 CancellationToken cancellationToken) =>
             {
                 var systemOverview = await systemProvider.GetOverviewAsync(cancellationToken);
@@ -150,6 +161,7 @@ public partial class Program
                         "system" => module with { Status = systemOverview.Status },
                         "docker" => module with { Status = dockerStatus },
                         "media" => module with { Status = mediaOptions.IsAnyServiceConfigured ? "Available" : "NotConfigured" },
+                        "meal-planner" => module with { Status = mealPlannerStore.IsAvailable ? "Available" : "Unavailable" },
                         _ => module
                     });
                 return Results.Ok(modules);
@@ -401,6 +413,8 @@ public partial class Program
                 try { return Results.Ok(await service.ConfirmAsync(input, cancellationToken)); }
                 catch (MediaRequestException exception) { return RequestProblem(exception); }
             });
+
+        app.MapMealPlannerEndpoints();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

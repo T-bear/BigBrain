@@ -183,9 +183,10 @@ test('prioritizes search and quick actions before system and Docker modules', as
 
   expect([...container.querySelectorAll('[data-dashboard-module]')].map(element => element.getAttribute('data-dashboard-module')))
     .toEqual([
+      'meal-planner',
       'media-search',
-      'quick-actions',
       'media-jobs',
+      'quick-actions',
       'media-health',
       'insights',
       'services',
@@ -199,15 +200,16 @@ test('prioritizes search and quick actions before system and Docker modules', as
 test('uses collapsed defaults for low-priority infrastructure modules', async () => {
   window.localStorage.clear()
   render(<App />)
-  await screen.findByRole('heading', { name: 'System status' })
+  await screen.findByText('Administration', { selector: 'strong' })
+  fireEvent.click(screen.getByText('Administration', { selector: 'strong' }))
 
-  const systemToggle = screen.getByRole('button', { name: 'Expandera System status' })
-  const dockerToggle = screen.getByRole('button', { name: 'Expandera Docker overview' })
+  const systemToggle = screen.getByRole('button', { name: 'Expandera System och lagring' })
+  const dockerToggle = screen.getByRole('button', { name: 'Expandera Docker' })
   expect(systemToggle).toHaveAttribute('aria-expanded', 'false')
   expect(systemToggle).toHaveAttribute('aria-controls', 'system-content')
   expect(dockerToggle).toHaveAttribute('aria-expanded', 'false')
 
   fireEvent.click(systemToggle)
-  expect(screen.getByRole('button', { name: 'Minimera System status' })).toHaveAttribute('aria-expanded', 'true')
+  expect(screen.getByRole('button', { name: 'Minimera System och lagring' })).toHaveAttribute('aria-expanded', 'true')
   expect(screen.getByRole('progressbar', { name: 'CPU usage' })).toBeInTheDocument()
 })

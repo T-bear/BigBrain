@@ -75,11 +75,13 @@ test('renders jobs, progress, episode aggregation and expandable provider detail
   const { container } = render(<MediaJobs />)
 
   expect(await screen.findByRole('heading', { name: 'The Expanse' })).toBeInTheDocument()
-  expect(screen.getByText('Importing', { selector: '.media-job__status' })).toBeInTheDocument()
+  expect(screen.getByText('Bearbetas', { selector: '.media-job__status' })).toBeInTheDocument()
   expect(screen.getByLabelText('98 percent')).toBeInTheDocument()
-  expect(screen.getByText('1 of 2 episodes completed')).toBeInTheDocument()
-  expect(screen.getByText('ETA 2 min')).toBeInTheDocument()
-  fireEvent.click(screen.getByText('Show provider details'))
+  expect(screen.getByText('1 av 2 avsnitt klara')).toBeInTheDocument()
+  expect(screen.getByText('Cirka 2 min kvar')).toBeInTheDocument()
+  expect(screen.getByText('Provider: Sonarr')).not.toBeVisible()
+  fireEvent.click(screen.getByText('Visa tekniska detaljer'))
+  expect(screen.getByText('Provider: Sonarr')).toBeVisible()
   expect(screen.getByText('Episode 1')).toBeInTheDocument()
   expect(container.querySelector('.media-jobs-grid')).toBeInTheDocument()
   expect(container.querySelector('.media-job__identity')).toBeInTheDocument()
@@ -106,10 +108,10 @@ test('polling transition to available resolves Jellyfin play metadata without re
   act(() => window.dispatchEvent(new Event('focus')))
   Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' })
   act(() => document.dispatchEvent(new Event('visibilitychange')))
-  fireEvent.click(within(screen.getByLabelText('Filter media jobs')).getByRole('button', { name: 'Available' }))
+  fireEvent.click(within(screen.getByLabelText('Filtrera pågående media')).getByRole('button', { name: 'Klara' }))
 
-  expect(await screen.findByText('Available', { selector: '.media-job__status' })).toBeInTheDocument()
-  const play = await screen.findByRole('link', { name: /play in jellyfin/i })
+  expect(await screen.findByText('Klar', { selector: '.media-job__status' })).toBeInTheDocument()
+  const play = await screen.findByRole('link', { name: /spela i jellyfin/i })
   expect(play).toHaveAttribute('href', '/jellyfin/web/index.html#!/details?id=abc123')
   expect(getMediaPlay).toHaveBeenCalledTimes(1)
 })
@@ -125,7 +127,7 @@ test('Jellyfin degraded state retains jobs and never shows an unverified play ac
   })
   render(<MediaJobs />)
 
-  expect(await screen.findByText('Jellyfin is currently unavailable. Download and import status is still shown.')).toBeInTheDocument()
+  expect(await screen.findByText('Vissa mediatjänster svarar inte just nu. Tillgängliga nedladdningar visas fortfarande.')).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'The Expanse' })).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /play in jellyfin/i })).not.toBeInTheDocument()
 })
@@ -155,12 +157,12 @@ test('filters jobs and reveals only a bounded first page', async () => {
   }))
   getMediaJobs.mockResolvedValue({ ...importing, jobs: availableJobs })
   render(<MediaJobs />)
-  await screen.findByRole('button', { name: 'Available' })
+  await screen.findByRole('button', { name: 'Klara' })
 
-  fireEvent.click(within(screen.getByLabelText('Filter media jobs')).getByRole('button', { name: 'Available' }))
+  fireEvent.click(within(screen.getByLabelText('Filtrera pågående media')).getByRole('button', { name: 'Klara' }))
 
   expect(screen.getAllByRole('article')).toHaveLength(8)
-  fireEvent.click(screen.getByRole('button', { name: 'Show more' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Visa fler' }))
   expect(screen.getAllByRole('article')).toHaveLength(9)
 })
 
@@ -176,7 +178,7 @@ test('long titles remain in overflow-protected identity and errors are sanitized
     }],
   })
   const { container } = render(<MediaJobs />)
-  fireEvent.click(within(await screen.findByLabelText('Filter media jobs')).getByRole('button', { name: 'Failed' }))
+  fireEvent.click(within(await screen.findByLabelText('Filtrera pågående media')).getByRole('button', { name: 'Problem' }))
 
   expect(await screen.findByRole('alert')).toHaveTextContent('This media job needs attention.')
   const article = screen.getByRole('article')

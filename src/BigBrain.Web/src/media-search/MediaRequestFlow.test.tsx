@@ -90,8 +90,9 @@ test('switches to grouped external lookup and blocks already registered results'
   const fetch = vi.fn(() => ok(lookup))
   await openExternalResult(fetch)
 
-  expect(screen.getByRole('heading', { name: 'Sonarr' })).toBeInTheDocument()
-  expect(screen.getByRole('heading', { name: 'Radarr' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Serier' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Filmer' })).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Sonarr' })).not.toBeInTheDocument()
   expect(screen.getByText('Redan tillagd')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Lägg till film' })).not.toBeInTheDocument()
 })
@@ -108,7 +109,7 @@ test('requires options and preview review before one explicit confirm', async ()
       summary: {
         title: 'The Expanse', year: 2015, provider: 'Sonarr', mediaType: 'series',
         rootFolder: 'TV Library', qualityProfile: 'HD 1080p', monitoring: 'All',
-        seriesType: 'Standard', searchAfterAdd: false,
+        seriesType: 'Standard', searchAfterAdd: true,
       },
     })
     if (url.includes('/confirm')) {
@@ -121,15 +122,20 @@ test('requires options and preview review before one explicit confirm', async ()
   fireEvent.click(add)
 
   const dialog = await screen.findByRole('dialog')
-  await waitFor(() => expect(within(dialog).getByLabelText('Root folder')).toHaveFocus())
+  await waitFor(() => expect(within(dialog).getByText('Avancerade inställningar')).toBeInTheDocument())
+  const advanced = within(dialog).getByText('Avancerade inställningar').closest('details')!
+  expect(advanced).not.toHaveAttribute('open')
+  fireEvent.click(within(dialog).getByText('Avancerade inställningar'))
+  expect(within(dialog).getByLabelText('Börja söka efter filer direkt')).toBeChecked()
   expect(within(dialog).getByText('TV Library')).toBeInTheDocument()
   expect(within(dialog).queryByText('/srv/')).not.toBeInTheDocument()
   expect(fetch).not.toHaveBeenCalledWith(expect.stringContaining('/confirm'), expect.anything())
 
-  fireEvent.click(within(dialog).getByRole('button', { name: 'Review addition' }))
-  expect(await within(dialog).findByRole('heading', { name: 'Review before adding' })).toBeInTheDocument()
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Granska' }))
+  expect(await within(dialog).findByRole('heading', { name: 'Det här händer när du bekräftar' })).toBeInTheDocument()
   expect(within(dialog).getByText('HD 1080p')).toBeInTheDocument()
-  const confirm = within(dialog).getByRole('button', { name: 'Add series to Sonarr' })
+  expect(within(dialog).getByText('Tekniska detaljer').closest('details')).not.toHaveAttribute('open')
+  const confirm = within(dialog).getByRole('button', { name: 'Bekräfta och börja söka' })
   fireEvent.click(confirm)
   fireEvent.click(confirm)
   await waitFor(() => expect(confirm).toBeDisabled())
@@ -138,7 +144,7 @@ test('requires options and preview review before one explicit confirm', async ()
   confirmResolve?.({ ok: true, json: async () => ({
     status: 'created', provider: 'Sonarr', mediaType: 'series', sourceId: '9', title: 'The Expanse',
   }) })
-  expect(await within(dialog).findByText('The Expanse was added to Sonarr.')).toBeInTheDocument()
+  expect(await within(dialog).findByText('The Expanse har lagts till.')).toBeInTheDocument()
 })
 
 test('Escape closes before review and returns focus while raw errors stay hidden', async () => {

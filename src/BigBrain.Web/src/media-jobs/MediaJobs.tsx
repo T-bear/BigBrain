@@ -6,11 +6,11 @@ import { MediaJobCard } from './MediaJobCard'
 type JobFilter = 'active' | 'importing' | 'available' | 'failed' | 'all'
 const JOB_POLL_MS = 12_000
 const filters: Array<{ id: JobFilter; label: string }> = [
-  { id: 'active', label: 'Active' },
-  { id: 'importing', label: 'Importing' },
-  { id: 'available', label: 'Available' },
-  { id: 'failed', label: 'Failed' },
-  { id: 'all', label: 'All' },
+  { id: 'active', label: 'Pågår' },
+  { id: 'importing', label: 'Bearbetas' },
+  { id: 'available', label: 'Klara' },
+  { id: 'failed', label: 'Problem' },
+  { id: 'all', label: 'Alla' },
 ]
 
 export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
@@ -72,11 +72,9 @@ export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
     {failed && !snapshot && <p role="alert" className="notice notice--error">Media jobs could not be loaded.</p>}
     {failed && snapshot && <p role="status" className="notice notice--warning">Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.</p>}
     {unavailableProviders.length > 0 && <p role="status" className="notice notice--warning">
-      {unavailableProviders.some(provider => provider.provider === 'Jellyfin')
-        ? 'Jellyfin is currently unavailable. Download and import status is still shown.'
-        : 'Some media providers are temporarily unavailable. Available job data is still shown.'}
+      Vissa mediatjänster svarar inte just nu. Tillgängliga nedladdningar visas fortfarande.
     </p>}
-    <div className="media-job-filters" aria-label="Filter media jobs">
+    <div className="media-job-filters" aria-label="Filtrera pågående media">
       {filters.map(item => <button
         aria-pressed={filter === item.id}
         className={filter === item.id ? 'media-job-filter media-job-filter--active' : 'media-job-filter'}
@@ -84,12 +82,12 @@ export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
         onClick={() => { setFilter(item.id); setVisibleCount(8) }}
         type="button">{item.label}</button>)}
     </div>
-    {snapshot && jobs.length === 0 && <p className="media-jobs-empty">No active or recently available media jobs.</p>}
+    {snapshot && jobs.length === 0 && <p className="media-jobs-empty">Inget pågår i den här vyn.</p>}
     {jobs.length > 0 &&
       <div className="media-jobs-grid">{visibleJobs.map(job => <MediaJobCard job={job} key={job.id} />)}</div>}
     {visibleCount < jobs.length &&
       <button className="secondary-button media-jobs-more" type="button" onClick={() => setVisibleCount(count => count + 8)}>
-        Show more
+        Visa fler
       </button>}
   </section>
 }

@@ -37,6 +37,36 @@ test('switching Film and Serie sends the selected media type', async () => {
   expect(String(fetch.mock.calls[1][0])).toContain('mediaType=series')
 })
 
+test('puts search first, ranks the best result and keeps additional results collapsed', async () => {
+  const result = (title: string, foreignId: string) => ({
+    provider: 'Radarr', foreignId, title, originalTitle: null, year: 2026, overview: null,
+    network: null, runtimeMinutes: 90, status: 'released', mediaType: 'movie', lookupState: 'external',
+    imageAvailable: false, alreadyRegistered: false, existingSourceId: null,
+  })
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({
+    ...emptyLookup,
+    query: 'Alien',
+    providers: [{ provider: 'Radarr', status: 'online', error: null, results: [
+      result('Alien: Romulus', '2'), result('Alien', '1'), result('Another title', '3'),
+    ] }],
+  }) })))
+  const { container } = render(<MediaSearch />)
+  const search = screen.getByRole('search')
+  const type = screen.getByRole('group', { name: 'Jag söker' })
+  expect(search.compareDocumentPosition(type) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Alien' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  expect(await screen.findByRole('heading', { name: 'Alien' })).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Alien: Romulus' })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Visa fler resultat' }))
+  expect(screen.getByRole('heading', { name: 'Alien: Romulus' })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Visa färre' }))
+  expect(screen.queryByRole('heading', { name: 'Alien: Romulus' })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Rensa' }))
+  expect(screen.getByRole('searchbox')).toHaveValue('')
+  expect(container.querySelector('.media-search-results')).toBeNull()
+})
+
 test('poster falls back without leaving a broken image', () => {
   render(<MediaPoster title="Alien" url="https://images.example.test/alien.jpg" />)
   fireEvent.error(screen.getByRole('img', { name: 'Poster för Alien' }))
@@ -59,9 +89,9 @@ test('valid poster is lazy loaded and missing poster uses placeholder', () => {
 test('mobile navigation has stable destinations and marks the active view', () => {
   window.location.hash = '#queue'
   render(<MobileNavigation />)
-  expect(screen.getByRole('link', { name: /Kö/ })).toHaveAttribute('href', '#queue')
-  expect(screen.getByRole('link', { name: /Kö/ })).toHaveAttribute('aria-current', 'page')
-  expect(screen.getByRole('link', { name: /Tjänster/ })).toHaveAttribute('href', '#quick-actions')
+  expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('href', '#queue')
+  expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('aria-current', 'page')
+  expect(screen.getByRole('link', { name: /Admin/ })).toHaveAttribute('href', '#administration')
 })
 
 test('provider timeout is shown with a Swedish safe message', async () => {

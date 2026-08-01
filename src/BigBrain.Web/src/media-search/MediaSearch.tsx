@@ -42,27 +42,33 @@ export function MediaSearch() {
     }
   }
 
+  function clearSearch() {
+    controllerRef.current?.abort()
+    setQuery(''); setResult(null); setLookupResult(null); setErrorCode(null); setLoading(false)
+  }
+
   return <section className="media-search card" aria-labelledby="media-search-heading">
     <div className="media-search-intro">
       <p className="eyebrow">Mediasökning</p>
       <h3 id="media-search-heading">Hitta film och serier</h3>
-      <p>Sök i Sonarr och Radarr eller kontrollera dina befintliga bibliotek.</p>
+      <p>Sök efter något nytt eller kontrollera det som redan finns.</p>
     </div>
-    <MediaSearchModeSelector mode={mode} onChange={next => { setMode(next); setErrorCode(null) }} />
-    {mode === 'external' && <MediaTypeSelector value={mediaType} onChange={setMediaType} />}
     <MediaSearchForm
       loading={loading}
       query={query}
       onQueryChange={setQuery}
       onSubmit={() => void submit()}
     />
+    <MediaSearchModeSelector mode={mode} onChange={next => { setMode(next); setErrorCode(null) }} />
+    {mode === 'external' && <MediaTypeSelector value={mediaType} onChange={setMediaType} />}
     {loading && <p className="media-search-loading" aria-live="polite">Searching media services…</p>}
     {errorCode && <p className="notice notice--error" role="alert">{mediaErrorMessage(errorCode)}</p>}
-    {!loading && mode === 'libraries' && result && <MediaSearchResults response={result} />}
+    {!loading && mode === 'libraries' && result && <><MediaSearchResults response={result} /><button className="secondary-button media-search-clear" type="button" onClick={clearSearch}>Rensa</button></>}
     {!loading && mode === 'external' && lookupResult && <MediaLookupResults
       response={lookupResult}
       onPrepare={(target, trigger) => { setRequestTarget(target); setReturnFocus(trigger) }}
     />}
+    {!loading && lookupResult && <button className="secondary-button media-search-clear" type="button" onClick={clearSearch}>Rensa</button>}
     {requestTarget && <MediaRequestDialog
       result={requestTarget}
       returnFocus={returnFocus}

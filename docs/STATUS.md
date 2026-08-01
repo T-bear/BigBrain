@@ -14,9 +14,9 @@
 
 Kort sammanfattning:
 
-- Mål: fastställ exakt varför Jellyfin visades som `degraded` och korrigera endast en tydligt verifierad grundorsak i BigBrain.
-- Definition of Done: hela anropskedjan verifierad, minsta säkra korrigering genomförd, runtime och samtliga build-/testgrindar gröna.
-- Resultat: klart. Jellyfin och Media overall rapporterar nu `online` genom både API och frontendproxy.
+- Mål: leverera Matlista med permanenta familjematsedlar och helgluncher samt förenkla BigBrains familje-UX enligt KISS-principen utan ny routing, behörighetsmodell eller backendplattform.
+- Definition of Done: Matlista inklusive SQLite schema 2 bevarad, vardagsflöden prioriterade, diagnostik nåbar via stängd Administration, mobilproblemen korrigerade och full build-, test-, runtime- och browsergrind grön.
+- Resultat: klart. Matlista är runtimeverifierad med nio måltider per vecka och den vanliga startsidan visar handlingar och resultat före teknisk diagnostik.
 
 ---
 
@@ -37,6 +37,62 @@ Kort sammanfattning:
 - Docker-, API- och Web-images med health checks för API och Web.
 - FlareSolverr `3.5.0` som Compose-tjänst med healthcheck, konfigurerbar hostport/loggnivå och anslutning till medianätverket.
 - Prowlarr indexer proxy `FlareSolverr` på `http://flaresolverr:8191/`, avgränsad med matchande tagg till Torrent[CORE].
+- `meal-planner` med UI-namnet Matlista: maträtter, taggar, deterministisk generering, automatiskt och manuellt byte, permanenta matsedlar samt valbar browserutskrift.
+
+### Matlista – första vertikala versionen
+
+Status: Implementerad och runtimeverifierad 2026-08-01
+
+- Familjeschemat är en ren tvåveckorsfunktion förankrad i `2026-08-03`, måndag i Vecka A. Cykeln returnerar 4, 6 respektive 3 personer enligt det beslutade dagsschemat och fungerar även för datum före ankaret.
+- Maträtter kan skapas, redigeras, tas bort, ha noll eller flera taggar och filtreras med en eller flera taggar.
+- Sex skyddade standardtaggar skapas reproducerbart: `3–4 personer`, `6 personer`, `Fredagsmat`, `Lättlagat`, `Helgmat` och `Lunch`. `Lunch` har den stabila kategorin `mealType`, visas i hantering/filter/redigering och kan inte tas bort. Egna taggar kan skapas och tas bort; borttagning kopplar säkert loss taggen från maträtter.
+- Varje planerad post har den stabila måltidstypen `lunch` eller `dinner`. Generatorn skapar sju middagar och två helgluncher, totalt nio måltider per full vecka. Lunch-taggen prioriteras för helglunch men är inte obligatorisk eller exklusiv; portionstagsregler, otaggad fallback, middagens dagstagsprioritering och seedad injicerbar randomisering bevaras.
+- Automatiskt byte och manuellt val adresserar `schedule + datum + måltidstyp`, ändrar endast den valda måltiden och behåller datum och personantal. Äldre bytes-URL:er finns kvar kompatibelt och avser middag.
+- Matlista använder dashboardens befintliga minimering. Minimerat vardagsläge visar dagens middag; på lördag och söndag visas både lunch och middag med samma personantal. Om dagens datum saknas visas närmast relevanta matsedelsdag; utan matsedel visas ett tydligt tomläge.
+- Öppnat läge har fyra lokala, tillgängliga arbetslägen: `Matsedel`, `Maträtter`, `Generera` och `Sparade`. Endast valt arbetsläge renderas synligt och `Matsedel` är standard. Tagghantering ligger stängd inne i `Maträtter`.
+- Veckovyn visar endast en vecka, två små gränsmedvetna navigeringsknappar och sju kompakta dagsrader. Vardagar har en middagspost; helgkort har separata kompakta lunch- och middagsposter med varsin byteskontroll. Permanent maträttsväljare är borttagen och endast vald måltids inline-yta öppnas.
+- Maträttsbiblioteket har kombinerbar textsökning och flertaggsfilter, träffantal, kompakta rader och åtgärdsmenyer som skalar till längre listor utan paginering.
+- Generering återgår direkt till den nya aktiva matsedeln med bekräftelse. Sparade matsedlar visas som kompakta poster och kan öppnas, väljas för utskrift eller tas bort med bekräftelse.
+- `POST /api/v1/modules/meal-planner/meals/seed-examples` lägger idempotent till 24 varierade exempelrätter utan att ändra eller ta bort användarrätter och utan att generera matsedlar. UI-åtgärden visas i tomt maträttsbibliotek och kräver bekräftelse.
+- Sparade matsedlar kan fortsatt väljas för en ren A4-anpassad browserutskrift.
+- Persistens: en modullokal SQLite-databas med schemaversion 2 och namngiven Compose-volym. Den versionssatta, idempotenta migreringen från schema 1 lägger till `mealType=dinner` på äldre planerade poster utan att ändra eller radera matsedlar eller maträtter. Lösningen valdes för minsta permanenta datalager utan att införa en generell dataplattform eller ändra andra modulers lagring.
+- Modulstatus är oberoende av mediatjänster. Om SQLite-filen inte kan öppnas registreras Matlista som `Unavailable`; övriga moduler påverkas inte.
+
+Kvarvarande begränsningar: SQLite-lösningen är avsiktligt enkel och förutsätter en API-instans. Backup/restore, fleranvändarkonflikter, generell autentisering/auktorisering och persistent audit är inte lösta. Raderingar kräver bekräftelse i UI och loggas strukturerat av API:t, men projektet saknar ännu identitetsbunden audit.
+
+### KISS-fokuserad familje-UX
+
+Status: Implementerad och verifierad 2026-08-01
+
+- Permanent UX-princip: `BigBrain ska utgå från vad användaren vill göra, inte från hur de underliggande systemen är byggda. Standardvyn visar handling, resultat och nödvändig återkoppling. Teknisk konfiguration och diagnostik visas först på uttrycklig begäran eller i Administration.`
+- Startsidan prioriterar Matlista, mediesökning och Pågående. Server-, Docker-, Sentinel-, provider-, health-, versions- och diagnostikinformation ligger i en tillgänglig `Administration`-sektion som är stängd som standard men öppnas direkt från mobilens Admin-ingång. Verkliga funktionsfel visas fortfarande kort i berört vardagsflöde.
+- Normala `Available`-/`Healthy`-etiketter är borttagna från vanlig navigation och Matlistas rubrik. Avvikande modulstatus visas fortsatt.
+- Mediesökfältet ligger före valet `Jag söker`. Resultatrubrikerna är `Serier` och `Filmer`; exakt titelmatch rankas först, bara bästa träffen per kategori visas initialt och fler resultat kan visas, döljas eller rensas lokalt.
+- Lägg-till-flödet behåller befintlig preview/confirm och idempotens. Rekommenderade val används i standardsteget, `Börja söka efter filer direkt` är på från början men kan ändras under stängda `Avancerade inställningar`, och tekniska värden ligger under stängda `Tekniska detaljer` i bekräftelsen.
+- Pågående mediakort visar användartitel, mediatyp, svensk status, progress, procent och tillgänglig återstående tid. Provider, fullständig release-/torrenttitel och interna statusvärden är fortsatt åtkomliga under `Visa tekniska detaljer`; filtren heter `Pågår`, `Bearbetas`, `Klara`, `Problem` och `Alla`.
+- Matlistas maträttsbibliotek har en kompakt `+ Lägg till`-åtgärd och en grupperad filterpanel för Måltid, Antal personer, Tillfälle och Övrigt. Panelen har valt antal, `Rensa filter`, tydlig stängning och Escape-stöd; textsökning och taggfilter kombineras som tidigare.
+- Alla `input`, `select` och `textarea` beräknas till minst 16 px på mobil. Viewporten tillåter fortsatt användarzoom.
+
+Framtida planer, inte implementerade i denna sprint:
+
+- recept;
+- ingredienser;
+- automatisk portionsskalning;
+- inköpslista;
+- kostnad och budget;
+- allergier;
+- individuella kostpreferenser;
+- favoriter och blockerade rätter;
+- betyg;
+- historik och regler för hur nyligen en rätt använts;
+- låsta dagar;
+- drag-and-drop;
+- delning mellan användare;
+- användarprofiler;
+- molnsynk;
+- export till PDF;
+- koppling till kalender;
+- AI-förslag baserade på befintliga rätter och preferenser.
 
 ---
 
@@ -71,16 +127,23 @@ Datum: 2026-08-01
 Verifierat:
 
 - Backend build: Release OK i .NET 10 SDK-container, 0 varningar och 0 fel.
-- Backend tester: 158 OK, 0 failed, 0 skipped; dessutom 19 fokuserade mediaadaptertester OK.
-- Frontend tester: 42 OK i 8 testfiler, inklusive modulordning, expandering, minimering, ARIA och lokal persistence.
+- Backend tester: 186 OK, 0 failed, 0 skipped (154 API/modul + 32 Sentinel), inklusive 28 fokuserade Matlista-testfall för familjeschema, nio måltider, lunchurval, exakt byte, schema 1→2, CRUD, exempeldata och API-fel.
+- Frontend tester: 56 OK i 9 testfiler. Utöver Matlistas vardags-/helg-, bytes-, genererings-, schema-, exempeldata- och utskriftstester täcks sökfältets ordning, resultatranking, visa fler/färre, rensning, stängda Administration-/avancerade-/tekniska detaljer, standardaktiverad filsökning, svenska jobbfilter och den viewport-säkra filterpanelen.
 - Frontend production build: OK.
+- Matlista runtime: modulen rapporterar `Available`; schema 1 migrerades automatiskt till schema 2. Den befintliga matsedelns 14 poster och användarrätter bevarades, samtliga äldre poster läses som `dinner`, och den sjätte skyddade standardtaggen `Lunch` finns genom både direkt API och frontendproxy.
+- Matlista mobil: verifierad i riktig Chromium vid 390 × 844 med isolerad mockdata; dokumentbredd och viewport är båda 390 px. Minimerat helgläge visar lunch och middag, veckovyn har sju dagsrader, lördagens kompakta dubbelpost är 111 px hög och endast lunchens bytesyta öppnades (`dinner` förblev stängd).
+- Matlista bibliotek: browserflödet lade 24 exempelrätter i en isolerad mock, kombinerade textsökning med `Lättlagat` och visade `1 av 24 maträtter` utan runtime-mutation.
+- Matlista utskrift: Chromium print-media visar nio måltidsrader för en full vald vecka inklusive måltidstyp; dashboardnavigationen är dold och CSS behåller A4-layout och sidbrytning per vecka.
+- KISS UX browser: riktig Chromium vid 390 × 844 gav viewport/dokumentbredd `390/390`, visuell skala `1` före och efter fokus samt beräknad fältstorlek `16px`. Filterpanelen låg inom viewporten (`366px` bred), dialogen låg inom viewporten (`366px` bred), Administration var stängd initialt och öppnades via Admin, bästa medieträffen var ensam initialt och fler träffar kunde visas.
+- Desktop browser: riktig Chromium vid 1440 × 1000 gav viewport/dokumentbredd `1440/1440`; Administration var stängd initialt.
+- Matlista kompaktvy: isolerad browserdata visade lördagens lunch och middag i minimerat läge; helgens dubbelrad var `103px` hög. Print-media visade nio rader och dold mobilnavigation.
 - Jellyfin direkt: `/health` svarade `200 Healthy`; `System/Info` svarade med version `10.11.11`; den nya `/Items`-frågan svarade `200` med åtta sorterade poster.
 - BigBrain API: `/api/v1/modules/media` rapporterade Jellyfin `online`, åtta nyligen tillagda poster och Media overall `online`.
 - Frontendproxy: samma mediaendpoint via Web rapporterade Jellyfin och Media overall `online`.
 - Providerregression: Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent rapporterade samtliga `online`; provideranropen svarade `200`.
-- Mobil verifiering: senast 2026-07-31, 390 × 844 viewport utan horisontell scroll eller överlappande kontroller; sökningen visas i första vyn och bottennavigationen täcker inte innehåll.
-- Compose build: API-imagen byggdes om i production/Release och startades med korrigeringen. Full build av Sentinel och Web kördes senast 2026-07-31.
-- Compose-konfiguration: senast verifierad 2026-07-31 med Sentinel, API, Web och FlareSolverr.
+- Mobil verifiering: 2026-08-01, 390 × 844 utan horisontell scroll; filterpanel, mediedialog, bottennavigation, minimerad/expanderad Matlista och utskriftsläge verifierade.
+- Compose build: API- och Web-images byggdes om och endast API/Web återskapades; båda startade healthy.
+- Compose-konfiguration: verifierad 2026-08-01 med `docker compose config --quiet`.
 - Runtime: Sentinel, API, Web och FlareSolverr kör; API, Web och FlareSolverr är healthy.
 - FlareSolverr: `/health` svarar på hostport 8191 och från Prowlarr via `http://flaresolverr:8191/health`.
 - Prowlarr: FlareSolverr-proxytest och `Test All Indexers` OK; fem av fem indexers giltiga.
@@ -96,6 +159,7 @@ Verifierat:
 - System: Healthy; uptime, CPU, minne och `BigBrain Storage` verifierade.
 - Media: Online; Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent online. Health score är `68`/`actionRecommended` på grund av separata provider-healthvarningar, inte providerstatus.
 - Docker: Unavailable i BigBrain; inventory-capability saknas.
+- Matlista: Available; SQLite schema 2 öppet via namngiven Compose-volym, sex skyddade standardtaggar och migrerade äldre middagsposter verifierade.
 - Sentinel: Running.
 - API: Healthy.
 - Web: Healthy.
@@ -107,7 +171,7 @@ Verifierat:
 
 ## Nästa sprint
 
-Rekommenderat nästa mål: autentisering och auktorisering för Control Plane, avgränsat som en separat säkerhetssprint med eget arkitekturbeslut och Definition of Done.
+Rekommenderat nästa lilla mål: en avgränsad språk- och tomlägesgenomgång av de kvarvarande engelska systemtexterna inne i Administration, utan att ändra API eller arkitektur. För Matlista bör nästa separata datamål vara backup/restore för modulens SQLite-data.
 
 Övriga verifierade öppna kandidater, utan inbördes prioritering:
 
@@ -128,7 +192,7 @@ Rekommenderat nästa mål: autentisering och auktorisering för Control Plane, a
 - Jellyfin-dashboardens delanropsfel loggar HTTP-status men inte ett säkert operation-ID per endpoint, vilket gjorde det misslyckade delanropet svårare att identifiera. Ingen bredare observabilityändring gjordes i denna sprint.
 - Dashboardlayouten lagras endast lokalt per webbläsare och saknar användarbunden synkronisering.
 - Drag-and-drop för modulordning och PWA auto-update är inte implementerade.
-- Brain, Worker och databas är inte implementerade.
+- Brain och Worker är inte implementerade. Matlista har en avgränsad SQLite-databas; någon generell databasplattform finns inte.
 - Cloudflare-challenges kan vara intermittenta; första Torrent[CORE]-testet nådde 60 sekunders timeout, medan fyra efterföljande försök lyckades på cirka 15–16 sekunder.
 
 ---
@@ -136,7 +200,7 @@ Rekommenderat nästa mål: autentisering och auktorisering för Control Plane, a
 ## Senaste Codex-session
 
 - Datum: 2026-08-01
-- Syfte: diagnostisera och, vid verifierat BigBrain-fel, korrigera Jellyfin `degraded`.
-- Resultat: inkompatibelt `/Items/Latest`-anrop ersatt med en API-nyckelkompatibel, sorterad `/Items`-fråga; Jellyfin och Media overall är verifierat `online`.
-- Commitmeddelande: `fix(media): restore Jellyfin recently added status`.
-- Nästa rekommenderade steg: autentisering och auktorisering i en separat säkerhetssprint.
+- Syfte: slutföra Matlista och genomföra en KISS-fokuserad UX-sprint för familjens vanligaste handlingar.
+- Resultat: Matlistas SQLite schema 2, helgluncher och befintliga flöden är bevarade. Startsidan prioriterar Matlista, sökning och Pågående; teknisk information är samlad i stängd Administration; mediesökning, lägg-till-dialog, jobbkort och Matlistas filter är mobilförenklade. Full build/test och runtime-/browser-/printverifiering är godkända.
+- Commitmeddelande: `feat(ui): simplify BigBrain family experience`.
+- Nästa rekommenderade steg: en liten språk- och tomlägesgenomgång inne i Administration; därefter avgränsad backup/restore för Matlista.

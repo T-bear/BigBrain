@@ -21,6 +21,7 @@ Thumbs.db
 .env.*
 !.env.example
 .sentinel/
+data/
 
 # Test output
 TestResults/

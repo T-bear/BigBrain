@@ -11,7 +11,7 @@ export function MediaTypeSelector({ value, onChange }: {
   onChange: (value: MediaTypeSelection) => void
 }) {
   return <fieldset className="media-type-selector">
-    <legend>Mediatyp</legend>
+    <legend>Jag söker</legend>
     <div>{choices.map(choice => <button
       type="button"
       key={choice.value}

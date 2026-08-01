@@ -9,6 +9,11 @@ import type {
   MediaRequestPreviewResponse,
   MediaSearchResponse,
   MediaServiceLink,
+  MealPlannerDay,
+  MealPlannerMeal,
+  MealPlannerSchedule,
+  MealPlannerSeedResult,
+  MealPlannerTag,
   ModuleDefinition,
   SystemOverview,
 } from './types'
@@ -30,6 +35,27 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>
 }
 
+async function sendJson<T>(url: string, method: 'POST' | 'PUT', body: unknown): Promise<T> {
+  const response = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null) as { code?: string; detail?: string } | null
+    throw new ApiError(problem?.code ?? 'requestFailed', problem?.detail ?? 'The request could not be completed.')
+  }
+  return response.json() as Promise<T>
+}
+
+async function deleteRequest(url: string): Promise<void> {
+  const response = await fetch(url, { method: 'DELETE' })
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null) as { code?: string; detail?: string } | null
+    throw new ApiError(problem?.code ?? 'requestFailed', problem?.detail ?? 'The request could not be completed.')
+  }
+}
+
 export const getModules = (signal?: AbortSignal) =>
   getJson<ModuleDefinition[]>('/api/v1/modules', signal)
 
@@ -44,6 +70,29 @@ export const getMediaOverview = (signal?: AbortSignal) =>
 
 export const getMediaServiceLinks = (signal?: AbortSignal) =>
   getJson<MediaServiceLink[]>('/api/v1/modules/media/service-links', signal)
+
+const mealPlannerBase = '/api/v1/modules/meal-planner'
+export const getMealPlannerMeals = (tagIds: string[] = []) =>
+  getJson<MealPlannerMeal[]>(`${mealPlannerBase}/meals${tagIds.length ? `?tags=${encodeURIComponent(tagIds.join(','))}` : ''}`)
+export const createMealPlannerMeal = (name: string, tagIds: string[]) =>
+  sendJson<MealPlannerMeal>(`${mealPlannerBase}/meals`, 'POST', { name, tagIds })
+export const updateMealPlannerMeal = (id: string, name: string, tagIds: string[]) =>
+  sendJson<MealPlannerMeal>(`${mealPlannerBase}/meals/${encodeURIComponent(id)}`, 'PUT', { name, tagIds })
+export const deleteMealPlannerMeal = (id: string) => deleteRequest(`${mealPlannerBase}/meals/${encodeURIComponent(id)}`)
+export const seedMealPlannerExamples = () =>
+  sendJson<MealPlannerSeedResult>(`${mealPlannerBase}/meals/seed-examples`, 'POST', {})
+export const getMealPlannerTags = () => getJson<MealPlannerTag[]>(`${mealPlannerBase}/tags`)
+export const createMealPlannerTag = (name: string, category: MealPlannerTag['category']) =>
+  sendJson<MealPlannerTag>(`${mealPlannerBase}/tags`, 'POST', { name, category })
+export const deleteMealPlannerTag = (id: string) => deleteRequest(`${mealPlannerBase}/tags/${encodeURIComponent(id)}`)
+export const getMealPlannerSchedules = () => getJson<MealPlannerSchedule[]>(`${mealPlannerBase}/schedules`)
+export const generateMealPlannerSchedule = (startDate: string, weekCount: number, title: string) =>
+  sendJson<MealPlannerSchedule>(`${mealPlannerBase}/schedules/generate`, 'POST', { startDate, weekCount, title: title || null, seed: 0 })
+export const replaceMealPlannerDay = (scheduleId: string, date: string, mealType: MealPlannerDay['mealType']) =>
+  sendJson<MealPlannerSchedule>(`${mealPlannerBase}/schedules/${encodeURIComponent(scheduleId)}/days/${date}/${mealType}/replace`, 'PUT', { seed: 0 })
+export const setMealPlannerDay = (scheduleId: string, date: string, mealType: MealPlannerDay['mealType'], mealId: string) =>
+  sendJson<MealPlannerSchedule>(`${mealPlannerBase}/schedules/${encodeURIComponent(scheduleId)}/days/${date}/${mealType}/meal`, 'PUT', { mealId })
+export const deleteMealPlannerSchedule = (id: string) => deleteRequest(`${mealPlannerBase}/schedules/${encodeURIComponent(id)}`)
 
 export const getMediaJobs = (signal?: AbortSignal) =>
   getJson<MediaJobsResponse>('/api/v1/modules/media/jobs?limit=50', signal)

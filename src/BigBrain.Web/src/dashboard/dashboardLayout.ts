@@ -3,6 +3,7 @@ import { useState } from 'react'
 export const DASHBOARD_LAYOUT_STORAGE_KEY = 'bigbrain.dashboard.layout.v1'
 
 export const dashboardModules = [
+  { id: 'meal-planner', defaultExpanded: true, collapsible: true },
   { id: 'media-search', defaultExpanded: true, collapsible: false },
   { id: 'quick-actions', defaultExpanded: true, collapsible: false },
   { id: 'media-jobs', defaultExpanded: true, collapsible: true },

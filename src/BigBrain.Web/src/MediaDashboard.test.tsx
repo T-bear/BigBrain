@@ -80,7 +80,7 @@ test('shows loading and then online activity without write controls', async () =
   vi.stubGlobal('fetch', vi.fn(() => new Promise((resolve) => { resolveRequest = resolve })))
   render(<MediaDashboard />)
 
-  expect(screen.getByText('Loading media intelligence…')).toBeInTheDocument()
+  expect(screen.getByText('Laddar film och serier…')).toBeInTheDocument()
   resolveRequest?.(response(overview()))
 
   expect(await screen.findByText('All services healthy')).toBeInTheDocument()
@@ -92,6 +92,18 @@ test('shows loading and then online activity without write controls', async () =
   expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /\b(pause|resume|delete|add|play)\b/i })).not.toBeInTheDocument()
+})
+
+test('keeps technical modules in Administration, closed by default and reachable on request', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  render(<MediaDashboard />)
+  await screen.findByRole('heading', { name: 'Hitta film och serier' })
+  const administration = screen.getByText('Administration', { selector: 'strong' }).closest('details')!
+  expect(administration).not.toHaveAttribute('open')
+  expect(screen.getByRole('heading', { name: 'Media Health', hidden: true })).not.toBeVisible()
+  fireEvent.click(screen.getByText('Administration', { selector: 'strong' }))
+  expect(administration).toHaveAttribute('open')
+  expect(screen.getByRole('heading', { name: 'Media Health' })).toBeVisible()
 })
 
 test('shows partial success with degraded and unavailable services', async () => {
@@ -128,14 +140,15 @@ test('keeps the dashboard usable when every service is offline', async () => {
   expect(screen.getByRole('heading', { name: 'qBittorrent' })).toBeInTheDocument()
   expect(screen.getByText('Sonarr queue is clear.')).toBeInTheDocument()
   expect(screen.getByText('Radarr queue is clear.')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Refresh' })).toBeEnabled()
+  fireEvent.click(screen.getByText('Administration', { selector: 'strong' }))
+  expect(screen.getByRole('button', { name: 'Uppdatera' })).toBeEnabled()
 })
 
 test('shows total API failure', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('network failure'))))
   render(<MediaDashboard />)
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('Media dashboard could not be loaded.')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Film och serier kunde inte laddas.')
 })
 
 test('limits long lists and supports accessible show all and collapse controls', async () => {
@@ -229,7 +242,7 @@ test('falls back safely when persisted module state is invalid', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
   render(<MediaDashboard />)
 
-  expect(await screen.findByRole('button', { name: 'Minimera Media Jobs' }))
+  expect(await screen.findByRole('button', { name: 'Minimera Pågående' }))
     .toHaveAttribute('aria-expanded', 'true')
   expect(screen.getByRole('button', { name: 'Expandera Media Health' }))
     .toHaveAttribute('aria-expanded', 'false')

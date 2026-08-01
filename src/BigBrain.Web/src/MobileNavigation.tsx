@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 const items = [
   { id: 'home', label: 'Hem', icon: '⌂' },
   { id: 'search', label: 'Sök', icon: '⌕' },
-  { id: 'queue', label: 'Kö', icon: '↧' },
-  { id: 'quick-actions', label: 'Tjänster', icon: '▦' },
+  { id: 'queue', label: 'Pågår', icon: '↧' },
+  { id: 'administration', label: 'Admin', icon: '⚙' },
 ]
 
 export function MobileNavigation() {
@@ -17,7 +17,12 @@ export function MobileNavigation() {
   }, [])
 
   return <nav className="mobile-navigation" aria-label="Snabbnavigation">
-    {items.map(item => <a key={item.id} href={`#${item.id}`} aria-current={active === item.id ? 'page' : undefined}>
+    {items.map(item => <a key={item.id} href={`#${item.id}`} aria-current={active === item.id ? 'page' : undefined} onClick={() => {
+      if (item.id === 'administration') {
+        const administration = document.getElementById('administration') as HTMLDetailsElement | null
+        if (administration) administration.open = true
+      }
+    }}>
       <span aria-hidden="true">{item.icon}</span>{item.label}
     </a>)}
   </nav>

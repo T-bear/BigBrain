@@ -6,6 +6,7 @@ import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
 import { MobileNavigation } from './MobileNavigation'
 import { CollapsibleModule } from './dashboard/CollapsibleModule'
 import { useDashboardLayout } from './dashboard/dashboardLayout'
+import { MealPlanner } from './meal-planner/MealPlanner'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -83,13 +84,13 @@ export default function App() {
           <span className="brand__mark">B</span>
           <span>BigBrain</span>
         </a>
-        <nav aria-label="Modules">
-          <p className="nav-label">Modules</p>
+        <nav aria-label="Moduler">
+          <p className="nav-label">Moduler</p>
           {moduleError && <p role="alert" className="muted">Module registry unavailable.</p>}
-          {modules.map((module) => (
+          {modules.filter(module => module.id === 'meal-planner' || module.id === 'media').map((module) => (
             <a className="nav-link" href={module.route} key={module.id}>
               <span>{module.name}</span>
-              <StatusBadge status={module.status} compact />
+              {!['available', 'online'].includes(module.status.toLowerCase()) && <StatusBadge status={module.status} compact />}
             </a>
           ))}
         </nav>
@@ -98,12 +99,16 @@ export default function App() {
       <main className="main" id="home">
         <header className="page-header">
           <div>
-            <p className="eyebrow">Control plane</p>
-            <h1>Server overview</h1>
+            <p className="eyebrow">Familjens BigBrain</p>
+            <h1>Vad vill du göra?</h1>
           </div>
-          <span className="sprint-badge">Sprint 2</span>
         </header>
 
+        <MealPlanner
+          expanded={expanded['meal-planner']}
+          onToggle={() => toggle('meal-planner')}
+          status={modules.find(module => module.id === 'meal-planner')?.status ?? (moduleError ? 'Unavailable' : 'Loading')}
+        />
         <MediaDashboard expanded={expanded} onToggle={toggle}>
           <CollapsibleModule
             actions={<StatusBadge status={systemStatus} />}
@@ -111,7 +116,7 @@ export default function App() {
             expanded={expanded.system}
             moduleId="system"
             onToggle={() => toggle('system')}
-            title="System status"
+            title="System och lagring"
           >
 
             {!system && !systemError && <p aria-live="polite">Loading system metrics…</p>}
@@ -153,7 +158,7 @@ export default function App() {
             expanded={expanded.docker}
             moduleId="docker"
             onToggle={() => toggle('docker')}
-            title="Docker overview"
+            title="Docker"
           >
             {dockerError ? (
               <p role="alert" className="notice notice--error">Docker inventory could not be loaded.</p>

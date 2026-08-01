@@ -107,15 +107,16 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task ModulesReturnsSystemAndDockerModules()
+    public async Task ModulesReturnsRegisteredModules()
     {
         var response = await _client.GetAsync("/api/v1/modules", TestContext.Current.CancellationToken);
         var modules = await response.Content.ReadFromJsonAsync<ModuleResponse[]>(TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = Assert.IsType<ModuleResponse[]>(modules);
-        Assert.Equal(["docker", "media", "system"], result.Select(module => module.Id));
+        Assert.Equal(["docker", "meal-planner", "media", "system"], result.Select(module => module.Id));
         Assert.Equal("Unavailable", Assert.Single(result, module => module.Id == "docker").Status);
+        Assert.Equal("Available", Assert.Single(result, module => module.Id == "meal-planner").Status);
         Assert.Equal("NotConfigured", Assert.Single(result, module => module.Id == "media").Status);
         var system = Assert.Single(result, module => module.Id == "system");
         Assert.Equal("Unavailable", system.Status);

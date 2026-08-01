@@ -7,9 +7,11 @@ public sealed class ModuleRegistryTests
     [Fact]
     public void SprintTwoRegistryContainsSystemAndDocker()
     {
-        var registry = new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition]);
+        var registry = new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition]);
 
-        Assert.Equal(["docker", "media", "system"], registry.GetModules().Select(module => module.Id));
+        Assert.Equal(["docker", "meal-planner", "media", "system"], registry.GetModules().Select(module => module.Id));
+        Assert.Equal("Matlista", MealPlannerModule.Definition.Name);
+        Assert.Equal("/#meal-planner", MealPlannerModule.Definition.Route);
     }
 
     [Fact]

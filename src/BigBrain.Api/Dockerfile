@@ -15,6 +15,7 @@ RUN dotnet publish src/BigBrain.Api/BigBrain.Api.csproj --configuration Release 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app .
+RUN mkdir -p /data && chown $APP_UID /data
 USER $APP_UID
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "BigBrain.Api.dll"]
