@@ -109,12 +109,23 @@ Status: Implementerad och verifierad 2026-08-01
 
 ### Officiell BigBrain-ikon
 
-Status: Implementerad och verifierad 2026-08-01
+Status: Implementerad och ompublicerad från ny masterkälla 2026-08-02
 
 - Den blå–lila neonikonen med hjärna och B är BigBrains officiella huvudikon och ersätter den tidigare textbaserade B-symbolen i headern utan ändrad headerhöjd.
+- `branding/bigbrain-icon-source.png` är enda masterkälla. Favicon, Apple touch icon, header-/PWA-ikonerna i `192×192` och `512×512` samt maskable-ikonen genererades om från denna bild. Den ospårade, äldre reservkopian `branding/bigbrain-icon-sourceX.png` saknade referenser och togs bort efter bild- och referenskontroll.
 - Webbassets finns som PNG i `32×32`, `180×180`, `192×192` och `512×512`. En separat `512×512` maskable-version centrerar samma oförändrade motiv med extra säkerhetsmarginal på konsekvent svart bakgrund.
 - Browserfliken använder `32×32`-favicon, iOS använder `180×180` Apple touch icon och webbmanifestet deklarerar `192×192` och `512×512` med `purpose: any` samt maskable-versionen med `purpose: maskable`.
+- Samtliga fem bilder, manifestet och Web health svarade `200` i den ombyggda Web-containern. Chromium verifierade den nya `192×192`-bilden i oförändrade `34×34` i headern.
 - Redan installerade PWA-versioner kan behålla den gamla ikonen i operativsystemets cache. På iPhone kan appen därför behöva tas bort från hemskärmen och installeras om manuellt för att den nya ikonen ska visas.
+
+### Inköpslista – korrigeringsuppföljning
+
+Status: Implementerad och verifierad 2026-08-02
+
+- Efter ett lyckat tillägg töms snabbfältet och återfår fokus efter att den uppdaterade listan renderats, utan timeout eller scrollryck. Flödet fungerar med Enter och knapp. Valideringsfel lämnar ett återställbart fält, serverfel stjäl inte fokus och dubblettdialogen behåller fokus tills användaren slutför eller avbryter den.
+- Varuradens tidigare radbundna meny ersattes med en lokal fixed portalmeny som högerjusteras, klampas inom viewporten och vänder uppåt när utrymmet nedåt inte räcker. Menyn har högst en öppen instans, kontrollerad radbrytning, 44 px tryckmål, utanförstängning, Escape och fokusåtergång utan autoscroll.
+- Frontend: 67 tester i 10 filer gröna och production build grön. Compose-konfiguration och Web-image är gröna; endast Web återskapades och är healthy. Inga backend- eller API-filer ändrades.
+- Isolerad Chromium-verifiering med 46 startvaror genomfördes vid `390×844`, `320×844` och `1440×1000`: fem följande Enter-tillägg utan nytt tryck i fältet, meny på första och nedersta rad, uppåtvänd meny vid nederkant, korrekt Escape/fokusåtergång, dold bottennavigation i handlingsläget, ingen horisontell overflow och inga konsolfel.
 
 Framtida planer, inte implementerade i denna sprint:
 
