@@ -184,6 +184,7 @@ test('prioritizes search and quick actions before system and Docker modules', as
   expect([...container.querySelectorAll('[data-dashboard-module]')].map(element => element.getAttribute('data-dashboard-module')))
     .toEqual([
       'meal-planner',
+      'shopping-list',
       'media-search',
       'media-jobs',
       'quick-actions',

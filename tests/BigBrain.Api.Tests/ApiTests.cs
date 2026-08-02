@@ -114,9 +114,10 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = Assert.IsType<ModuleResponse[]>(modules);
-        Assert.Equal(["docker", "meal-planner", "media", "system"], result.Select(module => module.Id));
+        Assert.Equal(["docker", "shopping-list", "meal-planner", "media", "system"], result.Select(module => module.Id));
         Assert.Equal("Unavailable", Assert.Single(result, module => module.Id == "docker").Status);
         Assert.Equal("Available", Assert.Single(result, module => module.Id == "meal-planner").Status);
+        Assert.Equal("Available", Assert.Single(result, module => module.Id == "shopping-list").Status);
         Assert.Equal("NotConfigured", Assert.Single(result, module => module.Id == "media").Status);
         var system = Assert.Single(result, module => module.Id == "system");
         Assert.Equal("Unavailable", system.Status);

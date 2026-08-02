@@ -1,0 +1,2 @@
+import type { ShoppingSuggestion } from './types'
+export function ShoppingSuggestions({items,active,onPick}:{items:ShoppingSuggestion[];active:number;onPick:(name:string)=>void}){return <ul className="shopping-suggestions" id="shopping-suggestions" role="listbox">{items.map((item,index)=><li aria-selected={index===active} id={`shopping-suggestion-${index}`} key={item.name} role="option"><button onMouseDown={e=>e.preventDefault()} onClick={()=>onPick(item.name)} type="button">{item.name}<small>{item.source}</small></button></li>)}</ul>}

@@ -3,10 +3,10 @@
 ## Projektstatus
 
 - Version: `0.1.0-alpha`
-- Senaste uppdatering: 2026-08-01
-- Senaste commit före denna sprint: `b19bfe083b2b7e9b03473064b9129e40c8537e91`
+- Senaste uppdatering: 2026-08-02
+- Senaste commit före denna sprint: `4c020b5`
 - Aktiv branch: `main`
-- Senaste verifierade build: 2026-08-01, backend Release, BigBrain API-image och frontend production build OK
+- Senaste verifierade build: 2026-08-02, backend Release, BigBrain API-/Web-images och frontend production build OK
 
 ---
 
@@ -14,9 +14,9 @@
 
 Kort sammanfattning:
 
-- Mål: införa den officiella BigBrain-ikonen i header, favicon, Apple touch icon och PWA-manifest utan annan UX- eller funktionsändring.
-- Definition of Done: optimerade standard- och maskable-ikoner, giltigt manifest och HTML-head samt grön frontend-, runtime- och browserverifiering.
-- Resultat: klart. Brandingen är uppdaterad och UX-feature-freeze är fortsatt oförändrad.
+- Mål: införa den nya, uttryckligen beställda modulen Inköpslista som ett smalt permanent och mobilvänligt vertikalt snitt.
+- Definition of Done: aktiv lista, säkra dubblettflöden, lokala förslag och historik, handlingsläge, deterministisk inlärd butiksordning, separat SQLite-volym samt grön test-, runtime- och browserverifiering.
+- Resultat: klart och verifierat. Den generella UX-feature-freezen är fortsatt oförändrad för övriga flöden.
 
 ---
 
@@ -38,6 +38,28 @@ Kort sammanfattning:
 - FlareSolverr `3.5.0` som Compose-tjänst med healthcheck, konfigurerbar hostport/loggnivå och anslutning till medianätverket.
 - Prowlarr indexer proxy `FlareSolverr` på `http://flaresolverr:8191/`, avgränsad med matchande tagg till Torrent[CORE].
 - `meal-planner` med UI-namnet Matlista: maträtter, taggar, deterministisk generering, automatiskt och manuellt byte, permanenta matsedlar samt valbar browserutskrift.
+- `shopping-list` med UI-namnet Inköpslista: en permanent aktiv lista, mängd, redigering, borttagning med bekräftelse, köp/återställning, lokal autocomplete, ofta köpt, inköpssessioner och inlärd butiksordning.
+
+### Inköpslista – första vertikala versionen
+
+Status: Implementerad och runtimeverifierad 2026-08-02
+
+- Dashboarden visar modulen som en sammanhållen enhet. Minimerat läge visar antal kvar, direkt `+ Lägg till vara`, högst tre första oköpta varor och ett tydligt tomläge; normal `Available`-status visas inte.
+- Handlingsläget är en egen fixed appyta utan Fullscreen API. Dashboardroten blir inert, bottennavigation och FAB döljs, bakgrundsscroll låses, safe-area respekteras och fokus fångas säkert samt återgår vid `Tillbaka` eller Escape.
+- Aktiv lista: namn 1–120 tecken, antal 1–999, stora checkboxmål, redigering, bekräftad borttagning, separat minimerbar `Köpta`-sektion och återställning utan automatisk radering.
+- Dubbletter jämförs efter trimning, hopslagning av upprepade mellanslag, Unicode-normalisering och svensk skiftlägesokänslig normalisering. UI kontrollerar före POST; API och ett partiellt unikt SQLite-index försvarar samma invariant. Oköpt dubblett erbjuder `Öka antal`, `Visa varan` och `Avbryt`; köpt dubblett erbjuder återaktivering.
+- Autocomplete prioriterar faktisk lokal historik/frekvens/senaste köp och kompletterar med en liten statisk svensk grundlista. Grundlistan skrivs inte till historiken innan användaren faktiskt lägger till varan. Listboxen kan styras med tangentbord och stängas med Escape.
+- `Ofta köpt` rankas deterministiskt efter antal avslutade köp, senaste köptid och namn. Antal tillägg lagras separat för lokal historik/förslag. Inga tekniska poäng visas.
+- En session skapas när första varan bockas av och lagrar normaliserad identitet, UTC-tid och avbockningsposition. `Avsluta inköp` kräver bekräftelse, arkiverar köpta varor, avslutar sessionen och låter användaren uttryckligen behålla eller ta bort oköpta varor; historiken raderas inte.
+- Inlärd ordning: varje avslutad session bidrar med observerad position. Senaste nya observationen väger 1,15 mot äldre genomsnitt. Historisk position används först efter två observationer; annars används stabil skapelse-/ordinalordning, skapad tid och namn. Sortering läses vid öppning/laddning och tillägg; vid avbockning flyttas bara varan till `Köpta`, så återstående rader hoppar inte runt.
+- Ingen extern AI, extern produktdatabas eller internetberoende används. Modellen är lokal, deterministisk och förklarbar.
+- Persistens: separat SQLite-schema version 1 med tabellerna `Items`, `Sessions`, `CheckEvents`, `ItemStats` och `SchemaInfo`, idempotent initiering, parameteriserad SQL, UTC-tider och named Compose-volym `shopping-list-data` på `/shopping-data`. Databasen är inte Git-spårad. En API-instans stöds i v1; flerinstansdrift kräver ett separat arkitekturbeslut.
+- API: `GET/POST /items`, `PUT/DELETE /items/{id}`, `POST /items/{id}/purchase|restore|increase|reactivate`, `GET /suggestions`, `GET /frequent` och `POST /finish` under `/api/v1/modules/shopping-list`. Validering ger 400, saknad vara 404, dubblett 409 och lagringsfel 503 som Problem Details med stabil kod.
+- Backend: hela lösningen byggd i Release och 192 tester gröna (160 API + 32 Sentinel). Frontend: 62 tester i 10 filer gröna och production build grön. `git diff --check` och `docker compose config --quiet` gröna.
+- Compose/runtime: API- och Web-images byggda; endast API och Web återskapades. Båda är healthy. Inköpslista rapporterar `Available`, den permanenta listan är tom, grundlisteförslag fungerar och Matlista, System och samtliga fem mediaproviders fortsätter fungera.
+- Browser: isolerad Chromium-mock vid 390 × 844 och 1440 × 1000 med 50 varor, långt namn, åtta köpta, ofta köpt och historik. Mobil gav viewport/dokumentbredd 390/390, 16 px input, 48 × 48 checkboxmål, förslagspanel 366 px inom viewporten, dold bottennavigation, inert bakgrund, korrekt Escape/fokus och inga konsolfel. Desktop gav 1440/1440 och samma gröna handlingsflöden.
+- Kända begränsningar: en aktiv lista, en butiksgemensam ordningsmodell, ingen backup/restore ännu och ingen flerinstanssamordning. Nästa rekommenderade lilla mål är backup/restore för den separata moduldatabasen.
+- Framtidsplaner, inte implementerade: recept-/ingredienskoppling från Matlista och automatisk generering från matsedel; enheter som kg, liter och paket; manuella butikskategorier, egen avdelningsordning, olika ordning per butik och drag-and-drop; priser/budget; streckkodsläsning; skafferi/lager; delning/realtidssynk; användarprofiler; molnsynk; röstinmatning; AI-baserade men alltid godkända förslag; notiser om återkommande behov.
 
 ### Matlista – första vertikala versionen
 
@@ -186,12 +208,13 @@ Verifierat:
 - Media: Online; Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent online. Health score är `68`/`actionRecommended` på grund av separata provider-healthvarningar, inte providerstatus.
 - Docker: Unavailable i BigBrain; inventory-capability saknas.
 - Matlista: Available; SQLite schema 2 öppet via namngiven Compose-volym, sex skyddade standardtaggar och migrerade äldre middagsposter verifierade.
+- Inköpslista: Available; separat SQLite schema 1 öppet via namngiven Compose-volym och tom permanent aktiv lista verifierad.
 - Sentinel: Running.
 - API: Healthy.
 - Web: Healthy.
 - FlareSolverr: Healthy; nåbar från Prowlarr på det externa medianätverket.
 - Prowlarr: Online; FlareSolverr-proxy aktiv för Torrent[CORE].
-- Senast verifierad: 2026-08-01.
+- Senast verifierad: 2026-08-02.
 
 ---
 

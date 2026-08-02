@@ -7,6 +7,7 @@ import { MobileNavigation } from './MobileNavigation'
 import { CollapsibleModule } from './dashboard/CollapsibleModule'
 import { useDashboardLayout } from './dashboard/dashboardLayout'
 import { MealPlanner } from './meal-planner/MealPlanner'
+import { ShoppingList } from './shopping-list/ShoppingList'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -87,7 +88,7 @@ export default function App() {
         <nav aria-label="Moduler" className="desktop-navigation">
           <p className="nav-label">Moduler</p>
           {moduleError && <p role="alert" className="muted">Module registry unavailable.</p>}
-          {modules.filter(module => module.id === 'meal-planner' || module.id === 'media').map((module) => (
+          {modules.filter(module => ['meal-planner','shopping-list','media'].includes(module.id)).map((module) => (
             <a className="nav-link" href={module.route} key={module.id}>
               <span>{module.name}</span>
               {!['available', 'online'].includes(module.status.toLowerCase()) && <StatusBadge status={module.status} compact />}
@@ -109,6 +110,7 @@ export default function App() {
           onToggle={() => toggle('meal-planner')}
           status={modules.find(module => module.id === 'meal-planner')?.status ?? (moduleError ? 'Unavailable' : 'Loading')}
         />
+        <ShoppingList expanded={expanded['shopping-list']} onToggle={() => toggle('shopping-list')} status={modules.find(module => module.id === 'shopping-list')?.status ?? (moduleError ? 'Unavailable' : 'Loading')} />
         <MediaDashboard expanded={expanded} onToggle={toggle}>
           <CollapsibleModule
             actions={<StatusBadge status={systemStatus} />}

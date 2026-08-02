@@ -32,6 +32,7 @@ services:
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
       MealPlanner__DatabasePath: /data/meal-planner.db
+      ShoppingList__DatabasePath: /shopping-data/shopping-list.db
       Sentinel__Enabled: "true"
       Sentinel__NodeId: node:local
       Sentinel__SocketPath: /run/bigbrain/sentinel.sock
@@ -68,6 +69,7 @@ services:
       - sentinel-runtime:/run/bigbrain
       - ./.sentinel/client:/run/bigbrain/identity:ro
       - meal-planner-data:/data
+      - shopping-list-data:/shopping-data
     networks:
       - default
       - media
@@ -128,3 +130,4 @@ networks:
 volumes:
   sentinel-runtime:
   meal-planner-data:
+  shopping-list-data:

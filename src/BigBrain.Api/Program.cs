@@ -1,6 +1,7 @@
 using BigBrain.Modules;
 using BigBrain.Api.Media;
 using BigBrain.Api.MealPlanner;
+using BigBrain.Api.ShoppingList;
 using BigBrain.Api.Sentinel;
 using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -32,6 +33,9 @@ public partial class Program
         builder.Services.AddSingleton<IMealSelectionRandomFactory, SeededMealSelectionRandomFactory>();
         builder.Services.AddSingleton<MealPlanGenerator>();
         builder.Services.AddSingleton<MealPlannerService>();
+        var shoppingListOptions = builder.Configuration.GetSection(ShoppingListOptions.SectionName).Get<ShoppingListOptions>() ?? new();
+        builder.Services.AddSingleton(shoppingListOptions);
+        builder.Services.AddSingleton<ShoppingListStore>();
         builder.Services
             .AddOptions<SentinelClientOptions>()
             .BindConfiguration(SentinelClientOptions.SectionName)
@@ -119,7 +123,7 @@ public partial class Program
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
-            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition]));
+            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition]));
 
         var app = builder.Build();
 
@@ -148,6 +152,7 @@ public partial class Program
                 IDockerInventoryProvider dockerProvider,
                 MediaOptions mediaOptions,
                 MealPlannerStore mealPlannerStore,
+                ShoppingListStore shoppingListStore,
                 CancellationToken cancellationToken) =>
             {
                 var systemOverview = await systemProvider.GetOverviewAsync(cancellationToken);
@@ -162,6 +167,7 @@ public partial class Program
                         "docker" => module with { Status = dockerStatus },
                         "media" => module with { Status = mediaOptions.IsAnyServiceConfigured ? "Available" : "NotConfigured" },
                         "meal-planner" => module with { Status = mealPlannerStore.IsAvailable ? "Available" : "Unavailable" },
+                        "shopping-list" => module with { Status = shoppingListStore.IsAvailable ? "Available" : "Unavailable" },
                         _ => module
                     });
                 return Results.Ok(modules);
@@ -415,6 +421,7 @@ public partial class Program
             });
 
         app.MapMealPlannerEndpoints();
+        app.MapShoppingListEndpoints();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
