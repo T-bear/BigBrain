@@ -8,6 +8,11 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 
 - BigBrain kapslar Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent bakom media-adapters.
 - Publika BigBrain-API:er är versionssatta och kontrollerade mediebegäranden använder preview och explicit bekräftelse.
+- Jellyfin Server 10.11.11 exponerar det verifierade remote-play-kontraktet
+  `POST /Sessions/{sessionId}/Playing`; Smart Shuffle confines it to a selected live
+  remote-control-session och ett servervaliderat avsnitt för den konfigurerade användaren.
+- En Samsung Smart TV med Jellyfin for Tizen har verifierats som entydig aktiv session
+  med `SupportsRemoteControl=true`. Verklig end-to-end-uppspelning återstår enligt BB-014.
 
 ## Viktiga tekniska lärdomar
 
@@ -28,6 +33,7 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 
 - [Mediamodulen](../modules/media.md)
 - [Arkitektur](../../ARCHITECTURE.md)
+- [Proposed ADR 0011](../adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md)
 
 ## Senast verifierad
 
@@ -35,4 +41,6 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 
 ## Källa och evidens
 
-`docs/modules/media.md`, `docs/STATUS.md` och ARR-incidentens slutrapport och post-incidentdiagnos.
+`docs/modules/media.md`, `docs/STATUS.md`, de maskerade Smart Shuffle-rapporterna under
+`/home/enigma/BigBrain/reports/features/smart-shuffle/` samt ARR-incidentens slutrapport
+och post-incidentdiagnos.

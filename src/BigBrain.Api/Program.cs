@@ -57,7 +57,7 @@ public partial class Program
         }
         builder.Services.AddOptions<MediaOptions>()
             .BindConfiguration(MediaOptions.SectionName)
-            .Validate(MediaOptions.IsValid, "Media URLs and timeout must be valid.")
+            .Validate(MediaOptions.IsValid, "Media configuration is invalid; Smart Shuffle requires a Jellyfin UserId when enabled.")
             .ValidateOnStart();
         builder.Services.AddSingleton(serviceProvider =>
             serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MediaOptions>>().Value);
@@ -108,7 +108,14 @@ public partial class Program
             (IMediaJobsProvider)serviceProvider.GetRequiredService<IQBittorrentClient>());
         builder.Services.AddTransient<IMediaLibraryCatalog>(serviceProvider =>
             (IMediaLibraryCatalog)serviceProvider.GetRequiredService<IJellyfinClient>());
+        builder.Services.AddTransient<IJellyfinPlaybackClient>(serviceProvider =>
+            (IJellyfinPlaybackClient)serviceProvider.GetRequiredService<IJellyfinClient>());
         builder.Services.AddSingleton<IMediaJobsService, MediaJobsService>();
+        builder.Services.AddSingleton<ISmartShuffleRandom, SmartShuffleRandom>();
+        builder.Services.AddSingleton<SmartShuffleSelector>();
+        builder.Services.AddSingleton<ISmartShuffleStore, SmartShuffleStore>();
+        builder.Services.AddTransient<ISmartShuffleService, SmartShuffleService>();
+        builder.Services.AddHostedService<SmartShuffleCoordinator>();
         builder.Services.AddTransient<IMediaRequestProvider>(serviceProvider =>
             (IMediaRequestProvider)serviceProvider.GetRequiredService<ISonarrClient>());
         builder.Services.AddTransient<IMediaRequestProvider>(serviceProvider =>
@@ -420,6 +427,38 @@ public partial class Program
                 catch (MediaRequestException exception) { return RequestProblem(exception); }
             });
 
+        app.MapGet("/api/v1/modules/media/smart-shuffle/options",
+            async (ISmartShuffleService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.GetOptionsAsync(cancellationToken)); }
+                catch (SmartShuffleException exception) { return SmartShuffleProblem(exception); }
+            });
+        app.MapGet("/api/v1/modules/media/smart-shuffle/devices",
+            async (ISmartShuffleService service, CancellationToken cancellationToken) =>
+                Results.Ok(await service.GetDevicesAsync(cancellationToken)));
+        app.MapPost("/api/v1/modules/media/smart-shuffle/sessions",
+            async (CreateSmartShuffleSession input, ISmartShuffleService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.CreateAsync(input, cancellationToken)); }
+                catch (SmartShuffleException exception) { return SmartShuffleProblem(exception); }
+            });
+        app.MapGet("/api/v1/modules/media/smart-shuffle/sessions/{id}",
+            (string id, ISmartShuffleService service) => service.Get(id) is { } session
+                ? Results.Ok(session)
+                : ApiProblem("sessionNotFound", "Shuffle-sessionen hittades inte.", StatusCodes.Status404NotFound));
+        app.MapPost("/api/v1/modules/media/smart-shuffle/sessions/{id}/skip",
+            async (string id, ISmartShuffleService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.SkipAsync(id, cancellationToken)); }
+                catch (SmartShuffleException exception) { return SmartShuffleProblem(exception); }
+            });
+        app.MapPost("/api/v1/modules/media/smart-shuffle/sessions/{id}/stop",
+            (string id, ISmartShuffleService service) =>
+            {
+                try { return Results.Ok(service.Stop(id)); }
+                catch (SmartShuffleException exception) { return SmartShuffleProblem(exception); }
+            });
+
         app.MapMealPlannerEndpoints();
         app.MapShoppingListEndpoints();
 
@@ -458,6 +497,9 @@ public partial class Program
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
 
     private static IResult JobsProblem(MediaJobsException exception) =>
+        ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
+
+    private static IResult SmartShuffleProblem(SmartShuffleException exception) =>
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
 
     private static IResult SentinelProblem(string code, string detail, int statusCode) =>

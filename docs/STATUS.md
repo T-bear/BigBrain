@@ -3,7 +3,7 @@
 ## Projektstatus
 
 - Version: `0.1.0-alpha`
-- Senaste uppdatering: 2026-08-02
+- Senaste uppdatering: 2026-08-03
 - Senaste commit före denna sprint: `4c020b5`
 - Aktiv branch: `main`
 - Senaste verifierade build: 2026-08-02, backend Release, BigBrain API-/Web-images och frontend production build OK
@@ -30,6 +30,8 @@ Kort sammanfattning:
 - Media Dashboard för Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent.
 - Media Search, extern film-/seriesökning och säker posterproxy.
 - Media Jobs med köer, filter, detaljvy, SSE/polling och verifierad Jellyfin-uppspelning.
+- Smart Shuffle MVP med rättvis viktad shuffle, user-data-baserat episodval,
+  bakgrundskoordinator, versionssatt API och mobilanpassat frontendflöde.
 - Förhandsgranskade och explicit bekräftade Sonarr-/Radarr-begäranden med kortlivad token och idempotens.
 - Service Overview, media health score och regelbaserade insights.
 - Prioriterad dashboard med Media Search och snabbval före detaljerad system- och Dockertelemetri.
@@ -39,6 +41,23 @@ Kort sammanfattning:
 - Prowlarr indexer proxy `FlareSolverr` på `http://flaresolverr:8191/`, avgränsad med matchande tagg till Torrent[CORE].
 - `meal-planner` med UI-namnet Matlista: maträtter, taggar, deterministisk generering, automatiskt och manuellt byte, permanenta matsedlar samt valbar browserutskrift.
 - `shopping-list` med UI-namnet Inköpslista: en permanent aktiv lista, mängd, redigering, borttagning med bekräftelse, köp/återställning, lokal autocomplete, ofta köpt, inköpssessioner och inlärd butiksordning.
+
+### Smart Shuffle MVP
+
+Status: IMPLEMENTERAD MVP – automatisk och manuell slutverifiering på riktig TV återstår.
+
+- Backend, frontend, viktad algoritm med anti-repeat och starvation-skydd,
+  bakgrundskoordinator samt automatiska tester är implementerade.
+- Jellyfin Server 10.11.11 och exakt en fjärrstyrbar Samsung Smart TV-session via
+  Jellyfin for Tizen har verifierats read-only med `SupportsRemoteControl=true`.
+- `Media:Jellyfin:UserId` är bundet från säker lokal runtimekonfiguration i den
+  Git-ignorerade `.env`-filen; värdet exponeras inte i Git, API eller frontend.
+- Ingen mediafil eller Jellyfin-databas ändrades och ingen verklig TV-uppspelning
+  startades automatiskt. Knapptryck, automatisk övergång, skip och stop återstår att
+  verifiera end-to-end på den verkliga TV:n enligt BB-014.
+- Se [Mediamodulen](modules/media.md), [verifieringsrunbook](operations/runbooks/media-integration-verification.md),
+  [Proposed ADR 0011](adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md) och den
+  externa rapportserien under `/home/enigma/BigBrain/reports/features/smart-shuffle/`.
 
 ### Inköpslista – första vertikala versionen
 

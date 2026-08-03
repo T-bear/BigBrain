@@ -369,3 +369,18 @@ export interface MediaRequestConfirmResponse {
   sourceId: string
   title: string
 }
+
+export interface SmartShuffleSeries { id: string; name: string; hasPlayableEpisode: boolean }
+export interface SmartShuffleDevice { id: string; displayName: string; clientType: string; available: boolean; isPlaying: boolean }
+export interface SmartShuffleEpisode { id: string; seriesId: string; seriesName: string; title: string; seasonNumber: number; episodeNumber: number; playbackPositionTicks: number | null }
+export interface SmartShuffleOptions { enabled: boolean; series: SmartShuffleSeries[] }
+export interface SmartShuffleSession {
+  id: string
+  status: 'active' | 'stopped' | 'completed'
+  nowPlaying: SmartShuffleEpisode | null
+  recentSeries: string[]
+  remainingSeries: number
+  deviceName: string
+  startedAtUtc: string
+  errorCode: string | null
+}

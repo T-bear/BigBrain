@@ -10,6 +10,7 @@ public sealed class MediaOptions
     public MediaApiKeyOptions Prowlarr { get; init; } = new("http://prowlarr:9696");
     public QBittorrentOptions QBittorrent { get; init; } = new();
     public MediaRequestOptions Requests { get; init; } = new();
+    public SmartShuffleOptions SmartShuffle { get; init; } = new();
     public MediaServiceLinksOptions ServiceLinks { get; init; } = new();
     public int TimeoutSeconds { get; init; } = 3;
 
@@ -22,7 +23,8 @@ public sealed class MediaOptions
         && IsHttpUrl(options.QBittorrent.BaseUrl)
         && options.ServiceLinks.All.All(IsValidServiceLink)
         && options.Requests.PreviewTokenLifetimeMinutes is >= 1 and <= 15
-        && options.Requests.MaximumConcurrentRequests is >= 1 and <= 4;
+        && options.Requests.MaximumConcurrentRequests is >= 1 and <= 4
+        && (!options.SmartShuffle.Enabled || !string.IsNullOrWhiteSpace(options.Jellyfin.UserId));
 
     public bool IsAnyServiceConfigured =>
         !string.IsNullOrWhiteSpace(Jellyfin.ApiKey)
@@ -53,6 +55,12 @@ public sealed class MediaApiKeyOptions(string baseUrl)
 {
     public string BaseUrl { get; init; } = baseUrl;
     public string? ApiKey { get; init; }
+    public string? UserId { get; init; }
+}
+
+public sealed class SmartShuffleOptions
+{
+    public bool Enabled { get; init; }
 }
 
 public sealed class QBittorrentOptions

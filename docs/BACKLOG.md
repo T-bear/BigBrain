@@ -277,3 +277,36 @@ Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
 - Risk: Föråldrade baselines styr felsökning och beslut.
 - Definition of Done: Godkänd kalender, ägare, statusmodell och indexuppdatering per scope.
 - Relaterade dokument: `docs/indexes/baselines.md`, ADR 0010.
+
+### BB-013 – Persist Smart Shuffle sessions
+
+- Modul: Media
+- Typ: MVP-begränsning
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-03
+- Beskrivning: Ersätt processlokal Smart Shuffle-state först när restartåterställning eller flera API-repliker krävs.
+- Motiv: MVP:n förlorar automationstillstånd vid API-restart och stoppar inte redan startad TV-uppspelning.
+- Avgränsning: Ingen databas eller distribuerad låsning införs utan verifierat behov och nytt arkitekturbeslut.
+- Definition of Done: Godkänd persistensmodell, säkert återupptagande, idempotenta övergångar och multi-replika-test.
+- Relaterade dokument: `docs/modules/media.md`, ADR 0011.
+
+### BB-014 – Smart Shuffle – manuell TV-verifiering och MVP-härdning
+
+- Modul: Media / Smart Shuffle
+- Typ: Verifiering / härdning
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-03
+- Beskrivning: Smart Shuffle MVP är implementerad och automatiskt testad. Fullständig end-to-end-verifiering på den verkliga Samsung-TV:n återstår.
+- Avgränsning: Verifieringen ska utlösas genom användarens BigBrain-gränssnitt; ingen terminal eller automatiskt test får starta verklig uppspelning.
+- Definition of Done:
+  - TV:n visas som valbar enhet i BigBrain utan rått UserId eller session-ID.
+  - Användarens knapptryck startar exakt seriens valda nästa osedda avsnitt.
+  - Nästa serie väljs automatiskt när avsnittet slutar och samma serie undviks direkt när alternativ finns.
+  - Skip fungerar mot den verkliga TV-sessionen.
+  - Stoppa Smart Shuffle förhindrar nya automatiska byten utan att störa vanlig manuell Jellyfin-användning.
+  - Telefonens BigBrain-sida behöver inte hållas öppen.
+  - API-restartens processlokala MVP-beteende verifieras och dokumenteras.
+  - En slutlig, sekretessgranskad verifieringsrapport skapas.
+- Relaterade dokument: `docs/modules/media.md`, `docs/STATUS.md`, ADR 0011.

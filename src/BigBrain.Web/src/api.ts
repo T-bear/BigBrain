@@ -16,6 +16,9 @@ import type {
   MealPlannerTag,
   ModuleDefinition,
   SystemOverview,
+  SmartShuffleDevice,
+  SmartShuffleOptions,
+  SmartShuffleSession,
 } from './types'
 
 export class ApiError extends Error {
@@ -205,3 +208,14 @@ export const confirmMediaRequest = (requestToken: string, idempotencyKey: string
     '/api/v1/modules/media/requests/confirm',
     { requestToken, idempotencyKey },
     signal)
+
+const smartShuffleBase = '/api/v1/modules/media/smart-shuffle'
+export const getSmartShuffleOptions = (signal?: AbortSignal) => getJson<SmartShuffleOptions>(`${smartShuffleBase}/options`, signal)
+export const getSmartShuffleDevices = (signal?: AbortSignal) => getJson<SmartShuffleDevice[]>(`${smartShuffleBase}/devices`, signal)
+export const getSmartShuffleSession = (id: string, signal?: AbortSignal) => getJson<SmartShuffleSession>(`${smartShuffleBase}/sessions/${encodeURIComponent(id)}`, signal)
+export const createSmartShuffleSession = (seriesIds: string[], deviceId: string, signal?: AbortSignal) =>
+  postJson<SmartShuffleSession>(`${smartShuffleBase}/sessions`, { seriesIds, deviceId }, signal)
+export const skipSmartShuffle = (id: string, signal?: AbortSignal) =>
+  postJson<SmartShuffleSession>(`${smartShuffleBase}/sessions/${encodeURIComponent(id)}/skip`, {}, signal)
+export const stopSmartShuffle = (id: string, signal?: AbortSignal) =>
+  postJson<SmartShuffleSession>(`${smartShuffleBase}/sessions/${encodeURIComponent(id)}/stop`, {}, signal)

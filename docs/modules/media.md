@@ -31,6 +31,8 @@ The module does not mount the Docker socket or media directories, execute comman
 |---|---|---|
 | `MEDIA__JELLYFIN__BASEURL` | `http://jellyfin:8096` | No |
 | `MEDIA__JELLYFIN__APIKEY` | unset | Yes |
+| `MEDIA__JELLYFIN__USERID` | unset | Yes |
+| `MEDIA__SMARTSHUFFLE__ENABLED` | `false` | No |
 | `MEDIA__SONARR__BASEURL` | `http://sonarr:8989` | No |
 | `MEDIA__SONARR__APIKEY` | unset | Yes |
 | `MEDIA__RADARR__BASEURL` | `http://radarr:7878` | No |
@@ -215,11 +217,38 @@ The following are explicitly deferred and require separate authorization, audit,
 
 - Search for missing episodes or movies.
 - Pause, resume or delete a torrent.
-- Redirect, autoplay or stream a title in Jellyfin.
+- General redirect, autoplay or streaming outside the narrowly scoped Smart Shuffle
+  PlayNow capability.
 - AI commands for media management.
 
-No delete, rename, move, edit, release, command or download-client operation exists.
+No delete, rename, move, edit, release, general command or download-client operation exists.
+
+## Smart Shuffle MVP
+
+Smart Shuffle is an opt-in Media capability controlled by `Media:SmartShuffle:Enabled`
+and runtime-only `Media:Jellyfin:UserId`. It exposes versioned options, devices and
+session actions under `/api/v1/modules/media/smart-shuffle`. A user selects at least two
+series and one connected remote-control client, then explicitly starts the session.
+Selection uses weighted randomness, immediate anti-repeat, least-recently-selected
+weighting and a starvation threshold of twice the active candidate count.
+
+For the configured Jellyfin user, episodes are ordered by season and episode number.
+Season 0, played and non-playable episodes are excluded. Saved playback position is used
+for resume. The browser receives opaque device/session identifiers; raw Jellyfin session
+and user identities remain server-side. Stop ends automation only and does not stop the
+episode currently playing on the TV.
+
+State is process-local and limited to one active session. Restarting the API loses active
+automation state and does not stop outstanding playback. The background coordinator
+polls only active sessions and serializes transitions to prevent duplicate starts. See
+[Proposed ADR 0011](../adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md).
+
+The MVP is implemented and automatically tested. Jellyfin 10.11.11 and one live,
+remote-controllable Samsung Tizen session have been verified read-only. Real-TV
+end-to-end validation of explicit start, completion transition, skip and automation stop
+remains tracked as BB-014; no automated terminal or test run starts real playback.
 
 ## ADR impact
 
-No new ADR is required. The implementation follows the existing decision that Sentinel owns node-local privileged resources while ordinary product APIs remain behind Control Plane integration adapters. Any future write scope must receive its own architecture and security review before implementation.
+The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
+Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.

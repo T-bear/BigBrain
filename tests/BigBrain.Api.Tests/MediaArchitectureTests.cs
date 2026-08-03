@@ -4,7 +4,7 @@ namespace BigBrain.Api.Tests;
 
 public sealed class MediaArchitectureTests
 {
-    private static readonly string[] FrontendMediaDirectories = ["media-search", "media-jobs"];
+    private static readonly string[] FrontendMediaDirectories = ["media-search", "media-jobs", "smart-shuffle"];
 
     [Fact]
     public void MediaProductionCodeHasNoHostOrDockerIntegration()
@@ -43,7 +43,7 @@ public sealed class MediaArchitectureTests
     }
 
     [Fact]
-    public void MediaContractsRemainSeparatedAndExternalWritesStayInArrAdapter()
+    public void MediaContractsRemainSeparatedAndExternalWritesStayInApprovedAdapters()
     {
         Assert.False(typeof(IMediaLookupProvider).IsAssignableFrom(typeof(ISonarrClient)));
         Assert.False(typeof(IMediaLookupProvider).IsAssignableFrom(typeof(IRadarrClient)));
@@ -58,7 +58,7 @@ public sealed class MediaArchitectureTests
             .Where(file => File.ReadAllText(file).Contains("HttpMethod.Post", StringComparison.Ordinal))
             .Select(file => Path.GetFileName(file)!)
             .ToArray();
-        Assert.Equal(["ArrClients.cs"], filesWithPost);
+        Assert.Equal(["ArrClients.cs", "JellyfinClient.cs"], filesWithPost.Order(StringComparer.Ordinal));
         var arrSource = File.ReadAllText(Path.Combine(mediaDirectory, "ArrClients.cs"));
         Assert.Equal(2, Count(arrSource, "HttpMethod.Post"));
         Assert.Contains("\"api/v3/series\"", arrSource, StringComparison.Ordinal);
@@ -81,7 +81,8 @@ public sealed class MediaArchitectureTests
         var lookupSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaLookup.cs"));
         Assert.DoesNotContain("HttpMethod.Post", lookupSource, StringComparison.Ordinal);
         var jellyfinSource = File.ReadAllText(Path.Combine(mediaDirectory, "JellyfinClient.cs"));
-        Assert.DoesNotContain("HttpMethod.Post", jellyfinSource, StringComparison.Ordinal);
+        Assert.Equal(1, Count(jellyfinSource, "HttpMethod.Post"));
+        Assert.Contains("Sessions/{Uri.EscapeDataString(sessionId)}/Playing?playCommand=PlayNow", jellyfinSource, StringComparison.Ordinal);
         var jobsSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaJobs.cs"));
         Assert.DoesNotContain("HttpMethod.Post", jobsSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Put", jobsSource, StringComparison.Ordinal);

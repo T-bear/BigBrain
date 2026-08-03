@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace BigBrain.Api.Media;
 
 public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient, IMediaSearchProvider, IMediaLibraryCatalog
+    : MediaClientBase(httpClient, "Jellyfin"), IJellyfinClient, IMediaSearchProvider, IMediaLibraryCatalog, IJellyfinPlaybackClient
 {
     public async Task<MediaSearchProviderResult> SearchAsync(
         string query,
@@ -206,6 +206,96 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
             .Select(MapCatalogItem)
             .Where(item => item.MediaType is MediaLookupTypes.Series or MediaLookupTypes.Movie)
             .ToArray();
+    }
+
+    async Task<IReadOnlyList<SmartShuffleSeriesOption>> IJellyfinPlaybackClient.GetSeriesAsync(
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        using var response = await GetJellyfinJsonAsync(
+            $"Items?UserId={Uri.EscapeDataString(userId)}&Recursive=true&IncludeItemTypes=Series&Limit=200",
+            options.Jellyfin.ApiKey!, cancellationToken);
+        return Items(response.RootElement).Select(item => new SmartShuffleSeriesOption(
+            GetString(item, "Id") ?? string.Empty,
+            GetString(item, "Name") ?? "Namnlös serie",
+            true)).Where(item => item.Id.Length > 0).ToArray();
+    }
+
+    async Task<SmartShuffleEpisode?> IJellyfinPlaybackClient.GetNextEpisodeAsync(
+        string seriesId,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        using var response = await GetJellyfinJsonAsync(
+            $"Shows/{Uri.EscapeDataString(seriesId)}/Episodes?UserId={Uri.EscapeDataString(userId)}"
+            + "&Fields=UserData,MediaSources&EnableUserData=true&Limit=1000",
+            options.Jellyfin.ApiKey!, cancellationToken);
+        var episodes = Items(response.RootElement);
+        if (episodes.Any(item => !item.TryGetProperty("UserData", out var data)
+            || data.ValueKind != System.Text.Json.JsonValueKind.Object))
+            throw new SmartShuffleException("userDataUnavailable", "Jellyfin saknar tillförlitlig användarstatus för serien.", 503);
+        return episodes
+            .Where(item => GetNullableInt32(item, "ParentIndexNumber") is > 0)
+            .Where(item => item.TryGetProperty("UserData", out var data)
+                && data.ValueKind == System.Text.Json.JsonValueKind.Object
+                && !Boolean(data, "Played"))
+            .Where(item => item.TryGetProperty("MediaSources", out var sources)
+                && sources.ValueKind == System.Text.Json.JsonValueKind.Array
+                && sources.GetArrayLength() > 0)
+            .OrderBy(item => GetNullableInt32(item, "ParentIndexNumber") ?? int.MaxValue)
+            .ThenBy(item => GetNullableInt32(item, "IndexNumber") ?? int.MaxValue)
+            .ThenBy(item => GetString(item, "Id"), StringComparer.Ordinal)
+            .Select(item =>
+            {
+                var userData = item.GetProperty("UserData");
+                var position = GetInt64(userData, "PlaybackPositionTicks");
+                return new SmartShuffleEpisode(
+                    GetString(item, "Id") ?? string.Empty,
+                    seriesId,
+                    GetString(item, "SeriesName") ?? "Namnlös serie",
+                    GetString(item, "Name") ?? "Namnlöst avsnitt",
+                    GetNullableInt32(item, "ParentIndexNumber") ?? 0,
+                    GetNullableInt32(item, "IndexNumber") ?? 0,
+                    position > 0 ? position : null);
+            })
+            .FirstOrDefault(episode => episode.Id.Length > 0);
+    }
+
+    async Task<IReadOnlyList<JellyfinRemoteSession>> IJellyfinPlaybackClient.GetRemoteSessionsAsync(CancellationToken cancellationToken)
+    {
+        using var response = await GetJellyfinJsonAsync("Sessions", options.Jellyfin.ApiKey!, cancellationToken);
+        return response.RootElement.ValueKind != System.Text.Json.JsonValueKind.Array ? [] : response.RootElement.EnumerateArray()
+            .Select(item => new JellyfinRemoteSession(
+                GetString(item, "Id") ?? string.Empty,
+                GetString(item, "UserId") ?? string.Empty,
+                GetString(item, "DeviceName") ?? "Jellyfin-enhet",
+                GetString(item, "Client") ?? "Jellyfin",
+                Boolean(item, "SupportsRemoteControl"),
+                item.TryGetProperty("NowPlayingItem", out var playing) && playing.ValueKind == System.Text.Json.JsonValueKind.Object))
+            .Where(item => item.SessionId.Length > 0).ToArray();
+    }
+
+    async Task IJellyfinPlaybackClient.PlayNowAsync(string sessionId, string itemId, long? startPositionTicks, CancellationToken cancellationToken)
+    {
+        var path = $"Sessions/{Uri.EscapeDataString(sessionId)}/Playing?playCommand=PlayNow&itemIds={Uri.EscapeDataString(itemId)}";
+        if (startPositionTicks is > 0) path += $"&startPositionTicks={startPositionTicks.Value}";
+        using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        request.Headers.TryAddWithoutValidation("X-Emby-Token", options.Jellyfin.ApiKey!);
+        using var response = await HttpClient.SendAsync(request, cancellationToken);
+        EnsureSuccess(response);
+    }
+
+    async Task<JellyfinPlaybackStatus> IJellyfinPlaybackClient.GetPlaybackStatusAsync(string sessionId, CancellationToken cancellationToken)
+    {
+        using var response = await GetJellyfinJsonAsync("Sessions", options.Jellyfin.ApiKey!, cancellationToken);
+        var session = response.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
+            ? response.RootElement.EnumerateArray().FirstOrDefault(item => GetString(item, "Id") == sessionId)
+            : default;
+        if (session.ValueKind != System.Text.Json.JsonValueKind.Object) return new(false, null, false);
+        var itemId = session.TryGetProperty("NowPlayingItem", out var playing) && playing.ValueKind == System.Text.Json.JsonValueKind.Object
+            ? GetString(playing, "Id") : null;
+        var paused = session.TryGetProperty("PlayState", out var state) && state.ValueKind == System.Text.Json.JsonValueKind.Object && Boolean(state, "IsPaused");
+        return new(true, itemId, paused);
     }
 
     private async Task<(System.Text.Json.JsonDocument? Document, bool Succeeded)> TryGetSupplementalJsonAsync(

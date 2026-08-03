@@ -9,6 +9,7 @@ import { MediaJobs } from './media-jobs/MediaJobs'
 import { MediaServiceLinks } from './media-services/MediaServiceLinks'
 import { CollapsibleModule } from './dashboard/CollapsibleModule'
 import { useDashboardLayout, type DashboardExpandedState, type DashboardModuleId } from './dashboard/dashboardLayout'
+import { SmartShuffle } from './smart-shuffle/SmartShuffle'
 
 const MEDIA_STATUS_POLL_MS = 45_000
 
@@ -70,6 +71,7 @@ export function MediaDashboard({
     {error && <p role="alert" className="notice notice--error">Film och serier kunde inte laddas.{overview ? ' Senaste tillgängliga uppdatering visas.' : ''}</p>}
     {overview && <>
       <div id="search" data-dashboard-module="media-search"><MediaSearch /></div>
+      <SmartShuffle />
       <CollapsibleModule
         eyebrow="Pågående aktivitet"
         expanded={layoutExpanded['media-jobs']}
