@@ -4,6 +4,8 @@
 
 Normativ arkitektur finns i `ARCHITECTURE.md` och `docs/architecture/`; beslut i `docs/adr/`; modulkontrakt i `docs/modules/`; kunskap i `docs/knowledge/`; procedurer i `docs/operations/`; status och arbete i `docs/STATUS.md` och `docs/BACKLOG.md`; runtimeevidens under `/home/enigma/BigBrain/reports/`.
 
+Frontendens stabila [theme contract v1](../design-system/theme-contract-v1.md), [manuella verifieringsplan](../design-system/manual-verification.md) och [Proposed ADR 0012](../adr/0012-design-system-theme-contract-and-jellyfin-adapter.md) dokumenterar designsystemets ägarskap och Jellyfin-gräns.
+
 ## Dokumentauktoritet
 
 Inom samma scope: 1) Accepted ADR, 2) aktuell normativ arkitektur, 3) kod och commitbunden kodbaseline, 4) modulkontrakt, 5) godkänd runbook, 6) daterad baseline inom rätt scope, 7) incidentens slutrapport, 8) diagnostik och historisk evidens, 9) Proposed design och rekommendationer. En senare fil ersätter inte automatiskt en äldre fil med annat scope.

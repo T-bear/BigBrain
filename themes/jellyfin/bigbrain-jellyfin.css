@@ -1,0 +1,37 @@
+/* BigBrain Jellyfin theme adapter v1.0.0; verified selectors: Jellyfin Web 10.11.11. */
+:root {
+  --bb-jf-bg: #0b1120;
+  --bb-jf-bg-subtle: #0e1625;
+  --bb-jf-surface: #111d30;
+  --bb-jf-surface-raised: #17243a;
+  --bb-jf-border: #3b4d69;
+  --bb-jf-text: #e7edf7;
+  --bb-jf-text-muted: #91a0b7;
+  --bb-jf-primary: #7164e8;
+  --bb-jf-primary-hover: #796deb;
+  --bb-jf-danger: #ff8f8f;
+  --bb-jf-focus: #9f94ff;
+  --bb-jf-radius-sm: .5rem;
+  --bb-jf-radius-md: .625rem;
+  --bb-jf-radius-lg: .875rem;
+  --bb-jf-shadow: 0 .875rem 2.25rem rgb(0 0 0 / 40%);
+}
+
+body, .backgroundContainer, .skinBody { background-color: var(--bb-jf-bg); color: var(--bb-jf-text); }
+.skinHeader { background: color-mix(in srgb, var(--bb-jf-bg) 94%, transparent); color: var(--bb-jf-text); backdrop-filter: blur(.75rem); }
+.mainDrawer { background: var(--bb-jf-bg-subtle); color: var(--bb-jf-text); border-right: 1px solid var(--bb-jf-border); }
+.navMenuOption-selected, .emby-tab-button-active { color: var(--bb-jf-text); background: var(--bb-jf-surface-raised); }
+.cardBox { border-radius: var(--bb-jf-radius-lg); }
+.cardImageContainer { border-radius: var(--bb-jf-radius-lg); box-shadow: var(--bb-jf-shadow); }
+.cardText, .itemName, .detailPagePrimaryContainer { color: var(--bb-jf-text); }
+.secondary, .fieldDescription, .listItemBodyText, .overview { color: var(--bb-jf-text-muted); }
+.emby-button, .raised { border-radius: var(--bb-jf-radius-md); }
+.button-submit, .raised.button-submit { background: var(--bb-jf-primary); color: #fff; }
+.button-submit:hover, .raised.button-submit:hover { background: var(--bb-jf-primary-hover); }
+.emby-input, .emby-textarea, .emby-select { border: 1px solid var(--bb-jf-border); border-radius: var(--bb-jf-radius-sm); background: var(--bb-jf-bg-subtle); color: var(--bb-jf-text); }
+.dialog { border: 1px solid var(--bb-jf-border); border-radius: var(--bb-jf-radius-lg); background: var(--bb-jf-surface); color: var(--bb-jf-text); box-shadow: var(--bb-jf-shadow); }
+.detailPagePrimaryContainer, .detailPageContent { text-shadow: 0 1px 2px rgb(0 0 0 / 60%); }
+.listItem { border-radius: var(--bb-jf-radius-md); }
+.listItem:hover { background: var(--bb-jf-surface-raised); }
+.emby-button:focus-visible, .emby-input:focus-visible, .emby-textarea:focus-visible, .emby-select:focus-visible, .card:focus-visible, .listItem:focus-visible { outline: 3px solid var(--bb-jf-focus); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

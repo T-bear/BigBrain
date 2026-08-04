@@ -3,12 +3,12 @@ import type { DockerContainer } from './types'
 
 export function StatusBadge({ status, compact = false }: { status: string; compact?: boolean }) {
   const normalized = status.toLowerCase()
-  return <span className={`status-badge status-badge--${normalized} ${compact ? 'status-badge--compact' : ''}`}>{status}</span>
+  return <span className={`bb-badge status-badge status-badge--${normalized} ${compact ? 'status-badge--compact' : ''}`}>{status}</span>
 }
 
 export function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <article className="card metric-card">
+    <article className="bb-card card metric-card">
       <h3>{label}</h3>
       <p className="metric-value">{value}</p>
     </article>
@@ -18,7 +18,7 @@ export function MetricCard({ label, value }: { label: string; value: string }) {
 export function ProgressMetric({ label, value, detail }: { label: string; value: number | null; detail: string }) {
   const safeValue = value === null ? 0 : Math.min(100, Math.max(0, value))
   return (
-    <article className="card metric-card">
+    <article className="bb-card card metric-card">
       <div className="metric-header">
         <h3>{label}</h3>
         <strong>{value === null ? 'Unavailable' : `${safeValue.toFixed(1)}%`}</strong>
@@ -31,7 +31,7 @@ export function ProgressMetric({ label, value, detail }: { label: string; value:
 
 export function ModuleCard({ title, status, children }: PropsWithChildren<{ title: string; status: string }>) {
   return (
-    <article className="card module-card">
+    <article className="bb-card card module-card">
       <div className="metric-header">
         <h3>{title}</h3>
         <StatusBadge status={status} />
@@ -46,7 +46,7 @@ export function DockerContainerList({ containers }: { containers: DockerContaine
   return (
     <ul className="container-list">
       {containers.map((container) => (
-        <li className="card" key={container.id}>
+        <li className="bb-card bb-list-row card" key={container.id}>
           <strong>{container.name}</strong>
           <span>{container.image}</span>
           <StatusBadge status={container.state} />

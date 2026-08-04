@@ -25,6 +25,8 @@ Explicitly deferred are Control Plane-to-Sentinel communication, real host metri
 Media Sprint 1 uses only documented application HTTP APIs and exposes `GET /api/v1/modules/media`. Credentials remain runtime configuration and all media mutations are deferred. See [Media Module documentation](docs/modules/media.md).
 The verified qBittorrent 5.2+ integration uses its official stateless Bearer API key authentication and only read-only WebAPI endpoints.
 
+BigBrain Web uses the token-based [theme contract v1](docs/design-system/theme-contract-v1.md). The separately versioned Jellyfin adapter under `themes/jellyfin/` is a manual artifact and is never installed automatically.
+
 To connect the module to the existing media stack, follow [TESTING.md](TESTING.md). Runtime credentials belong in an ignored local `.env` copied from `.env.example`.
 
 ## Repository layout

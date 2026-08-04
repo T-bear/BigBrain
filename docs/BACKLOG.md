@@ -310,3 +310,15 @@ Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
   - API-restartens processlokala MVP-beteende verifieras och dokumenteras.
   - En slutlig, sekretessgranskad verifieringsrapport skapas.
 - Relaterade dokument: `docs/modules/media.md`, `docs/STATUS.md`, ADR 0011.
+
+### BB-015 – Design system v1 – manuell visuell och Tizen-verifiering
+
+- Modul: BigBrain Web / Media
+- Typ: Verifiering
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-04
+- Beskrivning: Kör den dokumenterade visuella kontrollen av båda BigBrain-teman och verifiera separat, efter uttryckligt installationsgodkännande, om serverbaserad Jellyfin Custom CSS påverkar den verkliga Samsung Tizen-klienten.
+- Avgränsning: Ingen automatisk Jellyfin-publicering, klientfork eller TV-patch. Custom CSS säkerhetskopieras och installeras endast manuellt efter separat godkännande.
+- Definition of Done: BigBrain är manuellt verifierat vid 320 px, mobil, desktop, tangentbord och 200 % text; Jellyfin Web desktop/mobile är visuellt verifierat; verklig Tizen-effekt och fungerande selectors är dokumenterade eller uttryckligen klassade som ej stödda.
+- Relaterade dokument: `docs/design-system/manual-verification.md`, `themes/jellyfin/compatibility.md`, ADR 0012.

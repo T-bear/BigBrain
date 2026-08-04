@@ -1,0 +1,18 @@
+/* BigBrain Jellyfin adapter tokens v1; source reference, not imported by BigBrain Web. */
+:root {
+  --bb-jf-bg: #0b1120;
+  --bb-jf-bg-subtle: #0e1625;
+  --bb-jf-surface: #111d30;
+  --bb-jf-surface-raised: #17243a;
+  --bb-jf-border: #3b4d69;
+  --bb-jf-text: #e7edf7;
+  --bb-jf-text-muted: #91a0b7;
+  --bb-jf-primary: #7164e8;
+  --bb-jf-primary-hover: #796deb;
+  --bb-jf-danger: #ff8f8f;
+  --bb-jf-focus: #9f94ff;
+  --bb-jf-radius-sm: .5rem;
+  --bb-jf-radius-md: .625rem;
+  --bb-jf-radius-lg: .875rem;
+  --bb-jf-shadow: 0 .875rem 2.25rem rgb(0 0 0 / 40%);
+}

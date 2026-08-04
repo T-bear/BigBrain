@@ -1,0 +1,32 @@
+/* Theme contract v1 example: token overrides only. */
+[data-theme="example-ocean"] {
+  color-scheme: dark;
+  --bb-color-bg: #071923;
+  --bb-color-bg-subtle: #0c2632;
+  --bb-color-surface: #103443;
+  --bb-color-surface-raised: #17475a;
+  --bb-color-surface-overlay: #103443;
+  --bb-color-border: #397084;
+  --bb-color-border-strong: #69a2b5;
+  --bb-color-text: #eefbff;
+  --bb-color-text-muted: #a8c9d3;
+  --bb-color-text-inverse: #071923;
+  --bb-color-primary: #55d6be;
+  --bb-color-primary-hover: #78e4d0;
+  --bb-color-primary-active: #36b9a2;
+  --bb-color-primary-contrast: #071923;
+  --bb-color-accent: #8bd9ff;
+  --bb-color-success: #65df9b;
+  --bb-color-success-contrast: #071923;
+  --bb-color-warning: #ffd166;
+  --bb-color-warning-contrast: #211600;
+  --bb-color-danger: #ff8fa3;
+  --bb-color-danger-contrast: #2a080e;
+  --bb-color-info: #8bd9ff;
+  --bb-color-info-contrast: #071923;
+  --bb-color-backdrop: rgb(2 12 18 / 75%);
+  --bb-shadow-sm: 0 .25rem .75rem rgb(0 0 0 / 20%);
+  --bb-shadow-md: 0 .875rem 2.25rem rgb(0 0 0 / 35%);
+  --bb-shadow-lg: 0 1.5rem 5rem rgb(0 0 0 / 60%);
+  --bb-focus-ring: 0 0 0 3px #8bd9ff;
+}

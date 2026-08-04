@@ -60,17 +60,17 @@ export function SmartShuffle() {
     finally { if (!requestController.signal.aborted) setBusy(false) }
   }
 
-  if (!options) return <section className="smart-shuffle" aria-live="polite"><h3>Smart Shuffle</h3><p>Laddar…</p></section>
-  if (!options.enabled) return <section className="smart-shuffle"><h3>Smart Shuffle</h3><p>Smart Shuffle är inte aktiverat.</p></section>
+  if (!options) return <section className="bb-panel bb-loading-state smart-shuffle" aria-live="polite"><h3>Smart Shuffle</h3><p>Laddar…</p></section>
+  if (!options.enabled) return <section className="bb-panel bb-empty-state smart-shuffle"><h3>Smart Shuffle</h3><p>Smart Shuffle är inte aktiverat.</p></section>
 
-  return <section className="smart-shuffle" aria-labelledby="smart-shuffle-heading">
+  return <section className="bb-panel smart-shuffle" aria-labelledby="smart-shuffle-heading">
     <h3 id="smart-shuffle-heading">Smart Shuffle</h3>
     {error && <p role="alert" className="notice notice--error">{error}</p>}
     {session ? <div aria-live="polite">
       <p><strong>Status:</strong> {session.status}</p>
       {session.nowPlaying && <p><strong>Spelas nu:</strong> {session.nowPlaying.seriesName} – S{session.nowPlaying.seasonNumber}E{session.nowPlaying.episodeNumber} {session.nowPlaying.title}</p>}
       <p><strong>TV:</strong> {session.deviceName}</p>
-      <div className="smart-shuffle__actions">
+      <div className="bb-action-group smart-shuffle__actions">
         <button type="button" disabled={busy || session.status !== 'active'} onClick={() => void act(signal => skipSmartShuffle(session.id, signal))}>Hoppa till nästa</button>
         <button type="button" disabled={busy || session.status !== 'active'} onClick={() => void act(signal => stopSmartShuffle(session.id, signal))}>Stoppa Smart Shuffle</button>
       </div>

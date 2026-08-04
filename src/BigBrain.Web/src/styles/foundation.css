@@ -1,0 +1,6 @@
+html { background: var(--bb-color-bg, #0b1120); }
+body { color: var(--bb-color-text, #e7edf7); background: var(--bb-color-bg, #0b1120); font-family: var(--bb-font-family-body); line-height: var(--bb-line-height-normal); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--bb-font-family-heading); line-height: var(--bb-line-height-tight); }
+:focus-visible { outline: 0; box-shadow: var(--bb-focus-ring); }
+.bb-sr-only, .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

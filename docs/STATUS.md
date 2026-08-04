@@ -252,6 +252,8 @@ Verifierat:
 
 UX är feature-fryst. Nästa UX-mål ska endast öppnas av konkret användartest, reproducerbart fel eller tydligt nytt användarbehov. För Matlista är nästa separata datamål fortsatt backup/restore för modulens SQLite-data.
 
+Designsystem v1 är implementerat i källkod med mörkt/ljust tema, stabilt tokenkontrakt och en separat ej installerad Jellyfin 10.11.11-adapter. Automatiska frontendtester är gröna; manuell visuell BigBrain- och Tizen-verifiering återstår enligt BB-015.
+
 Övriga verifierade öppna kandidater, utan inbördes prioritering:
 
 1. Docker inventory via Sentinel.

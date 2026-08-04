@@ -1,0 +1,37 @@
+:root,
+[data-theme="bigbrain-dark"] {
+  color-scheme: dark;
+  --bb-color-bg: #0b1120;
+  --bb-color-bg-subtle: #0e1625;
+  --bb-color-surface: #111d30;
+  --bb-color-surface-raised: #17243a;
+  --bb-color-surface-overlay: #101a2c;
+  --bb-color-border: #3b4d69;
+  --bb-color-border-strong: #536683;
+  --bb-color-text: #e7edf7;
+  --bb-color-text-muted: #91a0b7;
+  --bb-color-text-inverse: #ffffff;
+  --bb-color-primary: #7164e8;
+  --bb-color-primary-hover: #796deb;
+  --bb-color-primary-active: #6255d4;
+  --bb-color-primary-contrast: #ffffff;
+  --bb-color-accent: #a99fff;
+  --bb-color-success: #58d391;
+  --bb-color-success-contrast: #071a10;
+  --bb-color-warning: #f2cf79;
+  --bb-color-warning-contrast: #1f1704;
+  --bb-color-danger: #ff8f8f;
+  --bb-color-danger-contrast: #240709;
+  --bb-color-info: #72b7ff;
+  --bb-color-info-contrast: #06182a;
+  --bb-color-backdrop: rgb(5 9 18 / 80%);
+  --bb-shadow-sm: 0 .25rem .75rem rgb(0 0 0 / 20%);
+  --bb-shadow-md: 0 .875rem 2.25rem rgb(0 0 0 / 40%);
+  --bb-shadow-lg: 0 1.5rem 5rem rgb(0 0 0 / 70%);
+  --bb-focus-ring: 0 0 0 3px #9f94ff;
+  --surface: var(--bb-color-surface);
+  --border: var(--bb-color-border);
+  --muted: var(--bb-color-text-muted);
+  --accent: var(--bb-color-accent);
+  --danger: var(--bb-color-danger);
+}

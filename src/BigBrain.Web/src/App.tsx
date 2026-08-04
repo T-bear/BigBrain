@@ -8,6 +8,7 @@ import { CollapsibleModule } from './dashboard/CollapsibleModule'
 import { useDashboardLayout } from './dashboard/dashboardLayout'
 import { MealPlanner } from './meal-planner/MealPlanner'
 import { ShoppingList } from './shopping-list/ShoppingList'
+import { ThemeControl } from './ThemeControl'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -79,7 +80,7 @@ export default function App() {
   const dockerStatus = dockerError ? 'Error' : docker?.availability.available ? 'Available' : docker ? 'Unavailable' : 'Loading'
 
   return (
-    <div className="shell">
+    <div className="shell bb-page-shell">
       <aside className="sidebar">
         <a className="brand" href="/" aria-label="BigBrain home">
           <img className="brand__mark" src="/icons/bigbrain-192.png" alt="" width="34" height="34" />
@@ -97,12 +98,13 @@ export default function App() {
         </nav>
       </aside>
 
-      <main className="main" id="home">
+      <main className="main bb-page" id="home">
         <header className="page-header">
           <div>
             <p className="eyebrow">Familjens BigBrain</p>
             <h1>Vad vill du göra?</h1>
           </div>
+          <ThemeControl />
         </header>
 
         <MealPlanner
