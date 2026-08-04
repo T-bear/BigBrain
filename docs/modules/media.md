@@ -243,10 +243,18 @@ automation state and does not stop outstanding playback. The background coordina
 polls only active sessions and serializes transitions to prevent duplicate starts. See
 [Proposed ADR 0011](../adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md).
 
-The MVP is implemented and automatically tested. Jellyfin 10.11.11 and one live,
-remote-controllable Samsung Tizen session have been verified read-only. Real-TV
-end-to-end validation of explicit start, completion transition, skip and automation stop
-remains tracked as BB-014; no automated terminal or test run starts real playback.
+Candidate episode checks run in parallel under a bounded Smart Shuffle-specific request
+timeout. Immediately before playback, the backend revalidates the live session, configured
+user and remote-control capability, then sends the server-selected episode using Jellyfin
+10.11.11's `POST /Sessions/{sessionId}/Playing` contract. Accepted commands transition
+through `awaitingPlaybackConfirmation`; bounded confirmation polling promotes an exact
+`NowPlayingItem` match to `active` without retrying the write command. The frontend blocks
+overlapping starts and maps only stable, sanitized error categories to Swedish messages.
+
+Explicit start and user-driven skip have been end-to-end verified on the selected Samsung
+Tizen TV. Jellyfin accepted each command and the expected episode became `NowPlayingItem`.
+Natural completion transition remains tracked as BB-014; no terminal or automated test run
+starts real playback.
 
 ## ADR impact
 

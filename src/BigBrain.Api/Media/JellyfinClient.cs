@@ -282,7 +282,18 @@ public sealed class JellyfinClient(HttpClient httpClient, MediaOptions options)
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
         request.Headers.TryAddWithoutValidation("X-Emby-Token", options.Jellyfin.ApiKey!);
         using var response = await HttpClient.SendAsync(request, cancellationToken);
-        EnsureSuccess(response);
+        if (response.IsSuccessStatusCode) return;
+        var status = (int)response.StatusCode;
+        throw response.StatusCode switch
+        {
+            System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden =>
+                new JellyfinPlaybackException("playbackAuthenticationFailure", "Jellyfin-autentiseringen för uppspelning misslyckades.", 503),
+            System.Net.HttpStatusCode.NotFound =>
+                new JellyfinPlaybackException("playbackTargetUnavailable", "TV-sessionen eller avsnittet finns inte längre.", 409),
+            System.Net.HttpStatusCode.BadRequest =>
+                new JellyfinPlaybackException("playbackRejected", "Jellyfin avvisade uppspelningskommandot.", 502),
+            _ => new JellyfinPlaybackException("playbackProviderFailure", "Jellyfin kunde inte starta avsnittet.", status >= 500 ? 503 : 502)
+        };
     }
 
     async Task<JellyfinPlaybackStatus> IJellyfinPlaybackClient.GetPlaybackStatusAsync(string sessionId, CancellationToken cancellationToken)

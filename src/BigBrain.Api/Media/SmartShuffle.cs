@@ -12,6 +12,11 @@ public sealed record SmartShuffleSessionResponse(string Id, string Status, Smart
 
 internal sealed record JellyfinRemoteSession(string SessionId, string UserId, string DeviceName, string Client, bool SupportsRemoteControl, bool IsPlaying);
 internal sealed record JellyfinPlaybackStatus(bool SessionAvailable, string? NowPlayingItemId, bool IsPaused);
+internal sealed class JellyfinPlaybackException(string code, string message, int statusCode) : Exception(message)
+{
+    public string Code { get; } = code;
+    public int StatusCode { get; } = statusCode;
+}
 
 internal interface IJellyfinPlaybackClient
 {
@@ -70,7 +75,7 @@ internal sealed class SmartShuffleState
     public List<string> History { get; } = [];
     public SmartShuffleEpisode? CurrentEpisode { get; set; }
     public DateTimeOffset LastCommandAtUtc { get; set; }
-    public string Status { get; set; } = "active";
+    public string Status { get; set; } = "starting";
     public string? ErrorCode { get; set; }
 }
 
@@ -122,6 +127,9 @@ internal sealed class SmartShuffleService(
         LoggerMessage.Define<string>(LogLevel.Information, new EventId(2403, nameof(SessionStopped)), "Smart Shuffle stopped session={Session}");
     private static readonly Action<ILogger, string, Exception?> PollFailed =
         LoggerMessage.Define<string>(LogLevel.Warning, new EventId(2404, nameof(PollFailed)), "Smart Shuffle poll failed session={Session} category=provider");
+    private static readonly Action<ILogger, string, string, bool, bool, Exception?> PlaybackPhase =
+        LoggerMessage.Define<string, string, bool, bool>(LogLevel.Information, new EventId(2406, nameof(PlaybackPhase)),
+            "Smart Shuffle playback operation={Operation} category={Category} itemPresent={ItemPresent} nowPlayingMatch={NowPlayingMatch}");
 
     public async Task<SmartShuffleOptionsResponse> GetOptionsAsync(CancellationToken cancellationToken)
     {
@@ -145,19 +153,26 @@ internal sealed class SmartShuffleService(
         EnsureConfigured();
         var selected = input.SeriesIds.Distinct(StringComparer.Ordinal).ToArray();
         if (selected.Length is < 2 or > MaximumSeries) throw new SmartShuffleException("invalidSeriesSelection", "Välj mellan två och tjugo unika serier.");
-        if (store.Active is { Status: "active" }) throw new SmartShuffleException("sessionAlreadyActive", "En Smart Shuffle-session är redan aktiv.", 409);
+        if (store.Active is { Status: "starting" or "awaitingPlaybackConfirmation" or "active" })
+            throw new SmartShuffleException("sessionAlreadyActive", "En Smart Shuffle-session är redan aktiv.", 409);
 
         var validSeries = await jellyfin.GetSeriesAsync(options.Jellyfin.UserId!, cancellationToken);
         if (selected.Any(id => validSeries.All(series => series.Id != id))) throw new SmartShuffleException("invalidSeries", "En vald serie är inte längre tillgänglig.");
         var sessions = (await jellyfin.GetRemoteSessionsAsync(cancellationToken)).Where(IsTargetable).ToArray();
         var target = sessions.SingleOrDefault(session => DeviceId(session.SessionId) == input.DeviceId)
             ?? throw new SmartShuffleException("deviceUnavailable", "Den valda TV:n är inte längre tillgänglig.", 409);
-        var candidates = new Dictionary<string, SmartShuffleCandidate>(StringComparer.Ordinal);
-        foreach (var id in selected)
+        SmartShuffleEpisode?[] initialEpisodes;
+        try
         {
-            var episode = await jellyfin.GetNextEpisodeAsync(id, options.Jellyfin.UserId!, cancellationToken);
-            candidates[id] = new(id, episode is not null, 0, 0);
+            initialEpisodes = await Task.WhenAll(selected.Select(id =>
+                jellyfin.GetNextEpisodeAsync(id, options.Jellyfin.UserId!, cancellationToken)));
         }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SmartShuffleException("jellyfinTimeout", "Jellyfin svarade inte i tid.", 503);
+        }
+        var candidates = selected.Select((id, index) => new SmartShuffleCandidate(id, initialEpisodes[index] is not null, 0, 0))
+            .ToDictionary(candidate => candidate.SeriesId, StringComparer.Ordinal);
         if (candidates.Values.Count(candidate => candidate.Playable) < 2) throw new SmartShuffleException("tooFewPlayableSeries", "Minst två valda serier måste ha osedda avsnitt.");
 
         var state = new SmartShuffleState
@@ -169,7 +184,13 @@ internal sealed class SmartShuffleService(
             Candidates = candidates
         };
         store.Active = state;
-        await PlayNextAsync(state, cancellationToken);
+        try { await PlayNextAsync(state, cancellationToken); }
+        catch
+        {
+            state.Status = "failed";
+            store.Active = null;
+            throw;
+        }
         SessionStarted(logger, state.Id, target.DeviceName, null);
         return Map(state);
     }
@@ -199,13 +220,22 @@ internal sealed class SmartShuffleService(
     public async Task PollAsync(CancellationToken cancellationToken)
     {
         var state = store.Active;
-        if (state is not { Status: "active", CurrentEpisode: not null }) return;
+        if (state is not { Status: "active" or "awaitingPlaybackConfirmation", CurrentEpisode: not null }) return;
         if (DateTimeOffset.UtcNow - state.LastCommandAtUtc < TimeSpan.FromSeconds(15)) return;
         if (!await state.Gate.WaitAsync(0, cancellationToken)) return;
         try
         {
             var playback = await jellyfin.GetPlaybackStatusAsync(state.RawDeviceSessionId, cancellationToken);
             if (!playback.SessionAvailable) { state.Status = "stopped"; state.ErrorCode = "deviceDisconnected"; return; }
+            if (state.Status == "awaitingPlaybackConfirmation")
+            {
+                if (playback.NowPlayingItemId == state.CurrentEpisode.Id)
+                {
+                    state.Status = "active";
+                    state.ErrorCode = null;
+                }
+                return;
+            }
             if (playback.NowPlayingItemId is null) await PlayNextCoreAsync(state, cancellationToken);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
@@ -232,7 +262,26 @@ internal sealed class SmartShuffleService(
             if (seriesId is null) { state.Status = "completed"; state.CurrentEpisode = null; return; }
             var episode = await jellyfin.GetNextEpisodeAsync(seriesId, options.Jellyfin.UserId!, cancellationToken);
             if (episode is null) { state.Candidates[seriesId] = state.Candidates[seriesId] with { Playable = false }; continue; }
-            await jellyfin.PlayNowAsync(state.RawDeviceSessionId, episode.Id, episode.PlaybackPositionTicks, cancellationToken);
+            var live = (await jellyfin.GetRemoteSessionsAsync(cancellationToken)).SingleOrDefault(session =>
+                session.SessionId == state.RawDeviceSessionId
+                && session.UserId == options.Jellyfin.UserId
+                && session.SupportsRemoteControl);
+            if (live is null) throw new SmartShuffleException("deviceUnavailable", "TV-sessionen är inte längre ansluten eller fjärrstyrbar.", 409);
+            state.Status = "starting";
+            try
+            {
+                await jellyfin.PlayNowAsync(live.SessionId, episode.Id, episode.PlaybackPositionTicks, cancellationToken);
+            }
+            catch (JellyfinPlaybackException exception)
+            {
+                PlaybackPhase(logger, "playNow", exception.Code, true, false, null);
+                throw new SmartShuffleException(exception.Code, exception.Message, exception.StatusCode);
+            }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                PlaybackPhase(logger, "playNow", "timeout", true, false, null);
+                throw new SmartShuffleException("playbackTimeout", "Jellyfin svarade inte i tid.", 503);
+            }
             foreach (var key in state.Candidates.Keys.ToArray())
             {
                 var current = state.Candidates[key];
@@ -247,8 +296,26 @@ internal sealed class SmartShuffleService(
             state.CurrentEpisode = episode;
             state.LastCommandAtUtc = DateTimeOffset.UtcNow;
             state.ErrorCode = null;
+            state.Status = "awaitingPlaybackConfirmation";
+            var confirmed = await ConfirmPlaybackAsync(state, episode.Id, cancellationToken);
+            if (confirmed) state.Status = "active";
+            PlaybackPhase(logger, "confirmPlayback", confirmed ? "confirmed" : "awaiting", true, confirmed, null);
             return;
         }
+    }
+
+    private async Task<bool> ConfirmPlaybackAsync(SmartShuffleState state, string episodeId, CancellationToken cancellationToken)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(options.SmartShuffle.PlaybackConfirmationSeconds);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(750), cancellationToken);
+            var playback = await jellyfin.GetPlaybackStatusAsync(state.RawDeviceSessionId, cancellationToken);
+            if (!playback.SessionAvailable) throw new SmartShuffleException("deviceUnavailable", "TV-sessionen är inte längre ansluten.", 409);
+            if (playback.NowPlayingItemId == episodeId) return true;
+        }
+        state.ErrorCode = "playbackConfirmationPending";
+        return false;
     }
 
     private bool Configured => options.SmartShuffle.Enabled && !string.IsNullOrWhiteSpace(options.Jellyfin.UserId) && !string.IsNullOrWhiteSpace(options.Jellyfin.ApiKey);

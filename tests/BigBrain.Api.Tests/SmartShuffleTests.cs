@@ -85,6 +85,70 @@ public sealed class SmartShuffleTests
     }
 
     [Fact]
+    public async Task CreateRejectsWrongUserOrNonControllableSessionImmediatelyBeforePlayback()
+    {
+        foreach (var fake in new[]
+        {
+            new FakePlayback { SessionUserId = "other" },
+            new FakePlayback { SupportsRemoteControl = false }
+        })
+        {
+            var service = new SmartShuffleService(Options(), fake, new SmartShuffleStore(), new SmartShuffleSelector(new SeededRandom(2)), NullLogger<SmartShuffleService>.Instance);
+            var error = await Assert.ThrowsAsync<SmartShuffleException>(() =>
+                service.CreateAsync(new(["a", "b"], SmartShuffleDeviceId(fake.SessionId)), TestContext.Current.CancellationToken));
+            Assert.Equal("deviceUnavailable", error.Code);
+            Assert.Equal(0, fake.PlayCount);
+        }
+    }
+
+    [Fact]
+    public async Task AcceptedCommandCanRemainPendingWithoutSecondPlayCommand()
+    {
+        var fake = new FakePlayback { ConfirmPlayback = false };
+        var options = Options(confirmationSeconds: 3);
+        var service = new SmartShuffleService(options, fake, new SmartShuffleStore(), new SmartShuffleSelector(new SeededRandom(2)), NullLogger<SmartShuffleService>.Instance);
+
+        var created = await service.CreateAsync(new(["a", "b"], SmartShuffleDeviceId(fake.SessionId)), TestContext.Current.CancellationToken);
+
+        Assert.Equal("awaitingPlaybackConfirmation", created.Status);
+        Assert.Equal("playbackConfirmationPending", created.ErrorCode);
+        Assert.Equal(1, fake.PlayCount);
+    }
+
+    [Fact]
+    public async Task TimedOutCandidateLookupIsSanitizedAndLeavesNoActiveSession()
+    {
+        var fake = new FakePlayback { EpisodeException = new TaskCanceledException("secret") };
+        var store = new SmartShuffleStore();
+        var service = new SmartShuffleService(Options(), fake, store, new SmartShuffleSelector(new SeededRandom(2)), NullLogger<SmartShuffleService>.Instance);
+
+        var error = await Assert.ThrowsAsync<SmartShuffleException>(() =>
+            service.CreateAsync(new(["a", "b"], SmartShuffleDeviceId(fake.SessionId)), CancellationToken.None));
+
+        Assert.Equal("jellyfinTimeout", error.Code);
+        Assert.Null(store.Active);
+        Assert.DoesNotContain("secret", error.SafeMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task CoordinatorClearsPendingErrorAfterDelayedConfirmation()
+    {
+        var fake = new FakePlayback { ConfirmPlayback = false };
+        var store = new SmartShuffleStore();
+        var service = new SmartShuffleService(Options(3), fake, store, new SmartShuffleSelector(new SeededRandom(2)), NullLogger<SmartShuffleService>.Instance);
+        var created = await service.CreateAsync(new(["a", "b"], SmartShuffleDeviceId(fake.SessionId)), TestContext.Current.CancellationToken);
+        var state = store.Find(created.Id)!;
+        state.LastCommandAtUtc = DateTimeOffset.UtcNow.AddMinutes(-1);
+        fake.NowPlayingItemId = state.CurrentEpisode!.Id;
+
+        await service.PollAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal("active", state.Status);
+        Assert.Null(state.ErrorCode);
+        Assert.Equal(1, fake.PlayCount);
+    }
+
+    [Fact]
     public async Task OptionsSanitizesJellyfinAuthenticationFailure()
     {
         var fake = new FakePlayback { SeriesException = new MediaAuthenticationException() };
@@ -121,10 +185,10 @@ public sealed class SmartShuffleTests
         return result;
     }
 
-    private static MediaOptions Options() => new()
+    private static MediaOptions Options(int confirmationSeconds = 3) => new()
     {
         Jellyfin = new MediaApiKeyOptions("http://jellyfin") { ApiKey = "fake", UserId = "user" },
-        SmartShuffle = new SmartShuffleOptions { Enabled = true }
+        SmartShuffle = new SmartShuffleOptions { Enabled = true, PlaybackConfirmationSeconds = confirmationSeconds }
     };
 
     private static string SmartShuffleDeviceId(string raw) =>
@@ -141,6 +205,10 @@ public sealed class SmartShuffleTests
         public string SessionId { get; } = "raw-session-id";
         public string? MissingSeries { get; init; }
         public Exception? SeriesException { get; init; }
+        public Exception? EpisodeException { get; init; }
+        public string SessionUserId { get; init; } = "user";
+        public bool SupportsRemoteControl { get; init; } = true;
+        public bool ConfirmPlayback { get; init; } = true;
         public int PlayCount { get; private set; }
         public string? NowPlayingItemId { get; set; } = "playing";
         public Task<IReadOnlyList<SmartShuffleSeriesOption>> GetSeriesAsync(string userId, CancellationToken cancellationToken) =>
@@ -148,13 +216,15 @@ public sealed class SmartShuffleTests
                 ? Task.FromResult<IReadOnlyList<SmartShuffleSeriesOption>>([new("a", "A", true), new("b", "B", true)])
                 : Task.FromException<IReadOnlyList<SmartShuffleSeriesOption>>(SeriesException);
         public Task<SmartShuffleEpisode?> GetNextEpisodeAsync(string seriesId, string userId, CancellationToken cancellationToken) =>
-            Task.FromResult(seriesId == MissingSeries ? null : new SmartShuffleEpisode(seriesId + "-e1", seriesId, seriesId.ToUpperInvariant(), "Episode", 1, 1, seriesId == "a" ? 120L : null));
+            EpisodeException is null
+                ? Task.FromResult(seriesId == MissingSeries ? null : new SmartShuffleEpisode(seriesId + "-e1", seriesId, seriesId.ToUpperInvariant(), "Episode", 1, 1, seriesId == "a" ? 120L : null))
+                : Task.FromException<SmartShuffleEpisode?>(EpisodeException);
         public Task<IReadOnlyList<JellyfinRemoteSession>> GetRemoteSessionsAsync(CancellationToken cancellationToken) =>
-            Task.FromResult<IReadOnlyList<JellyfinRemoteSession>>([new(SessionId, "user", "TV", "Tizen", true, false)]);
+            Task.FromResult<IReadOnlyList<JellyfinRemoteSession>>([new(SessionId, SessionUserId, "TV", "Tizen", SupportsRemoteControl, false)]);
         public Task PlayNowAsync(string sessionId, string itemId, long? startPositionTicks, CancellationToken cancellationToken)
         {
             PlayCount++;
-            NowPlayingItemId = itemId;
+            if (ConfirmPlayback) NowPlayingItemId = itemId;
             return Task.CompletedTask;
         }
         public Task<JellyfinPlaybackStatus> GetPlaybackStatusAsync(string sessionId, CancellationToken cancellationToken) =>

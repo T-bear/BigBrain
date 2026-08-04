@@ -24,6 +24,8 @@ public sealed class MediaOptions
         && options.ServiceLinks.All.All(IsValidServiceLink)
         && options.Requests.PreviewTokenLifetimeMinutes is >= 1 and <= 15
         && options.Requests.MaximumConcurrentRequests is >= 1 and <= 4
+        && options.SmartShuffle.RequestTimeoutSeconds is >= 3 and <= 30
+        && options.SmartShuffle.PlaybackConfirmationSeconds is >= 3 and <= 30
         && (!options.SmartShuffle.Enabled || !string.IsNullOrWhiteSpace(options.Jellyfin.UserId));
 
     public bool IsAnyServiceConfigured =>
@@ -61,6 +63,8 @@ public sealed class MediaApiKeyOptions(string baseUrl)
 public sealed class SmartShuffleOptions
 {
     public bool Enabled { get; init; }
+    public int RequestTimeoutSeconds { get; init; } = 15;
+    public int PlaybackConfirmationSeconds { get; init; } = 20;
 }
 
 public sealed class QBittorrentOptions

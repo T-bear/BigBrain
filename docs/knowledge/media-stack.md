@@ -12,12 +12,17 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
   `POST /Sessions/{sessionId}/Playing`; Smart Shuffle confines it to a selected live
   remote-control-session och ett servervaliderat avsnitt för den konfigurerade användaren.
 - En Samsung Smart TV med Jellyfin for Tizen har verifierats som entydig aktiv session
-  med `SupportsRemoteControl=true`. Verklig end-to-end-uppspelning återstår enligt BB-014.
+  med `SupportsRemoteControl=true`. UI-styrd start och hopp har verifierats end-to-end:
+  Jellyfin accepterade kommandot, rätt `NowPlayingItem` bekräftades och sessionen blev aktiv.
 
 ## Viktiga tekniska lärdomar
 
 - Historisk incidentlärdom: ett fungerande Sonarr–Prowlarr–qBittorrent-flöde kan ändå vänta på swarm eller lokal kö.
 - Rekommendation: verifiera integration, köregler, trackerstatus och peers som separata lager.
+- Smart Shuffle behöver en separat, avgränsad Jellyfin-timeout: en generell tresekundersgräns
+  kan avbryta episodvalet innan PlayNow når servern.
+- Ett accepterat remote-play-kommando och bekräftad TV-uppspelning är skilda tillstånd.
+  Tizen kan behöva en kort verifieringsperiod; skrivkommandot får inte skickas igen under den.
 
 ## Vanliga feltolkningar
 
@@ -37,7 +42,7 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 
 ## Senast verifierad
 
-2026-08-03.
+2026-08-04.
 
 ## Källa och evidens
 

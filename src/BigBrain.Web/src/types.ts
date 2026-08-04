@@ -376,7 +376,7 @@ export interface SmartShuffleEpisode { id: string; seriesId: string; seriesName:
 export interface SmartShuffleOptions { enabled: boolean; series: SmartShuffleSeries[] }
 export interface SmartShuffleSession {
   id: string
-  status: 'active' | 'stopped' | 'completed'
+  status: 'starting' | 'awaitingPlaybackConfirmation' | 'active' | 'failed' | 'stopped' | 'completed'
   nowPlaying: SmartShuffleEpisode | null
   recentSeries: string[]
   remainingSeries: number

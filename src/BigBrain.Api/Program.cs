@@ -61,7 +61,11 @@ public partial class Program
             .ValidateOnStart();
         builder.Services.AddSingleton(serviceProvider =>
             serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MediaOptions>>().Value);
-        AddMediaClient<IJellyfinClient, JellyfinClient>(builder.Services, "Jellyfin", options => options.Jellyfin.BaseUrl);
+        AddMediaClient<IJellyfinClient, JellyfinClient>(
+            builder.Services,
+            "Jellyfin",
+            options => options.Jellyfin.BaseUrl,
+            options => Math.Max(options.TimeoutSeconds, options.SmartShuffle.RequestTimeoutSeconds));
         AddMediaClient<ISonarrClient, SonarrClient>(builder.Services, "Sonarr", options => options.Sonarr.BaseUrl);
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, "Radarr", options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
@@ -473,14 +477,15 @@ public partial class Program
     private static void AddMediaClient<TClient, TImplementation>(
         IServiceCollection services,
         string provider,
-        Func<MediaOptions, string> getBaseUrl)
+        Func<MediaOptions, string> getBaseUrl,
+        Func<MediaOptions, int>? getTimeoutSeconds = null)
         where TClient : class
         where TImplementation : class, TClient
     {
         services.AddHttpClient<TClient, TImplementation>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();
-            ConfigureMediaClient(httpClient, getBaseUrl(options), options.TimeoutSeconds);
+            ConfigureMediaClient(httpClient, getBaseUrl(options), getTimeoutSeconds?.Invoke(options) ?? options.TimeoutSeconds);
         }).AddHttpMessageHandler(serviceProvider =>
             new ProviderHttpLoggingHandler(
                 provider,

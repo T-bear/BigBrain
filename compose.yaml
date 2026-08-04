@@ -49,6 +49,8 @@ services:
       Media__Jellyfin__ApiKey: ${MEDIA__JELLYFIN__APIKEY:-}
       Media__Jellyfin__UserId: ${MEDIA__JELLYFIN__USERID:-}
       Media__SmartShuffle__Enabled: ${MEDIA__SMARTSHUFFLE__ENABLED:-false}
+      Media__SmartShuffle__RequestTimeoutSeconds: ${MEDIA__SMARTSHUFFLE__REQUESTTIMEOUTSECONDS:-15}
+      Media__SmartShuffle__PlaybackConfirmationSeconds: ${MEDIA__SMARTSHUFFLE__PLAYBACKCONFIRMATIONSECONDS:-20}
       Media__Sonarr__BaseUrl: ${MEDIA__SONARR__BASEURL:-http://sonarr:8989}
       Media__Sonarr__ApiKey: ${MEDIA__SONARR__APIKEY:-}
       Media__Radarr__BaseUrl: ${MEDIA__RADARR__BASEURL:-http://radarr:7878}

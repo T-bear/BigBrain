@@ -1,6 +1,6 @@
 # BigBrain Backlog
 
-Senast uppdaterad: 2026-08-03
+Senast uppdaterad: 2026-08-04
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
 
@@ -147,6 +147,66 @@ Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
 - En lång lista scrollar endast i avsedd intern container.
 - Samma beteende vid 320×844 och 390×844.
 - Tangentbord, radmeny och dialog orsakar inte falsk overflow.
+
+---
+
+### BB-017 – Smart Shuffle kan inte starta uppspelning på verifierad Samsung Tizen-TV
+
+- Modul: Media / Smart Shuffle
+- Typ: Produktionsbugg / Jellyfin remote playback
+- Prioritet: P1
+- Status: Klar
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+Smart Shuffle kan läsa Jellyfin-biblioteket, visa serier och identifiera en verifierad och fjärrstyrbar Samsung Smart TV via Jellyfin for Tizen. När användaren trycker ”Starta på TV” startas ingen uppspelning och BigBrain visar det sanerade felet ”Jellyfin kunde inte utföra Smart Shuffle-åtgärden.”
+
+#### Reproduktionssteg
+
+1. Öppna Jellyfin-appen på Samsung-TV:n.
+2. Kontrollera att vanlig manuell uppspelning fungerar.
+3. Öppna BigBrain → Media → Smart Shuffle.
+4. Välj minst två serier.
+5. Välj Samsung Smart TV.
+6. Tryck ”Starta på TV”.
+7. Observera att ingen uppspelning startar och att BigBrain visar standardfelet.
+
+#### Förväntat beteende
+
+- BigBrain revaliderar vald TV-session.
+- BigBrain väljer korrekt nästa osedda eller påbörjade episod.
+- BigBrain skickar ett versionskorrekt PlayNow-kommando.
+- Rätt avsnitt startar på exakt vald TV.
+- BigBrain verifierar att samma avsnitt blir NowPlayingItem.
+- Smart Shuffle-sessionen övergår till aktiv status.
+
+#### Verifierad grundorsak
+
+Det tidigare UI-styrda försöket nådde aldrig PlayNow. En sekventiell episodfråga timeoutade mot Jellyfin efter den generella tresekundersgränsen och `TaskCanceledException` lämnade Smart Shuffle-felmodellen som ett ohanterat 500-svar.
+
+#### Fix och verifiering
+
+Episodkontrollen körs parallellt med en avgränsad Smart Shuffle-timeout. TV-session, användare och fjärrstyrbarhet revalideras precis före ett versionskorrekt PlayNow-anrop. Accepterad uppspelning skiljs från inväntad och bekräftad uppspelning, med en begränsad verifieringsperiod anpassad för Tizen. Säkra felkategorier, startspärr mot dubbelklick och regressionstester har lagts till.
+
+Ett verkligt UI-styrt knapptryck på den slutliga versionen gav exakt ett startkommando, Jellyfin svarade `204`, rätt avsnitt blev `NowPlayingItem` och BigBrain-sessionen blev `active`. Användaren bekräftade att allt fungerade på Samsung-TV:n. Även användarstyrda hopp till nästa avsnitt accepterades och bekräftades utan terminalbaserad uppspelning.
+
+Testbevis: 186 API-tester och 32 Sentinel-tester godkända; 76 frontendtester och production build godkända. Permanent rapport: `/home/enigma/BigBrain/reports/features/smart-shuffle/smart-shuffle-p1-playback-start-fix-20260804-153939.txt`.
+
+#### Definition of Done
+
+- Exakt grundorsak identifierad.
+- Jellyfin 10.11.11-kontraktet verifierat.
+- Session, användare och episod revalideras precis före start.
+- Rätt session-ID och item-ID används internt.
+- Query-parametrar och requestformat är versionskorrekta.
+- Upstream-status och säker felkategori loggas utan hemligheter.
+- Användarens UI-klick startar rätt avsnitt på Samsung-TV:n.
+- NowPlayingItem verifieras efter start.
+- Dubbelklick kan inte orsaka dubbla starter.
+- Automatiska tester täcker grundorsaken och relevanta fel.
+- Permanent verifieringsrapport skapad.
+- Buggen markeras som löst först efter verklig UI-styrd TV-verifiering.
 
 ---
 

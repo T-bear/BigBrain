@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createSmartShuffleSession, getSmartShuffleDevices, getSmartShuffleOptions, getSmartShuffleSession, skipSmartShuffle, stopSmartShuffle } from '../api'
+import { ApiError, createSmartShuffleSession, getSmartShuffleDevices, getSmartShuffleOptions, getSmartShuffleSession, skipSmartShuffle, stopSmartShuffle } from '../api'
 import type { SmartShuffleDevice, SmartShuffleOptions, SmartShuffleSession } from '../types'
 
 export function SmartShuffle() {
@@ -12,6 +12,7 @@ export function SmartShuffle() {
   const [error, setError] = useState('')
   const controller = useRef<AbortController | null>(null)
   const polling = useRef(false)
+  const busyRef = useRef(false)
 
   const load = useCallback(async () => {
     controller.current?.abort()
@@ -36,7 +37,7 @@ export function SmartShuffle() {
   }, [load])
 
   useEffect(() => {
-    if (!session || session.status !== 'active') return
+    if (!session || !['active', 'awaitingPlaybackConfirmation'].includes(session.status)) return
     const poll = async () => {
       if (document.visibilityState !== 'visible' || polling.current) return
       polling.current = true
@@ -51,13 +52,14 @@ export function SmartShuffle() {
   }, [session?.id, session?.status])
 
   const act = async (request: (signal: AbortSignal) => Promise<SmartShuffleSession>) => {
-    if (busy) return
+    if (busyRef.current) return
+    busyRef.current = true
     setBusy(true); setError('')
     const requestController = new AbortController()
     controller.current = requestController
     try { setSession(await request(requestController.signal)) }
-    catch { setError('Jellyfin kunde inte utföra Smart Shuffle-åtgärden.') }
-    finally { if (!requestController.signal.aborted) setBusy(false) }
+    catch (requestError) { setError(smartShuffleError(requestError)) }
+    finally { busyRef.current = false; if (!requestController.signal.aborted) setBusy(false) }
   }
 
   if (!options) return <section className="bb-panel bb-loading-state smart-shuffle" aria-live="polite"><h3>Smart Shuffle</h3><p>Laddar…</p></section>
@@ -68,6 +70,7 @@ export function SmartShuffle() {
     {error && <p role="alert" className="notice notice--error">{error}</p>}
     {session ? <div aria-live="polite">
       <p><strong>Status:</strong> {session.status}</p>
+      {session.status === 'awaitingPlaybackConfirmation' && <p>Startkommando skickat – väntar på TV:n …</p>}
       {session.nowPlaying && <p><strong>Spelas nu:</strong> {session.nowPlaying.seriesName} – S{session.nowPlaying.seasonNumber}E{session.nowPlaying.episodeNumber} {session.nowPlaying.title}</p>}
       <p><strong>TV:</strong> {session.deviceName}</p>
       <div className="bb-action-group smart-shuffle__actions">
@@ -91,4 +94,15 @@ export function SmartShuffle() {
       </button>
     </>}
   </section>
+}
+
+function smartShuffleError(error: unknown) {
+  if (!(error instanceof ApiError)) return 'Smart Shuffle kunde inte startas.'
+  return ({
+    deviceUnavailable: 'TV-sessionen är inte längre ansluten.',
+    playbackRejected: 'Jellyfin avvisade uppspelningskommandot.',
+    playbackTargetUnavailable: 'Det valda avsnittet kunde inte spelas.',
+    playbackTimeout: 'Jellyfin svarade inte i tid.',
+    jellyfinTimeout: 'Jellyfin svarade inte i tid.',
+  } as Record<string, string>)[error.code] ?? 'Smart Shuffle kunde inte startas.'
 }

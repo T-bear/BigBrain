@@ -44,7 +44,7 @@ Kort sammanfattning:
 
 ### Smart Shuffle MVP
 
-Status: IMPLEMENTERAD MVP – automatisk och manuell slutverifiering på riktig TV återstår.
+Status: IMPLEMENTERAD – P1-startflödet verifierat på Samsung Tizen-TV 2026-08-04.
 
 - Backend, frontend, viktad algoritm med anti-repeat och starvation-skydd,
   bakgrundskoordinator samt automatiska tester är implementerade.
@@ -52,9 +52,13 @@ Status: IMPLEMENTERAD MVP – automatisk och manuell slutverifiering på riktig 
   Jellyfin for Tizen har verifierats read-only med `SupportsRemoteControl=true`.
 - `Media:Jellyfin:UserId` är bundet från säker lokal runtimekonfiguration i den
   Git-ignorerade `.env`-filen; värdet exponeras inte i Git, API eller frontend.
-- Ingen mediafil eller Jellyfin-databas ändrades och ingen verklig TV-uppspelning
-  startades automatiskt. Knapptryck, automatisk övergång, skip och stop återstår att
-  verifiera end-to-end på den verkliga TV:n enligt BB-014.
+- P1-felet i startflödet berodde på att den sekventiella episodkontrollen överskred den
+  generella tresekunderstimeouten innan PlayNow. Parallell kontroll, avgränsad timeout,
+  sessionsrevalidering och Tizen-anpassad bekräftelsemodell är nu implementerade.
+- Ett uttryckligt knapptryck i BigBrain skickade exakt ett kommando, Jellyfin svarade
+  `204`, rätt `NowPlayingItem` bekräftades och sessionen blev aktiv. Användaren bekräftade
+  TV-resultatet; användarstyrda hopp verifierades också. Ingen uppspelning startades från
+  terminal eller test. Automatisk övergång vid naturligt avsnittsslut återstår enligt BB-014.
 - Se [Mediamodulen](modules/media.md), [verifieringsrunbook](operations/runbooks/media-integration-verification.md),
   [Proposed ADR 0011](adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md) och den
   externa rapportserien under `/home/enigma/BigBrain/reports/features/smart-shuffle/`.

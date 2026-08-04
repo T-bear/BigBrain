@@ -74,3 +74,37 @@ test('active session can skip and stop automation through explicit actions', asy
   expect(fetch.mock.calls[4][0]).toBe('/api/v1/modules/media/smart-shuffle/sessions/opaque-session/stop')
   expect(screen.getByRole('button', { name: 'Hoppa till nästa' })).toBeDisabled()
 })
+
+test('double click sends one create request and shows awaiting confirmation', async () => {
+  const pending = { ...session, status: 'awaitingPlaybackConfirmation' as const, errorCode: 'playbackConfirmationPending' }
+  let resolveCreate!: (value: unknown) => void
+  const createResponse = new Promise(resolve => { resolveCreate = resolve })
+  const fetch = vi.fn()
+    .mockResolvedValueOnce({ ok: true, json: async () => options })
+    .mockResolvedValueOnce({ ok: true, json: async () => [device] })
+    .mockReturnValueOnce(createResponse)
+  vi.stubGlobal('fetch', fetch)
+  render(<SmartShuffle />)
+  fireEvent.click(await screen.findByLabelText('Serie A'))
+  fireEvent.click(screen.getByLabelText('Serie B'))
+  const start = screen.getByRole('button', { name: 'Starta på TV' })
+  fireEvent.click(start); fireEvent.click(start)
+  expect(fetch).toHaveBeenCalledTimes(3)
+  resolveCreate({ ok: true, json: async () => pending })
+  expect(await screen.findByText(/Startkommando skickat/)).toBeInTheDocument()
+})
+
+test('maps safe playback error and re-enables start', async () => {
+  const fetch = vi.fn()
+    .mockResolvedValueOnce({ ok: true, json: async () => options })
+    .mockResolvedValueOnce({ ok: true, json: async () => [device] })
+    .mockResolvedValueOnce({ ok: false, json: async () => ({ code: 'playbackRejected', detail: 'raw upstream must not render' }) })
+  vi.stubGlobal('fetch', fetch)
+  render(<SmartShuffle />)
+  fireEvent.click(await screen.findByLabelText('Serie A'))
+  fireEvent.click(screen.getByLabelText('Serie B'))
+  fireEvent.click(screen.getByRole('button', { name: 'Starta på TV' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Jellyfin avvisade uppspelningskommandot.')
+  expect(screen.queryByText(/raw upstream/)).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Starta på TV' })).toBeEnabled()
+})
