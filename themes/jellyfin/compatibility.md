@@ -2,9 +2,14 @@
 
 - Adapter version: 1.0.0.
 - Selector baseline: installed Jellyfin Server/Web 10.11.11, inspected read-only 2026-08-04.
-- Jellyfin Web desktop: selectors and CSS syntax automatically verified; visual/manual verification pending because CSS was not installed.
-- Jellyfin Web mobile: responsive-safe rules present; manual visual verification pending.
-- Jellyfin for Tizen: manual verification required on the real TV. The official client embeds Jellyfin Web, but this does not prove that this server's Custom CSS is fetched/applied by the installed TV build.
+- Server Custom CSS: installed additively 2026-08-04 through Jellyfin's named Branding
+  configuration API; the previous CSS was preserved byte-for-byte and no restart occurred.
+- Jellyfin Web desktop/mobile: selectors and syntax verified; headless login-page DOM at
+  1440 x 1000 and 390 x 844 loaded the adapter token without horizontal overflow.
+  Authenticated home/card/detail/dialog views still require manual visual approval.
+- Jellyfin for Tizen: an active, remote-controllable Samsung session was confirmed
+  read-only after installation, without playback. Visual/navigation verification on the
+  real TV remains required.
 - Other native clients: unsupported/not verified unless they use Jellyfin Web and load server Custom CSS.
 - Administration dashboard: server Custom CSS is intentionally not applied by Jellyfin 10.11, so it is outside adapter scope.
 

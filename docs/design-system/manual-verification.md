@@ -10,12 +10,15 @@
 6. Navigate by keyboard on desktop and confirm every interactive element has visible focus.
 7. Enlarge text to 200% and confirm content/actions remain usable.
 
-## Jellyfin (future separately approved installation only)
+## Jellyfin (installed; manual visual approval pending)
 
-1. Back up current Jellyfin Custom CSS manually.
-2. Open Jellyfin Web and, only after separate approval, paste `themes/jellyfin/bigbrain-jellyfin.css` into Custom CSS.
-3. Check home/library views, a detail page, forms and dialogs.
-4. Confirm playback controls remain visible and usable; stop and remove the theme if readability/function degrades.
-5. Check mobile Jellyfin Web.
-6. Open Jellyfin on Samsung Tizen, determine whether server CSS is actually applied, and record working/non-working selectors.
-7. Remove the CSS to roll back; no database or client patch is involved.
+The adapter was backed up and installed additively on 2026-08-04. Follow the
+[operations runbook](../operations/runbooks/jellyfin-bigbrain-theme.md) for any future
+install, update or rollback.
+
+1. Check home/library views, a detail page, forms and dialogs.
+2. Confirm playback controls remain visible and usable; stop and remove the theme if readability/function degrades.
+3. Check mobile Jellyfin Web.
+4. Open Jellyfin on Samsung Tizen, determine whether server CSS is actually applied, and record working/non-working selectors.
+5. If anything degrades, use the documented block removal or backup restore; no database
+   or client patch is involved and a server restart is normally unnecessary.
