@@ -2,6 +2,7 @@
 
 - [Media integration verification](../operations/runbooks/media-integration-verification.md)
 - [qBittorrent queue and peer diagnosis](../operations/runbooks/qbittorrent-queue-and-peer-diagnosis.md)
+- [Download Control safe removal](../operations/runbooks/download-control-safe-removal.md)
 - [System baseline capture](../operations/runbooks/system-baseline-capture.md)
 - [Dead Download Recovery v1](../operations/recovery/dead-download-recovery-v1.md)
 - [Manuell design- och Jellyfin-temaverifiering](../design-system/manual-verification.md)

@@ -7,12 +7,21 @@ Samla säker kunskap om kö, peers och torrentborttagning.
 ## Verifierade fakta
 
 - Versionsspecifik incidentobservation gäller qBittorrent 5.2.3.
+- Installerad Web API-version är 2.15.1. Officiellt delete-kontrakt är
+  `POST /api/v2/torrents/delete` med formfälten `hashes` och `deleteFiles`.
+- `hashes` kan upstream vara flera `|`-separerade värden eller `all`; BigBrains Download
+  Control-adapter tillåter därför endast en internt liveverifierad hash per anrop.
+- `deleteFiles=true` raderar även nedladdad data; annars påverkas endast torrentjobbet.
 - `queuedDL` med metadata och 0/0 peers betyder inte automatiskt en död torrent.
 
 ## Viktiga tekniska lärdomar
 
 - Kontrollera `queueing_enabled`, `max_active_downloads`, köposition, trackers, DHT, PeX och LSD före peerbedömning.
 - Separat borttagning i den verifierade recoveryrutinen använder endast exakt liveverifierad torrent och `deleteFiles=false`.
+- Save path delas normalt av flera torrents och är inte en säker datagräns. Content path
+  måste vara icke-tom och unik, och färdiga/importosäkra jobb blockeras från destruktiv borttagning.
+- Den deployade MVP:n har användarverifierat en filbevarande UI-borttagning av ett fastnat
+  jobb. Detta är inte evidens för fullständig säkerhet i `deleteFiles=true`-flödet.
 
 ## Vanliga feltolkningar
 
@@ -30,8 +39,9 @@ Samla säker kunskap om kö, peers och torrentborttagning.
 
 ## Senast verifierad
 
-2026-08-03; versionsobservationen gäller qBittorrent 5.2.3.
+2026-08-04; versionsobservationen gäller qBittorrent 5.2.3 och Web API 2.15.1.
 
 ## Källa och evidens
 
-Post-incidentdiagnosen 2026-08-03 och ARR-incidentens slutrapport.
+Read-only liveverifiering 2026-08-04, officiell qBittorrent WebUI API-dokumentation,
+post-incidentdiagnosen 2026-08-03 och ARR-incidentens slutrapport.

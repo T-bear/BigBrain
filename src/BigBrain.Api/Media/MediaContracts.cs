@@ -122,6 +122,12 @@ public interface IQBittorrentClient
     Task<QBittorrentOverview> GetOverviewAsync(CancellationToken cancellationToken);
 }
 
+internal interface IQBittorrentQueueClient
+{
+    Task<IReadOnlyList<QBittorrentQueueItem>> GetQueueAsync(CancellationToken cancellationToken);
+    Task RemoveAsync(string hash, bool deleteFiles, CancellationToken cancellationToken);
+}
+
 public interface IMediaService
 {
     Task<MediaOverview> GetOverviewAsync(CancellationToken cancellationToken);

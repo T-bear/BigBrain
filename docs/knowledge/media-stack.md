@@ -7,6 +7,8 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 ## Verifierade fakta
 
 - BigBrain kapslar Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent bakom media-adapters.
+- Download Control är den enda qBittorrent-write-gränsen: exakt ett liveverifierat jobb,
+  opakt browser-ID, preview/bekräftelse och `deleteFiles=false` som standard.
 - Publika BigBrain-API:er är versionssatta och kontrollerade mediebegäranden använder preview och explicit bekräftelse.
 - Jellyfin Server 10.11.11 exponerar det verifierade remote-play-kontraktet
   `POST /Sessions/{sessionId}/Playing`; Smart Shuffle confines it to a selected live
@@ -39,6 +41,7 @@ Beskriva stabil kunskap om BigBrains medieintegrationer.
 - [Mediamodulen](../modules/media.md)
 - [Arkitektur](../../ARCHITECTURE.md)
 - [Proposed ADR 0011](../adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md)
+- [Proposed ADR 0013](../adr/0013-safe-qbittorrent-download-removal-boundary.md)
 
 ## Senast verifierad
 

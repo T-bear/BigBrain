@@ -110,6 +110,10 @@ public partial class Program
             (IMediaJobsProvider)serviceProvider.GetRequiredService<IRadarrClient>());
         builder.Services.AddTransient<IMediaJobsProvider>(serviceProvider =>
             (IMediaJobsProvider)serviceProvider.GetRequiredService<IQBittorrentClient>());
+        builder.Services.AddTransient<IQBittorrentQueueClient>(serviceProvider =>
+            (IQBittorrentQueueClient)serviceProvider.GetRequiredService<IQBittorrentClient>());
+        builder.Services.AddSingleton<DownloadControlStore>();
+        builder.Services.AddTransient<IDownloadControlService, DownloadControlService>();
         builder.Services.AddTransient<IMediaLibraryCatalog>(serviceProvider =>
             (IMediaLibraryCatalog)serviceProvider.GetRequiredService<IJellyfinClient>());
         builder.Services.AddTransient<IJellyfinPlaybackClient>(serviceProvider =>
@@ -353,6 +357,31 @@ public partial class Program
                 }
             });
 
+        app.MapGet("/api/v1/modules/media/downloads",
+            async (IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.GetAsync(cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
+        app.MapGet("/api/v1/modules/media/downloads/{id}",
+            async (string id, IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.GetAsync(id, cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
+        app.MapPost("/api/v1/modules/media/downloads/{id}/remove-preview",
+            async (string id, DownloadRemovalPreviewInput input, IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.PreviewAsync(id, input, cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
+        app.MapPost("/api/v1/modules/media/downloads/{id}/remove",
+            async (string id, DownloadRemovalInput input, IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.RemoveAsync(id, input, cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
+
         app.MapGet(
             "/api/v1/modules/media/library-status",
             async (
@@ -505,6 +534,9 @@ public partial class Program
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
 
     private static IResult SmartShuffleProblem(SmartShuffleException exception) =>
+        ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
+
+    private static IResult DownloadProblem(DownloadControlException exception) =>
         ApiProblem(exception.Code, exception.SafeMessage, exception.StatusCode);
 
     private static IResult SentinelProblem(string code, string detail, int statusCode) =>

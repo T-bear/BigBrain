@@ -19,6 +19,10 @@ import type {
   SmartShuffleDevice,
   SmartShuffleOptions,
   SmartShuffleSession,
+  DownloadsResponse,
+  DownloadSummary,
+  DownloadRemovalPreview,
+  DownloadRemovalResult,
 } from './types'
 
 export class ApiError extends Error {
@@ -219,3 +223,12 @@ export const skipSmartShuffle = (id: string, signal?: AbortSignal) =>
   postJson<SmartShuffleSession>(`${smartShuffleBase}/sessions/${encodeURIComponent(id)}/skip`, {}, signal)
 export const stopSmartShuffle = (id: string, signal?: AbortSignal) =>
   postJson<SmartShuffleSession>(`${smartShuffleBase}/sessions/${encodeURIComponent(id)}/stop`, {}, signal)
+
+const downloadsBase = '/api/v1/modules/media/downloads'
+export const getDownloads = (signal?: AbortSignal) => getJson<DownloadsResponse>(downloadsBase, signal)
+export const getDownload = (id: string, signal?: AbortSignal) =>
+  getJson<DownloadSummary>(`${downloadsBase}/${encodeURIComponent(id)}`, signal)
+export const previewDownloadRemoval = (id: string, deleteData: boolean, signal?: AbortSignal) =>
+  postJson<DownloadRemovalPreview>(`${downloadsBase}/${encodeURIComponent(id)}/remove-preview`, { deleteData }, signal)
+export const removeDownload = (id: string, confirmationToken: string, deleteData: boolean, signal?: AbortSignal) =>
+  postJson<DownloadRemovalResult>(`${downloadsBase}/${encodeURIComponent(id)}/remove`, { confirmationToken, deleteData }, signal)

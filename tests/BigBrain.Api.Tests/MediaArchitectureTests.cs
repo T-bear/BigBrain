@@ -4,7 +4,7 @@ namespace BigBrain.Api.Tests;
 
 public sealed class MediaArchitectureTests
 {
-    private static readonly string[] FrontendMediaDirectories = ["media-search", "media-jobs", "smart-shuffle"];
+    private static readonly string[] FrontendMediaDirectories = ["media-search", "media-jobs", "smart-shuffle", "download-control"];
 
     [Fact]
     public void MediaProductionCodeHasNoHostOrDockerIntegration()
@@ -58,7 +58,7 @@ public sealed class MediaArchitectureTests
             .Where(file => File.ReadAllText(file).Contains("HttpMethod.Post", StringComparison.Ordinal))
             .Select(file => Path.GetFileName(file)!)
             .ToArray();
-        Assert.Equal(["ArrClients.cs", "JellyfinClient.cs"], filesWithPost.Order(StringComparer.Ordinal));
+        Assert.Equal(["ArrClients.cs", "JellyfinClient.cs", "QBittorrentClient.cs"], filesWithPost.Order(StringComparer.Ordinal));
         var arrSource = File.ReadAllText(Path.Combine(mediaDirectory, "ArrClients.cs"));
         Assert.Equal(2, Count(arrSource, "HttpMethod.Post"));
         Assert.Contains("\"api/v3/series\"", arrSource, StringComparison.Ordinal);
@@ -83,6 +83,10 @@ public sealed class MediaArchitectureTests
         var jellyfinSource = File.ReadAllText(Path.Combine(mediaDirectory, "JellyfinClient.cs"));
         Assert.Equal(1, Count(jellyfinSource, "HttpMethod.Post"));
         Assert.Contains("Sessions/{Uri.EscapeDataString(sessionId)}/Playing?playCommand=PlayNow", jellyfinSource, StringComparison.Ordinal);
+        var qbittorrentSource = File.ReadAllText(Path.Combine(mediaDirectory, "QBittorrentClient.cs"));
+        Assert.Equal(1, Count(qbittorrentSource, "HttpMethod.Post"));
+        Assert.Contains("api/v2/torrents/delete", qbittorrentSource, StringComparison.Ordinal);
+        Assert.Contains("[\"deleteFiles\"]", qbittorrentSource, StringComparison.Ordinal);
         var jobsSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaJobs.cs"));
         Assert.DoesNotContain("HttpMethod.Post", jobsSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Put", jobsSource, StringComparison.Ordinal);

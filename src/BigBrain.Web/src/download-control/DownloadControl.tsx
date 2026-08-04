@@ -1,0 +1,114 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ApiError, getDownloads, previewDownloadRemoval, removeDownload } from '../api'
+import type { DownloadRemovalPreview, DownloadStatus, DownloadSummary } from '../types'
+
+const labels: Record<DownloadStatus, string> = {
+  active: 'Aktiv', queued: 'Köad', paused: 'Pausad', error: 'Fel', completed: 'Klar', unknown: 'Okänd',
+}
+const filters: Array<{ value: 'all' | DownloadStatus; label: string }> = [
+  { value: 'all', label: 'Alla' }, { value: 'active', label: 'Aktiva' }, { value: 'queued', label: 'Köade' },
+  { value: 'paused', label: 'Pausade' }, { value: 'error', label: 'Fel' }, { value: 'completed', label: 'Klara' },
+]
+
+function bytes(value: number, suffix = '') {
+  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
+  let amount = Math.max(0, value); let unit = 0
+  while (amount >= 1024 && unit < units.length - 1) { amount /= 1024; unit += 1 }
+  return `${amount.toFixed(unit ? 1 : 0)} ${units[unit]}${suffix}`
+}
+
+function safeError(error: unknown) {
+  if (!(error instanceof ApiError)) return 'Åtgärden kunde inte slutföras.'
+  switch (error.code) {
+    case 'downloadNotFound': return 'Nedladdningen finns inte längre.'
+    case 'downloadIdentityChanged': return 'Nedladdningen ändrades. Uppdatera listan och försök igen.'
+    case 'downloadRemovalConflict': return 'En borttagning pågår redan.'
+    case 'destructiveRemovalNotAllowed': case 'sharedPathRisk': return 'Data kan inte raderas säkert. Du kan fortfarande avbryta och bevara filerna.'
+    case 'confirmationExpired': return 'Bekräftelsen har löpt ut. Förhandsgranska igen.'
+    case 'providerTimeout': return 'qBittorrent svarade inte i tid.'
+    case 'providerAuthenticationFailure': return 'qBittorrent-autentiseringen misslyckades.'
+    default: return 'qBittorrent-åtgärden kunde inte slutföras.'
+  }
+}
+
+export function DownloadControl() {
+  const [downloads, setDownloads] = useState<DownloadSummary[]>([])
+  const [filter, setFilter] = useState<'all' | DownloadStatus>('all')
+  const [selected, setSelected] = useState<DownloadSummary | null>(null)
+  const [preview, setPreview] = useState<DownloadRemovalPreview | null>(null)
+  const [deleteData, setDeleteData] = useState(false)
+  const [understood, setUnderstood] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const controller = useRef<AbortController | null>(null)
+  const busyRef = useRef(false)
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+
+  const load = useCallback(async () => {
+    controller.current?.abort(); const next = new AbortController(); controller.current = next
+    try { const response = await getDownloads(next.signal); setDownloads(Array.isArray(response.downloads) ? response.downloads : []); setMessage('') }
+    catch (error) { if (!(error instanceof Error) || error.name !== 'AbortError') setMessage(safeError(error)) }
+  }, [])
+
+  useEffect(() => { void load(); return () => controller.current?.abort() }, [load])
+  useEffect(() => {
+    if (!selected) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !busy) { setSelected(null); setPreview(null) }
+      if (event.key !== 'Tab' || !dialogRef.current) return
+      const focusable = [...dialogRef.current.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled)')]
+      if (!focusable.length) return
+      const first = focusable[0]; const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onKey); dialogRef.current?.querySelector<HTMLElement>('button')?.focus()
+    return () => document.removeEventListener('keydown', onKey)
+  }, [selected, busy])
+
+  const prepare = async (destructive: boolean) => {
+    if (!selected || busyRef.current) return
+    busyRef.current = true; setBusy(true); setMessage('')
+    try { setPreview(await previewDownloadRemoval(selected.id, destructive)); setDeleteData(destructive); setUnderstood(false) }
+    catch (error) { setMessage(safeError(error)) }
+    finally { busyRef.current = false; setBusy(false) }
+  }
+  const confirm = async () => {
+    if (!selected || !preview || busyRef.current || (deleteData && !understood)) return
+    busyRef.current = true; setBusy(true); setMessage('')
+    try {
+      await removeDownload(selected.id, preview.confirmationToken, deleteData)
+      setDownloads(items => items.filter(item => item.id !== selected.id))
+      setSelected(null); setPreview(null); setMessage(deleteData ? 'Nedladdningen och dess data togs bort.' : 'Nedladdningen avbröts. Filerna bevarades.')
+    } catch (error) { setMessage(safeError(error)) }
+    finally { busyRef.current = false; setBusy(false) }
+  }
+  const visible = filter === 'all' ? downloads : downloads.filter(item => item.status === filter)
+
+  return <section className="download-control" aria-labelledby="downloads-heading">
+    <header><div><p className="eyebrow">qBittorrent</p><h3 id="downloads-heading">Nedladdningar</h3></div><button className="secondary-button" type="button" onClick={() => void load()}>Uppdatera nedladdningar</button></header>
+    <div className="download-filters" aria-label="Filtrera nedladdningar">{filters.map(item => <button type="button" aria-pressed={filter === item.value} key={item.value} onClick={() => setFilter(item.value)}>{item.label}</button>)}</div>
+    <p aria-live="polite" className="download-message">{message}</p>
+    {visible.length === 0 ? <p>Inga nedladdningar i det här filtret.</p> : <ul className="download-list">{visible.map(item => <li key={item.id}>
+      <div><strong>{item.name}</strong><span>{labels[item.status]} · {item.category}{item.ownership === 'sonarr' || item.ownership === 'radarr' ? ` · Hanteras av ${item.ownership === 'sonarr' ? 'Sonarr' : 'Radarr'}` : ''}</span></div>
+      <progress aria-label={`Framsteg för ${item.name}`} max="100" value={item.progressPercent} />
+      <div className="download-metrics"><span>{item.progressPercent.toFixed(1)} %</span><span>{bytes(item.sizeBytes)}</span><span>↓ {bytes(item.downloadSpeedBytesPerSecond, '/s')}</span><span>↑ {bytes(item.uploadSpeedBytesPerSecond, '/s')}</span>{item.queuePosition !== null && <span>Kö {item.queuePosition}</span>}</div>
+      <button type="button" className="secondary-button" onClick={() => { setSelected(item); setPreview(null); setDeleteData(false); setMessage('') }}>Hantera {item.name}</button>
+    </li>)}</ul>}
+    {selected && <div className="download-dialog" role="dialog" aria-modal="true" aria-labelledby="download-dialog-title" ref={dialogRef}>
+      <button type="button" className="download-dialog__close" disabled={busy} onClick={() => { setSelected(null); setPreview(null) }} aria-label="Stäng dialog">×</button>
+      <h3 id="download-dialog-title">{preview ? (deleteData ? 'Avbryt och radera nedladdade data?' : 'Avbryt nedladdning?') : selected.name}</h3>
+      {!preview ? <>
+        <p>{labels[selected.status]} · {selected.progressPercent.toFixed(1)} % · {bytes(selected.downloadedBytes)} nedladdat</p>
+        {selected.warnings.map(warning => <p className="notice notice--warning" key={warning}>{warning}</p>)}
+        <button type="button" disabled={busy} onClick={() => void prepare(false)}>Avbryt nedladdning</button>
+        <button type="button" className="danger-button" disabled={busy || !selected.destructiveRemovalAllowed} onClick={() => void prepare(true)}>Avbryt och radera data</button>
+      </> : <>
+        <p>{deleteData ? 'Åtgärden kan inte ångras från BigBrain. qBittorrent instrueras att radera torrentens data. Annan media får inte påverkas.' : 'Torrentjobbet tas bort från qBittorrent. Redan nedladdade filer bevaras.'}</p>
+        {preview.warnings.map(warning => <p className="notice notice--warning" key={warning}>{warning}</p>)}
+        {deleteData && <label className="download-understand"><input type="checkbox" checked={understood} onChange={event => setUnderstood(event.target.checked)} /> Jag förstår att nedladdade data raderas.</label>}
+        <div className="download-dialog__actions"><button type="button" className="secondary-button" disabled={busy} onClick={() => setPreview(null)}>Tillbaka</button><button type="button" className={deleteData ? 'danger-button' : ''} disabled={busy || (deleteData && !understood)} onClick={() => void confirm()}>{busy ? 'Arbetar…' : 'Bekräfta'}</button></div>
+      </>}
+    </div>}
+  </section>
+}

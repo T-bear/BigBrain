@@ -221,7 +221,33 @@ The following are explicitly deferred and require separate authorization, audit,
   PlayNow capability.
 - AI commands for media management.
 
-No delete, rename, move, edit, release, general command or download-client operation exists.
+No rename, move, edit, release or general download-client command exists. The separately
+bounded Download Control capability below is the sole qBittorrent delete boundary.
+
+## Download Control MVP
+
+The Media dashboard exposes `/api/v1/modules/media/downloads` plus opaque detail,
+`remove-preview` and `remove` endpoints. qBittorrent 5.2.3/Web API 2.15.1 is normalized to
+safe display fields; hashes, content/save paths, credentials and upstream bodies remain
+server-side. Random process-local IDs expire after five minutes. Preview confirmations
+expire after two minutes and bind exactly one live fingerprint and explicit `deleteData`
+choice.
+
+The default action sends one internally resolved hash to `POST /api/v2/torrents/delete`
+with `deleteFiles=false`. Destructive `deleteFiles=true` is separately presented and
+requires an active acknowledgement. It is blocked for completed/import-uncertain jobs,
+empty or shared content paths, root-like path scope or changed identity. Both paths
+re-read the queue immediately before mutation, serialize token use and provide idempotent
+missing/completed results. Safe structured audit excludes raw identities.
+
+Sonarr/Radarr category ownership produces a warning only. Download Control does not alter
+Arr history, blocklist, searches, monitored state, media or client configuration. See
+[Proposed ADR 0013](../adr/0013-safe-qbittorrent-download-removal-boundary.md) and the
+[safe removal runbook](../operations/runbooks/download-control-safe-removal.md).
+
+The MVP is deployed. The user has confirmed one UI-driven file-preserving removal from
+qBittorrent. Destructive removal remains conservatively available only through the
+documented risk gates and is not claimed as fully production-verified.
 
 ## Smart Shuffle MVP
 

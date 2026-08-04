@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace BigBrain.Api.Media;
 
 public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions options)
-    : MediaClientBase(httpClient, "qBittorrent"), IQBittorrentClient, IMediaJobsProvider
+    : MediaClientBase(httpClient, "qBittorrent"), IQBittorrentClient, IQBittorrentQueueClient, IMediaJobsProvider
 {
     string IMediaJobsProvider.MediaType => MediaTypes.Unknown;
 
@@ -148,4 +148,46 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
             || state.Contains("stopped", StringComparison.OrdinalIgnoreCase));
 
     private static QBittorrentOverview Empty(MediaServiceStatus status) => new(status, 0, 0, 0, 0, 0, null, null, 0, 0, null, []);
+
+    async Task<IReadOnlyList<QBittorrentQueueItem>> IQBittorrentQueueClient.GetQueueAsync(
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(options.QBittorrent.ApiKey))
+            throw new DownloadControlException("providerUnavailable", "qBittorrent är inte konfigurerad.", StatusCodes.Status503ServiceUnavailable);
+
+        using var torrents = await GetJsonAsync("api/v2/torrents/info", null, cancellationToken);
+        if (torrents.RootElement.ValueKind != JsonValueKind.Array) return [];
+        return torrents.RootElement.EnumerateArray().Select(item => new QBittorrentQueueItem(
+            GetString(item, "hash") ?? string.Empty,
+            SafeDisplayTitle(GetString(item, "name") ?? "Untitled"),
+            GetString(item, "state") ?? "unknown",
+            GetString(item, "category"),
+            GetString(item, "save_path"),
+            GetString(item, "content_path"),
+            Math.Clamp(GetDouble(item, "progress"), 0, 1),
+            Math.Max(0, GetInt64(item, "size")),
+            Math.Max(0, GetInt64(item, "downloaded")),
+            Math.Max(0, GetInt64(item, "dlspeed")),
+            Math.Max(0, GetInt64(item, "upspeed")),
+            GetInt32(item, "priority"))).Where(item => item.Hash.Length is 40 or 64).ToArray();
+    }
+
+    async Task IQBittorrentQueueClient.RemoveAsync(string hash, bool deleteFiles, CancellationToken cancellationToken)
+    {
+        if (hash.Length is not (40 or 64) || hash.Any(character => !Uri.IsHexDigit(character)))
+            throw new DownloadControlException("downloadIdentityChanged", "Nedladdningens identitet är inte längre giltig.", StatusCodes.Status409Conflict);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v2/torrents/delete")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["hashes"] = hash,
+                ["deleteFiles"] = deleteFiles ? "true" : "false"
+            })
+        };
+        using var response = await HttpClient.SendAsync(request, cancellationToken);
+        if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden)
+            throw new DownloadControlException("providerAuthenticationFailure", "qBittorrent-autentiseringen misslyckades.", StatusCodes.Status503ServiceUnavailable);
+        if (!response.IsSuccessStatusCode)
+            throw new DownloadControlException("removalRejected", "qBittorrent avvisade borttagningen.", StatusCodes.Status502BadGateway);
+    }
 }

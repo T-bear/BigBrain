@@ -384,3 +384,42 @@ export interface SmartShuffleSession {
   startedAtUtc: string
   errorCode: string | null
 }
+
+export type DownloadStatus = 'active' | 'queued' | 'paused' | 'error' | 'completed' | 'unknown'
+export interface DownloadSummary {
+  id: string
+  name: string
+  status: DownloadStatus
+  progressPercent: number
+  sizeBytes: number
+  downloadedBytes: number
+  downloadSpeedBytesPerSecond: number
+  uploadSpeedBytesPerSecond: number
+  queuePosition: number | null
+  category: string
+  ownership: 'sonarr' | 'radarr' | 'manual' | 'unknown'
+  importStatus: 'notImported' | 'unknown'
+  destructiveRemovalAllowed: boolean
+  warnings: string[]
+}
+export interface DownloadsResponse { collectedAtUtc: string; downloads: DownloadSummary[] }
+export interface DownloadRemovalPreview {
+  confirmationToken: string
+  expiresAtUtc: string
+  name: string
+  status: DownloadStatus
+  category: string
+  ownership: DownloadSummary['ownership']
+  downloadedBytes: number
+  filesWillBePreserved: boolean
+  destructiveRemovalAllowed: boolean
+  warnings: string[]
+}
+export interface DownloadRemovalResult {
+  status: 'removed' | 'alreadyMissing'
+  removed: boolean
+  dataPreserved: boolean
+  alreadyMissing: boolean
+  ownership: DownloadSummary['ownership']
+  errorCode: string | null
+}
