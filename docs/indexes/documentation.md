@@ -1,17 +1,39 @@
-# Dokumentationsindex
+# Documentation Index
 
-## Typer och hemvist
+## Authority order
 
-Normativ arkitektur finns i `ARCHITECTURE.md` och `docs/architecture/`; beslut i `docs/adr/`; modulkontrakt i `docs/modules/`; kunskap i `docs/knowledge/`; procedurer i `docs/operations/`; status och arbete i `docs/STATUS.md` och `docs/BACKLOG.md`; runtimeevidens under `/home/enigma/BigBrain/reports/`.
+When sources disagree, use this order and resolve the inconsistency explicitly:
 
-Frontendens stabila [theme contract v1](../design-system/theme-contract-v1.md), [manuella verifieringsplan](../design-system/manual-verification.md) och [Proposed ADR 0012](../adr/0012-design-system-theme-contract-and-jellyfin-adapter.md) dokumenterar designsystemets ägarskap och Jellyfin-gräns.
+1. Accepted ADR
+2. Normative architecture
+3. Code and commit-bound baseline
+4. Module contract
+5. Approved runbook
+6. Current [STATUS](../STATUS.md)
+7. Sanitized verification report
+8. Diagnostics
+9. Proposed ADR
+10. Historical document
 
-Download Controls publika gräns dokumenteras i [Mediamodulen](../modules/media.md), [säker borttagningsrunbook](../operations/runbooks/download-control-safe-removal.md) och [Proposed ADR 0013](../adr/0013-safe-qbittorrent-download-removal-boundary.md).
+## Entry points
 
-## Dokumentauktoritet
+- [README](../../README.md): product overview and development entry point.
+- [STATUS](../STATUS.md): compact current reality and verification level.
+- [BACKLOG](../BACKLOG.md): remaining work and acceptance criteria.
+- [AGENTS](../../AGENTS.md): working, safety and completion rules.
+- [ARCHITECTURE](../../ARCHITECTURE.md): normative system boundaries.
+- [TESTING](../../TESTING.md): testing map.
+- [ADR index](adr.md), [knowledge index](knowledge.md), [operations index](operations.md) and [reports index](reports.md).
 
-Inom samma scope: 1) Accepted ADR, 2) aktuell normativ arkitektur, 3) kod och commitbunden kodbaseline, 4) modulkontrakt, 5) godkänd runbook, 6) daterad baseline inom rätt scope, 7) incidentens slutrapport, 8) diagnostik och historisk evidens, 9) Proposed design och rekommendationer. En senare fil ersätter inte automatiskt en äldre fil med annat scope.
+Local reports under `/home/enigma/BigBrain/reports/` are fuller internal evidence and
+are not repository authority. Only reviewed, sanitized knowledge is published under
+`docs/reports/`.
 
-## Läsordning och ansvar
+## Product and architecture
 
-Läs README och arkitektur, Accepted ADR:er, relevant modulkontrakt, scope-index, godkänd runbook och därefter evidens. Buggar hör i backlog, planer i roadmap, beslut i ADR, procedurer i operations, fakta i knowledge och incidenter i extern rapportyta. Styrningen är [Proposed ADR 0010](../adr/0010-documentation-ownership-hierarchy-baseline-lifecycle-and-retention.md).
+- [Dashboard and Widget Framework](../architecture/dashboard-widget-framework.md)
+- [Media module](../modules/media.md)
+- [Meal Planner knowledge](../knowledge/meal-planner.md)
+- [Shopping List knowledge](../knowledge/shopping-list.md)
+- [Design system](../design-system/theme-contract-v1.md)
+- [Early sprint history](../history/early-sprints.md)

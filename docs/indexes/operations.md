@@ -1,11 +1,12 @@
-# Operationsindex
+# Operations Index
 
-- [Media integration verification](../operations/runbooks/media-integration-verification.md)
-- [qBittorrent queue and peer diagnosis](../operations/runbooks/qbittorrent-queue-and-peer-diagnosis.md)
+- [Operations overview](../operations/README.md)
+- [Runbook index](../operations/runbooks/README.md)
+- [Dashboard verification](../operations/runbooks/dashboard-widget-framework-verification.md)
 - [Download Control safe removal](../operations/runbooks/download-control-safe-removal.md)
-- [System baseline capture](../operations/runbooks/system-baseline-capture.md)
-- [Dead Download Recovery v1](../operations/recovery/dead-download-recovery-v1.md)
-- [Manuell design- och Jellyfin-temaverifiering](../design-system/manual-verification.md)
-- [Jellyfin BigBrain theme installation and rollback](../operations/runbooks/jellyfin-bigbrain-theme.md)
-
-Backup/restore och deployment har endast grundindex. Draft är inte en obevakad standardprocedur.
+- [Media integration verification](../operations/runbooks/media-integration-verification.md)
+- [Jellyfin theme installation and rollback](../operations/runbooks/jellyfin-bigbrain-theme.md)
+- [qBittorrent diagnosis](../operations/runbooks/qbittorrent-queue-and-peer-diagnosis.md)
+- [Dead download recovery](../operations/recovery/dead-download-recovery-v1.md)
+- [Backup and restore](../operations/backup-restore/README.md)
+- [Deployment](../operations/deployment/README.md)

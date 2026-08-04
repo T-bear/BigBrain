@@ -1,102 +1,103 @@
 # BigBrain
 
-BigBrain is a modular control plane for a Debian-based home server. Sprint 2 adds safe, read-only system monitoring and a Docker inventory contract to the stable modular-monolith foundation.
+BigBrain är ett modulärt control plane och familjegränssnitt för en Debian-baserad hemserver. Produkten samlar dagliga familjeflöden, mediahantering, systemstatus och framtida AI-funktioner i en gemensam React-applikation och ett versionssatt ASP.NET Core-API.
 
-## Sprint 2 scope
+## Produktvision
 
-Included:
+BigBrain ska utgå från vad användaren vill göra, inte från hur underliggande tjänster är byggda. Vardagliga funktioner ska vara enkla, mobila och säkra. Tekniska detaljer ska finnas i Admin. Externa mutationer ska vara smala, objektspecifika, bekräftade och auditerbara.
 
-- ASP.NET Core Web API on .NET 10 LTS.
-- React, TypeScript, and Vite web application.
-- In-memory module registry with separate System and Docker modules.
-- `GET /api/v1/system/health`.
-- `GET /api/v1/system/overview` with a stable metrics contract and an explicit unavailable result until Sentinel integration exists.
-- `GET /api/v1/docker/containers` with an explicit unavailable result until Sentinel integration exists.
-- `GET /api/v1/modules`.
-- Responsive dashboard with live system values, provider-driven module status, clear unavailable/error states, and non-overlapping system polling approximately every five seconds.
-- Read-only Media dashboard foundation for normalized Jellyfin, Sonarr, Radarr, Prowlarr and qBittorrent status.
-- Docker Compose and container health checks.
-- Backend and frontend tests.
+## Aktuell arkitektur
 
-The System and Docker modules are read-only. The Web API does not read host resources, mount the Docker socket, execute shell commands, or control the Docker daemon. Their provider contracts are prepared for a future approved Sentinel integration. Until then, System returns `status: "Unavailable"` with null/empty metrics and Docker returns `available: false` with an empty container list. See [ADR 0001](docs/adr/0001-web-api-must-not-control-docker.md).
+- **BigBrain Web:** React, TypeScript och Vite; gemensamt applikationsskal, designsystem och kompilerade förstapartswidgets.
+- **BigBrain API:** modulär ASP.NET Core-monolit med versionssatta API:er och Problem Details.
+- **BigBrain Modules:** domän- och integrationsgränser för System, Media, Matlista och Inköpslista.
+- **BigBrain Sentinel:** separat minsta-behörighetsgräns för lokala systemcapabilities; Web och API monterar aldrig Docker-socketen.
+- **Integration adapters:** Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent kapslas bakom typade adapters.
 
-Explicitly deferred are Control Plane-to-Sentinel communication, real host metrics, real Docker inventory, every Docker mutation (including start, stop, restart, delete and exec), every media mutation, authentication, database persistence, AI, SignalR, Prometheus, external monitoring, home automation and plugin loading.
+Se [arkitekturbaslinjen](ARCHITECTURE.md), [ADR-indexet](docs/indexes/adr.md) och [arbetsreglerna](AGENTS.md).
 
-Media Sprint 1 uses only documented application HTTP APIs and exposes `GET /api/v1/modules/media`. Credentials remain runtime configuration and all media mutations are deferred. See [Media Module documentation](docs/modules/media.md).
-The verified qBittorrent 5.2+ integration uses its official stateless Bearer API key authentication. Dashboard reads remain read-only; Download Control adds one narrowly bounded, previewed and confirmed removal endpoint with file preservation as the default.
+## Dashboard Views och Widget Framework
 
-BigBrain Web uses the token-based [theme contract v1](docs/design-system/theme-contract-v1.md). The separately versioned Jellyfin adapter under `themes/jellyfin/` is a manual artifact and is never installed automatically.
-The selector offers `Mörkt`, `Ljust` and the graphite-and-brass `Obsidian Gold`; the stored choice is restored on reload.
+Webbgränssnittet har fyra vyer utan sidomladdning:
 
-To connect the module to the existing media stack, follow [TESTING.md](TESTING.md). Runtime credentials belong in an ignored local `.env` copied from `.env.example`.
+- **Hem:** Matlista, Inköpslista samt tydligt ej implementerade Kalender- och Påminnelseplatshållare.
+- **Media:** sökning, pågående jobb, Smart Shuffle, Download Control och mediaintegrationer.
+- **AI:** tydligt ej implementerade platshållare för kommande AI-funktioner.
+- **Admin:** serverstatus, containers, integrationer och teknisk information.
 
-## Repository layout
+`DashboardRegistry`, `ApplicationWidgetRegistry`, `WidgetProvider` och `DashboardWorkspace` ger stabila widget-ID:n, metadata, bibliotek, visa/dölj, kollapsning, drag- och knappbaserad omordning samt versionerad lokal persistence. Phase 1 är implementerad, automatiskt verifierad, Web-deployad och manuellt visuellt godkänd. Per-user/shared dashboards, synk, roller och användarvalda storlekar är framtida arbete i BB-027.
 
-```text
-src/
-├── BigBrain.Api/       Versioned HTTP API and health endpoints
-├── BigBrain.Modules/   Module contracts, registry, metrics providers, System and Docker modules
-└── BigBrain.Web/       React application and module-driven dashboard
-tests/
-└── BigBrain.Api.Tests/ API and module registry tests
-```
+Se [widgetarkitekturen](docs/architecture/dashboard-widget-framework.md) och [Proposed ADR 0014](docs/adr/0014-dashboard-views-and-widget-framework.md).
 
-Future logical components documented in `ARCHITECTURE.md` are created only when a sprint gives them concrete responsibility.
+## Huvudfunktioner
 
-## Run with Docker Compose
+### Familj
 
-```bash
-docker compose up --build -d
-```
+- **Matlista:** maträtter, taggar, familjeschema, generering, måltidsbyte, sparade matsedlar och utskrift.
+- **Inköpslista:** permanent aktiv lista, dubblettskydd, förslag, ofta köpt, inköpssessioner och inlärd butiksordning.
 
-The dashboard is available at `http://localhost:13000`. The API is available at `http://localhost:18080`. The non-default loopback ports keep this development stack isolated from existing home-server services.
+### Media
 
-```bash
-curl http://localhost:18080/api/v1/system/health
-curl http://localhost:18080/api/v1/system/overview
-curl http://localhost:18080/api/v1/docker/containers
-curl http://localhost:18080/api/v1/modules
-curl http://localhost:18080/api/v1/modules/media
-```
+- **Media Search:** bibliotekssökning och kontrollerad Sonarr-/Radarr-preview och bekräftelse.
+- **Media Jobs:** normaliserade köer, status, filter och säkra detaljer.
+- **Smart Shuffle:** servervalt episodflöde och användarstyrd fjärruppspelning på verifierad Jellyfin for Tizen-session.
+- **Download Control:** säker qBittorrent-listning, opaka ID:n, preview/bekräftelse och filbevarande standardborttagning; destruktiv borttagning har strängare riskgrindar och återstående manuell härdning.
+- **Media Overview:** Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent med partiell felisolering.
 
-Stop the BigBrain stack with:
+Se [Mediamodulen](docs/modules/media.md), [Smart Shuffle-ADR](docs/adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md) och [Download Control-ADR](docs/adr/0013-safe-qbittorrent-download-removal-boundary.md).
 
-```bash
-docker compose down
-```
+### System och Sentinel
 
-## Local development
+Systemstatus läser allowlistade uptime-, CPU-, minnes- och diskcapabilities genom Sentinel. Dockerinventeringens fortsatta arkitekturarbete är separat från Media-adapters. Sentinel-filer med Proposed beslut är inte automatiskt accepterade.
 
-The .NET SDK is not installed on the Debian host. Backend builds, tests and analyzers
-run in the pinned .NET 10 SDK container. The temporary artifacts path avoids changing
-or depending on host-owned `bin` and `obj` directories.
+### Designsystem och teman
 
-```bash
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" \
-  --workdir /workspace \
-  --env BIGBRAIN_REPOSITORY_ROOT=/workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet build BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
+BigBrain använder semantiska `--bb-`-tokens, tillgängliga komponenttillstånd och temana Mörkt, Ljust och Obsidian Gold. Jellyfin-adaptrar är separata manuella CSS-artefakter; Obsidian Gold-varianten är inte automatiskt installerad i Jellyfin.
 
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" \
-  --workdir /workspace \
-  --env BIGBRAIN_REPOSITORY_ROOT=/workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet test BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
-```
+Se [theme contract v1](docs/design-system/theme-contract-v1.md), [manuell designkontroll](docs/design-system/manual-verification.md) och [Proposed ADR 0012](docs/adr/0012-design-system-theme-contract-and-jellyfin-adapter.md).
+
+## Verifieringsnivåer
+
+Dokumentationen skiljer på implementerat, automatiskt verifierat, deployat och manuellt verifierat. [STATUS](docs/STATUS.md) är den aktuella verklighetsbilden; sanerade rapporter under [docs/reports](docs/reports/README.md) innehåller daterad evidens. Lokala fullrapporter är intern evidens och publiceras inte rått.
+
+## Lokal utveckling
+
+Frontend:
 
 ```bash
 cd src/BigBrain.Web
 npm ci
+npm test -- --run
 npm run build
-npm test
 ```
 
-## Architecture and working rules
+Backend körs i den dokumenterade .NET 10 SDK-containern:
 
-- `ARCHITECTURE.md` contains the approved architecture baseline and roadmap.
-- `AGENTS.md` contains permanent repository working rules.
-- Public APIs are versioned and API errors use Problem Details.
-- The API and Web containers never mount the Docker socket.
+```bash
+docker run --rm --user "$(id -u):$(id -g)" \
+  --volume "$PWD:/workspace" --workdir /workspace \
+  mcr.microsoft.com/dotnet/sdk:10.0 \
+  dotnet test BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
+```
+
+Se [TESTING.md](TESTING.md) för testkartan och [operationsindexet](docs/indexes/operations.md) för deployment och runtimeverifiering.
+
+## Säker runtimekonfiguration
+
+Kopiera `.env.example` till den Git-ignorerade `.env` och ge filen rättighet `0600`. Lägg aldrig credentials, cookies, privata URL:er eller råa externa identiteter i Git, frontend, rapporter eller diagnostik. Validera Compose med `docker compose config --quiet` utan att skriva ut den effektiva konfigurationen.
+
+## Dokumentationskarta
+
+- [STATUS](docs/STATUS.md) – aktuell implementerings-, deployment- och verifieringsstatus.
+- [BACKLOG](docs/BACKLOG.md) – kvarvarande verifierat arbete och kända begränsningar.
+- [Dokumentationsindex](docs/indexes/documentation.md) – auktoritet och läsordning.
+- [Knowledge-index](docs/indexes/knowledge.md) – system- och integrationskunskap.
+- [Operationsindex](docs/indexes/operations.md) – runbooks, deployment och recovery.
+- [ADR-index](docs/indexes/adr.md) – beslut och Proposed förslag.
+- [Rapportindex](docs/indexes/reports.md) – sanerad GitHub-evidens och lokal rapportpolicy.
+- [AGENTS.md](AGENTS.md) – permanenta arbets-, dokumentations- och publiceringsregler.
+- [Tidig historik](docs/history/early-sprints.md) – historiska sprintbaselines som inte längre är produktöversikt.
+
+## CI
+
+GitHub Actions kör backend restore/build/test, frontend install/test/build, dokumentationsgrind och secret scan. CI deployar inte, ansluter inte till hemmaservern och använder inga live write-endpoints.

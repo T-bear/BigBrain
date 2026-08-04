@@ -1,4 +1,4 @@
-# Media Module – Sprint 3
+# Media Module
 
 ## Sprint 4 – Media Experience
 
@@ -17,7 +17,12 @@ experience without adding a new platform, client type or module architecture.
 
 ## Responsibility and boundary
 
-The Media module provides a read-only, normalized dashboard view of Jellyfin, Sonarr, Radarr, Prowlarr and qBittorrent. These are application services, so their documented HTTP APIs are accessed through Control Plane adapters. Sentinel remains the exclusive boundary for operating-system resources, Docker, processes and filesystems; the Media module does not use those interfaces.
+The Media module provides normalized dashboard and search reads for Jellyfin, Sonarr,
+Radarr, Prowlarr and qBittorrent. It also exposes a small set of purpose-built,
+explicitly authorized write workflows such as Smart Shuffle, controlled Arr requests
+and Download Control. Every external service remains behind an adapter; there is no
+general proxy. Sentinel remains the exclusive boundary for operating-system resources,
+Docker, processes and filesystems.
 
 Each upstream API is treated as untrusted. Typed clients translate allowlisted fields into BigBrain contracts, apply short timeouts and bounded lists, accept cancellation, and convert service-specific failures into sanitized status results. One failing service does not fail the aggregate response.
 
@@ -78,7 +83,8 @@ Each service status contains only:
 
 The endpoint always returns normalized BigBrain DTOs. It never returns raw provider payloads, request headers, cookies, API keys, passwords, user names, IP addresses, device identifiers, local paths, download URLs or detailed viewing history.
 
-The dashboard and library-search endpoints remain read-only.
+The dashboard and library-search endpoints remain read-only. Mutations use separate,
+versioned endpoints with their own authorization, validation and Problem Details contracts.
 
 ### `GET /api/v1/modules/media/search?query={query}`
 

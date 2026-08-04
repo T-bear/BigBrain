@@ -436,7 +436,7 @@ BigBrain ska kunna pausa och återuppta en enskild nedladdning.
 - Modul: Media / Download Control
 - Typ: Funktion
 - Prioritet: P3
-- Status: Ny
+- Status: Avvisad
 - Upptäckt: 2026-08-04
 
 #### Beskrivning
@@ -451,6 +451,9 @@ Exempel på åtgärder:
 - visa tydligt vad som kommer att hända innan något utförs.
 
 Detta ska vara ett eget arbetsflöde och inte blandas ihop med vanlig borttagning.
+
+Posten är en dubblett av BB-021 och ersätts av den mer preciserade posten där. Ingen
+implementation eller historik har tagits bort.
 
 #### Definition of Done
 
@@ -519,28 +522,30 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Modul: Projektdokumentation
 - Typ: Dokumentationsskuld
 - Prioritet: P2
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-03
 - Beskrivning: Uppdatera funktioner, läsordning och länkar efter faktagranskning.
 - Motiv: README speglar inte hela verifierade implementationen.
 - Avgränsning: Ingen arkitekturändring eller ny funktion.
 - Risk: Felaktig onboarding.
 - Definition of Done: Kort, kodverifierad README med auktoritativa länkar.
-- Relaterade dokument: `README.md`, `docs/indexes/documentation.md`.
+- Relaterade dokument: `README.md`, `docs/indexes/documentation.md`, `docs/history/early-sprints.md`.
+- Slutförd: 2026-08-04; långlivad produktöversikt verifierad och relevant tidig historik bevarad separat.
 
 ### BB-006 – Dela upp och korta STATUS.md
 
 - Modul: Projektdokumentation
 - Typ: Informationsarkitektur
 - Prioritet: P2
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-03
 - Beskrivning: Begränsa STATUS till aktuellt läge och placera historisk verifiering efter review.
 - Motiv: Filen blandar sprintlogg, runtimeevidens, problem och produktstatus.
 - Avgränsning: Bevara historik; inga flyttar utan review.
 - Risk: Förlust av evidens eller dubbla sanningar.
 - Definition of Done: Definierat ansvar, indexerad historik och verifierade länkar.
-- Relaterade dokument: `docs/STATUS.md`, `docs/indexes/baselines.md`, ADR 0010.
+- Relaterade dokument: `docs/STATUS.md`, `docs/reports/REPORT-CATALOG.md`, ADR 0010.
+- Slutförd: 2026-08-04; kompakt modulstatus skiljer implementation, test, deployment och manuell verifiering.
 
 ### BB-007 – Besluta om en enda produktroadmap
 
@@ -589,14 +594,15 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Modul: Kvalitet
 - Typ: Dokumentationsstruktur
 - Prioritet: P3
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-03
 - Beskrivning: Separera testpolicy från körinstruktioner och senare placera dem rätt.
 - Motiv: Normativ policy och procedur bör vara tydligt åtskilda.
 - Avgränsning: Ingen flytt i denna fas; länkar granskas först.
 - Risk: Brutna länkar eller otydlig Definition of Done.
 - Definition of Done: Godkänd målstruktur, bevarad historik och gröna länkar.
-- Relaterade dokument: `TESTING.md`, `docs/operations/README.md`.
+- Relaterade dokument: `TESTING.md`, `docs/operations/runbooks/dashboard-widget-framework-verification.md`.
+- Slutförd: 2026-08-04; rotfilen är en testkarta och Dashboard-proceduren har en verifierad runbook.
 
 ### BB-011 – Konsolidera STABILIZATION_PLAN
 
@@ -644,7 +650,7 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Modul: Media / Smart Shuffle
 - Typ: Verifiering / härdning
 - Prioritet: P2
-- Status: Ny
+- Status: Pågår
 - Upptäckt: 2026-08-03
 - Beskrivning: Smart Shuffle MVP är implementerad, publicerad och automatiskt testad. UI-styrd start, rätt `NowPlayingItem` och användarstyrt skip är verifierade på den verkliga Samsung-TV:n. Naturlig avsnittsövergång, stopplivscykel och API-restartens processlokala beteende återstår för fullständig end-to-end-verifiering.
 - Avgränsning: Verifieringen ska utlösas genom användarens BigBrain-gränssnitt; ingen terminal eller automatiskt test får starta verklig uppspelning.
@@ -670,3 +676,15 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Avgränsning: Ingen automatisk Jellyfin-publicering, klientfork eller TV-patch. Custom CSS säkerhetskopieras och installeras endast manuellt efter separat godkännande.
 - Definition of Done: BigBrains mörka, ljusa och Obsidian Gold-teman är manuellt verifierade vid 320 px, mobil, desktop, tangentbord och 200 % text; aktuell Jellyfin-variant är separat installerad efter backup och Jellyfin Web desktop/mobile är visuellt verifierat; verklig Tizen-effekt och fungerande selectors är dokumenterade eller uttryckligen klassade som ej stödda.
 - Relaterade dokument: `docs/design-system/manual-verification.md`, `themes/jellyfin/compatibility.md`, ADR 0012.
+
+### BB-027 – Dashboardprofiler, synkronisering och avancerade widgetlayouter
+
+- Modul: BigBrain Web / Dashboard
+- Typ: Framtida arkitektur och funktion
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+- Beskrivning: Utred nästa dashboardfas med per-user och delade dashboards, mallar, profiler, rollbaserade layouter, användarvalda widgetstorlekar, verkställda widgetbehörigheter och serversynkronisering. Phase 1 är avsiktligt lokal och enhetsbunden.
+- Avgränsning: Ingen backendpersistens, identitetsmodell, synkkonfliktlösning eller behörighetsmotor införs innan separata kontrakt och faktisk användarmodell finns.
+- Definition of Done: Godkänd ägarskaps- och identitetsmodell, versionssatt synkkontrakt, konflikt- och migreringsstrategi, behörighetstester, tillgänglig storleksredigering, offlinebeteende, säkerhetsgranskning och manuell fleranvändarverifiering.
+- Relaterade dokument: `docs/architecture/dashboard-widget-framework.md`, ADR 0014.
