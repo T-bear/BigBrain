@@ -18,10 +18,12 @@ const primarySections: readonly DashboardModuleId[] = ['media-health', 'insights
 const secondarySections: readonly DashboardModuleId[] = ['activity', 'details']
 
 export function MediaDashboard({
+  administrationOnly = false,
   children,
   expanded,
   onToggle,
 }: {
+  administrationOnly?: boolean
   children?: ReactNode
   expanded?: DashboardExpandedState
   onToggle?: (moduleId: DashboardModuleId) => void
@@ -65,12 +67,12 @@ export function MediaDashboard({
     }
   }, [refresh])
 
-  return <section id="media" aria-labelledby="media-heading" className="media-section">
-    <div className="section-heading"><div><p className="eyebrow">Film och serier</p><h2 id="media-heading">Hitta något att titta på</h2></div>
-    </div>
+  return <section id={administrationOnly ? 'media-administration' : 'media'} aria-label={administrationOnly ? 'Mediaadministration' : undefined} aria-labelledby={administrationOnly ? undefined : 'media-heading'} className="media-section">
+    {!administrationOnly && <div className="section-heading"><div><p className="eyebrow">Film och serier</p><h2 id="media-heading">Hitta något att titta på</h2></div>
+    </div>}
     {loading && !overview && <p aria-live="polite">Laddar film och serier…</p>}
     {error && <p role="alert" className="notice notice--error">Film och serier kunde inte laddas.{overview ? ' Senaste tillgängliga uppdatering visas.' : ''}</p>}
-    {overview && <>
+    {overview && !administrationOnly && <>
       <div id="search" data-dashboard-module="media-search"><MediaSearch /></div>
       <SmartShuffle />
       <DownloadControl />
@@ -84,7 +86,7 @@ export function MediaDashboard({
         <div id="queue"><MediaJobs showHeading={false} /></div>
       </CollapsibleModule>
     </>}
-    <details className="administration" id="administration">
+    <details className="administration" id="administration" open={administrationOnly || undefined}>
       <summary><span><strong>Administration</strong><small>Systemstatus, tjänster och diagnostik</small></span></summary>
       <div className="administration__content">
         <div className="administration__heading"><div><p className="eyebrow">Teknisk översikt</p><h2>Administration</h2></div><div className="section-actions"><StatusBadge status={overview?.status ?? (error ? 'error' : 'loading')} /><button type="button" className="secondary-button" onClick={() => void refresh()} disabled={loading}>Uppdatera</button></div></div>

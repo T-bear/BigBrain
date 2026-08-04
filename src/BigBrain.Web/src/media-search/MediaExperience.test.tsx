@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import { MobileNavigation } from '../MobileNavigation'
+import { dashboardRegistry } from '../dashboard/appWidgets'
+import { ApplicationWidgetRegistry, WidgetProvider } from '../dashboard/widgetFramework'
 import { MediaPoster } from './MediaPoster'
 import { MediaSearch } from './MediaSearch'
 import { MediaServiceLinks } from '../media-services/MediaServiceLinks'
@@ -133,13 +135,12 @@ test('valid poster is lazy loaded and missing poster uses placeholder', () => {
 })
 
 test('mobile navigation has stable destinations and marks the active view', () => {
-  window.location.hash = '#queue'
-  render(<MobileNavigation />)
-  expect(screen.getByRole('link', { name: /Hem/ })).toHaveAttribute('href', '#home')
-  expect(screen.getByRole('link', { name: /Sök/ })).toHaveAttribute('href', '#search')
-  expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('href', '#queue')
-  expect(screen.getByRole('link', { name: /Pågår/ })).toHaveAttribute('aria-current', 'page')
-  expect(screen.getByRole('link', { name: /Admin/ })).toHaveAttribute('href', '#administration')
+  render(<WidgetProvider registry={new ApplicationWidgetRegistry([])}><MobileNavigation dashboards={dashboardRegistry} /></WidgetProvider>)
+  expect(screen.getByRole('button', { name: /Hem/ })).toHaveAttribute('aria-current', 'page')
+  fireEvent.click(screen.getByRole('button', { name: /Media/ }))
+  expect(screen.getByRole('button', { name: /Media/ })).toHaveAttribute('aria-current', 'page')
+  expect(screen.getByRole('button', { name: /AI/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Admin/ })).toBeInTheDocument()
 })
 
 test('provider timeout is shown with a Swedish safe message', async () => {

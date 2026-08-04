@@ -1,29 +1,10 @@
-import { useEffect, useState } from 'react'
+import type { DashboardRegistry } from './dashboard/widgetFramework'
+import { useWidgets } from './dashboard/widgetFramework'
+import { dashboardRegistry } from './dashboard/appWidgets'
 
-const items = [
-  { id: 'home', label: 'Hem', icon: '⌂' },
-  { id: 'search', label: 'Sök', icon: '⌕' },
-  { id: 'queue', label: 'Pågår', icon: '↧' },
-  { id: 'administration', label: 'Admin', icon: '⚙' },
-]
-
-export function MobileNavigation() {
-  const [active, setActive] = useState(() => window.location.hash.slice(1) || 'home')
-
-  useEffect(() => {
-    const update = () => setActive(window.location.hash.slice(1) || 'home')
-    window.addEventListener('hashchange', update)
-    return () => window.removeEventListener('hashchange', update)
-  }, [])
-
+export function MobileNavigation({ dashboards = dashboardRegistry }: { dashboards?: DashboardRegistry }) {
+  const { activeView, setActiveView } = useWidgets()
   return <nav className="mobile-navigation" aria-label="Snabbnavigation">
-    {items.map(item => <a key={item.id} href={`#${item.id}`} aria-current={active === item.id ? 'page' : undefined} onClick={() => {
-      if (item.id === 'administration') {
-        const administration = document.getElementById('administration') as HTMLDetailsElement | null
-        if (administration) administration.open = true
-      }
-    }}>
-      <span aria-hidden="true">{item.icon}</span>{item.label}
-    </a>)}
+    {dashboards.getAll().map(item => <button key={item.id} aria-current={activeView === item.id ? 'page' : undefined} onClick={() => setActiveView(item.id)} type="button"><span aria-hidden="true">{item.icon}</span>{item.title}</button>)}
   </nav>
 }
