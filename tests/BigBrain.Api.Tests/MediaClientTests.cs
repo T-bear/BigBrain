@@ -172,6 +172,43 @@ public sealed class MediaClientTests
     }
 
     [Fact]
+    public async Task SmartShuffleSelectsFirstUnplayedRegularEpisodeAndPreservesResumePosition()
+    {
+        Uri? requestedUri = null;
+        var client = new JellyfinClient(CreateClient(request =>
+        {
+            requestedUri = request.RequestUri;
+            return Json("""{"Items":[{"Id":"special","SeriesName":"Show","Name":"Special","ParentIndexNumber":0,"IndexNumber":1,"UserData":{"Played":false,"PlaybackPositionTicks":0},"MediaSources":[{}]},{"Id":"played","SeriesName":"Show","Name":"Played","ParentIndexNumber":1,"IndexNumber":1,"UserData":{"Played":true,"PlaybackPositionTicks":0},"MediaSources":[{}]},{"Id":"resume","SeriesName":"Show","Name":"Resume","ParentIndexNumber":1,"IndexNumber":2,"UserData":{"Played":false,"PlaybackPositionTicks":12345},"MediaSources":[{}]},{"Id":"later","SeriesName":"Show","Name":"Later","ParentIndexNumber":2,"IndexNumber":1,"UserData":{"Played":false,"PlaybackPositionTicks":0},"MediaSources":[{}]}]}""");
+        }), Options());
+
+        var episode = await ((IJellyfinPlaybackClient)client).GetNextEpisodeAsync(
+            "series", "user", TestContext.Current.CancellationToken);
+
+        Assert.NotNull(episode);
+        Assert.Equal("resume", episode.Id);
+        Assert.Equal(1, episode.SeasonNumber);
+        Assert.Equal(2, episode.EpisodeNumber);
+        Assert.Equal(12345, episode.PlaybackPositionTicks);
+        Assert.Equal("/Shows/series/Episodes", requestedUri!.AbsolutePath);
+        Assert.Contains("UserId=user", requestedUri.Query, StringComparison.Ordinal);
+        Assert.Contains("EnableUserData=true", requestedUri.Query, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task SmartShuffleRejectsEpisodeResponsesWithoutUserData()
+    {
+        var client = new JellyfinClient(CreateClient(_ => Json(
+            """{"Items":[{"Id":"episode","ParentIndexNumber":1,"IndexNumber":1,"MediaSources":[{}]}]}""")), Options());
+
+        var error = await Assert.ThrowsAsync<SmartShuffleException>(() =>
+            ((IJellyfinPlaybackClient)client).GetNextEpisodeAsync(
+                "series", "user", TestContext.Current.CancellationToken));
+
+        Assert.Equal("userDataUnavailable", error.Code);
+        Assert.DoesNotContain("series", error.SafeMessage, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task SonarrMapsSuccessfulReadOnlyResponses()
     {
         var client = new SonarrClient(CreateClient(request => Json(ArrResponse(request.RequestUri!, true))), Options());
