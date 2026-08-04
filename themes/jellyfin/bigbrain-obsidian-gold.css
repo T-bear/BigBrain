@@ -1,0 +1,39 @@
+/* BigBrain Obsidian Gold Jellyfin adapter v1.0.0; verified selectors: Jellyfin Web 10.11.11. Manual installation only. */
+:root {
+  --bb-jf-theme-id: bigbrain-obsidian-gold;
+  --bb-jf-bg: #111214;
+  --bb-jf-bg-subtle: #16181b;
+  --bb-jf-surface: #1a1c1f;
+  --bb-jf-surface-raised: #22252a;
+  --bb-jf-border: #5f584b;
+  --bb-jf-text: #f2eee5;
+  --bb-jf-text-muted: #b5aea2;
+  --bb-jf-primary: #c9a55c;
+  --bb-jf-primary-hover: #e0c27a;
+  --bb-jf-primary-contrast: #17130b;
+  --bb-jf-danger: #e78e91;
+  --bb-jf-focus: #e0c27a;
+  --bb-jf-radius-sm: .5rem;
+  --bb-jf-radius-md: .625rem;
+  --bb-jf-radius-lg: .875rem;
+  --bb-jf-shadow: 0 .875rem 2.25rem rgb(0 0 0 / 48%);
+}
+
+body, .backgroundContainer, .skinBody { background-color: var(--bb-jf-bg); color: var(--bb-jf-text); }
+.skinHeader { background: color-mix(in srgb, var(--bb-jf-bg) 94%, transparent); color: var(--bb-jf-text); backdrop-filter: blur(.75rem); }
+.mainDrawer { background: var(--bb-jf-bg-subtle); color: var(--bb-jf-text); border-right: 1px solid var(--bb-jf-border); }
+.navMenuOption-selected, .emby-tab-button-active { color: var(--bb-jf-text); background: var(--bb-jf-surface-raised); box-shadow: inset 3px 0 var(--bb-jf-primary); }
+.cardBox { border-radius: var(--bb-jf-radius-lg); }
+.cardImageContainer { border-radius: var(--bb-jf-radius-lg); box-shadow: var(--bb-jf-shadow); }
+.cardText, .itemName, .detailPagePrimaryContainer { color: var(--bb-jf-text); }
+.secondary, .fieldDescription, .listItemBodyText, .overview { color: var(--bb-jf-text-muted); }
+.emby-button, .raised { border-radius: var(--bb-jf-radius-md); }
+.button-submit, .raised.button-submit { background: var(--bb-jf-primary); color: var(--bb-jf-primary-contrast); }
+.button-submit:hover, .raised.button-submit:hover { background: var(--bb-jf-primary-hover); }
+.emby-input, .emby-textarea, .emby-select { border: 1px solid var(--bb-jf-border); border-radius: var(--bb-jf-radius-sm); background: var(--bb-jf-bg-subtle); color: var(--bb-jf-text); }
+.dialog { border: 1px solid var(--bb-jf-border); border-radius: var(--bb-jf-radius-lg); background: var(--bb-jf-surface); color: var(--bb-jf-text); box-shadow: var(--bb-jf-shadow); }
+.detailPagePrimaryContainer, .detailPageContent { text-shadow: 0 1px 2px rgb(0 0 0 / 65%); }
+.listItem { border-radius: var(--bb-jf-radius-md); }
+.listItem:hover { background: var(--bb-jf-surface-raised); }
+.emby-button:focus-visible, .emby-input:focus-visible, .emby-textarea:focus-visible, .emby-select:focus-visible, .card:focus-visible, .listItem:focus-visible { outline: 3px solid var(--bb-jf-focus); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

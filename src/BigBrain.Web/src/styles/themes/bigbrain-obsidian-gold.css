@@ -1,0 +1,31 @@
+[data-theme="bigbrain-obsidian-gold"] {
+  color-scheme: dark;
+  --bb-color-bg: #111214;
+  --bb-color-bg-subtle: #16181b;
+  --bb-color-surface: #1a1c1f;
+  --bb-color-surface-raised: #22252a;
+  --bb-color-surface-overlay: #202226;
+  --bb-color-border: #5f584b;
+  --bb-color-border-strong: #8d7952;
+  --bb-color-text: #f2eee5;
+  --bb-color-text-muted: #b5aea2;
+  --bb-color-text-inverse: #17130b;
+  --bb-color-primary: #c9a55c;
+  --bb-color-primary-hover: #e0c27a;
+  --bb-color-primary-active: #9d7c3f;
+  --bb-color-primary-contrast: #17130b;
+  --bb-color-accent: #d6b66f;
+  --bb-color-success: #72c697;
+  --bb-color-success-contrast: #08170f;
+  --bb-color-warning: #e0b96a;
+  --bb-color-warning-contrast: #1d1404;
+  --bb-color-danger: #e78e91;
+  --bb-color-danger-contrast: #250809;
+  --bb-color-info: #85b8d6;
+  --bb-color-info-contrast: #07151d;
+  --bb-color-backdrop: rgb(7 7 8 / 82%);
+  --bb-shadow-sm: 0 .25rem .75rem rgb(0 0 0 / 28%);
+  --bb-shadow-md: 0 .875rem 2.25rem rgb(0 0 0 / 48%);
+  --bb-shadow-lg: 0 1.5rem 5rem rgb(0 0 0 / 72%);
+  --bb-focus-ring: 0 0 0 3px #e0c27a;
+}

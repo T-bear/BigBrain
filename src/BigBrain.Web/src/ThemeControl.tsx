@@ -19,6 +19,7 @@ export function ThemeControl() {
     <select className="bb-select" id="bigbrain-theme" value={theme} onChange={event => changeTheme(event.target.value as ThemeId)}>
       <option value="bigbrain-dark">Mörkt</option>
       <option value="bigbrain-light">Ljust</option>
+      <option value="bigbrain-obsidian-gold">Obsidian Gold</option>
     </select>
   </label>
 }

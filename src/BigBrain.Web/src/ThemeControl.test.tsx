@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ThemeControl } from './ThemeControl'
-import { applyTheme, DEFAULT_THEME, resolveInitialTheme, THEME_STORAGE_KEY } from './theme'
+import { applyTheme, DEFAULT_THEME, resolveInitialTheme, THEME_STORAGE_KEY, themes } from './theme'
 
 describe('theme contract', () => {
   afterEach(cleanup)
@@ -37,5 +37,25 @@ describe('theme contract', () => {
     render(<ThemeControl />)
     expect(screen.getByLabelText('Tema')).toHaveValue('bigbrain-light')
     expect(document.documentElement.dataset.theme).toBe('bigbrain-light')
+  })
+
+  it('registers, selects and restores Obsidian Gold', () => {
+    expect(themes).toContain('bigbrain-obsidian-gold')
+    const { unmount } = render(<ThemeControl />)
+    const control = screen.getByLabelText('Tema')
+
+    expect(screen.getByRole('option', { name: 'Obsidian Gold' })).toBeInTheDocument()
+    fireEvent.change(control, { target: { value: 'bigbrain-obsidian-gold' } })
+    expect(document.documentElement.dataset.theme).toBe('bigbrain-obsidian-gold')
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('bigbrain-obsidian-gold')
+
+    unmount()
+    render(<ThemeControl />)
+    expect(screen.getByLabelText('Tema')).toHaveValue('bigbrain-obsidian-gold')
+    expect(document.documentElement.dataset.theme).toBe('bigbrain-obsidian-gold')
+  })
+
+  it('keeps every registered theme unique', () => {
+    expect(new Set(themes).size).toBe(themes.length)
   })
 })

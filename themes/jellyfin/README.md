@@ -12,3 +12,9 @@ The adapter changes color, header, drawer/navigation, cards/posters, buttons, fo
 
 See [compatibility](compatibility.md), the [install/rollback runbook](../../docs/operations/runbooks/jellyfin-bigbrain-theme.md)
 and the [manual verification plan](../../docs/design-system/manual-verification.md).
+
+## Obsidian Gold variant
+
+`bigbrain-obsidian-gold.css` is a second standalone adapter using the `bigbrain-obsidian-gold` visual direction. `obsidian-gold-tokens.css` is its editable token reference. The variant reuses only the selectors already verified for the 10.11.11 baseline; it adds no imports, URLs, fonts or BigBrain Web selectors.
+
+Copy the complete standalone file into Jellyfin Custom CSS only after a separate operator decision and the backup procedure in the runbook. Installing it is not part of building or selecting the BigBrain Web theme. Samsung Tizen needs manual verification on the real TV, and Jellyfin's administration dashboard remains outside Custom CSS scope.

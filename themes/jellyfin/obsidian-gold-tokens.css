@@ -1,0 +1,19 @@
+/* Obsidian Gold Jellyfin adapter tokens v1; source reference, not imported by BigBrain Web. */
+:root {
+  --bb-jf-bg: #111214;
+  --bb-jf-bg-subtle: #16181b;
+  --bb-jf-surface: #1a1c1f;
+  --bb-jf-surface-raised: #22252a;
+  --bb-jf-border: #5f584b;
+  --bb-jf-text: #f2eee5;
+  --bb-jf-text-muted: #b5aea2;
+  --bb-jf-primary: #c9a55c;
+  --bb-jf-primary-hover: #e0c27a;
+  --bb-jf-primary-contrast: #17130b;
+  --bb-jf-danger: #e78e91;
+  --bb-jf-focus: #e0c27a;
+  --bb-jf-radius-sm: .5rem;
+  --bb-jf-radius-md: .625rem;
+  --bb-jf-radius-lg: .875rem;
+  --bb-jf-shadow: 0 .875rem 2.25rem rgb(0 0 0 / 48%);
+}

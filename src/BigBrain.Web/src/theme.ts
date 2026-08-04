@@ -1,4 +1,4 @@
-export const themes = ['bigbrain-dark', 'bigbrain-light'] as const
+export const themes = ['bigbrain-dark', 'bigbrain-light', 'bigbrain-obsidian-gold'] as const
 export type ThemeId = (typeof themes)[number]
 export const DEFAULT_THEME: ThemeId = 'bigbrain-dark'
 export const THEME_STORAGE_KEY = 'bigbrain-theme'

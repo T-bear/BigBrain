@@ -12,5 +12,6 @@
   real TV remains required.
 - Other native clients: unsupported/not verified unless they use Jellyfin Web and load server Custom CSS.
 - Administration dashboard: server Custom CSS is intentionally not applied by Jellyfin 10.11, so it is outside adapter scope.
+- Obsidian Gold variant: `bigbrain-obsidian-gold.css` uses the same verified 10.11.11 selector set. It is technically self-contained but is not installed or visually approved; authenticated Jellyfin Web and real Samsung Tizen verification remain manual gates.
 
 Official Jellyfin documentation states that Custom CSS is loaded after default Web styles and only affects clients using Jellyfin Web. Selectors are not part of BigBrain's stable theme contract and must be rechecked for every Jellyfin Web upgrade.

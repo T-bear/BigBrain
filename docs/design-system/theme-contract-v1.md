@@ -14,6 +14,14 @@ Text and interactive-state combinations should meet WCAG AA contrast (4.5:1 for 
 
 To add a theme: copy `themes/example-theme.css`, change only tokens, add its ID to the typed allowlist and Swedish selector labels, then test default/fallback/persistence, keyboard focus, 320 px layout, text enlargement, critical modules and production build in both themes. A future JSON generator may emit this token file, but JSON and generators are not part of v1.
 
+## First-party themes
+
+- `bigbrain-dark` (`Mörkt`) is the default dark blue-violet theme.
+- `bigbrain-light` (`Ljust`) follows the light system preference when no choice is stored.
+- `bigbrain-obsidian-gold` (`Obsidian Gold`) uses layered graphite surfaces, warm off-white text and restrained brass-gold interaction accents. Semantic success, warning, danger and information colors remain distinct.
+
+The selector stores the chosen ID under the existing `bigbrain-theme` key. Reloading restores a valid choice; an invalid stored value safely returns to `bigbrain-dark`. New themes remain token-only: add a file under `src/BigBrain.Web/src/styles/themes/`, import it from `styles/index.css`, register the ID in `theme.ts`, add the Swedish selector label and extend the contract tests. Component- or module-specific palette rules do not belong in a theme.
+
 ## Stability boundary and versions
 
 The `--bb-` tokens above, `data-theme`, and general `bb-` component class meanings are v1. Exact DOM structure, module-specific classes, layout selectors, React component props and compatibility aliases are not stable public API. Breaking token changes require a new contract version and migration notes.
