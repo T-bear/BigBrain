@@ -23,9 +23,10 @@ The System and Docker modules are read-only. The Web API does not read host reso
 Explicitly deferred are Control Plane-to-Sentinel communication, real host metrics, real Docker inventory, every Docker mutation (including start, stop, restart, delete and exec), every media mutation, authentication, database persistence, AI, SignalR, Prometheus, external monitoring, home automation and plugin loading.
 
 Media Sprint 1 uses only documented application HTTP APIs and exposes `GET /api/v1/modules/media`. Credentials remain runtime configuration and all media mutations are deferred. See [Media Module documentation](docs/modules/media.md).
-The verified qBittorrent 5.2+ integration uses its official stateless Bearer API key authentication and only read-only WebAPI endpoints.
+The verified qBittorrent 5.2+ integration uses its official stateless Bearer API key authentication. Dashboard reads remain read-only; Download Control adds one narrowly bounded, previewed and confirmed removal endpoint with file preservation as the default.
 
 BigBrain Web uses the token-based [theme contract v1](docs/design-system/theme-contract-v1.md). The separately versioned Jellyfin adapter under `themes/jellyfin/` is a manual artifact and is never installed automatically.
+The selector offers `Mörkt`, `Ljust` and the graphite-and-brass `Obsidian Gold`; the stored choice is restored on reload.
 
 To connect the module to the existing media stack, follow [TESTING.md](TESTING.md). Runtime credentials belong in an ignored local `.env` copied from `.env.example`.
 

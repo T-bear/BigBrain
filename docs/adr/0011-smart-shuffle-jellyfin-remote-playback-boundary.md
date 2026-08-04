@@ -42,5 +42,7 @@ and durable recovery require a later decision and persistent store.
   excluded, while saved playback position is passed as `startPositionTicks`.
 - Provider failures and disappearing sessions become sanitized BigBrain failures.
 - Automated tests use fake playback clients and never control a real TV.
-- Manual end-to-end TV validation remains a separate operational gate tracked in BB-014.
+- UI-driven start, exact `NowPlayingItem` and user-driven skip have been verified on the
+  real Samsung Tizen client. Natural completion, stop lifecycle and restart behavior
+  remain separate operational gates tracked in BB-014.
 - The decision remains Proposed pending architecture and security review.

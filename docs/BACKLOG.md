@@ -150,6 +150,60 @@ Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
 
 ---
 
+### BB-016 – Ofta köpt visar varor som redan finns i inköpslistan
+
+- Modul: Inköpslista
+- Typ: UX / filtrering
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+Sektionen ”Ofta köpt” visar varor som redan finns i den aktiva inköpslistan. När en vara läggs till från sektionen kan förslaget dessutom ligga kvar trots att det inte längre är relevant.
+
+#### Nuvarande beteende
+
+- En vara kan visas samtidigt under ”Ofta köpt” och ”Att köpa”.
+- Ett förslag kan ligga kvar efter att användaren har lagt till varan.
+- Användaren kan få intrycket att samma vara fortfarande behöver läggas till.
+- Gränssnittet använder utrymme till förslag som inte längre kan hjälpa användaren.
+
+#### Förväntat beteende
+
+- Varor som redan finns i inköpslistan filtreras bort från ”Ofta köpt”.
+- En vara som läggs till från ”Ofta köpt” försvinner direkt efter lyckat tillägg.
+- Tillägg genom vanlig textinmatning uppdaterar också förslagen.
+- En borttagen vara kan återkomma när den fortfarande kvalificerar sig som ofta köpt.
+- Filtreringen använder samma namnnormalisering som dubblettkontrollen.
+- Sektionen visas inte som en tom eller irrelevant förslagsyta när inga förslag återstår.
+
+#### Risk
+
+Dubbel information skapar visuell oreda och kan leda till förvirring eller upprepade försök att lägga till en vara som redan finns i listan.
+
+#### Avgränsning
+
+Denna backlogregistrering bestämmer inte om filtreringen slutligen ska ske i frontend, backend eller båda. Vid implementation ska befintlig datamodell, dubblettregel och källa för ”Ofta köpt” först inspekteras. Ingen ändring av statistik eller historik för ofta köpta varor efterfrågas.
+
+#### Definition of Done
+
+- Ingen vara visas samtidigt i ”Ofta köpt” och den aktiva inköpslistan.
+- Ett förslag försvinner direkt efter ett lyckat tillägg från ”Ofta köpt”.
+- Ett lyckat tillägg genom vanlig textinmatning uppdaterar också förslagen.
+- En borttagen vara kan återkomma om den fortfarande kvalificerar sig.
+- Versaler, gemener och omgivande blanksteg hanteras konsekvent med dubblettkontrollen.
+- Ingen felaktig dubblett skapas.
+- Sektionen hanterar noll återstående förslag enligt befintlig UI-standard.
+- Beteendet fungerar på mobil och desktop.
+- Regressionstester finns för relevant filtreringslogik och användarflöde.
+
+#### Manuell evidens
+
+På mobilvyn observerades att ”Mjölk” visades både under ”Ofta köpt” och i den aktiva listan ”Att köpa”.
+
+---
+
 ### BB-017 – Smart Shuffle kan inte starta uppspelning på verifierad Samsung Tizen-TV
 
 - Modul: Media / Smart Shuffle
@@ -207,6 +261,240 @@ Testbevis: 186 API-tester och 32 Sentinel-tester godkända; 76 frontendtester oc
 - Automatiska tester täcker grundorsaken och relevanta fel.
 - Permanent verifieringsrapport skapad.
 - Buggen markeras som löst först efter verklig UI-styrd TV-verifiering.
+
+---
+
+### BB-018 – Smart Shuffle – Jellyfins ”Nästa avsnitt” visas missvisande mellan serier
+
+- Modul: Media / Smart Shuffle
+- Typ: UX / Jellyfin-klientintegration
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+När ett avsnitt avslutas under Smart Shuffle visar Jellyfin for Tizen den vanliga ”Nästa avsnitt”-rutan för nästa avsnitt i samma serie. Smart Shuffle väljer däremot nästa serie enligt sin rättvisa shufflealgoritm. Funktionen fortsätter att fungera, men Jellyfins förslag blir missvisande och visuellt störande.
+
+#### Förväntat beteende
+
+Smart Shuffle och Jellyfins klientgränssnitt ska ge en begriplig och konsekvent övergång mellan serier. Jellyfins normala nästa-avsnitt-funktion ska fortsatt fungera vid vanlig Jellyfin-uppspelning utanför Smart Shuffle.
+
+#### Utredningspunkter
+
+- Verifiera om Jellyfin 10.11.11 eller Jellyfin for Tizen dokumenterar ett sessionsavgränsat sätt att stänga av eller undvika klientens vanliga ”Nästa avsnitt”-ruta.
+- Utred om ett annat dokumenterat playbackflöde kan göra Smart Shuffle-övergången tydligare utan att störa vanlig Jellyfin-användning.
+- Om klientbeteendet inte säkert kan påverkas, utred dokumentation av begränsningen eller en tydlig förklaring i Smart Shuffle-gränssnittet.
+- Inför inte odokumenterade Jellyfin-endpoints eller klienthack.
+
+#### Avgränsning
+
+Ingen global Jellyfin-inställning får försämra eller stänga av den normala nästa-avsnitt-funktionen utanför Smart Shuffle. Implementationen ska föregås av verifiering av installerad serverversion, Tizen-klientens beteende och dokumenterade kontrakt. Ingen kod-, runtime-, Compose-, Jellyfin- eller Tizen-konfigurationsändring ingår i denna backlogregistrering.
+
+#### Definition of Done
+
+- Installerad Jellyfin-version och Jellyfin for Tizen-beteendet verifieras.
+- Det dokumenterade Jellyfin-kontraktet för completion, autoplay, PlayNext och nästa-avsnitt-UI undersöks.
+- Det fastställs om klientens ruta kan påverkas per Smart Shuffle-session.
+- Ingen global Jellyfin-inställning ändras utan separat uttryckligt beslut.
+- Vanlig manuell Jellyfin-uppspelning påverkas inte.
+- Smart Shuffles automatiska seriebyte fortsätter att fungera.
+- Ingen odokumenterad eller versionsosäker endpoint används.
+- Automatisk övergång, skip och stop regressionstestas.
+- Lösningen verifieras manuellt på Samsung Smart TV.
+- Relevant dokumentation och permanent verifieringsrapport uppdateras.
+
+---
+
+### BB-019 – BigBrain saknar säker borttagning av oönskad nedladdning
+
+- Modul: Media / Download Control
+- Typ: Funktion / säker extern mutation
+- Prioritet: P2
+- Status: Pågår
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+BigBrain saknade ett objektspecifikt och bekräftat sätt att avbryta ett oönskat qBittorrent-jobb utan att exponera rå torrentidentitet eller riskera andra jobb och media.
+
+#### Implementerad MVP
+
+Listning, opaka kortlivade ID:n, live-revalidering, filbevarande standardborttagning, separat riskgrindad destruktiv borttagning, Arr-varning, säkra fel och automatiska fake-baserade tester är implementerade och deployade. Användaren har genom BigBrains UI bekräftat att minst ett fastnat jobb togs bort från qBittorrent med filerna bevarade. Full manuell verifiering av `deleteFiles=true`, samtliga destruktiva riskscenarier och konsekvenser för importerad media/Arr återstår; status förblir därför Pågår.
+
+#### Manuell status och kvarvarande verifiering
+
+- Filbevarande borttagning genom BigBrain UI: verifierad av användaren.
+- Borttagning från qBittorrent: verifierad av användaren.
+- Destruktiv dataradering: inte fullständigt produktionsverifierad.
+- Retry, pausa/återuppta, Arr Recovery, diagnostik, masshantering och retention: separata backlogposter BB-020–BB-026.
+
+#### Definition of Done
+
+- Exakt ett liveverifierat jobb påverkas per request.
+- Normal borttagning använder `deleteFiles=false` och bevarar data.
+- Destruktiv borttagning är separat, explicit och blockeras vid osäker risk.
+- Rå hash, credentials, paths och upstreamfel exponeras inte.
+- Sonarr/Radarr-ägarskap varnas för utan Arr-mutation.
+- Backend-/frontendtester och production build är gröna.
+- Verklig UI-styrd testborttagning verifieras på uttryckligt testjobb.
+- Permanent rapport publiceras och indexeras.
+
+---
+
+### BB-020 – Download Control – säker masshantering
+
+- Modul: Media / Download Control
+- Typ: Framtida funktion / destruktiv batchhantering
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+- Beskrivning: Utred separat preview, målmanifest, bekräftelse och audit för flera torrentjobb. MVP:n får fortsatt endast påverka ett jobb per request.
+- Definition of Done: Separat arkitekturbeslut, explicit målmanifest, total riskbedömning, ingen `all`-parameter, batchtester och manuell verifiering.
+
+---
+
+### BB-021 – Download Control – koordinerad Sonarr/Radarr-recovery
+
+- Modul: Media / Download Control
+- Typ: Framtida funktion / Arr-orkestrering
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+- Beskrivning: Utred ett separat uttryckligt flöde för blocklist, köborttagning och ny sökning när Arr äger jobbet. MVP:n muterar endast qBittorrent.
+- Definition of Done: Versionsverifierade Arr-kontrakt, separat preview/bekräftelse, idempotens, ingen dold sökning och end-to-end-test med ofarligt testjobb.
+
+---
+
+### BB-022 – Download Control – säker rensning och retention för avslutade jobb
+
+- Modul: Media / Download Control
+- Typ: Framtida funktion / retention
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+- Beskrivning: Definiera en separat policy för avslutade jobb, importerad media och eventuell datarensning. MVP:n blockerar destruktiv borttagning av färdiga/importosäkra jobb.
+- Definition of Done: Beslutad retentionpolicy, verifierat import- och hårdlänkskontrakt, säkra undantag, audit, rollbackstrategi och manuell verifiering.
+
+---
+
+### BB-023 – Download Control – Försök igen (Retry)
+
+- Modul: Media / Download Control
+- Typ: Funktion
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+Användaren ska kunna försöka återuppliva en nedladdning som fastnat utan att behöva öppna qBittorrent.
+
+Exempel på åtgärder:
+
+- reannounce mot trackers;
+- Force Resume om torrenten är pausad;
+- uppdatera status efter utförd åtgärd;
+- visa säkra felmeddelanden;
+- aldrig exponera hash eller råa API-svar.
+
+#### Definition of Done
+
+- Exakt ett torrentjobb påverkas.
+- Säkra felkoder används.
+- Ingen påverkan på andra torrents.
+- Fullständig backend- och frontendtestning finns.
+- Dokumentationen är uppdaterad.
+
+---
+
+### BB-024 – Download Control – Pausa / Återuppta
+
+- Modul: Media / Download Control
+- Typ: Funktion
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+BigBrain ska kunna pausa och återuppta en enskild nedladdning.
+
+#### Definition of Done
+
+- Pausa fungerar.
+- Återuppta fungerar.
+- Status uppdateras direkt.
+- Ingen massoperation används.
+- Endast ett jobb påverkas.
+- Tester och dokumentation är uppdaterade.
+
+---
+
+### BB-025 – Download Control – Arr Recovery
+
+- Modul: Media / Download Control
+- Typ: Funktion
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+Skapa ett separat återställningsflöde för nedladdningar som ägs av Sonarr eller Radarr.
+
+Exempel på åtgärder:
+
+- ta bort torrent;
+- valfri blocklist;
+- starta ny sökning;
+- visa tydligt vad som kommer att hända innan något utförs.
+
+Detta ska vara ett eget arbetsflöde och inte blandas ihop med vanlig borttagning.
+
+#### Definition of Done
+
+- Preview finns.
+- Bekräftelse krävs.
+- Säker rollback vid fel finns.
+- End-to-end-test finns.
+- Dokumentationen är uppdaterad.
+
+---
+
+### BB-026 – Download Control – Diagnostik (”Varför laddar den inte ner?”)
+
+- Modul: Media / Download Control
+- Typ: UX / funktion
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-04
+
+#### Beskrivning
+
+BigBrain ska analysera varför en nedladdning inte gör framsteg och ge användaren en begriplig förklaring i stället för enbart rå status.
+
+Exempel på diagnoser:
+
+- inga seeders;
+- tracker svarar inte;
+- torrent pausad;
+- väntar på metadata;
+- disk full;
+- Sonarr/Radarr väntar;
+- fel autentisering;
+- timeout;
+- nätverksproblem.
+
+För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
+
+#### Definition of Done
+
+- Diagnoser visas med mänskligt språk.
+- Felsökningen bygger på verifierad data.
+- Ingen rå intern information exponeras.
+- Tester finns.
+- Dokumentationen är uppdaterad.
 
 ---
 
@@ -358,7 +646,7 @@ Testbevis: 186 API-tester och 32 Sentinel-tester godkända; 76 frontendtester oc
 - Prioritet: P2
 - Status: Ny
 - Upptäckt: 2026-08-03
-- Beskrivning: Smart Shuffle MVP är implementerad och automatiskt testad. Fullständig end-to-end-verifiering på den verkliga Samsung-TV:n återstår.
+- Beskrivning: Smart Shuffle MVP är implementerad, publicerad och automatiskt testad. UI-styrd start, rätt `NowPlayingItem` och användarstyrt skip är verifierade på den verkliga Samsung-TV:n. Naturlig avsnittsövergång, stopplivscykel och API-restartens processlokala beteende återstår för fullständig end-to-end-verifiering.
 - Avgränsning: Verifieringen ska utlösas genom användarens BigBrain-gränssnitt; ingen terminal eller automatiskt test får starta verklig uppspelning.
 - Definition of Done:
   - TV:n visas som valbar enhet i BigBrain utan rått UserId eller session-ID.
@@ -378,7 +666,7 @@ Testbevis: 186 API-tester och 32 Sentinel-tester godkända; 76 frontendtester oc
 - Prioritet: P2
 - Status: Ny
 - Upptäckt: 2026-08-04
-- Beskrivning: Kör den dokumenterade visuella kontrollen av båda BigBrain-teman och verifiera separat, efter uttryckligt installationsgodkännande, om serverbaserad Jellyfin Custom CSS påverkar den verkliga Samsung Tizen-klienten.
+- Beskrivning: Kör den dokumenterade visuella kontrollen av samtliga BigBrain-teman och verifiera separat, efter uttryckligt installationsgodkännande för aktuell adaptervariant, om serverbaserad Jellyfin Custom CSS påverkar den verkliga Samsung Tizen-klienten. Obsidian Gold är deployat i BigBrain Web men ännu inte mänskligt visuellt godkänt; dess separata Jellyfin-adapter är inte installerad.
 - Avgränsning: Ingen automatisk Jellyfin-publicering, klientfork eller TV-patch. Custom CSS säkerhetskopieras och installeras endast manuellt efter separat godkännande.
-- Definition of Done: BigBrain är manuellt verifierat vid 320 px, mobil, desktop, tangentbord och 200 % text; Jellyfin Web desktop/mobile är visuellt verifierat; verklig Tizen-effekt och fungerande selectors är dokumenterade eller uttryckligen klassade som ej stödda.
+- Definition of Done: BigBrains mörka, ljusa och Obsidian Gold-teman är manuellt verifierade vid 320 px, mobil, desktop, tangentbord och 200 % text; aktuell Jellyfin-variant är separat installerad efter backup och Jellyfin Web desktop/mobile är visuellt verifierat; verklig Tizen-effekt och fungerande selectors är dokumenterade eller uttryckligen klassade som ej stödda.
 - Relaterade dokument: `docs/design-system/manual-verification.md`, `themes/jellyfin/compatibility.md`, ADR 0012.
