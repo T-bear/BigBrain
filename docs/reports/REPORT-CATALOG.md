@@ -8,7 +8,7 @@
 | Download Control MVP | Catalog metadata only; full reports local | [STATUS](../STATUS.md#download-control) and [runbook](../operations/runbooks/download-control-safe-removal.md) | Local full evidence retained |
 | Obsidian Gold | Catalog metadata only; full reports local | [STATUS](../STATUS.md#designsystem-och-teman) and [theme contract](../design-system/theme-contract-v1.md) | Local full evidence retained |
 | Early ARR recovery and diagnostics | Local only or superseded | [History](../history/early-sprints.md) | Not published as raw reports |
-| Repository consolidation | Sanitized full report | [Documentation reports](documentation/) | Created at publication closure |
+| Repository consolidation | Sanitized full report | [Publication report](documentation/repository-consolidation-and-documentation-governance-20260804-214358.md) | Published |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value
