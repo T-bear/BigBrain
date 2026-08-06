@@ -1,6 +1,6 @@
 # BigBrain Backlog
 
-Senast uppdaterad: 2026-08-04
+Senast uppdaterad: 2026-08-05
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
 
@@ -23,6 +23,153 @@ Status:
 ---
 
 ## Buggar
+
+### BB-030 – Dashboardinställningar under kugghjulsmeny
+
+- Modul: BigBrain Web / Dashboard
+- Typ: UX / navigering och inställningar
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-05
+
+#### Beskrivning
+
+Kontrollerna Tema, Redigera och Widgetbibliotek visas permanent högst upp i varje dashboardvy. De tar mycket vertikalt utrymme på mobil och är sekundära inställningsfunktioner snarare än primärt innehåll.
+
+#### Önskat beteende
+
+- Visa en tydlig kugghjulsknapp för dashboardinställningar.
+- Tema, Redigera och Widgetbibliotek öppnas därifrån.
+- Menyn gäller aktuell dashboardvy.
+- Aktivt redigeringsläge framgår fortfarande tydligt.
+- Tema förblir globalt om det är det nuvarande kontraktet.
+- Funktionerna försvinner inte och blir inte svårare att nå.
+- Menyn fungerar med touch, tangentbord, Escape, fokusfälla och fokusåterställning.
+- Lösningen fungerar i alla teman och på mobil och desktop.
+
+#### Avgränsning
+
+Ingen ändring av widgetpersistens, moduldata, dashboardprofiler eller backend.
+
+#### Definition of Done
+
+- Tema, Redigera och Widgetbibliotek ligger bakom en tydlig kugghjulskontroll.
+- Dashboardens primära innehåll börjar högre upp på mobil.
+- Alla tre funktionerna är fullt åtkomliga.
+- Menyn har korrekt tillgänglighetssemantik.
+- Aktivt redigeringsläge är tydligt.
+- Verifierat i Ljust, Mörkt och Obsidian Gold.
+- Regressionstester och manuell mobilverifiering finns.
+
+#### Manuell evidens
+
+På iPhone i Obsidian Gold tar Tema-väljaren samt knapparna Redigera och Widgetbibliotek en stor del av den övre dashboardytan.
+
+### BB-031 – Download Control orsakar horisontell overflow på mobil
+
+- Modul: Media / Download Control
+- Typ: Bugg / mobil layout / overflow
+- Prioritet: P1
+- Status: Bekräftad
+- Upptäckt: 2026-08-05
+
+#### Beskrivning
+
+När widgeten Nedladdningar är öppen på mobil blir delar av Download Control bredare än widgeten och viewporten. Informationsrutor, filter, åtgärdsknappar och långa torrentnamn kan fortsätta utanför högerkanten.
+
+#### Nuvarande beteende
+
+- Uppdateringsknappen kapas eller hamnar delvis utanför.
+- Filterraden fortsätter utanför widgetens bredd.
+- Torrentkort och Hantera-knappar kan bli bredare än tillgängligt utrymme.
+- Långa namn pressar layouten horisontellt.
+- Innehåll döljs bakom viewportens högra kant.
+
+#### Förväntat beteende
+
+- Ingen sida- eller widgetövergripande horisontell scroll.
+- Allt innehåll håller sig inom widgetens inre bredd.
+- Långa torrentnamn radbryts eller trunkeras kontrollerat.
+- Filter får radbrytas eller ligga i en avsiktlig intern scrollrad utan att hela sidan expanderar.
+- Knappar anpassas till mobilbredd.
+- Progressindikator och metadata håller sig inom kortet.
+- Desktoplayouten försämras inte.
+
+#### Tekniska kontrollpunkter
+
+- `min-width: 0` på grid- och flexbarn.
+- `overflow-wrap` och `word-break` för långa release-namn.
+- Fasta bredder och `width: max-content`.
+- `flex-wrap` för header och filter.
+- `max-width: 100%`.
+- `box-sizing`.
+- Eventuell `overflow-x` på fel container.
+
+#### Definition of Done
+
+- Ingen horisontell dokument-scroll vid 320, 375 och 390 px.
+- Header, filter, torrentkort och knappar ryms.
+- Mycket långa torrentnamn förstör inte layouten.
+- Download Control är användbart i alla teman.
+- Regressionstest använder representativt långt torrentnamn.
+- Manuell verifiering genomförs på iPhone.
+
+#### Manuell evidens
+
+På Media-vyn i mobilformat går uppdateringsknappen, filterraden och torrentinformationen utanför widgetens högra kant.
+
+### BB-032 – Kalenderns Heroma-importdialog orsakar horisontell scroll
+
+- Modul: Kalender / Heroma-import
+- Typ: Bugg / mobil modal / overflow
+- Prioritet: P1
+- Status: Bekräftad
+- Upptäckt: 2026-08-05
+
+#### Beskrivning
+
+När dialogen Importera Heroma-schema öppnas på mobil visas en horisontell scrollbar längst ned. Dialogens innehåll är bredare än den visuella viewporten.
+
+#### Nuvarande beteende
+
+- Importdialogen kan scrollas horisontellt.
+- Delar av dialogen sträcker sig utanför skärmen.
+- Filväljaren, knappen Förhandsgranska eller dialogens inre panel misstänks skapa en för stor minsta bredd.
+- Problemet är särskilt tydligt i mörkt tema på iPhone.
+
+#### Förväntat beteende
+
+- Dialogen är aldrig bredare än mobilens visuella viewport.
+- Endast vertikal scroll används när innehållet är långt.
+- Filväljare, statusrad, förhandsgranskningsknapp och stängknapp ryms inom dialogen.
+- Långa filnamn radbryts eller trunkeras säkert.
+- Safe-area-insets respekteras.
+- Dialogen fungerar även med flera valda filer och långa filnamn.
+
+#### Tekniska kontrollpunkter
+
+- `width` och `max-width` med hänsyn till viewport och safe area.
+- `min-width: 0` på dialogens barn.
+- Native `input[type=file]`.
+- `box-sizing`.
+- Padding plus border.
+- `100vw` kontra `100dvw`.
+- Långa filnamn och flex-/gridbarn.
+- `overflow-x` på dialog, overlay och body.
+
+#### Definition of Done
+
+- Ingen horisontell scrollbar vid 320, 375 och 390 px.
+- Dialogen ryms inom viewporten i alla teman.
+- Flera filer och långa filnamn förstör inte layouten.
+- Endast avsedd vertikal dialogscroll används.
+- Bakgrundssidan förblir låst.
+- Escape, fokusfälla och fokusåterställning fungerar fortsatt.
+- Regressionstest och manuell iPhone-verifiering finns.
+
+#### Manuell evidens
+
+På iPhone visas en tydlig horisontell scrollbar längst ned i dialogen Importera Heroma-schema.
 
 ### BB-001 – Ingen synlig återkoppling när en dubblettvara stoppas
 
