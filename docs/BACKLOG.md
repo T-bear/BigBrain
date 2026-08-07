@@ -1,6 +1,6 @@
 # BigBrain Backlog
 
-Senast uppdaterad: 2026-08-05
+Senast uppdaterad: 2026-08-07
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
 
@@ -492,12 +492,144 @@ Listning, opaka kortlivade ID:n, live-revalidering, filbevarande standardborttag
 ### BB-020 – Download Control – säker masshantering
 
 - Modul: Media / Download Control
-- Typ: Framtida funktion / destruktiv batchhantering
-- Prioritet: P3
+- Typ: Funktion / UX / säker extern mutation
+- Prioritet: P1
 - Status: Ny
 - Upptäckt: 2026-08-04
-- Beskrivning: Utred separat preview, målmanifest, bekräftelse och audit för flera torrentjobb. MVP:n får fortsatt endast påverka ett jobb per request.
-- Definition of Done: Separat arkitekturbeslut, explicit målmanifest, total riskbedömning, ingen `all`-parameter, batchtester och manuell verifiering.
+
+#### Bakgrund och verifierat nuläge
+
+Download Control listar qBittorrents aktuella torrentjobb men kan endast öppna och
+hantera ett jobb åt gången. Det blir ineffektivt när flera jobb har fel, har fastnat,
+är pausade, behöver startas om eller tas bort, eller är färdiga och kan rensas.
+
+Detta är den befintliga backlogposten för samma behov; den konkretiserades och höjdes
+från P3 till P1 den 2026-08-07 efter verifierat användarbehov. Ingen ny dubblettpost
+skapades. Objektspecifika Retry och Pausa/Återuppta i BB-023 respektive BB-024 är
+förutsättningar eller relaterade capabilities. Koordinerad Sonarr/Radarr-recovery
+förblir separat i BB-021; den ersatta dubbletten BB-025 ändrar inte denna gräns.
+Säker rensning av avslutade jobb och retention definieras fortsatt i BB-022, och
+diagnostik i BB-026.
+
+#### Önskad UX
+
+- Checkbox per nedladdning.
+- ”Markera alla” gäller endast den aktuella filtrerade vyn.
+- Antalet markerade poster visas tydligt och alla kan avmarkeras med en handling.
+- Ett batchåtgärdsfält visas eller aktiveras först när minst ett objekt har markerats.
+- Utred Starta/återuppta markerade, Pausa markerade, Försök igen markerade fel,
+  Ta bort markerade och Rensa markerade färdiga.
+- Utred separata snabbåtgärder: Försök igen alla fel, Pausa alla aktiva,
+  Återuppta alla pausade och Rensa färdiga.
+- Urval, bekräftelse, resultat och fel ska vara begripliga och användbara på mobil
+  och desktop samt med tangentbord och skärmläsare.
+
+#### Säkerhets- och kontraktskrav
+
+- En framtida implementation ska föregås av ett separat arkitekturbeslut och får
+  varken använda qBittorrents `hashes=all` eller bli en generell proxy.
+- Browsern skickar endast opaka BigBrain-identiteter. Torrenthashar, paths,
+  credentials och råa upstreamsvar exponeras aldrig.
+- Servern skapar ett explicit målmanifest och preview visar exakt vilka jobb och
+  åtgärder som kommer att påverkas innan bekräftelse.
+- Varje objekt och dess identitet revalideras server-side omedelbart före mutation;
+  browser-supplied raw hashes eller ett implicit aktuellt filter är aldrig auktoritet.
+- Varje objekt får en individuell riskbedömning. Ett osäkert objekt får inte utsättas
+  för destruktiv mutation och får inte göra övriga objekts riskbedömning mindre strikt.
+- Kontraktet ska uttryckligen besluta atomärt kontra partiellt resultat och redovisa
+  success/failure per objekt, inklusive säkra Problem Details-fel.
+- Åtgärder ska vara idempotenta där det är möjligt och skyddas mot dubbelklick,
+  återanvänd bekräftelse och samtidiga submits.
+- Destruktiv dataradering har en separat aktiv bekräftelse, tillämpar minst samma
+  konservativa path-/importgrindar som objektspecifik borttagning och får aldrig
+  påverka ett objekt vars datascope är osäkert.
+- Arr-ägarskap är inte tillstånd för dold mutation. Koordinerad blocklist,
+  köborttagning eller ny sökning följer BB-021:s separata preview- och
+  bekräftelsekontrakt.
+
+#### Definition of Done
+
+- Val, ”Markera alla” för filtrerad vy, antal valda, avmarkering och villkorat
+  batchåtgärdsfält är implementerade och tillgänglighetsverifierade.
+- Beslutade batch- och snabbåtgärder har tydliga tillståndsregler och påverkar endast
+  det visade, bekräftade målmanifestet.
+- Separat arkitekturbeslut dokumenterar capability-gräns, risk per objekt,
+  atomärt eller partiellt resultat, idempotens och concurrency.
+- Ingen `all`-parameter, rå hash, path eller generell qBittorrent-proxy används.
+- Preview, separat destruktiv bekräftelse, server-side revalidering, per-item-resultat,
+  audit och säkra fel är automatiskt testade.
+- Mobil, desktop, tangentbord och skärmläsarnamn/aria-labels är verifierade.
+- Ofarlig manuell batchverifiering visar att exakt avsedda jobb påverkades och att
+  övriga qBittorrent-, Sonarr-, Radarr- och medieobjekt var oförändrade.
+- Relevant modul-, status-, ADR-, test- och runbookdokumentation är uppdaterad.
+
+---
+
+### BB-033 – Media – tydliggör skillnaden mellan Nedladdningar och Mediajobb
+
+- Modul: Media / MediaDashboard
+- Typ: UX / informationsarkitektur
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-07
+
+#### Bakgrund och verifierad ansvarsskillnad
+
+Media-vyn visar både ”Nedladdningar” och den kollapsbara modulen ”Pågående” med
+undertiteln ”Pågående aktivitet” (Media Jobs). Gränssnittet förklarar inte varför båda
+finns, och Media Jobs kan dessutom sammanfatta flera aktiva poster som ”pågående
+nedladdningar”.
+
+- **Nedladdningar / Download Control** representerar qBittorrents aktuella torrentkö.
+  Den läser den fulla kön via Download Control-kontraktet, normaliserar torrentstatus,
+  hastighet, storlek, köposition, kategori och Arr-ägarskapsvarning och är den
+  avsiktligt smala mutationsytan för objektspecifik, preview-/bekräftelsestyrd
+  borttagning. Livscykeln är begränsad till torrentjobbet: aktiv, köad, pausad, fel,
+  klar eller okänd.
+- **Pågående / Media Jobs** är en separat read-only livscykelvy för ett medieönskemål
+  genom flera system. Den aggregerar Sonarrs och Radarrs registrerade bibliotek och
+  köer, en begränsad qBittorrent-lista och Jellyfins bibliotekskatalog. Poster
+  normaliseras och kan grupperas från beställd/sökning/kö/nedladdning via
+  stannad/fel och färdig nedladdning/import till tillgänglig i Jellyfin.
+- Funktionerna överlappar därför avsiktligt under nedladdningsfasen: samma
+  qBittorrentjobb kan synas i båda. De har inte samma ansvar. Download Control visar
+  och hanterar torrentjobbet; Media Jobs förklarar mediets end-to-end-status och är
+  inte en mutationsyta.
+
+Det är främst presentationen och de nuvarande namnen, inte de verifierade
+ansvarsgränserna, som är otydliga för en användare utan kunskap om qBittorrent,
+Sonarr eller Radarr.
+
+#### Önskat resultat
+
+- Användaren förstår direkt att den ena modulen hanterar själva nedladdningskön och
+  att den andra följer mediets väg till biblioteket.
+- Utred bättre användarnamn, exempelvis ”Nedladdningskö” för Download Control och
+  ”Biblioteksjobb” eller ”Bearbetning” för Media Jobs, utan att föregripa beslutet.
+- Utred korta beskrivande undertitlar, särskiljande ikonografi och begripliga
+  statusbeskrivningar utan krav på teknisk tjänstekunskap.
+- Utred om modulerna bör visualisera en gemensam men sanningsenlig pipeline, exempelvis
+  `Hittad → Nedladdning → Import/bearbetning → Klar i Jellyfin`, inklusive hur
+  ”beställd”, ”söker”, fel, paus, kö och okänd status representeras.
+- Behåll tekniska providerdetaljer som valfri fördjupning och förklara överlappningen
+  när samma nedladdningsfas visas i båda modulerna.
+- Ingen funktionalitet eller befintlig säkerhetsgräns får försvinna.
+
+#### Definition of Done
+
+- Den faktiska ansvarsskillnaden och datakällorna ovan återspeglas i namn,
+  beskrivningar och statusetiketter.
+- Slutanvändaren behöver inte känna till qBittorrent, Sonarr eller Radarr för att
+  förstå vilken modul som visar livscykel respektive hanterar nedladdningskön.
+- Namn, undertitlar, ikonografi och eventuell pipeline är konsekventa med verklig
+  funktion och vilseleder inte om import- eller Jellyfin-status.
+- Avsiktlig överlappning under nedladdningsfasen förklaras utan att dubblera eller
+  ta bort funktionalitet.
+- Mobil och desktop är visuellt och funktionellt verifierade.
+- Tillgängliga namn, rubrikhierarki, aria-labels, statusmeddelanden och
+  skärmläsarkontext är verifierade.
+- Relevanta tester samt modul-, status- och UX-dokument uppdateras när lösningen
+  implementeras.
 
 ---
 
