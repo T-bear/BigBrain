@@ -32,6 +32,21 @@ public sealed class ShoppingListStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task SimilarNamesRequireExplicitOverrideWithoutFuzzySubstringMatching()
+    {
+        var store=Store(); await store.AddAsync("Lördagsgodis",1,TestContext.Current.CancellationToken);
+        foreach(var candidate in new[]{"Lördags godis","lordagsgodis","lördags-godis"})
+        {
+            var duplicate=await Assert.ThrowsAsync<ShoppingListException>(()=>store.AddAsync(candidate,1,TestContext.Current.CancellationToken));
+            Assert.Equal(ShoppingListErrorCodes.SimilarDuplicate,duplicate.Code);
+        }
+        await store.AddAsync("Lördags godis",1,TestContext.Current.CancellationToken,true);
+        await store.AddAsync("Havremjölk",1,TestContext.Current.CancellationToken);
+        await store.AddAsync("Mjölk",1,TestContext.Current.CancellationToken);
+        Assert.Equal(4,(await store.GetAsync(TestContext.Current.CancellationToken)).Items.Count);
+    }
+
+    [Fact]
     public async Task TwoCompletedSessionsCreateDeterministicLearnedOrderWithoutReorderingDuringChecks()
     {
         var store=Store();

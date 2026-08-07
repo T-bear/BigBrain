@@ -25,7 +25,7 @@ Webbgränssnittet har fyra vyer utan sidomladdning:
 - **AI:** tydligt ej implementerade platshållare för kommande AI-funktioner.
 - **Admin:** serverstatus, containers, integrationer och teknisk information.
 
-`DashboardRegistry`, `ApplicationWidgetRegistry`, `WidgetProvider` och `DashboardWorkspace` ger stabila widget-ID:n, metadata, bibliotek, visa/dölj, kollapsning, drag- och knappbaserad omordning samt versionerad lokal persistence. Phase 1 är implementerad, automatiskt verifierad, Web-deployad och manuellt visuellt godkänd. Per-user/shared dashboards, synk, roller och användarvalda storlekar är framtida arbete i BB-027.
+`DashboardRegistry`, `ApplicationWidgetRegistry`, `WidgetProvider` och `DashboardWorkspace` ger stabila widget-ID:n, metadata, bibliotek, visa/dölj, kollapsning, drag- och knappbaserad omordning samt versionerad lokal persistence. Tema, redigeringsläge och widgetbibliotek nås samlat genom Dashboardinställningar. Phase 1 är implementerad, automatiskt verifierad, Web-deployad och manuellt visuellt godkänd; den senare inställningsfixen är automatiskt verifierad men ännu inte deployad. Per-user/shared dashboards, synk, roller och användarvalda storlekar är framtida arbete i BB-027.
 
 Se [widgetarkitekturen](docs/architecture/dashboard-widget-framework.md) och [Proposed ADR 0014](docs/adr/0014-dashboard-views-and-widget-framework.md).
 
@@ -34,7 +34,7 @@ Se [widgetarkitekturen](docs/architecture/dashboard-widget-framework.md) och [Pr
 ### Familj
 
 - **Matlista:** maträtter, taggar, familjeschema, generering, måltidsbyte, sparade matsedlar och utskrift.
-- **Inköpslista:** permanent aktiv lista, dubblettskydd, förslag, ofta köpt, inköpssessioner och inlärd butiksordning.
+- **Inköpslista:** permanent aktiv lista, exakt dubblettskydd, konservativ upptäckt av skrivvarianter, förslag, ofta köpt, inköpssessioner och inlärd butiksordning.
 
 ### Media
 

@@ -12,7 +12,7 @@ public sealed record ShoppingListSnapshot(IReadOnlyList<ShoppingItem> Items, str
 public sealed record ShoppingSuggestion(string Name, string Source);
 public sealed record FrequentItem(string Name, int PurchaseCount, DateTimeOffset? LastPurchasedAtUtc);
 public sealed record FinishShoppingResult(int ArchivedCount, int RemainingCount);
-public sealed record AddShoppingItemRequest(string? Name, int Quantity = 1);
+public sealed record AddShoppingItemRequest(string? Name, int Quantity = 1, bool AddAnyway = false);
 public sealed record UpdateShoppingItemRequest(string? Name, int Quantity = 1);
 public sealed record FinishShoppingRequest(bool KeepUnpurchased);
 
@@ -21,6 +21,7 @@ public static class ShoppingListErrorCodes
     public const string InvalidRequest = "shoppingListInvalidRequest";
     public const string Duplicate = "shoppingListDuplicate";
     public const string PurchasedDuplicate = "shoppingListPurchasedDuplicate";
+    public const string SimilarDuplicate = "shoppingListSimilarDuplicate";
     public const string NotFound = "shoppingListItemNotFound";
     public const string Unavailable = "shoppingListUnavailable";
 }

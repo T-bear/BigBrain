@@ -10,6 +10,12 @@ or fonts.
 
 The adapter changes color, header, drawer/navigation, cards/posters, buttons, forms, dialogs, details, lists and focus states. It does not hide controls, modify video/subtitles, resize posters globally or patch a native client.
 
+The adapter cannot automatically follow BigBrain Web's current theme selection. Jellyfin
+loads server-side Custom CSS in a separate origin and client lifecycle and has no access
+to BigBrain's `data-theme` attribute or localStorage choice. Dynamic coupling would stop
+the artifact from being a standalone, manually reviewed adapter and is outside ADR 0012.
+Operators must continue to select and install one reviewed Jellyfin variant explicitly.
+
 See [compatibility](compatibility.md), the [install/rollback runbook](../../docs/operations/runbooks/jellyfin-bigbrain-theme.md)
 and the [manual verification plan](../../docs/design-system/manual-verification.md).
 

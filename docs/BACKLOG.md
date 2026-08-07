@@ -29,7 +29,7 @@ Status:
 - Modul: BigBrain Web / Dashboard
 - Typ: UX / navigering och inställningar
 - Prioritet: P2
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-05
 
 #### Beskrivning
@@ -65,12 +65,16 @@ Ingen ändring av widgetpersistens, moduldata, dashboardprofiler eller backend.
 
 På iPhone i Obsidian Gold tar Tema-väljaren samt knapparna Redigera och Widgetbibliotek en stor del av den övre dashboardytan.
 
+#### Lösning och verifiering
+
+Tema, redigeringsläge och widgetbibliotek samlas i en tillgänglig inställningspanel bakom ett kugghjul. Escape och klick utanför stänger panelen med fokusåterställning. Implementationen verifierades 2026-08-07 med komponenttester, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 i samtliga tre teman. Ingen deployment ingick.
+
 ### BB-031 – Download Control orsakar horisontell overflow på mobil
 
 - Modul: Media / Download Control
 - Typ: Bugg / mobil layout / overflow
 - Prioritet: P1
-- Status: Bekräftad
+- Status: Klar
 - Upptäckt: 2026-08-05
 
 #### Beskrivning
@@ -117,6 +121,10 @@ När widgeten Nedladdningar är öppen på mobil blir delar av Download Control 
 #### Manuell evidens
 
 På Media-vyn i mobilformat går uppdateringsknappen, filterraden och torrentinformationen utanför widgetens högra kant.
+
+#### Lösning och verifiering
+
+Grundorsaken var intrinsic sizing i gridbarn, header, åtgärdsknapp och långa texter. Berörda containers har nu explicita `min-width: 0`/`max-width: 100%`, radbrytning och enkolumnslayout på mobil utan att dölja informationsinnehåll. Implementationen verifierades 2026-08-07 med komponent-/CSS-regressionstest, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 utan dokument- eller widgetoverflow. Ingen deployment ingick.
 
 ### BB-032 – Kalenderns Heroma-importdialog orsakar horisontell scroll
 
@@ -955,6 +963,7 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Avgränsning: Ingen automatisk Jellyfin-publicering, klientfork eller TV-patch. Custom CSS säkerhetskopieras och installeras endast manuellt efter separat godkännande.
 - Definition of Done: BigBrains mörka, ljusa och Obsidian Gold-teman är manuellt verifierade vid 320 px, mobil, desktop, tangentbord och 200 % text; aktuell Jellyfin-variant är separat installerad efter backup och Jellyfin Web desktop/mobile är visuellt verifierat; verklig Tizen-effekt och fungerande selectors är dokumenterade eller uttryckligen klassade som ej stödda.
 - Relaterade dokument: `docs/design-system/manual-verification.md`, `themes/jellyfin/compatibility.md`, ADR 0012.
+- Sprint 1-bedömning 2026-08-07: automatisk synk med BigBrains aktuella tema implementeras inte. Jellyfin laddar manuellt installerad server-CSS i en separat origin och klientlivscykel och kan inte läsa BigBrains `data-theme` eller localStorage. Dynamisk koppling skulle bryta ADR 0012:s fristående adaptergräns. Posten förblir öppen för den redan definierade manuella variantinstallationen och Tizen-verifieringen.
 
 ### BB-027 – Dashboardprofiler, synkronisering och avancerade widgetlayouter
 
@@ -973,7 +982,7 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Modul: Inköpslista
 - Typ: Bugg / UX / datakvalitet
 - Prioritet: P1
-- Status: Bekräftad
+- Status: Klar
 - Upptäckt: 2026-08-07
 
 #### Problem och verifierat nuläge
@@ -999,12 +1008,16 @@ Den befintliga kontrollen använder ett normaliserat namn och stoppar exakta tr�
 - Relevanta frontend- och backendtester finns.
 - Dokumentationen är uppdaterad.
 
+#### Lösning och verifiering
+
+En separat konservativ jämförelsenyckel tar bort whitespace, Unicode-bindestreck och diakritiska markörer. Ingen edit distance, substringmatchning eller annan fuzzy-algoritm används. En sannolik träff visar befintlig vara och kräver uttryckligt val mellan använd befintlig, lägg till ändå och avbryt. `mjölk` och `havremjölk` förblir olika. Frontend-, API- och storetester samt production build verifierar beteendet.
+
 ### BB-035 – Shopping List – förbättra läsbarheten för Ofta köpt
 
 - Modul: Inköpslista
 - Typ: Bugg / UX / tillgänglighet
 - Prioritet: P2
-- Status: Bekräftad
+- Status: Klar
 - Upptäckt: 2026-08-07
 
 #### Problem och verifierat nuläge
@@ -1024,6 +1037,10 @@ Kontrollera Ljust, Mörkt och Obsidian Gold samt default, hover, focus, active, 
 - Mobil layout, radbrytning och touchyta fungerar.
 - Snapshot-, komponent- eller motsvarande regressionstest skyddar samtliga relevanta tillstånd och teman.
 - Dokumentationen är uppdaterad.
+
+#### Lösning och verifiering
+
+Knapparna använder nu semantiska surface/text-, primary/contrast-, focus- och disabled-tokens i stället för inverse-text på en vanlig surface. Default, hover, focus, active/selected och disabled skyddas av regressionstest. Production build och headless Chromium i Ljust, Mörkt och Obsidian Gold vid mobilbredd godkändes 2026-08-07. Ingen deployment ingick.
 
 ### BB-036 – BigBrain – realtidssynkronisering av delad familjedata
 

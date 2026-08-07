@@ -13,13 +13,15 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Deployat: BigBrain Web. Ingen backend-, Compose- eller runtimekonfigurationsändring krävdes.
 - Manuellt verifierat: mobilnavigationen, de fyra vyerna och layouten godkändes 2026-08-04.
 - Kända begränsningar: profilsynkronisering, delade dashboards, mallar, roller, serverpersistens och fria storlekar är framtida arbete i BB-027.
+- Sprint 1-buggfix 2026-08-07: Dashboardinställningar samlar Tema, redigeringsläge och widgetbibliotek bakom ett tillgängligt kugghjul. Fixen är automatiskt testad, production-byggd och verifierad i headless Chromium för mobil, tablet och desktop, men inte deployad eller manuellt verifierad på fysisk enhet.
 - Dokument: [arkitektur](architecture/dashboard-widget-framework.md), [ADR 0014](adr/0014-dashboard-views-and-widget-framework.md), [runbook](operations/runbooks/dashboard-widget-framework-verification.md), [rapporter](reports/features/dashboard/).
 
 ## Matlista och Inköpslista
 
 - Status: Implementerade, deployade och manuellt runtimeverifierade.
 - Implementerat: familjefokuserade mobilflöden för veckoplanering och inköp.
-- Kända begränsningar: kvarvarande UX-, datakvalitets-, tillgänglighets- och realtidsbehov finns i BB-001–BB-003, BB-016 och BB-034–BB-036. De tre sistnämnda är dokumenterade men inte implementerade.
+- Sprint 1-buggfix 2026-08-07: konservativ skrivvariantskontroll och uttryckligt `Lägg till ändå` är implementerade för nya varor; ”Ofta köpt” använder läsbara semantiska färger i samtliga dokumenterade states. Fixarna är automatiskt testade, production-byggda och verifierade i headless Chromium för samtliga teman och states, men inte deployade eller manuellt verifierade på fysisk enhet.
+- Kända begränsningar: BB-001–BB-003 och BB-016 återstår separat. Gemensam realtidssynk är endast planerad i BB-036.
 - Dokument: [Matlista](knowledge/meal-planner.md) och [Inköpslista](knowledge/shopping-list.md).
 
 ## Media
@@ -43,6 +45,7 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Automatiskt verifierat: opaka ID:n, live-revalidering, preview/bekräftelse, exakt ett mål, filbevarande respektive separat destruktivt kontrakt, samtidighetsskydd och sanerade fel.
 - Manuellt verifierat: minst ett användarstyrt filbevarande borttagande från qBittorrent via BigBrain. Destruktiv `deleteFiles=true` är inte fullständigt produktionsverifierad.
 - Kända begränsningar: BB-019–BB-026 täcker återstående verifiering, masshantering, ARR-recovery, retention, retry, paus/återuppta och diagnostik.
+- Sprint 1-buggfix 2026-08-07: informationspaneler, kort, header, progress och långa namn är breddbegränsade utan horisontell widgetscroll. Fixen är automatiskt testad, production-byggd och verifierad i headless Chromium för mobil, tablet och desktop, men inte deployad eller manuellt verifierad på fysisk enhet.
 - Dokument: [Media](modules/media.md), [ADR 0013](adr/0013-safe-qbittorrent-download-removal-boundary.md), [runbook](operations/runbooks/download-control-safe-removal.md), [qBittorrent](knowledge/qbittorrent.md).
 
 ## Designsystem och teman
@@ -50,6 +53,7 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Status: designsystem v1 och Obsidian Gold är implementerade, automatiskt verifierade och deployade i BigBrain Web.
 - Implementerat: tokenbaserade teman, persistens och säker fallback. Standardtemat ändrades inte.
 - Jellyfin: separata CSS-adaptrar finns. Den befintliga BigBrain-adaptern och Obsidian Gold-underlaget ska inte sammanblandas; Obsidian Gold är inte installerat som Jellyfin Custom CSS och är inte Tizen-verifierat.
+- Jellyfin följer inte BigBrains aktuella runtime-tema: serverinstallerad Custom CSS körs i en separat Jellyfin-klient och kan inte läsa BigBrains lokala `data-theme` eller localStorage. Automatisk koppling skulle bryta ADR 0012:s fristående, manuellt publicerade adaptergräns och implementeras därför inte i Sprint 1.
 - Kända begränsningar: manuell tvärmodul- och Tizen-verifiering följs i BB-015.
 - Dokument: [temakontrakt](design-system/theme-contract-v1.md), [manuell verifiering](design-system/manual-verification.md), [ADR 0012](adr/0012-design-system-theme-contract-and-jellyfin-adapter.md), [Jellyfin-adapter](../themes/jellyfin/README.md).
 

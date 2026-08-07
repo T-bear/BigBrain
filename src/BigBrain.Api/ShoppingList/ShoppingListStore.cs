@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Data.Sqlite;
 
@@ -36,6 +37,16 @@ public sealed partial class ShoppingListStore : IDisposable
 
     public static string Normalize(string value) => CleanName(value).Normalize().ToUpper(new CultureInfo("sv-SE"));
 
+    public static string SimilarityKey(string value)
+    {
+        var characters = CleanName(value).Normalize(NormalizationForm.FormD).Where(character =>
+        {
+            var category = CharUnicodeInfo.GetUnicodeCategory(character);
+            return category != UnicodeCategory.NonSpacingMark && category != UnicodeCategory.DashPunctuation && !char.IsWhiteSpace(character);
+        });
+        return string.Concat(characters).Normalize(NormalizationForm.FormC).ToUpperInvariant();
+    }
+
     public async Task<ShoppingListSnapshot> GetAsync(CancellationToken token)
     {
         await using var connection = await OpenAsync(token);
@@ -55,7 +66,7 @@ public sealed partial class ShoppingListStore : IDisposable
         return new(items, sessionId);
     }
 
-    public async Task<ShoppingItem> AddAsync(string rawName, int quantity, CancellationToken token)
+    public async Task<ShoppingItem> AddAsync(string rawName, int quantity, CancellationToken token, bool addAnyway = false)
     {
         ValidateQuantity(quantity);
         var name = CleanName(rawName); var normalized = Normalize(name); var now = DateTimeOffset.UtcNow;
@@ -70,6 +81,19 @@ public sealed partial class ShoppingListStore : IDisposable
             if (existing is not null)
                 throw new ShoppingListException(Convert.ToInt32(existing, CultureInfo.InvariantCulture) == 1 ? ShoppingListErrorCodes.PurchasedDuplicate : ShoppingListErrorCodes.Duplicate,
                     Convert.ToInt32(existing, CultureInfo.InvariantCulture) == 1 ? $"{name} ligger redan under Köpta." : $"{name} finns redan på listan.", 409);
+            if (!addAnyway)
+            {
+                await using var candidates = connection.CreateCommand();
+                candidates.CommandText = "SELECT Name FROM Items WHERE ArchivedAtUtc IS NULL";
+                await using var reader = await candidates.ExecuteReaderAsync(token);
+                var key = SimilarityKey(name);
+                while (await reader.ReadAsync(token))
+                {
+                    var candidate = reader.GetString(0);
+                    if (SimilarityKey(candidate) == key)
+                        throw new ShoppingListException(ShoppingListErrorCodes.SimilarDuplicate, $"Liknande vara finns redan: {candidate}", 409);
+                }
+            }
             var ordinal = Convert.ToInt32(await ScalarAsync(connection, "SELECT COALESCE(MAX(SortOrdinal),0)+1 FROM Items", token), CultureInfo.InvariantCulture);
             var item = new ShoppingItem(Guid.NewGuid().ToString("N"), name, normalized, quantity, false, now, now, ordinal);
             await using var insert = connection.CreateCommand();

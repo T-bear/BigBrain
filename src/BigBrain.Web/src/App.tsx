@@ -4,7 +4,6 @@ import { DashboardWorkspace } from './dashboard/DashboardWorkspace'
 import { createAppWidgetRegistry, dashboardRegistry } from './dashboard/appWidgets'
 import { WidgetProvider, useWidgets } from './dashboard/widgetFramework'
 import { MobileNavigation } from './MobileNavigation'
-import { ThemeControl } from './ThemeControl'
 import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
 
 const POLL_INTERVAL_MS = 5_000
@@ -22,7 +21,6 @@ function AppShell() {
         <p className="nav-label">Vyer</p>
         {dashboardRegistry.getAll().map(view => <button aria-current={activeView === view.id ? 'page' : undefined} className="nav-link" key={view.id} onClick={() => setActiveView(view.id)} type="button"><span aria-hidden="true">{view.icon}</span><span>{view.title}</span></button>)}
       </nav>
-      <ThemeControl />
     </aside>
     <DashboardWorkspace dashboards={dashboardRegistry} />
     <MobileNavigation dashboards={dashboardRegistry} />

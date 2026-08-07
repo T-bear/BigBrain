@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ThemeControl } from '../ThemeControl'
 import type { DashboardRegistry, DashboardViewId, WidgetDefinition } from './widgetFramework'
 import { useWidgets } from './widgetFramework'
 
@@ -70,7 +71,9 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
   const { activeView, preferences, registry } = useWidgets()
   const [editMode, setEditMode] = useState(false)
   const [libraryOpen, setLibraryOpen] = useState(false)
-  const libraryButtonRef = useRef<HTMLButtonElement>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsButtonRef = useRef<HTMLButtonElement>(null)
+  const settingsRef = useRef<HTMLDivElement>(null)
   const dashboard = dashboards.get(activeView)
   const viewPreferences = preferences.views[activeView] ?? { order: [], hidden: [], collapsed: [] }
   const available = registry.getForView(activeView)
@@ -79,12 +82,30 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     ...available.filter(widget => widget.defaultView === activeView && !viewPreferences.order.includes(widget.id)),
   ].filter(widget => !viewPreferences.hidden.includes(widget.id))
 
+  useEffect(() => {
+    if (!settingsOpen) return
+    settingsRef.current?.querySelector<HTMLElement>('select, button')?.focus()
+    const close = (event: KeyboardEvent | MouseEvent) => {
+      if (event instanceof KeyboardEvent && event.key !== 'Escape') return
+      if (event instanceof MouseEvent && (settingsRef.current?.contains(event.target as Node) || settingsButtonRef.current?.contains(event.target as Node))) return
+      setSettingsOpen(false)
+      window.setTimeout(() => settingsButtonRef.current?.focus(), 0)
+    }
+    document.addEventListener('keydown', close)
+    document.addEventListener('mousedown', close)
+    return () => { document.removeEventListener('keydown', close); document.removeEventListener('mousedown', close) }
+  }, [settingsOpen])
+
   return <main className="main bb-page dashboard-workspace" id={activeView}>
     <header className="page-header dashboard-workspace__header">
       <div><p className="eyebrow">{dashboard.description}</p><h1>{dashboard.title}</h1></div>
       <div className="dashboard-workspace__actions">
-        <button aria-pressed={editMode} className="secondary-button" onClick={() => setEditMode(current => !current)} type="button">{editMode ? 'Avsluta redigering' : 'Redigera'}</button>
-        <button className="secondary-button" onClick={() => setLibraryOpen(true)} ref={libraryButtonRef} type="button">Widgetbibliotek</button>
+        <button aria-expanded={settingsOpen} aria-haspopup="dialog" aria-label="Dashboardinställningar" className="secondary-button dashboard-settings__trigger" onClick={() => setSettingsOpen(current => !current)} ref={settingsButtonRef} type="button"><span aria-hidden="true">⚙</span><span>Dashboardinställningar</span></button>
+        {settingsOpen && <div aria-label="Dashboardinställningar" className="dashboard-settings" ref={settingsRef} role="dialog">
+          <ThemeControl />
+          <button aria-pressed={editMode} className="secondary-button" onClick={() => setEditMode(current => !current)} type="button">{editMode ? 'Avsluta redigering' : 'Aktivera redigeringsläge'}</button>
+          <button className="secondary-button" onClick={() => { setSettingsOpen(false); setLibraryOpen(true) }} type="button">Öppna widgetbibliotek</button>
+        </div>}
       </div>
     </header>
     {editMode && <p aria-live="polite" className="notice">Redigeringsläge är aktivt. Dra widgets eller använd pilknapparna för att ändra ordning.</p>}
@@ -92,6 +113,6 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
       {ordered.map((widget, index) => <WidgetFrame definition={widget} editMode={editMode} index={index} key={widget.id} total={ordered.length} view={activeView} />)}
     </div>
     {ordered.length === 0 && <section className="empty-state"><h2>Inga widgets visas</h2><p>Öppna widgetbiblioteket för att lägga till widgets i den här vyn.</p><button className="primary-button" onClick={() => setLibraryOpen(true)} type="button">Öppna widgetbiblioteket</button></section>}
-    {libraryOpen && <WidgetLibrary onClose={() => { setLibraryOpen(false); window.setTimeout(() => libraryButtonRef.current?.focus(), 0) }} view={activeView} />}
+    {libraryOpen && <WidgetLibrary onClose={() => { setLibraryOpen(false); window.setTimeout(() => settingsButtonRef.current?.focus(), 0) }} view={activeView} />}
   </main>
 }

@@ -60,7 +60,8 @@ test('restores the last selected dashboard and falls back from invalid storage',
 
 test('widget library hides a widget without deleting data and persists visibility', () => {
   render(<App />)
-  fireEvent.click(screen.getByRole('button', { name: 'Widgetbibliotek' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Dashboardinställningar' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna widgetbibliotek' }))
   const dialog = screen.getByRole('dialog', { name: 'Visa widgets' })
   fireEvent.click(within(dialog).getByRole('checkbox', { name: /Kalender/ }))
   fireEvent.click(within(dialog).getByRole('button', { name: 'Klar' }))
@@ -70,7 +71,8 @@ test('widget library hides a widget without deleting data and persists visibilit
 
 test('edit mode reorders widgets and collapsed state is persisted', () => {
   const { container } = render(<App />)
-  fireEvent.click(screen.getByRole('button', { name: 'Redigera' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Dashboardinställningar' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Aktivera redigeringsläge' }))
   fireEvent.click(screen.getByRole('button', { name: 'Flytta Inköpslista upp' }))
   expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')).slice(0, 2)).toEqual(['shopping-list', 'meal-plan'])
   const shoppingWidget = container.querySelector('[data-widget-id="shopping-list"]') as HTMLElement
@@ -86,6 +88,18 @@ test('renders system values and safe Docker state only in Admin', async () => {
   expect(await screen.findByText('bigbrain-host')).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'CPU usage' })).toHaveAttribute('value', '23.5')
   expect(screen.getByText('Docker inventory requires Sentinel integration.')).toBeInTheDocument()
+})
+
+test('dashboard settings groups theme, editing and widget library with keyboard dismissal', () => {
+  render(<App />)
+  const trigger = screen.getByRole('button', { name: 'Dashboardinställningar' })
+  fireEvent.click(trigger)
+  const settings = screen.getByRole('dialog', { name: 'Dashboardinställningar' })
+  expect(within(settings).getByRole('combobox', { name: 'Tema' })).toBeInTheDocument()
+  expect(within(settings).getByRole('button', { name: 'Aktivera redigeringsläge' })).toBeInTheDocument()
+  expect(within(settings).getByRole('button', { name: 'Öppna widgetbibliotek' })).toBeInTheDocument()
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(screen.queryByRole('dialog', { name: 'Dashboardinställningar' })).not.toBeInTheDocument()
 })
 
 test('shows loading and safe errors in Admin', async () => {

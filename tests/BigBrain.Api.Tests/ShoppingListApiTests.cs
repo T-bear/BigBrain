@@ -39,5 +39,15 @@ public sealed class ShoppingListApiTests : IDisposable
     }
 
     private WebApplicationFactory<Program> Factory()=>new WebApplicationFactory<Program>().WithWebHostBuilder(builder=>builder.ConfigureTestServices(services=>{services.RemoveAll<ShoppingListOptions>();services.RemoveAll<ShoppingListStore>();services.AddSingleton(new ShoppingListOptions{DatabasePath=Path.Combine(directory,"shopping.db")});services.AddSingleton<ShoppingListStore>();}));
+
+    [Fact]
+    public async Task SimilarDuplicateRequiresExplicitAddAnyway()
+    {
+        await using var factory=Factory();using var client=factory.CreateClient();
+        (await client.PostAsJsonAsync("/api/v1/modules/shopping-list/items",new AddShoppingItemRequest("Lördagsgodis",1),TestContext.Current.CancellationToken)).EnsureSuccessStatusCode();
+        var similar=await client.PostAsJsonAsync("/api/v1/modules/shopping-list/items",new AddShoppingItemRequest("lordags godis",1),TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Conflict,similar.StatusCode);Assert.Contains(ShoppingListErrorCodes.SimilarDuplicate,await similar.Content.ReadAsStringAsync(TestContext.Current.CancellationToken),StringComparison.Ordinal);
+        (await client.PostAsJsonAsync("/api/v1/modules/shopping-list/items",new AddShoppingItemRequest("lordags godis",1,true),TestContext.Current.CancellationToken)).EnsureSuccessStatusCode();
+    }
     public void Dispose(){if(Directory.Exists(directory))Directory.Delete(directory,true);}
 }

@@ -6,7 +6,7 @@ public static class ShoppingListEndpoints
     {
         var group=app.MapGroup("/api/v1/modules/shopping-list");
         group.MapGet("/items",(ShoppingListStore s,CancellationToken t)=>Run(()=>s.GetAsync(t)));
-        group.MapPost("/items",(AddShoppingItemRequest r,ShoppingListStore s,CancellationToken t)=>Run(async()=>await s.AddAsync(r.Name??"",r.Quantity,t),201));
+        group.MapPost("/items",(AddShoppingItemRequest r,ShoppingListStore s,CancellationToken t)=>Run(async()=>await s.AddAsync(r.Name??"",r.Quantity,t,r.AddAnyway),201));
         group.MapPut("/items/{id}",(string id,UpdateShoppingItemRequest r,ShoppingListStore s,CancellationToken t)=>Run(()=>s.UpdateAsync(id,r.Name??"",r.Quantity,t)));
         group.MapPost("/items/{id}/purchase",(string id,ShoppingListStore s,CancellationToken t)=>Run(()=>s.SetPurchasedAsync(id,true,t)));
         group.MapPost("/items/{id}/restore",(string id,ShoppingListStore s,CancellationToken t)=>Run(()=>s.SetPurchasedAsync(id,false,t)));

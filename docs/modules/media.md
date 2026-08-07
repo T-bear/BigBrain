@@ -255,6 +255,12 @@ The MVP is deployed. The user has confirmed one UI-driven file-preserving remova
 qBittorrent. Destructive removal remains conservatively available only through the
 documented risk gates and is not claimed as fully production-verified.
 
+The Sprint 1 Web fix constrains Download Control headers, messages, progress, cards and
+long names to the widget's available width. Mobile uses a single-column card layout;
+tablet and desktop retain the bounded two-column action layout. This presentation fix
+does not change the removal capability or provider contract and is automatically tested
+and production-built, but not yet deployed or manually viewport-verified.
+
 ## Smart Shuffle MVP
 
 Smart Shuffle is an opt-in Media capability controlled by `Media:SmartShuffle:Enabled`
