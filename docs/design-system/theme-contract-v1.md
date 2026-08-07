@@ -20,7 +20,9 @@ To add a theme: copy `themes/example-theme.css`, change only tokens, add its ID 
 - `bigbrain-light` (`Ljust`) follows the light system preference when no choice is stored.
 - `bigbrain-obsidian-gold` (`Obsidian Gold`) uses layered graphite surfaces, warm off-white text and restrained brass-gold interaction accents. Semantic success, warning, danger and information colors remain distinct.
 
-The selector stores the chosen ID under the existing `bigbrain-theme` key. Reloading restores a valid choice; an invalid stored value safely returns to `bigbrain-dark`. New themes remain token-only: add a file under `src/BigBrain.Web/src/styles/themes/`, import it from `styles/index.css`, register the ID in `theme.ts`, add the Swedish selector label and extend the contract tests. Component- or module-specific palette rules do not belong in a theme.
+ThemeProvider använder det globala, versionssatta `GET/PUT /api/v1/settings/theme` som auktoritativ familjeinställning. Värdet persisteras i Settings-modulens separata SQLite-volume. Den befintliga nyckeln `bigbrain-theme` i `localStorage` är endast cache/offline-fallback och kan seeda servern en gång när serverinställningen ännu saknas; därefter hämtar mobil och desktop samma servervärde vid start och när klienten återfår fokus. Ogiltiga värden avvisas av API:t och lokal UI-state återställs om skrivningen misslyckas.
+
+Nya teman förblir token-only: lägg till filen under `src/BigBrain.Web/src/styles/themes/`, importera den från `styles/index.css`, registrera samma ID i både frontendens och API:ts allowlist, lägg till svensk selector-label och utöka kontraktstesterna. Komponent- eller modulspecifika palettregler hör inte hemma i ett tema.
 
 ## Stability boundary and versions
 

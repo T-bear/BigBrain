@@ -33,7 +33,7 @@ Samla verifierad kunskap om modulen Inköpslista.
 
 ## Senast verifierad
 
-2026-08-07; grundimplementationen runtimeverifierades 2026-08-02. Sprint 1-fixarna är automatiskt verifierade och production-byggda men inte deployade eller manuellt verifierade.
+2026-08-07; grundimplementationen runtimeverifierades 2026-08-02. Sprint 1-fixarna är automatiskt verifierade, production-byggda och deployade, men deploymenten är underkänd och ny manuell produktägarverifiering väntar efter remediation.
 
 ## Källa och evidens
 

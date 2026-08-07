@@ -10,7 +10,7 @@ BigBrain ska utgå från vad användaren vill göra, inte från hur underliggand
 
 - **BigBrain Web:** React, TypeScript och Vite; gemensamt applikationsskal, designsystem och kompilerade förstapartswidgets.
 - **BigBrain API:** modulär ASP.NET Core-monolit med versionssatta API:er och Problem Details.
-- **BigBrain Modules:** domän- och integrationsgränser för System, Media, Matlista och Inköpslista.
+- **BigBrain Modules:** domän- och integrationsgränser för System, Media, Matlista, Inköpslista och Kalender.
 - **BigBrain Sentinel:** separat minsta-behörighetsgräns för lokala systemcapabilities; Web och API monterar aldrig Docker-socketen.
 - **Integration adapters:** Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent kapslas bakom typade adapters.
 
@@ -20,7 +20,7 @@ Se [arkitekturbaslinjen](ARCHITECTURE.md), [ADR-indexet](docs/indexes/adr.md) oc
 
 Webbgränssnittet har fyra vyer utan sidomladdning:
 
-- **Hem:** Matlista, Inköpslista samt tydligt ej implementerade Kalender- och Påminnelseplatshållare.
+- **Hem:** Matlista, Inköpslista, Kalenderns kompakta veckovy samt en tydligt ej implementerad Påminnelseplatshållare.
 - **Media:** sökning, pågående jobb, Smart Shuffle, Download Control och mediaintegrationer.
 - **AI:** tydligt ej implementerade platshållare för kommande AI-funktioner.
 - **Admin:** serverstatus, containers, integrationer och teknisk information.
@@ -35,6 +35,7 @@ Se [widgetarkitekturen](docs/architecture/dashboard-widget-framework.md) och [Pr
 
 - **Matlista:** maträtter, taggar, familjeschema, generering, måltidsbyte, sparade matsedlar och utskrift.
 - **Inköpslista:** permanent aktiv lista, exakt dubblettskydd, konservativ upptäckt av skrivvarianter, förslag, ofta köpt, inköpssessioner och inlärd butiksordning.
+- **Kalender:** persistent veckokalender, responsiv månadsvy och säker server-side flerfilsimport från verifierade Heroma `.xlsx`-scheman. Se [modulkontraktet](docs/modules/calendar.md).
 
 ### Media
 

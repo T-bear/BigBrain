@@ -5,6 +5,7 @@ import { createAppWidgetRegistry, dashboardRegistry } from './dashboard/appWidge
 import { WidgetProvider, useWidgets } from './dashboard/widgetFramework'
 import { MobileNavigation } from './MobileNavigation'
 import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
+import { ThemeProvider } from './ThemeProvider'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -27,7 +28,7 @@ function AppShell() {
   </div>
 }
 
-export default function App() {
+function AppContent() {
   const [modules, setModules] = useState<ModuleDefinition[]>([])
   const [moduleError, setModuleError] = useState(false)
   const [system, setSystem] = useState<SystemOverview | null>(null)
@@ -58,4 +59,8 @@ export default function App() {
 
   const registry = useMemo(() => createAppWidgetRegistry({ docker, dockerError, moduleError, modules, system, systemError }), [docker, dockerError, moduleError, modules, system, systemError])
   return <WidgetProvider registry={registry}><AppShell /></WidgetProvider>
+}
+
+export default function App() {
+  return <ThemeProvider><AppContent /></ThemeProvider>
 }

@@ -1,5 +1,7 @@
 # BigBrain Current State
 
+> Den detaljerade inventeringen nedan är en historisk snapshot från 2026-07-30. Aktuell verifierad status finns i [STATUS](../STATUS.md); senaste avgränsade runtimeändring är [Sprint 1 UX bugfix deployment](features/sprint-1/sprint-1-bugfix-deployment-20260807.md). Dokumenterade senare moduler och backloggposter ska inte härledas från denna äldre snapshot.
+
 Inventerad 2026-07-30 från produktionskod, tester, Docker Compose och en
 read-only-kontroll av den körande lokala installationen. Rapporten beskriver
 nuvarande implementation och skiljer mellan implementerad funktion, faktisk

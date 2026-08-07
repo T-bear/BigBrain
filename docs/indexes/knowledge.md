@@ -8,4 +8,5 @@ Kunskapsbasen innehåller evidensbaserade fakta och tydligt märkta observatione
 - [Media stack](../knowledge/media-stack.md), [Sonarr](../knowledge/sonarr.md), [Radarr](../knowledge/radarr.md), [Prowlarr](../knowledge/prowlarr.md), [qBittorrent](../knowledge/qbittorrent.md)
 - [Docker](../knowledge/docker.md), [Sentinel](../knowledge/sentinel.md), [Authentication](../knowledge/authentication.md)
 - [Shopping List](../knowledge/shopping-list.md), [Meal Planner](../knowledge/meal-planner.md)
+- [Heroma schedule import](../knowledge/heroma-schedule-import.md)
 - [Theme contract v1](../design-system/theme-contract-v1.md) och [Jellyfin-adapterns kompatibilitet](../../themes/jellyfin/compatibility.md)

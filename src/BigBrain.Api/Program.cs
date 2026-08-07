@@ -2,6 +2,8 @@ using BigBrain.Modules;
 using BigBrain.Api.Media;
 using BigBrain.Api.MealPlanner;
 using BigBrain.Api.ShoppingList;
+using BigBrain.Api.Calendar;
+using BigBrain.Api.Settings;
 using BigBrain.Api.Sentinel;
 using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -36,6 +38,14 @@ public partial class Program
         var shoppingListOptions = builder.Configuration.GetSection(ShoppingListOptions.SectionName).Get<ShoppingListOptions>() ?? new();
         builder.Services.AddSingleton(shoppingListOptions);
         builder.Services.AddSingleton<ShoppingListStore>();
+        var calendarOptions = builder.Configuration.GetSection(CalendarOptions.SectionName).Get<CalendarOptions>() ?? new();
+        builder.Services.AddSingleton(calendarOptions);
+        builder.Services.AddSingleton<CalendarStore>();
+        builder.Services.AddSingleton<HeromaScheduleParser>();
+        builder.Services.AddSingleton<CalendarImportService>();
+        var settingsOptions = builder.Configuration.GetSection(SettingsOptions.SectionName).Get<SettingsOptions>() ?? new();
+        builder.Services.AddSingleton(settingsOptions);
+        builder.Services.AddSingleton<SettingsStore>();
         builder.Services
             .AddOptions<SentinelClientOptions>()
             .BindConfiguration(SentinelClientOptions.SectionName)
@@ -138,7 +148,7 @@ public partial class Program
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
         builder.Services.AddSingleton<IModuleRegistry>(
-            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition]));
+            new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition]));
 
         var app = builder.Build();
 
@@ -494,6 +504,9 @@ public partial class Program
 
         app.MapMealPlannerEndpoints();
         app.MapShoppingListEndpoints();
+        app.MapCalendarEndpoints();
+        app.MapSettingsEndpoints();
+        _ = app.Services.GetRequiredService<SettingsStore>();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

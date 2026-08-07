@@ -1,5 +1,7 @@
 # BigBrain – nulägesinventering
 
+> Historisk inventering från 2026-07-29. Den ska inte användas som aktuell runtime-status. Se [STATUS](../STATUS.md) och [Sprint 1-deploymenten](features/sprint-1/sprint-1-bugfix-deployment-20260807.md) för verifierat nuläge 2026-08-07.
+
 Inventerad 2026-07-29 utifrån produktionskod och befintliga tester. Bedömningen gäller vad som finns i repositoryt, inte en verifiering mot en körande hemserver.
 
 ## 1–3. Funktionalitet och färdiggrad

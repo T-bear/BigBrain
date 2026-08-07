@@ -14,6 +14,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0012](../adr/0012-design-system-theme-contract-and-jellyfin-adapter.md) | Proposed | Theme and Jellyfin adapter boundary |
 | [0013](../adr/0013-safe-qbittorrent-download-removal-boundary.md) | Proposed | Safe Download Control boundary |
 | [0014](../adr/0014-dashboard-views-and-widget-framework.md) | Proposed | Dashboard views and widget framework |
+| [0015](../adr/0015-calendar-heroma-import-boundary.md) | Proposed | Calendar ownership and Heroma import boundary |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

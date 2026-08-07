@@ -7,6 +7,7 @@ import { MediaJobs } from '../media-jobs/MediaJobs'
 import { MediaSearch } from '../media-search/MediaSearch'
 import { ShoppingList } from '../shopping-list/ShoppingList'
 import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
+import { CalendarWidget } from '../calendar/Calendar'
 import { ApplicationWidgetRegistry, DashboardRegistry, type WidgetDefinition } from './widgetFramework'
 
 export interface AppWidgetData {
@@ -81,7 +82,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
   return new ApplicationWidgetRegistry([
     { id: 'meal-plan', title: 'Matlista', description: 'Planera familjens måltider.', icon: '◫', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <MealPlanner expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'meal-planner')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
     { id: 'shopping-list', title: 'Inköpslista', description: 'Familjens aktiva inköpslista.', icon: '✓', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <ShoppingList expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'shopping-list')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
-    planned('calendar', 'Kalender', 'Samla familjens kommande aktiviteter.', '▦', 'home'),
+    { id: 'calendar', title: 'Kalender', description: 'Veckans arbetsschema och säker Heroma-import.', icon: '▦', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: ['calendar.events.read'], render: () => <CalendarWidget /> },
     planned('reminders', 'Påminnelser', 'Visa familjens viktigaste påminnelser.', '◉', 'home'),
     { id: 'media-search', title: 'Mediesökning', description: 'Hitta filmer och serier.', icon: '⌕', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaSearch /> },
     { id: 'downloads', title: 'Nedladdningar', description: 'Följ och hantera qBittorrent-jobb säkert.', icon: '⇣', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <DownloadControl /> },

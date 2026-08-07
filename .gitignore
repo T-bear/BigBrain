@@ -26,3 +26,6 @@ data/
 # Test output
 TestResults/
 coverage/
+# Private local import samples must never be committed.
+import-samples/
+**/import-samples/

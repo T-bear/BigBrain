@@ -24,12 +24,91 @@ Status:
 
 ## Buggar
 
+### BB-037 – Sprint 1-deployment tappade runtimekonfiguration och kalenderkoppling
+
+- Modul: Deployment / Media / Kalender
+- Typ: P0-regression / konfiguration / persistence
+- Prioritet: P0
+- Status: Pågår
+- Upptäckt: 2026-08-07
+
+En deployment från en ren käll-export kördes utan repositoryts runtimekonfiguration och från en commit som ännu saknade den deployade kalendermodulen. API-containern fick tomma integrationsvärden och kalenderns named volume monterades inte. Volymen raderades aldrig; databasen verifierades med `integrity=ok`, 39 händelser och 2 importer före återanslutning.
+
+#### Definition of Done
+
+- Deployment använder avsedd runtimekonfiguration utan att secrets publiceras.
+- Kalender-, mat-, shopping- och settingsvolymer är explicit monterade och verifierade.
+- Kalenderdata och importhistorik kan läsas efter API-omstart.
+- Integrationerna klassas åter som konfigurerade.
+- API/Web är healthy och externa tjänster behåller identitet och data.
+- Produktägaren har manuellt verifierat kalender och integrationer.
+
+Automatisk status 2026-08-07: konfiguration och kalendervolym är återanslutna; kalender-API visar befintliga importer/händelser och integrationskonfigurationen är åter laddad. Manuell produktägarverifiering väntar.
+
+### BB-038 – Delat persistent tema mellan mobil och webb
+
+- Modul: Settings / BigBrain Web
+- Typ: P0-regression / UX / persistence
+- Prioritet: P0
+- Status: Pågår
+- Upptäckt: 2026-08-07
+
+Temat lagrades endast per webbläsare i `localStorage`; ThemeProvider, SettingsService och Theme API saknades. Mobil och desktop kunde därför ha olika teman.
+
+#### Definition of Done
+
+- Ett versionssatt Theme API läser och skriver ett allowlistat tema.
+- ThemeProvider använder serverns persistenta värde som auktoritativ källa.
+- Befintligt lokalt tema kan säkert seeda en tidigare okonfigurerad serverinställning.
+- Ogiltiga teman avvisas med Problem Details och lokal UI-state återställs vid skrivfel.
+- Inställningen överlever API-omstart och delas mellan klienter.
+- Frontend-/backendtester, build och produktägarens mobil-/desktopverifiering är godkända.
+
+Automatisk status 2026-08-07: API, dedikerad settingsvolym och ThemeProvider är implementerade, testade och deployade; produktägarens manuella verifiering väntar.
+
+### BB-028 – Kalender – Heroma-schemaimport och veckovis arbetsöversikt
+
+- Modul: Kalender
+- Typ: Funktion / extern filimport
+- Prioritet: P1
+- Status: Pågår
+- Upptäckt: 2026-08-05
+
+#### Definition of Done
+
+- Flera verifierade Heroma-filer kan förhandsgranskas och importeras med partiell framgång.
+- Faktiskt `.xlsx`-format, datum, tider, dag/kväll, utbildning, samverkan, semester, okända typer och flera poster per datum parsas säkert.
+- Kalenderdata och importhistorik persisterar server-side.
+- Hem visar aktuell vecka; förstorat läge visar hela månaden med tider i varje relevant dag och läsbar mobilpresentation.
+- Exakt dubblett blockeras; omimport erbjuder Replace, Merge och Cancel; konflikter skrivs inte över.
+- Backend/frontend/build/dokumentations- och säkerhetsgrindar är gröna.
+- Endast API och Web deployas och är healthy.
+- Produktägaren verifierar privat flerfilsimport, reload, dubblett, omimport och mobilvy.
+- Sanerad rapport, dokumentation, avsedda commits och push är publicerade; HEAD matchar `origin/main` och CI är grön eller tydligt pågående.
+
+Nuvarande status: backend, import, persistence och veckovy är deployade; produktägaren har efter omstart verifierat korrekt aktuell arbetsvecka och importerad schemadata. Den kvarvarande blockeraren var ett separat mobilt layoutfel där Importhistorik överlappade månadens dag 12–15. Grundorsaken var en begränsad CSS-gridrad i den expanderade dialogen. Fixen använder ett vertikalt flex-/blockflöde, radbrytning och bottenkompensation, är automatiskt verifierad med 94 Web-tester och Web-only-deployad. Produktägarens mobilverifiering, commits och push återstår.
+
+### BB-029 – Kalender – externa synkar och personliga kalenderfunktioner
+
+- Modul: Kalender
+- Typ: Framtida funktion
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-05
+
+Omfattar framtida Google/Apple/ICS-synk, familje- och manuella händelser, påminnelser, per-user kalender, pushnotiser, AI-planeringsförslag och arbetstidsstatistik. Funktionerna kräver separata ägarskaps-, behörighets-, konflikt- och integritetsbeslut och ingår inte i Heroma-MVP:n.
+
+#### Definition of Done
+
+- En prioriterad del har verifierat användarbehov och separat arkitekturbeslut.
+- Ägarskap, per-user-scope, sync-konflikter, auktorisering och retention är dokumenterade och testade.
+
 ### BB-030 – Dashboardinställningar under kugghjulsmeny
 
 - Modul: BigBrain Web / Dashboard
 - Typ: UX / navigering och inställningar
 - Prioritet: P2
-- Status: Klar
+- Status: Pågår
 - Upptäckt: 2026-08-05
 
 #### Beskrivning
@@ -67,14 +146,14 @@ På iPhone i Obsidian Gold tar Tema-väljaren samt knapparna Redigera och Widget
 
 #### Lösning och verifiering
 
-Tema, redigeringsläge och widgetbibliotek samlas i en tillgänglig inställningspanel bakom ett kugghjul. Escape och klick utanför stänger panelen med fokusåterställning. Implementationen verifierades 2026-08-07 med komponenttester, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 i samtliga tre teman. Ingen deployment ingick.
+Tema, redigeringsläge och widgetbibliotek samlas i en tillgänglig inställningspanel bakom ett kugghjul. Escape och klick utanför stänger panelen med fokusåterställning. Implementationen verifierades 2026-08-07 med komponenttester, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 i samtliga tre teman. Fixen deployades 2026-08-07; produktägarens manuella mobil- och desktopverifiering väntar.
 
 ### BB-031 – Download Control orsakar horisontell overflow på mobil
 
 - Modul: Media / Download Control
 - Typ: Bugg / mobil layout / overflow
 - Prioritet: P1
-- Status: Klar
+- Status: Pågår
 - Upptäckt: 2026-08-05
 
 #### Beskrivning
@@ -124,7 +203,7 @@ På Media-vyn i mobilformat går uppdateringsknappen, filterraden och torrentinf
 
 #### Lösning och verifiering
 
-Grundorsaken var intrinsic sizing i gridbarn, header, åtgärdsknapp och långa texter. Berörda containers har nu explicita `min-width: 0`/`max-width: 100%`, radbrytning och enkolumnslayout på mobil utan att dölja informationsinnehåll. Implementationen verifierades 2026-08-07 med komponent-/CSS-regressionstest, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 utan dokument- eller widgetoverflow. Ingen deployment ingick.
+Grundorsaken var intrinsic sizing i gridbarn, header, åtgärdsknapp och långa texter. Berörda containers har nu explicita `min-width: 0`/`max-width: 100%`, radbrytning och enkolumnslayout på mobil utan att dölja informationsinnehåll. Implementationen verifierades 2026-08-07 med komponent-/CSS-regressionstest, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 utan dokument- eller widgetoverflow. Fixen deployades 2026-08-07; produktägarens manuella mobilverifiering väntar.
 
 ### BB-032 – Kalenderns Heroma-importdialog orsakar horisontell scroll
 
@@ -982,7 +1061,7 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Modul: Inköpslista
 - Typ: Bugg / UX / datakvalitet
 - Prioritet: P1
-- Status: Klar
+- Status: Pågår
 - Upptäckt: 2026-08-07
 
 #### Problem och verifierat nuläge
@@ -1010,14 +1089,14 @@ Den befintliga kontrollen använder ett normaliserat namn och stoppar exakta tr�
 
 #### Lösning och verifiering
 
-En separat konservativ jämförelsenyckel tar bort whitespace, Unicode-bindestreck och diakritiska markörer. Ingen edit distance, substringmatchning eller annan fuzzy-algoritm används. En sannolik träff visar befintlig vara och kräver uttryckligt val mellan använd befintlig, lägg till ändå och avbryt. `mjölk` och `havremjölk` förblir olika. Frontend-, API- och storetester samt production build verifierar beteendet.
+En separat konservativ jämförelsenyckel tar bort whitespace, Unicode-bindestreck och diakritiska markörer. Ingen edit distance, substringmatchning eller annan fuzzy-algoritm används. En sannolik träff visar befintlig vara och kräver uttryckligt val mellan använd befintlig, lägg till ändå och avbryt. `mjölk` och `havremjölk` förblir olika. Frontend-, API- och storetester samt production build verifierar beteendet. API- och Web-fixen deployades 2026-08-07; produktägarens manuella verifiering väntar.
 
 ### BB-035 – Shopping List – förbättra läsbarheten för Ofta köpt
 
 - Modul: Inköpslista
 - Typ: Bugg / UX / tillgänglighet
 - Prioritet: P2
-- Status: Klar
+- Status: Pågår
 - Upptäckt: 2026-08-07
 
 #### Problem och verifierat nuläge
@@ -1040,7 +1119,7 @@ Kontrollera Ljust, Mörkt och Obsidian Gold samt default, hover, focus, active, 
 
 #### Lösning och verifiering
 
-Knapparna använder nu semantiska surface/text-, primary/contrast-, focus- och disabled-tokens i stället för inverse-text på en vanlig surface. Default, hover, focus, active/selected och disabled skyddas av regressionstest. Production build och headless Chromium i Ljust, Mörkt och Obsidian Gold vid mobilbredd godkändes 2026-08-07. Ingen deployment ingick.
+Knapparna använder nu semantiska surface/text-, primary/contrast-, focus- och disabled-tokens i stället för inverse-text på en vanlig surface. Default, hover, focus, active/selected och disabled skyddas av regressionstest. Production build och headless Chromium i Ljust, Mörkt och Obsidian Gold vid mobilbredd godkändes 2026-08-07. Web-fixen deployades 2026-08-07; produktägarens manuella tema- och stateverifiering väntar.
 
 ### BB-036 – BigBrain – realtidssynkronisering av delad familjedata
 

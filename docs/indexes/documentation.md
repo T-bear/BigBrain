@@ -33,6 +33,7 @@ are not repository authority. Only reviewed, sanitized knowledge is published un
 
 - [Dashboard and Widget Framework](../architecture/dashboard-widget-framework.md)
 - [Media module](../modules/media.md)
+- [Calendar module](../modules/calendar.md)
 - [Meal Planner knowledge](../knowledge/meal-planner.md)
 - [Shopping List knowledge](../knowledge/shopping-list.md)
 - [Design system](../design-system/theme-contract-v1.md)

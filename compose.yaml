@@ -31,6 +31,8 @@ services:
         condition: service_started
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
+      Calendar__DatabasePath: /calendar-data/calendar.db
+      Settings__DatabasePath: /settings-data/settings.db
       MealPlanner__DatabasePath: /data/meal-planner.db
       ShoppingList__DatabasePath: /shopping-data/shopping-list.db
       Sentinel__Enabled: "true"
@@ -74,6 +76,8 @@ services:
       - ./.sentinel/client:/run/bigbrain/identity:ro
       - meal-planner-data:/data
       - shopping-list-data:/shopping-data
+      - calendar-data:/calendar-data
+      - settings-data:/settings-data
     networks:
       - default
       - media
@@ -135,3 +139,5 @@ volumes:
   sentinel-runtime:
   meal-planner-data:
   shopping-list-data:
+  calendar-data:
+  settings-data:
