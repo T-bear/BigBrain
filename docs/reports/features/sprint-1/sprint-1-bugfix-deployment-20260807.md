@@ -11,7 +11,9 @@
 
 ## Status
 
-Deploymenten underkändes efter produktägarens test på grund av konfigurations-, kalender- och temaregressioner. Remediation är deployad men produktägarens nya manuella verifiering väntar; se [incidentrapporten](../../incidents/sprint-1-deployment-regression-20260807.md). Sprint 1 är inte slutverifierad.
+**COMPLETED AND MANUALLY VERIFIED.**
+
+Dashboardinställningar, Download Control-layout, konservativ Shopping List-dubblettdetektering och ”Ofta köpt”-kontrast är implementerade, automatiskt verifierade, deployade och manuellt godkända av produktägaren. Den underkända första deploymenten och dess remediation döljs inte; slutligt godkänd root cause och resolution finns i [incidentrapporten](../../incidents/sprint-1-deployment-regression-20260807.md).
 
 ## Evidence
 
@@ -21,6 +23,8 @@ Deploymenten underkändes efter produktägarens test på grund av konfigurations
 - Compose-konfiguration, dokumentationsverifiering och diffkontroll godkändes.
 - Dokumentationsverifieringen omfattade 82 Markdown-filer och 36 unika BB-ID:n före denna rapports tillkomst.
 - API och Web blev healthy med restart count 0 och svarade HTTP 200 efter deployment.
+- Efter remediation passerade 99 frontendtester, production build, 207 API-tester och 32 Sentinel-tester.
+- Produktägaren verifierade därefter manuellt Dashboard, Download Control, Shopping List, Ofta köpt, kalenderåterställning, integrationsstatus och persistent tema på mobil/webb och godkände Sprint 1.
 
 ## Changes
 
@@ -34,8 +38,8 @@ Inga externa mediatjänster, torrents, mediafiler eller externa tjänsters data 
 
 ## Remaining work
 
-Produktägaren ska manuellt verifiera Dashboardinställningar på mobil, Download Controls layout och långa namn, Shopping Lists skrivvarianter och negativa matchningsfall samt ”Ofta köpt” i samtliga teman och relevanta interaktionstillstånd. BB-030, BB-031, BB-034 och BB-035 ska inte beskrivas som manuellt verifierade före återrapportering. Framtida realtidssynk ligger fortsatt separat i BB-036.
+Inget Sprint 1-arbete återstår. Framtida realtidssynk ligger fortsatt separat i BB-036. Dashboardprofiler/synk, externa kalenderfunktioner och övriga framtida backloggposter är uttryckligen uppskjutna och ingick inte i Sprint 1.
 
 ## Resumption
 
-Utgå från [STATUS](../../../STATUS.md), [BACKLOG](../../../BACKLOG.md) och denna rapport. Minsta säkra nästa steg är produktägarens read-only manuella UI-verifiering följd av en separat dokumentations- och publikationspass; börja inte Sprint 2 inom verifieringspasset.
+Utgå från [STATUS](../../../STATUS.md), [BACKLOG](../../../BACKLOG.md) och denna rapport. Sprint 1 är stängd; Sprint 2 påbörjas endast genom ett separat uttryckligt uppdrag.

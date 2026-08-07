@@ -6,14 +6,14 @@
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
 
-## Sprint 1 blockerstatus
+## Sprint 1 – slutförd
 
-- Status: Deploymenten 2026-08-07 är underkänd av produktägaren. Remediation är implementerad, automatiskt verifierad och deployad, men Sprint 1 är fortfarande pågående tills ny manuell produktägarverifiering är godkänd.
+- Status: Slutförd 2026-08-07. Sprint 1-fixarna och remediationen efter deploymentregressionen är implementerade, automatiskt verifierade, deployade och manuellt godkända av produktägaren.
 - Root cause: en ren deployexport saknade root-runtimekonfigurationen och den ännu opublicerade kalendermodulen. Integrationsvärden blev tomma och kalenderns befintliga volume monterades inte. Separat lagrades tema endast per klients `localStorage`.
 - Data: kalenderdatabasen raderades inte och verifierades med `integrity=ok`; 39 händelser och 2 importer fanns kvar före återanslutning. Kalender-API läser åter data.
 - Remediation: API/Web använder åter avsedd konfiguration och persistent storage. Ett globalt allowlistat Theme API, en persistent settingsvolym och ThemeProvider synkroniserar tema mellan klienter.
 - Automatiskt verifierat: 99 frontendtester, production build, 207 API-tester, 32 Sentinel-tester, healthy API/Web, kalender- och integrationskontrakt samt dokumentationsgrindar.
-- Manuell verifiering: väntar för samtliga blockerare och de tidigare Sprint 1-fixarna. Se BB-030, BB-031, BB-034, BB-035, BB-037 och BB-038.
+- Manuell verifiering: godkänd av produktägaren för Dashboardinställningar, Download Control, Shopping List, Ofta köpt, kalenderåterställning, integrationer och delat persistent tema. BB-028, BB-030–BB-032, BB-034–BB-035 och BB-037–BB-038 är klara.
 - Incidentrapport: [Sprint 1 deployment regression](reports/incidents/sprint-1-deployment-regression-20260807.md).
 
 ## Dashboard Views och Widget Framework Phase 1
@@ -23,24 +23,24 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Deployat: BigBrain Web. Ingen backend-, Compose- eller runtimekonfigurationsändring krävdes.
 - Manuellt verifierat: mobilnavigationen, de fyra vyerna och layouten godkändes 2026-08-04.
 - Kända begränsningar: profilsynkronisering, delade dashboards, mallar, roller, serverpersistens och fria storlekar är framtida arbete i BB-027.
-- Sprint 1-buggfix 2026-08-07: Dashboardinställningar samlar Tema, redigeringsläge och widgetbibliotek bakom ett tillgängligt kugghjul. Fixen är automatiskt testad, production-byggd, headless-verifierad och deployad i BigBrain Web; produktägarens manuella verifiering på mobil och desktop väntar.
+- Sprint 1-buggfix 2026-08-07: Dashboardinställningar samlar Tema, redigeringsläge och widgetbibliotek bakom ett tillgängligt kugghjul. Fixen är automatiskt testad, production-byggd, headless-verifierad, deployad och manuellt godkänd på mobil och desktop.
 - Dokument: [arkitektur](architecture/dashboard-widget-framework.md), [ADR 0014](adr/0014-dashboard-views-and-widget-framework.md), [runbook](operations/runbooks/dashboard-widget-framework-verification.md), [rapporter](reports/features/dashboard/).
 
 ## Kalender och Heroma-import
 
-- Status: Implementerat, automatiskt verifierat och deployat 2026-08-05. Veckovy och importerad schemadata är manuellt verifierade efter omstart; mobilfixen för månadsvyn väntar på produktägarens verifiering.
+- Status: Implementerat, automatiskt verifierat, deployat och manuellt godkänt. Kalenderdata och importhistorik bevarades genom deploymentincidenten och är åter verifierade efter remediation.
 - Implementerat: server-side `.xlsx`-parser för verifierad svensk Heroma-månadskalender, flera filer med partiell framgång, kortlivad preview, transaktionell confirm, exakt dubblettskydd, Replace/Merge/Cancel, konfliktstopp, SQLite-persistens, importhistorik, veckovy på Hem och responsiv månadsvy med direkt synliga tider.
 - Formatverifiering: den privata lokala samplefilens signatur, sheet/dimensioner, calendar-grid, tidsmönster, specialetiketter, merge och dokumentegenskaper analyserades utan publicering av råvärden. Originalet importerades inte och finns inte i Git.
 - Automatiskt verifierat: syntetisk workbook-parser, dag/kväll, specialtyper, flera intervall, okänd/ledig, overnight, ogiltig struktur, persistence, duplicate, replace/merge conflict samt frontendens vecka, månad, navigation, flerfils-preview, Escape och fokusåterställning.
-- Deployat: Endast BigBrain API och Web återskapades och är healthy; Sentinel och FlareSolverr behöll sina containeridentiteter. Kalenderns read-only week/import-history-endpoints och Web svarade HTTP 200 med tom kalender/importhistorik.
-- Manuellt verifierat: Produktägaren har bekräftat att aktuell arbetsvecka och importerad schemadata visas korrekt efter omstart. Ett separat mobilt layoutfel där Importhistorik överlappade dag 12–15 korrigerades därefter i normalt dokumentflöde och deployades Web-only; BB-028 är inte klar innan produktägaren godkänt den nya mobilvyn.
+- Deployat: BigBrain API och Web är healthy. Kalenderns read-only week/import-history-endpoints svarar HTTP 200 och läser befintlig persistent data.
+- Manuellt verifierat: Produktägaren har godkänt aktuell arbetsvecka, importerad schemadata, importhistorik och mobil layout efter remediationen.
 - Dokument: [Kalender](modules/calendar.md), [Heroma-kunskap](knowledge/heroma-schedule-import.md), [ADR 0015](adr/0015-calendar-heroma-import-boundary.md) och [verifieringsrunbook](operations/runbooks/calendar-verification.md).
 
 ## Matlista och Inköpslista
 
 - Status: Implementerade, deployade och manuellt runtimeverifierade.
 - Implementerat: familjefokuserade mobilflöden för veckoplanering och inköp.
-- Sprint 1-buggfix 2026-08-07: konservativ skrivvariantskontroll och uttryckligt `Lägg till ändå` är implementerade för nya varor; ”Ofta köpt” använder läsbara semantiska färger i samtliga dokumenterade states. Fixarna är automatiskt testade, production-byggda, headless-verifierade och deployade i BigBrain API/Web; produktägarens manuella verifiering väntar.
+- Sprint 1-buggfix 2026-08-07: konservativ skrivvariantskontroll och uttryckligt `Lägg till ändå` är implementerade för nya varor; ”Ofta köpt” använder läsbara semantiska färger i samtliga dokumenterade states. Fixarna är automatiskt testade, production-byggda, headless-verifierade, deployade och manuellt godkända.
 - Kända begränsningar: BB-001–BB-003 och BB-016 återstår separat. Gemensam realtidssynk är endast planerad i BB-036.
 - Dokument: [Matlista](knowledge/meal-planner.md) och [Inköpslista](knowledge/shopping-list.md).
 
@@ -65,7 +65,7 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Automatiskt verifierat: opaka ID:n, live-revalidering, preview/bekräftelse, exakt ett mål, filbevarande respektive separat destruktivt kontrakt, samtidighetsskydd och sanerade fel.
 - Manuellt verifierat: minst ett användarstyrt filbevarande borttagande från qBittorrent via BigBrain. Destruktiv `deleteFiles=true` är inte fullständigt produktionsverifierad.
 - Kända begränsningar: BB-019–BB-026 täcker återstående verifiering, masshantering, ARR-recovery, retention, retry, paus/återuppta och diagnostik.
-- Sprint 1-buggfix 2026-08-07: informationspaneler, kort, header, progress och långa namn är breddbegränsade utan horisontell widgetscroll. Fixen är automatiskt testad, production-byggd, headless-verifierad och deployad i BigBrain Web; produktägarens manuella mobilverifiering väntar.
+- Sprint 1-buggfix 2026-08-07: informationspaneler, kort, header, progress och långa namn är breddbegränsade utan horisontell widgetscroll. Fixen är automatiskt testad, production-byggd, headless-verifierad, deployad och manuellt godkänd på mobil.
 - Dokument: [Media](modules/media.md), [ADR 0013](adr/0013-safe-qbittorrent-download-removal-boundary.md), [runbook](operations/runbooks/download-control-safe-removal.md), [qBittorrent](knowledge/qbittorrent.md).
 
 ## Designsystem och teman
