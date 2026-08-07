@@ -1,6 +1,6 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-08-04 (Europe/Stockholm)
+- Senast uppdaterad: 2026-08-07 (Europe/Stockholm)
 - Verifierad mot commit: `1b62b90`
 - Runtime senast verifierad: 2026-08-04
 
@@ -19,7 +19,7 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 
 - Status: Implementerade, deployade och manuellt runtimeverifierade.
 - Implementerat: familjefokuserade mobilflöden för veckoplanering och inköp.
-- Kända begränsningar: kvarvarande UX-buggar och förbättringar finns i BB-001–BB-003 och BB-016.
+- Kända begränsningar: kvarvarande UX-, datakvalitets-, tillgänglighets- och realtidsbehov finns i BB-001–BB-003, BB-016 och BB-034–BB-036. De tre sistnämnda är dokumenterade men inte implementerade.
 - Dokument: [Matlista](knowledge/meal-planner.md) och [Inköpslista](knowledge/shopping-list.md).
 
 ## Media

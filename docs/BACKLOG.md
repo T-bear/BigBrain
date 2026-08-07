@@ -967,3 +967,94 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Avgränsning: Ingen backendpersistens, identitetsmodell, synkkonfliktlösning eller behörighetsmotor införs innan separata kontrakt och faktisk användarmodell finns.
 - Definition of Done: Godkänd ägarskaps- och identitetsmodell, versionssatt synkkontrakt, konflikt- och migreringsstrategi, behörighetstester, tillgänglig storleksredigering, offlinebeteende, säkerhetsgranskning och manuell fleranvändarverifiering.
 - Relaterade dokument: `docs/architecture/dashboard-widget-framework.md`, ADR 0014.
+
+### BB-034 – Shopping List – upptäck snarlika varor innan tillägg
+
+- Modul: Inköpslista
+- Typ: Bugg / UX / datakvalitet
+- Prioritet: P1
+- Status: Bekräftad
+- Upptäckt: 2026-08-07
+
+#### Problem och verifierat nuläge
+
+Den befintliga kontrollen använder ett normaliserat namn och stoppar exakta träffar, men fångar inte tillräckligt väl mindre skrivvariationer. I verklig användning kan exempelvis `Lördags godis` och `Lördagsgodis` förekomma samtidigt trots att de sannolikt avser samma vara. BB-001 gäller återkopplingen för en redan stoppad exakt dubblett och täcker därför inte detta fynd; en separat post behövs.
+
+#### Framtida lösningsriktning
+
+- Utred och verifiera normalisering för skiftläge, inledande och avslutande whitespace, flera mellanslag, sammanskrivning kontra mellanslag, bindestreck och relevant diakritik.
+- Komplettera vid behov med enkel fuzzy similarity och en dokumenterad säkerhetsmodell.
+- Vid en sannolik men osäker dubblett ska UI visa exempelvis `Liknande vara finns redan: Lördagsgodis` och erbjuda använd befintlig, lägg till ändå och avbryt.
+- Osäker likhet får inte automatiskt blockera ett tillägg eller skriva över ett befintligt listobjekt.
+- Undvik aggressiv matchning som utan tydlig säkerhetsmodell slår ihop skilda produkter, exempelvis `mjölk` och `havremjölk`.
+
+#### Definition of Done
+
+- En verifierad normaliserings- och säkerhetsstrategi är dokumenterad.
+- Testfall täcker vanliga skrivvariationer, inklusive `Lördags godis`/`Lördagsgodis`, samt negativa närliggande fall.
+- Sannolika dubbletter upptäcks innan tillägg.
+- Användaren kan välja använd befintlig, lägg till ändå eller avbryt när matchningen är osäker.
+- Inga befintliga listobjekt skrivs över.
+- Feedbacken är tillgänglig och fungerar på mobil och desktop.
+- Relevanta frontend- och backendtester finns.
+- Dokumentationen är uppdaterad.
+
+### BB-035 – Shopping List – förbättra läsbarheten för Ofta köpt
+
+- Modul: Inköpslista
+- Typ: Bugg / UX / tillgänglighet
+- Prioritet: P2
+- Status: Bekräftad
+- Upptäckt: 2026-08-07
+
+#### Problem och verifierat nuläge
+
+Kapselknapparna under ”Ofta köpt” använder en textfärg som kan ge otillräcklig kontrast mot knappytan, så flera knappar ser nästan tomma ut. BB-016 behandlar vilka förslag som visas och täcker inte läsbarhet eller tillståndsstyling; en separat post behövs.
+
+#### Omfattning
+
+Kontrollera Ljust, Mörkt och Obsidian Gold samt default, hover, focus, active, disabled och selected state. Läsbarhet, fokusmarkering och mobil layout ska verifieras utan att försämra knappens träffyta eller begriplighet.
+
+#### Definition of Done
+
+- Texten är tydligt läsbar i alla stödda teman och tillstånd.
+- WCAG-relevant kontrast är mätt, dokumenterad och uppfylld för text och nödvändiga visuella indikatorer.
+- Knapptext försvinner inte i default, hover, focus, active, disabled eller selected state.
+- Synlig fokusmarkering fungerar med tangentbord.
+- Mobil layout, radbrytning och touchyta fungerar.
+- Snapshot-, komponent- eller motsvarande regressionstest skyddar samtliga relevanta tillstånd och teman.
+- Dokumentationen är uppdaterad.
+
+### BB-036 – BigBrain – realtidssynkronisering av delad familjedata
+
+- Modul: BigBrain-plattformen / första konsument Inköpslista
+- Typ: Arkitektur / funktion / realtid
+- Prioritet: P1
+- Status: Ny
+- Upptäckt: 2026-08-07
+
+#### Problem och användningsfall
+
+En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar inköpslistan från en annan klient. Användaren måste ladda om eller navigera om. Första konkreta användningsfallet är Inköpslista, men behovet ska utredas som ett gemensamt realtidskontrakt för BigBrain och inte som ett modulspecifikt specialfall. BB-027 gäller dashboardprofiler och serversynkroniserad layout och täcker inte server push för delad familjedata.
+
+#### Arkitekturriktning och omfattning
+
+- Utred i första hand ASP.NET Core SignalR/WebSockets i linje med `ARCHITECTURE.md`; aggressiv polling ska inte bli standard utan dokumenterat skäl.
+- Ett separat ADR krävs före implementation för transport, kontrakt, modulägarskap, eventversionering, återhämtning, konfliktmodell, authorization, säkerhet och fallback.
+- Första integrationen ska synka skapad, uppdaterad, borttagen och avbockad/återställd vara i Inköpslista.
+- Kontraktet ska hantera automatisk reconnect, återhämtning efter avbrott, stale-client-resync, flera samtidiga klienter, ordning/versionering, idempotens och definierade konflikter.
+- Framtida möjliga konsumenter är Matlista, Kalender, Påminnelser, Mediajobb, Download Control samt AI-jobb/notiser och andra delade familjemoduler.
+- Framtida authorization ska följa faktisk användarmodell. Secrets och interna identifierare får inte exponeras i onödan.
+- Normal målsättning på lokalt nät är synlig uppdatering inom cirka 1–2 sekunder utan reload, navigation eller manuell refresh.
+- UI kan diskret visa live/ansluten, återansluter och offline.
+
+#### Definition of Done
+
+- Ett gemensamt, versionssatt realtidskontrakt och tillhörande ADR är godkända och dokumenterade.
+- Inköpslista är första integrerade konsument och create/update/delete/check-state synkas.
+- Automatisk reconnect och stale-state-resync fungerar.
+- Konflikt-, ordnings-, versions- och idempotensmodeller är definierade och testade.
+- Flera samtidiga klienter är integrationstestade.
+- Fallback- och offlinebeteende är dokumenterat; lösningen använder ingen onödig polling.
+- Authorization, informationsminimering och övrig säkerhet är granskade.
+- Integrationstester, relevant dokumentation och runbook finns.
