@@ -163,9 +163,22 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Typ: Implementation
 - Prioritet: P2
 - Status: Planerad
-- Beroenden: BB-044, BB-046, BB-071 and Accepted ADR 0021 scope.
+- Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
+  remain reproducible and enforceable.
+- Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
+  corporate actions, immutable dataset revisions, quality/correction handling, measured
+  self-hosted persistence and a provider adapter only after authorization.
+- Beroenden: BB-044, BB-046 and Accepted ADR 0021. Provider-neutral types/fixture tests are
+  not blocked; provider activation and persistence of real provider data are blocked by
+  BB-071.
+- Risk: license laundering through normalized/derived copies, silent correction, bias,
+  stale/gapped data, backup over-retention and premature database choice.
 - Definition of Done: licensed, versioned datasets normalize reproducibly with source,
-  timezone, corporate-action, quality, gap and duplicate tests.
+  timezone, corporate-action, quality, gap and duplicate tests; policy denies unknown,
+  expired or undeclared use; correction/deletion/backup behavior is explicit and tested.
+- Verification: synthetic unit/property/integration fixtures prove entitlement,
+  provenance, lineage, deterministic replay, correction supersession and deletion scope;
+  owner-reviewed BB-071 evidence is required before any external-data acceptance test.
 
 ### BB-046 – Market-data licensing, retention and provider research
 
@@ -190,6 +203,10 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Status: Pågår – väntar på leverantörsbekräftelse
 - Upptäckt: 2026-08-10
 - Beroenden: BB-046 and Accepted ADR 0021.
+- Syfte/scope: establish the exact provider/product/market entitlement that may govern
+  BB-045 raw, normalized, corporate-action and derived evidence.
+- Risk: inferring permission from API access, free pricing or silence would make stored
+  evidence unusable and may violate provider/exchange terms.
 
 Obtain written confirmation for the exact intended individual/personal product and
 markets before creating an account or ingestion adapter. Confirmation must cover local
@@ -204,6 +221,8 @@ exchange-specific terms. Compare Twelve Data with Tiingo/Massive where scope dif
   behavior are explicit; uncertainty blocks ingestion.
 - Required subscription/exchange fees and credential class are documented without secrets.
 - One provider/product scope is approved for BB-045, or selection is explicitly rejected.
+- Verification: dated first-party terms or written provider response is mapped to each
+  allowed use, retention/deletion class, market and product; unknown remains fail-closed.
 
 Research update 2026-08-10: public terms confirm personal/internal use in differing
 scopes, but they do not grant BigBrain's complete required retention. Twelve Data states
@@ -241,8 +260,14 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
 - Prioritet: P1
 - Status: Planerad
 - Beroenden: BB-047, BB-048.
+- Syfte/scope: prevent research selection from being mistaken for durable expectancy by
+  governing split design, repeated testing, parameter/regime sensitivity and sequence risk.
+- Risk: overfitting, survivorship/look-ahead/data leakage, selection and multiple-testing
+  bias, regime change and underestimated costs/slippage.
 - Definition of Done: look-ahead/data leakage guards, in/validation/out-of-sample splits,
   sensitivity, regime/cost stress and useful walk-forward/sequence-risk tests are evidenced.
+- Verification: seeded negative controls and synthetic biased datasets must be rejected;
+  reports disclose trial population, dataset/version, costs and untouched holdout scope.
 
 ### BB-050 – M4 versioned deterministic strategy contract and candidates
 
@@ -311,8 +336,14 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
 - Prioritet: P2
 - Status: Planerad
 - Beroenden: BB-049–BB-055.
+- Syfte/scope: compare immutable strategy/model/parameter versions and govern transitions
+  through EXPERIMENTAL, BACKTESTED, PAPER, APPROVED, ACTIVE, SUSPENDED and RETIRED.
+- Risk: recent-performance promotion, incompatible evidence comparison and hidden data
+  mining can grant unjustified authority.
 - Definition of Done: cost-aware metrics and attribution compare immutable versions;
   lifecycle promotion needs evidence and explicit approval, not recent performance.
+- Verification: tests prove new evidence cannot mutate/promote an active version and that
+  every transition checks current evidence, Risk policy and owner authorization.
 
 ### BB-057 – M7 restart-safe paper trading engine
 
@@ -441,8 +472,14 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
 - Prioritet: P2
 - Status: Planerad
 - Beroenden: BB-056 and any active trading mode.
+- Syfte/scope: collect outcomes, detect drift and propose reversible version lifecycle
+  actions without self-modifying live strategy behavior.
+- Risk: feedback loops, regime drift, contaminated labels and automatic retraining or
+  promotion based on recent wins.
 - Definition of Done: recurring evidence, drift alerts and explicit suspend/retire/promote
   controls keep every active strategy version owned, current and reversible.
+- Verification: soak/failure tests prove collection only emits evidence/proposals; live
+  changes require the full review/promotion gate and explicit owner action.
 
 ### BB-070 – Decision journal, observability and failure injection
 
@@ -450,10 +487,18 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
 - Typ: Cross-cutting safety implementation
 - Prioritet: P1
 - Status: Planerad
-- Beroenden: BB-044, BB-053; evolves with M7–M13.
+- Syfte/scope: preserve the queryable market→signal→risk/policy→decision→execution→outcome
+  graph, including NO TRADE, REJECTED, costs, horizons and post-trade evaluation.
+- Beroenden: BB-044 and the provider-neutral evidence schema may evolve now; persisted
+  market references depend on BB-045, risk evidence on BB-053, and execution/outcomes
+  evolve with M7–M13.
+- Risk: winner-only evidence, broken correlation, secret/raw-data leakage, tampering and
+  journal retention that conflicts with source entitlement.
 - Definition of Done: append-oriented decisions reconstruct buy/sell reasons; safe health,
   P&L/risk/execution/reconciliation metrics and outage/restart/corruption tests exist
   without credentials or unnecessary account details.
+- Verification: invariant/restart/corruption tests reconstruct complete accepted,
+  rejected and no-trade chains and enforce source-policy/redaction rules.
 
 ---
 

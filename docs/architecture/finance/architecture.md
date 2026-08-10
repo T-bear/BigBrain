@@ -73,3 +73,8 @@ calendar and ingestion metadata are mandatory. See
 [provider selection](market-data-provider-selection.md). Accepted ADR 0021 governs this
 boundary; BB-071 still blocks provider activation because architecture approval is not a
 data license. No adapter is implemented yet.
+
+The canonical memory and entitlement model is specified in
+[market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral
+policy/provenance types may be implemented against fixtures before BB-071; real provider
+payloads may not be persisted or reused until their exact policy returns `Allowed`.

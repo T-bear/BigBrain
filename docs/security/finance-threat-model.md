@@ -51,3 +51,10 @@ deletion, so no adapter may be enabled until an approved product or written exce
 defines storage duration, non-display backtesting, derived evidence and deletion duties.
 Dataset deletion must never silently destroy referenced evidence; if the license cannot
 support reproducible retention, the provider is ineligible for BB-045.
+
+Market-data memory adds risks of license laundering through canonical/derived copies,
+backup retention beyond entitlement, poisoned corrections, incomplete lineage and a
+model-training use not granted by the source policy. Controls are a versioned entitlement
+envelope, explicit allowed-use enum, fail-closed evaluation, immutable revisions/checksums,
+quarantine/quality states and deletion across primary/normalized/backup copies. “Derived”
+never implies unrestricted, and model outputs cannot self-promote into live policy.

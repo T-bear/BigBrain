@@ -43,6 +43,9 @@ docker compose config --quiet
   including invariant, simulation, paper, sandbox, failure-injection, reconciliation,
   security, UI/accessibility, performance and soak layers. No Finance test may access a
   live broker or real credentials.
+  Market-data tests must prove fail-closed entitlement, immutable provenance, derived
+  lineage, correction supersession and retention/deletion scope with synthetic fixtures
+  until BB-071 authorizes a provider.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

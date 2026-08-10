@@ -22,6 +22,11 @@ market data after termination and restricts non-display/derived use without a li
 Activation therefore requires an affirmative written entitlement or a different product.
 Until then, fixtures remain the only authorized source.
 
+Selection is free-first and cost-aware: evaluate legally retainable free/self-hosted
+sources before paid tiers, then choose the cheapest product that satisfies quality,
+coverage and evidence needs. Free tiers and Stooq remain unverified candidates, not an
+authorization. Cost cannot relax licensing, provenance, security or live-data quality.
+
 ## Dated entitlement matrix
 
 Classification is based only on official public material reviewed 2026-08-10. “Likely”
@@ -44,6 +49,8 @@ is an interpretation, not permission.
 The intended ability to retain a reproducible raw archive after cancellation is not
 available under the public default terms of any shortlisted provider. This is not inferred
 permission. BB-071 remains open and BB-045 remains blocked.
+The provider-neutral policy/provenance subset of BB-045 may proceed with synthetic
+fixtures; only external adapter activation and persistence of provider data are blocked.
 
 ## Initial M2 dataset
 

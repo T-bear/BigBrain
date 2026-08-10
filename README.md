@@ -59,7 +59,9 @@ och journalmodeller. Ingen persistence, executor, brokerintegration, UI eller li
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och
-[Finance-modulen](docs/modules/finance.md).
+[Finance-modulen](docs/modules/finance.md). Finance följer “free first” och “collect once,
+reuse when permitted”: providerneutral lokal historik prioriteras kostnadsmedvetet, men
+okänd licens eller retention stoppar lagring och användning.
 
 ### Designsystem och teman
 

@@ -11,3 +11,5 @@ The canonical Finance delivery sequence is the
 RESEARCH with M0 and M1 complete. BB-046 provider research and ADR 0021 owner review are
 complete, but M2 ingestion is blocked by BB-071's written retention entitlement.
 External data, PAPER execution, live connectivity and real-money authority are not implemented.
+Provider-neutral policy/provenance contracts and synthetic fixture tests may be built
+before BB-071; actual provider ingestion or durable provider data may not.

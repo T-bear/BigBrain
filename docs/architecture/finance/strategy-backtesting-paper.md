@@ -49,3 +49,15 @@ representative evidence; profitable-day count alone is not acceptance.
 Strategy Lab compares versioned evidence and uses lifecycle states EXPERIMENTAL,
 BACKTESTED, PAPER, APPROVED, ACTIVE, SUSPENDED and RETIRED. Recent performance alone can
 never promote a strategy.
+
+## Evidence and learning boundary
+
+The controlled path is `COLLECT → MEASURE → BACKTEST → VALIDATE → PAPER TRADE → REVIEW
+→ PROMOTE → LIVE`. Dataset, feature, parameter and model versions are immutable inputs to
+evidence; measuring new outcomes never changes an active strategy automatically. Derived
+features/results retain raw dataset provenance and remain subject to the provider policy.
+
+Validation explicitly addresses multiple testing/data mining and selection bias in
+addition to overfitting, survivorship, look-ahead, leakage, regime change, costs and
+slippage. Promotion requires current lifecycle evidence, Risk policy and explicit owner
+approval. See [market-data memory and provenance](market-data-memory-and-provenance.md).

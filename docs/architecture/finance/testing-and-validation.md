@@ -14,6 +14,13 @@ Critical invariants receive dedicated automated tests:
 - Frontend and AI cannot obtain broker credentials.
 - Costs are included in net results and reproducible backtests cannot look ahead.
 - Mode promotion needs current evidence and explicit product-owner authorization.
+- Missing, unknown, expired or mismatched entitlement denies persistence and every
+  undeclared use.
+- Derived artifacts preserve complete input lineage and cannot weaken raw-data policy.
+- Provider corrections create new revisions; referenced evidence is never silently
+  rewritten.
+- Retention deletion covers normalized copies and backups according to explicit policy.
+- Outcome analysis includes NO TRADE/REJECTED populations and declared horizons.
 
 Test doubles must be structurally unable to reach live accounts. Sandbox tests require
 separate non-live credentials and explicit scope. Live acceptance, when eventually

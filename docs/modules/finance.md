@@ -61,6 +61,13 @@ three shortlisted products, so written clarification or a different license is n
 ADR 0021's provider-neutral direction is Accepted; that acceptance does not activate a
 provider. See [provider selection](../architecture/finance/market-data-provider-selection.md).
 
+Finance applies “collect once, reuse when permitted” and free-first/cost-aware selection.
+Every raw dataset and derived artifact carries provider, dataset/revision, retrieval,
+instrument, quality and entitlement provenance. Allowed purposes are explicit; unknown or
+expired rights fail closed. Derived metrics are not presumed exempt from provider terms.
+The full model, decision/outcome evidence graph and bounded self-hosted storage direction
+are defined in [market-data memory and provenance](../architecture/finance/market-data-memory-and-provenance.md).
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and
@@ -88,6 +95,11 @@ proof of execution. Uncertain results are reconciled and never blindly retried.
 The future Autonomic layer uses Finance capabilities through the Trading Controller.
 It cannot access broker credentials, the broker adapter or Finance storage directly,
 and it cannot override risk, approval, mode or audit policy.
+
+Finance does not freely “learn” into production. Evidence flows through collection,
+measurement, backtest, validation, PAPER, review and explicit promotion. A new model,
+parameter or strategy version has no live authority merely because historical metrics
+improve.
 
 ## Product behavior
 

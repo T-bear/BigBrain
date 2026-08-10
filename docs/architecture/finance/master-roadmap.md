@@ -25,6 +25,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Next safe task: send the BB-071 provider inquiry, then evaluate the written response.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
+- Safe parallel foundation: implement only provider-neutral entitlement/provenance types,
+  fail-closed evaluation and synthetic invariants from BB-045. Provider payload ingestion,
+  persistence and account work remain blocked.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -75,11 +78,14 @@ safe mode or disabling the new capability; it never means erasing financial evid
 
 - Objective: ingest reproducible, licensed historical datasets with provenance.
 - Scope/tasks: provider adapter, corporate-action/timezone handling, quality checks,
-  immutable dataset/version references and retention policy.
+  immutable dataset/version references, retention/allowed-use policy, decision-evidence
+  lineage and a measured self-hosted storage choice.
 - Non-goals: live feed, strategy claims or orders.
 - Prerequisites: M1 and completed licensing/provider research for selected data.
 - Architecture impact: Finance-owned storage and provider adapter.
 - Tests: fixture ingestion, gaps, duplicates, stale timestamps, timezone and replay.
+- Additional invariants: unknown/expired entitlement denies use; derived artifacts inherit
+  lineage/restrictions; corrections append; deletion covers licensed copies/backups.
 - Security/docs: minimize account/provider data; document license and provenance.
 - Definition of Done/gate: identical dataset version produces identical normalized data.
 - Rollback: disable adapter and retain referenced datasets/evidence per policy.

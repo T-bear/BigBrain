@@ -97,12 +97,18 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Completed research: BB-046 compared eight provider candidates. Twelve Data is the
   primary Nordic/global EOD candidate; Tiingo and Massive are specialized US alternatives.
   Daily raw OHLCV plus separate corporate actions is the recommended M2 scope.
+- Architecture baseline: collect once/reuse when permitted, explicit provenance and
+  fail-closed entitlement checks govern local market-data memory. Free/legal sources are
+  evaluated first, but free access is not retention permission. Decision/outcome evidence
+  and controlled learning are versioned and cannot mutate active/live strategies.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
   with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
   credential is authorized.
+- Parallel safe implementation scope: BB-045's provider-neutral entitlement/provenance
+  value model and fixture-only invariant tests may proceed without network or persistence.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
@@ -112,7 +118,8 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Live trading enabled: **NO**.
 - Current trading mode: **RESEARCH** (domain/default and module status only; not deployed).
 - Dokument: [master roadmap](architecture/finance/master-roadmap.md),
-  [module](modules/finance.md), [threat model](security/finance-threat-model.md).
+  [module](modules/finance.md), [threat model](security/finance-threat-model.md),
+  [market-data memory](architecture/finance/market-data-memory-and-provenance.md).
 
 ## Säkerhets- och publiceringsnotering
 

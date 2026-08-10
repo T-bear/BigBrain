@@ -20,3 +20,17 @@ M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED 
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are
 still deferred; the current journal is test/evidence foundation only.
+
+## Persistent evidence shape
+
+Future records form an append-only correlation graph from market snapshot and dataset
+revision through signals, strategy/parameter version, risk/policy state, decision and
+reason codes, rejected alternatives, order/no-trade, execution, costs and slippage to
+realized/unrealized outcomes at named horizons and post-trade evaluation. Valuation and
+outcome records identify their own dataset versions. NO TRADE and REJECTED remain queryable
+to prevent winner-only analysis.
+
+Each reference is subject to the originating dataset's entitlement. The journal may retain
+sanitized policy/deletion audit metadata only when allowed; it must not embed raw provider
+data to bypass a deletion obligation. See
+[market-data memory and provenance](market-data-memory-and-provenance.md).
