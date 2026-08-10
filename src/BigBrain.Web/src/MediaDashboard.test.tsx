@@ -247,3 +247,15 @@ test('falls back safely when persisted module state is invalid', async () => {
   expect(screen.getByRole('button', { name: 'Expandera Media Health' }))
     .toHaveAttribute('aria-expanded', 'false')
 })
+
+test('explains the difference between the download queue and the media lifecycle without provider knowledge', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  render(<MediaDashboard />)
+
+  expect(await screen.findByRole('heading', { name: 'Nedladdningskö' })).toBeInTheDocument()
+  expect(screen.getByText(/Pausa, återuppta, felsök eller hantera själva nedladdningen/)).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Medieflöde' })).toBeInTheDocument()
+  expect(screen.getByText(/genom sökning, nedladdning och bearbetning tills de finns i biblioteket/)).toBeInTheDocument()
+  expect(screen.getByText(/kan därför synas här samtidigt/)).toBeInTheDocument()
+  expect(screen.getByRole('region', { name: 'Poster i Medieflödet' })).toBeInTheDocument()
+})

@@ -12,6 +12,15 @@ describe('Sprint 1 UX layout contracts', () => {
     expect(css).toContain('@media(max-width:560px){.download-control{padding:12px}')
   })
 
+  it('keeps grouped download navigation responsive with adequate mobile touch targets', () => {
+    expect(css).toMatch(/\.download-groups,\.download-group \{[^}]*min-width:0;[^}]*max-width:100%;/)
+    expect(css).toMatch(/\.download-group__toggle \{[^}]*min-height:44px;/)
+    expect(css).toContain('@media(max-width:560px){.download-control{padding:12px}')
+    expect(css).toContain('.download-group>header{align-items:stretch;flex-direction:column}')
+    expect(css).toMatch(/\.download-row-actions button,\.download-batch button \{[^}]*width:100%;[^}]*max-width:100%;[^}]*min-height:44px;/)
+    expect(css).not.toMatch(/\.download-group[^}]*position:fixed/)
+  })
+
   it('keeps frequent item buttons readable in every interaction state', () => {
     expect(css).toMatch(/\.shopping-frequent button \{[^}]*background:var\(--bb-color-surface\);[^}]*color:var\(--bb-color-text\);/)
     expect(css).toMatch(/\.shopping-frequent button:hover \{[^}]*color:var\(--bb-color-text\);/)

@@ -45,7 +45,7 @@ Status:
 - Modul: Media / Download Control
 - Typ: UX / navigation / responsivitet
 - Prioritet: P2
-- Status: Planerad
+- Status: Pågår
 - Upptäckt: 2026-08-10
 
 När historiken innehåller många färdiga nedladdningar blir Download Control mycket lång.
@@ -66,6 +66,44 @@ bevaras.
 - Färdiga nedladdningar är fortsatt enkla att hitta och komma åt.
 - Urval, filtrering och befintlig batchhantering fungerar fortsatt utan ändrad mutationsgräns.
 - Vald lösning har automatiska regressionstester och manuell responsiv verifiering.
+
+#### Sprint 3 implementation 2026-08-10
+
+Standardvyn grupperar i ordningen fel/problem, aktiva, köade/pausade och klara.
+Klara är kollapsad som standard när alla statusar visas, med antal och en tillgänglig
+Visa/Dölj-kontroll; filtret Klara visar fortsatt hela gruppen direkt. Filter, urvalets
+filtrerade scope, batchverktyg och objektsåtgärder ligger kvar ovanför historiken.
+Lösningen är implementerad, testad med 30 klara poster, production-byggd och Web-deployad
+2026-08-10. Sprint 3-leveransen är stängd efter teknisk runtimeverifiering och omedelbar
+produktägaracceptans utan blockerande fynd. BB-040 är ändå inte Klar eftersom dess fulla
+DoD kräver längre kvalitativ mobil-, desktop-, tangentbords- och overflowverifiering.
+Den uppföljningen sker i BB-041 och blockerar inte den stängda sprinten.
+
+### BB-041 – Download Control – post-release UX-utvärdering efter Sprint 3
+
+- Modul: Media / Download Control
+- Typ: UX validation / post-release evaluation
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-10
+
+Sprint 3 är implementerad, automatiskt verifierad, production-byggd, Web-deployad och
+tekniskt accepterad utan kända blockerande regressioner. Produktägaren behöver använda
+den nya presentationen över tid innan en slutlig kvalitativ bedömning kan göras av
+statusgruppering, kompakt historik, vardagsnavigation, skillnaden mellan Nedladdningskö
+och Medieflöde samt mobil- och desktopflöde.
+
+Detta är post-release validation, inte en Sprint 3-blockerare, känd defekt eller
+misslyckad verifiering. Ingen implementation ingår i kortet om faktisk användning inte
+identifierar ett separat verifierat förbättringsbehov.
+
+#### Definition of Done
+
+- Produktägaren har använt den deployade UX:en under en representativ period.
+- Statusgruppering, kompakt historik och navigation bedöms på mobil och desktop.
+- Skillnaden och den avsiktliga överlappningen mellan Nedladdningskö och Medieflöde är begriplig.
+- Eventuella verifierade fynd registreras som separata backloggposter; avsaknad av fynd dokumenteras också.
+- BB-040 och BB-033 bedöms mot sina återstående DoD-punkter med daterad evidens.
 
 ---
 
@@ -774,6 +812,16 @@ Sonarr eller Radarr.
   skärmläsarkontext är verifierade.
 - Relevanta tester samt modul-, status- och UX-dokument uppdateras när lösningen
   implementeras.
+
+#### Sprint 3 implementation 2026-08-10
+
+Nedladdningskö beskriver nu vardagligt att den hanterar själva nedladdningen och
+hänvisar till Medieflöde för vägen till biblioteket. Medieflöde beskriver sökning,
+nedladdning, bearbetning och bibliotek samt varför samma titel kan synas i båda vyerna.
+Rubriker, undertitlar och skärmläsarregioner är automatiskt verifierade utan nya
+providerbegrepp i förklaringen. Web är deployad och Sprint 3 är stängd efter teknisk
+acceptans utan blockerande fynd. Posten förblir Pågår tills den längre kvalitativa
+mobil-/desktopverifieringen i BB-041 uppfyller hela Definition of Done.
 
 ---
 

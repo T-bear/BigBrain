@@ -72,7 +72,7 @@ export function MediaJobs({ showHeading = true }: { showHeading?: boolean }) {
   const unavailableProviders = (Array.isArray(snapshot?.providers) ? snapshot.providers : [])
     .filter(provider => provider.status !== 'online')
 
-  return <section className="media-jobs-section" aria-label={showHeading ? undefined : 'Media Jobs'} aria-labelledby={showHeading ? 'media-jobs-heading' : undefined}>
+  return <section className="media-jobs-section" aria-label={showHeading ? undefined : 'Poster i Medieflödet'} aria-labelledby={showHeading ? 'media-jobs-heading' : undefined}>
     {showHeading && <header className="media-jobs-heading">
       <div><p className="eyebrow">Live activity</p><h3 id="media-jobs-heading">Media Jobs</h3></div>
       <span aria-live="polite">{failed ? 'Uppdatering avbruten' : 'Uppdateras automatiskt'}</span>

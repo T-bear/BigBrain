@@ -6,8 +6,14 @@ const labels: Record<DownloadStatus, string> = {
   active: 'Aktiv', queued: 'Köad', paused: 'Pausad', error: 'Fel', completed: 'Klar', unknown: 'Okänd',
 }
 const filters: Array<{ value: 'all' | DownloadStatus; label: string }> = [
-  { value: 'all', label: 'Alla' }, { value: 'active', label: 'Aktiva' }, { value: 'queued', label: 'Köade' },
-  { value: 'paused', label: 'Pausade' }, { value: 'error', label: 'Fel' }, { value: 'completed', label: 'Klara' },
+  { value: 'all', label: 'Alla' }, { value: 'error', label: 'Fel' }, { value: 'active', label: 'Aktiva' },
+  { value: 'queued', label: 'Köade' }, { value: 'paused', label: 'Pausade' }, { value: 'completed', label: 'Klara' },
+]
+const groups: Array<{ id: string; label: string; statuses: DownloadStatus[] }> = [
+  { id: 'problems', label: 'Fel och problem', statuses: ['error', 'unknown'] },
+  { id: 'active', label: 'Aktiva', statuses: ['active'] },
+  { id: 'waiting', label: 'Köade och pausade', statuses: ['queued', 'paused'] },
+  { id: 'completed', label: 'Klara', statuses: ['completed'] },
 ]
 
 function bytes(value: number, suffix = '') {
@@ -41,6 +47,7 @@ export function DownloadControl() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [checked, setChecked] = useState<Set<string>>(new Set())
+  const [completedExpanded, setCompletedExpanded] = useState(false)
   const controller = useRef<AbortController | null>(null)
   const busyRef = useRef(false)
   const dialogRef = useRef<HTMLDivElement | null>(null)
@@ -85,7 +92,9 @@ export function DownloadControl() {
     finally { busyRef.current = false; setBusy(false) }
   }
   const visible = filter === 'all' ? downloads : downloads.filter(item => item.status === filter)
-  const checkedVisible = visible.filter(item => checked.has(item.id))
+  const visibleGroups = groups
+    .map(group => ({ ...group, items: visible.filter(item => group.statuses.includes(item.status)) }))
+    .filter(group => group.items.length > 0)
   const applyOperation = async (item: DownloadSummary, operation: DownloadOperation) => {
     if (busyRef.current) return
     busyRef.current = true; setBusy(true); setMessage('')
@@ -105,20 +114,30 @@ export function DownloadControl() {
     finally { busyRef.current = false; setBusy(false) }
   }
 
+  const downloadItem = (item: DownloadSummary) => <li key={item.id}>
+    <label className="download-select"><input type="checkbox" checked={checked.has(item.id)} disabled={busy} onChange={event => setChecked(current => { const next = new Set(current); event.target.checked ? next.add(item.id) : next.delete(item.id); return next })} aria-label={`Markera ${item.name}`} /><span className="sr-only">Markera {item.name}</span></label>
+    <div><strong>{item.name}</strong><span>{labels[item.status]} · {item.category}{item.ownership === 'sonarr' || item.ownership === 'radarr' ? ` · Hanteras av ${item.ownership === 'sonarr' ? 'Sonarr' : 'Radarr'}` : ''}</span></div>
+    <progress aria-label={`Framsteg för ${item.name}`} max="100" value={item.progressPercent} />
+    <div className="download-metrics"><span>{item.progressPercent.toFixed(1)} %</span><span>{bytes(item.sizeBytes)}</span><span>↓ {bytes(item.downloadSpeedBytesPerSecond, '/s')}</span><span>↑ {bytes(item.uploadSpeedBytesPerSecond, '/s')}</span>{item.queuePosition !== null && <span>Kö {item.queuePosition}</span>}</div>
+    <div className="download-row-actions">{item.capabilities.canPause && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'pause')}>Pausa {item.name}</button>}{item.capabilities.canResume && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'resume')}>Återuppta {item.name}</button>}{item.capabilities.canRetry && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'retry')}>Försök igen {item.name}</button>}<button type="button" className="secondary-button" disabled={busy} onClick={() => { setSelected(item); setPreview(null); setDeleteData(false); setMessage('') }}>Hantera {item.name}</button></div>
+    <details className="download-diagnosis"><summary>Varför laddar den inte ner?</summary><strong>{item.diagnosis.explanation}</strong><ul>{item.diagnosis.verifiedObservations.map(observation => <li key={observation}>{observation}</li>)}</ul></details>
+  </li>
+
   return <section className="download-control" aria-labelledby="downloads-heading">
-    <header><div><p className="eyebrow">Hantera aktiva nedladdningar</p><h3 id="downloads-heading">Nedladdningskö</h3></div><button className="secondary-button" type="button" disabled={busy} onClick={() => void load()}>Uppdatera nedladdningar</button></header>
+    <header><div><p className="eyebrow">Hantera det som laddas ner just nu</p><h3 id="downloads-heading">Nedladdningskö</h3><p className="download-intro">Pausa, återuppta, felsök eller hantera själva nedladdningen. Mediets väg till biblioteket visas i Medieflöde.</p></div><button className="secondary-button" type="button" disabled={busy} onClick={() => void load()}>Uppdatera nedladdningar</button></header>
     <div className="download-filters" aria-label="Filtrera nedladdningar">{filters.map(item => <button type="button" aria-pressed={filter === item.value} key={item.value} onClick={() => setFilter(item.value)}>{item.label}</button>)}</div>
     <div className="download-selection"><button type="button" className="secondary-button" disabled={visible.length === 0 || busy} onClick={() => setChecked(current => { const next = new Set(current); visible.forEach(item => next.add(item.id)); return next })}>Markera alla i aktuell vy</button><button type="button" className="secondary-button" disabled={checked.size === 0 || busy} onClick={() => setChecked(new Set())}>Avmarkera alla</button><span aria-live="polite">{checked.size} markerade</span></div>
     {checked.size > 0 && <div className="download-batch" aria-label="Åtgärder för markerade nedladdningar"><button type="button" disabled={busy} onClick={() => void applyBatch('pause')}>Pausa markerade</button><button type="button" disabled={busy} onClick={() => void applyBatch('resume')}>Återuppta markerade</button><button type="button" disabled={busy} onClick={() => void applyBatch('retry')}>Försök igen markerade</button></div>}
     <p aria-live="polite" className="download-message">{message}</p>
-    {visible.length === 0 ? <p>Inga nedladdningar i det här filtret.</p> : <ul className="download-list">{visible.map(item => <li key={item.id}>
-      <label className="download-select"><input type="checkbox" checked={checked.has(item.id)} disabled={busy} onChange={event => setChecked(current => { const next = new Set(current); event.target.checked ? next.add(item.id) : next.delete(item.id); return next })} aria-label={`Markera ${item.name}`} /><span className="sr-only">Markera {item.name}</span></label>
-      <div><strong>{item.name}</strong><span>{labels[item.status]} · {item.category}{item.ownership === 'sonarr' || item.ownership === 'radarr' ? ` · Hanteras av ${item.ownership === 'sonarr' ? 'Sonarr' : 'Radarr'}` : ''}</span></div>
-      <progress aria-label={`Framsteg för ${item.name}`} max="100" value={item.progressPercent} />
-      <div className="download-metrics"><span>{item.progressPercent.toFixed(1)} %</span><span>{bytes(item.sizeBytes)}</span><span>↓ {bytes(item.downloadSpeedBytesPerSecond, '/s')}</span><span>↑ {bytes(item.uploadSpeedBytesPerSecond, '/s')}</span>{item.queuePosition !== null && <span>Kö {item.queuePosition}</span>}</div>
-      <div className="download-row-actions">{item.capabilities.canPause && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'pause')}>Pausa {item.name}</button>}{item.capabilities.canResume && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'resume')}>Återuppta {item.name}</button>}{item.capabilities.canRetry && <button type="button" disabled={busy} onClick={() => void applyOperation(item, 'retry')}>Försök igen {item.name}</button>}<button type="button" className="secondary-button" disabled={busy} onClick={() => { setSelected(item); setPreview(null); setDeleteData(false); setMessage('') }}>Hantera {item.name}</button></div>
-      <details className="download-diagnosis"><summary>Varför laddar den inte ner?</summary><strong>{item.diagnosis.explanation}</strong><ul>{item.diagnosis.verifiedObservations.map(observation => <li key={observation}>{observation}</li>)}</ul></details>
-    </li>)}</ul>}
+    {visible.length === 0 ? <p>Inga nedladdningar i det här filtret.</p> : <div className="download-groups">{visibleGroups.map(group => {
+      const collapsible = group.id === 'completed' && filter === 'all'
+      const expanded = !collapsible || completedExpanded
+      const contentId = `download-group-${group.id}`
+      return <section className={`download-group download-group--${group.id}`} aria-labelledby={`${contentId}-heading`} key={group.id}>
+        <header><h4 id={`${contentId}-heading`}>{group.label} <span>{group.items.length}</span></h4>{collapsible && <button aria-controls={contentId} aria-expanded={expanded} className="secondary-button download-group__toggle" type="button" onClick={() => setCompletedExpanded(value => !value)}>{expanded ? 'Dölj klara' : `Visa ${group.items.length} klara`}</button>}</header>
+        {expanded && <ul className="download-list" id={contentId}>{group.items.map(downloadItem)}</ul>}
+      </section>
+    })}</div>}
     {selected && <div className="download-dialog" role="dialog" aria-modal="true" aria-labelledby="download-dialog-title" ref={dialogRef}>
       <button type="button" className="download-dialog__close" disabled={busy} onClick={() => { setSelected(null); setPreview(null) }} aria-label="Stäng dialog">×</button>
       <h3 id="download-dialog-title">{preview ? (deleteData ? 'Avbryt och radera nedladdade data?' : 'Avbryt nedladdning?') : selected.name}</h3>

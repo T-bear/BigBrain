@@ -83,7 +83,7 @@ export function MediaDashboard({
         onToggle={() => toggleModule('media-jobs')}
         title="Medieflöde"
       >
-        <div id="queue"><MediaJobs showHeading={false} /></div>
+        <div id="queue"><p className="media-flow-intro">Följ film och serier genom sökning, nedladdning och bearbetning tills de finns i biblioteket. En titel kan därför synas här samtidigt som själva nedladdningen visas i Nedladdningskö.</p><MediaJobs showHeading={false} /></div>
       </CollapsibleModule>
     </>}
     <details className="administration" id="administration" open={administrationOnly || undefined}>

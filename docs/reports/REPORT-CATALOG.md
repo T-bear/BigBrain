@@ -10,6 +10,7 @@
 | Smart Shuffle MVP and Tizen playback | Catalog metadata only; full reports local | [STATUS](../STATUS.md#smart-shuffle) and [Media](../modules/media.md#smart-shuffle-mvp) | Local full evidence retained |
 | Download Control MVP | Catalog metadata only; full reports local | [STATUS](../STATUS.md#download-control) and [runbook](../operations/runbooks/download-control-safe-removal.md) | Local full evidence retained |
 | Download Control Sprint 2 | Sanitized implementation and closure report | [Sprint 2 closure](features/download-control/sprint-2-download-operations-20260809.md) | Closed and deployment accepted; Retry manual verification pending, no known defect |
+| Download Control Sprint 3 | Sanitized implementation, deployment and closure report | [Sprint 3 navigation](features/download-control/sprint-3-download-navigation-20260810.md) | Closed; technical verification passed, extended UX evaluation deferred to BB-041 |
 | Obsidian Gold | Catalog metadata only; full reports local | [STATUS](../STATUS.md#designsystem-och-teman) and [theme contract](../design-system/theme-contract-v1.md) | Local full evidence retained |
 | Early ARR recovery and diagnostics | Local only or superseded | [History](../history/early-sprints.md) | Not published as raw reports |
 | Repository consolidation | Sanitized full report | [Publication report](documentation/repository-consolidation-and-documentation-governance-20260804-214358.md) | Published |

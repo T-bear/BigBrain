@@ -261,6 +261,18 @@ tablet and desktop retain the bounded two-column action layout. This presentatio
 does not change the removal capability or provider contract and is automatically tested,
 production-built, deployed and manually viewport-verified.
 
+Sprint 3 keeps all filters, selection, partial batch commands, row commands, diagnostics
+and safe removal above a status-grouped presentation. The default order is problems,
+active, queued/paused and completed. Completed history is collapsed in the all-status
+view and remains directly reachable through its disclosure control or the completed
+filter. The control explains that it manages the download itself; the separate
+**Medieflöde** explains the larger path through search, download, processing and the
+library, including their intentional overlap during download. This is frontend-only,
+automatically verified, production-built, Web-deployed and technically accepted without
+a known blocking regression. Sprint 3 is closed. Extended qualitative UX evaluation
+during real use is intentionally deferred to BB-041; BB-040 and BB-033 retain their
+remaining evidence requirements independently of sprint status.
+
 ### Sprint 2 command capabilities
 
 Download Control now exposes server-owned single-target and bounded partial-batch

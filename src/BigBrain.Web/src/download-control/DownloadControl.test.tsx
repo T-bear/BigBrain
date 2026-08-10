@@ -12,6 +12,10 @@ const item = {
   diagnosis: { code: 'insufficientData', severity: 'info', explanation: 'BigBrain kan inte avgöra orsaken med tillgänglig information.', verifiedObservations: ['Ingen säker diagnostisk orsak kunde verifieras.'], availableSafeActions: ['pause', 'remove'] },
 }
 const response = (body: unknown, ok = true) => ({ ok, json: async () => body })
+const download = (id: string, status: typeof item.status, capabilities = item.capabilities) => ({
+  ...item, id, name: id, status, capabilities,
+  progressPercent: status === 'completed' ? 100 : item.progressPercent,
+})
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
@@ -72,4 +76,64 @@ test('unsafe destructive removal stays disabled and raw upstream detail is never
   fireEvent.click(await screen.findByRole('button', { name: 'Hantera Safe Show' }))
   expect(screen.getByRole('button', { name: 'Avbryt och radera data' })).toBeDisabled()
   expect(screen.queryByText(/SID=|raw upstream|[0-9a-f]{40}/i)).not.toBeInTheDocument()
+})
+
+test('prioritizes problems and active jobs while keeping a large completed history one keyboard action away', async () => {
+  const manyCompleted = Array.from({ length: 30 }, (_, index) => download(`Klar ${index + 1}`, 'completed', { canPause: false, canResume: false, canRetry: false, canRemove: true }))
+  const downloads = [
+    ...manyCompleted,
+    download('Aktiv nu', 'active'),
+    download('Problem nu', 'error', { canPause: false, canResume: true, canRetry: true, canRemove: true }),
+    download('Pausad nu', 'paused', { canPause: false, canResume: true, canRetry: true, canRemove: true }),
+  ]
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response({ collectedAtUtc: '2026-08-10T10:00:00Z', downloads }))))
+  const { container } = render(<DownloadControl />)
+
+  expect(await screen.findByText('Problem nu')).toBeInTheDocument()
+  expect(screen.getByText('Aktiv nu')).toBeInTheDocument()
+  expect(screen.queryByText('Klar 1')).not.toBeInTheDocument()
+  const headings = [...container.querySelectorAll('.download-group h4')].map(node => node.textContent)
+  expect(headings).toEqual(['Fel och problem 1', 'Aktiva 1', 'Köade och pausade 1', 'Klara 30'])
+
+  const toggle = screen.getByRole('button', { name: 'Visa 30 klara' })
+  expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  toggle.focus()
+  fireEvent.keyDown(toggle, { key: 'Enter' })
+  fireEvent.click(toggle)
+  expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  expect(toggle).toHaveFocus()
+  expect(screen.getByText('Klar 30')).toBeInTheDocument()
+  expect(container.querySelector('.download-control')).toHaveClass('download-control')
+  expect(container.querySelector('.download-groups')).toBeInTheDocument()
+})
+
+test('filters, filtered selection, batch toolbar, diagnostics and row operations survive grouped presentation', async () => {
+  const downloads = [
+    download('Aktiv A', 'active'),
+    download('Aktiv B', 'active'),
+    download('Problem C', 'error', { canPause: false, canResume: true, canRetry: true, canRemove: true }),
+    download('Klar D', 'completed', { canPause: false, canResume: false, canRetry: false, canRemove: true }),
+  ]
+  const fetch = vi.fn(() => Promise.resolve(response({ collectedAtUtc: '2026-08-10T10:00:00Z', downloads })))
+  vi.stubGlobal('fetch', fetch)
+  render(<DownloadControl />)
+  await screen.findByText('Aktiv A')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Aktiva' }))
+  expect(screen.queryByText('Problem C')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Markera alla i aktuell vy' }))
+  expect(screen.getByText('2 markerade')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Pausa markerade' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Återuppta markerade' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Försök igen markerade' })).toBeInTheDocument()
+  expect(screen.getAllByText('Varför laddar den inte ner?')).toHaveLength(2)
+  expect(screen.getByRole('button', { name: 'Pausa Aktiv A' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Hantera Aktiv A' })).toBeInTheDocument()
+
+  fireEvent.click(screen.getByRole('button', { name: 'Fel' }))
+  expect(screen.getByRole('button', { name: 'Återuppta Problem C' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Försök igen Problem C' })).toBeInTheDocument()
+  expect(screen.getByText('2 markerade')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Avmarkera alla' }))
+  expect(screen.getByText('0 markerade')).toBeInTheDocument()
 })
