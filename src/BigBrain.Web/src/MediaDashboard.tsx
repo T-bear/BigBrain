@@ -77,11 +77,11 @@ export function MediaDashboard({
       <SmartShuffle />
       <DownloadControl />
       <CollapsibleModule
-        eyebrow="Pågående aktivitet"
+        eyebrow="Följ film och serier från sökning till bibliotek"
         expanded={layoutExpanded['media-jobs']}
         moduleId="media-jobs"
         onToggle={() => toggleModule('media-jobs')}
-        title="Pågående"
+        title="Medieflöde"
       >
         <div id="queue"><MediaJobs showHeading={false} /></div>
       </CollapsibleModule>

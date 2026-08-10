@@ -42,7 +42,7 @@ Se [widgetarkitekturen](docs/architecture/dashboard-widget-framework.md) och [Pr
 - **Media Search:** bibliotekssökning och kontrollerad Sonarr-/Radarr-preview och bekräftelse.
 - **Media Jobs:** normaliserade köer, status, filter och säkra detaljer.
 - **Smart Shuffle:** servervalt episodflöde och användarstyrd fjärruppspelning på verifierad Jellyfin for Tizen-session.
-- **Download Control:** säker qBittorrent-listning, opaka ID:n, preview/bekräftelse och filbevarande standardborttagning; destruktiv borttagning har strängare riskgrindar och återstående manuell härdning.
+- **Nedladdningskö / Download Control:** säker qBittorrent-listning, opaka ID:n, diagnostik, paus/återuppta/retry, begränsad partiell batch samt objektspecifik säker borttagning. Sprint 2 är deployad och godkänd; Retry väntar separat på manuell verifiering när ett naturligt felande jobb finns.
 - **Media Overview:** Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent med partiell felisolering.
 
 Se [Mediamodulen](docs/modules/media.md), [Smart Shuffle-ADR](docs/adr/0011-smart-shuffle-jellyfin-remote-playback-boundary.md) och [Download Control-ADR](docs/adr/0013-safe-qbittorrent-download-removal-boundary.md).

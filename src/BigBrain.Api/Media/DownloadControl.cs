@@ -7,13 +7,26 @@ namespace BigBrain.Api.Media;
 internal sealed record QBittorrentQueueItem(
     string Hash, string Name, string State, string? Category, string? SavePath, string? ContentPath,
     double Progress, long SizeBytes, long DownloadedBytes, long DownloadSpeedBytesPerSecond,
-    long UploadSpeedBytesPerSecond, int QueuePosition);
+    long UploadSpeedBytesPerSecond, int QueuePosition, int SeedCount = 0, int PeerCount = 0);
+
+public static class DownloadOperations
+{
+    public const string Pause = "pause";
+    public const string Resume = "resume";
+    public const string Retry = "retry";
+    public static bool IsSupported(string value) => value is Pause or Resume or Retry;
+}
+
+public sealed record DownloadCapabilities(bool CanPause, bool CanResume, bool CanRetry, bool CanRemove);
+public sealed record DownloadDiagnosis(string Code, string Severity, string Explanation,
+    IReadOnlyList<string> VerifiedObservations, IReadOnlyList<string> AvailableSafeActions);
 
 public sealed record DownloadSummary(
     string Id, string Name, string Status, double ProgressPercent, long SizeBytes,
     long DownloadedBytes, long DownloadSpeedBytesPerSecond, long UploadSpeedBytesPerSecond,
     int? QueuePosition, string Category, string Ownership, string ImportStatus,
-    bool DestructiveRemovalAllowed, IReadOnlyList<string> Warnings);
+    bool DestructiveRemovalAllowed, IReadOnlyList<string> Warnings, DownloadCapabilities Capabilities,
+    DownloadDiagnosis Diagnosis);
 public sealed record DownloadsResponse(DateTimeOffset CollectedAtUtc, IReadOnlyList<DownloadSummary> Downloads);
 public sealed record DownloadRemovalPreviewInput(bool DeleteData = false);
 public sealed record DownloadRemovalPreview(
@@ -23,6 +36,10 @@ public sealed record DownloadRemovalPreview(
 public sealed record DownloadRemovalInput(string ConfirmationToken, bool DeleteData = false);
 public sealed record DownloadRemovalResult(
     string Status, bool Removed, bool DataPreserved, bool AlreadyMissing, string Ownership, string? ErrorCode);
+public sealed record DownloadOperationResult(string Id, string Operation, string Status, DownloadSummary? Download);
+public sealed record DownloadBatchInput(string Operation, IReadOnlyList<string> Ids);
+public sealed record DownloadBatchItemResult(string Id, string Status, DownloadSummary? Download);
+public sealed record DownloadBatchResult(string Operation, bool Partial, IReadOnlyList<DownloadBatchItemResult> Results);
 
 public sealed class DownloadControlException(string code, string safeMessage, int statusCode) : Exception
 {
@@ -42,6 +59,7 @@ internal sealed class DownloadControlStore
     private readonly object gate = new();
     private readonly Dictionary<string, DownloadIdentity> identities = [];
     private readonly Dictionary<string, RemovalConfirmation> confirmations = [];
+    private readonly HashSet<string> operations = [];
 
     public string PutIdentity(string hash, string fingerprint, DateTimeOffset now)
     {
@@ -114,6 +132,16 @@ internal sealed class DownloadControlStore
         }
     }
 
+    public bool TryAcquireOperation(string id)
+    {
+        lock (gate) return operations.Add(id);
+    }
+
+    public void ReleaseOperation(string id)
+    {
+        lock (gate) operations.Remove(id);
+    }
+
     private void Purge(DateTimeOffset now)
     {
         foreach (var key in identities.Where(item => item.Value.ExpiresAtUtc <= now).Select(item => item.Key).ToArray()) identities.Remove(key);
@@ -128,6 +156,8 @@ internal interface IDownloadControlService
     Task<DownloadSummary> GetAsync(string id, CancellationToken cancellationToken);
     Task<DownloadRemovalPreview> PreviewAsync(string id, DownloadRemovalPreviewInput input, CancellationToken cancellationToken);
     Task<DownloadRemovalResult> RemoveAsync(string id, DownloadRemovalInput input, CancellationToken cancellationToken);
+    Task<DownloadOperationResult> OperateAsync(string id, string operation, CancellationToken cancellationToken);
+    Task<DownloadBatchResult> BatchAsync(DownloadBatchInput input, CancellationToken cancellationToken);
 }
 
 internal sealed class DownloadControlService(
@@ -136,6 +166,7 @@ internal sealed class DownloadControlService(
     private static readonly Action<ILogger, string, bool, string, Exception?> Audit =
         LoggerMessage.Define<string, bool, string>(LogLevel.Information, new EventId(2420, "DownloadRemoval"),
             "Download control operation={Operation} deleteData={DeleteData} result={Result}");
+    private const int MaximumBatchSize = 25;
 
     public async Task<DownloadsResponse> GetAsync(CancellationToken cancellationToken)
     {
@@ -198,6 +229,63 @@ internal sealed class DownloadControlService(
         catch { store.Release(input.ConfirmationToken); throw new DownloadControlException("providerUnavailable", "qBittorrent är inte tillgänglig.", StatusCodes.Status503ServiceUnavailable); }
     }
 
+    public async Task<DownloadOperationResult> OperateAsync(string id, string operation, CancellationToken cancellationToken)
+    {
+        if (!DownloadOperations.IsSupported(operation))
+            throw new DownloadControlException("operationNotAllowed", "Åtgärden är inte tillåten.", StatusCodes.Status400BadRequest);
+        if (!store.TryAcquireOperation(id))
+            throw new DownloadControlException("operationConflict", "En åtgärd pågår redan för nedladdningen.", StatusCodes.Status409Conflict);
+        try
+        {
+            var queue = await ReadQueue(cancellationToken);
+            var item = Revalidate(store.GetIdentity(id, DateTimeOffset.UtcNow), queue);
+            var capabilities = Capabilities(item);
+            if (!Allowed(capabilities, operation))
+                return new(id, operation, "alreadyInDesiredState", Map(item, queue, id));
+            if (operation == DownloadOperations.Pause) await client.StopAsync(item.Hash, cancellationToken);
+            else if (operation == DownloadOperations.Resume) await client.StartAsync(item.Hash, cancellationToken);
+            else
+            {
+                if (capabilities.CanResume) await client.StartAsync(item.Hash, cancellationToken);
+                await client.ReannounceAsync(item.Hash, cancellationToken);
+            }
+            var refreshed = await ReadQueue(cancellationToken);
+            var current = refreshed.SingleOrDefault(candidate => candidate.Hash == item.Hash);
+            var summary = current is null ? null : Map(current, refreshed, store.PutIdentity(current.Hash, Fingerprint(current), DateTimeOffset.UtcNow));
+            Audit(logger, operation, false, "succeeded", null);
+            return new(id, operation, "succeeded", summary);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch (DownloadControlException) { throw; }
+        catch (TaskCanceledException) { throw new DownloadControlException("providerTimeout", "qBittorrent svarade inte i tid.", StatusCodes.Status503ServiceUnavailable); }
+        catch (MediaAuthenticationException) { throw new DownloadControlException("providerAuthenticationFailure", "qBittorrent-autentiseringen misslyckades.", StatusCodes.Status503ServiceUnavailable); }
+        catch { throw new DownloadControlException("providerUnavailable", "qBittorrent är inte tillgänglig.", StatusCodes.Status503ServiceUnavailable); }
+        finally { store.ReleaseOperation(id); }
+    }
+
+    public async Task<DownloadBatchResult> BatchAsync(DownloadBatchInput input, CancellationToken cancellationToken)
+    {
+        if (!DownloadOperations.IsSupported(input.Operation))
+            throw new DownloadControlException("operationNotAllowed", "Åtgärden är inte tillåten.", StatusCodes.Status400BadRequest);
+        var ids = input.Ids?.Where(id => !string.IsNullOrWhiteSpace(id)).Distinct(StringComparer.Ordinal).ToArray() ?? [];
+        if (ids.Length is 0 or > MaximumBatchSize)
+            throw new DownloadControlException("invalidBatchManifest", $"Välj mellan 1 och {MaximumBatchSize} nedladdningar.", StatusCodes.Status400BadRequest);
+        var results = new List<DownloadBatchItemResult>(ids.Length);
+        foreach (var id in ids)
+        {
+            try
+            {
+                var result = await OperateAsync(id, input.Operation, cancellationToken);
+                results.Add(new(id, result.Status, result.Download));
+            }
+            catch (DownloadControlException exception)
+            {
+                results.Add(new(id, BatchStatus(exception.Code), null));
+            }
+        }
+        return new(input.Operation, true, results);
+    }
+
     private async Task<IReadOnlyList<QBittorrentQueueItem>> ReadQueue(CancellationToken token)
     {
         try { return await client.GetQueueAsync(token); }
@@ -222,8 +310,54 @@ internal sealed class DownloadControlService(
         var risk = Risk(item, queue);
         return new(id, item.Name, NormalizeStatus(item), item.Progress * 100, item.SizeBytes, item.DownloadedBytes,
             item.DownloadSpeedBytesPerSecond, item.UploadSpeedBytesPerSecond, item.QueuePosition >= 0 ? item.QueuePosition : null,
-            DisplayCategory(item), Ownership(item), item.Progress < 1 ? "notImported" : "unknown", risk.Allowed, Warnings(item, risk));
+            DisplayCategory(item), Ownership(item), item.Progress < 1 ? "notImported" : "unknown", risk.Allowed, Warnings(item, risk),
+            Capabilities(item), Diagnose(item));
     }
+
+    private static DownloadCapabilities Capabilities(QBittorrentQueueItem item)
+    {
+        var status = NormalizeStatus(item);
+        return new(status is "active" or "queued" or "error", status == "paused",
+            status is "paused" or "queued" or "error", true);
+    }
+
+    private static bool Allowed(DownloadCapabilities capabilities, string operation) => operation switch
+    {
+        DownloadOperations.Pause => capabilities.CanPause,
+        DownloadOperations.Resume => capabilities.CanResume,
+        DownloadOperations.Retry => capabilities.CanRetry,
+        _ => false
+    };
+
+    private static DownloadDiagnosis Diagnose(QBittorrentQueueItem item)
+    {
+        var state = item.State.ToLowerInvariant();
+        var capabilities = Capabilities(item);
+        var actions = new List<string>();
+        if (capabilities.CanRetry) actions.Add(DownloadOperations.Retry);
+        if (capabilities.CanPause) actions.Add(DownloadOperations.Pause);
+        if (capabilities.CanResume) actions.Add(DownloadOperations.Resume);
+        if (capabilities.CanRemove) actions.Add("remove");
+        if (NormalizeStatus(item) == "paused") return new("paused", "info", "Nedladdningen är pausad.", ["qBittorrent rapporterar ett pausat tillstånd."], actions);
+        if (state.Contains("meta")) return new("waitingForMetadata", "warning", "Nedladdningen väntar på metadata.", ["qBittorrent rapporterar att metadata hämtas."], actions);
+        if (NormalizeStatus(item) == "queued") return new("queued", "info", "Nedladdningen väntar i kön.", [item.QueuePosition >= 0 ? $"Verifierad köposition: {item.QueuePosition}." : "qBittorrent rapporterar ett köat tillstånd."], actions);
+        if (NormalizeStatus(item) == "error")
+        {
+            if (item.SeedCount == 0 && item.PeerCount == 0) return new("noPeers", "warning", "Ingen överföring sker och inga anslutna seeders eller peers kunde verifieras.", ["Nedladdningshastigheten är 0 B/s.", "Anslutna seeders: 0.", "Anslutna peers: 0."], actions);
+            return new("stalled", "warning", "Nedladdningen har fastnat utan verifierad överföring.", ["qBittorrent rapporterar ett fastnat tillstånd.", $"Anslutna seeders: {item.SeedCount}.", $"Anslutna peers: {item.PeerCount}."], actions);
+        }
+        return new("insufficientData", "info", "BigBrain kan inte avgöra orsaken med tillgänglig information.", ["Ingen säker diagnostisk orsak kunde verifieras."], actions);
+    }
+
+    private static string BatchStatus(string code) => code switch
+    {
+        "downloadNotFound" => "notFound",
+        "downloadIdentityChanged" => "identityChanged",
+        "operationNotAllowed" => "operationNotAllowed",
+        "providerUnavailable" or "providerAuthenticationFailure" => "providerUnavailable",
+        "providerTimeout" => "providerTimeout",
+        _ => "rejected"
+    };
 
     private static (bool Allowed, string Code) Risk(QBittorrentQueueItem item, IReadOnlyList<QBittorrentQueueItem> queue)
     {

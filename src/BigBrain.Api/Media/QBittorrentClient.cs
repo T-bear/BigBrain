@@ -169,7 +169,9 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
             Math.Max(0, GetInt64(item, "downloaded")),
             Math.Max(0, GetInt64(item, "dlspeed")),
             Math.Max(0, GetInt64(item, "upspeed")),
-            GetInt32(item, "priority"))).Where(item => item.Hash.Length is 40 or 64).ToArray();
+            GetInt32(item, "priority"),
+            Math.Max(0, GetInt32(item, "num_seeds")),
+            Math.Max(0, GetInt32(item, "num_leechs")))).Where(item => item.Hash.Length is 40 or 64).ToArray();
     }
 
     async Task IQBittorrentQueueClient.RemoveAsync(string hash, bool deleteFiles, CancellationToken cancellationToken)
@@ -189,5 +191,29 @@ public sealed class QBittorrentClient(HttpClient httpClient, MediaOptions option
             throw new DownloadControlException("providerAuthenticationFailure", "qBittorrent-autentiseringen misslyckades.", StatusCodes.Status503ServiceUnavailable);
         if (!response.IsSuccessStatusCode)
             throw new DownloadControlException("removalRejected", "qBittorrent avvisade borttagningen.", StatusCodes.Status502BadGateway);
+    }
+
+    Task IQBittorrentQueueClient.StopAsync(string hash, CancellationToken cancellationToken) =>
+        SendSingleTargetAsync("api/v2/torrents/stop", hash, "operationRejected", cancellationToken);
+
+    Task IQBittorrentQueueClient.StartAsync(string hash, CancellationToken cancellationToken) =>
+        SendSingleTargetAsync("api/v2/torrents/start", hash, "operationRejected", cancellationToken);
+
+    Task IQBittorrentQueueClient.ReannounceAsync(string hash, CancellationToken cancellationToken) =>
+        SendSingleTargetAsync("api/v2/torrents/reannounce", hash, "operationRejected", cancellationToken);
+
+    private async Task SendSingleTargetAsync(string endpoint, string hash, string rejectionCode, CancellationToken cancellationToken)
+    {
+        if (hash.Length is not (40 or 64) || hash.Any(character => !Uri.IsHexDigit(character)))
+            throw new DownloadControlException("downloadIdentityChanged", "Nedladdningens identitet är inte längre giltig.", StatusCodes.Status409Conflict);
+        using var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string> { ["hashes"] = hash })
+        };
+        using var response = await HttpClient.SendAsync(request, cancellationToken);
+        if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden)
+            throw new DownloadControlException("providerAuthenticationFailure", "qBittorrent-autentiseringen misslyckades.", StatusCodes.Status503ServiceUnavailable);
+        if (!response.IsSuccessStatusCode)
+            throw new DownloadControlException(rejectionCode, "qBittorrent avvisade åtgärden.", StatusCodes.Status502BadGateway);
     }
 }

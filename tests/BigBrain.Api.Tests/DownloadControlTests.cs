@@ -5,6 +5,65 @@ namespace BigBrain.Api.Tests;
 
 public sealed class DownloadControlTests
 {
+    [Fact]
+    public async Task PauseResolvesOneOpaqueTargetAndUsesStopOnly()
+    {
+        var first = Item();
+        var other = Item(new string('b', 40), "Other.Show");
+        var fake = new FakeQueue([first, other]);
+        var service = Service(fake);
+        var id = (await service.GetAsync(CancellationToken.None)).Downloads[0].Id;
+
+        var result = await service.OperateAsync(id, DownloadOperations.Pause, CancellationToken.None);
+
+        Assert.Equal("succeeded", result.Status);
+        Assert.Equal([(DownloadOperations.Pause, first.Hash)], fake.Operations);
+        Assert.DoesNotContain(fake.Operations, operation => operation.Hash == other.Hash);
+    }
+
+    [Fact]
+    public async Task RetryPausedStartsThenReannouncesWithoutRemove()
+    {
+        var fake = new FakeQueue([Item(state: "stoppedDL")]);
+        var service = Service(fake);
+        var id = (await service.GetAsync(CancellationToken.None)).Downloads.Single().Id;
+
+        await service.OperateAsync(id, DownloadOperations.Retry, CancellationToken.None);
+
+        Assert.Equal([DownloadOperations.Resume, DownloadOperations.Retry], fake.Operations.Select(item => item.Operation));
+        Assert.Empty(fake.Removals);
+    }
+
+    [Fact]
+    public async Task BatchIsBoundedPartialAndReportsStaleTargetIndividually()
+    {
+        var fake = new FakeQueue([Item(), Item(new string('b', 40), "Other.Show")]);
+        var service = Service(fake);
+        var listed = await service.GetAsync(CancellationToken.None);
+        fake.Items = [fake.Items[0]];
+
+        var result = await service.BatchAsync(new(DownloadOperations.Pause, listed.Downloads.Select(item => item.Id).ToArray()), CancellationToken.None);
+
+        Assert.True(result.Partial);
+        Assert.Equal("succeeded", result.Results[0].Status);
+        Assert.Equal("notFound", result.Results[1].Status);
+        await Assert.ThrowsAsync<DownloadControlException>(() => service.BatchAsync(
+            new(DownloadOperations.Pause, Enumerable.Range(0, 26).Select(index => $"opaque-{index}").ToArray()), CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData("stoppedDL", "paused")]
+    [InlineData("metaDL", "waitingForMetadata")]
+    [InlineData("stalledDL", "noPeers")]
+    [InlineData("downloading", "insufficientData")]
+    public async Task DiagnosisUsesOnlyVerifiedNormalizedSignals(string state, string expected)
+    {
+        var response = await Service(new FakeQueue([Item(state: state)])).GetAsync(CancellationToken.None);
+        var diagnosis = response.Downloads.Single().Diagnosis;
+        Assert.Equal(expected, diagnosis.Code);
+        Assert.DoesNotContain("/downloads", System.Text.Json.JsonSerializer.Serialize(diagnosis), StringComparison.OrdinalIgnoreCase);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -149,14 +208,15 @@ public sealed class DownloadControlTests
 
     private static QBittorrentQueueItem Item(
         string? hash = null, string name = "Safe.Show.S01E01", double progress = .4,
-        string contentPath = "/downloads/Safe.Show.S01E01") =>
-        new(hash ?? new string('a', 40), name, "downloading", "sonarr", "/downloads", contentPath,
+        string contentPath = "/downloads/Safe.Show.S01E01", string state = "downloading") =>
+        new(hash ?? new string('a', 40), name, state, "sonarr", "/downloads", contentPath,
             progress, 1000, 400, 20, 2, 1);
 
     private sealed class FakeQueue(IReadOnlyList<QBittorrentQueueItem> items) : IQBittorrentQueueClient
     {
         public IReadOnlyList<QBittorrentQueueItem> Items { get; set; } = items;
         public List<(string Hash, bool DeleteFiles)> Removals { get; } = [];
+        public List<(string Operation, string Hash)> Operations { get; } = [];
         public Exception? Failure { get; init; }
         public TaskCompletionSource DeleteStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public TaskCompletionSource? DeleteGate { get; init; }
@@ -168,6 +228,9 @@ public sealed class DownloadControlTests
             DeleteStarted.TrySetResult();
             if (DeleteGate is not null) await DeleteGate.Task.WaitAsync(cancellationToken);
         }
+        public Task StopAsync(string hash, CancellationToken cancellationToken) { Operations.Add((DownloadOperations.Pause, hash)); return Task.CompletedTask; }
+        public Task StartAsync(string hash, CancellationToken cancellationToken) { Operations.Add((DownloadOperations.Resume, hash)); return Task.CompletedTask; }
+        public Task ReannounceAsync(string hash, CancellationToken cancellationToken) { Operations.Add((DownloadOperations.Retry, hash)); return Task.CompletedTask; }
     }
 
     private sealed class Handler(Func<HttpRequestMessage, Task<HttpResponseMessage>> send) : HttpMessageHandler

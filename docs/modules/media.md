@@ -258,8 +258,26 @@ documented risk gates and is not claimed as fully production-verified.
 The Sprint 1 Web fix constrains Download Control headers, messages, progress, cards and
 long names to the widget's available width. Mobile uses a single-column card layout;
 tablet and desktop retain the bounded two-column action layout. This presentation fix
-does not change the removal capability or provider contract and is automatically tested
-and production-built, but not yet deployed or manually viewport-verified.
+does not change the removal capability or provider contract and is automatically tested,
+production-built, deployed and manually viewport-verified.
+
+### Sprint 2 command capabilities
+
+Download Control now exposes server-owned single-target and bounded partial-batch
+capabilities for pause, resume and retry. Every opaque target is resolved and revalidated
+against a fresh live queue immediately before one adapter mutation. Batch manifests
+contain 1–25 explicit IDs; there is no implicit all operation. qBittorrent 5.2.3 uses
+`stop`, `start` and `reannounce`. Retry never searches, removes or mutates Arr.
+
+Each normalized download includes eligibility flags and deterministic read-only
+diagnostics from allowlisted state, queue position, speed and connected peer/seeder
+counts. Unknown causes remain unknown. The UI calls Download Control **Nedladdningskö**
+and the cross-provider lifecycle view **Medieflöde**. Batch delete is deferred because
+the destructive preview contract remains single-target. Sprint 2 was deployed and
+accepted by the product owner on 2026-08-10. Pause/resume, batch handling and diagnostics
+were manually approved. Retry remains implemented and automatically verified but awaits
+manual verification because no naturally failing download was available; this is not a
+known defect or a Sprint 2 blocker.
 
 ## Smart Shuffle MVP
 

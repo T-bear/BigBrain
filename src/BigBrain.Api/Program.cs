@@ -391,6 +391,18 @@ public partial class Program
                 try { return Results.Ok(await service.RemoveAsync(id, input, cancellationToken)); }
                 catch (DownloadControlException exception) { return DownloadProblem(exception); }
             });
+        app.MapPost("/api/v1/modules/media/downloads/{id}/actions/{operation}",
+            async (string id, string operation, IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.OperateAsync(id, operation, cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
+        app.MapPost("/api/v1/modules/media/downloads/actions/batch",
+            async (DownloadBatchInput input, IDownloadControlService service, CancellationToken cancellationToken) =>
+            {
+                try { return Results.Ok(await service.BatchAsync(input, cancellationToken)); }
+                catch (DownloadControlException exception) { return DownloadProblem(exception); }
+            });
 
         app.MapGet(
             "/api/v1/modules/media/library-status",

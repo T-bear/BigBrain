@@ -8,6 +8,8 @@ const item = {
   uploadSpeedBytesPerSecond: 2, queuePosition: 1, category: 'sonarr', ownership: 'sonarr',
   importStatus: 'notImported', destructiveRemovalAllowed: true,
   warnings: ['Det här jobbet verkar hanteras av Sonarr. BigBrain tar endast bort den aktuella posten från qBittorrent.'],
+  capabilities: { canPause: true, canResume: false, canRetry: false, canRemove: true },
+  diagnosis: { code: 'insufficientData', severity: 'info', explanation: 'BigBrain kan inte avgöra orsaken med tillgänglig information.', verifiedObservations: ['Ingen säker diagnostisk orsak kunde verifieras.'], availableSafeActions: ['pause', 'remove'] },
 }
 const response = (body: unknown, ok = true) => ({ ok, json: async () => body })
 

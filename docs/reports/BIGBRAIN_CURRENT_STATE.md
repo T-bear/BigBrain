@@ -1,6 +1,6 @@
 # BigBrain Current State
 
-> Den detaljerade inventeringen nedan är en historisk snapshot från 2026-07-30. Aktuell verifierad status finns i [STATUS](../STATUS.md). [Sprint 1 UX bugfix deployment](features/sprint-1/sprint-1-bugfix-deployment-20260807.md), Calendar recovery och incidentremediation är slutförda och manuellt godkända 2026-08-07. Dokumenterade senare moduler och backloggposter ska inte härledas från denna äldre snapshot.
+> Den detaljerade inventeringen nedan är en historisk snapshot från 2026-07-30. Aktuell verifierad status finns i [STATUS](../STATUS.md). [Sprint 2](features/download-control/sprint-2-download-operations-20260809.md) stängdes och deploymenten godkändes 2026-08-10, med Retry manuellt väntande utan känd defekt. Dokumenterade senare moduler och backloggposter ska inte härledas från denna äldre snapshot.
 
 Inventerad 2026-07-30 från produktionskod, tester, Docker Compose och en
 read-only-kontroll av den körande lokala installationen. Rapporten beskriver

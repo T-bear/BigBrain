@@ -84,8 +84,11 @@ public sealed class MediaArchitectureTests
         Assert.Equal(1, Count(jellyfinSource, "HttpMethod.Post"));
         Assert.Contains("Sessions/{Uri.EscapeDataString(sessionId)}/Playing?playCommand=PlayNow", jellyfinSource, StringComparison.Ordinal);
         var qbittorrentSource = File.ReadAllText(Path.Combine(mediaDirectory, "QBittorrentClient.cs"));
-        Assert.Equal(1, Count(qbittorrentSource, "HttpMethod.Post"));
+        Assert.Equal(2, Count(qbittorrentSource, "HttpMethod.Post"));
         Assert.Contains("api/v2/torrents/delete", qbittorrentSource, StringComparison.Ordinal);
+        Assert.Contains("api/v2/torrents/stop", qbittorrentSource, StringComparison.Ordinal);
+        Assert.Contains("api/v2/torrents/start", qbittorrentSource, StringComparison.Ordinal);
+        Assert.Contains("api/v2/torrents/reannounce", qbittorrentSource, StringComparison.Ordinal);
         Assert.Contains("[\"deleteFiles\"]", qbittorrentSource, StringComparison.Ordinal);
         var jobsSource = File.ReadAllText(Path.Combine(mediaDirectory, "MediaJobs.cs"));
         Assert.DoesNotContain("HttpMethod.Post", jobsSource, StringComparison.Ordinal);

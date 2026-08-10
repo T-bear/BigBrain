@@ -1,8 +1,28 @@
 # BigBrain Backlog
 
-Senast uppdaterad: 2026-08-07
+Senast uppdaterad: 2026-08-10
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
+
+### BB-039 – Media Controller – serie-, säsongs- och avsnittsstatus
+
+- Modul: Media
+- Typ: Framtida funktion
+- Prioritet: P3
+- Status: Ny
+- Upptäckt: 2026-08-09
+
+En framtida Media Controller ska via normaliserade Media/Arr-kontrakt visa antal släppta,
+lokalt tillgängliga, saknade och kommande avsnitt, per-season breakdown och status på
+avsnittsnivå. En framtida uttrycklig ”Sök saknade”-capability kräver eget säkert
+mutationskontrakt. Funktionen får inte byggas på Download Controls presentation state.
+
+#### Definition of Done
+
+- Släppta, lokalt tillgängliga, saknade och kommande avsnitt normaliseras från verifierade källor.
+- Serie-, säsongs- och avsnittsnivå är konsekventa och testade.
+- ”Sök saknade” har separat auktorisering, preview/audit och versionsverifierad Arr-adapter.
+- Ingen direkt koppling till Download Control-UI eller rå providerpayload finns.
 
 Prioritet:
 
@@ -19,6 +39,33 @@ Status:
 - Pågår
 - Klar
 - Avvisad
+
+### BB-040 – Download Control – snabb navigation vid många färdiga nedladdningar
+
+- Modul: Media / Download Control
+- Typ: UX / navigation / responsivitet
+- Prioritet: P2
+- Status: Planerad
+- Upptäckt: 2026-08-10
+
+När historiken innehåller många färdiga nedladdningar blir Download Control mycket lång.
+Användaren måste scrolla långt mellan aktiva eller problematiska poster, relevanta
+kontroller och färdiga poster; problemet är särskilt tydligt på mobil.
+
+Önskat resultat är snabb och begriplig navigation oavsett historikens längd. Lösningen
+ska utredas utifrån beteendet och får inte låsas till en viss komponent. Kollapsbar
+sektion, ”Visa fler”, statusfilter, separat historikvy, snabbnavigation eller en
+kombination kan utvärderas. Befintlig batchhantering och dess säkerhetsgränser ska
+bevaras.
+
+#### Definition of Done
+
+- Användaren behöver inte scrolla genom en lång lista med klara nedladdningar för att nå relevanta kontroller.
+- Lösningen fungerar väl på mobil och desktop samt med tangentbord och skärmläsare.
+- Aktiva och problematiska nedladdningar prioriteras visuellt.
+- Färdiga nedladdningar är fortsatt enkla att hitta och komma åt.
+- Urval, filtrering och befintlig batchhantering fungerar fortsatt utan ändrad mutationsgräns.
+- Vald lösning har automatiska regressionstester och manuell responsiv verifiering.
 
 ---
 
@@ -585,7 +632,7 @@ Listning, opaka kortlivade ID:n, live-revalidering, filbevarande standardborttag
 - Modul: Media / Download Control
 - Typ: Funktion / UX / säker extern mutation
 - Prioritet: P1
-- Status: Ny
+- Status: Pågår
 - Upptäckt: 2026-08-04
 
 #### Bakgrund och verifierat nuläge
@@ -601,6 +648,12 @@ förutsättningar eller relaterade capabilities. Koordinerad Sonarr/Radarr-recov
 förblir separat i BB-021; den ersatta dubbletten BB-025 ändrar inte denna gräns.
 Säker rensning av avslutade jobb och retention definieras fortsatt i BB-022, och
 diagnostik i BB-026.
+
+Sprint 2-slutstatus 2026-08-10: urval, ”markera alla” i filtrerad vy, vald-räknare,
+avmarkering och begränsad partiell batch för pause, resume och retry är implementerade,
+automatiskt verifierade, deployade och manuellt godkända av produktägaren. Destruktiv
+batch, rensning och retention ingår inte i den godkända delmängden; posten förblir
+Pågår eftersom hela Definition of Done inte är uppfylld.
 
 #### Önskad UX
 
@@ -661,7 +714,7 @@ diagnostik i BB-026.
 - Modul: Media / MediaDashboard
 - Typ: UX / informationsarkitektur
 - Prioritet: P2
-- Status: Ny
+- Status: Pågår
 - Upptäckt: 2026-08-07
 
 #### Bakgrund och verifierad ansvarsskillnad
@@ -753,7 +806,7 @@ Sonarr eller Radarr.
 - Modul: Media / Download Control
 - Typ: Funktion
 - Prioritet: P2
-- Status: Ny
+- Status: Pågår
 - Upptäckt: 2026-08-04
 
 #### Beskrivning
@@ -776,6 +829,11 @@ Exempel på åtgärder:
 - Fullständig backend- och frontendtestning finns.
 - Dokumentationen är uppdaterad.
 
+Verifieringsstatus 2026-08-10: implementation och automatiska backend-/frontendtester
+är klara och capabilityn är deployad. Manuell verifiering väntar tills en naturligt
+felande eller problematisk nedladdning finns. Avsaknaden av ett säkert realistiskt
+testobjekt är inte en konstaterad defekt och blockerar inte Sprint 2-stängningen.
+
 ---
 
 ### BB-024 – Download Control – Pausa / Återuppta
@@ -783,7 +841,7 @@ Exempel på åtgärder:
 - Modul: Media / Download Control
 - Typ: Funktion
 - Prioritet: P2
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-04
 
 #### Beskrivning
@@ -798,6 +856,9 @@ BigBrain ska kunna pausa och återuppta en enskild nedladdning.
 - Ingen massoperation används.
 - Endast ett jobb påverkas.
 - Tester och dokumentation är uppdaterade.
+
+Slutstatus 2026-08-10: implementerad, automatiskt verifierad, deployad och manuellt
+godkänd av produktägaren, både objektspecifikt och inom Sprint 2:s säkra batchgräns.
 
 ---
 
@@ -840,7 +901,7 @@ implementation eller historik har tagits bort.
 - Modul: Media / Download Control
 - Typ: UX / funktion
 - Prioritet: P2
-- Status: Ny
+- Status: Klar
 - Upptäckt: 2026-08-04
 
 #### Beskrivning
@@ -868,6 +929,9 @@ För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
 - Ingen rå intern information exponeras.
 - Tester finns.
 - Dokumentationen är uppdaterad.
+
+Slutstatus 2026-08-10: deterministisk, sanerad diagnostik är implementerad,
+automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 
 ---
 

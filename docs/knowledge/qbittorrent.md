@@ -11,6 +11,10 @@ Samla säker kunskap om kö, peers och torrentborttagning.
   `POST /api/v2/torrents/delete` med formfälten `hashes` och `deleteFiles`.
 - `hashes` kan upstream vara flera `|`-separerade värden eller `all`; BigBrains Download
   Control-adapter tillåter därför endast en internt liveverifierad hash per anrop.
+- qBittorrent 5.2.3/Web API 2.15.1 använder `torrents/stop`, `torrents/start` och
+  `torrents/reannounce` för Sprint 2:s paus, återuppta och konservativa retry.
+- Även batch behandlas som separata, liveverifierade enmålsanrop; `hashes=all` och
+  hashlistor används aldrig.
 - `deleteFiles=true` raderar även nedladdad data; annars påverkas endast torrentjobbet.
 - `queuedDL` med metadata och 0/0 peers betyder inte automatiskt en död torrent.
 

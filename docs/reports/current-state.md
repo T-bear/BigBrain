@@ -1,6 +1,6 @@
 # BigBrain – nulägesinventering
 
-> Historisk inventering från 2026-07-29. Den ska inte användas som aktuell runtime-status. Se [STATUS](../STATUS.md) och [Sprint 1-deploymenten](features/sprint-1/sprint-1-bugfix-deployment-20260807.md): Sprint 1, Calendar recovery och remediation är slutförda och manuellt godkända 2026-08-07.
+> Historisk inventering från 2026-07-29. Den ska inte användas som aktuell runtime-status. Se [STATUS](../STATUS.md) och [Sprint 2-rapporten](features/download-control/sprint-2-download-operations-20260809.md): Sprint 2 stängdes och deploymenten godkändes 2026-08-10, med Retry manuellt väntande utan känd defekt.
 
 Inventerad 2026-07-29 utifrån produktionskod och befintliga tester. Bedömningen gäller vad som finns i repositoryt, inte en verifiering mot en körande hemserver.
 

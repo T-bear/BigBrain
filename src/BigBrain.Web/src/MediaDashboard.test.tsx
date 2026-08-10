@@ -242,7 +242,7 @@ test('falls back safely when persisted module state is invalid', async () => {
   vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
   render(<MediaDashboard />)
 
-  expect(await screen.findByRole('button', { name: 'Minimera Pågående' }))
+  expect(await screen.findByRole('button', { name: 'Minimera Medieflöde' }))
     .toHaveAttribute('aria-expanded', 'true')
   expect(screen.getByRole('button', { name: 'Expandera Media Health' }))
     .toHaveAttribute('aria-expanded', 'false')

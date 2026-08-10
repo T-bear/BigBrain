@@ -7,7 +7,7 @@ const css = readFileSync(resolve(process.cwd(), 'src/styles/modules.css'), 'utf8
 describe('Sprint 1 UX layout contracts', () => {
   it('constrains download information to the widget at mobile and wider sizes', () => {
     expect(css).toMatch(/\.download-control \{[^}]*min-width:0;[^}]*max-width:100%;[^}]*overflow-x:clip;/)
-    expect(css).toMatch(/\.download-list li \{[^}]*min-width:0;[^}]*max-width:100%;[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(0,auto\);/)
+    expect(css).toMatch(/\.download-list>li \{[^}]*min-width:0;[^}]*max-width:100%;[^}]*grid-template-columns:auto minmax\(0,1fr\);/)
     expect(css).toMatch(/\.download-message \{[^}]*max-width:100%;[^}]*overflow-wrap:anywhere;/)
     expect(css).toContain('@media(max-width:560px){.download-control{padding:12px}')
   })

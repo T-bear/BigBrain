@@ -23,6 +23,9 @@ import type {
   DownloadSummary,
   DownloadRemovalPreview,
   DownloadRemovalResult,
+  DownloadOperation,
+  DownloadOperationResult,
+  DownloadBatchResult,
 } from './types'
 
 export class ApiError extends Error {
@@ -232,3 +235,7 @@ export const previewDownloadRemoval = (id: string, deleteData: boolean, signal?:
   postJson<DownloadRemovalPreview>(`${downloadsBase}/${encodeURIComponent(id)}/remove-preview`, { deleteData }, signal)
 export const removeDownload = (id: string, confirmationToken: string, deleteData: boolean, signal?: AbortSignal) =>
   postJson<DownloadRemovalResult>(`${downloadsBase}/${encodeURIComponent(id)}/remove`, { confirmationToken, deleteData }, signal)
+export const operateDownload = (id: string, operation: DownloadOperation, signal?: AbortSignal) =>
+  postJson<DownloadOperationResult>(`${downloadsBase}/${encodeURIComponent(id)}/actions/${operation}`, {}, signal)
+export const operateDownloadsBatch = (ids: string[], operation: DownloadOperation, signal?: AbortSignal) =>
+  postJson<DownloadBatchResult>(`${downloadsBase}/actions/batch`, { ids, operation }, signal)

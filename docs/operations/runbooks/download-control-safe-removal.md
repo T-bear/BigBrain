@@ -28,3 +28,12 @@ Stop on expired/changed identity, ambiguous or shared content path, completed/im
 ## Invariants
 
 No terminal-based live delete, mass operation, Arr history/blocklist/search mutation, media deletion, qBittorrent configuration change or raw identity in reports. A new list and preview are required after API restart.
+
+Sprint 2:s batch omfattar endast pause, resume och retry enligt ADR 0016. Batch-delete
+ingår inte; all borttagning följer fortsatt objektspecifik preview och bekräftelse.
+
+Produktägaren godkände 2026-08-10 pause/resume, den säkra batchhanteringen och
+diagnostiken i deployad runtime. Retry är implementerad och automatiskt verifierad men
+väntar på manuell kontroll när en naturligt felande nedladdning finns; skapa eller
+mutera inte ett riktigt jobb enbart för att framtvinga kontrollen. Detta är ingen känd
+defekt och blockerade inte Sprint 2-stängningen.

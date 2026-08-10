@@ -386,6 +386,9 @@ export interface SmartShuffleSession {
 }
 
 export type DownloadStatus = 'active' | 'queued' | 'paused' | 'error' | 'completed' | 'unknown'
+export type DownloadOperation = 'pause' | 'resume' | 'retry'
+export interface DownloadCapabilities { canPause: boolean; canResume: boolean; canRetry: boolean; canRemove: boolean }
+export interface DownloadDiagnosis { code: string; severity: 'info' | 'warning' | 'error'; explanation: string; verifiedObservations: string[]; availableSafeActions: string[] }
 export interface DownloadSummary {
   id: string
   name: string
@@ -401,6 +404,8 @@ export interface DownloadSummary {
   importStatus: 'notImported' | 'unknown'
   destructiveRemovalAllowed: boolean
   warnings: string[]
+  capabilities: DownloadCapabilities
+  diagnosis: DownloadDiagnosis
 }
 export interface DownloadsResponse { collectedAtUtc: string; downloads: DownloadSummary[] }
 export interface DownloadRemovalPreview {
@@ -423,3 +428,6 @@ export interface DownloadRemovalResult {
   ownership: DownloadSummary['ownership']
   errorCode: string | null
 }
+export interface DownloadOperationResult { id: string; operation: DownloadOperation; status: 'succeeded' | 'alreadyInDesiredState'; download: DownloadSummary | null }
+export type DownloadBatchStatus = 'succeeded' | 'alreadyInDesiredState' | 'notFound' | 'identityChanged' | 'operationNotAllowed' | 'providerUnavailable' | 'providerTimeout' | 'rejected'
+export interface DownloadBatchResult { operation: DownloadOperation; partial: true; results: Array<{ id: string; status: DownloadBatchStatus; download: DownloadSummary | null }> }
