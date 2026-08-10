@@ -78,3 +78,7 @@ The canonical memory and entitlement model is specified in
 [market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral
 policy/provenance types may be implemented against fixtures before BB-071; real provider
 payloads may not be persisted or reused until their exact policy returns `Allowed`.
+
+BB-045 now implements this provider-neutral contract in `BigBrain.Modules.Finance` with no
+adapter or IO. Evaluation additionally matches the requested provider/product exactly;
+an otherwise valid policy for another product fails closed with a stable diagnostic code.

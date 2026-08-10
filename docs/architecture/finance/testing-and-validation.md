@@ -33,3 +33,11 @@ precision and explicit rounding, currency/invariant failures, UTC/causal timesta
 OHLCV validation, provider-neutral data, strategy/order separation, safe mode default,
 missing/rejected risk and policy, NO TRADE/REJECTED journal entries, paper-only intent and
 the complete correlation chain. It contains no network or credential configuration.
+
+## BB-045 policy/provenance coverage
+
+Synthetic domain tests cover exact allowed use, undeclared/unsupported use, explicit
+denial, missing/not-current/provider-product-mismatched policy, raw and derived persistence,
+post-subscription retention, required derived parents, raw lineage rejection, immutable
+dataset revision state and deterministic results/reason codes. Fixtures contain no real
+provider DTO or payload and no test opens a network, database or runtime connection.

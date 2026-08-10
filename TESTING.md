@@ -46,6 +46,9 @@ docker compose config --quiet
   Market-data tests must prove fail-closed entitlement, immutable provenance, derived
   lineage, correction supersession and retention/deletion scope with synthetic fixtures
   until BB-071 authorizes a provider.
+  BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
+  exact provider/product scope, missing/unknown/denied/expired policy, persistence,
+  post-subscription retention, immutable revision state and raw/derived lineage.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

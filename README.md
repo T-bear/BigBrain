@@ -55,7 +55,9 @@ Systemstatus läser allowlistade uptime-, CPU-, minnes- och diskcapabilities gen
 
 Finance har en implementerad, read-only RESEARCH-grund med säkra numeriska värdeobjekt,
 provider-neutrala market-data-/strategikontrakt samt fail-closed risk-, policy-, besluts-
-och journalmodeller. Ingen persistence, executor, brokerintegration, UI eller live trading
+och journalmodeller. BB-045 har nu även starka entitlement-, provenance-, dataset revision-
+och raw/derived-lineagetyper samt en deterministisk fail-closed evaluator. Ingen persistence,
+provideradapter, executor, brokerintegration, UI eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och

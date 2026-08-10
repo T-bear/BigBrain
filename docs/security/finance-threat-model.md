@@ -58,3 +58,9 @@ model-training use not granted by the source policy. Controls are a versioned en
 envelope, explicit allowed-use enum, fail-closed evaluation, immutable revisions/checksums,
 quarantine/quality states and deletion across primary/normalized/backup copies. “Derived”
 never implies unrestricted, and model outputs cannot self-promote into live policy.
+
+Implementation review 2026-08-10: the first BB-045 slice adds only immutable domain state
+and a pure evaluator. Evidence is an opaque validated reference, not content or a secret.
+There is no logger, raw payload, network client, provider credential, persistence or
+execution path. Exact provider/product matching prevents a policy from authorizing data
+from another product accidentally.

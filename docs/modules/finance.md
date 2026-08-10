@@ -43,6 +43,22 @@ security or workload need and an accepted ADR.
 The deterministic reference pipeline and fixture strategy exist to test architecture,
 not as investment logic or evidence of profitability.
 
+## Implemented BB-045 provider-neutral slice
+
+- `MarketDataUse` defines LiveDisplay, HistoricalAnalysis, Backtest, WalkForward,
+  PaperTrading, StrategyTraining, DerivedMetrics and LongTermStorage without loose strings.
+- Entitlement policies bind ID/version, provider/product, safe evidence reference, UTC
+  validity, per-use decisions, persistence, post-subscription retention and deletion.
+- The evaluator returns effective allow/deny, original Allowed/Denied/Unknown, stable
+  reason code and policy reference. Missing, unsupported, product-mismatched, expired,
+  denied or unknown scope fails closed.
+- Immutable dataset revisions and provenance envelopes bind checksum, adapter/schema,
+  UTC source/retrieval time, instrument/venue, policy, quality and raw/derived lineage.
+  Derived provenance requires input revisions and receives no automatic entitlement.
+
+This code has no IO, network, persistence, logging or provider SDK. Tests use only the
+synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
+
 ## Deliberately deferred
 
 Persistence is deferred until its ownership, retention and journal integrity requirements

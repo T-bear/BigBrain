@@ -12,4 +12,5 @@ RESEARCH with M0 and M1 complete. BB-046 provider research and ADR 0021 owner re
 complete, but M2 ingestion is blocked by BB-071's written retention entitlement.
 External data, PAPER execution, live connectivity and real-money authority are not implemented.
 Provider-neutral policy/provenance contracts and synthetic fixture tests may be built
-before BB-071; actual provider ingestion or durable provider data may not.
+before BB-071. That first BB-045 slice is implemented and verified; actual provider
+ingestion or durable provider data remains blocked.

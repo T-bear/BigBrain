@@ -12,6 +12,7 @@
 - [Finance Sprint 2 market-data research](../reports/features/finance/finance-sprint-2-market-data-research-20260810.md)
 - [Finance BB-071 retention gate review](../reports/features/finance/finance-bb-071-retention-gate-review-20260810.md)
 - [Finance market-data memory foundation](../reports/features/finance/finance-market-data-memory-foundation-20260810.md)
+- [Finance BB-045 policy/provenance foundation](../reports/features/finance/finance-market-data-policy-provenance-foundation-20260810.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.

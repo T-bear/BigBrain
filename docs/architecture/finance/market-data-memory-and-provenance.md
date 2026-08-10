@@ -1,6 +1,7 @@
 # Finance market-data memory, provenance and learning foundation
 
-Status: architecture baseline; no external data, persistence or runtime is implemented.
+Status: provider-neutral entitlement/provenance code implemented and verified; no external
+data, adapter, persistence or runtime is implemented.
 Governing decisions: Accepted ADR 0021 for market-data ownership/retention and Proposed
 ADR 0020 for evidence and strategy governance.
 
@@ -157,8 +158,15 @@ Provider-neutral work may proceed before BB-071: typed policy/usage/classificati
 an in-memory fail-closed entitlement evaluator, provenance envelopes, fixture-only dataset
 revisions and invariant tests. No real provider payload may be persisted.
 
+Implemented 2026-08-10: these types and evaluator now exist in
+`src/BigBrain.Modules/Finance/MarketDataEntitlements.cs`. The evaluator binds requests to
+exact provider/product scope and returns the source decision plus a stable reason while
+effective use remains denied for missing, unknown, denied, mismatched or expired policy.
+Tests are synthetic and deterministic. Persistence and external adapters remain absent.
+
 BB-071 remains the external gate for selecting an entitlement and retaining actual
 provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. The next recommended implementation is the provider-neutral
-policy/provenance slice of BB-045 using synthetic fixtures only; persistence selection and
-external adapter activation remain separately gated.
+provider until BB-071 passes. The next recommended implementation is canonical instrument
+identity with venue/MIC and time-bounded provider-symbol mappings, then synthetic OHLCV
+and corporate-action normalization. Persistence selection and external adapter activation
+remain separately gated.

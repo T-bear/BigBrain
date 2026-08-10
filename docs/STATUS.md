@@ -88,8 +88,8 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 ## Finance
 
 - Current phase: RESEARCH.
-- Current milestone: M1 Finance domain skeleton complete, automatically verified and
-  published with the Sprint 1 evidence; deployment remains not performed.
+- Current milestone: M2 / BB-045 in progress. M1 is complete; the first provider-neutral
+  entitlement/provenance slice is implemented, automatically verified and not deployed.
 - Completed work: M0 planning plus decimal-based money/price/quantity/risk primitives,
   UTC market observations, provider-neutral market-data and strategy contracts, explicit
   risk/policy decision boundary, in-memory append-oriented decision journal, future
@@ -101,14 +101,21 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   fail-closed entitlement checks govern local market-data memory. Free/legal sources are
   evaluated first, but free access is not retention permission. Decision/outcome evidence
   and controlled learning are versioned and cannot mutate active/live strategies.
+- Implemented BB-045 slice: typed market-data uses; Allowed/Denied/Unknown policy;
+  provider/product/evidence/validity/retention/deletion metadata; immutable dataset
+  revision and provenance models; raw/derived parent lineage; stable reason codes and a
+  deterministic evaluator where missing, mismatched, expired or uncertain scope denies.
+- Automated verification 2026-08-10: .NET 10 restore/build passed; 259 API tests and 32
+  Sentinel tests passed (291 total), including synthetic entitlement/provenance invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
   with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
   credential is authorized.
-- Parallel safe implementation scope: BB-045's provider-neutral entitlement/provenance
-  value model and fixture-only invariant tests may proceed without network or persistence.
+- Next safe implementation slice: canonical instrument identity with time-bounded
+  provider-symbol mappings, followed by synthetic OHLCV/corporate-action normalization;
+  no provider adapter or persistence while BB-071 remains open.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
