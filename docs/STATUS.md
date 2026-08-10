@@ -97,13 +97,17 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Completed research: BB-046 compared eight provider candidates. Twelve Data is the
   primary Nordic/global EOD candidate; Tiingo and Massive are specialized US alternatives.
   Daily raw OHLCV plus separate corporate actions is the recommended M2 scope.
-- Active work: none.
-- Next safe task: BB-071 written storage/retention confirmation. BB-045 ingestion remains
-  blocked; no provider account, SDK or credential is authorized.
+- Active work: BB-071 is waiting for written provider confirmation. Current public terms
+  require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
+  establish the complete intended retention/backtesting entitlement.
+- Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
+  with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
+  credential is authorized.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
-- Blockers: BB-071 and Proposed ADR 0021 review block external data ingestion; all
-  documented gates block real money.
+- Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
+  product-owner architecture review on 2026-08-10; its acceptance does not activate a
+  provider. All documented gates block real money.
 - Owner approval required: every promotion toward live or greater autonomy.
 - Live trading enabled: **NO**.
 - Current trading mode: **RESEARCH** (domain/default and module status only; not deployed).

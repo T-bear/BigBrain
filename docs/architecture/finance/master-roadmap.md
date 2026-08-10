@@ -21,9 +21,10 @@ enabled before all M13 gates are evidenced and explicitly approved.
 
 - Current phase/milestone: RESEARCH / M1 complete.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
-- Active work: none.
-- Next safe task: BB-071 written provider retention confirmation, then BB-045 ingestion.
-- Blockers for M2 implementation: BB-071 and owner review of Proposed ADR 0021.
+- Active work: BB-071 waits for written provider confirmation.
+- Next safe task: send the BB-071 provider inquiry, then evaluate the written response.
+- Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
+  2026-08-10, but acceptance authorizes no provider or ingestion.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -84,8 +85,10 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Rollback: disable adapter and retain referenced datasets/evidence per policy.
 
 BB-046 research is complete. The provisional primary candidate is Twelve Data for
-Nordic/global EOD, with Tiingo/Massive as US specialists. This does not start M2: BB-071
-must establish storage and post-cancellation retention entitlement first.
+Nordic/global EOD, with Tiingo/Massive as US specialists. Public terms now show deletion
+requirements after cancellation and leave parts of deterministic backtest/derived-data
+use product-dependent. This does not start M2: BB-071 must establish an adequate written
+entitlement first.
 
 ### M3 – Backtest engine — PLANNED
 

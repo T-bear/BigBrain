@@ -20,7 +20,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0018](../adr/0018-finance-risk-modes-and-progressive-autonomy.md) | Proposed | Finance hard risk and progressive autonomy |
 | [0019](../adr/0019-finance-broker-truth-and-execution-reconciliation.md) | Proposed | Finance broker truth and execution reconciliation |
 | [0020](../adr/0020-finance-evidence-and-strategy-governance.md) | Proposed | Finance evidence and strategy governance |
-| [0021](../adr/0021-finance-provider-neutral-market-data-and-retention-gate.md) | Proposed | Finance provider-neutral market data and retention gate |
+| [0021](../adr/0021-finance-provider-neutral-market-data-and-retention-gate.md) | Accepted | Finance provider-neutral market data and retention gate |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

@@ -1,7 +1,8 @@
 # ADR 0021: Provider-neutral market data and retention gate
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-10
+- Accepted: 2026-08-10 after explicit product-owner review of the architectural direction
 
 ## Context
 
@@ -39,3 +40,12 @@ authentication, exchange subscriptions and an order-capable integration surface.
 BB-045 depends on BB-071. Storage must preserve provenance, corrections, adjustment state,
 market calendars and immutable versions. Multiple adapters remain possible, but data is
 never silently blended. This ADR authorizes no account, credential, SDK or ingestion.
+
+## Owner review
+
+The product owner accepted the provider-neutral canonical model, immutable reproducible
+datasets, separate raw observations and corporate actions, revision/supersession model,
+non-ticker-only identity, deliberately small daily/EOD M2 scope, entitlement gate and
+separation from broker execution on 2026-08-10. Acceptance authorizes the architecture
+only. It does not authorize a provider account, subscription, credential, ingestion,
+deployment, PAPER mode or live trading.

@@ -70,4 +70,6 @@ Provider adapters normalize into immutable canonical datasets before strategy ac
 Canonical identity uses an internal ID plus MIC/currency and time-bounded provider symbol
 mappings. Dataset provenance, raw/adjusted state, corporate actions, corrections, market
 calendar and ingestion metadata are mandatory. See
-[provider selection](market-data-provider-selection.md); no adapter is implemented yet.
+[provider selection](market-data-provider-selection.md). Accepted ADR 0021 governs this
+boundary; BB-071 still blocks provider activation because architecture approval is not a
+data license. No adapter is implemented yet.

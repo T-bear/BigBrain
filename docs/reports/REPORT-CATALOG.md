@@ -17,6 +17,7 @@
 | Finance policy-governed trading epic | Sanitized planning baseline | [Finance epic planning](features/finance/finance-epic-planning-20260810.md) | M0 complete; runtime and trading not implemented |
 | Finance Sprint 1 foundation | Sanitized implementation evidence | [Sprint 1 foundation](features/finance/finance-sprint-1-foundation-20260810.md) | M1 domain/evidence foundation automatically verified; not deployed |
 | Finance Sprint 2 market-data research | Sanitized provider/licensing research | [Sprint 2 research](features/finance/finance-sprint-2-market-data-research-20260810.md) | BB-046 complete; provider activation blocked by BB-071 |
+| Finance BB-071 retention gate review | Sanitized public-terms and owner-review evidence | [BB-071 review](features/finance/finance-bb-071-retention-gate-review-20260810.md) | ADR 0021 accepted; BB-071 waiting for provider confirmation |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

@@ -163,7 +163,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Typ: Implementation
 - Prioritet: P2
 - Status: Planerad
-- Beroenden: BB-044, BB-046, BB-071 and owner-approved ADR 0021 scope.
+- Beroenden: BB-044, BB-046, BB-071 and Accepted ADR 0021 scope.
 - Definition of Done: licensed, versioned datasets normalize reproducibly with source,
   timezone, corporate-action, quality, gap and duplicate tests.
 
@@ -187,9 +187,9 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data Governance
 - Typ: Licensing confirmation / implementation gate
 - Prioritet: P1
-- Status: Ny
+- Status: Pågår – väntar på leverantörsbekräftelse
 - Upptäckt: 2026-08-10
-- Beroenden: BB-046 and Proposed ADR 0021.
+- Beroenden: BB-046 and Accepted ADR 0021.
 
 Obtain written confirmation for the exact intended individual/personal product and
 markets before creating an account or ingestion adapter. Confirmation must cover local
@@ -204,6 +204,15 @@ exchange-specific terms. Compare Twelve Data with Tiingo/Massive where scope dif
   behavior are explicit; uncertainty blocks ingestion.
 - Required subscription/exchange fees and credential class are documented without secrets.
 - One provider/product scope is approved for BB-045, or selection is explicitly rejected.
+
+Research update 2026-08-10: public terms confirm personal/internal use in differing
+scopes, but they do not grant BigBrain's complete required retention. Twelve Data states
+that data is retained only for the subscription-permitted duration and deleted within
+30 days after termination. Tiingo requires prompt permanent deletion on termination and
+written approval for derived-data creation/retention. Massive requires use to cease and
+all market data to be deleted on termination, and its individual terms restrict
+non-display/derived use. BB-071 therefore remains open. The ready-to-send questions are
+in `docs/architecture/finance/provider-retention-inquiry.md`.
 
 ### BB-047 – M3 deterministic backtest engine
 

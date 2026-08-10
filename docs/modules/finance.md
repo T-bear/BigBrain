@@ -56,7 +56,10 @@ BB-046 recommends daily raw OHLCV plus separately versioned corporate actions fo
 US/Nordic allowlist. Twelve Data is the primary EOD candidate because documented coverage
 includes Nasdaq Stockholm; Tiingo and Massive remain US-specialized alternatives. No
 provider is selected or authorized until BB-071 confirms storage and cancellation
-retention rights. See [provider selection](../architecture/finance/market-data-provider-selection.md).
+retention rights. Public terms currently require deletion after cancellation for all
+three shortlisted products, so written clarification or a different license is needed.
+ADR 0021's provider-neutral direction is Accepted; that acceptance does not activate a
+provider. See [provider selection](../architecture/finance/market-data-provider-selection.md).
 
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an

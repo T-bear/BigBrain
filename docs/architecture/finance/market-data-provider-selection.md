@@ -1,11 +1,11 @@
 # Finance market-data provider selection
 
-Status: BB-046 research complete 2026-08-10; provider activation is blocked by BB-071.
+Status: BB-046 complete; BB-071 waiting for provider confirmation as of 2026-08-10.
 Prices and product terms below are time-sensitive observations, not permanent facts.
 
 ## Decision
 
-No provider is finally selected or authorized yet. Twelve Data is the primary candidate
+No provider is selected or authorized. Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
 Nordic exchanges, its reference model exposes MIC and optional FIGI/ISIN, and it supports
 daily through intraday OHLCV. Tiingo is the preferred specialized comparison for long US
@@ -13,10 +13,37 @@ end-of-day history and corporate-action-aware raw/adjusted data. Massive is the 
 alternative when consolidated US coverage, delisted identifiers, flat files or later
 minute data justify its higher and US-focused scope.
 
-Activation requires written/provider-account confirmation under BB-071 that a personal
-Swedish installation may cache and retain the exact purchased EOD data and corporate
-actions for deterministic local backtests, including after subscription cancellation,
-without redistribution. Until then, fixtures remain the only authorized source.
+Public terms do not satisfy the intended durable evidence archive. Twelve Data permits
+internal processing/storage during the applicable subscription scope but limits retention
+to the permitted subscription duration and requires deletion within 30 days after expiry.
+Tiingo permits local storage only during an active subscription, requires deletion after
+expiry and requires written approval for derived data. Massive requires deletion of all
+market data after termination and restricts non-display/derived use without a license.
+Activation therefore requires an affirmative written entitlement or a different product.
+Until then, fixtures remain the only authorized source.
+
+## Dated entitlement matrix
+
+Classification is based only on official public material reviewed 2026-08-10. “Likely”
+is an interpretation, not permission.
+
+| Requirement | Twelve Data | Tiingo | Massive |
+| --- | --- | --- | --- |
+| Personal/private eligibility | **Confirmed**: terms apply to individuals and internal use | **Confirmed**: individual API plan, internal consumption | **Confirmed**: individual, personal non-business use |
+| US EOD | **Confirmed** | **Confirmed** | **Confirmed** |
+| Swedish/Nordic EOD | **Confirmed** for listed EOD venues including XSTO/XOSL; exact instrument entitlement must be sampled | **Unclear** | **Unclear/not the documented stock focus** |
+| Local raw storage while subscribed | **Confirmed**, within tier/documented retention limits | **Confirmed**, only while subscription is active | **Unclear**: API/flat-file access exists, but default terms call data display-only and restrict copying/non-display use |
+| Maximum storage duration | **Unclear**: terms defer to subscription and documentation; no product-specific maximum was located | **Confirmed** only as active-subscription duration; any shorter product limit remains unclear | **Unclear** while active |
+| Deterministic private backtesting | **Likely/interpretation** as internal non-display processing, but tier permission is not explicit | **Unclear** because derived-data creation requires written approval | **Prohibited without additional license** under the non-display/derived-work restriction |
+| Corporate-action storage | **Unclear** | **Unclear** despite EOD split/dividend fields | **Unclear** |
+| Derived metrics/report retention | **Likely/interpretation** when non-reversible; explicit post-expiry status is unclear | **Prohibited without written approval** | **Unclear/prohibited without non-display license** |
+| Raw retention after cancellation | **Prohibited**: delete within 30 days | **Prohibited**: promptly and permanently delete | **Prohibited**: cease use and delete all market data |
+| Redistribution | **Prohibited** absent add-on/agreement | **Prohibited** absent permission | **Prohibited** absent consent/license |
+| Exchange-specific restrictions/fees | **Confirmed possible; exact XSTO/product obligations unclear** | **Unclear for intended scope** | **Confirmed possible; US exchange agreements apply by dataset** |
+
+The intended ability to retain a reproducible raw archive after cancellation is not
+available under the public default terms of any shortlisted provider. This is not inferred
+permission. BB-071 remains open and BB-045 remains blocked.
 
 ## Initial M2 dataset
 
@@ -84,6 +111,12 @@ partial pages, duplicate/missing candles and provider corrections are explicit r
 A second provider is a validation source, not silently mixed into one series. Provider
 disagreement is journaled and resolved by a declared dataset policy.
 
+Provider/account activation must also bind each dataset to an entitlement record:
+product/tier, effective terms version, approved markets, permitted purpose, retention
+deadline and deletion obligation. An expired or unknown entitlement fails closed. The
+implementation must support quarantining an incomplete import, detecting duplicates and
+calendar-aware gaps, and appending provider corrections without rewriting prior evidence.
+
 ## Sources reviewed
 
 Primary provider documentation and terms were reviewed 2026-08-10:
@@ -104,3 +137,9 @@ Primary provider documentation and terms were reviewed 2026-08-10:
 - [Interactive Brokers market-data documentation](https://www.interactivebrokers.com/campus/ibkr-api-page/twsapi-doc/)
 - Stooq public download surface; no sufficiently explicit official API/storage license
   was located, so it is not eligible for automated M2 ingestion without clarification.
+
+The BB-071 evidence relies particularly on Twelve Data Terms sections 2 and 16, Tiingo
+Terms section 1.6, and Massive Market Data Terms sections 5 and 8. Provider replies must
+identify the applicable product and override/addendum if they differ from these public
+defaults. The ready-to-send inquiry is
+[provider retention inquiry](provider-retention-inquiry.md).

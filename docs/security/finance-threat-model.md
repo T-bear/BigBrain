@@ -44,3 +44,10 @@ BB-046 review: future market-data credentials remain runtime-only adapter secret
 and entitlements are security policy: ingestion must fail closed when product, market,
 retention or rate-limit scope is unknown. Provider corrections and stale/partial data are
 untrusted inputs; immutable provenance prevents silent historical rewriting.
+
+BB-071 review: licensing and retention are enforced as data-governance policy, not
+inferred from API access. Public cancellation clauses for shortlisted providers require
+deletion, so no adapter may be enabled until an approved product or written exception
+defines storage duration, non-display backtesting, derived evidence and deletion duties.
+Dataset deletion must never silently destroy referenced evidence; if the license cannot
+support reproducible retention, the provider is ineligible for BB-045.
