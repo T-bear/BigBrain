@@ -88,17 +88,21 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 ## Finance
 
 - Current phase: RESEARCH.
-- Current milestone: M0 architecture and safety specification complete.
-- Completed work: master roadmap, module/capability architecture, threat/risk model,
-  progressive modes, backtest/paper/broker plans, ADR proposals, runbooks, test strategy
-  and granular BB-042–BB-070 backlog.
+- Current milestone: M1 Finance domain skeleton complete, automatically verified and
+  published with the Sprint 1 evidence; deployment remains not performed.
+- Completed work: M0 planning plus decimal-based money/price/quantity/risk primitives,
+  UTC market observations, provider-neutral market-data and strategy contracts, explicit
+  risk/policy decision boundary, in-memory append-oriented decision journal, future
+  paper-domain records and deterministic reference pipeline.
 - Active work: none.
-- Next safe task: BB-044 / M1 read-only Finance domain skeleton, without broker SDK,
-  credentials, market feed, order endpoint or trading runtime.
-- Blockers: product-owner prioritization for M1; all documented gates block real money.
+- Next safe task: BB-046 market-data licensing/provider research before BB-045 external
+  historical ingestion. No provider or SDK should be selected first.
+- Known limitations: no persistence, external market data, real strategy, full Risk Engine,
+  paper executor, custom Finance API/UI, broker adapter or runtime deployment.
+- Blockers: BB-046 blocks external data ingestion; all documented gates block real money.
 - Owner approval required: every promotion toward live or greater autonomy.
 - Live trading enabled: **NO**.
-- Current trading mode: **NOT IMPLEMENTED**.
+- Current trading mode: **RESEARCH** (domain/default and module status only; not deployed).
 - Dokument: [master roadmap](architecture/finance/master-roadmap.md),
   [module](modules/finance.md), [threat model](security/finance-threat-model.md).
 

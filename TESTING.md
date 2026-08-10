@@ -13,23 +13,12 @@ npm test -- --run
 npm run build
 ```
 
-Backend och Sentinel, från repositoryroten:
+Backend och Sentinel med den lokala .NET 10 SDK:n, från repositoryroten och utan sudo:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" --workdir /workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet restore BigBrain.slnx
-
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" --workdir /workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet build BigBrain.slnx --configuration Release --no-restore --artifacts-path /tmp/bigbrain-artifacts
-
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" --workdir /workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet test BigBrain.slnx --configuration Release --no-build --artifacts-path /tmp/bigbrain-artifacts
+dotnet restore BigBrain.slnx
+dotnet build BigBrain.slnx --configuration Release --no-restore
+dotnet test BigBrain.slnx --configuration Release --no-build --no-restore
 ```
 
 Dokumentation och repositoryhygien:
@@ -54,6 +43,9 @@ docker compose config --quiet
   including invariant, simulation, paper, sandbox, failure-injection, reconciliation,
   security, UI/accessibility, performance and soak layers. No Finance test may access a
   live broker or real credentials.
+  Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
+  strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
+  korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.
 
 ## Live-säkerhetsregel
 

@@ -70,6 +70,8 @@ När ett uppdrag tillför långsiktigt relevant kunskap ska Codex skapa eller up
 
 ### Commit- och pushprincip
 
+- Repositoryts publicerade dokumentation och Git-historik är source of truth mellan agentsessioner; en ny agent ska kunna återskapa aktuell status utan terminalhistorik.
+- Dokumentationspublicering innebär aldrig deployment eller runtimeändring. Sådana åtgärder kräver separat uttrycklig auktorisering.
 - När ett uppdrag är verifierat och användaren har godkänt push ska kod, tester och tillhörande dokumentation committas och pushas tillsammans i en eller flera tydliga commits.
 - Om endast dokumentation ändrats ska den verifieras, få en separat dokumentationscommit och pushas. Dokumentation får inte lämnas lokalt enbart för att ingen kod ändrades.
 - Om kod inte får pushas ska relevant dokumentation ändå uppdateras lokalt och samtliga väntande filer redovisas.

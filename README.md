@@ -10,7 +10,7 @@ BigBrain ska utgå från vad användaren vill göra, inte från hur underliggand
 
 - **BigBrain Web:** React, TypeScript och Vite; gemensamt applikationsskal, designsystem och kompilerade förstapartswidgets.
 - **BigBrain API:** modulär ASP.NET Core-monolit med versionssatta API:er och Problem Details.
-- **BigBrain Modules:** domän- och integrationsgränser för System, Media, Matlista, Inköpslista, Kalender och planerad Finance.
+- **BigBrain Modules:** domän- och integrationsgränser för System, Media, Matlista, Inköpslista, Kalender och Finance.
 - **BigBrain Sentinel:** separat minsta-behörighetsgräns för lokala systemcapabilities; Web och API monterar aldrig Docker-socketen.
 - **Integration adapters:** Jellyfin, Sonarr, Radarr, Prowlarr och qBittorrent kapslas bakom typade adapters.
 
@@ -51,11 +51,13 @@ Se [Mediamodulen](docs/modules/media.md), [Smart Shuffle-ADR](docs/adr/0011-smar
 
 Systemstatus läser allowlistade uptime-, CPU-, minnes- och diskcapabilities genom Sentinel. Dockerinventeringens fortsatta arkitekturarbete är separat från Media-adapters. Sentinel-filer med Proposed beslut är inte automatiskt accepterade.
 
-### Finance – långsiktig plan
+### Finance – research foundation
 
-Finance har en publicerad säkerhets- och leveransplan från RESEARCH via backtesting och
-PAPER till eventuellt MANUAL_APPROVAL, LIMITED_AUTO och policy-governed AUTO. Live trading
-är inte implementerad eller aktiverad. Se den kanoniska
+Finance har en implementerad, read-only RESEARCH-grund med säkra numeriska värdeobjekt,
+provider-neutrala market-data-/strategikontrakt samt fail-closed risk-, policy-, besluts-
+och journalmodeller. Ingen persistence, executor, brokerintegration, UI eller live trading
+är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
+och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och
 [Finance-modulen](docs/modules/finance.md).
 
@@ -80,13 +82,12 @@ npm test -- --run
 npm run build
 ```
 
-Backend körs i den dokumenterade .NET 10 SDK-containern:
+Backend kan köras med repositoryts lokala .NET 10 SDK:
 
 ```bash
-docker run --rm --user "$(id -u):$(id -g)" \
-  --volume "$PWD:/workspace" --workdir /workspace \
-  mcr.microsoft.com/dotnet/sdk:10.0 \
-  dotnet test BigBrain.slnx --configuration Release --artifacts-path /tmp/bigbrain-artifacts
+dotnet restore BigBrain.slnx
+dotnet build BigBrain.slnx --configuration Release --no-restore
+dotnet test BigBrain.slnx --configuration Release --no-build --no-restore
 ```
 
 Se [TESTING.md](TESTING.md) för testkartan och [operationsindexet](docs/indexes/operations.md) för deployment och runtimeverifiering.

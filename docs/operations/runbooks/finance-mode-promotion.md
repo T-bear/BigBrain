@@ -1,6 +1,7 @@
 # Finance mode promotion runbook
 
-Status: design-only; every current Finance mode is NOT IMPLEMENTED.
+Status: design-only for promotion. RESEARCH is represented as the safe domain default and
+read-only module status, but Finance has not been deployed and no promotion operation exists.
 
 Promotion is an owner-authorized policy change, never an elapsed-time automation. Before
 promotion, record current mode, target, evidence set, policy/risk version, outstanding

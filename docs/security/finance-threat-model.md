@@ -2,6 +2,11 @@
 
 Status: planning baseline; review again before credentials, sandbox or live connectivity.
 
+M1 review: the implementation adds only domain types, in-memory evidence and a read-only
+module registration. It adds no network client, broker SDK, credential configuration,
+secret-bearing fixture, external order endpoint, persistence or logging sink. Candidate,
+risk, policy and decision remain separate, with missing safety evidence failing closed.
+
 ## Assets and adversaries
 
 High-value assets are broker credentials, authorization/mode policy, account and position

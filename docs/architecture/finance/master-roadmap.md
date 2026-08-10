@@ -1,6 +1,6 @@
 # BigBrain Finance – master roadmap
 
-Status: M0 complete as a planning baseline; all trading runtime is not implemented.
+Status: M0 and M1 complete; Finance remains an undeployed RESEARCH foundation.
 Owner approval required: before every transition toward live or greater autonomy.
 Live trading enabled: **NO**. Current trading mode: **NOT IMPLEMENTED**.
 
@@ -18,12 +18,11 @@ enabled before all M13 gates are evidenced and explicitly approved.
 
 ## Current state and next gate
 
-- Current phase/milestone: RESEARCH / M0 complete.
-- Completed: architecture, safety, testing, security and phased delivery specification.
+- Current phase/milestone: RESEARCH / M1 complete.
+- Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
 - Active work: none.
-- Next safe task: M1, create a Finance domain skeleton with read-only in-memory contracts,
-  no broker SDK, credentials, market feed, order endpoint or trading runtime.
-- Blockers for M1: product-owner prioritization only.
+- Next safe task: BB-046 licensing/provider research, then M2 historical data ingestion.
+- Blockers for M2 implementation: BB-046 and an owner-reviewed provider/data scope.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -57,7 +56,7 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Definition of Done/gate: canonical documents published and validation green.
 - Rollback: revert documentation commit; runtime is unaffected.
 
-### M1 – Finance domain skeleton — PLANNED
+### M1 – Finance domain skeleton — COMPLETE
 
 - Objective: create versioned domain primitives and a read-only module surface.
 - Scope/tasks: money/instrument/time semantics, portfolio and signal value objects,
@@ -68,7 +67,7 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Tests: unit/property tests for precision, currency, identifiers and serialization.
 - Security/docs: no credentials; update module/API and data-ownership documentation.
 - Definition of Done/gate: deterministic contracts, no write capability, green tests.
-- Rollback: remove module registration and unused schema without data migration.
+- Rollback: remove module registration and domain-only types; no schema or data migration exists.
 
 ### M2 – Historical market-data foundation — PLANNED
 

@@ -56,3 +56,10 @@ Order intent needs a stable decision/preview identity and an idempotency boundar
 Timeout or transport success does not establish execution. The controller records an
 uncertain outcome, blocks conflicting action and reconciles before any retry. Material
 cash, position, order or fill mismatch suspends automated trading.
+
+## M1 implementation boundary
+
+M1 implements domain contracts and a deterministic in-memory evidence slice in
+`BigBrain.Modules`. Strategy evaluation, risk, policy and decision are distinct types.
+The module registry exposes only `finance.research.read`; there is no Finance-specific
+HTTP mutation, broker port, network client, executor, persistence or Web component.

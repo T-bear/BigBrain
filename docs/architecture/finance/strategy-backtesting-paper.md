@@ -12,6 +12,11 @@ The Decision Engine cannot authorize execution; hard Risk policy remains authori
 Regimes may include trending, range-bound, high/low volatility, abnormal conditions and
 insufficient liquidity, with reduced exposure or no trading when appropriate.
 
+M1 implements the provider-neutral observation/context input and versioned signal output.
+The reference strategy used by tests is fixture-only and produces deterministic evidence;
+it is not a profitability claim. Paper order/fill records are descriptive domain types,
+not an execution engine.
+
 ## Backtesting
 
 The engine must replay reproducible datasets deterministically, version parameters and

@@ -15,3 +15,8 @@ can create exposure; material uncertainty causes suspension.
 Journal integrity, retention, access control, redaction, clock source and export/reporting
 requirements must be finalized before PAPER persistence. Corrections append a linked
 record rather than rewriting history.
+
+M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
+intent decisions, risk/policy results, reason codes and observation→evaluation→decision
+correlation. Persistence, integrity protection, retention and outcome reconciliation are
+still deferred; the current journal is test/evidence foundation only.

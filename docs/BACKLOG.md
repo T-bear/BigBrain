@@ -148,10 +148,14 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance
 - Typ: Architecture / implementation
 - Prioritet: P2
-- Status: Planerad
+- Status: Klar
 - Beroenden: BB-043 and ADR 0017 review.
 - Definition of Done: versioned money/instrument/time, signal and portfolio primitives,
   module registration and read-only fakes have unit/property tests; no broker or order path.
+- Slutförd: 2026-08-10. Finance registreras read-only som Research; decimal-/UTC-typer,
+  provider-neutral observation/strategy, risk/policy, journal, paper-domain records och en
+  fixture-only reference pipeline är implementerade och testade. Ingen executor, extern
+  provider, broker, credential, Finance-write-endpoint, persistence, UI eller deployment finns.
 
 ### BB-045 – M2 historical market-data ingestion and provenance
 

@@ -1,6 +1,7 @@
 # Finance module
 
-Status: planned; no Finance runtime, trading mode, broker connection or order capability exists.
+Status: M1 foundation implemented and automatically verified; not deployed. Finance is
+read-only RESEARCH and has no broker connection, executor or external order capability.
 
 Finance is a future first-party BigBrain module for research, simulation and eventually
 policy-governed trading. It owns Finance domain state and must not read another module's
@@ -19,6 +20,35 @@ security or workload need and an accepted ADR.
 - Execution Verification and reconciliation compare internal state with broker truth.
 - Decision Journal records an append-oriented reconstruction chain.
 - Finance UI presents state, previews, evidence, risk and emergency controls.
+
+## Implemented M1 foundation
+
+- `Money`, `Price`, `Quantity` and `Percentage` use `decimal` and reject invalid values.
+  Currency is an explicit normalized three-letter value. Money rounds only through an
+  explicit midpoint-to-even operation; domain values otherwise retain decimal precision.
+- Instruments, venues, quote/OHLCV candles, timeframes and market observations are
+  provider-neutral. Persistent/domain timestamps must use `DateTimeOffset` UTC; market,
+  observation, evaluation and decision times remain separate for future latency metrics.
+- `IFinanceStrategy` accepts verified observation/context and returns only a versioned
+  evaluation/signal. It cannot return or submit an order.
+- Risk and policy results are separate and default to `Missing`; missing or rejected data
+  fails closed. A candidate becomes only a paper intent when both accept and mode is PAPER.
+- The in-memory journal records NO TRADE and REJECTED as well as accepted paper intent,
+  retaining observation, evaluation, decision and correlation identifiers.
+- Paper order/fill, position and result are domain records only. No paper executor,
+  persistence or external adapter exists.
+- Finance is registered in the existing module registry with status `Research`, no widget
+  and only `finance.research.read`.
+
+The deterministic reference pipeline and fixture strategy exist to test architecture,
+not as investment logic or evidence of profitability.
+
+## Deliberately deferred
+
+Persistence is deferred until its ownership, retention and journal integrity requirements
+are designed. No migration or existing data store was changed. Custom Finance API/UI,
+external market data, indicators, production strategies, full risk policy and paper
+execution belong to later milestones.
 
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an

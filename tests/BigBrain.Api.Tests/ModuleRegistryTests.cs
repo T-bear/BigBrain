@@ -26,4 +26,16 @@ public sealed class ModuleRegistryTests
 
         Assert.Equal(["alpha", "zulu"], modules.Select(module => module.Id));
     }
+
+    [Fact]
+    public void FinanceModuleExposesOnlyResearchReadCapability()
+    {
+        var registry = new InMemoryModuleRegistry([FinanceModule.Definition]);
+
+        var finance = Assert.Single(registry.GetModules());
+        Assert.Equal("finance", finance.Id);
+        Assert.Equal("Research", finance.Status);
+        Assert.Equal(["finance.research.read"], finance.Capabilities);
+        Assert.Empty(finance.DashboardWidgets);
+    }
 }
