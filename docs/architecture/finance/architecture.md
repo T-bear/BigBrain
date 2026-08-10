@@ -63,3 +63,11 @@ M1 implements domain contracts and a deterministic in-memory evidence slice in
 `BigBrain.Modules`. Strategy evaluation, risk, policy and decision are distinct types.
 The module registry exposes only `finance.research.read`; there is no Finance-specific
 HTTP mutation, broker port, network client, executor, persistence or Web component.
+
+## Planned M2 market-data boundary
+
+Provider adapters normalize into immutable canonical datasets before strategy access.
+Canonical identity uses an internal ID plus MIC/currency and time-bounded provider symbol
+mappings. Dataset provenance, raw/adjusted state, corporate actions, corrections, market
+calendar and ingestion metadata are mandatory. See
+[provider selection](market-data-provider-selection.md); no adapter is implemented yet.

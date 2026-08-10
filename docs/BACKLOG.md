@@ -163,7 +163,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Typ: Implementation
 - Prioritet: P2
 - Status: Planerad
-- Beroenden: BB-044, BB-046.
+- Beroenden: BB-044, BB-046, BB-071 and owner-approved ADR 0021 scope.
 - Definition of Done: licensed, versioned datasets normalize reproducibly with source,
   timezone, corporate-action, quality, gap and duplicate tests.
 
@@ -172,10 +172,38 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Governance
 - Typ: Research / legal-operational gate
 - Prioritet: P2
-- Status: Planerad
+- Status: Klar
 - Beroenden: BB-043.
 - Definition of Done: owner-reviewed provider/API usage, licensing, retention and
   redistribution constraints are documented without unsupported legal conclusions.
+- Slutförd: 2026-08-10. Eight candidates were compared using public provider sources.
+  Twelve Data is the primary Nordic/global EOD candidate, Tiingo the US EOD specialist
+  and Massive the US-depth alternative. No activation is authorized because long-term
+  local retention and post-cancellation rights remain uncertain; BB-071 is the explicit
+  confirmation gate. Daily raw OHLCV plus separate corporate actions is the M2 baseline.
+
+### BB-071 – Confirm market-data storage and retention entitlement
+
+- Modul: Finance / Market Data Governance
+- Typ: Licensing confirmation / implementation gate
+- Prioritet: P1
+- Status: Ny
+- Upptäckt: 2026-08-10
+- Beroenden: BB-046 and Proposed ADR 0021.
+
+Obtain written confirmation for the exact intended individual/personal product and
+markets before creating an account or ingestion adapter. Confirmation must cover local
+storage/caching duration, deterministic backtesting, derived metrics/reports, corporate
+actions, retention after cancellation, non-redistribution, Swedish residence and any
+exchange-specific terms. Compare Twelve Data with Tiingo/Massive where scope differs.
+
+#### Definition of Done
+
+- Product owner reviews dated provider responses/terms for the selected dataset.
+- Permitted instruments, intervals, storage duration, derived use and cancellation
+  behavior are explicit; uncertainty blocks ingestion.
+- Required subscription/exchange fees and credential class are documented without secrets.
+- One provider/product scope is approved for BB-045, or selection is explicitly rejected.
 
 ### BB-047 – M3 deterministic backtest engine
 

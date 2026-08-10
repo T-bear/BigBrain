@@ -16,6 +16,7 @@
 | Repository consolidation | Sanitized full report | [Publication report](documentation/repository-consolidation-and-documentation-governance-20260804-214358.md) | Published |
 | Finance policy-governed trading epic | Sanitized planning baseline | [Finance epic planning](features/finance/finance-epic-planning-20260810.md) | M0 complete; runtime and trading not implemented |
 | Finance Sprint 1 foundation | Sanitized implementation evidence | [Sprint 1 foundation](features/finance/finance-sprint-1-foundation-20260810.md) | M1 domain/evidence foundation automatically verified; not deployed |
+| Finance Sprint 2 market-data research | Sanitized provider/licensing research | [Sprint 2 research](features/finance/finance-sprint-2-market-data-research-20260810.md) | BB-046 complete; provider activation blocked by BB-071 |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

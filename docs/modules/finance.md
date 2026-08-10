@@ -50,6 +50,14 @@ are designed. No migration or existing data store was changed. Custom Finance AP
 external market data, indicators, production strategies, full risk policy and paper
 execution belong to later milestones.
 
+## Market-data research baseline
+
+BB-046 recommends daily raw OHLCV plus separately versioned corporate actions for a small
+US/Nordic allowlist. Twelve Data is the primary EOD candidate because documented coverage
+includes Nasdaq Stockholm; Tiingo and Massive remain US-specialized alternatives. No
+provider is selected or authorized until BB-071 confirms storage and cancellation
+retention rights. See [provider selection](../architecture/finance/market-data-provider-selection.md).
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

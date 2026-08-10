@@ -37,6 +37,7 @@ are not repository authority. Only reviewed, sanitized knowledge is published un
 - [Finance master roadmap](../architecture/finance/master-roadmap.md)
 - [Finance module](../modules/finance.md)
 - [Finance threat model](../security/finance-threat-model.md)
+- [Finance market-data provider selection](../architecture/finance/market-data-provider-selection.md)
 - [Meal Planner knowledge](../knowledge/meal-planner.md)
 - [Shopping List knowledge](../knowledge/shopping-list.md)
 - [Design system](../design-system/theme-contract-v1.md)

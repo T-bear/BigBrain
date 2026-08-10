@@ -94,12 +94,16 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   UTC market observations, provider-neutral market-data and strategy contracts, explicit
   risk/policy decision boundary, in-memory append-oriented decision journal, future
   paper-domain records and deterministic reference pipeline.
+- Completed research: BB-046 compared eight provider candidates. Twelve Data is the
+  primary Nordic/global EOD candidate; Tiingo and Massive are specialized US alternatives.
+  Daily raw OHLCV plus separate corporate actions is the recommended M2 scope.
 - Active work: none.
-- Next safe task: BB-046 market-data licensing/provider research before BB-045 external
-  historical ingestion. No provider or SDK should be selected first.
+- Next safe task: BB-071 written storage/retention confirmation. BB-045 ingestion remains
+  blocked; no provider account, SDK or credential is authorized.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
-- Blockers: BB-046 blocks external data ingestion; all documented gates block real money.
+- Blockers: BB-071 and Proposed ADR 0021 review block external data ingestion; all
+  documented gates block real money.
 - Owner approval required: every promotion toward live or greater autonomy.
 - Live trading enabled: **NO**.
 - Current trading mode: **RESEARCH** (domain/default and module status only; not deployed).

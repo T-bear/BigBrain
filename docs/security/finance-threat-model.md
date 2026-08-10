@@ -39,3 +39,8 @@ Trading can lose capital even when controls work. Backtests may be biased and fu
 markets may differ. Broker/data outages, legal change and credential compromise remain
 residual risks. No live mode is acceptable until threat-model review, incident response,
 rotation/revocation, reconciliation, emergency drills and owner risk acceptance pass.
+
+BB-046 review: future market-data credentials remain runtime-only adapter secrets. Terms
+and entitlements are security policy: ingestion must fail closed when product, market,
+retention or rate-limit scope is unknown. Provider corrections and stale/partial data are
+untrusted inputs; immutable provenance prevents silent historical rewriting.

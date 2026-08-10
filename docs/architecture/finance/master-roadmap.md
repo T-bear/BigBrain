@@ -2,7 +2,8 @@
 
 Status: M0 and M1 complete; Finance remains an undeployed RESEARCH foundation.
 Owner approval required: before every transition toward live or greater autonomy.
-Live trading enabled: **NO**. Current trading mode: **NOT IMPLEMENTED**.
+Live trading enabled: **NO**. Current trading mode: **RESEARCH** domain/module status only;
+Finance is not deployed and no mode transition operation exists.
 
 ## What and why
 
@@ -21,8 +22,8 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Current phase/milestone: RESEARCH / M1 complete.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
 - Active work: none.
-- Next safe task: BB-046 licensing/provider research, then M2 historical data ingestion.
-- Blockers for M2 implementation: BB-046 and an owner-reviewed provider/data scope.
+- Next safe task: BB-071 written provider retention confirmation, then BB-045 ingestion.
+- Blockers for M2 implementation: BB-071 and owner review of Proposed ADR 0021.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -81,6 +82,10 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Security/docs: minimize account/provider data; document license and provenance.
 - Definition of Done/gate: identical dataset version produces identical normalized data.
 - Rollback: disable adapter and retain referenced datasets/evidence per policy.
+
+BB-046 research is complete. The provisional primary candidate is Twelve Data for
+Nordic/global EOD, with Tiingo/Massive as US specialists. This does not start M2: BB-071
+must establish storage and post-cancellation retention entitlement first.
 
 ### M3 – Backtest engine — PLANNED
 
@@ -264,5 +269,6 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - [Broker, execution and reconciliation](broker-execution-reconciliation.md)
 - [Decision journal and observability](decision-journal-observability.md)
 - [Testing strategy](testing-and-validation.md)
+- [Market-data provider selection](market-data-provider-selection.md)
 - [Threat model](../../security/finance-threat-model.md)
 - [Backlog](../../BACKLOG.md#bigbrain-finance--policy-governed-autonomous-trading)

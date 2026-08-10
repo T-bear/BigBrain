@@ -34,6 +34,11 @@ where appropriate, and examine parameter, regime and cost sensitivity. Monte Car
 sequence-risk analysis is used when informative. Historical profitability never
 guarantees future profitability.
 
+BB-045 must keep raw prices and corporate actions separate from adjusted replay views,
+bind every report to an immutable dataset version and use availability timestamps rather
+than later corrections. A current-survivor-only universe cannot qualify a strategy unless
+the survivorship limitation is explicit and accepted.
+
 ## Paper trading and Strategy Lab
 
 Paper trading uses live or near-live observations but persistent simulated cash,

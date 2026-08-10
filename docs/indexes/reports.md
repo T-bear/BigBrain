@@ -9,6 +9,7 @@
 - [Download Control Sprint 3 navigation report](../reports/features/download-control/sprint-3-download-navigation-20260810.md)
 - [Finance planning baseline](../reports/features/finance/finance-epic-planning-20260810.md)
 - [Finance Sprint 1 foundation](../reports/features/finance/finance-sprint-1-foundation-20260810.md)
+- [Finance Sprint 2 market-data research](../reports/features/finance/finance-sprint-2-market-data-research-20260810.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.
