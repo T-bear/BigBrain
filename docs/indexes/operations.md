@@ -12,3 +12,5 @@
 - [Dead download recovery](../operations/recovery/dead-download-recovery-v1.md)
 - [Backup and restore](../operations/backup-restore/README.md)
 - [Deployment](../operations/deployment/README.md)
+- [Finance emergency stop](../operations/runbooks/finance-emergency-stop.md)
+- [Finance mode promotion](../operations/runbooks/finance-mode-promotion.md)

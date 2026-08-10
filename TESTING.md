@@ -50,6 +50,10 @@ docker compose config --quiet
 - Designsystem och teman: [manuell verifieringsplan](docs/design-system/manual-verification.md), [theme contract](docs/design-system/theme-contract-v1.md) och [Jellyfin-runbook](docs/operations/runbooks/jellyfin-bigbrain-theme.md).
 - qBittorrentdiagnostik: [queue/peer-runbook](docs/operations/runbooks/qbittorrent-queue-and-peer-diagnosis.md).
 - Aktuell verifieringsstatus: [STATUS](docs/STATUS.md).
+- Finance: [testing and validation strategy](docs/architecture/finance/testing-and-validation.md),
+  including invariant, simulation, paper, sandbox, failure-injection, reconciliation,
+  security, UI/accessibility, performance and soak layers. No Finance test may access a
+  live broker or real credentials.
 
 ## Live-säkerhetsregel
 

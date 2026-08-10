@@ -1,7 +1,7 @@
 # BigBrain Status
 
 - Senast uppdaterad: 2026-08-10 (Europe/Stockholm)
-- Verifierad mot commit: den publicerade Sprint 2 closure-committen i Git-historiken; deploymenten är produktägargodkänd.
+- Verifierad mot commit: Finance-planeringen publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
 - Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
@@ -84,6 +84,23 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Status: grundläggande systemstatus är deployad; den bredare Sentinel-arkitekturen är föreslagen och inte godkänd som generell mutationsplattform.
 - Kända begränsningar: lokala, ännu inte publicerade Sentinel-förslag är inte del av denna baseline.
 - Dokument: [arkitektur](architecture/sentinel-architecture.md), [kunskap](knowledge/sentinel.md), [ADR-index](indexes/adr.md).
+
+## Finance
+
+- Current phase: RESEARCH.
+- Current milestone: M0 architecture and safety specification complete.
+- Completed work: master roadmap, module/capability architecture, threat/risk model,
+  progressive modes, backtest/paper/broker plans, ADR proposals, runbooks, test strategy
+  and granular BB-042–BB-070 backlog.
+- Active work: none.
+- Next safe task: BB-044 / M1 read-only Finance domain skeleton, without broker SDK,
+  credentials, market feed, order endpoint or trading runtime.
+- Blockers: product-owner prioritization for M1; all documented gates block real money.
+- Owner approval required: every promotion toward live or greater autonomy.
+- Live trading enabled: **NO**.
+- Current trading mode: **NOT IMPLEMENTED**.
+- Dokument: [master roadmap](architecture/finance/master-roadmap.md),
+  [module](modules/finance.md), [threat model](security/finance-threat-model.md).
 
 ## Säkerhets- och publiceringsnotering
 

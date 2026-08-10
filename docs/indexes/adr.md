@@ -16,6 +16,10 @@ Proposed records are not accepted authority merely because related code exists.
 | [0014](../adr/0014-dashboard-views-and-widget-framework.md) | Proposed | Dashboard views and widget framework |
 | [0015](../adr/0015-calendar-heroma-import-boundary.md) | Proposed | Calendar ownership and Heroma import boundary |
 | [0016](../adr/0016-safe-download-control-command-and-partial-batch-boundary.md) | Accepted | Safe Download Control commands and partial batch |
+| [0017](../adr/0017-finance-policy-governed-trading-boundary.md) | Proposed | Finance policy-governed trading boundary |
+| [0018](../adr/0018-finance-risk-modes-and-progressive-autonomy.md) | Proposed | Finance hard risk and progressive autonomy |
+| [0019](../adr/0019-finance-broker-truth-and-execution-reconciliation.md) | Proposed | Finance broker truth and execution reconciliation |
+| [0020](../adr/0020-finance-evidence-and-strategy-governance.md) | Proposed | Finance evidence and strategy governance |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

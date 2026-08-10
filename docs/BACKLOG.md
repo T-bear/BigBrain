@@ -107,6 +107,315 @@ identifierar ett separat verifierat förbättringsbehov.
 
 ---
 
+## BigBrain Finance – policy-governed autonomous trading
+
+All Finance items are planning unless explicitly marked complete. No trading mode,
+broker connection or live authority exists. Dependencies refer to BB items and the
+[Finance master roadmap](architecture/finance/master-roadmap.md).
+
+### BB-042 – Epic: BigBrain Finance – policy-governed autonomous trading
+
+- Modul: Finance
+- Typ: Epic
+- Prioritet: P2
+- Status: Planerad
+- Upptäckt: 2026-08-10
+- Beroenden: BB-043; all promotion gates in the master roadmap.
+
+Deliver reproducible research, backtesting and paper trading before progressively gated
+manual, limited and policy-governed automatic trading. Preserve capital, seek positive
+net expectancy after costs, control drawdown and permit zero-trade days. Automatic
+trading is the eventual destination, never the starting state or a guaranteed return.
+
+#### Definition of Done
+
+- M0–M15 meet their individual DoD and evidence gates.
+- Live modes have current legal/operational review and explicit owner approval.
+- Risk cannot be bypassed; emergency controls, audit and reconciliation are proven.
+
+### BB-043 – Finance M0 architecture and safety baseline
+
+- Modul: Finance / Architecture
+- Typ: Planning / documentation
+- Prioritet: P1
+- Status: Klar
+- Beroenden: none.
+- Definition of Done: master roadmap, module/architecture, threat model, ADRs, runbooks,
+  test plan and granular backlog are validated and published. Completed 2026-08-10.
+
+### BB-044 – M1 Finance domain skeleton and read-only module
+
+- Modul: Finance
+- Typ: Architecture / implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-043 and ADR 0017 review.
+- Definition of Done: versioned money/instrument/time, signal and portfolio primitives,
+  module registration and read-only fakes have unit/property tests; no broker or order path.
+
+### BB-045 – M2 historical market-data ingestion and provenance
+
+- Modul: Finance / Market Data
+- Typ: Implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-044, BB-046.
+- Definition of Done: licensed, versioned datasets normalize reproducibly with source,
+  timezone, corporate-action, quality, gap and duplicate tests.
+
+### BB-046 – Market-data licensing, retention and provider research
+
+- Modul: Finance / Governance
+- Typ: Research / legal-operational gate
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-043.
+- Definition of Done: owner-reviewed provider/API usage, licensing, retention and
+  redistribution constraints are documented without unsupported legal conclusions.
+
+### BB-047 – M3 deterministic backtest engine
+
+- Modul: Finance / Backtesting
+- Typ: Implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-045.
+- Definition of Done: versioned datasets/parameters replay deterministically with order
+  and portfolio simulation, benchmarks, gross/net metrics and reproducible reports.
+
+### BB-048 – Transaction-cost, slippage and fill simulation
+
+- Modul: Finance / Backtesting
+- Typ: Implementation / validation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-047.
+- Definition of Done: applicable fees, spread, slippage, FX, delay, partial fill and
+  rejection are modeled; a strategy negative after costs fails validation.
+
+### BB-049 – Anti-overfitting and out-of-sample validation
+
+- Modul: Finance / Strategy Lab
+- Typ: Statistical validation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-047, BB-048.
+- Definition of Done: look-ahead/data leakage guards, in/validation/out-of-sample splits,
+  sensitivity, regime/cost stress and useful walk-forward/sequence-risk tests are evidenced.
+
+### BB-050 – M4 versioned deterministic strategy contract and candidates
+
+- Modul: Finance / Strategy Engine
+- Typ: Implementation / research
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-047.
+- Definition of Done: each momentum, trend, breakout, mean-reversion and volume/liquidity
+  candidate is independently testable and produces versioned StrategySignal evidence.
+
+### BB-051 – Market-regime classification
+
+- Modul: Finance / Strategy Engine
+- Typ: Research / implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-045, BB-050.
+- Definition of Done: versioned regimes and uncertainty can enable, disable or weight
+  strategies; abnormal volatility or poor liquidity can result in no trade.
+
+### BB-052 – Multi-strategy candidate decision model
+
+- Modul: Finance / Strategy Engine
+- Typ: Implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-050, BB-051.
+- Definition of Done: multiple versioned signals create an explainable Candidate Trade;
+  tests prove agreement is evidence and cannot authorize execution.
+
+### BB-053 – M5 hard Risk Engine and policy evaluation
+
+- Modul: Finance / Risk
+- Typ: Critical safety implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-044, BB-047; ADR 0018 review.
+- Definition of Done: all documented capital, exposure, loss, liquidity, spread, hours,
+  data/volatility and health limits are server-enforced and bypass/invariant tested.
+
+### BB-054 – Portfolio engine, sizing and bidirectional compounding
+
+- Modul: Finance / Portfolio
+- Typ: Implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-048, BB-053.
+- Definition of Done: cash, positions, exposure and current-equity sizing reconcile;
+  percentage risk never rises through compounding and sizes shrink after losses.
+
+### BB-055 – Exit management, circuit breakers and emergency control
+
+- Modul: Finance / Risk
+- Typ: Critical safety implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-053, BB-054.
+- Definition of Done: position-opening exit invariant, forced exits, STOP ALL TRADING,
+  HALTED behavior, safe-exit policy and resume authorization pass failure drills.
+
+### BB-056 – M6 Strategy Lab, metrics and lifecycle governance
+
+- Modul: Finance / Strategy Lab
+- Typ: Implementation / governance
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-049–BB-055.
+- Definition of Done: cost-aware metrics and attribution compare immutable versions;
+  lifecycle promotion needs evidence and explicit approval, not recent performance.
+
+### BB-057 – M7 restart-safe paper trading engine
+
+- Modul: Finance / Paper Trading
+- Typ: Implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-045, BB-050, BB-053, BB-056.
+- Definition of Done: persistent simulated cash/positions/orders/fills/P&L/costs support
+  delay, partial/rejected orders, restart and daily strategy-attributed summaries.
+
+### BB-058 – Paper-trading soak and evidence acceptance
+
+- Modul: Finance / Validation
+- Typ: Long-duration validation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-057, BB-070.
+- Definition of Done: representative owner-accepted evidence covers regimes, costs,
+  drawdown, operations and failures; success is not defined by profitable-day count.
+
+### BB-059 – M8 Finance dashboard and accessible PAPER/LIVE UI
+
+- Modul: Finance / Web
+- Typ: UX / implementation
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-053, BB-056, BB-057.
+- Definition of Done: portfolio, P&L, mode/risk, positions/orders, signals, journal,
+  warnings and emergency state are responsive/accessibility tested; PAPER/LIVE is unmistakable.
+
+### BB-060 – Swedish/EU legal, tax and operational live-trading research
+
+- Modul: Finance / Governance
+- Typ: Research / live gate
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-043.
+- Definition of Done: qualified sources and owner review cover broker terms, automated-
+  trading restrictions, account/tax/reporting, market-data/API and instrument constraints.
+
+### BB-061 – M9 broker evaluation and owner-approved selection
+
+- Modul: Finance / Broker
+- Typ: Research / architecture
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-046, BB-060.
+- Definition of Done: candidates are compared on Sweden/API/sandbox/instruments/costs,
+  data/orders/fractions/limits/security/reliability/terms; no convenience-only selection.
+
+### BB-062 – Broker abstraction and credential-security boundary
+
+- Modul: Finance / Broker
+- Typ: Security / implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-061; ADR 0017 review.
+- Definition of Done: typed adapter passes fake/sandbox contracts; paper/live secrets use
+  least-privilege injection, rotation/revocation and never reach Git, Web, AI or logs.
+
+### BB-063 – Execution verification, idempotency and reconciliation
+
+- Modul: Finance / Execution
+- Typ: Critical safety implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-055, BB-062; ADR 0019 review.
+- Definition of Done: immutable previews and idempotency prevent duplicates; broker truth
+  resolves uncertain/partial/rejected results and material mismatch suspends automation.
+
+### BB-064 – M10 Trading Controller and manual approval mode
+
+- Modul: Finance / Trading Controller
+- Typ: Sensitive implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-055, BB-059, BB-060–BB-063, BB-070; explicit owner approval.
+- Definition of Done: exact current previews show evidence/risk/cost/size/exit/impact and
+  only explicit bound approval can execute once, followed by independent verification.
+
+### BB-065 – M11 limited live automation
+
+- Modul: Finance / Trading
+- Typ: High-risk gated implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-058, BB-063, BB-064; explicit owner promotion.
+- Definition of Done: tiny exposure/universe/loss limits, mandatory exits, anomaly stop,
+  notification and daily reconciliation are verified with accepted bounded evidence.
+
+### BB-066 – M12 long-duration limited-live validation
+
+- Modul: Finance / Validation
+- Typ: Long-duration validation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-065.
+- Definition of Done: representative net expectancy, drawdown, regime, drift, incident and
+  reconciliation evidence is accepted; elapsed time alone is insufficient.
+
+### BB-067 – M13 policy-governed AUTO
+
+- Modul: Finance / Trading
+- Typ: High-risk gated implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-066, no critical defects, current BB-060 gate; explicit owner approval.
+- Definition of Done: policy-bounded autonomous entry/management/exit and suspension pass
+  independent invariant, circuit-breaker, reconciliation and emergency review.
+
+### BB-068 – M14 BigBrain Autonomic Finance capabilities
+
+- Modul: Finance / BigBrain.Brain
+- Typ: Future integration
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: stable BB-063/BB-067 capabilities and security review.
+- Definition of Done: OBSERVE–DIAGNOSE–DECIDE–POLICY–ACT–VERIFY uses the normal Trading
+  Controller; adversarial tests prove AI cannot access credentials or bypass policy.
+
+### BB-069 – M15 continuous strategy governance and drift control
+
+- Modul: Finance / Strategy Governance
+- Typ: Operations / governance
+- Prioritet: P2
+- Status: Planerad
+- Beroenden: BB-056 and any active trading mode.
+- Definition of Done: recurring evidence, drift alerts and explicit suspend/retire/promote
+  controls keep every active strategy version owned, current and reversible.
+
+### BB-070 – Decision journal, observability and failure injection
+
+- Modul: Finance / Audit and Operations
+- Typ: Cross-cutting safety implementation
+- Prioritet: P1
+- Status: Planerad
+- Beroenden: BB-044, BB-053; evolves with M7–M13.
+- Definition of Done: append-oriented decisions reconstruct buy/sell reasons; safe health,
+  P&L/risk/execution/reconciliation metrics and outage/restart/corruption tests exist
+  without credentials or unnecessary account details.
+
+---
+
 ## Buggar
 
 ### BB-037 – Sprint 1-deployment tappade runtimekonfiguration och kalenderkoppling
