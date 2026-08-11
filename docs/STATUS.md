@@ -152,10 +152,13 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   configured watchlist, freshness/session/quality/history and sanitized memory/revision/
   provenance. Production defaults to no provider, no observations and denied real ingestion/
   storage. The responsive view labels fixtures and chart gaps and has no trade/order control.
-  Automatically verified source only; not deployed, manually verified or M8-started.
+  API and Web are deployed and technically runtime-verified; not manually product-owner
+  verified and M8 has not started.
   Verification 2026-08-11: solution build passed with zero warnings/errors; 351 API and 32
   Sentinel tests passed; 106 Web tests and the Web production build passed; documentation,
-  Compose and whitespace gates passed.
+  Compose and whitespace gates passed. Runtime API/Web health, fail-closed Finance response,
+  405 mutation denial, mobile/desktop headless layout and persisted Calendar/theme/Media
+  read smoke passed. No external browser request or market feed was observed.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
@@ -182,8 +185,9 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Next safe task: resolve exact BB-071 entitlement for the first free live/historical source,
   starting with Twelve Data Basic. If complete evidence is obtained, request product-owner
   approval as a separate milestone. No account, adapter, SDK or credential is authorized.
-- Known limitations: no production persistence, external market data, real strategy, full Risk Engine,
-  paper executor, custom Finance API/UI, broker adapter or runtime deployment.
+- Known limitations: no Finance production persistence, external market data, real strategy,
+  full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
+  API/UI is read-only observation only.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
   product-owner architecture review on 2026-08-10; its acceptance does not activate a
   provider. All documented gates block real money.

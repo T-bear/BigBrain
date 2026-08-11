@@ -14,3 +14,4 @@
 - [Deployment](../operations/deployment/README.md)
 - [Finance emergency stop](../operations/runbooks/finance-emergency-stop.md)
 - [Finance mode promotion](../operations/runbooks/finance-mode-promotion.md)
+- [Finance read-only observation verification](../operations/runbooks/finance-read-only-observation-verification.md)

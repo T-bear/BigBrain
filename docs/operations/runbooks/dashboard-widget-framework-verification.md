@@ -7,12 +7,12 @@
 ## Automated verification
 
 From `src/BigBrain.Web` run `npm ci`, `npm test -- --run` and `npm run build`.
-The tests cover registry composition, the four views, widget visibility, ordering,
+The tests cover registry composition, the five views, widget visibility, ordering,
 collapse state, versioned persistence and fallback from malformed stored state.
 
 ## Responsive and manual verification
 
-Verify Hem, Media, AI and Admin without a full page reload. On a narrow viewport,
+Verify Hem, Media, Finance, AI and Admin without a full page reload. On a narrow viewport,
 confirm that bottom navigation does not cover content. On a wider viewport, confirm
 the grid, spacing, edit controls and dialog focus. Placeholder widgets must be clearly
 labelled as unavailable rather than appearing functional.

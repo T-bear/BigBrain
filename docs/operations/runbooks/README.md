@@ -8,5 +8,6 @@
 - [System baseline capture](system-baseline-capture.md)
 - [Finance emergency stop](finance-emergency-stop.md) — design-only until Finance exists
 - [Finance mode promotion](finance-mode-promotion.md) — design-only gated transition model
+- [Finance read-only observation verification](finance-read-only-observation-verification.md)
 
 Kontrollera alltid status, versioner, liveidentitet och stoppvillkor. Draft kräver review.

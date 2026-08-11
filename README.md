@@ -102,6 +102,8 @@ BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett 
 `GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
 provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures
 är alltid märkta; detta är tidig M2-observation och startar inte M8:s tradingdashboard.
+API- och Web-komponenterna för BB-074 är deployade och tekniskt runtime-verifierade
+2026-08-11. Produktägaren har inte ännu lämnat separat manuell UI-verifiering.
 
 ### Designsystem och teman
 

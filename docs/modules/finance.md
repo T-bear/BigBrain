@@ -249,6 +249,11 @@ BB-071 pending, denied ingestion/storage, no prices and no durable memory. The e
 US list is configured research scope, not authorization. Web renders explicit empty/error/
 synthetic/stale/gap states and a textual, gap-aware SVG chart. It has no provider DTO,
 credential, broker, order or mutation, and no synthetic runtime feed starts implicitly.
+API and Web were deployed and technically runtime-verified 2026-08-11. Runtime returned the
+safe default (RESEARCH, provider none, entitlement pending, all authority flags false,
+eight unpriced watchlist entries, zero observations and no configured persistence), and
+headless mobile/desktop verification found no external requests or blocking layout errors.
+This is not a manual product-owner UI approval.
 
 The UI will expose portfolio, equity curve, positions, pending orders, P&L, signals,
 strategy performance, journal, risk and broker health. PAPER and LIVE must be visually,

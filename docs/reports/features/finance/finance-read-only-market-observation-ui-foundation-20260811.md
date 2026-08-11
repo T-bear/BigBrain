@@ -4,11 +4,12 @@
 
 - Date: 2026-08-11
 - Scope: BB-074 early M2 research observation UI
-- Runtime/deployment: source, tests and documentation only; not deployed
+- Runtime/deployment: API and Web deployed and technically verified 2026-08-11
 
 ## Status
 
-Implemented and automatically verified in source; not deployed or manually verified.
+Implemented, automatically verified, deployed and technically runtime-verified. Manual
+product-owner UI verification has not been claimed. See the separate deployment report.
 
 ## Changes
 
