@@ -142,7 +142,13 @@ raw observations/actions, gaps and correction declarations. Before adapter invoc
 gate requires exact permission for historical analysis, backtesting, derived metrics,
 long-term storage and persistence. The pipeline then reuses canonical normalization and
 revision assembly; an acquisition journal records reproducibility/audit counts and deletion
-metadata without payloads or credentials. Only `SyntheticFixture` evidence is implemented.
+metadata without payloads or credentials. Within this provider-neutral foundation,
+`SyntheticFixture` remains the only adapter evidence.
+
+BB-077/BB-078 add the first concrete provider adapter and production persistence behind that
+boundary for EODHD Free daily data. This does not replace the provider-neutral contracts or
+turn the fixture pipeline into a provider transport; it supplies the selected read-only EOD
+implementation, durable revision catalog and sanitized operational evidence.
 
 The fixture persistence boundary now adds an immutable manifest, deterministic content
 fingerprint and provider-neutral storage contract around those revisions. Complete-only

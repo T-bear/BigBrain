@@ -28,6 +28,19 @@ skips symbols already acquired successfully that day, and uses one-second spacin
 stays below the documented 20 calls/day free limit. It uses
 no corporate-action, intraday or live endpoint.
 
+## Sanitized runtime evidence
+
+Run the one-shot command with the same Finance volume. It performs no provider request and
+prints only journal counts, symbols, coverage, revision IDs and replay checksums:
+
+```bash
+docker compose run --rm --no-deps --entrypoint dotnet api BigBrain.Api.dll finance-eodhd-runtime-evidence
+```
+
+Use it before and after API/Web recreation. An unchanged request count proves the same-day
+skip without spending another free-tier request. Never replace this with an environment dump
+or raw SQLite/payload output.
+
 ## Record termination or expiry
 
 Set `FINANCE__EODHD__ACCOUNTACTIVE=false` and

@@ -438,19 +438,34 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Market Data
 - Typ: Implementation / entitlement / retention
 - Prioritet: P1
-- Status: Implementerad och automatiskt verifierad till credential-gränsen; real runtime väntar
+- Status: Klar vid credential-gränsen; runtimeuppföljningen är levererad av BB-078
 - Upptäckt: 2026-08-11
 - Entitlement: current `Free` (€0) permits private non-commercial storage/manipulation/
   analysis while active; all copies must be deleted within one month after expiry.
 - Levererat: server-side EOD adapter, eight-symbol mapping, bounded rate/retry, SQLite WAL,
   content-addressed payloads, immutable revisions, acquisition journal, real read model/UI,
   deterministic replay and preview-confirm-delete receipt workflow.
-- Säker default: provider disabled without `FINANCE__EODHD__APITOKEN`, explicit active-account
-  state and enable flag. No token, request, real observation or trading capability exists.
-- Kvar: owner creates Free account, supplies secret/runtime flags, deploys and verifies real
-  bootstrap, restart/idempotence, exact-revision replay and UI. Then update runtime report.
+- Säker default: provider är fortsatt disabled utan `FINANCE__EODHD__APITOKEN`, explicit
+  active-account state och enable flag. Ingen trading capability skapades.
+- Uppföljning: konto/secret, real bootstrap, restart/idempotens, exact-revision replay och UI
+  verifierades senare i BB-078; BB-077-rapporten bevaras som historisk credential-bound evidens.
 - Reports: `docs/reports/features/finance/finance-eodhd-free-entitlement-revalidation-20260811.md`
   and `docs/reports/features/finance/finance-eodhd-credential-bound-activation-20260811.md`.
+
+### BB-078 – First real Finance market data activation
+
+- Modul: Finance / Market Data
+- Typ: Runtime activation / verification
+- Prioritet: P1
+- Status: Klar; implementerad, deployad och runtime-verifierad 2026-08-11
+- Evidens: credential verifierades endast som `present`; åtta av åtta bounded EODHD Free-
+  anrop lyckades utan retry för SPY, QQQ, IWM, AAPL, MSFT, JPM, XOM och JNJ.
+- Resultat: 2 008 reala daily OHLCV-observationer, åtta content-addressed payloads och åtta
+  immutable revisioner täcker 2025-08-11–2026-08-10 i beständig lokal SQLite-memory.
+- Verifierat: API/UI REAL EOD, aktiv retention, exakt-revision deterministic replay,
+  restartöverlevnad och dagens skip/idempotens utan ytterligare provideranrop.
+- Avgränsning: Finance är fortsatt RESEARCH; ingen live feed, broker, order eller trading.
+- Report: `docs/reports/features/finance/finance-bb-078-first-real-market-data-activation-20260811.md`.
 
 ### BB-047 – M3 deterministic backtest engine
 

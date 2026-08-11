@@ -230,8 +230,14 @@ time, checksum and revision. The read model/UI labels it REAL EOD/delayed, never
 Retention is first-class: active-account use is allowed; verified termination blocks new
 acquisition/replay and starts a one-month deadline. Preview enumerates raw payloads,
 normalized rows, revisions and indexes; exact owner confirmation executes scoped deletion
-and retains only a sanitized receipt. The provider remains credential-bound with no real
-data as of 2026-08-11.
+and retains only a sanitized receipt.
+
+BB-078 activated the configured Free credential without disclosing it. Eight bounded EOD
+requests populated the production volume with 2,008 real observations for the complete
+watchlist, eight payloads and eight immutable per-source revisions covering 2025-08-11 to
+2026-08-10. Restart left journal request count unchanged at eight and preserved the memory;
+the API/UI now renders REAL EOD/delayed data. Sanitized maintenance evidence can report
+catalog counts and replay checksums without provider payloads or secrets.
 
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an

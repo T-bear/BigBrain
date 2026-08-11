@@ -56,6 +56,11 @@ docker compose config --quiet
   impossible data, 429 retry bounds, symbol mapping, durable SQLite restart/idempotency,
   content-addressed payloads, deterministic exact-revision replay, expiry blocking,
   deletion preview/confirmation/receipt, unrelated-file protection and sanitized API/UI.
+  BB-078 adds a network-free runtime-evidence projection test and runs the command against
+  the deployed volume before/after restart. It exposes only request/catalog counts, symbols,
+  coverage, revision IDs, payload-reference integrity, causal knowledge-time status and replay checksums; never token or
+  raw payload content. The single bounded provider acquisition is runtime evidence, not an
+  ordinary automated-test dependency.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

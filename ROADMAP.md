@@ -59,8 +59,11 @@ BigBrain kringgår inte kontrollen; ingen adapter, data eller deployment aktiver
 **BB-077 EODHD FREE ACTIVATION** är implementerad till credential-gränsen. Nuvarande tier
 heter `Free`: €0, 20 anrop/dag och ett års EOD. Adapter, SQLite/content-addressed memory,
 revision/replay, API/UI och preview-confirm-delete-livscykel finns och är disabled by default.
-Ingen key eller real data fanns vid implementationen. Nästa gate är ägarens fria konto/key,
-bounded smoke, restart/idempotence och real UI/replay-verifiering.
+**BB-078 FIRST REAL MARKET DATA** passerade credential-gränsen 2026-08-11. Åtta av åtta
+watchlist-anrop lyckades utan retry och gav 2 008 EOD-observationer, åtta payloads/revisioner
+och ett beständigt lokalt minne för 2025-08-11–2026-08-10. Exakt-revision replay, restart,
+daglig skip/idempotens, API och responsiv UI är runtime-verifierade. Nästa säkra slice är
+indikator-/feature-grunden över den frysta reala revisionen; live/near-live förblir separat.
 
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/

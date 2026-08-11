@@ -1,30 +1,29 @@
 # Finance market-data provider selection
 
-Status: BB-046 and BB-072 research complete; BB-071 has positive human evidence for a
-qualifying Twelve Data Personal plan as of 2026-08-11; cost-first selection remains open.
+Status: EODHD Free is active for bounded read-only daily EOD personal research after BB-078;
+zero-cost live/near-live selection remains open. BB-071 separately has positive human
+evidence for a qualifying paid Twelve Data Personal plan.
 Prices and product terms below are time-sensitive observations, not permanent facts.
 
 Current product-owner budget constraint: **0 SEK** for external Finance market-data services.
 
 ## Decision
 
-No provider is selected, activated or authorized for ingestion. BB-072's dated free-source comparison found no
-zero-cost product with a complete verified grant for durable retention plus personal
-non-display backtesting. The explicit result is **DO NOT INGEST YET**. EODHD Free Starter
-is the best conditional free evaluation lead, but it exposes only the past year and its
-terms require deletion within one month after expiry. Twelve Data Basic is the best Nordic
-technical lead at that review point, but later human evidence established that Basic is
-evaluation/trial only and cannot support the intended operation.
+EODHD Free is the selected and active zero-cost source for bounded daily EOD historical
+research only. BB-078 acquired the complete eight-symbol watchlist in eight successful
+requests without retry and activated durable local memory. It exposes the past year and
+requires deletion of all covered copies within one month after expiry. No live/near-live
+source is selected, and Twelve Data remains an inactive paid fallback.
 
 The earlier live research reviewed Twelve Data Basic, Alpaca Basic/IEX, EODHD Free Starter
 and Alpha Vantage Free. Its conditional Basic ranking is superseded by human evidence that
 Basic is evaluation/trial only and a paid Personal plan is required.
 
-BB-075 rechecked current first-party evidence on 2026-08-11. Result: **FAIL CLOSED**. Alpaca
+BB-075 historically rechecked first-party evidence on 2026-08-11. Its result was **FAIL CLOSED**. Alpaca
 Basic/free IEX and EODHD Free Starter require exact human clarification; Stooq, Nasdaq Data
 Link and Finnhub lack complete product-specific rights evidence; Yahoo/yfinance and Alpha
 Vantage are incompatible with the intended automation/research scope; FMP requires prior
-written download/derivative approval. No exact free source passed, so no adapter exists.
+written download/derivative approval. No exact free source passed under that earlier policy.
 
 The earlier exact Basic/US pass resolved to **STATE B — HUMAN CONFIRMATION REQUIRED**.
 Direct written correspondence from Liam at Twelve Data now confirms that the submitted
@@ -52,8 +51,7 @@ market data after termination and restricts non-display/derived use without a li
 Twelve Data is therefore an **entitlement-cleared paid fallback / qualified candidate** for
 the submitted scope. Commercial/paying-subscriber, redistribution, customer/third-party,
 business, unknown-market and materially different use are not covered and require renewed
-review. No plan, account, credential, adapter or real-data ingestion exists; fixtures remain
-the only active data source.
+review. No Twelve Data plan, account, credential, adapter or real-data ingestion exists.
 Under the hard current budget Twelve Data is also **INACTIVE DUE TO ZERO-BUDGET CONSTRAINT**.
 
 Selection follows this cost order: **(1) free, (2) local/open-source, (3) existing BigBrain
@@ -77,8 +75,8 @@ Stooq's bounded official daily historical download is owner-accepted at the enti
 evidence layer. A 2026-08-11 request returned a JavaScript verification challenge rather
 than CSV, so the technical gate failed and BigBrain did not bypass or activate it. Alpaca
 retained IEX use remains human-confirmation-required. EODHD's personal storage/analysis
-grant applies while subscribed and carries a one-month deletion duty after expiry; without
-an account/key and verified deletion lifecycle it remains inactive.
+grant applies while subscribed and carries a one-month deletion duty after expiry. BB-077
+implemented that lifecycle and BB-078 subsequently activated the bounded EOD capability.
 
 ## BB-077 EODHD Free selection
 
@@ -91,9 +89,10 @@ within one month after termination/expiry. Redistribution/public access is prohi
 Under ADR 0022, daily historical acquisition, active-account local storage, normalization,
 private analysis and deterministic replay are selected and authorized. Post-expiry use and
 retention are denied. Derived artifacts are not exempt from deletion. Corporate actions,
-intraday and live are outside this selection. The adapter is implemented but disabled until
-the owner supplies a free key and explicit active-account flag; therefore selection is
-**CREDENTIAL-BOUND / NO REAL DATA YET**, not runtime-active.
+intraday and live are outside this selection. BB-078 crossed the credential boundary on
+2026-08-11: exactly eight bounded EOD calls succeeded without retry for all configured
+symbols. EODHD is now the **ACTIVE READ-ONLY EOD RESEARCH SOURCE** for these capabilities
+only; it is not a live source, broker or global provider authorization.
 
 ## Dated entitlement matrix
 

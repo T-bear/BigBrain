@@ -110,12 +110,15 @@ för CSV; ingen kontroll kringgicks och ingen källa aktiverades.
 BB-077 revaliderar den nuvarande produkten **EODHD Free** (€0, 20 anrop/dag, ett års EOD)
 och implementerar en credential-bound read-only adapter. SQLite plus content-addressed raw
 payload ger lokal revisionsmedveten memory, deterministic replay och Finance API/UI-stöd.
-Providern är disabled utan ägarens fria API-key; ingen riktig observation har ännu hämtats.
+BB-078 aktiverade den fria credentialen 2026-08-11: exakt åtta lyckade anrop utan retry gav
+2 008 riktiga dagliga observationer för SPY, QQQ, IWM, AAPL, MSFT, JPM, XOM och JNJ över
+2025-08-11–2026-08-10, åtta payloads och åtta immutable revisioner. API/UI visar REAL EOD,
+och restart verifierade beständig memory, oförändrat requestantal och deterministisk replay.
 Aktiv lagring/analys är tillåten för privat research, men alla täckta kopior måste raderas
 inom en månad efter account/subscription expiry genom preview och explicit bekräftelse.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
-`GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
-provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures
+`GET /api/v1/modules/finance/observation`. Produktionsruntime är RESEARCH med EODHD Free,
+ägargodkänd personlig research och beständig real EOD-memory. Syntetiska UI-fixtures
 är alltid märkta; detta är tidig M2-observation och startar inte M8:s tradingdashboard.
 API- och Web-komponenterna för BB-074 är deployade och tekniskt runtime-verifierade
 2026-08-11. Produktägaren har inte ännu lämnat separat manuell UI-verifiering.

@@ -22,6 +22,7 @@ Current implementation evidence:
 - [BB-076 owner-accepted zero-cost personal-research policy](finance-bb-076-owner-accepted-zero-cost-policy-20260811.md)
 - [BB-077 EODHD Free entitlement revalidation](finance-eodhd-free-entitlement-revalidation-20260811.md)
 - [BB-077 EODHD credential-bound activation](finance-eodhd-credential-bound-activation-20260811.md)
+- [BB-078 first real market-data activation](finance-bb-078-first-real-market-data-activation-20260811.md)
 - [BB-074 read-only market observation UI foundation](finance-read-only-market-observation-ui-foundation-20260811.md)
 - [BB-074 read-only observation UI deployment](finance-read-only-market-observation-ui-deployment-20260811.md)
 

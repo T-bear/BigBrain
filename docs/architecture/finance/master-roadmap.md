@@ -49,8 +49,12 @@ enabled before all M13 gates are evidenced and explicitly approved.
   surface returned a JavaScript verification control; no bypass, adapter or ingestion occurred.
 - BB-077: current `EODHD Free` is cleared for bounded private EOD research while active.
   Adapter, durable local memory, replay, API/UI and one-month termination deletion workflow
-  are implemented/tested but disabled because no owner key exists. Next: configure the free
-  credential, bounded eight-call bootstrap and verify real restart/replay/UI evidence.
+  were implemented/tested at the credential boundary.
+- BB-078: the configured free credential enabled exactly eight successful no-retry requests.
+  Production memory now holds 2,008 real daily observations across eight immutable revisions
+  for 2025-08-11–2026-08-10. Restart/idempotence, exact-revision replay and API/UI are
+  runtime-verified. Next: feature/indicator research over frozen real revisions; live remains
+  a separate entitlement/source gate.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

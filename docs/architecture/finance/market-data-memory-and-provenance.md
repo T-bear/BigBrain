@@ -54,6 +54,12 @@ session date, acquisition knowledge time, policy and revision. Repeated identica
 is idempotent; changed source content produces another immutable revision, and the read model
 selects latest knowledge without erasing old evidence.
 
+BB-078 runtime evidence confirms this store with 2,008 real observations, eight raw payloads
+and eight revisions for the complete research watchlist over 2025-08-11–2026-08-10. All
+revisions reproduced identical checksums on repeated replay. API/Web recreation preserved
+the catalog and payload references, and the acquisition journal prevented a second same-day
+download; external request count remained eight.
+
 The EODHD scope is subscription-only. Account termination is explicit configuration, not a
 network inference. It blocks acquisition/replay immediately and creates a one-month deletion
 deadline. Preview and exact confirmation cover payloads, normalized observations, revisions

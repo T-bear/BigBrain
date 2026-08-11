@@ -59,6 +59,15 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         Assert.Equal("ownerAcceptedPersonalResearch", snapshot.Provider.EvidenceClass);
         Assert.Equal(reopened.ReplayChecksum(first, new(2026, 8, 1), new(2026, 8, 11)),
             reopened.ReplayChecksum(first, new(2026, 8, 1), new(2026, 8, 11)));
+        var evidence = reopened.RuntimeEvidence();
+        Assert.Equal(2, evidence.ExternalRequests);
+        Assert.Equal(2, evidence.SuccessfulAttempts);
+        Assert.Equal(2, evidence.Observations);
+        Assert.Single(evidence.RevisionIds);
+        Assert.Equal(["AAPL.US"], evidence.SuccessfulSymbols);
+        Assert.Empty(evidence.FailedSymbols);
+        Assert.True(evidence.CausalKnowledgeTimes);
+        Assert.Equal(0, evidence.MissingPayloadFiles);
     }
 
     [Fact]

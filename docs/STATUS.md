@@ -219,18 +219,20 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   eight-symbol mapping, SQLite/content-addressed durable memory, acquisition journal,
   revision-aware read projection, deterministic replay, compact API/UI retention status and
   preview-confirm-delete receipts. Corporate actions, intraday and live remain disabled.
-- Credential/runtime state: no EODHD account key was available. Compose defaults provider
-  disabled and adds a persistent Finance volume. No real request, observation, populated
-  production memory, real replay, real-data UI runtime or provider-enabled deployment is
-  claimed. Exact owner setup is in the EODHD retention/deletion runbook.
-- Disabled deployment evidence 2026-08-11: API/Web healthy; provider candidate and entitlement
-  class render correctly; ingestion/storage/trading false; data kind none and counts zero.
-  The empty Finance volume preview reports zero covered copies. An initial volume-owner
-  packaging defect was fixed by provisioning `/finance-data` for the unprivileged API UID.
-- Known limitations: no Finance production persistence, external market data, real strategy,
+- BB-078 runtime evidence 2026-08-11: credential presence was verified as a boolean only;
+  EODHD Free is enabled with active account and unset entitlement end. Exactly eight external
+  EOD requests succeeded without retry for the full watchlist. The durable store contains
+  2 008 real observations, eight payloads and eight revisions covering 2025-08-11 through
+  2026-08-10. No symbol failed or was rejected.
+- Deployed verification: API/Web healthy; the API reports REAL, EODHD Free, delayed/closed,
+  durable persistence and active retention. All eight exact-revision replay checks repeated
+  with identical checksums. API/Web recreation preserved counts/revisions/payloads and the
+  worker skipped today's completed symbols, leaving request count at eight. Headless mobile
+  and desktop checks rendered all instruments and chart without console errors or overflow.
+- Known limitations: no live/near-live feed, corporate-action ingestion, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.
-- Blockers: no exact provider/product has been selected and authorized for ingestion. ADR 0021 was accepted after explicit
+- Blockers: no zero-cost live/near-live source is selected; strategy and trading gates remain. ADR 0021 was accepted after explicit
   product-owner architecture review on 2026-08-10; its acceptance does not activate a
   provider. All documented gates block real money.
 - Owner approval required: every promotion toward live or greater autonomy.

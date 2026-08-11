@@ -133,6 +133,11 @@ internal sealed class EodhdAdapter : IDisposable
 internal sealed record EodhdDeletionPreview(string PreviewId, int Observations, int Revisions, int Payloads,
     DateTimeOffset? DeadlineUtc, string Scope);
 
+internal sealed record EodhdRuntimeEvidence(int ExternalRequests, int AcquisitionAttempts, int SuccessfulAttempts,
+    int FailedAttempts, int Retries, int Observations, int Revisions, int Payloads, DateOnly? CoverageFrom,
+    DateOnly? CoverageTo, IReadOnlyList<string> SuccessfulSymbols, IReadOnlyList<string> FailedSymbols,
+    IReadOnlyList<string> RevisionIds, bool CausalKnowledgeTimes, int MissingPayloadFiles);
+
 internal sealed class EodhdMarketMemory
 {
     internal const string Provider = "EODHD";
@@ -305,6 +310,26 @@ internal sealed class EodhdMarketMemory
         return Sha(Encoding.UTF8.GetBytes(builder.ToString()));
     }
 
+    internal EodhdRuntimeEvidence RuntimeEvidence()
+    {
+        using var connection = new SqliteConnection(ConnectionString); connection.Open();
+        var attempts = Scalar(connection, "SELECT COUNT(*) FROM acquisitions");
+        var successes = Scalar(connection, "SELECT COUNT(*) FROM acquisitions WHERE outcome='success'");
+        var failures = Scalar(connection, "SELECT COUNT(*) FROM acquisitions WHERE outcome='failure'");
+        var retries = Scalar(connection, "SELECT COALESCE(SUM(retries),0) FROM acquisitions");
+        var observations = Scalar(connection, "SELECT COUNT(*) FROM observations");
+        var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions");
+        var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
+        var successfulSymbols = Strings(connection, "SELECT DISTINCT provider_symbol FROM acquisitions WHERE outcome='success' ORDER BY provider_symbol");
+        var failedSymbols = Strings(connection, "SELECT DISTINCT provider_symbol FROM acquisitions WHERE outcome='failure' ORDER BY provider_symbol");
+        var revisionIds = Strings(connection, "SELECT revision_id FROM revisions ORDER BY revision_id");
+        var missingPayloadFiles = Strings(connection, "SELECT path FROM payloads ORDER BY path").Count(path => !File.Exists(path));
+        var from = OptionalDate(connection, "SELECT MIN(session_date) FROM observations");
+        var to = OptionalDate(connection, "SELECT MAX(session_date) FROM observations");
+        return new(attempts + retries, attempts, successes, failures, retries, observations, revisions, payloads,
+            from, to, successfulSymbols, failedSymbols, revisionIds, HasCausalKnowledgeTimes(connection), missingPayloadFiles);
+    }
+
     private FinanceRetentionSummary Retention(SqliteConnection connection, bool accountActive)
     {
         var observations = Scalar(connection, "SELECT COUNT(*) FROM observations"); var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
@@ -316,6 +341,22 @@ internal sealed class EodhdMarketMemory
     }
 
     private static int Scalar(SqliteConnection connection, string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; return Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
+    private static List<string> Strings(SqliteConnection connection, string sql)
+    { using var command = connection.CreateCommand(); command.CommandText = sql; using var reader = command.ExecuteReader(); var values = new List<string>(); while (reader.Read()) values.Add(reader.GetString(0)); return values; }
+    private static DateOnly? OptionalDate(SqliteConnection connection, string sql)
+    { using var command = connection.CreateCommand(); command.CommandText = sql; return command.ExecuteScalar() is string value ? DateOnly.Parse(value, CultureInfo.InvariantCulture) : null; }
+    private static bool HasCausalKnowledgeTimes(SqliteConnection connection)
+    {
+        using var command = connection.CreateCommand(); command.CommandText = "SELECT session_date,acquired_utc FROM observations";
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var marketTime = new DateTimeOffset(DateOnly.Parse(reader.GetString(0), CultureInfo.InvariantCulture).ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+            var knowledgeTime = DateTimeOffset.Parse(reader.GetString(1), CultureInfo.InvariantCulture);
+            if (knowledgeTime < marketTime) return false;
+        }
+        return true;
+    }
     private static string Text(decimal value) => value.ToString(CultureInfo.InvariantCulture);
     private static string Date(DateOnly value) => value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     private static string Sha(byte[] value) => $"sha256:{Convert.ToHexString(SHA256.HashData(value)).ToLowerInvariant()}";
@@ -352,9 +393,24 @@ internal static class EodhdMaintenanceCommand
 {
     internal static bool TryRun(string[] args, IConfiguration configuration)
     {
-        if (args.Length == 0 || !args[0].StartsWith("finance-eodhd-deletion-", StringComparison.Ordinal)) return false;
+        if (args.Length == 0 || !args[0].StartsWith("finance-eodhd-", StringComparison.Ordinal)) return false;
         var options = new EodhdFinanceOptions(); configuration.GetSection(EodhdFinanceOptions.Section).Bind(options);
-        var memory = new EodhdMarketMemory(options); var preview = memory.PreviewDeletion();
+        var memory = new EodhdMarketMemory(options);
+        if (args[0] == "finance-eodhd-runtime-evidence")
+        {
+            var evidence = memory.RuntimeEvidence();
+            Console.WriteLine($"requests={evidence.ExternalRequests} attempts={evidence.AcquisitionAttempts} successes={evidence.SuccessfulAttempts} failures={evidence.FailedAttempts} retries={evidence.Retries}");
+            Console.WriteLine($"observations={evidence.Observations} revisions={evidence.Revisions} payloads={evidence.Payloads} missing-payload-files={evidence.MissingPayloadFiles} coverage={evidence.CoverageFrom:yyyy-MM-dd}..{evidence.CoverageTo:yyyy-MM-dd}");
+            Console.WriteLine($"successful-symbols={string.Join(',', evidence.SuccessfulSymbols)} failed-symbols={string.Join(',', evidence.FailedSymbols)} causal-knowledge-times={evidence.CausalKnowledgeTimes}");
+            foreach (var revision in evidence.RevisionIds)
+            {
+                var first = memory.ReplayChecksum(revision, evidence.CoverageFrom ?? DateOnly.MinValue, evidence.CoverageTo ?? DateOnly.MaxValue);
+                var second = memory.ReplayChecksum(revision, evidence.CoverageFrom ?? DateOnly.MinValue, evidence.CoverageTo ?? DateOnly.MaxValue);
+                Console.WriteLine($"replay revision={revision} deterministic={first == second} checksum={first}");
+            }
+            return true;
+        }
+        var preview = memory.PreviewDeletion();
         if (args[0] == "finance-eodhd-deletion-preview")
         {
             Console.WriteLine($"preview={preview.PreviewId} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} deadline={preview.DeadlineUtc:O}");
