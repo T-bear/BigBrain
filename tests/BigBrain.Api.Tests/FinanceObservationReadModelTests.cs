@@ -63,6 +63,22 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
     }
 
     [Fact]
+    public async Task FeatureApiIsBoundedReadOnlyResearchAndContainsNoSecretOrTradeSurface()
+    {
+        var response = await _client.GetAsync("/api/v1/modules/finance/features?instrumentId=US%3AARCX%3ASPY&featureId=sma.20&limit=20", TestContext.Current.CancellationToken);
+        var raw = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("\"operatingMode\":\"research\"", raw);
+        Assert.Contains("core-daily-v1", raw);
+        Assert.DoesNotContain("apiToken", raw, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("order", raw, StringComparison.OrdinalIgnoreCase);
+        using var mutation = new HttpRequestMessage(HttpMethod.Post, "/api/v1/modules/finance/features");
+        Assert.Equal(HttpStatusCode.MethodNotAllowed,
+            (await _client.SendAsync(mutation, TestContext.Current.CancellationToken)).StatusCode);
+    }
+
+    [Fact]
     public void DeterministicSyntheticSnapshotRetainsSafetyAndExplicitClassification()
     {
         var instant = new DateTimeOffset(2026, 8, 11, 10, 0, 0, TimeSpan.Zero);

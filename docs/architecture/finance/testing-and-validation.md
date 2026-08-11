@@ -40,6 +40,13 @@ Required layers are unit, integration, simulation, backtest regression, property
 paper integration, broker sandbox, failure injection, reconciliation, security, UI,
 accessibility, performance and long-running soak tests.
 
+BB-079 feature promotion specifically requires known-answer formula tests, explicit warmup/
+missing/gap cases, immutable revision/idempotency/reopen checks and a future-horizon fixture
+proving that values at T do not change when observations after T are appended. Runtime
+verification builds only from local memory, keeps provider request count unchanged and
+checks bounded API/UI plus source-entitlement deletion lineage. A stable snapshot alone is
+not sufficient no-lookahead evidence.
+
 Critical invariants receive dedicated automated tests:
 
 - Risk Engine cannot be bypassed by API, strategy, UI or Brain.

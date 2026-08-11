@@ -64,7 +64,21 @@ export interface FinanceObservationSnapshot {
   dataKind: FinanceDataKind
   watchlist: Array<{ instrumentId: string; symbol: string; displayName: string; price: number | null; currency: string | null; dailyChangePercent: number | null; observedAtUtc: string | null; freshness: FinanceFreshness; session: FinanceSession; quality: FinanceQuality; dataKind: FinanceDataKind; history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }> }>
   historicalMemory: { observationCount: number; activeRevisionId: string | null; parentRevisionId: string | null; coverageFrom: string | null; coverageTo: string | null; lastAcquiredAtUtc: string | null; gapCount: number; correctionCount: number; persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'; provider: string; product: string; policy: string; provenance: string }
-  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null } | null
+  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null; coveredFeatureValueCount?: number; coveredFeatureRevisionCount?: number } | null
+}
+
+export type FinanceFeatureState = 'unknown' | 'available' | 'warmup' | 'unavailable'
+export type FinanceFeatureQuality = 'unknown' | 'good' | 'gapAffected' | 'invalidInput'
+export interface FinanceFeatureSnapshot {
+  generatedAtUtc: string
+  operatingMode: 'research'
+  featureSetId: string
+  instrumentId: string
+  definitions: Array<{ id: string; name: string; version: string; kind: string; period: number; requiredInputs: string[]; requiredLookback: number; warmupBehavior: string; outputType: string; missingDataBehavior: string; gapBehavior: string; calculationMethod: string; priceBasis: string; fingerprint: string }>
+  revision: null | { revisionId: string; featureSetId: string; featureSetFingerprint: string; engineVersion: string; sourceMarketRevisions: string[]; coverageFrom: string | null; coverageTo: string | null; valueCount: number; availableCount: number; warmupCount: number; qualityIssueCount: number; checksum: string; createdAtUtc: string; buildElapsedMilliseconds: number; priceBasis: string; persistence: string }
+  latest: Array<{ definitionId: string; name: string; period: number; value: number | null; sessionDate: string | null; state: FinanceFeatureState; quality: FinanceFeatureQuality; knowledgeTimeUtc: string | null }>
+  historyDefinitionId: string
+  history: Array<{ sessionDate: string; value: number | null; state: FinanceFeatureState; quality: FinanceFeatureQuality; knowledgeTimeUtc: string }>
 }
 
 export interface MediaServiceStatus {

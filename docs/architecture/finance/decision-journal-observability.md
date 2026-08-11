@@ -57,6 +57,11 @@ appended at/after the horizon with actual path metrics and hypothetical costs; i
 replace or edit the prediction. This prevents hindsight-labelled decisions and supports
 future calibration/drift evidence. It contains no order, broker or credential reference.
 
+BB-079 makes the feature component concrete: evaluation evidence can reference immutable
+feature revision ID, feature-set fingerprint, engine version, exact source market revisions
+and checksum. Per-value knowledge time remains a mandatory causal filter. Feature
+materialization alone is not a decision and creates no recommendation or authorization.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

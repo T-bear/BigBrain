@@ -191,6 +191,14 @@ checksum integrity and licensed deletion across primary copies and backups.
 
 ## Implementation gates and next safe slice
 
+BB-079 implements immutable derived feature memory alongside the market catalog. A feature
+revision binds all source market revisions, `core-daily-v1` fingerprints and engine version;
+values retain source range and causal knowledge time. Rebuild is idempotent and old revisions
+are not overwritten. EODHD-dependent feature values/revisions/indexes inherit the active-
+account and confirmed deletion lifecycle. See ADR 0023 and the BB-079 report. The next safe
+slice is an offline deterministic M3 research harness referencing exact market and feature
+revision IDs.
+
 Provider-neutral work may proceed before BB-071: typed policy/usage/classification models,
 an in-memory fail-closed entitlement evaluator, provenance envelopes, fixture-only dataset
 revisions and invariant tests. No real provider payload may be persisted.

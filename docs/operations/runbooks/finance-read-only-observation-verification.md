@@ -19,10 +19,18 @@ healthy and verify the Finance endpoint, then recreate only Web with `--no-deps`
 
 ## Read-only verification
 
+Current BB-079 runtime is REAL EOD rather than the historical BB-074 empty baseline. Verify
+2,008 observations plus `core-daily-v1`, exact market/feature revision labels and compact
+SMA20/EMA20/RSI14/ATR14/volatility20/momentum20/volume-ratio20 values. The bounded
+`GET /api/v1/modules/finance/features` response must expose warmup/quality and causal lineage.
+The page describes measurements only; it must not render BUY/SELL, recommendations or order
+controls. EODHD request accounting must remain unchanged during local feature builds.
+
 - `/api/v1/system/health` and Web root are healthy.
-- `/api/v1/modules/finance/observation` reports RESEARCH; no authorized provider;
-  `ZERO-COST ENTITLEMENT GATE`; PAPER/LIVE/broker/ingestion/real-storage false; eight configured unpriced
-  research instruments; zero observations; no configured persistence.
+- `/api/v1/modules/finance/observation` reports RESEARCH, EODHD Free, REAL EOD/delayed,
+  active retention, eight instruments, 2,008 observations and durable persistence;
+  PAPER/LIVE/broker remain false. Treat these dated BB-078/079 counts as the current
+  2026-08-11 baseline, not an invariant for later scheduled accumulation.
 - POST/PUT/PATCH/DELETE on the observation route return 405.
 - Headless mobile and desktop checks show Finance navigation, explicit no-real-money and
   entitlement warnings, empty watchlist/chart/memory states, no trade controls, no overflow,

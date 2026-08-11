@@ -229,6 +229,12 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   with identical checksums. API/Web recreation preserved counts/revisions/payloads and the
   worker skipped today's completed symbols, leaving request count at eight. Headless mobile
   and desktop checks rendered all instruments and chart without console errors or overflow.
+- BB-079 runtime evidence 2026-08-11: `core-daily-v1` built locally from the same eight
+  immutable market revisions without another EODHD request. Revision
+  `feature-5d0397a53d094a2f` contains 42 168 values (39 616 available, 2 552 warmup, zero
+  reported quality issues) over 2025-08-11–2026-08-10. Rebuild checksum/idempotency,
+  no-lookahead tests, SQLite persistence/restart, feature API/UI and retention inventory
+  were verified. Dependent EODHD feature artifacts are in deletion scope.
 - Known limitations: no live/near-live feed, corporate-action ingestion, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.

@@ -59,6 +59,12 @@ later corrections remain separate child revisions. The benchmark exercises seque
 instrument-range access shapes only—it does not implement strategy logic or relax the
 supplied replay-as-of boundary.
 
+BB-079 supplies the first immutable derived input boundary. `core-daily-v1` binds exact
+market revisions, versioned feature definitions and engine version into one deterministic
+feature revision. Future M3 runs must cite both market and feature revision and filter
+features by causal knowledge time; a fully materialized later table is never universally
+visible to an earlier replay horizon. This is feature evidence only, not a signal or fill.
+
 ## Prospective shadow evaluation
 
 Forward evidence complements historical replay: at time T an immutable prediction records

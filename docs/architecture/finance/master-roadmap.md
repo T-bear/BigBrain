@@ -53,7 +53,11 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - BB-078: the configured free credential enabled exactly eight successful no-retry requests.
   Production memory now holds 2,008 real daily observations across eight immutable revisions
   for 2025-08-11–2026-08-10. Restart/idempotence, exact-revision replay and API/UI are
-  runtime-verified. Next: feature/indicator research over frozen real revisions; live remains
+  runtime-verified.
+- BB-079: `core-daily-v1` produced immutable revision `feature-5d0397a53d094a2f` with
+  42,168 causal feature values from all eight real market revisions. Determinism,
+  no-lookahead, persistence/restart, API/UI and EODHD deletion lineage are runtime-verified.
+  Next: minimal M3 research backtest bound to exact market + feature revisions; live remains
   a separate entitlement/source gate.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
@@ -170,7 +174,7 @@ MARKET DATA INGESTION** milestone begin.
 - Scope/tasks: event clock, fills, partial/rejected/delayed orders, fees, spread, slippage,
   FX/tax-fee assumptions, benchmarks, metrics and reproducible reports.
 - Non-goals: claiming future profitability or using live execution.
-- Prerequisites: M2.
+- Prerequisites: M2 and the BB-079 immutable feature-revision foundation (complete).
 - Architecture impact: simulation ports isolated from future broker ports.
 - Tests: golden replays, no look-ahead, deterministic seeds, cost and fill edge cases.
 - Security/docs: dataset/report lineage; no private brokerage data.

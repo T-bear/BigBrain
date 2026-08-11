@@ -437,6 +437,10 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
 .finance-chart figcaption { color:var(--bb-color-text-muted); font-size:var(--bb-font-size-sm); }
 .finance-chart-empty { display:grid; min-height:180px; place-content:center; gap:6px; color:var(--bb-color-text-muted); text-align:center; }
 .finance-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:0; }
+.finance-feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px; margin-top:16px; }
+.finance-feature { display:grid; gap:4px; min-width:0; padding:12px; border:1px solid var(--bb-color-border); border-radius:var(--bb-radius-md); background:var(--bb-color-bg-subtle); }
+.finance-feature span { font-size:var(--bb-font-size-lg); font-weight:var(--bb-font-weight-bold); font-variant-numeric:tabular-nums; }
+.finance-feature small { color:var(--bb-color-text-muted); overflow-wrap:anywhere; }
 .finance-entitlement { border-color:color-mix(in srgb,var(--bb-color-warning) 45%,var(--bb-color-border)); }
 
 @media (max-width:720px) {

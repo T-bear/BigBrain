@@ -239,6 +239,17 @@ watchlist, eight payloads and eight immutable per-source revisions covering 2025
 the API/UI now renders REAL EOD/delayed data. Sanitized maintenance evidence can report
 catalog counts and replay checksums without provider payloads or secrets.
 
+BB-079 adds the provider-neutral `core-daily-v1` feature engine above canonical memory.
+Exact market revision IDs plus versioned definitions/engine create immutable SQLite feature
+revisions; raw close/OHLC is never mixed with adjusted close, warmup is explicit and every
+value preserves causal knowledge time. The first real revision
+`feature-5d0397a53d094a2f` holds 42,168 values (39,616 available, 2,552 warmup) from all eight
+BB-078 source revisions. `GET /api/v1/modules/finance/features` provides bounded read-only
+definition/latest/history inspection with an optional UTC `knowledgeAsOfUtc` causal cutoff,
+and Web displays a compact indicator subset. These are
+measurements, not recommendations. EODHD retention/deletion covers dependent feature rows,
+revisions and indexes.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

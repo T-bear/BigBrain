@@ -116,6 +116,11 @@ BB-078 aktiverade den fria credentialen 2026-08-11: exakt åtta lyckade anrop ut
 och restart verifierade beständig memory, oförändrat requestantal och deterministisk replay.
 Aktiv lagring/analys är tillåten för privat research, men alla täckta kopior måste raderas
 inom en månad efter account/subscription expiry genom preview och explicit bekräftelse.
+BB-079 bygger nu `core-daily-v1` deterministiskt från de åtta frysta marknadsrevisionerna
+utan nya provideranrop. Första immutable feature-revisionen innehåller 42 168 värden
+(39 616 tillgängliga, 2 552 warmup) för returns, SMA/EMA, momentum, volatilitet, RSI, ATR
+och volymmått. API/UI visar read-only indikatorer och EODHD-raderingsinventeringen omfattar
+även beroende feature-artefakter. Detta är mätning i RESEARCH, inte signal eller trading.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsruntime är RESEARCH med EODHD Free,
 ägargodkänd personlig research och beständig real EOD-memory. Syntetiska UI-fixtures

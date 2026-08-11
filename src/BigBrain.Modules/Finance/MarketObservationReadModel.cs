@@ -35,7 +35,9 @@ public sealed record FinanceRetentionSummary(
     int CoveredRevisionCount,
     int CoveredPayloadCount,
     string DeletionScope,
-    string? LastReceiptId);
+    string? LastReceiptId,
+    int CoveredFeatureValueCount = 0,
+    int CoveredFeatureRevisionCount = 0);
 
 public sealed record FinanceInstrumentObservation(
     string InstrumentId,

@@ -131,14 +131,14 @@ internal sealed class EodhdAdapter : IDisposable
 }
 
 internal sealed record EodhdDeletionPreview(string PreviewId, int Observations, int Revisions, int Payloads,
-    DateTimeOffset? DeadlineUtc, string Scope);
+    int FeatureValues, int FeatureRevisions, DateTimeOffset? DeadlineUtc, string Scope);
 
 internal sealed record EodhdRuntimeEvidence(int ExternalRequests, int AcquisitionAttempts, int SuccessfulAttempts,
     int FailedAttempts, int Retries, int Observations, int Revisions, int Payloads, DateOnly? CoverageFrom,
     DateOnly? CoverageTo, IReadOnlyList<string> SuccessfulSymbols, IReadOnlyList<string> FailedSymbols,
     IReadOnlyList<string> RevisionIds, bool CausalKnowledgeTimes, int MissingPayloadFiles);
 
-internal sealed class EodhdMarketMemory
+internal sealed partial class EodhdMarketMemory
 {
     internal const string Provider = "EODHD";
     internal const string Product = "Free";
@@ -180,6 +180,7 @@ internal sealed class EodhdMarketMemory
               receipt_id TEXT PRIMARY KEY, deleted_utc TEXT NOT NULL, observations INTEGER NOT NULL,
               revisions INTEGER NOT NULL, payloads INTEGER NOT NULL, fingerprint TEXT NOT NULL);
             """; command.ExecuteNonQuery();
+        InitializeFeatureStorage(connection);
     }
 
     internal string Store(EodhdInstrument instrument, IReadOnlyList<EodhdDailyBar> bars, byte[] payload,
@@ -281,9 +282,11 @@ internal sealed class EodhdMarketMemory
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         var observations = Scalar(connection, "SELECT COUNT(*) FROM observations");
         var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
-        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}";
-        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads,
-            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, revisions and catalog indexes");
+        var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values");
+        var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
+        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}";
+        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions,
+            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market revisions, derived feature values/revisions and catalog indexes");
     }
 
     internal string ExecuteDeletion(EodhdDeletionPreview preview, string confirmation, DateTimeOffset deletedAtUtc)
@@ -294,11 +297,15 @@ internal sealed class EodhdMarketMemory
         var paths = new List<string>(); using (var command = connection.CreateCommand()) { command.Transaction = transaction; command.CommandText = "SELECT path FROM payloads"; using var reader = command.ExecuteReader(); while (reader.Read()) paths.Add(reader.GetString(0)); }
         foreach (var path in paths.Where(File.Exists)) File.Delete(path);
         if (paths.Any(File.Exists)) throw new IOException("One or more covered EODHD payloads could not be deleted.");
+        Execute(connection, transaction, "DELETE FROM feature_values"); Execute(connection, transaction, "DELETE FROM feature_revisions");
         Execute(connection, transaction, "DELETE FROM observations"); Execute(connection, transaction, "DELETE FROM revisions"); Execute(connection, transaction, "DELETE FROM payloads");
-        var fingerprint = Sha(Encoding.UTF8.GetBytes($"{preview.PreviewId}|{deletedAtUtc:O}|{preview.Observations}|{preview.Revisions}|{preview.Payloads}"));
+        var fingerprint = Sha(Encoding.UTF8.GetBytes($"{preview.PreviewId}|{deletedAtUtc:O}|{preview.Observations}|{preview.Revisions}|{preview.Payloads}|{preview.FeatureValues}|{preview.FeatureRevisions}"));
         var receipt = $"eodhd-delete-{fingerprint[7..23]}";
         Execute(connection, transaction, "INSERT INTO deletion_receipts VALUES($id,$at,$o,$r,$p,$f)", ("$id", receipt), ("$at", deletedAtUtc.ToString("O")),
-            ("$o", preview.Observations), ("$r", preview.Revisions), ("$p", preview.Payloads), ("$f", fingerprint)); transaction.Commit(); return receipt;
+            ("$o", preview.Observations), ("$r", preview.Revisions), ("$p", preview.Payloads), ("$f", fingerprint));
+        Execute(connection, transaction, "INSERT INTO feature_deletion_receipts VALUES($id,$values,$revisions)",
+            ("$id", receipt), ("$values", preview.FeatureValues), ("$revisions", preview.FeatureRevisions));
+        transaction.Commit(); return receipt;
     }
 
     internal string ReplayChecksum(string revisionId, DateOnly from, DateOnly to)
@@ -333,11 +340,13 @@ internal sealed class EodhdMarketMemory
     private FinanceRetentionSummary Retention(SqliteConnection connection, bool accountActive)
     {
         var observations = Scalar(connection, "SELECT COUNT(*) FROM observations"); var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
+        var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values"); var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
         string? receipt = null; using (var command = connection.CreateCommand()) { command.CommandText = "SELECT receipt_id FROM deletion_receipts ORDER BY deleted_utc DESC LIMIT 1"; receipt = command.ExecuteScalar() as string; }
         var deadline = _options.EntitlementEndsAtUtc?.AddMonths(1); var state = receipt is not null && observations == 0 ? FinanceRetentionState.DeletionComplete :
             accountActive ? FinanceRetentionState.Active : deadline is null ? FinanceRetentionState.Unknown : DateTimeOffset.UtcNow > deadline ? FinanceRetentionState.ExpiredBlocked : FinanceRetentionState.DeletionRequired;
         return new(state, _options.EntitlementEndsAtUtc, deadline, observations, revisions, payloads,
-            "raw payloads, normalized observations, revisions and catalog indexes", receipt);
+            "raw payloads, normalized observations, market revisions, derived feature values/revisions and catalog indexes", receipt,
+            featureValues, featureRevisions);
     }
 
     private static int Scalar(SqliteConnection connection, string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; return Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
@@ -393,9 +402,16 @@ internal static class EodhdMaintenanceCommand
 {
     internal static bool TryRun(string[] args, IConfiguration configuration)
     {
-        if (args.Length == 0 || !args[0].StartsWith("finance-eodhd-", StringComparison.Ordinal)) return false;
+        if (args.Length == 0 || !(args[0].StartsWith("finance-eodhd-", StringComparison.Ordinal) ||
+            args[0].StartsWith("finance-features-", StringComparison.Ordinal))) return false;
         var options = new EodhdFinanceOptions(); configuration.GetSection(EodhdFinanceOptions.Section).Bind(options);
         var memory = new EodhdMarketMemory(options);
+        if (args[0] == "finance-features-build")
+        {
+            var result = memory.BuildFeatures();
+            Console.WriteLine($"feature-revision={result.RevisionId} source-revisions={result.SourceMarketRevisions.Count} values={result.ValueCount} available={result.AvailableCount} warmup={result.WarmupCount} quality-issues={result.QualityIssueCount} checksum={result.Checksum} elapsed-ms={result.BuildElapsedMilliseconds} idempotent={result.Idempotent}");
+            return true;
+        }
         if (args[0] == "finance-eodhd-runtime-evidence")
         {
             var evidence = memory.RuntimeEvidence();
@@ -413,13 +429,13 @@ internal static class EodhdMaintenanceCommand
         var preview = memory.PreviewDeletion();
         if (args[0] == "finance-eodhd-deletion-preview")
         {
-            Console.WriteLine($"preview={preview.PreviewId} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} deadline={preview.DeadlineUtc:O}");
+            Console.WriteLine($"preview={preview.PreviewId} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} feature-values={preview.FeatureValues} feature-revisions={preview.FeatureRevisions} deadline={preview.DeadlineUtc:O}");
             return true;
         }
         if (args[0] == "finance-eodhd-deletion-execute" && args.Length == 2)
         {
             var receipt = memory.ExecuteDeletion(preview, $"DELETE {args[1]}", DateTimeOffset.UtcNow);
-            Console.WriteLine($"deletion-complete receipt={receipt} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads}");
+            Console.WriteLine($"deletion-complete receipt={receipt} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} feature-values={preview.FeatureValues} feature-revisions={preview.FeatureRevisions}");
             return true;
         }
         throw new ArgumentException("Use finance-eodhd-deletion-preview or finance-eodhd-deletion-execute <preview-id>.");

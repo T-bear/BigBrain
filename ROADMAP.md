@@ -64,6 +64,11 @@ watchlist-anrop lyckades utan retry och gav 2 008 EOD-observationer, åtta paylo
 och ett beständigt lokalt minne för 2025-08-11–2026-08-10. Exakt-revision replay, restart,
 daglig skip/idempotens, API och responsiv UI är runtime-verifierade. Nästa säkra slice är
 indikator-/feature-grunden över den frysta reala revisionen; live/near-live förblir separat.
+**BB-079 FIRST REAL FEATURE / INDICATOR ENGINE** levererar nu `core-daily-v1`: 42 168
+immutable, revisionsbundna feature-värden över de åtta reala marknadsrevisionerna. Formel-
+korrekthet, idempotent checksumma, explicit warmup, causal no-lookahead, SQLite-restart,
+retention lineage samt API/UI är verifierade och deployade. Nästa säkra gate är en minimal
+M3 research-backtest som binder exakt market revision + feature revision; ingen PAPER/trading.
 
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/

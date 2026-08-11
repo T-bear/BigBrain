@@ -22,6 +22,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0020](../adr/0020-finance-evidence-and-strategy-governance.md) | Proposed | Finance evidence and strategy governance |
 | [0021](../adr/0021-finance-provider-neutral-market-data-and-retention-gate.md) | Accepted | Finance provider-neutral market data and retention gate |
 | [0022](../adr/0022-finance-owner-accepted-zero-cost-personal-research.md) | Accepted | Finance owner-accepted zero-cost personal research |
+| [0023](../adr/0023-finance-immutable-feature-revisions-and-causal-lineage.md) | Accepted | Finance immutable feature revisions and causal lineage |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

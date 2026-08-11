@@ -68,6 +68,19 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         Assert.Empty(evidence.FailedSymbols);
         Assert.True(evidence.CausalKnowledgeTimes);
         Assert.Equal(0, evidence.MissingPayloadFiles);
+        var features = reopened.BuildFeatures();
+        var rebuilt = reopened.BuildFeatures();
+        var featureSnapshot = reopened.FeatureSnapshot(instrument.InstrumentId, "sma.20", null, null, null, 260);
+        Assert.Equal(features.RevisionId, rebuilt.RevisionId);
+        Assert.True(rebuilt.Idempotent);
+        Assert.Equal(42, features.ValueCount);
+        Assert.Equal(features.RevisionId, featureSnapshot.Revision!.RevisionId);
+        Assert.Equal(42, featureSnapshot.Revision.ValueCount);
+        var beforeFeatureKnowledge = reopened.FeatureSnapshot(instrument.InstrumentId, "sma.20", null, null,
+            featureSnapshot.Revision.CreatedAtUtc.AddTicks(-1), 260);
+        Assert.Null(beforeFeatureKnowledge.Revision);
+        Assert.Empty(beforeFeatureKnowledge.History);
+        Assert.Equal(42, reopened.Snapshot(true, true, true).Retention!.CoveredFeatureValueCount);
     }
 
     [Fact]
@@ -77,11 +90,14 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         var options = Options() with { EntitlementEndsAtUtc = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero) };
         var memory = new EodhdMarketMemory(options); var instrument = EodhdCatalog.Watchlist[3]; var acquired = DateTimeOffset.UtcNow;
         var revision = memory.Store(instrument, EodhdAdapter.Parse(Fixture()), Fixture(), new(2026, 8, 1), new(2026, 8, 11), acquired.AddSeconds(-1), acquired, 0);
+        var featureRevision = memory.BuildFeatures();
         var blocked = memory.Snapshot(true, true, false); var preview = memory.PreviewDeletion();
         var beforeDeletion = memory.ReplayChecksum(revision, new(2026, 8, 1), new(2026, 8, 11));
 
         Assert.False(blocked.Safety.IngestionAllowed);
         Assert.Equal(FinanceRetentionState.ExpiredBlocked, blocked.Retention!.State);
+        Assert.Equal(featureRevision.ValueCount, preview.FeatureValues);
+        Assert.Equal(1, preview.FeatureRevisions);
         Assert.Throws<InvalidOperationException>(() => memory.ExecuteDeletion(preview, "DELETE", acquired));
         var receipt = memory.ExecuteDeletion(preview, $"DELETE {preview.PreviewId}", acquired);
         Assert.StartsWith("eodhd-delete-", receipt);
@@ -90,6 +106,7 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         var complete = memory.Snapshot(true, true, false);
         Assert.Equal(FinanceRetentionState.DeletionComplete, complete.Retention!.State);
         Assert.Equal(0, complete.HistoricalMemory.ObservationCount);
+        Assert.Equal(0, complete.Retention.CoveredFeatureValueCount);
     }
 
     [Fact]

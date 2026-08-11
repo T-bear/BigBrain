@@ -27,6 +27,7 @@ import type {
   DownloadOperationResult,
   DownloadBatchResult,
   FinanceObservationSnapshot,
+  FinanceFeatureSnapshot,
 } from './types'
 
 export class ApiError extends Error {
@@ -78,6 +79,9 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 
 export const getFinanceObservation = (signal?: AbortSignal) =>
   getJson<FinanceObservationSnapshot>('/api/v1/modules/finance/observation', signal)
+
+export const getFinanceFeatures = (instrumentId: string, signal?: AbortSignal) =>
+  getJson<FinanceFeatureSnapshot>(`/api/v1/modules/finance/features?instrumentId=${encodeURIComponent(instrumentId)}&featureId=sma.20&limit=260`, signal)
 
 export const getMediaOverview = (signal?: AbortSignal) =>
   getJson<MediaOverview>('/api/v1/modules/media', signal)

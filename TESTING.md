@@ -61,6 +61,12 @@ docker compose config --quiet
   coverage, revision IDs, payload-reference integrity, causal knowledge-time status and replay checksums; never token or
   raw payload content. The single bounded provider acquisition is runtime evidence, not an
   ordinary automated-test dependency.
+  BB-079 adds hand-verifiable formula tests for returns, SMA/EMA, momentum, population
+  volatility, Wilder RSI/ATR and volume features; edge, warmup/gap, deterministic checksum,
+  correction lineage and explicit future-horizon/no-lookahead tests; SQLite reopen/
+  idempotency, retention deletion scope, bounded feature API and responsive feature UI.
+  Runtime feature builds consume only the existing local memory and must not trigger an
+  EODHD request.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

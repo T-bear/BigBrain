@@ -150,6 +150,13 @@ boundary for EODHD Free daily data. This does not replace the provider-neutral c
 turn the fixture pipeline into a provider transport; it supplies the selected read-only EOD
 implementation, durable revision catalog and sanitized operational evidence.
 
+BB-079 adds the next provider-neutral boundary:
+`immutable market revision set → versioned feature definitions → immutable feature revision`.
+Feature identity/checksum includes source revisions, feature-set fingerprint and engine
+version. Per-value market/knowledge time and bounded reads preserve causal replay; warmup and
+quality are explicit. The production implementation is local SQLite and inherits source
+retention/deletion. See accepted ADR 0023. It creates no strategy or execution authority.
+
 The fixture persistence boundary now adds an immutable manifest, deterministic content
 fingerprint and provider-neutral storage contract around those revisions. Complete-only
 append, idempotent identity, explicit conflicts, range/action/gap reads, lineage, integrity,

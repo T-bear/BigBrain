@@ -467,13 +467,29 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Avgränsning: Finance är fortsatt RESEARCH; ingen live feed, broker, order eller trading.
 - Report: `docs/reports/features/finance/finance-bb-078-first-real-market-data-activation-20260811.md`.
 
+### BB-079 – First real feature / indicator engine
+
+- Modul: Finance / Research features
+- Typ: Implementation / persistence / runtime verification
+- Prioritet: P1
+- Status: Klar; implementerad, deployad och runtime-verifierad 2026-08-11
+- Resultat: provider-neutral `core-daily-v1` beräknade 42 168 immutable feature-värden
+  (39 616 available, 2 552 warmup, 0 quality issues) från exakt åtta reala EODHD-
+  marknadsrevisioner utan nytt provideranrop.
+- Verifierat: kända formelsvar, deterministic checksum/idempotens, causal no-lookahead,
+  correction lineage, SQLite reopen/restart, bounded API, responsiv UI och retention/deletion
+  scope för beroende features.
+- Avgränsning: raw close/OHLC och providerklassificerad volym; inga signaler, strategier,
+  portfolio/order/PAPER/LIVE eller brokerfunktioner.
+- Report: `docs/reports/features/finance/finance-bb-079-first-real-feature-engine-20260811.md`.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting
 - Typ: Implementation
 - Prioritet: P2
 - Status: Planerad
-- Beroenden: BB-045.
+- Beroenden: BB-045 och BB-079.
 - Definition of Done: versioned datasets/parameters replay deterministically with order
   and portfolio simulation, benchmarks, gross/net metrics and reproducible reports.
 

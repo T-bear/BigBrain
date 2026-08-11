@@ -41,6 +41,16 @@ Use it before and after API/Web recreation. An unchanged request count proves th
 skip without spending another free-tier request. Never replace this with an environment dump
 or raw SQLite/payload output.
 
+Build or idempotently verify the current feature revision from local memory only:
+
+```bash
+docker compose run --rm --no-deps --entrypoint dotnet api BigBrain.Api.dll finance-features-build
+```
+
+This command performs no provider request. Retain its sanitized feature revision, value/
+warmup/quality counts and checksum. Inspect bounded values through
+`GET /api/v1/modules/finance/features`; never dump the database or licensed payloads.
+
 ## Record termination or expiry
 
 Set `FINANCE__EODHD__ACCOUNTACTIVE=false` and
@@ -58,7 +68,8 @@ docker compose run --rm api finance-eodhd-deletion-preview
 ```
 
 Record the sanitized preview ID and counts. Confirm the scope covers raw content-addressed
-payloads, normalized observations, revisions and catalog indexes. The Finance volume is not
+payloads, normalized observations, market revisions, dependent feature values/revisions and
+catalog indexes. Generic feature definitions contain no provider values and may remain. The Finance volume is not
 included in any BigBrain backup workflow in BB-077; if an operator has independently copied
 it, that copy must be enumerated and deleted separately before attesting completion.
 
