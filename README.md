@@ -88,16 +88,14 @@ En synthetic-only live-observationsgrund skiljer nu market event-, provider-, re
 och knowledge-tid, beskriver realtid/delay ärligt och simulerar observationer, sessioner,
 luckor, outage, dubbletter och corrections utan väggklocka. En uttryckligt icke-handlande
 teststrategi skapar immutable shadow predictions och separata senare outcomes/metrics;
-ingen order- eller brokeryta finns. Daterad free-live-research gör Twelve Data Basic till
-bästa villkorade tekniska US-kandidat, men BB-071 förblir blockerad och ingen provider är
-vald eller aktiverad. Den konsoliderade historik/live-grinden rekommenderar villkorat en
-enda Twelve Data Basic-källa för ett mycket litet US-only experiment. Långsiktig retention,
-forward-testing/derived-artifact-scope och termination måste först bekräftas skriftligt och
-godkännas av produktägaren. Ingen fri svensk/nordisk källa är berättigandeverifierad.
-En fördjupad BB-071-granskning verifierar Basic-teknik, intern non-display-behandling och
-30-dagars deletion men lämnar lokal retention, replay/backtest, forward/shadow evidence och
-post-termination derived/provenance uttryckligen okända. En exakt supportförfrågan och ett
-inaktivt åttasymbolers US-experiment är publicerade; inget konto eller adapter är godkänt.
+ingen order- eller brokeryta finns. Ny skriftlig mänsklig provider-evidens klargör att
+Twelve Data Basic endast är evaluation/trial och att BigBrains beskrivna privata användning
+kräver en betald Personal-plan. För den planen stöds lokal lagring och retention,
+research/testing, post-termination retention, derived data, auditmetadata och
+investeringsbeslut med endast ägarens egna medel. Twelve Data är därför en entitlement-
+cleared betald fallback, inte vald eller aktiverad provider. Cost-first-grinden går härnäst
+vidare med osänd Alpaca Basic/free IEX entitlement-research; inget konto, key, adapter eller
+verklig data har skapats. Ingen fri svensk/nordisk källa är berättigandeverifierad.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
 provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures

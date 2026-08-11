@@ -41,6 +41,16 @@ BB-045 depends on BB-071. Storage must preserve provenance, corrections, adjustm
 market calendars and immutable versions. Multiple adapters remain possible, but data is
 never silently blended. This ADR authorizes no account, credential, SDK or ingestion.
 
+## Evidence update 2026-08-11
+
+Direct human correspondence from Twelve Data clears the submitted private/self-hosted
+personal storage, research and retention use on a qualifying paid Personal plan, including
+post-termination derived data and audit metadata. It also establishes that Basic/free is
+evaluation/trial only and insufficient. This updates provider evidence, not the decision:
+Twelve Data is an entitlement-cleared paid fallback, while cost-first selection proceeds to
+Alpaca Basic/free IEX research. No provider, plan, account, key, adapter or ingestion is
+authorized by this note.
+
 ## Owner review
 
 The product owner accepted the provider-neutral canonical model, immutable reproducible

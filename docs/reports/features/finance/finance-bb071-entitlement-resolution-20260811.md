@@ -1,5 +1,10 @@
 # Finance BB-071 Twelve Data Basic entitlement resolution
 
+> Superseded evidence state: the `STATE B` conclusion below records the public-material
+> review at that time. Direct human correspondence later on 2026-08-11 clears the submitted
+> use on a qualifying paid Personal plan, while confirming Basic is insufficient. See the
+> [human confirmation report](finance-twelve-data-human-entitlement-confirmation-20260811.md).
+
 ## Metadata
 
 - Date checked: 2026-08-11

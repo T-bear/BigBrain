@@ -1,17 +1,18 @@
 # Finance market-data provider selection
 
-Status: BB-046 and BB-072 research complete; BB-071 waiting for provider confirmation as
-of 2026-08-11.
+Status: BB-046 and BB-072 research complete; BB-071 has positive human evidence for a
+qualifying Twelve Data Personal plan as of 2026-08-11; cost-first selection remains open.
 Prices and product terms below are time-sensitive observations, not permanent facts.
 
 ## Decision
 
-No provider is selected or authorized. BB-072's dated free-source comparison found no
+No provider is selected, activated or authorized for ingestion. BB-072's dated free-source comparison found no
 zero-cost product with a complete verified grant for durable retention plus personal
 non-display backtesting. The explicit result is **DO NOT INGEST YET**. EODHD Free Starter
 is the best conditional free evaluation lead, but it exposes only the past year and its
 terms require deletion within one month after expiry. Twelve Data Basic is the best Nordic
-technical lead, but its exact durable-retention/derived-use scope remains unresolved.
+technical lead at that review point, but later human evidence established that Basic is
+evaluation/trial only and cannot support the intended operation.
 
 Current/live research on 2026-08-11 reviewed Twelve Data Basic, Alpaca Basic/IEX, EODHD
 Free Starter and Alpha Vantage Free. Twelve Data Basic is now the best conditional free US
@@ -32,13 +33,14 @@ require prior approval for value-added use and are not an OHLCV/corporate-action
 Nordic free eligibility remains unknown. See the
 [combined provider evaluation](../../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
 
-An exact Basic/US entitlement pass still resolves to **STATE B — HUMAN CONFIRMATION
-REQUIRED**. Public terms verify access/processing, compliant non-reversible derived data and
-30-day Data deletion, but do not name versioned replay/backtests, prospective shadow
-evidence, local retention duration or post-termination derived/provenance artifacts. The
-prepared experiment is eight symbols via 15-minute REST batching with a 356-credit/day hard
-budget; trial WebSocket is excluded. See the
-[BB-071 resolution report](../../reports/features/finance/finance-bb071-entitlement-resolution-20260811.md).
+The earlier exact Basic/US pass resolved to **STATE B — HUMAN CONFIRMATION REQUIRED**.
+Direct written correspondence from Liam at Twelve Data now confirms that the submitted
+private/self-hosted personal use may store and retain data locally, conduct testing and
+research, retain data (including derived data and audit metadata) after termination and use
+the data for investment of only the owner's own funds on a qualifying **Personal plan**.
+Basic is limited to evaluation/trial symbols and is insufficient. This clears entitlement
+for that paid personal scope only; it does not select or activate Twelve Data. See the
+[human confirmation report](../../reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md).
 
 Within the earlier paid-capable shortlist, Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
@@ -54,36 +56,43 @@ to the permitted subscription duration and requires deletion within 30 days afte
 Tiingo permits local storage only during an active subscription, requires deletion after
 expiry and requires written approval for derived data. Massive requires deletion of all
 market data after termination and restricts non-display/derived use without a license.
-Activation therefore requires an affirmative written entitlement or a different product.
-Until then, fixtures remain the only authorized source.
+Twelve Data is therefore an **entitlement-cleared paid fallback / qualified candidate** for
+the submitted scope. Commercial/paying-subscriber, redistribution, customer/third-party,
+business, unknown-market and materially different use are not covered and require renewed
+review. No plan, account, credential, adapter or real-data ingestion exists; fixtures remain
+the only active data source.
 
-Selection is free-first and cost-aware: evaluate legally retainable free/self-hosted
-sources before paid tiers, then choose the cheapest product that satisfies quality,
-coverage and evidence needs. Free tiers and Stooq remain unverified candidates, not an
-authorization. Cost cannot relax licensing, provenance, security or live-data quality.
+Selection follows this cost order: **(1) free, (2) local/open-source, (3) existing BigBrain
+infrastructure, (4) paid only after verified need**. Twelve Data's positive entitlement does
+not bypass that order. Alpaca Basic/free IEX is the next research candidate; its personal
+use, storage, raw/normalized retention, replay/backtest, accumulation, backup/revision,
+derived/audit, post-termination, personal-funds and IEX/exchange conditions remain unresolved.
+No Alpaca inquiry is recorded as sent. Cost cannot relax licensing, provenance, security or
+live-data quality.
 
 ## Dated entitlement matrix
 
-Classification is based only on official public material reviewed 2026-08-10. “Likely”
-is an interpretation, not permission.
+The Twelve Data column includes direct provider correspondence reviewed 2026-08-11 for the
+submitted personal use and a qualifying Personal plan. Other columns remain based on public
+material reviewed 2026-08-10. Evidence is product/use specific.
 
 | Requirement | Twelve Data | Tiingo | Massive |
 | --- | --- | --- | --- |
-| Personal/private eligibility | **Confirmed**: terms apply to individuals and internal use | **Confirmed**: individual API plan, internal consumption | **Confirmed**: individual, personal non-business use |
+| Personal/private eligibility | **Supported by human response** for the submitted use on Personal; Basic insufficient | **Confirmed**: individual API plan, internal consumption | **Confirmed**: individual, personal non-business use |
 | US EOD | **Confirmed** | **Confirmed** | **Confirmed** |
 | Swedish/Nordic EOD | **Confirmed** for listed EOD venues including XSTO/XOSL; exact instrument entitlement must be sampled | **Unclear** | **Unclear/not the documented stock focus** |
-| Local raw storage while subscribed | **Confirmed**, within tier/documented retention limits | **Confirmed**, only while subscription is active | **Unclear**: API/flat-file access exists, but default terms call data display-only and restrict copying/non-display use |
-| Maximum storage duration | **Unclear**: terms defer to subscription and documentation; no product-specific maximum was located | **Confirmed** only as active-subscription duration; any shorter product limit remains unclear | **Unclear** while active |
-| Deterministic private backtesting | **Likely/interpretation** as internal non-display processing, but tier permission is not explicit | **Unclear** because derived-data creation requires written approval | **Prohibited without additional license** under the non-display/derived-work restriction |
+| Local raw storage while subscribed | **Supported by human response** on Personal for submitted scope | **Confirmed**, only while subscription is active | **Unclear**: API/flat-file access exists, but default terms call data display-only and restrict copying/non-display use |
+| Maximum storage duration | **Local and post-termination retention supported** by human response for submitted Personal scope | **Confirmed** only as active-subscription duration; any shorter product limit remains unclear | **Unclear** while active |
+| Deterministic private backtesting | **Supported within submitted testing/research scope** on Personal | **Unclear** because derived-data creation requires written approval | **Prohibited without additional license** under the non-display/derived-work restriction |
 | Corporate-action storage | **Unclear** | **Unclear** despite EOD split/dividend fields | **Unclear** |
-| Derived metrics/report retention | **Likely/interpretation** when non-reversible; explicit post-expiry status is unclear | **Prohibited without written approval** | **Unclear/prohibited without non-display license** |
-| Raw retention after cancellation | **Prohibited**: delete within 30 days | **Prohibited**: promptly and permanently delete | **Prohibited**: cease use and delete all market data |
+| Derived metrics/report retention | **Supported**, including after termination, for submitted Personal scope | **Prohibited without written approval** | **Unclear/prohibited without non-display license** |
+| Raw retention after cancellation | **Supported by human response** for submitted Personal scope | **Prohibited**: promptly and permanently delete | **Prohibited**: cease use and delete all market data |
 | Redistribution | **Prohibited** absent add-on/agreement | **Prohibited** absent permission | **Prohibited** absent consent/license |
 | Exchange-specific restrictions/fees | **Confirmed possible; exact XSTO/product obligations unclear** | **Unclear for intended scope** | **Confirmed possible; US exchange agreements apply by dataset** |
 
-The intended ability to retain a reproducible raw archive after cancellation is not
-available under the public default terms of any shortlisted provider. This is not inferred
-permission. BB-071 remains open and BB-045 remains blocked.
+The direct Twelve Data response supersedes the earlier public-text uncertainty only for the
+submitted Personal-plan use. It does not authorize Basic or another provider/product.
+BB-045 real ingestion remains blocked by cost-first selection and explicit activation approval.
 The provider-neutral policy/provenance subset of BB-045 may proceed with synthetic
 fixtures; only external adapter activation and persistence of provider data are blocked.
 

@@ -84,8 +84,9 @@ Canonical identity uses an internal ID plus MIC/currency and time-bounded provid
 mappings. Dataset provenance, raw/adjusted state, corporate actions, corrections, market
 calendar and ingestion metadata are mandatory. See
 [provider selection](market-data-provider-selection.md). Accepted ADR 0021 governs this
-boundary; BB-071 still blocks provider activation because architecture approval is not a
-data license. No adapter is implemented yet.
+boundary. BB-071 now contains positive human Twelve Data Personal-plan evidence, but Basic
+is insufficient and no provider has been selected or activated; architecture or entitlement
+evidence alone is not activation approval. No adapter is implemented yet.
 
 The canonical memory and entitlement model is specified in
 [market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral

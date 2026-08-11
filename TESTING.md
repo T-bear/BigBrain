@@ -45,7 +45,8 @@ docker compose config --quiet
   live broker or real credentials.
   Market-data tests must prove fail-closed entitlement, immutable provenance, derived
   lineage, correction supersession and retention/deletion scope with synthetic fixtures
-  until BB-071 authorizes a provider.
+  until an exact provider/product is entitlement-cleared, selected and explicitly approved
+  for activation; BB-071 evidence alone does not activate a provider.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

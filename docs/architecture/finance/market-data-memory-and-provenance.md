@@ -25,9 +25,15 @@ integrity, license compliance or capital/risk controls. Scraping outside terms, 
 live inputs and bypassing entitlements are prohibited. Provider-neutral domain contracts
 allow a source to be replaced without rewriting strategy, risk or execution logic.
 
-Free candidates such as Stooq or limited developer tiers remain candidates only. Free
+Free candidates such as Alpaca Basic/free IEX, Stooq or limited developer tiers remain candidates only. Free
 access does not establish storage, corporate-action, derived-use or cancellation rights;
 BB-071-quality evidence is required before their data can enter durable storage.
+
+Twelve Data's 2026-08-11 human response clears the submitted personal use on a qualifying
+paid Personal plan, including local and post-termination raw/derived/audit retention. It
+does not clear Basic/free, redistribution or materially different use. Under the cost order
+free → local/open-source → existing BigBrain infrastructure → paid after verified need,
+Twelve Data remains a paid fallback while Alpaca Basic/free IEX entitlement is investigated.
 
 ## Canonical market-data memory
 
@@ -189,9 +195,9 @@ original or revision, and relates immutable original/replacement IDs plus reason
 Old revision snapshots stay addressable; linear acyclic supersession prevents ambiguous
 branches and deterministic ordering ignores hash/input order.
 
-BB-071 remains the external gate for selecting an entitlement and retaining actual
-provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. BB-072 free historical source research completed on
+Exact provider/product entitlement, cost-first selection and explicit activation approval
+remain the external gates for retaining actual provider data. BB-045 remains the ingestion/
+storage implementation and must not activate a provider until those gates pass. BB-072 free historical source research completed on
 2026-08-11 without authorizing a source: EODHD Free Starter and Twelve Data Basic remain
 conditional evidence leads and the recommendation is `DO NOT INGEST YET`. Only exact
 written entitlement plus product-owner review may precede an adapter/acceptance slice.

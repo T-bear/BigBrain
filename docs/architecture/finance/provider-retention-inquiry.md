@@ -1,7 +1,19 @@
 # BB-071 provider retention inquiry
 
-Status: ready to send to Twelve Data support/licensing; no provider account or credential is required to send it.
-Date prepared: 2026-08-10; narrowed to Twelve Data Basic / US on 2026-08-11.
+Status: Twelve Data inquiry answered by a human on 2026-08-11; Alpaca Basic/free IEX
+template prepared but **not sent**. No provider account or credential is required.
+Date prepared: 2026-08-10; Twelve Data answer and Alpaca next track recorded 2026-08-11.
+
+## Twelve Data outcome
+
+Direct written correspondence from Liam at Twelve Data supports the submitted private,
+self-hosted personal storage/research/retention scope on a qualifying Personal plan,
+including post-termination derived data and audit metadata. Basic is evaluation/trial-symbol
+access and is insufficient. The exact context and conservative interpretation are published
+in the [sanitized human confirmation report](../../reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md).
+
+The historical message below is retained as the inquiry record. Do not resend it as if
+Basic were still the intended operational product.
 
 ## Exact Twelve Data Basic inquiry
 
@@ -109,6 +121,43 @@ A yes/no answer with qualifications for each item would be especially helpful.
 
 Thank you.
 
+## Alpaca Basic/free IEX inquiry — prepared, not sent
+
+Subject: Alpaca Basic/free IEX — private local research, retention and personal-use rights
+
+Hello,
+
+I am evaluating Alpaca Basic/free IEX US equities and ETF market data for a private,
+self-hosted personal research project in Sweden. There is no company, paying subscriber,
+customer/third-party access, redistribution, broker order flow or commercial service. No
+account or integration has been created.
+
+For that exact free/basic product and IEX feed, please confirm in writing:
+
+1. whether personal self-hosted use and local storage of raw observations are permitted;
+2. whether provider-neutral normalized copies and local historical accumulation may be
+   retained, and for how long;
+3. whether deterministic replay, personal backtesting and prospective forward/shadow
+   evaluation are permitted;
+4. whether backups, immutable revisions, corrections and reproducibility snapshots may be
+   retained;
+5. whether indicators, features, outcomes, aggregate metrics and other derived artifacts
+   may be created and retained;
+6. whether provenance/audit metadata, checksums and deletion receipts may be retained;
+7. what raw, normalized, backup, revision, derived and audit records must be deleted after
+   account termination or loss of free/basic access;
+8. whether the data may inform investment decisions involving only the owner's own funds;
+9. which IEX, exchange, attribution, non-display, account or third-party restrictions alter
+   any answer; and
+10. whether free/basic access is sufficient for this exact use or a paid/data agreement is
+    required.
+
+Please identify the governing product, feed, terms/version and any market-specific limits.
+A technical API capability or general personal-use statement will not be treated as storage
+or retention permission.
+
+Thank you.
+
 ## Provider-specific notes
 
 - **EODHD Free Starter (first conditional lead):** ask whether deterministic private
@@ -129,5 +178,6 @@ Thank you.
 The product owner should retain the provider's complete dated response and applicable
 terms privately, then publish only a sanitized decision summary in the repository. Do not
 commit account identifiers, personal correspondence headers, credentials or private
-pricing. BB-071 remains open until the response identifies an adequate exact entitlement;
-silence or an informal marketing statement is not approval.
+pricing. A gate closes only when a dated response identifies an adequate exact entitlement;
+silence or an informal marketing statement is not approval. The Twelve Data human response
+met that evidence need for a qualifying Personal plan and submitted use; Alpaca remains unresolved.

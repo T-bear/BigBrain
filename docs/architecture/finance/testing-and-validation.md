@@ -3,9 +3,11 @@
 BB-072 is a documentation/research-only gate. It added no source code, provider payload or
 executable test surface; documentation verification, whitespace validation and Compose
 configuration validation are its applicable automated gates. External-data acceptance
-tests remain forbidden until BB-071 authorizes an exact entitlement.
+tests remain forbidden until an exact provider/product is entitlement-cleared, selected and
+explicitly approved for activation.
 
-The exact Twelve Data Basic BB-071 pass is also documentation-only and remains State B.
+The later human Twelve Data BB-071 evidence update is also documentation-only. It supersedes
+State B for a qualifying paid Personal plan but does not authorize Basic or activation.
 Existing synthetic entitlement, duplicate/out-of-order/stale/session/outage/recovery/
 correction/no-lookahead/no-order tests must remain green. No provider acceptance/network
 test may run until written rights and separate product-owner approval exist.

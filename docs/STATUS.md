@@ -159,36 +159,35 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   Compose and whitespace gates passed. Runtime API/Web health, fail-closed Finance response,
   405 mutation denial, mobile/desktop headless layout and persisted Calendar/theme/Media
   read smoke passed. No external browser request or market feed was observed.
-- Active work: BB-071 is waiting for written provider confirmation. Current public terms
-  require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
-  establish the complete intended retention/backtesting entitlement.
-- Current free-live research: Twelve Data Basic is the best conditional technical US
-  candidate (free real-time US equities/ETFs, limited credits, internal non-display), with
-  Alpaca Basic/IEX as a US technical fallback. Neither has complete product-specific durable
-  retention/forward-testing/derived/termination evidence; EODHD Free is limited/delayed and
-  Alpha Vantage realtime/delayed US data is premium-only. No provider is authorized.
-- Combined historical/live gate 2026-08-11: ten free/free-adjacent paths were evaluated.
-  Twelve Data Basic is the conditional single-provider lead for an 8–10 instrument US-only
-  experiment, but durable retention, exact forward-test/derived-artifact scope and complete
-  termination scope remain unverified. Nasdaq Nordic delayed files require prior approval
-  for value-added use and are not a canonical OHLCV/corporate-action product. Free Nordic
-  eligibility remains unknown. The 800-credit/day limit is a bottleneck before local disk.
-  Decision remains DO NOT INGEST.
-- BB-071 resolution attempt 2026-08-11: current Twelve Data first-party material verifies
-  Basic US historical/current technical access, internal non-display processing, compliant
-  non-reversible derived data and mandatory Data deletion within 30 days after termination.
-  It does not explicitly close local retention duration, deterministic replay/backtesting,
-  forward/shadow evidence, strategy training, ordinary provenance retention or
-  post-termination derived-artifact scope. State: HUMAN CONFIRMATION REQUIRED; BB-071 open.
-  The inactive proposed experiment uses eight US symbols, 15-minute REST batches and a hard
-  356-credit/day plan (444/800 safety capacity); no WebSocket dependency, account or API use.
-- Next safe task: resolve exact BB-071 entitlement for the first free live/historical source,
-  starting with Twelve Data Basic. If complete evidence is obtained, request product-owner
-  approval as a separate milestone. No account, adapter, SDK or credential is authorized.
+- BB-071 entitlement update 2026-08-11: a human Twelve Data representative confirmed the
+  submitted private/self-hosted personal scope is supported on a qualifying Personal plan,
+  including local storage/retention, research/testing, post-termination retention, derived
+  data, audit metadata and owner-personal-funds investment use. Basic is evaluation/trial
+  only and insufficient. Twelve Data is an entitlement-cleared **paid fallback / qualified
+  candidate**, not selected or active.
+- Historical free-live research ranked Twelve Data Basic conditionally, but that rank is
+  superseded by human evidence that Basic is evaluation/trial only. Alpaca Basic/free IEX
+  is now the next cost-first candidate; its entitlement is unresolved. EODHD Free remains
+  limited/delayed and Alpha Vantage realtime/delayed US data premium-only. No provider is authorized.
+- Combined gate: Twelve Data Personal is legally qualified for the submitted scope but paid;
+  free operational suitability is **NO** for Basic. Nasdaq Nordic delayed files still require
+  prior approval and are not a canonical OHLCV/corporate-action product. Free Nordic
+  eligibility remains unknown. Decision remains **DO NOT INGEST** pending selection.
+- The earlier public-evidence state **HUMAN CONFIRMATION REQUIRED** is superseded for a
+  qualifying Twelve Data Personal plan by direct provider correspondence. It is not cleared
+  for Basic, commercial/paying-subscriber, redistribution, customer/third-party, unknown
+  market or materially different use. No plan, account, key, adapter or real data exists.
+- Cost-first provider selection remains open. Next safe task: resolve Alpaca Basic/free IEX
+  entitlement for the same private scope, without creating an account, key, SDK or adapter;
+  then compare any authorized adequate zero-cost option with the Twelve Data paid fallback
+  and request explicit product-owner selection before first authorized ingestion.
+- Documentation verification 2026-08-11: documentation gate passed for 127 Markdown files
+  and 74 unique BB IDs; `git diff --check` and Compose configuration validation passed.
+  Source build/test suites were not run because this slice changes no production source.
 - Known limitations: no Finance production persistence, external market data, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.
-- Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
+- Blockers: no exact provider/product has been selected and authorized for ingestion. ADR 0021 was accepted after explicit
   product-owner architecture review on 2026-08-10; its acceptance does not activate a
   provider. All documented gates block real money.
 - Owner approval required: every promotion toward live or greater autonomy.

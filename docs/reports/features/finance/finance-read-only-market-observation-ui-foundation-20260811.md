@@ -1,5 +1,9 @@
 # Finance read-only market observation UI foundation
 
+> Entitlement status update: later human Twelve Data evidence on 2026-08-11 clears the
+> submitted use only on a paid Personal plan; Basic is insufficient. No provider is selected
+> or active, so this report's fail-closed runtime boundary remains unchanged.
+
 ## Metadata
 
 - Date: 2026-08-11

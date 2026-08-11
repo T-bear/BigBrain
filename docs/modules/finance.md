@@ -169,9 +169,10 @@ execution belong to later milestones.
 BB-046 recommends daily raw OHLCV plus separately versioned corporate actions for a small
 US/Nordic allowlist. Twelve Data is the primary EOD candidate because documented coverage
 includes Nasdaq Stockholm; Tiingo and Massive remain US-specialized alternatives. No
-provider is selected or authorized until BB-071 confirms storage and cancellation
-retention rights. Public terms currently require deletion after cancellation for all
-three shortlisted products, so written clarification or a different license is needed.
+provider is selected or activated. BB-071 now contains direct human evidence that the
+submitted private use has storage and post-termination retention rights on a qualifying
+Twelve Data Personal plan. Basic/free is insufficient, so cost-first comparison must
+resolve Alpaca Basic/free IEX before a paid choice.
 ADR 0021's provider-neutral direction is Accepted; that acceptance does not activate a
 provider. See [provider selection](../architecture/finance/market-data-provider-selection.md).
 
@@ -191,12 +192,12 @@ termination deletion require written evidence and explicit owner approval. Nasda
 delayed files do not pass the value-added-use gate. See the
 [combined evaluation](../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
 
-The exact BB-071 pass remains State B. Current public material does not resolve local
-retention duration, replay/backtest, forward/shadow evidence or post-termination derived/
-provenance retention. The prepared but inactive experiment uses `SPY`, `QQQ`, `IWM`,
-`AAPL`, `MSFT`, `JPM`, `XOM` and `JNJ`, 15-minute REST batches and a 356/800 daily credit
-ceiling. It creates no provider-specific domain dependency; see the
-[resolution report](../reports/features/finance/finance-bb071-entitlement-resolution-20260811.md).
+The former BB-071 State B is superseded for Twelve Data Personal. Human evidence supports
+the submitted local storage/retention, research/testing, post-termination raw/derived/audit
+retention and owner-personal-funds data use. It does not cover Basic, redistribution,
+commercial/paying-subscriber, customer/third-party or materially different use. Twelve Data
+is an entitlement-cleared paid fallback only; see the
+[human confirmation report](../reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md).
 
 Finance applies “collect once, reuse when permitted” and free-first/cost-aware selection.
 Every raw dataset and derived artifact carries provider, dataset/revision, retrieval,

@@ -21,12 +21,12 @@ enabled before all M13 gates are evidenced and explicitly approved.
 
 - Current phase/milestone: RESEARCH / early M2, BB-045 in progress.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
-- Active work: BB-071 waits for written provider confirmation.
-- Next safe task: obtain exact BB-071 written evidence for Twelve Data Basic's conditional
-  US-only lead, including durable retention, forward testing, derived artifacts, exchange
-  scope and termination deletion; then require owner approval before activation.
-- Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
-  2026-08-10, but acceptance authorizes no provider or ingestion.
+- BB-071: positive human evidence clears the submitted Twelve Data use on a qualifying paid
+  Personal plan; Basic/free is insufficient. This is entitlement, not activation.
+- Next safe task: resolve Alpaca Basic/free IEX entitlement for the same private scope, then
+  compare any adequate authorized zero-cost option with Twelve Data as the paid fallback.
+- Blocker for M2 ingestion: cost-first provider selection plus explicit product-owner
+  activation approval. ADR 0021 authorizes no provider or ingestion.
 - Safe parallel foundation: entitlement/provenance, identity/normalization,
   session/gap/replay, immutable correction/supersession assembly and synthetic acquisition
   gate/journal orchestration are verified.
@@ -34,13 +34,11 @@ enabled before all M13 gates are evidenced and explicitly approved.
   persistence and account work remain blocked.
 - BB-074 early read-only observation UI is implemented under M2 with a fail-closed
   provider-neutral snapshot. M8 remains planned and has not started.
-- The combined 2026-08-11 gate permits only a conditional 8–10 instrument US proposal.
-  No free Nordic source is authorized. The later milestone is FIRST AUTHORIZED FREE MARKET
+- No free US or Nordic source is authorized. The later milestone is FIRST AUTHORIZED MARKET
   DATA INGESTION and requires a separate product-owner prompt.
-- BB-071 public-evidence resolution is State B: send the exact Twelve Data Basic inquiry.
-  The prepared first experiment remains inactive: eight US equities/ETFs, 15-minute REST,
-  EOD reconciliation, 356-credit/day ceiling, no WebSocket/broker/order. Provider response
-  and subsequent explicit owner approval are the only next gate toward real observation.
+- The former BB-071 State B is superseded by direct Twelve Data human evidence for Personal.
+  No plan, account, key, adapter or data exists. Basic is not an operational option. Alpaca
+  entitlement research is prepared but not sent; provider selection remains open.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -131,24 +129,24 @@ the decision is `DO NOT INGEST YET`. EODHD Free Starter and Twelve Data Basic re
 conditional evidence leads only. This milestone created no account, key, adapter, download
 or persistence. BB-071-class exact entitlement and explicit owner review remain mandatory.
 
-### Next safe M2 implementation while BB-071 is open
+### Next safe M2 gate after Twelve Data entitlement confirmation
 
 The synthetic acquisition, persistence-manifest/benchmark and live-observation/shadow-
 learning foundations are complete. The live slice adds four-clock knowledge semantics,
 honest freshness, deterministic gap/outage/correction delivery and immutable prospective
-prediction/outcome evidence without an order path. Twelve Data Basic is the best conditional
-free US technical candidate after current research, but exact retention/forward-testing and
-third-party rights remain incomplete; no provider is selected.
+prediction/outcome evidence without an order path. Twelve Data Personal is an entitlement-
+cleared paid fallback; Basic is insufficient and no provider is selected.
 
 JSONL and SQLite were measured at up to 1,260,000 fixture rows; immutable files plus a
 transactional SQLite catalog/index is the provisional direction, with medium confidence.
-The immediate next milestone is **RESOLVE ENTITLEMENT FOR FIRST FREE LIVE/HISTORICAL
-PROVIDER**. If exact rights are positively verified, pause for **PRODUCT OWNER APPROVAL –
-FIRST FREE MARKET DATA PROVIDER**. If entitlement evidence remains absent, a separate
+The immediate next milestone is **RESOLVE ALPACA BASIC/FREE IEX ENTITLEMENT**. If exact
+rights are positively verified, compare it with the Twelve Data entitlement-cleared paid
+fallback and pause for **PRODUCT OWNER APPROVAL – FIRST MARKET DATA PROVIDER**. If free
+entitlement evidence remains absent, a separate
 synthetic local-memory backup/restore validation remains safe, but is not started here.
 Only after an
-exact free/free-adjacent entitlement is accepted may an explicitly owner-approved **FIRST
-AUTHORIZED FREE HISTORICAL DATA ADAPTER** milestone begin.
+exact provider entitlement is accepted may an explicitly owner-approved **FIRST AUTHORIZED
+MARKET DATA INGESTION** milestone begin.
 
 ### M3 – Backtest engine — PLANNED
 

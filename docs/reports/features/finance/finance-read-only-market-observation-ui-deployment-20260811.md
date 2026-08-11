@@ -1,5 +1,9 @@
 # Finance read-only market observation UI deployment
 
+> Entitlement status update: later human Twelve Data evidence on 2026-08-11 clears the
+> submitted use only on a paid Personal plan; Basic is insufficient. No provider is selected
+> or active, so this deployment remains RESEARCH with zero real observations.
+
 ## Metadata
 
 - Date: 2026-08-11

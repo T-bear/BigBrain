@@ -244,7 +244,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data Governance
 - Typ: Licensing confirmation / implementation gate
 - Prioritet: P1
-- Status: Pågår – väntar på leverantörsbekräftelse
+- Status: Klar – Twelve Data Personal entitlement verifierat; provider selection/activation separat
 - Upptäckt: 2026-08-10
 - Beroenden: BB-046 and Accepted ADR 0021.
 - Syfte/scope: establish the exact provider/product/market entitlement that may govern
@@ -290,6 +290,18 @@ replay/backtest, forward/shadow evidence, strategy training, provenance or post-
 derived retention. Status remains **Pågår – väntar på leverantörsbekräftelse**. The narrowed
 ready-to-send inquiry is `docs/architecture/finance/provider-retention-inquiry.md`; a free
 account is required only for later API access, not for sending the inquiry.
+
+Human evidence update 2026-08-11: Liam at Twelve Data confirmed in writing that the
+submitted private, self-hosted, non-commercial and non-redistributed BigBrain use may use a
+Personal plan. Local storage/retention, testing/research, post-termination retention,
+derived data, audit metadata and use for investment decisions involving only the owner's
+own funds are supported for that scope. Basic is evaluation/trial-symbol access and is not
+authorized for the intended operation; a paid Personal plan is required. BB-071's Twelve
+Data entitlement question is therefore resolved, but no provider is selected or activated.
+Commercial/paying-subscriber, redistribution, third-party/customer, unknown-market or
+materially changed use remains denied pending renewed review. Cost-first selection now
+continues with Alpaca Basic/free IEX entitlement research before any paid decision. Evidence:
+`docs/reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md`.
 
 ### BB-072 – FREE HISTORICAL DATA INGESTION preparation and source research
 
@@ -342,13 +354,17 @@ account is required only for later API access, not for sending the inquiry.
   return/excursion/volatility/cost metrics. Sixteen focused tests passed; full suite count is
   recorded in STATUS/report after publication. Free-live research reviewed Twelve Data Basic,
   Alpaca Basic/IEX, EODHD Free and Alpha Vantage Free. Twelve Basic is the best conditional
-  technical candidate, but exact retention/forward-testing/third-party scope remains incomplete;
-  BB-071 stays blocked.
+  technical candidate at that review point, but later human evidence established that Basic
+  is insufficient and a paid Personal plan is required.
 - Consolidated evidence 2026-08-11: the historical/live scorecard, capacity estimate and
   Twelve Data Basic checklist are published in
   `docs/reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md`.
-  It authorizes no provider. FIRST AUTHORIZED FREE MARKET DATA INGESTION requires written
+  It authorizes no provider. FIRST AUTHORIZED MARKET DATA INGESTION requires written
   entitlement evidence and a separate explicit product-owner approval.
+- Entitlement update 2026-08-11: Twelve Data is an entitlement-cleared paid fallback for
+  the submitted personal use, not a free or active provider. Basic is insufficient. Alpaca
+  Basic/free IEX is the next cost-first candidate, with entitlement unresolved and no
+  account, key, SDK, adapter or inquiry claimed.
 - Prepared, not authorized: an eight-symbol US-only 15-minute REST/EOD experiment with a
   356/800-credit hard daily plan and no WebSocket, provider call, broker or order. Evidence:
   `docs/reports/features/finance/finance-bb071-entitlement-resolution-20260811.md`.
