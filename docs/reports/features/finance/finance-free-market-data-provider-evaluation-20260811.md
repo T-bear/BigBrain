@@ -11,6 +11,8 @@
 ## Status
 
 Research is complete for this dated gate. No source is authorized and BB-071 remains open.
+The subsequent exact Twelve Data review remains STATE B — HUMAN CONFIRMATION REQUIRED; see
+[BB-071 entitlement resolution](finance-bb071-entitlement-resolution-20260811.md).
 
 ## Changes
 

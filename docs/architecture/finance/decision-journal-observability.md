@@ -1,5 +1,11 @@
 # Finance decision journal and observability
 
+Provider entitlement note 2026-08-11: prospective shadow predictions, later outcomes and
+their retained metrics are separate artifact classes in BB-071. Twelve Data's public Basic
+material does not explicitly resolve their forward-testing or post-termination retention.
+They remain synthetic-only until written evidence and owner approval; an internal-use label
+alone cannot authorize the journal.
+
 Every financial decision must be reconstructable. The append-oriented journal references
 timestamp, safe market snapshot, data/strategy/policy versions, signals, regime, proposed
 action, risk result, policy result, preview, execution and verification results, exit

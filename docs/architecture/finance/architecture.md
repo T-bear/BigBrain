@@ -41,6 +41,12 @@ basis and immutable revision lineage. Overlap, disagreement and late corrections
 explicit evidence; no provider silently overwrites another. The free-first source gate is
 documented in [provider selection](market-data-provider-selection.md).
 
+The first authorized adapter, if later approved, is constrained to the existing acquisition
+boundary and four-clock observation model. Its quota controller must fail before a configured
+daily/minute ceiling, represent 429/temporary failure as provider outage, recover bounded
+missing ranges idempotently and never map no response to an unchanged price. These are
+adapter responsibilities, not Twelve Data concepts in the canonical domain.
+
 ## Autonomic integration
 
 ```text

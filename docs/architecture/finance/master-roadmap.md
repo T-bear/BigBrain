@@ -35,6 +35,10 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - The combined 2026-08-11 gate permits only a conditional 8–10 instrument US proposal.
   No free Nordic source is authorized. The later milestone is FIRST AUTHORIZED FREE MARKET
   DATA INGESTION and requires a separate product-owner prompt.
+- BB-071 public-evidence resolution is State B: send the exact Twelve Data Basic inquiry.
+  The prepared first experiment remains inactive: eight US equities/ETFs, 15-minute REST,
+  EOD reconciliation, 356-credit/day ceiling, no WebSocket/broker/order. Provider response
+  and subsequent explicit owner approval are the only next gate toward real observation.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

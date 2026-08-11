@@ -5,6 +5,11 @@ executable test surface; documentation verification, whitespace validation and C
 configuration validation are its applicable automated gates. External-data acceptance
 tests remain forbidden until BB-071 authorizes an exact entitlement.
 
+The exact Twelve Data Basic BB-071 pass is also documentation-only and remains State B.
+Existing synthetic entitlement, duplicate/out-of-order/stale/session/outage/recovery/
+correction/no-lookahead/no-order tests must remain green. No provider acceptance/network
+test may run until written rights and separate product-owner approval exist.
+
 The subsequent synthetic acquisition slice tests the pre-adapter entitlement boundary and
 adapter-to-domain orchestration without network or storage. It covers deterministic request,
 batch and pagination order; deny-before-adapter; synthetic-only policy identity; unauthorized

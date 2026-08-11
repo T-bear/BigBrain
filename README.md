@@ -93,6 +93,10 @@ vald eller aktiverad. Den konsoliderade historik/live-grinden rekommenderar vill
 enda Twelve Data Basic-källa för ett mycket litet US-only experiment. Långsiktig retention,
 forward-testing/derived-artifact-scope och termination måste först bekräftas skriftligt och
 godkännas av produktägaren. Ingen fri svensk/nordisk källa är berättigandeverifierad.
+En fördjupad BB-071-granskning verifierar Basic-teknik, intern non-display-behandling och
+30-dagars deletion men lämnar lokal retention, replay/backtest, forward/shadow evidence och
+post-termination derived/provenance uttryckligen okända. En exakt supportförfrågan och ett
+inaktivt åttasymbolers US-experiment är publicerade; inget konto eller adapter är godkänt.
 
 ### Designsystem och teman
 

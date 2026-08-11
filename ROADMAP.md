@@ -40,3 +40,7 @@ observation. A combined 2026-08-11 gate keeps Twelve Data Basic as the condition
 single-provider US lead for an initial 8–10 instrument experiment; Nordic collection has
 no free authorized source. Next is written entitlement resolution plus product-owner
 approval, not an adapter. Only then may **FIRST AUTHORIZED FREE MARKET DATA INGESTION** begin.
+The exact BB-071 review reached **STATE B — HUMAN CONFIRMATION REQUIRED**. Public terms do
+not close local-retention, deterministic replay/backtest, forward/shadow evidence or
+post-termination derived/provenance scope. The next action is the published provider
+inquiry; synthetic work is not a substitute for that answer.

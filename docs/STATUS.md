@@ -162,6 +162,14 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   for value-added use and are not a canonical OHLCV/corporate-action product. Free Nordic
   eligibility remains unknown. The 800-credit/day limit is a bottleneck before local disk.
   Decision remains DO NOT INGEST.
+- BB-071 resolution attempt 2026-08-11: current Twelve Data first-party material verifies
+  Basic US historical/current technical access, internal non-display processing, compliant
+  non-reversible derived data and mandatory Data deletion within 30 days after termination.
+  It does not explicitly close local retention duration, deterministic replay/backtesting,
+  forward/shadow evidence, strategy training, ordinary provenance retention or
+  post-termination derived-artifact scope. State: HUMAN CONFIRMATION REQUIRED; BB-071 open.
+  The inactive proposed experiment uses eight US symbols, 15-minute REST batches and a hard
+  356-credit/day plan (444/800 safety capacity); no WebSocket dependency, account or API use.
 - Next safe task: resolve exact BB-071 entitlement for the first free live/historical source,
   starting with Twelve Data Basic. If complete evidence is obtained, request product-owner
   approval as a separate milestone. No account, adapter, SDK or credential is authorized.

@@ -191,6 +191,13 @@ termination deletion require written evidence and explicit owner approval. Nasda
 delayed files do not pass the value-added-use gate. See the
 [combined evaluation](../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
 
+The exact BB-071 pass remains State B. Current public material does not resolve local
+retention duration, replay/backtest, forward/shadow evidence or post-termination derived/
+provenance retention. The prepared but inactive experiment uses `SPY`, `QQQ`, `IWM`,
+`AAPL`, `MSFT`, `JPM`, `XOM` and `JNJ`, 15-minute REST batches and a 356/800 daily credit
+ceiling. It creates no provider-specific domain dependency; see the
+[resolution report](../reports/features/finance/finance-bb071-entitlement-resolution-20260811.md).
+
 Finance applies “collect once, reuse when permitted” and free-first/cost-aware selection.
 Every raw dataset and derived artifact carries provider, dataset/revision, retrieval,
 instrument, quality and entitlement provenance. Allowed purposes are explicit; unknown or

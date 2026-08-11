@@ -32,6 +32,14 @@ require prior approval for value-added use and are not an OHLCV/corporate-action
 Nordic free eligibility remains unknown. See the
 [combined provider evaluation](../../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
 
+An exact Basic/US entitlement pass still resolves to **STATE B — HUMAN CONFIRMATION
+REQUIRED**. Public terms verify access/processing, compliant non-reversible derived data and
+30-day Data deletion, but do not name versioned replay/backtests, prospective shadow
+evidence, local retention duration or post-termination derived/provenance artifacts. The
+prepared experiment is eight symbols via 15-minute REST batching with a 356-credit/day hard
+budget; trial WebSocket is excluded. See the
+[BB-071 resolution report](../../reports/features/finance/finance-bb071-entitlement-resolution-20260811.md).
+
 Within the earlier paid-capable shortlist, Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
 Nordic exchanges, its reference model exposes MIC and optional FIGI/ISIN, and it supports

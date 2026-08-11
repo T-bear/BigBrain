@@ -283,6 +283,14 @@ retained derived artifacts and exchange/termination scope unresolved. Nasdaq Nor
 delayed files require prior approval for value-added use. BB-071 remains open; every
 unchecked item in the published exact-product checklist denies ingestion.
 
+Resolution attempt 2026-08-11: public Twelve Data Basic evidence closes technical US
+historical/current access, internal processing/non-display, compliant derived creation and
+the 30-day termination deletion rule. It does not close local retention duration,
+replay/backtest, forward/shadow evidence, strategy training, provenance or post-termination
+derived retention. Status remains **Pågår – väntar på leverantörsbekräftelse**. The narrowed
+ready-to-send inquiry is `docs/architecture/finance/provider-retention-inquiry.md`; a free
+account is required only for later API access, not for sending the inquiry.
+
 ### BB-072 – FREE HISTORICAL DATA INGESTION preparation and source research
 
 - Modul: Finance / Market Data Governance
@@ -341,6 +349,9 @@ unchecked item in the published exact-product checklist denies ingestion.
   `docs/reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md`.
   It authorizes no provider. FIRST AUTHORIZED FREE MARKET DATA INGESTION requires written
   entitlement evidence and a separate explicit product-owner approval.
+- Prepared, not authorized: an eight-symbol US-only 15-minute REST/EOD experiment with a
+  356/800-credit hard daily plan and no WebSocket, provider call, broker or order. Evidence:
+  `docs/reports/features/finance/finance-bb071-entitlement-resolution-20260811.md`.
 - Kvar: entitlement evidence and owner approval; authorized adapter/local live memory; richer
   calibration/drawdown/regime/instrument/horizon metrics; feature engine and strategy research.
 

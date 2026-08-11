@@ -1,7 +1,56 @@
 # BB-071 provider retention inquiry
 
-Status: ready for product-owner delivery; no provider account or credential is required.
-Date prepared: 2026-08-10; candidate order updated after BB-072 on 2026-08-11.
+Status: ready to send to Twelve Data support/licensing; no provider account or credential is required to send it.
+Date prepared: 2026-08-10; narrowed to Twelve Data Basic / US on 2026-08-11.
+
+## Exact Twelve Data Basic inquiry
+
+Send to Twelve Data support/licensing using the public contact channel. Retain the complete
+dated response privately and publish only a sanitized entitlement decision.
+
+Subject: Twelve Data Basic — private US data retention and forward-research rights
+
+Hello,
+
+I am in Sweden and am considering the **Twelve Data Basic (Free), individual plan** for a
+private, personal, non-commercial and non-display research installation. The proposed first
+experiment covers eight US-listed equities/ETFs, uses approximately 15-minute REST polling
+during the regular session plus next-day EOD reconciliation, and makes no data available to
+third parties. There is no client service, public display, redistribution, broker connection,
+order execution, paper trading or high-frequency trading.
+
+Before I create an account, please answer each question specifically for Basic and the
+default US equities/ETF feed, and identify the governing terms/documentation date:
+
+1. May raw historical EOD and current/intraday observations be stored in a private local
+   database while the Basic subscription/account remains active? What maximum cache or
+   retention period applies?
+2. May those stored observations be normalized into a provider-neutral schema and retained
+   with event, provider, received and first-usable timestamps plus source/provenance?
+3. May they be replayed repeatedly for deterministic personal non-display backtests and used
+   for prospective forward testing of non-trading strategy rules?
+4. May the system create immutable hypothetical “shadow” predictions before outcomes are
+   known, later attach actual outcomes, and retain that evidence for comparison?
+5. May it compute and retain non-reversible indicators, features, returns, volatility,
+   calibration and aggregate strategy-performance metrics while Basic remains active?
+6. After termination or account expiry, does section 16.2 require deletion of raw provider
+   observations, normalized copies, backups and reproducible dataset revisions within 30
+   days? Please answer yes/no for each class.
+7. After termination, may non-reversible derived features, aggregate metrics, shadow
+   predictions/outcomes and strategy evidence be retained indefinitely? If only some may
+   remain, please identify them.
+8. May minimal audit metadata that contains no price/volume values remain after deletion—for
+   example provider/product, policy version, acquisition timestamps, checksums and deletion
+   receipts—or is this outside the section 16.2 compliance-audit exception?
+9. Do any exchange, venue or third-party restrictions on the default Basic US feed change
+   these answers or require an addendum, registration, fee, attribution or deletion rule?
+10. Does the proposed automated internal research require a paid plan, non-display license
+    or written addendum despite being personal, non-commercial and non-redistributed?
+
+Please provide a yes/no answer with qualifications for each numbered item. If Basic does not
+permit the scope, please identify the lowest-cost exact product/addendum that does.
+
+Thank you.
 
 Live/current scope extension prepared 2026-08-11: ask the exact free product whether
 personal/internal non-display forward testing may persist each received observation with
