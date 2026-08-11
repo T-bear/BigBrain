@@ -73,6 +73,11 @@ docker compose config --quiet
   replay compatibility and no-lookahead. Run the reproducible fixture benchmark with
   `dotnet run --project tools/BigBrain.Finance.PersistenceBenchmarks -c Release --no-build -- --full`;
   it writes only process-scoped temporary files and compares JSONL/SQLite without external IO.
+  Live-observation tests use only an injected synthetic feed and explicit UTC evidence.
+  They cover event/provider/received/knowledge causality, honest delay classification,
+  deterministic and out-of-order delivery, duplicate/correction preservation, missing/
+  outage/session events, fail-closed entitlement, immutable versioned prediction/outcome,
+  cost-aware prospective metrics, no-lookahead and absence of broker/order/secret surfaces.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

@@ -21,6 +21,14 @@ revision-catalog no-lookahead. The standalone full benchmark deterministically c
 JSONL and SQLite at 2,520, 126,000 and 1,260,000 rows; timings are architectural samples,
 not CI performance thresholds.
 
+The BB-073 fixture suite verifies event/provider/received/knowledge causality, inclusive
+knowledge availability, explicit delay labels, deterministic delivery independent of input
+order, out-of-order market events, duplicate/correction preservation, session boundaries,
+missing observations, provider outage, fail-closed multi-use entitlement, immutable shadow
+prediction and separately appended horizon outcome, full strategy-version isolation,
+tail-loss-aware metrics, persistence/journal references, no secret surface and no broker or
+order property. It uses no wall clock, sleep, network, storage or random input.
+
 Required layers are unit, integration, simulation, backtest regression, property/invariant,
 paper integration, broker sandbox, failure injection, reconciliation, security, UI,
 accessibility, performance and long-running soak tests.

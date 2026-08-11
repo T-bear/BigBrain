@@ -32,9 +32,19 @@ become live. HALTED prevents new exposure and strategy-originated orders, cancel
 eligible pending orders according to policy, may preserve safe exits, and requires
 explicit owner action to resume.
 
+`SHADOW` is an observation behavior inside RESEARCH, not a trading-authority mode and not a
+new step in the authority ladder. It may evaluate a versioned test/research strategy and
+record a hypothetical signal/outcome, but cannot create an order, paper intent, position or
+capital allocation. Prospective evidence does not promote PAPER, change risk limits or
+deploy a strategy automatically.
+
 ## Compounding
 
 `capital_next = capital_current + realized_net_profit_loss` is the conceptual equity
 update. Position sizing may use current risk-adjusted equity: sizes can grow gradually
 when equity rises and must shrink when equity falls. Compounding never justifies a
 higher percentage risk. All sizing uses net results and current hard limits.
+
+Compounding remains a long-term objective to investigate, never a promised outcome. Signal
+frequency, win rate or a nominal daily-return target cannot substitute for positive net
+expectancy after costs, drawdown and tail-risk evidence. Survival takes precedence.

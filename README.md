@@ -83,6 +83,13 @@ BB-072:s daterade jämförelse av tio gratis eller gratisnära källprodukter fa
 verifierar hela kombinationen varaktig lokal retention och personlig non-display
 backtesting. Rekommendationen är `DO NOT INGEST YET`; EODHD Free Starter och Twelve Data
 Basic är villkorade evidensspår, inte valda providers.
+En synthetic-only live-observationsgrund skiljer nu market event-, provider-, received-
+och knowledge-tid, beskriver realtid/delay ärligt och simulerar observationer, sessioner,
+luckor, outage, dubbletter och corrections utan väggklocka. En uttryckligt icke-handlande
+teststrategi skapar immutable shadow predictions och separata senare outcomes/metrics;
+ingen order- eller brokeryta finns. Daterad free-live-research gör Twelve Data Basic till
+bästa villkorade tekniska US-kandidat, men BB-071 förblir blockerad och ingen provider är
+vald eller aktiverad.
 
 ### Designsystem och teman
 

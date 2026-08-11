@@ -215,6 +215,21 @@ index, lineage and deletion metadata. Confidence is medium pending backup/restor
 concurrent-reader and deletion-across-backup validation. No ADR or production store is
 accepted by this measurement alone.
 
+## Forward/live observation memory
+
+Authorized current observations should accumulate into the same entitlement-aware local
+memory without being confused with previously acquired history. Each forward fact preserves
+event, provider, received and first-usable knowledge time plus stream/journal identity and
+honest realtime/delayed/EOD freshness. Daily permitted batches may publish new immutable
+revisions; corrections append and never rewrite what BigBrain actually knew earlier.
+
+This prospective stream is especially valuable because it proves the knowledge boundary at
+the time of observation. Shadow predictions and later outcomes are derived artifacts with
+lineage and policy, not a loophole around provider deletion. Local reuse reduces calls and
+cost only while the exact entitlement permits retention; expiry/deletion must cover raw,
+canonical, derived and backup copies while sanitized audit receipts may remain only where
+allowed.
+
 ## Persistence requirements derived from revision assembly
 
 Future storage must support append-only revision metadata; immutable observation/action/

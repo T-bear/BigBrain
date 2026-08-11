@@ -123,13 +123,20 @@ or persistence. BB-071-class exact entitlement and explicit owner review remain 
 
 ### Next safe M2 implementation while BB-071 is open
 
-The synthetic acquisition and persistence-manifest/benchmark foundations are complete.
+The synthetic acquisition, persistence-manifest/benchmark and live-observation/shadow-
+learning foundations are complete. The live slice adds four-clock knowledge semantics,
+honest freshness, deterministic gap/outage/correction delivery and immutable prospective
+prediction/outcome evidence without an order path. Twelve Data Basic is the best conditional
+free US technical candidate after current research, but exact retention/forward-testing and
+third-party rights remain incomplete; no provider is selected.
+
 JSONL and SQLite were measured at up to 1,260,000 fixture rows; immutable files plus a
 transactional SQLite catalog/index is the provisional direction, with medium confidence.
-If entitlement evidence is still absent, the next safe milestone is **SYNTHETIC LOCAL
-HISTORICAL MEMORY PROTOTYPE / BACKUP-RESTORE VALIDATION**: validate transactional manifest
-publication, concurrent replay reads and licensed deletion across primary/backup copies
-without provider data. Only after an
+The immediate next milestone is **RESOLVE ENTITLEMENT FOR FIRST FREE LIVE/HISTORICAL
+PROVIDER**. If exact rights are positively verified, pause for **PRODUCT OWNER APPROVAL –
+FIRST FREE MARKET DATA PROVIDER**. If entitlement evidence remains absent, a separate
+synthetic local-memory backup/restore validation remains safe, but is not started here.
+Only after an
 exact free/free-adjacent entitlement is accepted may an explicitly owner-approved **FIRST
 AUTHORIZED FREE HISTORICAL DATA ADAPTER** milestone begin.
 

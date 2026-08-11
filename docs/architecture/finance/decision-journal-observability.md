@@ -39,6 +39,13 @@ deleted revision IDs and manifest fingerprints, but not licensed observations, a
 raw payload. This preserves an auditable fact of deletion without laundering provider data
 into the journal. A future durable journal must correlate receipt and acquisition IDs.
 
+The BB-073 shadow journal is a separate prospective evidence chain. A prediction freezes
+strategy/configuration/feature/risk/build versions, knowledge boundary, observation IDs,
+direction, score, horizon, hypothetical entry, regime and reason codes. A later outcome is
+appended at/after the horizon with actual path metrics and hypothetical costs; it cannot
+replace or edit the prediction. This prevents hindsight-labelled decisions and supports
+future calibration/drift evidence. It contains no order, broker or credential reference.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

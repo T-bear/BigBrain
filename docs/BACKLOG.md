@@ -304,6 +304,35 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
   **DO NOT INGEST YET**. No account, key, adapter, download, purchase or persistence was
   created. Evidence: `docs/reports/features/finance/free-historical-data-source-research-20260811.md`.
 
+### BB-073 – Live market observation and prospective shadow learning
+
+- Modul: Finance / Market Observer / Strategy Research
+- Typ: M2/M3 provider-neutral implementation and entitlement research
+- Prioritet: P2
+- Status: Pågår – synthetic live-observation/shadow-learning foundation verifierad; external feed blocked
+- Upptäckt: 2026-08-11
+- Beroenden: BB-045 foundations; BB-071 and explicit product-owner approval before external data.
+- Syfte/scope: build a broker-free forward evidence stream with explicit event/provider/
+  received/knowledge time, honest freshness, deterministic observation/gap/outage/correction
+  handling, immutable versioned shadow predictions, later outcomes and prospective metrics.
+- Non-goals: provider adapter/account/key, external payload, broker, order, PAPER/LIVE/AUTO,
+  profitability claim, self-modifying strategy/risk or runtime deployment.
+- Definition of Done: an authorized exact feed can be normalized and entitlement-aware
+  persisted, shadow evaluation cannot look ahead, predictions/outcomes remain immutable and
+  version-isolated, prospective metrics include costs/tail risk, and no execution capability
+  exists. Provider activation requires separate owner approval.
+- Evidens 2026-08-11: `LiveMarketObservation` and deterministic synthetic feed model four
+  clocks, delay, session/missing/outage, duplicates and corrections. A fail-closed live gate
+  requires analysis/walk-forward/training/derived/storage rights. The explicit non-production
+  fixture rule appends immutable predictions and later outcomes and computes version-isolated
+  return/excursion/volatility/cost metrics. Sixteen focused tests passed; full suite count is
+  recorded in STATUS/report after publication. Free-live research reviewed Twelve Data Basic,
+  Alpaca Basic/IEX, EODHD Free and Alpha Vantage Free. Twelve Basic is the best conditional
+  technical candidate, but exact retention/forward-testing/third-party scope remains incomplete;
+  BB-071 stays blocked.
+- Kvar: entitlement evidence and owner approval; authorized adapter/local live memory; richer
+  calibration/drawdown/regime/instrument/horizon metrics; feature engine and strategy research.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting

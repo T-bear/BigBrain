@@ -29,3 +29,11 @@ transactional SQLite catalog/index; it is evidence, not a production storage sel
 activation. Next is exact written entitlement evidence or, while blocked, a bounded
 synthetic local-memory prototype/backup-and-restore validation. BB-071 remains mandatory
 before real ingestion or provider-data storage.
+
+**LIVE MARKET OBSERVATION / SHADOW LEARNING preparation** (BB-073) now has a verified
+synthetic foundation: explicit event/provider/received/knowledge time, honest freshness,
+deterministic outage/gap/correction feed, immutable versioned predictions, later outcomes
+and prospective metrics with no broker/order path. Current official research ranks Twelve
+Data Basic as the best conditional free US technical candidate, but product-specific
+retention/forward-testing rights remain incomplete. BB-071 therefore still blocks external
+observation. Next is entitlement resolution, not an adapter.

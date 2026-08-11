@@ -13,6 +13,17 @@ is the best conditional free evaluation lead, but it exposes only the past year 
 terms require deletion within one month after expiry. Twelve Data Basic is the best Nordic
 technical lead, but its exact durable-retention/derived-use scope remains unresolved.
 
+Current/live research on 2026-08-11 reviewed Twelve Data Basic, Alpaca Basic/IEX, EODHD
+Free Starter and Alpha Vantage Free. Twelve Data Basic is now the best conditional free US
+technical candidate: its current pricing explicitly lists real-time US equities/ETFs,
+limited API/trial WebSocket credits and internal non-display usage. Terms permit internal
+processing/storage and non-reversible derived data subject to tier/third-party restrictions,
+but retention is subscription-bound and termination requires deletion within 30 days.
+Exact forward-testing, third-party venue and artifact scope remains incomplete. Alpaca's
+free IEX feed is a technical fallback but reviewed terms do not close durable storage,
+derived and termination rights and require a brokerage-linked account. No provider is
+authorized; see the [free live research](../../reports/features/finance/free-live-market-data-source-research-20260811.md).
+
 Within the earlier paid-capable shortlist, Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
 Nordic exchanges, its reference model exposes MIC and optional FIGI/ISIN, and it supports

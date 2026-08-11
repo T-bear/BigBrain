@@ -13,6 +13,8 @@ Current implementation evidence:
 - [BB-072 free historical data source research](free-historical-data-source-research-20260811.md)
 - [BB-045 synthetic acquisition foundation](finance-synthetic-acquisition-foundation-20260811.md)
 - [BB-045 synthetic persistence benchmark and manifest foundation](finance-synthetic-persistence-benchmark-20260811.md)
+- [BB-073 free live/current market-data research](free-live-market-data-source-research-20260811.md)
+- [BB-073 live observation and shadow learning foundation](finance-live-observation-shadow-learning-20260811.md)
 
 Provider research and retention-gate reports do not authorize provider activation; use
 `docs/STATUS.md` and `docs/BACKLOG.md` for the current gate state.

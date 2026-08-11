@@ -3,6 +3,15 @@
 Status: ready for product-owner delivery; no provider account or credential is required.
 Date prepared: 2026-08-10; candidate order updated after BB-072 on 2026-08-11.
 
+Live/current scope extension prepared 2026-08-11: ask the exact free product whether
+personal/internal non-display forward testing may persist each received observation with
+event/provider/received/knowledge timestamps, compute and retain immutable hypothetical
+signals/outcomes and derived calibration/performance metrics, and accumulate that prospective
+history while subscribed. Require exact feed/venue coverage, delay classification,
+third-party restrictions, raw/derived/backup retention periods and termination deletion
+duties. A general “algorithmic use” or “internal use” answer is insufficient unless it maps
+these artifacts and the intended US/Nordic markets explicitly.
+
 ## Intended use
 
 I operate a private, personal software installation in Sweden. I am evaluating a market-

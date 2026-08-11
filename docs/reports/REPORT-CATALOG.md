@@ -26,6 +26,8 @@
 | Finance BB-072 free historical source research | Sanitized dated first-party source/rights comparison | [Free historical source research](features/finance/free-historical-data-source-research-20260811.md) | Research complete; no free source authorized; do not ingest pending BB-071 evidence |
 | Finance BB-045 synthetic acquisition foundation | Sanitized implementation and automated-test evidence | [Synthetic acquisition foundation](features/finance/finance-synthetic-acquisition-foundation-20260811.md) | Fixture-only acquisition/gate/journal integration verified; BB-071 still blocks real data |
 | Finance BB-045 synthetic persistence benchmark | Sanitized manifest, contract and measured JSONL/SQLite evidence | [Synthetic persistence benchmark](features/finance/finance-synthetic-persistence-benchmark-20260811.md) | Fixture-only benchmark verified; hybrid direction provisional; no production store/provider data |
+| Finance BB-073 free live/current source research | Dated first-party product, freshness and entitlement comparison | [Free live research](features/finance/free-live-market-data-source-research-20260811.md) | Twelve Data Basic conditional technical lead; BB-071 remains blocked; no provider activated |
+| Finance BB-073 live observation/shadow learning | Sanitized implementation and automated-test evidence | [Live observation foundation](features/finance/finance-live-observation-shadow-learning-20260811.md) | Fixture-only four-clock feed and immutable prospective evidence; no broker/order/runtime |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

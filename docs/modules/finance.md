@@ -108,6 +108,19 @@ not as investment logic or evidence of profitability.
 - Scoped deletion removes affected fixture payload/revisions while preserving a sanitized
   receipt with scope, deleted revision IDs, manifest fingerprints and policy evidence. It
   neither deletes unrelated revisions nor retains prices/actions as an audit workaround.
+- `LiveMarketObservation` represents snapshot/five-minute/daily current evidence with
+  canonical/provider/symbol/MIC identity, decimal OHLCV, explicit freshness/delay, session,
+  quality/correction, stream/revision, policy/provenance and acquisition-journal reference.
+  Event, provider, received and knowledge time are separate UTC facts; causal ordering and
+  delayed-versus-realtime labels fail closed.
+- `SyntheticLiveMarketFeed` emits deterministic fixture deliveries without wall-clock wait
+  and preserves out-of-order event time, duplicate/correction evidence, missing observations,
+  session boundaries and provider outages. Its entitlement gate requires explicit analysis,
+  walk-forward, training, derived, storage and persistence rights.
+- The only shadow rule is named `TEST-SYNTHETIC-MOMENTUM-NON-TRADING`. It sees only evidence
+  known at evaluation time and creates a strategy/config/feature/risk/build-bound immutable
+  prediction. A separate outcome later records gross/net return, favorable/adverse excursion,
+  volatility and hypothetical costs. Metrics never mix full strategy-version keys.
 
 The domain implementation has no network, production persistence, durable logging or
 provider SDK. The benchmark tool performs bounded temporary JSONL/SQLite IO using only the
@@ -120,6 +133,10 @@ future backtests must resolve the provider reference at the historical session d
 
 This replay primitive is not the M3 backtest engine: it has no strategy, portfolio,
 position, fill, fee, slippage, P&L, risk expansion, paper executor or order capability.
+
+The shadow-learning fixture is likewise not PAPER or a production strategy. “Learning” in
+this phase means observe → record → measure → compare → score → build evidence. It cannot
+rewrite strategies/risk, promote versions, deploy code, allocate capital or create orders.
 
 ## Measured persistence direction (not activated)
 

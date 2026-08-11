@@ -114,3 +114,19 @@ fingerprint and provider-neutral storage contract around those revisions. Comple
 append, idempotent identity, explicit conflicts, range/action/gap reads, lineage, integrity,
 policy-scoped enumeration and deletion are proven by an in-memory reference. This is a
 domain/benchmark boundary, not a production repository, API endpoint or runtime database.
+
+## Live observation and shadow evidence boundary
+
+Historical replay and forward observation share canonical identity, entitlement,
+provenance and immutable revision references but remain distinct evidence streams. Current
+observations record market event time, provider production time, BigBrain receive time and
+first-usable knowledge time. A strategy evaluation may consume only evidence whose knowledge
+time is at or before its supplied boundary. Delayed or end-of-day evidence is labelled as
+such; technical accessibility never upgrades freshness or rights.
+
+The fixture-only live feed and shadow pipeline implement `OBSERVE → RECORD → MEASURE →
+COMPARE → SCORE → BUILD EVIDENCE`. They do not implement the Trading Controller, broker
+adapter, order intent, portfolio, PAPER executor or self-modifying strategy. Predictions
+bind strategy/configuration/feature/risk/build and data/policy versions and remain immutable;
+outcomes append later. No result can promote a version or alter risk without a future
+separate governed workflow.

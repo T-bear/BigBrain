@@ -1,9 +1,9 @@
 # BigBrain Status
 
 - Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
-- Verifierad mot commit: BB-072 source research is complete for publication from current
-  main; published SHA is assigned after commit. Latest runtime
-  evidence is unchanged.
+- Verifierad mot commit: BB-073 synthetic live-observation/shadow-learning foundation and
+  current free-live research are complete for publication from current main; published SHA
+  is assigned after commit. Latest runtime evidence is unchanged.
 - Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
@@ -138,17 +138,26 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   JSONL and SQLite fixture benchmarks measured up to 1,260,000 rows; the evidence supports
   a provisional immutable-file + transactional SQLite catalog/index direction, not an
   activated production store or final ADR.
-- Automated verification 2026-08-11: .NET 10 restore/build passed; 328 API tests and 32
-  Sentinel tests passed (360 total). This includes 12 persistence manifest/roundtrip/
-  integrity/deletion/replay tests plus all prior acquisition and no-lookahead invariants.
+- Implemented BB-073 synthetic live-learning slice: provider-neutral current observations
+  distinguish event/provider/received/knowledge time and honest real-time/delayed/EOD
+  freshness. A deterministic fixture feed represents out-of-order delivery, duplicate,
+  correction, session, missing observation and outage. The broker-free fixture shadow rule
+  appends immutable strategy/config/feature/risk/build-bound predictions and later outcomes,
+  then calculates version-isolated prospective return/excursion/volatility/cost metrics.
+- Automated verification 2026-08-11: .NET 10 restore/build passed; 344 API tests and 32
+  Sentinel tests passed (376 total). This includes 16 live observation/entitlement/shadow/
+  outcome/metric/no-order tests plus all prior persistence and no-lookahead invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
-- Next safe task: obtain exact BB-071-class written evidence for EODHD Free Starter and
-  Twelve Data Basic, covering US/XSTO retention, non-display backtesting, derived data and
-  termination. If still blocked, validate a bounded synthetic hybrid local-memory prototype,
-  backup/restore and deletion propagation before any durable product implementation. No
-  provider account, SDK or credential is authorized; the measured direction remains review-gated.
+- Current free-live research: Twelve Data Basic is the best conditional technical US
+  candidate (free real-time US equities/ETFs, limited credits, internal non-display), with
+  Alpaca Basic/IEX as a US technical fallback. Neither has complete product-specific durable
+  retention/forward-testing/derived/termination evidence; EODHD Free is limited/delayed and
+  Alpha Vantage realtime/delayed US data is premium-only. No provider is authorized.
+- Next safe task: resolve exact BB-071 entitlement for the first free live/historical source,
+  starting with Twelve Data Basic. If complete evidence is obtained, request product-owner
+  approval as a separate milestone. No account, adapter, SDK or credential is authorized.
 - Known limitations: no production persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit

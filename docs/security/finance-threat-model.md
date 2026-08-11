@@ -91,3 +91,13 @@ synthetic provider/product/evidence identifiers. Immutable batch IDs reject conf
 retries, corrections reuse the existing assembler, and journal contracts expose no key,
 token, header or raw-payload field. No transport, serializer, credential, external data,
 durable store, runtime capability or trading authority was introduced.
+
+Implementation review 2026-08-11 (live/shadow fixture): current observations preserve
+event/provider/received/knowledge time and explicit delay so stale or late delivery cannot
+masquerade as contemporaneous knowledge. Missing entitlement denies observation retention
+and learning uses. Predictions and outcomes are separate immutable records bound to exact
+strategy/configuration/feature/risk/build/data/policy versions, limiting hindsight rewrite
+and evidence mixing. The only strategy is explicitly non-production/non-trading; the new
+surface has no broker/order property, secret, network, persistence, runtime or authority.
+Future live transport adds outage/reconnect, stream spoofing, sequence/correction poisoning,
+credential leakage and terms-change risks and requires a separate adapter threat review.

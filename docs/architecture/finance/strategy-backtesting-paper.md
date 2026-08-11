@@ -59,6 +59,25 @@ later corrections remain separate child revisions. The benchmark exercises seque
 instrument-range access shapes only—it does not implement strategy logic or relax the
 supplied replay-as-of boundary.
 
+## Prospective shadow evaluation
+
+Forward evidence complements historical replay: at time T an immutable prediction records
+only then-known observations, feature/strategy/configuration/risk/build versions, score,
+direction, horizon, hypothetical entry, regime and reasons. At or after T+horizon a separate
+outcome may append return, maximum favorable/adverse excursion, volatility, hypothetical
+fees/spread/slippage and calibration evidence. The original prediction is never rewritten.
+
+Initial fixture metrics cover count, wins/losses, win rate, average/median/expected net
+return, excursion and outcome volatility, isolated by full strategy version. Production
+evaluation must additionally cover hypothetical-equity drawdown and cohorts by signal
+strength, calibration, regime, instrument and horizon. Win rate alone is never sufficient:
+tail losses, costs and risk-adjusted expectancy dominate frequency.
+
+Capital compounding is a research objective, not an assumption. Finance may investigate
+whether repeated positive net expectancy survives fees, spread, slippage, tax/operational
+effects, losses and tail risk. It must never encode “many trades imply profit” or a promised
+daily return. Survival and risk-adjusted positive expectancy take precedence over frequency.
+
 ## Paper trading and Strategy Lab
 
 Paper trading uses live or near-live observations but persistent simulated cash,
