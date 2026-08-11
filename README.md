@@ -18,10 +18,11 @@ Se [arkitekturbaslinjen](ARCHITECTURE.md), [ADR-indexet](docs/indexes/adr.md) oc
 
 ## Dashboard Views och Widget Framework
 
-Webbgränssnittet har fyra vyer utan sidomladdning:
+Webbgränssnittet har fem vyer utan sidomladdning:
 
 - **Hem:** Matlista, Inköpslista, Kalenderns kompakta veckovy samt en tydligt ej implementerad Påminnelseplatshållare.
 - **Media:** sökning, pågående jobb, Smart Shuffle, Download Control och mediaintegrationer.
+- **Finance:** read-only research-watchlist, entitlementstatus, historiskt minne och gap-aware diagram.
 - **AI:** tydligt ej implementerade platshållare för kommande AI-funktioner.
 - **Admin:** serverstatus, containers, integrationer och teknisk information.
 
@@ -72,7 +73,7 @@ integritet, revisionsfrågor och policyavgränsad deletion. En in-memory referen
 reproducerbar JSONL/SQLite-benchmark använder endast syntetiska EOD-rader; mätningen stödjer
 provisoriskt SQLite som transaktionellt katalog/index tillsammans med immutable filer för
 payload, men aktiverar ingen produktionslagring. Ingen verklig providerpersistence,
-verklig provideradapter, executor, brokerintegration, UI eller live trading
+verklig provideradapter, executor, brokerintegration eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och
@@ -97,6 +98,10 @@ En fördjupad BB-071-granskning verifierar Basic-teknik, intern non-display-beha
 30-dagars deletion men lämnar lokal retention, replay/backtest, forward/shadow evidence och
 post-termination derived/provenance uttryckligen okända. En exakt supportförfrågan och ett
 inaktivt åttasymbolers US-experiment är publicerade; inget konto eller adapter är godkänt.
+BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
+`GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
+provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures
+är alltid märkta; detta är tidig M2-observation och startar inte M8:s tradingdashboard.
 
 ### Designsystem och teman
 

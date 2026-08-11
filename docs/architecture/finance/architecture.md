@@ -143,3 +143,12 @@ adapter, order intent, portfolio, PAPER executor or self-modifying strategy. Pre
 bind strategy/configuration/feature/risk/build and data/policy versions and remain immutable;
 outcomes append later. No result can promote a version or alter risk without a future
 separate governed workflow.
+
+## Read-only observation projection
+
+BB-074 adds the last, read-only portion of the future flow:
+`authorized adapter (future) → journal → normalization/quality/session/gaps → immutable
+Finance memory → IFinanceObservationReader → versioned API → Finance Web`. Today only the
+projection exists and its production reader fails closed with no provider or observations.
+Synthetic snapshots are test-only. This is not a parallel data model and has no write/order
+capability.

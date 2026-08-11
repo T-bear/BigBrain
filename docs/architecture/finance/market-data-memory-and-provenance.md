@@ -246,3 +246,8 @@ product, policy, provenance and deletion metadata; deterministic membership/as-o
 and checksums/backups that retain entitlement. The first bounded size/range/deletion
 measurement is complete; concurrent readers, backup/restore and licensed deletion across
 backup copies remain. No production persistence technology is selected or activated here.
+
+BB-074 projects only sanitized revision, coverage, count, persistence, policy and provenance
+summaries to Web. Raw payloads, credentials, secret URLs and legal correspondence are not
+fields in the read contract. Production remains empty until authorized canonical memory is
+published through the normal Finance boundary.

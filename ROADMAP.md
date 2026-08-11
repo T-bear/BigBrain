@@ -44,3 +44,8 @@ The exact BB-071 review reached **STATE B — HUMAN CONFIRMATION REQUIRED**. Pub
 not close local-retention, deterministic replay/backtest, forward/shadow evidence or
 post-termination derived/provenance scope. The next action is the published provider
 inquiry; synthetic work is not a substitute for that answer.
+
+**READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
+research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/
+synthetic/stale/gap states, memory summary and accessible lightweight chart. This does not
+start M8; portfolio, positions, orders, risk, broker and execution workflows remain planned.

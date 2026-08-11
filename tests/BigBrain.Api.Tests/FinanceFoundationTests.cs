@@ -197,7 +197,9 @@ public sealed class FinanceFoundationTests
     {
         Assert.Equal("Research", FinanceModule.Definition.Status);
         Assert.Equal(["finance.research.read"], FinanceModule.Definition.Capabilities);
-        Assert.Empty(FinanceModule.Definition.DashboardWidgets);
+        var widget = Assert.Single(FinanceModule.Definition.DashboardWidgets);
+        Assert.Equal("finance-observation", widget.Id);
+        Assert.Equal("/api/v1/modules/finance/observation", widget.DataEndpoint);
     }
 
     private static DecisionJournalEntry Evaluate(

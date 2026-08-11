@@ -147,6 +147,15 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Automated verification 2026-08-11: .NET 10 restore/build passed; 344 API tests and 32
   Sentinel tests passed (376 total). This includes 16 live observation/entitlement/shadow/
   outcome/metric/no-order tests plus all prior persistence and no-lookahead invariants.
+- Implemented BB-074 early read-only Finance observation UI: Finance-owned typed snapshot
+  and `GET /api/v1/modules/finance/observation` expose RESEARCH safety, provider/entitlement,
+  configured watchlist, freshness/session/quality/history and sanitized memory/revision/
+  provenance. Production defaults to no provider, no observations and denied real ingestion/
+  storage. The responsive view labels fixtures and chart gaps and has no trade/order control.
+  Automatically verified source only; not deployed, manually verified or M8-started.
+  Verification 2026-08-11: solution build passed with zero warnings/errors; 351 API and 32
+  Sentinel tests passed; 106 Web tests and the Web production build passed; documentation,
+  Compose and whitespace gates passed.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.

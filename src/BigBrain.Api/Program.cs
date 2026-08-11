@@ -5,6 +5,8 @@ using BigBrain.Api.ShoppingList;
 using BigBrain.Api.Calendar;
 using BigBrain.Api.Settings;
 using BigBrain.Api.Sentinel;
+using BigBrain.Api.Finance;
+using BigBrain.Modules.Finance;
 using BigBrain.Sentinel.Contracts;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -147,6 +149,7 @@ public partial class Program
         builder.Services.AddTransient<IMediaAddOptionsService, MediaAddOptionsService>();
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
+        builder.Services.AddSingleton<IFinanceObservationReader, SafeDefaultFinanceObservationReader>();
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 
@@ -241,6 +244,8 @@ public partial class Program
             "/api/v1/docker/containers",
             async (IDockerInventoryProvider provider, CancellationToken cancellationToken) =>
                 Results.Ok(await provider.GetContainersAsync(cancellationToken)));
+
+        app.MapFinanceEndpoints();
 
         app.MapGet(
             "/api/v1/modules/media",

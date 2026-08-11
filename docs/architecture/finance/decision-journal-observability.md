@@ -70,3 +70,7 @@ Each reference is subject to the originating dataset's entitlement. The journal 
 sanitized policy/deletion audit metadata only when allowed; it must not embed raw provider
 data to bypass a deletion obligation. See
 [market-data memory and provenance](market-data-memory-and-provenance.md).
+
+BB-074's Web snapshot is presentation, not evidence authority. It can display sanitized
+freshness/session/quality and revision/provenance summaries, but cannot authorize
+entitlement, change mode, write the journal or create orders.

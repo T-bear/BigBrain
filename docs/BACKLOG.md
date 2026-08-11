@@ -355,6 +355,23 @@ account is required only for later API access, not for sending the inquiry.
 - Kvar: entitlement evidence and owner approval; authorized adapter/local live memory; richer
   calibration/drawdown/regime/instrument/horizon metrics; feature engine and strategy research.
 
+### BB-074 – Early read-only Finance market observation UI
+
+- Modul: Finance / Web / Market Observer
+- Typ: M2 read-only implementation
+- Prioritet: P2
+- Status: Klar – implementerad och automatiskt verifierad 2026-08-11; ej deployad/manuellt verifierad
+- Beroenden: BB-044 and provider-neutral BB-045/BB-073 foundations; BB-071 before real data.
+- Scope: versioned provider-neutral snapshot, fail-closed production reader, research
+  watchlist, Finance view, empty/synthetic/stale/gap/session/quality states, memory panel
+  and accessible chart.
+- Non-goals: provider account/key/SDK/adapter, real payload, feed, broker, order, PAPER/LIVE/
+  AUTO, portfolio/risk/execution controls or deployment.
+- Definition of Done: navigable responsive UI, prominent RESEARCH/no-real-money and BB-071
+  denial, explicit fixtures, green API/UI/full regressions/build/docs gates.
+- Evidence: `docs/reports/features/finance/finance-read-only-market-observation-ui-foundation-20260811.md`.
+- Roadmap semantics: early M2 research observation; BB-059/M8 remains planned for trading UI.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting

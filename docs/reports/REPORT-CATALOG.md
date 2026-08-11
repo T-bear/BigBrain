@@ -30,6 +30,7 @@
 | Finance BB-073 live observation/shadow learning | Sanitized implementation and automated-test evidence | [Live observation foundation](features/finance/finance-live-observation-shadow-learning-20260811.md) | Fixture-only four-clock feed and immutable prospective evidence; no broker/order/runtime |
 | Finance free-first historical + live provider gate | Dated combined provider, entitlement, capacity and architecture evidence | [Provider evaluation](features/finance/finance-free-market-data-provider-evaluation-20260811.md) | Twelve Data Basic conditional US lead; no free source authorized; BB-071 remains open |
 | Finance BB-071 Twelve Data resolution | Exact-use entitlement matrix, zero-cost experiment and support inquiry | [BB-071 resolution](features/finance/finance-bb071-entitlement-resolution-20260811.md) | State B: human confirmation required; no account, adapter or data |
+| Finance BB-074 read-only observation UI | Sanitized read-contract, UI and safety evidence | [Observation UI foundation](features/finance/finance-read-only-market-observation-ui-foundation-20260811.md) | Early M2 read-only source automatically verified; not deployed; M8 remains planned |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

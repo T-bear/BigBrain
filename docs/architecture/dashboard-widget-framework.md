@@ -2,10 +2,11 @@
 
 ## Scope
 
-Phase 1 replaces the single scrolling start page with four instant client-side views:
+The framework now exposes five instant client-side views:
 
 - **Hem** – Matlista, Inköpslista and honest placeholders for Calendar and Reminders.
 - **Media** – Media Search, Downloads, Smart Shuffle, active jobs and Jellyfin/integration overview.
+- **Finance** – a compiled read-only RESEARCH observation widget; no provider or trading controls.
 - **AI** – registered placeholders for AI Chat, Agents, Voice Assistant, suggestions and automations; no AI capability is claimed yet.
 - **Admin** – server metrics, container inventory, media integrations and future update information.
 

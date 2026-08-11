@@ -8,6 +8,7 @@ import { MediaSearch } from '../media-search/MediaSearch'
 import { ShoppingList } from '../shopping-list/ShoppingList'
 import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
 import { CalendarWidget } from '../calendar/Calendar'
+import { FinanceObservation } from '../finance/FinanceObservation'
 import { ApplicationWidgetRegistry, DashboardRegistry, type WidgetDefinition } from './widgetFramework'
 
 export interface AppWidgetData {
@@ -71,6 +72,7 @@ function DockerWidget({ data }: { data: AppWidgetData }) {
 export const dashboardRegistry = new DashboardRegistry([
   { id: 'home', title: 'Hem', description: 'Familjens dagliga översikt', icon: '⌂' },
   { id: 'media', title: 'Media', description: 'Sök, spela och hantera media', icon: '▶' },
+  { id: 'finance', title: 'Finance', description: 'Read-only marknadsobservation i researchläge', icon: '◇' },
   { id: 'ai', title: 'AI', description: 'Assistenter och automation', icon: '✦' },
   { id: 'admin', title: 'Admin', description: 'System, tjänster och drift', icon: '⚙' },
 ])
@@ -89,6 +91,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     { id: 'smart-shuffle', title: 'Smart Shuffle', description: 'Starta en rättvis serieblandning på TV:n.', icon: '⤨', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <SmartShuffle /> },
     { id: 'media-jobs', title: 'Medieflöde', description: 'Följ film och serier från sökning till bibliotek.', icon: '↧', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaJobs showHeading={false} /> },
     { id: 'jellyfin-overview', title: 'Jellyfin och integrationer', description: 'Bibliotek, tjänster, köer och nyligen tillagt.', icon: '▶', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'large', supportedViews: ['media', 'admin'], permissions: [], render: () => <MediaDashboard administrationOnly /> },
+    { id: 'finance-observation', title: 'Finance observation', description: 'Read-only watchlist, historik och entitlementstatus.', icon: '◇', category: 'Finance', defaultView: 'finance', defaultSize: 'full', minimumSize: 'large', supportedViews: ['finance'], permissions: ['finance.research.read'], render: () => <FinanceObservation /> },
     planned('ai-chat', 'AI-chatt', 'Samtala med BigBrains framtida AI-assistent.', '✦', 'ai'),
     planned('agents', 'Agenter', 'Överblick över framtida AI-agenter.', '◎', 'ai'),
     planned('voice-assistant', 'Röstassistent', 'Röststyr familjens BigBrain.', '◖', 'ai'),

@@ -32,6 +32,8 @@ enabled before all M13 gates are evidenced and explicitly approved.
   gate/journal orchestration are verified.
   BB-072 has researched eligible zero-cost historical sources. Provider payload ingestion,
   persistence and account work remain blocked.
+- BB-074 early read-only observation UI is implemented under M2 with a fail-closed
+  provider-neutral snapshot. M8 remains planned and has not started.
 - The combined 2026-08-11 gate permits only a conditional 8–10 instrument US proposal.
   No free Nordic source is authorized. The later milestone is FIRST AUTHORIZED FREE MARKET
   DATA INGESTION and requires a separate product-owner prompt.
@@ -219,6 +221,7 @@ AUTHORIZED FREE HISTORICAL DATA ADAPTER** milestone begin.
 ### M8 – Finance dashboard and UI — PLANNED
 
 - Objective: show portfolio, P&L, mode, risk, positions, orders, signals and decisions.
+- Boundary: BB-074's early read-only market observation view does not satisfy or start M8.
 - Scope/tasks: overview, Strategy Lab, journal, warnings, broker health and emergency UI;
   WHY, WHY NOW, risk, costs, size, stop, target and portfolio impact in previews.
 - Non-goals: client-side policy, secrets or hidden PAPER/LIVE distinction.

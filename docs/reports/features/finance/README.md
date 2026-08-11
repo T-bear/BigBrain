@@ -17,6 +17,7 @@ Current implementation evidence:
 - [BB-073 live observation and shadow learning foundation](finance-live-observation-shadow-learning-20260811.md)
 - [Free-first historical + live provider gate](finance-free-market-data-provider-evaluation-20260811.md)
 - [BB-071 Twelve Data Basic entitlement resolution](finance-bb071-entitlement-resolution-20260811.md)
+- [BB-074 read-only market observation UI foundation](finance-read-only-market-observation-ui-foundation-20260811.md)
 
 Provider research and retention-gate reports do not authorize provider activation; use
 `docs/STATUS.md` and `docs/BACKLOG.md` for the current gate state.

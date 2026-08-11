@@ -240,6 +240,16 @@ improve.
 
 ## Product behavior
 
+BB-074 implements an earlier read-only observation surface, distinct from the future
+trading UI below. Finance owns `FinanceObservationSnapshot` and
+`IFinanceObservationReader`; `GET /api/v1/modules/finance/observation` returns sanitized
+RESEARCH safety, entitlement, watchlist, freshness/session/quality/data-kind and historical
+memory metadata. `SafeDefaultFinanceObservationReader` returns no authorized provider,
+BB-071 pending, denied ingestion/storage, no prices and no durable memory. The eight-symbol
+US list is configured research scope, not authorization. Web renders explicit empty/error/
+synthetic/stale/gap states and a textual, gap-aware SVG chart. It has no provider DTO,
+credential, broker, order or mutation, and no synthetic runtime feed starts implicitly.
+
 The UI will expose portfolio, equity curve, positions, pending orders, P&L, signals,
 strategy performance, journal, risk and broker health. PAPER and LIVE must be visually,
 semantically and accessibly unmistakable. A prominent STOP ALL TRADING control is

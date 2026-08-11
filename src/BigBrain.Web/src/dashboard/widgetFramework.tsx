@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 
-export const dashboardViewIds = ['home', 'media', 'ai', 'admin'] as const
+export const dashboardViewIds = ['home', 'media', 'finance', 'ai', 'admin'] as const
 export type DashboardViewId = typeof dashboardViewIds[number]
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full'
 

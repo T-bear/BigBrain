@@ -51,6 +51,21 @@ export interface DockerInventory {
   containers: DockerContainer[]
 }
 
+export type FinanceDataKind = 'none' | 'syntheticFixture' | 'real'
+export type FinanceFreshness = 'unknown' | 'current' | 'delayed' | 'stale' | 'unavailable'
+export type FinanceSession = 'unknown' | 'preMarket' | 'open' | 'closed' | 'gap' | 'outage'
+export type FinanceQuality = 'unknown' | 'good' | 'warning' | 'gap' | 'error'
+
+export interface FinanceObservationSnapshot {
+  generatedAtUtc: string
+  safety: { mode: 'unknown' | 'research'; liveTradingEnabled: boolean; paperTradingEnabled: boolean; brokerConnected: boolean; ingestionAllowed: boolean; realProviderStorageAllowed: boolean }
+  provider: { state: 'unknown' | 'noneAuthorized' | 'candidate' | 'authorized' | 'unavailable'; displayName: string; entitlement: 'unknown' | 'pendingWrittenConfirmation' | 'authorized' | 'denied' | 'expired'; entitlementGate: string; reason: string }
+  latestMarketDataUpdateUtc: string | null
+  dataKind: FinanceDataKind
+  watchlist: Array<{ instrumentId: string; symbol: string; displayName: string; price: number | null; currency: string | null; dailyChangePercent: number | null; observedAtUtc: string | null; freshness: FinanceFreshness; session: FinanceSession; quality: FinanceQuality; dataKind: FinanceDataKind; history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }> }>
+  historicalMemory: { observationCount: number; activeRevisionId: string | null; parentRevisionId: string | null; coverageFrom: string | null; coverageTo: string | null; lastAcquiredAtUtc: string | null; gapCount: number; correctionCount: number; persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'; provider: string; product: string; policy: string; provenance: string }
+}
+
 export interface MediaServiceStatus {
   serviceName: string
   status: 'online' | 'degraded' | 'unavailable' | 'notConfigured'

@@ -36,6 +36,6 @@ public sealed class ModuleRegistryTests
         Assert.Equal("finance", finance.Id);
         Assert.Equal("Research", finance.Status);
         Assert.Equal(["finance.research.read"], finance.Capabilities);
-        Assert.Empty(finance.DashboardWidgets);
+        Assert.Equal("finance-observation", Assert.Single(finance.DashboardWidgets).Id);
     }
 }

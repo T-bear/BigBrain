@@ -83,6 +83,9 @@ docker compose config --quiet
   fail-closed language are covered by documentation verification and `git diff --check`.
   The BB-071 resolution is likewise documentation-only: the existing 376-test synthetic
   baseline is rerun, while no provider/network acceptance test is authorized.
+  BB-074 tests prove fail-closed RESEARCH/no-provider/no-order API state and deterministic
+  synthetic mapping. Web tests cover navigation, no-real-money and entitlement warnings,
+  empty/synthetic/stale/gap/memory/chart states, native keyboard controls and no trade UI.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.
