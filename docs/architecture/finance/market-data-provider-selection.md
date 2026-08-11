@@ -67,6 +67,19 @@ live-data quality.
 The dated full zero-cost matrix and first-party source list are in the
 [BB-075 report](../../reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md).
 
+## BB-076 capability-scoped policy update
+
+ADR 0022 permits `OwnerAcceptedPersonalResearch` for a legitimate 0-SEK source and exact
+private read-only capability when no identified term prohibits it. It cannot override
+payment, prior-approval, automation, retention or access-control restrictions.
+
+Stooq's bounded official daily historical download is owner-accepted at the entitlement
+evidence layer. A 2026-08-11 request returned a JavaScript verification challenge rather
+than CSV, so the technical gate failed and BigBrain did not bypass or activate it. Alpaca
+retained IEX use remains human-confirmation-required. EODHD's personal storage/analysis
+grant applies while subscribed and carries a one-month deletion duty after expiry; without
+an account/key and verified deletion lifecycle it remains inactive.
+
 ## Dated entitlement matrix
 
 The Twelve Data column includes direct provider correspondence reviewed 2026-08-11 for the

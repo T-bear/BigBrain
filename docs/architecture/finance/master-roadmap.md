@@ -44,6 +44,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
   replay/backtest gate. No adapter or real data was activated. Alpaca Basic/free IEX remains
   the next human-confirmation action; EODHD Free Starter is second. Twelve Data is inactive
   under the zero budget.
+- BB-076: ADR 0022 permits capability-scoped owner acceptance for legitimate 0-SEK personal
+  read-only research. Stooq daily history reached that evidence class, but its official CSV
+  surface returned a JavaScript verification control; no bypass, adapter or ingestion occurred.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

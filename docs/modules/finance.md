@@ -213,6 +213,13 @@ adapter or real data exists. Twelve Data Personal remains an inactive paid fallb
 production observation reader stays fail-closed and now names the current zero-cost gate
 rather than the superseded BB-071 State B.
 
+BB-076 adds a narrower product-owner risk-acceptance class for legitimate zero-cost,
+private, read-only personal research. Authorization is capability-specific and records the
+evidence class, source/product, rationale and owner-acceptance version. Explicit negative
+terms, paid requirements, prior permission and technical access controls remain blocking.
+The first Stooq daily-download smoke encountered a JavaScript verification control; it was
+not bypassed, so production remains no-provider/no-real-data.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

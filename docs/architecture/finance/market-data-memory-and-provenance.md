@@ -42,6 +42,11 @@ The 2026-08-11 BB-075 sweep found no free source with complete exact rights; the
 production payload may enter this memory model and the provisional persistence direction
 remains unactivated.
 
+BB-076 introduces capability-scoped owner-accepted personal-research evidence for legitimate
+0-SEK sources without an identified prohibition. It does not weaken provenance, retention
+or technical-access gates. Stooq's bounded daily-history use met the residual evidence class,
+but its CSV surface returned a JavaScript verification challenge; no payload entered memory.
+
 ## Canonical market-data memory
 
 The logical model is independent of transport, provider and physical database:

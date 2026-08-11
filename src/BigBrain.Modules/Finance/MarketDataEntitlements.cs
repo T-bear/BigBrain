@@ -22,6 +22,15 @@ public enum EntitlementDecision
     Denied
 }
 
+public enum EntitlementEvidenceClass
+{
+    Unknown = 0,
+    ExplicitProviderGrant,
+    OwnerAcceptedPersonalResearch,
+    HumanConfirmationRequired,
+    Denied
+}
+
 public enum MarketDataClassification
 {
     Unknown = 0,
@@ -161,7 +170,11 @@ public sealed record MarketDataEntitlementPolicy
         EntitlementDecision postSubscriptionRetention,
         RetentionClassification retention,
         DeletionRequirement deletion,
-        DateTimeOffset? deletionDeadlineUtc = null)
+        DateTimeOffset? deletionDeadlineUtc = null,
+        EntitlementEvidenceClass evidenceClass = EntitlementEvidenceClass.Unknown,
+        decimal monetaryCostSek = 0,
+        string? ownerAcceptanceVersion = null,
+        string? rationale = null)
     {
         RequiredText.Require(id.Value, nameof(id));
         RequiredText.Require(version.Value, nameof(version));
@@ -192,9 +205,29 @@ public sealed record MarketDataEntitlementPolicy
         }
 
         if (!Enum.IsDefined(persistence) || !Enum.IsDefined(postSubscriptionRetention) ||
-            !Enum.IsDefined(retention) || !Enum.IsDefined(deletion))
+            !Enum.IsDefined(retention) || !Enum.IsDefined(deletion) || !Enum.IsDefined(evidenceClass))
         {
             throw new ArgumentException("Policy classifications must use defined values.");
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegative(monetaryCostSek);
+
+        if (evidenceClass == EntitlementEvidenceClass.OwnerAcceptedPersonalResearch)
+        {
+            if (monetaryCostSek != 0)
+            {
+                throw new ArgumentException("Owner-accepted personal research is limited to zero-cost sources.", nameof(monetaryCostSek));
+            }
+
+            RequiredText.Require(ownerAcceptanceVersion, nameof(ownerAcceptanceVersion));
+            RequiredText.Require(rationale, nameof(rationale));
+
+            if (useDecisions.GetValueOrDefault(MarketDataUse.PaperTrading) == EntitlementDecision.Allowed)
+            {
+                throw new ArgumentException(
+                    "Owner-accepted personal research cannot authorize broker-interacting paper trading.",
+                    nameof(useDecisions));
+            }
         }
 
         if (deletion == DeletionRequirement.DeleteByDeadline && deletionDeadlineUtc is null)
@@ -221,6 +254,10 @@ public sealed record MarketDataEntitlementPolicy
         Retention = retention;
         Deletion = deletion;
         DeletionDeadlineUtc = deletionDeadlineUtc;
+        EvidenceClass = evidenceClass;
+        MonetaryCostSek = monetaryCostSek;
+        OwnerAcceptanceVersion = ownerAcceptanceVersion;
+        Rationale = rationale;
     }
 
     public PolicyId Id { get; }
@@ -237,6 +274,10 @@ public sealed record MarketDataEntitlementPolicy
     public RetentionClassification Retention { get; }
     public DeletionRequirement Deletion { get; }
     public DateTimeOffset? DeletionDeadlineUtc { get; }
+    public EntitlementEvidenceClass EvidenceClass { get; }
+    public decimal MonetaryCostSek { get; }
+    public string? OwnerAcceptanceVersion { get; }
+    public string? Rationale { get; }
     public MarketDataPolicyReference Reference => new(Id, Version);
 
     public EntitlementDecision DecisionFor(MarketDataUse requestedUse) =>
@@ -446,6 +487,8 @@ public static class MarketDataEntitlementReasons
     public const string PersistenceUnknown = "marketData.entitlement.persistenceUnknown";
     public const string PostSubscriptionRetentionDenied = "marketData.entitlement.postSubscriptionRetentionDenied";
     public const string PostSubscriptionRetentionUnknown = "marketData.entitlement.postSubscriptionRetentionUnknown";
+    public const string HumanConfirmationRequired = "marketData.entitlement.humanConfirmationRequired";
+    public const string EvidenceDenied = "marketData.entitlement.evidenceDenied";
 }
 
 public static class MarketDataEntitlementEvaluator
@@ -489,6 +532,16 @@ public static class MarketDataEntitlementEvaluator
                 policy.PostSubscriptionRetention,
                 MarketDataEntitlementReasons.PostSubscriptionRetentionDenied,
                 reference);
+        }
+
+        if (policy.EvidenceClass == EntitlementEvidenceClass.Denied)
+        {
+            return Deny(EntitlementDecision.Denied, MarketDataEntitlementReasons.EvidenceDenied, reference);
+        }
+
+        if (policy.EvidenceClass == EntitlementEvidenceClass.HumanConfirmationRequired)
+        {
+            return Deny(EntitlementDecision.Unknown, MarketDataEntitlementReasons.HumanConfirmationRequired, reference);
         }
 
         if (context.EvaluatedAtUtc < policy.ValidFromUtc)

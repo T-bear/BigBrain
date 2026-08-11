@@ -93,6 +93,11 @@ source sweep cleared no exact free product, so the planned adapter/persistence b
 remains inactive. The fail-closed read projection names the zero-cost entitlement gate and
 never substitutes synthetic observations in production.
 
+BB-076 adds ADR 0022's capability-scoped owner-accepted personal-research evidence class.
+It applies only to legitimate 0-SEK private read-only research and cannot override explicit
+negative terms or technical controls. Stooq failed the technical activation gate because
+its official CSV request returned a JavaScript verification challenge.
+
 The canonical memory and entitlement model is specified in
 [market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral
 policy/provenance types may be implemented against fixtures before BB-071; real provider

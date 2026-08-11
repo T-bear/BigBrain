@@ -102,6 +102,11 @@ EODHD, Alpha Vantage, Finnhub, FMP och direkta exchange/open-spår fann ingen k�
 komplett verifierad automation-, retention- och research/backtesting-rätt. Finance förblir
 fail-closed utan riktig data; Twelve Data Personal är en inaktiv entitlement-cleared paid
 fallback. API-grinden visar nu `ZERO-COST ENTITLEMENT GATE` i stället för ersatt BB-071 State B.
+BB-076 inför en capability-specifik `OwnerAcceptedPersonalResearch`-klass för legitima
+0-SEK-källor där inga identifierade villkor förbjuder avgränsad privat research. Klassen
+kan aldrig åsidosätta negativa villkor, betalningskrav eller tekniska åtkomstkontroller.
+Stooqs download nådde evidensklassen men ett smoke-anrop gav en JavaScript-kontroll i stället
+för CSV; ingen kontroll kringgicks och ingen källa aktiverades.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
 provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures

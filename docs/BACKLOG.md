@@ -414,6 +414,25 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Kvar: obtain exact written Alpaca answers; then EODHD only if needed. No account/key/adapter
   or provider request before a complete affirmative answer.
 
+### BB-076 – Pragmatic zero-cost personal-research activation
+
+- Modul: Finance / Market Data Governance
+- Typ: Policy / entitlement / conditional activation
+- Prioritet: P1
+- Status: Klar – policy implementerad och verifierad; aktivering fail-closed vid teknisk gate
+- Upptäckt: 2026-08-11
+- Scope: capability-specifik ägaracceptans av residual osäkerhet för legitima 0-SEK-källor,
+  endast privat, read-only, icke-kommersiell personlig research utan identifierat förbud.
+- Evidens: ADR 0022 och policytypen skiljer explicit provider grant, owner-accepted personal
+  research, human confirmation och denied. Negativa villkor, betalning, förhandsgodkännande
+  och tekniska åtkomstkontroller kan inte åsidosättas.
+- Aktiveringsresultat: Stooq daily history nådde ägaraccepterad evidensklass, men den
+  officiella CSV-ytan returnerade en JavaScript-verifieringskontroll. Ingen bypass, adapter,
+  riktig observation, lokal memory, replay eller deployment skapades.
+- Kvar: få en normalt stödd Stooq-automationsväg eller välj en separat clearad källa med
+  konto/key och implementerbar retention/termination-livscykel.
+- Report: `docs/reports/features/finance/finance-bb-076-owner-accepted-zero-cost-policy-20260811.md`.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting

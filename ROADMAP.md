@@ -50,6 +50,12 @@ with complete automation, local-retention, replay/backtest and artifact-lifecycl
 No adapter, account, key, payload, real memory or deployment activation was created. Alpaca
 Basic/free IEX remains the first human-confirmation track; EODHD Free Starter is second.
 
+**BB-076 PRAGMATIC ZERO-COST PERSONAL-RESEARCH ACTIVATION** ändrar evidenssemantiken men
+inte säkerhetsgränsen. Ägaraccepterad personlig forskning kan beslutas per capability för
+legitima 0-SEK-källor utan identifierat förbud. Stooq nådde denna evidensklass för avgränsad
+daily history, men den offentliga CSV-ytan svarade med en JavaScript-verifieringskontroll.
+BigBrain kringgår inte kontrollen; ingen adapter, data eller deployment aktiverades.
+
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/
 synthetic/stale/gap states, memory summary and accessible lightweight chart. This does not

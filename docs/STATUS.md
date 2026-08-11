@@ -201,6 +201,16 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Repository gates: documentation verification passed for 128 Markdown files and 75 unique
   BB IDs; Compose configuration and `git diff --check` passed. The documentation command
   required an unsandboxed rerun after a sandbox-only `spawnSync git EPERM`.
+- BB-076 policy update 2026-08-11: Finance now distinguishes explicit provider grants,
+  owner-accepted personal research, human confirmation and denial per capability. Owner
+  acceptance is restricted to legitimate 0-SEK private read-only research and cannot
+  override an explicit prohibition, payment/permission requirement or access control.
+- Stooq daily historical download reached owner-accepted residual entitlement evidence for
+  the bounded personal use, but the official CSV smoke returned a JavaScript proof-of-work
+  verification page rather than data. No bypass was attempted, so activation remains
+  fail-closed. No provider/account/key/adapter/real memory/replay/deployment changed.
+- EODHD remains conditionally explicit while subscribed with its deletion duty and absent
+  account/key/lifecycle. Alpaca retained IEX use still requires human clarification.
 - Known limitations: no Finance production persistence, external market data, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.

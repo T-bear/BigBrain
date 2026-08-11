@@ -227,6 +227,67 @@ public sealed class FinanceMarketDataEntitlementTests
     }
 
     [Fact]
+    public void OwnerAcceptedPersonalResearchAllowsOnlyDeclaredZeroCostCapability()
+    {
+        var policy = CreatePolicy(
+            evidenceClass: EntitlementEvidenceClass.OwnerAcceptedPersonalResearch,
+            ownerAcceptanceVersion: "BB-076/2026-08-11",
+            rationale: "Private zero-cost read-only personal research; no identified prohibition.");
+
+        var allowed = MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.Backtest, ActiveContext());
+        var prohibited = MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.StrategyTraining, ActiveContext());
+
+        Assert.True(allowed.IsAllowed);
+        Assert.Equal(EntitlementEvidenceClass.OwnerAcceptedPersonalResearch, policy.EvidenceClass);
+        Assert.False(prohibited.IsAllowed);
+        Assert.Equal(MarketDataEntitlementReasons.UsageDenied, prohibited.ReasonCode);
+    }
+
+    [Fact]
+    public void OwnerAcceptanceCannotAuthorizeAPaidSource()
+    {
+        Assert.Throws<ArgumentException>(() => CreatePolicy(
+            evidenceClass: EntitlementEvidenceClass.OwnerAcceptedPersonalResearch,
+            monetaryCostSek: 1,
+            ownerAcceptanceVersion: "BB-076/2026-08-11",
+            rationale: "Invalid paid acceptance."));
+    }
+
+    [Fact]
+    public void OwnerAcceptanceCannotAuthorizeTrading()
+    {
+        var decisions = new Dictionary<MarketDataUse, EntitlementDecision>
+        {
+            [MarketDataUse.PaperTrading] = EntitlementDecision.Allowed
+        };
+
+        Assert.Throws<ArgumentException>(() => new MarketDataEntitlementPolicy(
+            new PolicyId("invalid-trading-policy"), new PolicyVersion("1"),
+            new MarketDataProvider("ExampleData"), new ProviderDataset("Free"),
+            new EvidenceReference("BB-076"), Now, Now, null, decisions,
+            EntitlementDecision.Denied, EntitlementDecision.Denied,
+            RetentionClassification.Prohibited, DeletionRequirement.None,
+            evidenceClass: EntitlementEvidenceClass.OwnerAcceptedPersonalResearch,
+            ownerAcceptanceVersion: "BB-076/2026-08-11", rationale: "Invalid trading grant."));
+    }
+
+    [Theory]
+    [InlineData(EntitlementEvidenceClass.HumanConfirmationRequired, "marketData.entitlement.humanConfirmationRequired")]
+    [InlineData(EntitlementEvidenceClass.Denied, "marketData.entitlement.evidenceDenied")]
+    public void EvidenceGateFailsClosedWhenConfirmationOrDenialApplies(
+        EntitlementEvidenceClass evidenceClass,
+        string expectedReason)
+    {
+        var result = MarketDataEntitlementEvaluator.Evaluate(
+            CreatePolicy(evidenceClass: evidenceClass),
+            MarketDataUse.Backtest,
+            ActiveContext());
+
+        Assert.False(result.IsAllowed);
+        Assert.Equal(expectedReason, result.ReasonCode);
+    }
+
+    [Fact]
     public void SyntheticFixtureCanReferenceCorporateActionDatasetWithoutProviderPayload()
     {
         var provenance = new MarketDataProvenance(
@@ -251,7 +312,11 @@ public sealed class FinanceMarketDataEntitlementTests
     private static MarketDataEntitlementPolicy CreatePolicy(
         DateTimeOffset? validUntilUtc = null,
         EntitlementDecision persistence = EntitlementDecision.Allowed,
-        EntitlementDecision postSubscriptionRetention = EntitlementDecision.Denied) =>
+        EntitlementDecision postSubscriptionRetention = EntitlementDecision.Denied,
+        EntitlementEvidenceClass evidenceClass = EntitlementEvidenceClass.Unknown,
+        decimal monetaryCostSek = 0,
+        string? ownerAcceptanceVersion = null,
+        string? rationale = null) =>
         new(
             new PolicyId("example-policy"),
             new PolicyVersion("1.0"),
@@ -272,7 +337,11 @@ public sealed class FinanceMarketDataEntitlementTests
             persistence,
             postSubscriptionRetention,
             RetentionClassification.SubscriptionOnly,
-            DeletionRequirement.DeleteAtSubscriptionEnd);
+            DeletionRequirement.DeleteAtSubscriptionEnd,
+            evidenceClass: evidenceClass,
+            monetaryCostSek: monetaryCostSek,
+            ownerAcceptanceVersion: ownerAcceptanceVersion,
+            rationale: rationale);
 
     private static MarketDataEntitlementContext ActiveContext(
         bool requiresPersistence = false,
