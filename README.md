@@ -89,7 +89,10 @@ luckor, outage, dubbletter och corrections utan väggklocka. En uttryckligt icke
 teststrategi skapar immutable shadow predictions och separata senare outcomes/metrics;
 ingen order- eller brokeryta finns. Daterad free-live-research gör Twelve Data Basic till
 bästa villkorade tekniska US-kandidat, men BB-071 förblir blockerad och ingen provider är
-vald eller aktiverad.
+vald eller aktiverad. Den konsoliderade historik/live-grinden rekommenderar villkorat en
+enda Twelve Data Basic-källa för ett mycket litet US-only experiment. Långsiktig retention,
+forward-testing/derived-artifact-scope och termination måste först bekräftas skriftligt och
+godkännas av produktägaren. Ingen fri svensk/nordisk källa är berättigandeverifierad.
 
 ### Designsystem och teman
 

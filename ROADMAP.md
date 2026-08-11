@@ -36,4 +36,7 @@ deterministic outage/gap/correction feed, immutable versioned predictions, later
 and prospective metrics with no broker/order path. Current official research ranks Twelve
 Data Basic as the best conditional free US technical candidate, but product-specific
 retention/forward-testing rights remain incomplete. BB-071 therefore still blocks external
-observation. Next is entitlement resolution, not an adapter.
+observation. A combined 2026-08-11 gate keeps Twelve Data Basic as the conditional
+single-provider US lead for an initial 8–10 instrument experiment; Nordic collection has
+no free authorized source. Next is written entitlement resolution plus product-owner
+approval, not an adapter. Only then may **FIRST AUTHORIZED FREE MARKET DATA INGESTION** begin.

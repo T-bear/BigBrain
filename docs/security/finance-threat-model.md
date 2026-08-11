@@ -52,6 +52,11 @@ defines storage duration, non-display backtesting, derived evidence and deletion
 Dataset deletion must never silently destroy referenced evidence; if the license cannot
 support reproducible retention, the provider is ineligible for BB-045.
 
+The combined 2026-08-11 gate adds no credential or network surface. A free API, public CSV
+or successful response is non-authoritative. Future secrets stay backend-only and outside
+Git, frontend, manifests, journals, logged URLs and unredacted errors. Written exact-product
+entitlement and owner approval precede account, key, adapter, download or persistence.
+
 Market-data memory adds risks of license laundering through canonical/derived copies,
 backup retention beyond entitlement, poisoned corrections, incomplete lineage and a
 model-training use not granted by the source policy. Controls are a versioned entitlement

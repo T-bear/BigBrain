@@ -78,6 +78,9 @@ docker compose config --quiet
   deterministic and out-of-order delivery, duplicate/correction preservation, missing/
   outage/session events, fail-closed entitlement, immutable versioned prediction/outcome,
   cost-aware prospective metrics, no-lookahead and absence of broker/order/secret surfaces.
+  The 2026-08-11 combined historical/live provider gate is documentation-only. It changes
+  no domain/runtime code and adds no .NET test delta; source links, scorecard evidence and
+  fail-closed language are covered by documentation verification and `git diff --check`.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

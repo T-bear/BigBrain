@@ -155,6 +155,13 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   Alpaca Basic/IEX as a US technical fallback. Neither has complete product-specific durable
   retention/forward-testing/derived/termination evidence; EODHD Free is limited/delayed and
   Alpha Vantage realtime/delayed US data is premium-only. No provider is authorized.
+- Combined historical/live gate 2026-08-11: ten free/free-adjacent paths were evaluated.
+  Twelve Data Basic is the conditional single-provider lead for an 8–10 instrument US-only
+  experiment, but durable retention, exact forward-test/derived-artifact scope and complete
+  termination scope remain unverified. Nasdaq Nordic delayed files require prior approval
+  for value-added use and are not a canonical OHLCV/corporate-action product. Free Nordic
+  eligibility remains unknown. The 800-credit/day limit is a bottleneck before local disk.
+  Decision remains DO NOT INGEST.
 - Next safe task: resolve exact BB-071 entitlement for the first free live/historical source,
   starting with Twelve Data Basic. If complete evidence is obtained, request product-owner
   approval as a separate milestone. No account, adapter, SDK or credential is authorized.

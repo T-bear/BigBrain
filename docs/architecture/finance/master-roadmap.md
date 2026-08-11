@@ -22,8 +22,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Current phase/milestone: RESEARCH / early M2, BB-045 in progress.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
 - Active work: BB-071 waits for written provider confirmation.
-- Next safe task: obtain exact BB-071 written evidence for the conditional EODHD Free
-  Starter and Twelve Data Basic leads, then evaluate it before any activation.
+- Next safe task: obtain exact BB-071 written evidence for Twelve Data Basic's conditional
+  US-only lead, including durable retention, forward testing, derived artifacts, exchange
+  scope and termination deletion; then require owner approval before activation.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
 - Safe parallel foundation: entitlement/provenance, identity/normalization,
@@ -31,6 +32,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
   gate/journal orchestration are verified.
   BB-072 has researched eligible zero-cost historical sources. Provider payload ingestion,
   persistence and account work remain blocked.
+- The combined 2026-08-11 gate permits only a conditional 8–10 instrument US proposal.
+  No free Nordic source is authorized. The later milestone is FIRST AUTHORIZED FREE MARKET
+  DATA INGESTION and requires a separate product-owner prompt.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

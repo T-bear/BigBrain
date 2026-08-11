@@ -34,6 +34,13 @@ adapter, and independent verification must resolve the resulting state.
 6. Broker state is authoritative for orders, fills, positions and cash after execution.
 7. Finance storage is module-owned; other modules use versioned capabilities, not tables.
 
+Historical bootstrap and live/near-live observations converge only after their separate
+provider envelopes pass entitlement and canonical normalization. They share canonical
+identity but retain source, product, event/provider/received/knowledge time, raw/adjusted
+basis and immutable revision lineage. Overlap, disagreement and late corrections are
+explicit evidence; no provider silently overwrites another. The free-first source gate is
+documented in [provider selection](market-data-provider-selection.md).
+
 ## Autonomic integration
 
 ```text

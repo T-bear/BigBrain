@@ -197,6 +197,13 @@ conditional evidence leads and the recommendation is `DO NOT INGEST YET`. Only e
 written entitlement plus product-owner review may precede an adapter/acceptance slice.
 Persistence selection remains separately measurement-gated.
 
+The combined historical/current gate keeps bootstrap and forward observations under one
+convergence rule: canonical identity may match, but provider/product, four-clock
+availability, raw/adjusted basis, policy and revision lineage remain separate. Overlap is
+deduplicated only when evidence agrees; disagreement and corrections append explicitly.
+Twelve Data Basic is only a conditional small-US lead. No provider memory may begin until
+exact written entitlement and owner approval are recorded.
+
 Implemented fixture-only acquisition preparation now provides the future ingress contract:
 exact request/product/range/policy/destination revision, immutable batch/pagination/
 completeness/provenance, stable observation IDs, explicit gaps/corrections and an immutable

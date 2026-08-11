@@ -183,6 +183,14 @@ Nordic technical lead but its exact rights remain incomplete. The current decisi
 `DO NOT INGEST YET`; see the
 [BB-072 report](../reports/features/finance/free-historical-data-source-research-20260811.md).
 
+The consolidated 2026-08-11 historical/live gate conditionally prefers Twelve Data Basic
+as one provider for a tiny US-only bootstrap/current experiment. Its 800 credits/day and
+8/minute make rate allowance, not disk, the first bottleneck. This is not authorization:
+durable retention, forward-testing/derived-artifact scope, exchange restrictions and
+termination deletion require written evidence and explicit owner approval. Nasdaq Nordic
+delayed files do not pass the value-added-use gate. See the
+[combined evaluation](../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
+
 Finance applies “collect once, reuse when permitted” and free-first/cost-aware selection.
 Every raw dataset and derived artifact carries provider, dataset/revision, retrieval,
 instrument, quality and entitlement provenance. Allowed purposes are explicit; unknown or

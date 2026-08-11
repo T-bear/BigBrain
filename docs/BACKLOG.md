@@ -277,6 +277,12 @@ all market data to be deleted on termination, and its individual terms restrict
 non-display/derived use. BB-071 therefore remains open. The ready-to-send questions are
 in `docs/architecture/finance/provider-retention-inquiry.md`.
 
+Gate update 2026-08-11: Twelve Data Basic is the conditional technical lead for a small
+US-only experiment, but public evidence still leaves durable retention, forward testing,
+retained derived artifacts and exchange/termination scope unresolved. Nasdaq Nordic's
+delayed files require prior approval for value-added use. BB-071 remains open; every
+unchecked item in the published exact-product checklist denies ingestion.
+
 ### BB-072 – FREE HISTORICAL DATA INGESTION preparation and source research
 
 - Modul: Finance / Market Data Governance
@@ -330,6 +336,11 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
   Alpaca Basic/IEX, EODHD Free and Alpha Vantage Free. Twelve Basic is the best conditional
   technical candidate, but exact retention/forward-testing/third-party scope remains incomplete;
   BB-071 stays blocked.
+- Consolidated evidence 2026-08-11: the historical/live scorecard, capacity estimate and
+  Twelve Data Basic checklist are published in
+  `docs/reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md`.
+  It authorizes no provider. FIRST AUTHORIZED FREE MARKET DATA INGESTION requires written
+  entitlement evidence and a separate explicit product-owner approval.
 - Kvar: entitlement evidence and owner approval; authorized adapter/local live memory; richer
   calibration/drawdown/regime/instrument/horizon metrics; feature engine and strategy research.
 

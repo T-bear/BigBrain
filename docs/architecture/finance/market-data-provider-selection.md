@@ -24,6 +24,14 @@ free IEX feed is a technical fallback but reviewed terms do not close durable st
 derived and termination rights and require a brokerage-linked account. No provider is
 authorized; see the [free live research](../../reports/features/finance/free-live-market-data-source-research-20260811.md).
 
+The combined historical/current gate on 2026-08-11 recommends **Option A conditionally**:
+Twelve Data Basic alone for an initial 8–10 instrument US-only experiment. This is not
+selection or authorization. Durable retention, exact forward-testing/retained-derived scope
+and exchange/termination obligations remain unverified. Nasdaq Nordic's free delayed files
+require prior approval for value-added use and are not an OHLCV/corporate-action product.
+Nordic free eligibility remains unknown. See the
+[combined provider evaluation](../../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
+
 Within the earlier paid-capable shortlist, Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
 Nordic exchanges, its reference model exposes MIC and optional FIGI/ISIN, and it supports
