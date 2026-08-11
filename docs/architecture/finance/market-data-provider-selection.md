@@ -80,6 +80,21 @@ retained IEX use remains human-confirmation-required. EODHD's personal storage/a
 grant applies while subscribed and carries a one-month deletion duty after expiry; without
 an account/key and verified deletion lifecycle it remains inactive.
 
+## BB-077 EODHD Free selection
+
+Current first-party material checked 2026-08-11 names the tier `Free` rather than Free
+Starter: €0, 20 calls/day, past-year EOD for any ticker after free registration/API key.
+Terms expressly permit a non-professional individual to store, manipulate and analyze data
+privately/non-commercially during the active subscription and require every copy deleted
+within one month after termination/expiry. Redistribution/public access is prohibited.
+
+Under ADR 0022, daily historical acquisition, active-account local storage, normalization,
+private analysis and deterministic replay are selected and authorized. Post-expiry use and
+retention are denied. Derived artifacts are not exempt from deletion. Corporate actions,
+intraday and live are outside this selection. The adapter is implemented but disabled until
+the owner supplies a free key and explicit active-account flag; therefore selection is
+**CREDENTIAL-BOUND / NO REAL DATA YET**, not runtime-active.
+
 ## Dated entitlement matrix
 
 The Twelve Data column includes direct provider correspondence reviewed 2026-08-11 for the

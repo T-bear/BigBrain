@@ -22,7 +22,20 @@ public sealed record FinanceProviderSummary(
     string DisplayName,
     EntitlementState Entitlement,
     string EntitlementGate,
-    string Reason);
+    string Reason,
+    string EvidenceClass = "unknown");
+
+public enum FinanceRetentionState { Unknown = 0, Active, DeletionRequired, ExpiredBlocked, DeletionComplete }
+
+public sealed record FinanceRetentionSummary(
+    FinanceRetentionState State,
+    DateTimeOffset? EntitlementEndsAtUtc,
+    DateTimeOffset? DeletionDeadlineUtc,
+    int CoveredObservationCount,
+    int CoveredRevisionCount,
+    int CoveredPayloadCount,
+    string DeletionScope,
+    string? LastReceiptId);
 
 public sealed record FinanceInstrumentObservation(
     string InstrumentId,
@@ -62,7 +75,8 @@ public sealed record FinanceObservationSnapshot(
     DateTimeOffset? LatestMarketDataUpdateUtc,
     ObservationDataKind DataKind,
     IReadOnlyList<FinanceInstrumentObservation> Watchlist,
-    FinanceHistoricalMemorySummary HistoricalMemory);
+    FinanceHistoricalMemorySummary HistoricalMemory,
+    FinanceRetentionSummary? Retention = null);
 
 public interface IFinanceObservationReader
 {

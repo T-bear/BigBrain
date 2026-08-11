@@ -47,6 +47,10 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - BB-076: ADR 0022 permits capability-scoped owner acceptance for legitimate 0-SEK personal
   read-only research. Stooq daily history reached that evidence class, but its official CSV
   surface returned a JavaScript verification control; no bypass, adapter or ingestion occurred.
+- BB-077: current `EODHD Free` is cleared for bounded private EOD research while active.
+  Adapter, durable local memory, replay, API/UI and one-month termination deletion workflow
+  are implemented/tested but disabled because no owner key exists. Next: configure the free
+  credential, bounded eight-call bootstrap and verify real restart/replay/UI evidence.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

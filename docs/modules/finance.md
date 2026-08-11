@@ -220,6 +220,19 @@ terms, paid requirements, prior permission and technical access controls remain 
 The first Stooq daily-download smoke encountered a JavaScript verification control; it was
 not bypassed, so production remains no-provider/no-real-data.
 
+BB-077 adds the first provider implementation behind the existing read-only boundary:
+current `EODHD Free`, limited to one year of daily EOD for the eight-symbol US watchlist.
+It is disabled without an API token plus explicit active-account/enable flags. Provider JSON
+stops at the adapter; SQLite WAL and content-addressed raw payloads preserve canonical IDs,
+provider symbols, MIC, raw OHLC, adjusted close, split-adjusted volume, policy, acquisition
+time, checksum and revision. The read model/UI labels it REAL EOD/delayed, never live.
+
+Retention is first-class: active-account use is allowed; verified termination blocks new
+acquisition/replay and starts a one-month deadline. Preview enumerates raw payloads,
+normalized rows, revisions and indexes; exact owner confirmation executes scoped deletion
+and retains only a sanitized receipt. The provider remains credential-bound with no real
+data as of 2026-08-11.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

@@ -52,6 +52,10 @@ docker compose config --quiet
   storage, broker, PAPER and LIVE flag remains false. BB-076 entitlement tests cover
   zero-cost/versioned owner acceptance, capability-specific denial precedence, paid-source
   rejection and fail-closed confirmation/denied evidence.
+  BB-077 EODHD tests use documented-shape sanitized JSON fixtures and cover parsing,
+  impossible data, 429 retry bounds, symbol mapping, durable SQLite restart/idempotency,
+  content-addressed payloads, deterministic exact-revision replay, expiry blocking,
+  deletion preview/confirmation/receipt, unrelated-file protection and sanitized API/UI.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

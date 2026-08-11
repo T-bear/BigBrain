@@ -42,8 +42,8 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"mode\":\"research\"", raw);
-        Assert.Contains("\"entitlement\":\"pendingWrittenConfirmation\"", raw);
-        Assert.Contains("ZERO-COST ENTITLEMENT GATE", raw);
+        Assert.Contains("\"entitlement\":\"authorized\"", raw);
+        Assert.Contains("EODHD FREE PERSONAL RESEARCH", raw);
         Assert.DoesNotContain("STATE B", raw);
         Assert.DoesNotContain("apiKey", raw, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("credential", raw, StringComparison.OrdinalIgnoreCase);

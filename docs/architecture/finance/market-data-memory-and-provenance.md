@@ -47,6 +47,19 @@ BB-076 introduces capability-scoped owner-accepted personal-research evidence fo
 or technical-access gates. Stooq's bounded daily-history use met the residual evidence class,
 but its CSV surface returned a JavaScript verification challenge; no payload entered memory.
 
+BB-077 implements the first concrete production store for the credential-bound EODHD path:
+immutable SHA-256-addressed JSON payloads plus a transactional SQLite WAL catalog. Current
+rows retain canonical/provider identity, raw OHLC, adjusted close, split-adjusted volume,
+session date, acquisition knowledge time, policy and revision. Repeated identical ingestion
+is idempotent; changed source content produces another immutable revision, and the read model
+selects latest knowledge without erasing old evidence.
+
+The EODHD scope is subscription-only. Account termination is explicit configuration, not a
+network inference. It blocks acquisition/replay immediately and creates a one-month deletion
+deadline. Preview and exact confirmation cover payloads, normalized observations, revisions
+and indexes; receipts retain counts/fingerprint but no licensed values. No backup workflow
+may include the Finance volume until it can enumerate/delete those copies too.
+
 ## Canonical market-data memory
 
 The logical model is independent of transport, provider and physical database:

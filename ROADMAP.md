@@ -56,6 +56,12 @@ legitima 0-SEK-källor utan identifierat förbud. Stooq nådde denna evidensklas
 daily history, men den offentliga CSV-ytan svarade med en JavaScript-verifieringskontroll.
 BigBrain kringgår inte kontrollen; ingen adapter, data eller deployment aktiverades.
 
+**BB-077 EODHD FREE ACTIVATION** är implementerad till credential-gränsen. Nuvarande tier
+heter `Free`: €0, 20 anrop/dag och ett års EOD. Adapter, SQLite/content-addressed memory,
+revision/replay, API/UI och preview-confirm-delete-livscykel finns och är disabled by default.
+Ingen key eller real data fanns vid implementationen. Nästa gate är ägarens fria konto/key,
+bounded smoke, restart/idempotence och real UI/replay-verifiering.
+
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/
 synthetic/stale/gap states, memory summary and accessible lightweight chart. This does not

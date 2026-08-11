@@ -98,6 +98,17 @@ It applies only to legitimate 0-SEK private read-only research and cannot overri
 negative terms or technical controls. Stooq failed the technical activation gate because
 its official CSV request returned a JavaScript verification challenge.
 
+BB-077 instantiates the accepted provider-neutral boundary for `EODHD Free`: provider HTTP/
+JSON and query-token handling stay in the API adapter, while canonical read contracts expose
+no DTO or secret. Local production persistence is SQLite WAL plus immutable SHA-256-addressed
+provider payloads. This is a concrete M2 responsibility, not a general storage abstraction.
+The implementation is disabled until a free key and explicit active-account state exist.
+
+EODHD's termination obligation is enforced as a separate lifecycle state, not inferred from
+network outage. Expiry blocks acquisition/replay; deletion uses preview, exact confirmation,
+provider/product/policy scope, copy counts and a sanitized non-price receipt. The Finance
+volume is excluded from backup automation until licensed-copy inventory is implemented.
+
 The canonical memory and entitlement model is specified in
 [market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral
 policy/provenance types may be implemented against fixtures before BB-071; real provider

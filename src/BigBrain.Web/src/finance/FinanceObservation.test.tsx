@@ -42,4 +42,23 @@ describe('Finance read-only observation UI', () => {
     expect(container.querySelectorAll('.finance-chart path')).toHaveLength(2)
     expect(within(container).getByText(/Datagap ritas inte/)).toBeVisible()
   })
+
+  test('renders real EOD memory and compact retention state without live or trading claims', () => {
+    const fixture: FinanceObservationSnapshot = { ...empty,
+      safety: { ...empty.safety, ingestionAllowed: true, realProviderStorageAllowed: true },
+      provider: { state: 'authorized', displayName: 'EODHD Free', entitlement: 'authorized', entitlementGate: 'EODHD FREE PERSONAL RESEARCH', reason: 'EOD-only', evidenceClass: 'ownerAcceptedPersonalResearch' },
+      dataKind: 'real', latestMarketDataUpdateUtc: '2026-08-11T18:00:00Z',
+      watchlist: [{ ...empty.watchlist[0], price: 103, currency: 'USD', dailyChangePercent: 1.48, observedAtUtc: '2026-08-10T00:00:00Z', freshness: 'delayed', session: 'closed', quality: 'good', dataKind: 'real', history: [
+        { observedAtUtc: '2026-08-07T00:00:00Z', value: 101.5, beginsAfterGap: false }, { observedAtUtc: '2026-08-10T00:00:00Z', value: 103, beginsAfterGap: false },
+      ] }], historicalMemory: { ...empty.historicalMemory, observationCount: 2, activeRevisionId: 'eodhd-revision', coverageFrom: '2026-08-07', coverageTo: '2026-08-10', persistence: 'durable', provider: 'EODHD', product: 'Free' },
+      retention: { state: 'active', entitlementEndsAtUtc: null, deletionDeadlineUtc: null, coveredObservationCount: 2, coveredRevisionCount: 1, coveredPayloadCount: 1, deletionScope: 'covered data', lastReceiptId: null },
+    }
+    render(<FinanceObservation initialSnapshot={fixture} />)
+    expect(screen.getByText(/REAL EOD-MARKET DATA/)).toBeVisible()
+    expect(screen.getByText('Ägargodkänd personlig research')).toBeVisible()
+    expect(screen.getAllByText('Aktiv').length).toBeGreaterThan(0)
+    expect(screen.getByText('2 observationer / 1 revisioner / 1 payloads')).toBeVisible()
+    expect(screen.queryByText(/realtid/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /köp|sälj|order|trade/i })).not.toBeInTheDocument()
+  })
 })

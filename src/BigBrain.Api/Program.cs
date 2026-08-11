@@ -26,6 +26,8 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration)) return;
+
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
         var mealPlannerOptions = builder.Configuration
@@ -149,7 +151,12 @@ public partial class Program
         builder.Services.AddTransient<IMediaAddOptionsService, MediaAddOptionsService>();
         builder.Services.AddSingleton<IMediaRequestService, MediaRequestService>();
         builder.Services.AddSingleton<IDockerInventoryProvider, UnavailableDockerInventoryProvider>();
-        builder.Services.AddSingleton<IFinanceObservationReader, SafeDefaultFinanceObservationReader>();
+        var eodhdOptions = new EodhdFinanceOptions();
+        builder.Configuration.GetSection(EodhdFinanceOptions.Section).Bind(eodhdOptions);
+        builder.Services.AddSingleton(eodhdOptions);
+        builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions));
+        builder.Services.AddHostedService<EodhdAcquisitionWorker>();
+        builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 

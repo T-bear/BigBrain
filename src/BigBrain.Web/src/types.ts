@@ -59,11 +59,12 @@ export type FinanceQuality = 'unknown' | 'good' | 'warning' | 'gap' | 'error'
 export interface FinanceObservationSnapshot {
   generatedAtUtc: string
   safety: { mode: 'unknown' | 'research'; liveTradingEnabled: boolean; paperTradingEnabled: boolean; brokerConnected: boolean; ingestionAllowed: boolean; realProviderStorageAllowed: boolean }
-  provider: { state: 'unknown' | 'noneAuthorized' | 'candidate' | 'authorized' | 'unavailable'; displayName: string; entitlement: 'unknown' | 'pendingWrittenConfirmation' | 'authorized' | 'denied' | 'expired'; entitlementGate: string; reason: string }
+  provider: { state: 'unknown' | 'noneAuthorized' | 'candidate' | 'authorized' | 'unavailable'; displayName: string; entitlement: 'unknown' | 'pendingWrittenConfirmation' | 'authorized' | 'denied' | 'expired'; entitlementGate: string; reason: string; evidenceClass?: string }
   latestMarketDataUpdateUtc: string | null
   dataKind: FinanceDataKind
   watchlist: Array<{ instrumentId: string; symbol: string; displayName: string; price: number | null; currency: string | null; dailyChangePercent: number | null; observedAtUtc: string | null; freshness: FinanceFreshness; session: FinanceSession; quality: FinanceQuality; dataKind: FinanceDataKind; history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }> }>
   historicalMemory: { observationCount: number; activeRevisionId: string | null; parentRevisionId: string | null; coverageFrom: string | null; coverageTo: string | null; lastAcquiredAtUtc: string | null; gapCount: number; correctionCount: number; persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'; provider: string; product: string; policy: string; provenance: string }
+  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null } | null
 }
 
 export interface MediaServiceStatus {

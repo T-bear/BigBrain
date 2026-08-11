@@ -9,5 +9,6 @@
 - [Finance emergency stop](finance-emergency-stop.md) — design-only until Finance exists
 - [Finance mode promotion](finance-mode-promotion.md) — design-only gated transition model
 - [Finance read-only observation verification](finance-read-only-observation-verification.md)
+- [Finance EODHD retention and deletion](finance-eodhd-retention-deletion.md)
 
 Kontrollera alltid status, versioner, liveidentitet och stoppvillkor. Draft kräver review.

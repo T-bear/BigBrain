@@ -33,6 +33,12 @@ services:
       ASPNETCORE_HTTP_PORTS: 8080
       Calendar__DatabasePath: /calendar-data/calendar.db
       Settings__DatabasePath: /settings-data/settings.db
+      Finance__Eodhd__Enabled: ${FINANCE__EODHD__ENABLED:-false}
+      Finance__Eodhd__AccountActive: ${FINANCE__EODHD__ACCOUNTACTIVE:-false}
+      Finance__Eodhd__ApiToken: ${FINANCE__EODHD__APITOKEN:-}
+      Finance__Eodhd__DatabasePath: /finance-data/eodhd-market-memory.db
+      Finance__Eodhd__PayloadDirectory: /finance-data/eodhd-payloads
+      Finance__Eodhd__EntitlementEndsAtUtc: ${FINANCE__EODHD__ENTITLEMENTENDSATUTC:-}
       MealPlanner__DatabasePath: /data/meal-planner.db
       ShoppingList__DatabasePath: /shopping-data/shopping-list.db
       Sentinel__Enabled: "true"
@@ -78,6 +84,7 @@ services:
       - shopping-list-data:/shopping-data
       - calendar-data:/calendar-data
       - settings-data:/settings-data
+      - finance-market-data:/finance-data
     networks:
       - default
       - media
@@ -141,3 +148,4 @@ volumes:
   shopping-list-data:
   calendar-data:
   settings-data:
+  finance-market-data:

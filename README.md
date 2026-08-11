@@ -107,6 +107,12 @@ BB-076 inför en capability-specifik `OwnerAcceptedPersonalResearch`-klass för 
 kan aldrig åsidosätta negativa villkor, betalningskrav eller tekniska åtkomstkontroller.
 Stooqs download nådde evidensklassen men ett smoke-anrop gav en JavaScript-kontroll i stället
 för CSV; ingen kontroll kringgicks och ingen källa aktiverades.
+BB-077 revaliderar den nuvarande produkten **EODHD Free** (€0, 20 anrop/dag, ett års EOD)
+och implementerar en credential-bound read-only adapter. SQLite plus content-addressed raw
+payload ger lokal revisionsmedveten memory, deterministic replay och Finance API/UI-stöd.
+Providern är disabled utan ägarens fria API-key; ingen riktig observation har ännu hämtats.
+Aktiv lagring/analys är tillåten för privat research, men alla täckta kopior måste raderas
+inom en månad efter account/subscription expiry genom preview och explicit bekräftelse.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
 provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures

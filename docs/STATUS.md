@@ -211,6 +211,22 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   fail-closed. No provider/account/key/adapter/real memory/replay/deployment changed.
 - EODHD remains conditionally explicit while subscribed with its deletion duty and absent
   account/key/lifecycle. Alpaca retained IEX use still requires human clarification.
+- BB-077 2026-08-11 revalidated the renamed current **EODHD Free** tier: €0, 20 calls/day,
+  past-year EOD and private non-commercial storage/manipulation/analysis while active. All
+  copies must be deleted within one month after expiry. This capability is authorized under
+  ADR 0022; post-expiry use/retention and redistribution are denied.
+- Implemented and automatically verified: direct server adapter, bounded retries/rate,
+  eight-symbol mapping, SQLite/content-addressed durable memory, acquisition journal,
+  revision-aware read projection, deterministic replay, compact API/UI retention status and
+  preview-confirm-delete receipts. Corporate actions, intraday and live remain disabled.
+- Credential/runtime state: no EODHD account key was available. Compose defaults provider
+  disabled and adds a persistent Finance volume. No real request, observation, populated
+  production memory, real replay, real-data UI runtime or provider-enabled deployment is
+  claimed. Exact owner setup is in the EODHD retention/deletion runbook.
+- Disabled deployment evidence 2026-08-11: API/Web healthy; provider candidate and entitlement
+  class render correctly; ingestion/storage/trading false; data kind none and counts zero.
+  The empty Finance volume preview reports zero covered copies. An initial volume-owner
+  packaging defect was fixed by provisioning `/finance-data` for the unprivileged API UID.
 - Known limitations: no Finance production persistence, external market data, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.

@@ -433,6 +433,25 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
   konto/key och implementerbar retention/termination-livscykel.
 - Report: `docs/reports/features/finance/finance-bb-076-owner-accepted-zero-cost-policy-20260811.md`.
 
+### BB-077 – EODHD Free real-data activation
+
+- Modul: Finance / Market Data
+- Typ: Implementation / entitlement / retention
+- Prioritet: P1
+- Status: Implementerad och automatiskt verifierad till credential-gränsen; real runtime väntar
+- Upptäckt: 2026-08-11
+- Entitlement: current `Free` (€0) permits private non-commercial storage/manipulation/
+  analysis while active; all copies must be deleted within one month after expiry.
+- Levererat: server-side EOD adapter, eight-symbol mapping, bounded rate/retry, SQLite WAL,
+  content-addressed payloads, immutable revisions, acquisition journal, real read model/UI,
+  deterministic replay and preview-confirm-delete receipt workflow.
+- Säker default: provider disabled without `FINANCE__EODHD__APITOKEN`, explicit active-account
+  state and enable flag. No token, request, real observation or trading capability exists.
+- Kvar: owner creates Free account, supplies secret/runtime flags, deploys and verifies real
+  bootstrap, restart/idempotence, exact-revision replay and UI. Then update runtime report.
+- Reports: `docs/reports/features/finance/finance-eodhd-free-entitlement-revalidation-20260811.md`
+  and `docs/reports/features/finance/finance-eodhd-credential-bound-activation-20260811.md`.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting
