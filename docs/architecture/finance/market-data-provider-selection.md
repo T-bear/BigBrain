@@ -52,6 +52,12 @@ permission. BB-071 remains open and BB-045 remains blocked.
 The provider-neutral policy/provenance subset of BB-045 may proceed with synthetic
 fixtures; only external adapter activation and persistence of provider data are blocked.
 
+BB-072 is the next research milestone for zero-cost historical sources. It rechecks exact
+first-party license/ToS, local retention and personal backtesting rights before technical
+coverage/quality comparison. Free access, public downloads or absence of authentication
+does not authorize ingestion. No candidate is activated by BB-072 research, and BB-071's
+fail-closed entitlement standard still applies to an exact source/product/market.
+
 ## Initial M2 dataset
 
 - A small owner-approved allowlist of US and Swedish/Nordic equities and ETFs.

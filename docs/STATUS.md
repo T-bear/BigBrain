@@ -1,7 +1,7 @@
 # BigBrain Status
 
 - Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
-- Verifierad mot commit: BB-045 session/replay foundation publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
+- Verifierad mot commit: BB-045 immutable revision assembly publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
 - Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
@@ -89,7 +89,7 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 
 - Current phase: RESEARCH.
 - Current milestone: M2 / BB-045 in progress. M1 is complete; the first provider-neutral
-  entitlement/provenance, canonical instrument/normalization and session/replay slices are
+  entitlement/provenance, identity/normalization, session/replay and immutable revision slices are
   implemented, automatically verified and not deployed.
 - Completed work: M0 planning plus decimal-based money/price/quantity/risk primitives,
   UTC market observations, provider-neutral market-data and strategy contracts, explicit
@@ -114,17 +114,21 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   conversion with DST ambiguity rejection, closure/missing/provider-gap/invalid/unknown
   classifications and immutable-revision replay with availability timestamps, historical
   provider references, corporate-action events and stable same-time ordering.
-- Automated verification 2026-08-11: .NET 10 restore/build passed; 286 API tests and 32
-  Sentinel tests passed (318 total), including synthetic session/replay invariants.
+- Implemented revision slice: immutable member snapshots, parent ancestry, explicit
+  original→replacement corrections, linear supersession, inclusive availability-as-of
+  selection and deterministic ordering. Old revision IDs remain exactly reproducible;
+  invalid references, cycles, branches, future members and scope changes fail explicitly.
+- Automated verification 2026-08-11: .NET 10 restore/build passed; 304 API tests and 32
+  Sentinel tests passed (336 total), including synthetic correction/no-lookahead invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
   with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
   credential is authorized.
-- Next safe implementation slice: an in-memory immutable dataset revision assembler with
-  explicit correction/supersession availability, then measure persistence requirements;
-  no provider adapter or persistence while BB-071 remains open.
+- Next milestone: BB-072 FREE HISTORICAL DATA INGESTION preparation/research compares
+  zero-cost sources and exact rights; it activates nothing. BB-071 still blocks real
+  provider ingestion/persistence. Physical storage selection remains measurement-gated.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit

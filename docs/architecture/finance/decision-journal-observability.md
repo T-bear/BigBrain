@@ -22,6 +22,11 @@ Ordering is derived from UTC effective time, explicit event priority, canonical 
 and stable tie-breakers—not wall clock, locale, hash or storage enumeration. No persistent
 journal write was added by this slice.
 
+Future journal/report evidence must record both the selected assembled revision ID and its
+knowledge/as-of boundary. Correction ID, original/replacement member IDs, reason/evidence
+and superseding revision make later facts explainable without rewriting earlier decisions.
+The current assembler is in-memory only and creates no persisted journal.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

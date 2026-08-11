@@ -25,9 +25,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Next safe task: send the BB-071 provider inquiry, then evaluate the written response.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
-- Safe parallel foundation: entitlement/provenance, canonical identity/normalization and
-  fixture-only session/gap/replay foundations are verified. Next, assemble immutable
-  in-memory revisions with explicit correction availability. Provider payload ingestion,
+- Safe parallel foundation: entitlement/provenance, identity/normalization,
+  session/gap/replay and immutable correction/supersession assembly are verified.
+  Next, BB-072 researches eligible zero-cost historical sources. Provider payload ingestion,
   persistence and account work remain blocked.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
@@ -102,8 +102,18 @@ provenance, stable canonical instrument identity, effective-dated provider symbo
 decimal OHLCV, cash dividends, exact stock splits, basic quality findings and deterministic
 synthetic normalization/duplicate handling. Explicit timezone-safe fixture sessions,
 closure/unknown/missing/provider-gap semantics and single-revision no-lookahead replay are
-also verified. Cross-revision correction availability, measured storage, authorized adapters
-and external acceptance remain incomplete.
+also verified. Immutable parent/member assembly now preserves original→replacement correction
+availability and old-revision reproduction. Measured storage, BB-072 free-source research,
+authorized adapters and external acceptance remain incomplete.
+
+### Next M2 milestone – FREE HISTORICAL DATA INGESTION preparation/research (BB-072)
+
+Research zero-cost candidates using current first-party terms and technical evidence. Compare
+license/ToS, local retention, personal backtesting, reproducibility, rate limits, history,
+survivorship/delisted coverage, corporate actions, raw/adjusted state, symbol history and
+quality. This milestone creates no account, key, adapter, download or persistence. A source
+is not eligible for ingestion merely because it is free; BB-071-class exact entitlement and
+explicit owner review remain mandatory.
 
 ### M3 – Backtest engine — PLANNED
 

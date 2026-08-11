@@ -181,9 +181,26 @@ session/quality/observation/dividend/split events and sorts through an explicit 
 priority/tie-break contract. It never fills, interpolates, mutates or silently combines
 revisions. This is an M2 data primitive, not strategy or portfolio simulation.
 
+Implemented 2026-08-11: `DatasetRevisionAssembly.cs` assembles immutable parent/child
+snapshots from ordered members and explicit corrections. Event time remains inside the
+canonical fact; member/correction availability and revision creation are separate UTC
+knowledge times. Correction availability is inclusive at `as-of`, cannot precede its
+original or revision, and relates immutable original/replacement IDs plus reason/evidence.
+Old revision snapshots stay addressable; linear acyclic supersession prevents ambiguous
+branches and deterministic ordering ignores hash/input order.
+
 BB-071 remains the external gate for selecting an entitlement and retaining actual
 provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. The next recommended implementation is an in-memory immutable
-dataset revision assembler that models correction/supersession availability without
-lookahead, followed by measured persistence design. Persistence selection and external
-adapter activation remain separately gated.
+provider until BB-071 passes. The next milestone is BB-072 free historical source research,
+followed only by an explicitly authorized adapter/acceptance slice if exact rights pass.
+Persistence selection remains separately measurement-gated.
+
+## Persistence requirements derived from revision assembly
+
+Future storage must support append-only revision metadata; immutable observation/action/
+finding bodies; parent and superseding revision links; original→replacement correction
+chains; UTC event-time and availability-time indexes; canonical logical identity; provider,
+product, policy, provenance and deletion metadata; deterministic membership/as-of queries;
+and checksums/backups that retain entitlement. Measure bounded EOD sizes, correction rate,
+range-replay latency, concurrent readers, backup/restore and licensed deletion before a
+technology decision. No persistence technology is selected or activated here.

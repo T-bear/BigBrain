@@ -91,3 +91,10 @@ fault and replays a single immutable revision by supplied availability timestamp
 priority/tie-break ordering, effective-date symbols and explicit dividend/split events
 prevent host-timezone dependence, lookahead and silent raw-price rewriting. It is not an
 exchange-calendar database, persistence layer or backtest engine.
+
+The immutable revision assembler now defines the correction boundary in memory. A child
+revision inherits its parent's immutable membership; a correction removes no historical
+record and instead relates active original and newly introduced replacement member IDs at
+an explicit UTC availability time. A linear acyclic supersession catalog makes old revision
+IDs reproducible and chooses current knowledge through inclusive `available <= as-of`.
+Dataset/provider/product scope cannot change inside the chain. Persistence remains deferred.

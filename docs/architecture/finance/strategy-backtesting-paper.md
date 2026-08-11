@@ -47,6 +47,12 @@ without rewriting raw bars. It is not the M3 strategy/portfolio/fill/cost backte
 Production exchange-calendar coverage and cross-revision correction replay remain pending;
 adjusted observations remain explicitly classified and are not raw evidence.
 
+The revision catalog now supplies the knowledge boundary required by future backtests:
+select the latest immutable revision available at the declared `ReplayAsOf`, then retain
+that exact revision ID in evidence. A later correction never changes an older revision or
+an earlier as-of selection. M3 still must bind the chosen assembled membership into replay
+and report configuration; this slice adds no strategy or simulation behavior.
+
 ## Paper trading and Strategy Lab
 
 Paper trading uses live or near-live observations but persistent simulated cash,

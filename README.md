@@ -60,6 +60,9 @@ och raw/derived-lineagetyper samt en deterministisk fail-closed evaluator. Den f
 grunden omfattar också kanonisk instrumentidentitet, effective-dated provider-symbolhistorik,
 daglig OHLCV, utdelningar, exakta splitkvoter, kvalitetsfynd, deterministisk normalisering,
 explicita marknadssessioner/gap och revision-bunden historisk replay utan lookahead.
+Immutable in-memory datasetrevisioner bevarar nu observation membership och applicerar
+corrections/supersession först vid deras explicita availability-gräns utan att skriva om
+äldre revisions-ID:n.
 Ingen persistence,
 provideradapter, executor, brokerintegration, UI eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting

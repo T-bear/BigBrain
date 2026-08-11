@@ -9,6 +9,7 @@ Current implementation evidence:
 - [BB-045 policy/provenance foundation](finance-market-data-policy-provenance-foundation-20260810.md)
 - [BB-045 canonical instrument/normalization foundation](finance-instrument-identity-normalization-foundation-20260810.md)
 - [BB-045 market-session/replay foundation](finance-market-session-replay-foundation-20260811.md)
+- [BB-045 immutable dataset revision assembly](finance-immutable-dataset-revision-assembly-20260811.md)
 
 Provider research and retention-gate reports do not authorize provider activation; use
 `docs/STATUS.md` and `docs/BACKLOG.md` for the current gate state.

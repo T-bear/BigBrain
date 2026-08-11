@@ -1,6 +1,6 @@
 # Finance module
 
-Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay foundations
+Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay/revision foundations
 implemented and automatically verified; not deployed. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.
 
@@ -77,6 +77,14 @@ not as investment logic or evidence of profitability.
   session, quality, observation and corporate-action events inside a supplied UTC range.
   It uses observation availability timestamps and historical effective-date symbols;
   future observations/actions/mappings do not leak into an earlier replay window.
+- Immutable revision assembly inherits members through an explicit parent, adds new facts
+  append-only and replaces an active member only through a correction with original and
+  replacement IDs, reason/evidence and exact UTC availability. Replacement preserves the
+  logical observation identity while its immutable source-revision provenance remains.
+- The catalog requires a linear acyclic supersession chain and selects the latest revision
+  whose creation/availability is `<=` the supplied knowledge boundary. Exact old revision
+  lookup never changes after later corrections. Member/correction output order is ordinal
+  and independent of input collection order.
 
 This code has no IO, network, persistence, logging or provider SDK. Tests use only the
 synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
@@ -88,6 +96,16 @@ future backtests must resolve the provider reference at the historical session d
 
 This replay primitive is not the M3 backtest engine: it has no strategy, portfolio,
 position, fill, fee, slippage, P&L, risk expansion, paper executor or order capability.
+
+## Derived persistence requirements (not implemented)
+
+The verified model requires future storage to support append-oriented revision metadata,
+immutable member bodies, parent/supersession links, original→replacement correction chains,
+UTC event/availability indexes, canonical observation identity, provider/product/policy
+provenance, deterministic revision membership queries and entitlement/deletion metadata.
+Expected EOD volume, replay range/query shape, backup/restore/deletion time, checksum cost
+and concurrent readers must be measured before selecting SQLite, files or another engine.
+No database, migration or storage abstraction is introduced by this slice.
 
 ## Deliberately deferred
 

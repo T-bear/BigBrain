@@ -118,7 +118,7 @@ broker connection or live authority exists. Dependencies refer to BB items and t
 - Modul: Finance
 - Typ: Epic
 - Prioritet: P2
-- Status: Pågår – entitlement/identity/normalization + session/replay foundation verifierad
+- Status: Pågår – provider-neutral M2 foundations inklusive immutable revision assembly verifierade
 - Upptäckt: 2026-08-10
 - Beroenden: BB-043; all promotion gates in the master roadmap.
 
@@ -162,7 +162,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data
 - Typ: Implementation
 - Prioritet: P2
-- Status: Pågår – entitlement/identity/normalization + session/replay foundation verifierad
+- Status: Pågår – immutable correction/supersession assembly verifierad
 - Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
   remain reproducible and enforceable.
 - Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
@@ -195,8 +195,14 @@ trading is the eventual destination, never the starting state or a guaranteed re
   distinct. Replay binds one immutable revision, orders events deterministically, exposes
   observations only at supplied availability time, resolves historical symbols and emits
   dividend/split events without rewriting raw bars. Full solution: 318/318 tests.
-- Kvar: correction/supersession availability across immutable revisions, richer quality
-  aggregation, measured persistence and an authorized provider adapter. Actual
+- Evidens 2026-08-11 (revision assembly): immutable snapshots inherit ordered membership
+  through an explicit parent chain. Corrections bind original/replacement member IDs,
+  reason/evidence and inclusive availability; catalog as-of selection cannot expose a
+  future correction. Old revisions remain directly reproducible and linear supersession,
+  cycle/reference/scope/future-member invariants fail closed. Corporate-action and
+  session/gap evidence retain source revision and policy. Full solution: 336/336 tests.
+- Kvar: richer quality aggregation, measured persistence, BB-072 free-source research,
+  authorized provider adapter and external acceptance. Actual
   provider ingestion/persistence remains blocked by BB-071.
 
 ### BB-046 – Market-data licensing, retention and provider research
@@ -251,6 +257,24 @@ written approval for derived-data creation/retention. Massive requires use to ce
 all market data to be deleted on termination, and its individual terms restrict
 non-display/derived use. BB-071 therefore remains open. The ready-to-send questions are
 in `docs/architecture/finance/provider-retention-inquiry.md`.
+
+### BB-072 – FREE HISTORICAL DATA INGESTION preparation and source research
+
+- Modul: Finance / Market Data Governance
+- Typ: Research / future ingestion gate
+- Prioritet: P2
+- Status: Planerad – nästa säkra M2-milestone efter provider-neutral foundation
+- Upptäckt: 2026-08-11
+- Beroenden: BB-045 provider-neutral foundation; BB-071 before any real-data ingestion/storage.
+- Syfte/scope: compare zero-cost historical sources without activating one. Evaluate cost,
+  license/ToS, local retention, personal backtesting rights, reproducible acquisition,
+  rate limits, coverage, survivorship/delisted instruments, corporate actions, raw/adjusted
+  prices, symbol history and quality.
+- Non-goals: account, API key, adapter, download, provider payload, persistence or purchase.
+- Definition of Done: dated first-party evidence and synthetic contract-fit analysis identify
+  whether any free source is legally and technically eligible; Unknown remains fail-closed.
+  Any recommended activation still requires explicit product-owner review and BB-071-class
+  entitlement evidence for the exact source/product/market/use.
 
 ### BB-047 – M3 deterministic backtest engine
 

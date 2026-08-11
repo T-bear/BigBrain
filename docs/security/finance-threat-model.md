@@ -77,3 +77,9 @@ mixed revisions and unsupported provider-gap claims fail explicitly. Replay uses
 UTC evidence only and cannot call a provider, broker, database, filesystem or clock. No
 credential, real payload, dependency, migration, runtime capability or trading authority
 was introduced.
+
+Implementation review 2026-08-11 (revision assembly): corrections cannot overwrite member
+IDs, change dataset/provider/product scope, precede source availability or create cycles/
+branches. As-of resolution is supplied UTC input and fails when no revision was available.
+All state is synthetic immutable in-memory data; there is no serializer, database, network,
+credential, provider payload, migration, paid dependency, runtime or trading capability.

@@ -13,6 +13,11 @@ complete, but M2 ingestion is blocked by BB-071's written retention entitlement.
 External data, PAPER execution, live connectivity and real-money authority are not implemented.
 Provider-neutral policy/provenance, canonical identity, normalization, market-session/gap
 semantics and deterministic synthetic replay may be built before BB-071. Those BB-045
-foundations are implemented and verified;
+foundations, inklusive immutable correction/supersession assembly, are implemented and verified;
 actual provider
 ingestion or durable provider data remains blocked.
+
+The next M2 milestone is **FREE HISTORICAL DATA INGESTION preparation/research** (BB-072):
+compare zero-cost sources on license, local retention, backtesting rights, coverage,
+corporate actions, symbol history and quality. Research does not authorize activation;
+BB-071 evidence remains mandatory before any real-data ingestion or storage.

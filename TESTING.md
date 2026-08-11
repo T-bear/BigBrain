@@ -58,6 +58,10 @@ docker compose config --quiet
   invalid/ambiguous local times, closure/unknown/missing/provider-gap distinctions,
   invalid-observation quarantine, historical ticker resolution, explicit dividends/splits,
   immutable revision binding, no-lookahead, range bounds and deterministic event order.
+  Revision-assembly tests verify original/corrected as-of views, inclusive availability,
+  immutable old revisions, explicit linear supersession, correction references/cycles,
+  deterministic multi-correction order, policy/provenance, corporate-action time,
+  inherited session/gap evidence and rejection of future/unavailable membership.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

@@ -60,3 +60,12 @@ invalid observation; bind one immutable revision; resolve provider symbols at ea
 date; keep raw bars and dividend/split events separate; honor supplied availability/range;
 and prove monotonic, stable repeated ordering. No wall clock, host-local timezone, network,
 filesystem, database, random input or sleep participates.
+
+## BB-045 immutable revision coverage
+
+Synthetic tests distinguish market event time from UTC knowledge availability and prove the
+inclusive `availability <= as-of` boundary. They cover original/corrected views, immutable
+old revisions, explicit supersession lookup, multiple ordered corrections, unknown/mismatched
+references, correction/revision cycles, ambiguous branches, scope changes, members unavailable
+at revision creation, repeated assembly and input-order independence. Corporate actions,
+historical ticker resolution and session/gap evidence retain temporal/provenance semantics.
