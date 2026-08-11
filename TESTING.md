@@ -47,6 +47,9 @@ docker compose config --quiet
   lineage, correction supersession and retention/deletion scope with synthetic fixtures
   until an exact provider/product is entitlement-cleared, selected and explicitly approved
   for activation; BB-071 evidence alone does not activate a provider.
+  BB-075 fail-closed tests additionally assert that the runtime reports the current
+  zero-cost entitlement gate rather than superseded State B wording, while every ingestion,
+  storage, broker, PAPER and LIVE flag remains false.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

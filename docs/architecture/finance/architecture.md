@@ -88,6 +88,11 @@ boundary. BB-071 now contains positive human Twelve Data Personal-plan evidence,
 is insufficient and no provider has been selected or activated; architecture or entitlement
 evidence alone is not activation approval. No adapter is implemented yet.
 
+BB-075 adds a hard current product constraint of 0 SEK for external market data. Its fresh
+source sweep cleared no exact free product, so the planned adapter/persistence boundary
+remains inactive. The fail-closed read projection names the zero-cost entitlement gate and
+never substitutes synthetic observations in production.
+
 The canonical memory and entitlement model is specified in
 [market-data memory and provenance](market-data-memory-and-provenance.md). Provider-neutral
 policy/provenance types may be implemented against fixtures before BB-071; real provider

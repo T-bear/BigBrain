@@ -96,6 +96,12 @@ investeringsbeslut med endast ägarens egna medel. Twelve Data är därför en e
 cleared betald fallback, inte vald eller aktiverad provider. Cost-first-grinden går härnäst
 vidare med osänd Alpaca Basic/free IEX entitlement-research; inget konto, key, adapter eller
 verklig data har skapats. Ingen fri svensk/nordisk källa är berättigandeverifierad.
+Produktägaren har nu satt Finance externa market-data-budget till exakt **0 SEK** tills ett
+nytt explicit beslut tas. En färsk sweep av Alpaca, Stooq, Yahoo/yfinance, Nasdaq Data Link,
+EODHD, Alpha Vantage, Finnhub, FMP och direkta exchange/open-spår fann ingen källa med
+komplett verifierad automation-, retention- och research/backtesting-rätt. Finance förblir
+fail-closed utan riktig data; Twelve Data Personal är en inaktiv entitlement-cleared paid
+fallback. API-grinden visar nu `ZERO-COST ENTITLEMENT GATE` i stället för ersatt BB-071 State B.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsdefault är RESEARCH, ingen auktoriserad
 provider, noll observationer och nekad ingestion/lagring av real data. Syntetiska UI-fixtures

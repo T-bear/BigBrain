@@ -4,6 +4,11 @@ Status: Twelve Data inquiry answered by a human on 2026-08-11; Alpaca Basic/free
 template prepared but **not sent**. No provider account or credential is required.
 Date prepared: 2026-08-10; Twelve Data answer and Alpaca next track recorded 2026-08-11.
 
+BB-075 update: current fresh research did not close Alpaca's storage/retention lifecycle.
+Send the prepared Alpaca inquiry first. If Alpaca fails, ask EODHD Free Starter specifically
+whether deterministic replay/backtesting and each normalized/backup/revision/derived/shadow/
+audit class may be retained while active and which must be deleted after termination.
+
 ## Twelve Data outcome
 
 Direct written correspondence from Liam at Twelve Data supports the submitted private,

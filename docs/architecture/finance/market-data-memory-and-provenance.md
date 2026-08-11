@@ -25,6 +25,10 @@ integrity, license compliance or capital/risk controls. Scraping outside terms, 
 live inputs and bypassing entitlements are prohibited. Provider-neutral domain contracts
 allow a source to be replaced without rewriting strategy, risk or execution logic.
 
+Current product constraint: external Finance market-data spend is exactly **0 SEK**. A paid
+source cannot be selected as the first operational source until the product owner explicitly
+changes that budget, even when its entitlement is otherwise clear.
+
 Free candidates such as Alpaca Basic/free IEX, Stooq or limited developer tiers remain candidates only. Free
 access does not establish storage, corporate-action, derived-use or cancellation rights;
 BB-071-quality evidence is required before their data can enter durable storage.
@@ -34,6 +38,9 @@ paid Personal plan, including local and post-termination raw/derived/audit reten
 does not clear Basic/free, redistribution or materially different use. Under the cost order
 free → local/open-source → existing BigBrain infrastructure → paid after verified need,
 Twelve Data remains a paid fallback while Alpaca Basic/free IEX entitlement is investigated.
+The 2026-08-11 BB-075 sweep found no free source with complete exact rights; therefore no
+production payload may enter this memory model and the provisional persistence direction
+remains unactivated.
 
 ## Canonical market-data memory
 

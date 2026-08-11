@@ -26,6 +26,8 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
         Assert.False(snapshot.Safety.RealProviderStorageAllowed);
         Assert.Equal(MarketDataProviderState.NoneAuthorized, snapshot.Provider.State);
         Assert.Equal(EntitlementState.PendingWrittenConfirmation, snapshot.Provider.Entitlement);
+        Assert.Equal("ZERO-COST ENTITLEMENT GATE", snapshot.Provider.EntitlementGate);
+        Assert.Equal("zero-cost-provider-unresolved", snapshot.HistoricalMemory.Policy);
         Assert.Equal(ObservationDataKind.None, snapshot.DataKind);
         Assert.Equal(8, snapshot.Watchlist.Count);
         Assert.All(snapshot.Watchlist, item => { Assert.Null(item.Price); Assert.Equal(ObservationDataKind.None, item.DataKind); });
@@ -41,6 +43,8 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"mode\":\"research\"", raw);
         Assert.Contains("\"entitlement\":\"pendingWrittenConfirmation\"", raw);
+        Assert.Contains("ZERO-COST ENTITLEMENT GATE", raw);
+        Assert.DoesNotContain("STATE B", raw);
         Assert.DoesNotContain("apiKey", raw, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("credential", raw, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("order", raw, StringComparison.OrdinalIgnoreCase);

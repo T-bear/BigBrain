@@ -389,6 +389,31 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Deployment evidence: `docs/reports/features/finance/finance-read-only-market-observation-ui-deployment-20260811.md`.
 - Roadmap semantics: early M2 research observation; BB-059/M8 remains planned for trading UI.
 
+### BB-075 – Zero-cost real market-data activation gate
+
+- Modul: Finance / Market Data Governance
+- Typ: Research / entitlement / conditional activation
+- Prioritet: P1
+- Status: Klar – fail-closed research publicerad; ingen 0-SEK-källa auktoriserad
+- Upptäckt: 2026-08-11
+- Budgetkrav: externa Finance market-data-tjänster = exakt 0 SEK tills nytt explicit
+  produktägarbeslut.
+- Scope: fresh first-party review of Alpaca Basic/IEX, Stooq, Yahoo/yfinance, Nasdaq Data
+  Link, EODHD Free, Alpha Vantage Free, Finnhub Free, FMP Basic and credible direct/open
+  alternatives; implement only if the exact automation/storage/research gate passes.
+- Definition of Done: provider matrix maps exact product/cost/market/automation/storage/
+  retention/termination/replay/derived/audit/own-funds/exchange rights; unknown fails closed;
+  adapter/runtime only if every required right is verified.
+- Evidence 2026-08-11: no source passed. Alpaca and EODHD require human clarification;
+  Stooq, Nasdaq Data Link and Finnhub lack complete exact evidence; Yahoo/yfinance and Alpha
+  Vantage are incompatible; FMP requires prior written download/derivative approval. Twelve
+  Data Personal remains an entitlement-cleared paid fallback inactive under the zero budget.
+- Runtime correction: the no-provider observation projection now reports
+  `ZERO-COST ENTITLEMENT GATE`, not superseded `BB-071 / STATE B`; ingestion/storage remain false.
+- Report: `docs/reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md`.
+- Kvar: obtain exact written Alpaca answers; then EODHD only if needed. No account/key/adapter
+  or provider request before a complete affirmative answer.
+
 ### BB-047 – M3 deterministic backtest engine
 
 - Modul: Finance / Backtesting

@@ -184,6 +184,23 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Documentation verification 2026-08-11: documentation gate passed for 127 Markdown files
   and 74 unique BB IDs; `git diff --check` and Compose configuration validation passed.
   Source build/test suites were not run because this slice changes no production source.
+- BB-075 zero-cost gate 2026-08-11: external Finance market-data budget is exactly 0 SEK.
+  Fresh first-party review of Alpaca, Stooq, Yahoo/yfinance, Nasdaq Data Link, EODHD, Alpha
+  Vantage, Finnhub, FMP and direct/open alternatives found no exact source with complete
+  automation, local retention, replay/backtest and artifact-lifecycle rights. Result:
+  **FAIL CLOSED / NO PROVIDER ACTIVATED**. No account, key, adapter, payload or real data exists.
+- Current candidates: Alpaca Basic/free IEX is HUMAN CONFIRMATION REQUIRED; EODHD Free
+  Starter is the second clarification track. Twelve Data Personal is entitlement-cleared
+  but inactive because it is paid. Production remains no-provider/no-real-data.
+- Implemented status correction: the safe Finance observation response now exposes
+  `ZERO-COST ENTITLEMENT GATE` and `zero-cost-provider-unresolved` instead of superseded
+  BB-071 State B wording. Safety flags remain RESEARCH with ingestion, real storage, PAPER,
+  LIVE and broker false. Automatically verified: 7 focused tests, 351 API tests, 32 Sentinel
+  tests and 106 Web tests plus backend/Web production builds passed. Not deployed: no
+  provider passed and no runtime activation was warranted.
+- Repository gates: documentation verification passed for 128 Markdown files and 75 unique
+  BB IDs; Compose configuration and `git diff --check` passed. The documentation command
+  required an unsandboxed rerun after a sandbox-only `spawnSync git EPERM`.
 - Known limitations: no Finance production persistence, external market data, real strategy,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.

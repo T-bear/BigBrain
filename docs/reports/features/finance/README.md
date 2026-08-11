@@ -18,6 +18,7 @@ Current implementation evidence:
 - [Free-first historical + live provider gate](finance-free-market-data-provider-evaluation-20260811.md)
 - [BB-071 Twelve Data Basic entitlement resolution](finance-bb071-entitlement-resolution-20260811.md)
 - [BB-071 Twelve Data human entitlement confirmation](finance-twelve-data-human-entitlement-confirmation-20260811.md)
+- [BB-075 zero-cost real market-data gate](finance-zero-cost-real-market-data-gate-20260811.md)
 - [BB-074 read-only market observation UI foundation](finance-read-only-market-observation-ui-foundation-20260811.md)
 - [BB-074 read-only observation UI deployment](finance-read-only-market-observation-ui-deployment-20260811.md)
 

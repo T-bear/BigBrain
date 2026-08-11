@@ -86,8 +86,9 @@ public sealed class SafeDefaultFinanceObservationReader : IFinanceObservationRea
     public FinanceObservationSnapshot GetSnapshot() => new(
         DateTimeOffset.UtcNow,
         new(FinanceOperatingMode.Research, false, false, false, false, false),
-        new(MarketDataProviderState.NoneAuthorized, "Ingen", EntitlementState.PendingWrittenConfirmation,
-            "BB-071 / STATE B", "Skriftlig entitlement-bekräftelse och produktägargodkännande saknas."),
+        new(MarketDataProviderState.NoneAuthorized, "Ingen aktiv provider", EntitlementState.PendingWrittenConfirmation,
+            "ZERO-COST ENTITLEMENT GATE",
+            "Ingen 0-SEK-källa har komplett verifierad rätt för automation, lokal retention och research/backtesting."),
         null,
         ObservationDataKind.None,
         ResearchWatchlist.Select(item => new FinanceInstrumentObservation(
@@ -95,5 +96,5 @@ public sealed class SafeDefaultFinanceObservationReader : IFinanceObservationRea
             ObservationFreshnessState.Unavailable, ObservationSessionState.Unknown,
             ObservationQualityState.Unknown, ObservationDataKind.None, [])).ToArray(),
         new FinanceHistoricalMemorySummary(0, null, null, null, null, null, 0, 0,
-            HistoricalPersistenceState.NotConfigured, "none", "none", "BB-071-pending", "none"));
+            HistoricalPersistenceState.NotConfigured, "none", "none", "zero-cost-provider-unresolved", "none"));
 }

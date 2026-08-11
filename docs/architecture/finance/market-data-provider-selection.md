@@ -4,6 +4,8 @@ Status: BB-046 and BB-072 research complete; BB-071 has positive human evidence 
 qualifying Twelve Data Personal plan as of 2026-08-11; cost-first selection remains open.
 Prices and product terms below are time-sensitive observations, not permanent facts.
 
+Current product-owner budget constraint: **0 SEK** for external Finance market-data services.
+
 ## Decision
 
 No provider is selected, activated or authorized for ingestion. BB-072's dated free-source comparison found no
@@ -14,24 +16,15 @@ terms require deletion within one month after expiry. Twelve Data Basic is the b
 technical lead at that review point, but later human evidence established that Basic is
 evaluation/trial only and cannot support the intended operation.
 
-Current/live research on 2026-08-11 reviewed Twelve Data Basic, Alpaca Basic/IEX, EODHD
-Free Starter and Alpha Vantage Free. Twelve Data Basic is now the best conditional free US
-technical candidate: its current pricing explicitly lists real-time US equities/ETFs,
-limited API/trial WebSocket credits and internal non-display usage. Terms permit internal
-processing/storage and non-reversible derived data subject to tier/third-party restrictions,
-but retention is subscription-bound and termination requires deletion within 30 days.
-Exact forward-testing, third-party venue and artifact scope remains incomplete. Alpaca's
-free IEX feed is a technical fallback but reviewed terms do not close durable storage,
-derived and termination rights and require a brokerage-linked account. No provider is
-authorized; see the [free live research](../../reports/features/finance/free-live-market-data-source-research-20260811.md).
+The earlier live research reviewed Twelve Data Basic, Alpaca Basic/IEX, EODHD Free Starter
+and Alpha Vantage Free. Its conditional Basic ranking is superseded by human evidence that
+Basic is evaluation/trial only and a paid Personal plan is required.
 
-The combined historical/current gate on 2026-08-11 recommends **Option A conditionally**:
-Twelve Data Basic alone for an initial 8–10 instrument US-only experiment. This is not
-selection or authorization. Durable retention, exact forward-testing/retained-derived scope
-and exchange/termination obligations remain unverified. Nasdaq Nordic's free delayed files
-require prior approval for value-added use and are not an OHLCV/corporate-action product.
-Nordic free eligibility remains unknown. See the
-[combined provider evaluation](../../reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md).
+BB-075 rechecked current first-party evidence on 2026-08-11. Result: **FAIL CLOSED**. Alpaca
+Basic/free IEX and EODHD Free Starter require exact human clarification; Stooq, Nasdaq Data
+Link and Finnhub lack complete product-specific rights evidence; Yahoo/yfinance and Alpha
+Vantage are incompatible with the intended automation/research scope; FMP requires prior
+written download/derivative approval. No exact free source passed, so no adapter exists.
 
 The earlier exact Basic/US pass resolved to **STATE B — HUMAN CONFIRMATION REQUIRED**.
 Direct written correspondence from Liam at Twelve Data now confirms that the submitted
@@ -61,6 +54,7 @@ the submitted scope. Commercial/paying-subscriber, redistribution, customer/thir
 business, unknown-market and materially different use are not covered and require renewed
 review. No plan, account, credential, adapter or real-data ingestion exists; fixtures remain
 the only active data source.
+Under the hard current budget Twelve Data is also **INACTIVE DUE TO ZERO-BUDGET CONSTRAINT**.
 
 Selection follows this cost order: **(1) free, (2) local/open-source, (3) existing BigBrain
 infrastructure, (4) paid only after verified need**. Twelve Data's positive entitlement does
@@ -69,6 +63,9 @@ use, storage, raw/normalized retention, replay/backtest, accumulation, backup/re
 derived/audit, post-termination, personal-funds and IEX/exchange conditions remain unresolved.
 No Alpaca inquiry is recorded as sent. Cost cannot relax licensing, provenance, security or
 live-data quality.
+
+The dated full zero-cost matrix and first-party source list are in the
+[BB-075 report](../../reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md).
 
 ## Dated entitlement matrix
 

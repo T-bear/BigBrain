@@ -19,6 +19,7 @@
 - [Finance BB-072 free historical data source research](../reports/features/finance/free-historical-data-source-research-20260811.md)
 - [Finance BB-045 synthetic acquisition foundation](../reports/features/finance/finance-synthetic-acquisition-foundation-20260811.md)
 - [Finance Twelve Data human entitlement confirmation](../reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md)
+- [Finance zero-cost real market-data gate](../reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.

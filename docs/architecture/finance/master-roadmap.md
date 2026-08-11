@@ -20,6 +20,7 @@ enabled before all M13 gates are evidenced and explicitly approved.
 ## Current state and next gate
 
 - Current phase/milestone: RESEARCH / early M2, BB-045 in progress.
+- Hard current budget: external Finance market data = **0 SEK** until explicitly changed.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
 - BB-071: positive human evidence clears the submitted Twelve Data use on a qualifying paid
   Personal plan; Basic/free is insufficient. This is entitlement, not activation.
@@ -39,6 +40,10 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - The former BB-071 State B is superseded by direct Twelve Data human evidence for Personal.
   No plan, account, key, adapter or data exists. Basic is not an operational option. Alpaca
   entitlement research is prepared but not sent; provider selection remains open.
+- BB-075 fresh zero-cost sweep: no source passed the exact automation/storage/retention/
+  replay/backtest gate. No adapter or real data was activated. Alpaca Basic/free IEX remains
+  the next human-confirmation action; EODHD Free Starter is second. Twelve Data is inactive
+  under the zero budget.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

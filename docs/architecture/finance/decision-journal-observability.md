@@ -6,6 +6,11 @@ material does not explicitly resolve their forward-testing or post-termination r
 They remain synthetic-only until written evidence and owner approval; an internal-use label
 alone cannot authorize the journal.
 
+BB-075 update: no zero-cost source cleared this artifact lifecycle. Twelve Data Personal
+clears the submitted scope but is an inactive paid fallback under the 0-SEK budget. Real
+acquisition and shadow evidence therefore remain disabled; synthetic evidence is not a
+production fallback.
+
 Every financial decision must be reconstructable. The append-oriented journal references
 timestamp, safe market snapshot, data/strategy/policy versions, signals, regime, proposed
 action, risk result, policy result, preview, execution and verification results, exit

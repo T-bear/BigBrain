@@ -44,6 +44,12 @@ so Twelve Data is a paid fallback rather than the free lead. The next action is 
 Alpaca Basic/free IEX entitlement inquiry and zero-cost comparison, not an adapter. Only
 after explicit provider selection may **FIRST AUTHORIZED MARKET DATA INGESTION** begin.
 
+**ZERO-COST REAL MARKET DATA ACTIVATION** (BB-075) is fail-closed. The current external
+market-data budget is exactly 0 SEK. A fresh first-party sweep found no exact free product
+with complete automation, local-retention, replay/backtest and artifact-lifecycle rights.
+No adapter, account, key, payload, real memory or deployment activation was created. Alpaca
+Basic/free IEX remains the first human-confirmation track; EODHD Free Starter is second.
+
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/
 synthetic/stale/gap states, memory summary and accessible lightweight chart. This does not

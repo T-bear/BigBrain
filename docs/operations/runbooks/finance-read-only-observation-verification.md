@@ -20,8 +20,8 @@ healthy and verify the Finance endpoint, then recreate only Web with `--no-deps`
 ## Read-only verification
 
 - `/api/v1/system/health` and Web root are healthy.
-- `/api/v1/modules/finance/observation` reports RESEARCH; no authorized provider; BB-071
-  pending; PAPER/LIVE/broker/ingestion/real-storage false; eight configured unpriced
+- `/api/v1/modules/finance/observation` reports RESEARCH; no authorized provider;
+  `ZERO-COST ENTITLEMENT GATE`; PAPER/LIVE/broker/ingestion/real-storage false; eight configured unpriced
   research instruments; zero observations; no configured persistence.
 - POST/PUT/PATCH/DELETE on the observation route return 405.
 - Headless mobile and desktop checks show Finance navigation, explicit no-real-money and
@@ -29,6 +29,8 @@ healthy and verify the Finance endpoint, then recreate only Web with `--no-deps`
   no console error and no external request.
 - Compare sanitized aggregate Calendar/theme/Media reads before and after. Do not print
   private calendar values, media identities, credentials or raw logs.
+- Confirm the historical-memory policy is `zero-cost-provider-unresolved`, with zero
+  observations and no silent synthetic fallback.
 
 ## Rollback
 

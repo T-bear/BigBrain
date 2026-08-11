@@ -206,6 +206,13 @@ expired rights fail closed. Derived metrics are not presumed exempt from provide
 The full model, decision/outcome evidence graph and bounded self-hosted storage direction
 are defined in [market-data memory and provenance](../architecture/finance/market-data-memory-and-provenance.md).
 
+The current product-owner constraint is stricter: external market-data budget is exactly
+**0 SEK** until explicitly changed. BB-075's fresh sweep did not clear any exact free source.
+Alpaca Basic/free IEX and EODHD Free Starter require human clarification; no account, key,
+adapter or real data exists. Twelve Data Personal remains an inactive paid fallback. The
+production observation reader stays fail-closed and now names the current zero-cost gate
+rather than the superseded BB-071 State B.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and
