@@ -14,6 +14,7 @@
 - [Finance market-data memory foundation](../reports/features/finance/finance-market-data-memory-foundation-20260810.md)
 - [Finance BB-045 policy/provenance foundation](../reports/features/finance/finance-market-data-policy-provenance-foundation-20260810.md)
 - [Finance BB-045 instrument/normalization foundation](../reports/features/finance/finance-instrument-identity-normalization-foundation-20260810.md)
+- [Finance BB-045 market-session/replay foundation](../reports/features/finance/finance-market-session-replay-foundation-20260811.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.

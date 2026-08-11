@@ -54,6 +54,10 @@ docker compose config --quiet
   adjusted classification, dividends, exact split ratios, immutable revision/policy
   references, duplicates/conflicts and repeatable output. No calendar is guessed: future
   expected no-trading days, unknown missing observations and provider gaps remain distinct.
+  Session/replay tests use an explicit `Europe/Stockholm` fixture calendar and verify UTC/DST,
+  invalid/ambiguous local times, closure/unknown/missing/provider-gap distinctions,
+  invalid-observation quarantine, historical ticker resolution, explicit dividends/splits,
+  immutable revision binding, no-lookahead, range bounds and deterministic event order.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

@@ -173,9 +173,17 @@ actions fail explicitly. Exact/conflicting duplicate outcomes are stable and non
 Without an exchange-calendar implementation, expected closure, unknown missing observation
 and provider gap remain separate concepts and are never guessed.
 
+Implemented 2026-08-11: `HistoricalReplay.cs` adds explicit fixture sessions with
+Trading/Closed/Unknown state, venue/MIC/timezone/evidence, safe UTC/DST conversion and
+stable gap classifications. Replay accepts one immutable revision and a supplied UTC range,
+uses historical provider references and source availability timestamps, emits separate
+session/quality/observation/dividend/split events and sorts through an explicit deterministic
+priority/tie-break contract. It never fills, interpolates, mutates or silently combines
+revisions. This is an M2 data primitive, not strategy or portfolio simulation.
+
 BB-071 remains the external gate for selecting an entitlement and retaining actual
 provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. The next recommended implementation is a small versioned
-market-session/calendar abstraction and richer gap findings, then deterministic historical
-replay over immutable synthetic revisions. Persistence selection and external adapter
-activation remain separately gated.
+provider until BB-071 passes. The next recommended implementation is an in-memory immutable
+dataset revision assembler that models correction/supersession availability without
+lookahead, followed by measured persistence design. Persistence selection and external
+adapter activation remain separately gated.

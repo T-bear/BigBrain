@@ -1,6 +1,6 @@
 # Finance module
 
-Status: M1 and provider-neutral BB-045 entitlement/instrument/normalization foundations
+Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay foundations
 implemented and automatically verified; not deployed. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.
 
@@ -66,14 +66,28 @@ not as investment logic or evidence of profitability.
 - Stable quality codes explain missing/ambiguous mappings, invalid ranges/volume/currency,
   duplicates and conflicts. Within one revision an exact duplicate is ignored with a
   finding; a conflicting duplicate is rejected and never overwrites the first observation.
+- `MarketSession` separates local trading date from UTC instants and represents only
+  explicit Trading, Closed or Unknown knowledge. Fixture calendars carry venue/MIC,
+  timezone and evidence; `TimeZoneInfo` performs conversion and invalid/ambiguous DST
+  local times fail rather than being guessed.
+- Gap classification keeps ExpectedClosure, MissingObservation, ProviderGap,
+  InvalidObservation and UnknownSession distinct. Only explicit provider-gap evidence may
+  classify a generic absence as provider-specific; no prices or volumes are fabricated.
+- Deterministic historical replay binds exactly one dataset revision and emits ordered
+  session, quality, observation and corporate-action events inside a supplied UTC range.
+  It uses observation availability timestamps and historical effective-date symbols;
+  future observations/actions/mappings do not leak into an earlier replay window.
 
 This code has no IO, network, persistence, logging or provider SDK. Tests use only the
 synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
 
-True exchange-calendar resolution is deliberately absent. Expected no-trading days,
-unknown missing observations and provider gaps must remain explicit rather than inferred.
+Production exchange-calendar resolution is deliberately absent. Only supplied fixture
+knowledge can establish trading or closure; unknown dates remain unknown.
 Renamed, inactive or delisted instruments remain historically addressable by canonical ID;
 future backtests must resolve the provider reference at the historical session date.
+
+This replay primitive is not the M3 backtest engine: it has no strategy, portfolio,
+position, fill, fee, slippage, P&L, risk expansion, paper executor or order capability.
 
 ## Deliberately deferred
 

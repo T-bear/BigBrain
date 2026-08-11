@@ -41,8 +41,11 @@ the survivorship limitation is explicit and accepted.
 
 The canonical identity foundation keeps renamed, inactive and delisted instruments
 historically addressable. Replay must resolve provider symbols using each session date,
-never today's ticker. Exchange-calendar/gap resolution and adjusted replay are not yet
-implemented; adjusted observations remain explicitly classified and are not raw evidence.
+never today's ticker. The M2 fixture replay now consumes explicit session knowledge and
+availability timestamps, keeps gap classifications distinct and emits corporate actions
+without rewriting raw bars. It is not the M3 strategy/portfolio/fill/cost backtest engine.
+Production exchange-calendar coverage and cross-revision correction replay remain pending;
+adjusted observations remain explicitly classified and are not raw evidence.
 
 ## Paper trading and Strategy Lab
 

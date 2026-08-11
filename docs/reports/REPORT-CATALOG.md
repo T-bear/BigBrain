@@ -21,6 +21,7 @@
 | Finance market-data memory foundation | Sanitized retention, provenance and learning architecture | [Memory foundation](features/finance/finance-market-data-memory-foundation-20260810.md) | Architecture defined; BB-071 remains open; no provider/runtime implementation |
 | Finance BB-045 policy/provenance foundation | Sanitized implementation and automated-test evidence | [Policy/provenance foundation](features/finance/finance-market-data-policy-provenance-foundation-20260810.md) | Provider-neutral slice verified; external ingestion/persistence blocked by BB-071 |
 | Finance BB-045 instrument/normalization foundation | Sanitized implementation and automated-test evidence | [Instrument/normalization foundation](features/finance/finance-instrument-identity-normalization-foundation-20260810.md) | Canonical synthetic slice verified; calendar/replay/provider/persistence remain |
+| Finance BB-045 market-session/replay foundation | Sanitized implementation and automated-test evidence | [Session/replay foundation](features/finance/finance-market-session-replay-foundation-20260811.md) | Timezone/gap/replay synthetic slice verified; correction/provider/persistence remain |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

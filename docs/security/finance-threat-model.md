@@ -70,3 +70,10 @@ code over synthetic fixtures. It rejects ambiguous/unknown identity, overlapping
 invalid OHLCV/currency/actions and conflicting duplicates without repair or overwrite.
 There is no deserialization surface, network, credential, real payload, persistence,
 broker code, execution capability, container change or paid dependency.
+
+Implementation review 2026-08-11 (session/replay): fixture calendars and replay remain
+pure in-memory code. Unknown calendar knowledge fails safe; invalid/ambiguous DST times,
+mixed revisions and unsupported provider-gap claims fail explicitly. Replay uses supplied
+UTC evidence only and cannot call a provider, broker, database, filesystem or clock. No
+credential, real payload, dependency, migration, runtime capability or trading authority
+was introduced.

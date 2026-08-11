@@ -58,7 +58,8 @@ provider-neutrala market-data-/strategikontrakt samt fail-closed risk-, policy-,
 och journalmodeller. BB-045 har nu även starka entitlement-, provenance-, dataset revision-
 och raw/derived-lineagetyper samt en deterministisk fail-closed evaluator. Den fixture-baserade
 grunden omfattar också kanonisk instrumentidentitet, effective-dated provider-symbolhistorik,
-daglig OHLCV, utdelningar, exakta splitkvoter, kvalitetsfynd och deterministisk normalisering.
+daglig OHLCV, utdelningar, exakta splitkvoter, kvalitetsfynd, deterministisk normalisering,
+explicita marknadssessioner/gap och revision-bunden historisk replay utan lookahead.
 Ingen persistence,
 provideradapter, executor, brokerintegration, UI eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting

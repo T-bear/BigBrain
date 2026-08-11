@@ -16,6 +16,12 @@ Journal integrity, retention, access control, redaction, clock source and export
 requirements must be finalized before PAPER persistence. Corrections append a linked
 record rather than rewriting history.
 
+The M2 historical replay foundation supplies future journal-compatible stable event
+identities for session, observation availability, quality/gap and corporate-action evidence.
+Ordering is derived from UTC effective time, explicit event priority, canonical instrument
+and stable tie-breakers—not wall clock, locale, hash or storage enumeration. No persistent
+journal write was added by this slice.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

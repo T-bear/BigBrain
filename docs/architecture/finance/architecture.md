@@ -84,3 +84,10 @@ adapter or IO. Canonical IDs survive ticker changes; provider/product/symbol/MIC
 are effective-dated, and synthetic daily OHLCV/corporate actions normalize with immutable
 revision and entitlement references. Evaluation additionally matches provider/product exactly;
 an otherwise valid policy for another product fails closed with a stable diagnostic code.
+
+The fixture-only session/replay foundation represents Trading, Closed and Unknown calendar
+knowledge with explicit timezone conversion, classifies absence without inferring provider
+fault and replays a single immutable revision by supplied availability timestamps. Stable
+priority/tie-break ordering, effective-date symbols and explicit dividend/split events
+prevent host-timezone dependence, lookahead and silent raw-price rewriting. It is not an
+exchange-calendar database, persistence layer or backtest engine.

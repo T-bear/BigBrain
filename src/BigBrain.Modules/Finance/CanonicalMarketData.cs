@@ -160,6 +160,17 @@ public sealed class InstrumentMappingCatalog
         if (matches.Length != 1) throw new MarketDataNormalizationException(MarketDataFindingCode.AmbiguousMapping, "More than one provider mapping is valid for the supplied date and venue.");
         return (_instruments[matches[0].InstrumentId], matches[0]);
     }
+
+    public ProviderInstrumentMapping ResolveProviderReference(
+        InstrumentId instrumentId, MarketDataProvider provider, ProviderDataset dataset, string mic, DateOnly marketDate)
+    {
+        var normalizedMic = RequiredText.Normalize(mic, nameof(mic)).ToUpperInvariant();
+        var matches = _mappings.Where(mapping => mapping.InstrumentId == instrumentId && mapping.Provider == provider &&
+            mapping.ProviderDataset == dataset && mapping.Mic == normalizedMic && mapping.IsValidOn(marketDate)).ToArray();
+        if (matches.Length == 0) throw new MarketDataNormalizationException(MarketDataFindingCode.MissingMapping, "No provider reference is valid for the canonical instrument, date and venue.");
+        if (matches.Length != 1) throw new MarketDataNormalizationException(MarketDataFindingCode.AmbiguousMapping, "More than one provider reference is valid for the canonical instrument, date and venue.");
+        return matches[0];
+    }
 }
 
 public sealed record SyntheticRawDailyBar(

@@ -25,9 +25,9 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Next safe task: send the BB-071 provider inquiry, then evaluate the written response.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
-- Safe parallel foundation: entitlement/provenance plus canonical instrument and synthetic
-  normalization foundations are verified. Next, define provider-neutral sessions/gaps and
-  deterministic replay. Provider payload ingestion,
+- Safe parallel foundation: entitlement/provenance, canonical identity/normalization and
+  fixture-only session/gap/replay foundations are verified. Next, assemble immutable
+  in-memory revisions with explicit correction availability. Provider payload ingestion,
   persistence and account work remain blocked.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
@@ -100,8 +100,10 @@ entitlement first.
 Provider-neutral BB-045 progress through 2026-08-11 includes fail-closed entitlement and
 provenance, stable canonical instrument identity, effective-dated provider symbols, daily
 decimal OHLCV, cash dividends, exact stock splits, basic quality findings and deterministic
-synthetic normalization/duplicate handling. Calendar-aware gaps, replay, measured storage,
-authorized adapters and external acceptance remain incomplete.
+synthetic normalization/duplicate handling. Explicit timezone-safe fixture sessions,
+closure/unknown/missing/provider-gap semantics and single-revision no-lookahead replay are
+also verified. Cross-revision correction availability, measured storage, authorized adapters
+and external acceptance remain incomplete.
 
 ### M3 – Backtest engine — PLANNED
 

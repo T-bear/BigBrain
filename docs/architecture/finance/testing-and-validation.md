@@ -50,3 +50,13 @@ dataset/policy preservation, explicit raw/adjusted basis, dividends, exact posit
 ratios, duplicate/conflict non-overwrite and repeated-input determinism. Tests are fast,
 clock-independent, network-free and storage-free. A future calendar test layer must keep
 expected closure, unknown missing observation and provider gap distinct.
+
+## BB-045 session and historical replay coverage
+
+Synthetic fixtures verify explicit Trading/Closed/Unknown session state, IANA timezone
+conversion, winter/summer UTC offsets and fail-safe invalid/ambiguous DST handling. Replay
+tests distinguish expected closure, generic missing observation, explicit provider gap and
+invalid observation; bind one immutable revision; resolve provider symbols at each historical
+date; keep raw bars and dividend/split events separate; honor supplied availability/range;
+and prove monotonic, stable repeated ordering. No wall clock, host-local timezone, network,
+filesystem, database, random input or sleep participates.
