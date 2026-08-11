@@ -1,7 +1,7 @@
 # BB-071 provider retention inquiry
 
 Status: ready for product-owner delivery; no provider account or credential is required.
-Date prepared: 2026-08-10.
+Date prepared: 2026-08-10; candidate order updated after BB-072 on 2026-08-11.
 
 ## Intended use
 
@@ -53,7 +53,12 @@ Thank you.
 
 ## Provider-specific notes
 
-- **Twelve Data (first contact):** ask support/sales to reconcile the requested archive
+- **EODHD Free Starter (first conditional lead):** ask whether deterministic private
+  backtesting and each derived-artifact class are covered by “manipulate and analyze”,
+  confirm whether the one-month deletion duty covers normalized, derived, audit and backup
+  copies, and identify exact US/XSTO free-tier corporate-action/symbol-history scope.
+- **Twelve Data Basic (Nordic technical lead):** ask support/sales to reconcile the
+  requested archive
   with Terms sections 2.2, 2.3(g), 16.1 and 16.2, and identify the plan/add-on governing
   XSTO/XOSL EOD, corporate actions and non-display backtesting.
 - **Tiingo:** ask whether written approval under Terms section 1.6 can cover backtest-

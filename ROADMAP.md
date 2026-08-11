@@ -17,7 +17,9 @@ foundations, inklusive immutable correction/supersession assembly, are implement
 actual provider
 ingestion or durable provider data remains blocked.
 
-The next M2 milestone is **FREE HISTORICAL DATA INGESTION preparation/research** (BB-072):
-compare zero-cost sources on license, local retention, backtesting rights, coverage,
-corporate actions, symbol history and quality. Research does not authorize activation;
-BB-071 evidence remains mandatory before any real-data ingestion or storage.
+**FREE HISTORICAL DATA INGESTION preparation/research** (BB-072) is complete. Ten
+free/free-adjacent source products were compared; none passed the complete durable
+retention and personal non-display backtesting gate. EODHD Free Starter is the best
+conditional evaluation lead and Twelve Data Basic the Nordic technical lead, but neither
+is authorized. Next is exact written entitlement evidence plus synthetic acquisition-
+contract planning. BB-071 remains mandatory before real ingestion or storage.

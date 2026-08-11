@@ -125,6 +125,14 @@ three shortlisted products, so written clarification or a different license is n
 ADR 0021's provider-neutral direction is Accepted; that acceptance does not activate a
 provider. See [provider selection](../architecture/finance/market-data-provider-selection.md).
 
+BB-072 re-evaluated ten zero-cost/free-adjacent source products on 2026-08-11. No exact
+product passed the complete local-retention, personal non-display backtesting, derived-use
+and termination gate. EODHD Free Starter is the best conditional evaluation lead but is
+limited to one year and requires deletion after expiry; Twelve Data Basic is the strongest
+Nordic technical lead but its exact rights remain incomplete. The current decision is
+`DO NOT INGEST YET`; see the
+[BB-072 report](../reports/features/finance/free-historical-data-source-research-20260811.md).
+
 Finance applies “collect once, reuse when permitted” and free-first/cost-aware selection.
 Every raw dataset and derived artifact carries provider, dataset/revision, retrieval,
 instrument, quality and entitlement provenance. Allowed purposes are explicit; unknown or

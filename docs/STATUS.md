@@ -1,7 +1,9 @@
 # BigBrain Status
 
 - Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
-- Verifierad mot commit: BB-045 immutable revision assembly publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
+- Verifierad mot commit: BB-072 source research is complete for publication from current
+  main; published SHA is assigned after commit. Latest runtime
+  evidence is unchanged.
 - Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
@@ -98,6 +100,10 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Completed research: BB-046 compared eight provider candidates. Twelve Data is the
   primary Nordic/global EOD candidate; Tiingo and Massive are specialized US alternatives.
   Daily raw OHLCV plus separate corporate actions is the recommended M2 scope.
+- Completed research: BB-072 compared ten free/free-adjacent source products with dated
+  first-party evidence. None passed the complete retention/non-display/backtesting gate.
+  EODHD Free Starter is the best conditional evaluation lead and Twelve Data Basic the
+  Nordic technical lead; neither is selected or authorized. Decision: DO NOT INGEST YET.
 - Architecture baseline: collect once/reuse when permitted, explicit provenance and
   fail-closed entitlement checks govern local market-data memory. Free/legal sources are
   evaluated first, but free access is not retention permission. Decision/outcome evidence
@@ -123,12 +129,10 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
-- Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
-  with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
-  credential is authorized.
-- Next milestone: BB-072 FREE HISTORICAL DATA INGESTION preparation/research compares
-  zero-cost sources and exact rights; it activates nothing. BB-071 still blocks real
-  provider ingestion/persistence. Physical storage selection remains measurement-gated.
+- Next safe task: obtain exact BB-071-class written evidence for EODHD Free Starter and
+  Twelve Data Basic, covering US/XSTO retention, non-display backtesting, derived data and
+  termination. Any acquisition-contract work remains synthetic. No provider account, SDK
+  or credential is authorized; physical storage selection remains measurement-gated.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit

@@ -71,6 +71,10 @@ och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance-modulen](docs/modules/finance.md). Finance följer “free first” och “collect once,
 reuse when permitted”: providerneutral lokal historik prioriteras kostnadsmedvetet, men
 okänd licens eller retention stoppar lagring och användning.
+BB-072:s daterade jämförelse av tio gratis eller gratisnära källprodukter fann ingen som
+verifierar hela kombinationen varaktig lokal retention och personlig non-display
+backtesting. Rekommendationen är `DO NOT INGEST YET`; EODHD Free Starter och Twelve Data
+Basic är villkorade evidensspår, inte valda providers.
 
 ### Designsystem och teman
 

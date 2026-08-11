@@ -1,11 +1,19 @@
 # Finance market-data provider selection
 
-Status: BB-046 complete; BB-071 waiting for provider confirmation as of 2026-08-10.
+Status: BB-046 and BB-072 research complete; BB-071 waiting for provider confirmation as
+of 2026-08-11.
 Prices and product terms below are time-sensitive observations, not permanent facts.
 
 ## Decision
 
-No provider is selected or authorized. Twelve Data remains the primary candidate
+No provider is selected or authorized. BB-072's dated free-source comparison found no
+zero-cost product with a complete verified grant for durable retention plus personal
+non-display backtesting. The explicit result is **DO NOT INGEST YET**. EODHD Free Starter
+is the best conditional free evaluation lead, but it exposes only the past year and its
+terms require deletion within one month after expiry. Twelve Data Basic is the best Nordic
+technical lead, but its exact durable-retention/derived-use scope remains unresolved.
+
+Within the earlier paid-capable shortlist, Twelve Data remains the primary candidate
 for M2 because its official EOD coverage includes Nasdaq Stockholm (`XSTO`) and other
 Nordic exchanges, its reference model exposes MIC and optional FIGI/ISIN, and it supports
 daily through intraday OHLCV. Tiingo is the preferred specialized comparison for long US
@@ -52,11 +60,15 @@ permission. BB-071 remains open and BB-045 remains blocked.
 The provider-neutral policy/provenance subset of BB-045 may proceed with synthetic
 fixtures; only external adapter activation and persistence of provider data are blocked.
 
-BB-072 is the next research milestone for zero-cost historical sources. It rechecks exact
-first-party license/ToS, local retention and personal backtesting rights before technical
-coverage/quality comparison. Free access, public downloads or absence of authentication
-does not authorize ingestion. No candidate is activated by BB-072 research, and BB-071's
-fail-closed entitlement standard still applies to an exact source/product/market.
+BB-072 completed its zero-cost review on 2026-08-11 across ten source/product paths. Free
+access, public downloads or absence of authentication did not authorize ingestion.
+Massive's default terms prohibit the needed non-display/strategy-derived use; FMP requires
+prior written approval to download/create derivative works; Alpha Vantage and Stooq do not
+provide a verified complete retention/backtesting grant; suitable Nasdaq Nordic history is
+paid; Yahoo historical download is a paid interactive feature. The full evidence and rights
+matrix are in the
+[BB-072 report](../../reports/features/finance/free-historical-data-source-research-20260811.md).
+BB-071's fail-closed standard still applies to the exact source/product/market.
 
 ## Initial M2 dataset
 
@@ -150,6 +162,11 @@ Primary provider documentation and terms were reviewed 2026-08-10:
 - [Interactive Brokers market-data documentation](https://www.interactivebrokers.com/campus/ibkr-api-page/twsapi-doc/)
 - Stooq public download surface; no sufficiently explicit official API/storage license
   was located, so it is not eligible for automated M2 ingestion without clarification.
+
+The zero-cost set was rechecked on 2026-08-11 using current first-party pricing, product
+and terms material for EODHD, Twelve Data, Alpha Vantage, FMP, Massive, Stooq, Nasdaq
+Nordic delayed/historical products, Yahoo Finance, Nasdaq Data Link and Tiingo's current
+paid individual tier. The BB-072 report above is canonical for that dated comparison.
 
 The BB-071 evidence relies particularly on Twelve Data Terms sections 2 and 16, Tiingo
 Terms section 1.6, and Massive Market Data Terms sections 5 and 8. Provider replies must

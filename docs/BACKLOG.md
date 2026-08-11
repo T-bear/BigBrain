@@ -201,8 +201,8 @@ trading is the eventual destination, never the starting state or a guaranteed re
   future correction. Old revisions remain directly reproducible and linear supersession,
   cycle/reference/scope/future-member invariants fail closed. Corporate-action and
   session/gap evidence retain source revision and policy. Full solution: 336/336 tests.
-- Kvar: richer quality aggregation, measured persistence, BB-072 free-source research,
-  authorized provider adapter and external acceptance. Actual
+- Kvar: richer quality aggregation, measured persistence, entitlement evidence for an
+  eligible source, authorized provider adapter and external acceptance. Actual
   provider ingestion/persistence remains blocked by BB-071.
 
 ### BB-046 – Market-data licensing, retention and provider research
@@ -263,7 +263,7 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
 - Modul: Finance / Market Data Governance
 - Typ: Research / future ingestion gate
 - Prioritet: P2
-- Status: Planerad – nästa säkra M2-milestone efter provider-neutral foundation
+- Status: Klar – research verifierad; ingen gratis källa auktoriserad
 - Upptäckt: 2026-08-11
 - Beroenden: BB-045 provider-neutral foundation; BB-071 before any real-data ingestion/storage.
 - Syfte/scope: compare zero-cost historical sources without activating one. Evaluate cost,
@@ -275,6 +275,15 @@ in `docs/architecture/finance/provider-retention-inquiry.md`.
   whether any free source is legally and technically eligible; Unknown remains fail-closed.
   Any recommended activation still requires explicit product-owner review and BB-071-class
   entitlement evidence for the exact source/product/market/use.
+- Slutförd 2026-08-11: ten exact source/product paths were compared using dated first-party
+  evidence. None verified the complete durable-retention and personal non-display
+  backtesting grant. EODHD Free Starter is the best conditional evaluation lead but has
+  one year of free history and a post-expiry deletion duty. Twelve Data Basic is the best
+  Nordic technical lead but exact retention/derived-use rights remain unresolved.
+  Massive prohibits the required default non-display/strategy-derived use, FMP requires
+  prior written download/derivative approval and Stooq rights remain unknown. Result:
+  **DO NOT INGEST YET**. No account, key, adapter, download, purchase or persistence was
+  created. Evidence: `docs/reports/features/finance/free-historical-data-source-research-20260811.md`.
 
 ### BB-047 – M3 deterministic backtest engine
 

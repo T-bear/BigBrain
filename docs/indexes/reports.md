@@ -16,6 +16,7 @@
 - [Finance BB-045 instrument/normalization foundation](../reports/features/finance/finance-instrument-identity-normalization-foundation-20260810.md)
 - [Finance BB-045 market-session/replay foundation](../reports/features/finance/finance-market-session-replay-foundation-20260811.md)
 - [Finance BB-045 immutable dataset revision assembly](../reports/features/finance/finance-immutable-dataset-revision-assembly-20260811.md)
+- [Finance BB-072 free historical data source research](../reports/features/finance/free-historical-data-source-research-20260811.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.

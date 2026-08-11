@@ -1,5 +1,10 @@
 # Finance testing and validation strategy
 
+BB-072 is a documentation/research-only gate. It added no source code, provider payload or
+executable test surface; documentation verification, whitespace validation and Compose
+configuration validation are its applicable automated gates. External-data acceptance
+tests remain forbidden until BB-071 authorizes an exact entitlement.
+
 Required layers are unit, integration, simulation, backtest regression, property/invariant,
 paper integration, broker sandbox, failure injection, reconciliation, security, UI,
 accessibility, performance and long-running soak tests.

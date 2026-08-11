@@ -23,6 +23,7 @@
 | Finance BB-045 instrument/normalization foundation | Sanitized implementation and automated-test evidence | [Instrument/normalization foundation](features/finance/finance-instrument-identity-normalization-foundation-20260810.md) | Canonical synthetic slice verified; superseded next-step note resolved by later reports |
 | Finance BB-045 market-session/replay foundation | Sanitized implementation and automated-test evidence | [Session/replay foundation](features/finance/finance-market-session-replay-foundation-20260811.md) | Timezone/gap/replay synthetic slice verified; correction foundation now separately verified |
 | Finance BB-045 immutable revision assembly | Sanitized implementation and automated-test evidence | [Revision assembly](features/finance/finance-immutable-dataset-revision-assembly-20260811.md) | Correction/supersession/as-of synthetic slice verified; real provider/persistence remain |
+| Finance BB-072 free historical source research | Sanitized dated first-party source/rights comparison | [Free historical source research](features/finance/free-historical-data-source-research-20260811.md) | Research complete; no free source authorized; do not ingest pending BB-071 evidence |
 
 Local-only classification prevents accidental publication of machine identities,
 operational logs and sensitive service data; it does not reduce the evidentiary value

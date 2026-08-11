@@ -191,8 +191,10 @@ branches and deterministic ordering ignores hash/input order.
 
 BB-071 remains the external gate for selecting an entitlement and retaining actual
 provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. The next milestone is BB-072 free historical source research,
-followed only by an explicitly authorized adapter/acceptance slice if exact rights pass.
+provider until BB-071 passes. BB-072 free historical source research completed on
+2026-08-11 without authorizing a source: EODHD Free Starter and Twelve Data Basic remain
+conditional evidence leads and the recommendation is `DO NOT INGEST YET`. Only exact
+written entitlement plus product-owner review may precede an adapter/acceptance slice.
 Persistence selection remains separately measurement-gated.
 
 ## Persistence requirements derived from revision assembly
