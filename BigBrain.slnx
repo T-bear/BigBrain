@@ -9,4 +9,7 @@
     <Project Path="tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj" />
     <Project Path="tests/BigBrain.Sentinel.Tests/BigBrain.Sentinel.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/BigBrain.Finance.PersistenceBenchmarks/BigBrain.Finance.PersistenceBenchmarks.csproj" />
+  </Folder>
 </Solution>

@@ -108,3 +108,9 @@ gate requires exact permission for historical analysis, backtesting, derived met
 long-term storage and persistence. The pipeline then reuses canonical normalization and
 revision assembly; an acquisition journal records reproducibility/audit counts and deletion
 metadata without payloads or credentials. Only `SyntheticFixture` evidence is implemented.
+
+The fixture persistence boundary now adds an immutable manifest, deterministic content
+fingerprint and provider-neutral storage contract around those revisions. Complete-only
+append, idempotent identity, explicit conflicts, range/action/gap reads, lineage, integrity,
+policy-scoped enumeration and deletion are proven by an in-memory reference. This is a
+domain/benchmark boundary, not a production repository, API endpoint or runtime database.

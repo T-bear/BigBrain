@@ -34,6 +34,11 @@ findings, outcome reason and resulting revision. It deliberately excludes creden
 headers and raw payloads. A future persistent correlation graph may reference its request
 and revision IDs but must not copy licensed data into audit records to evade deletion.
 
+Persistence deletion receipts follow the same rule: retain request/scope, policy evidence,
+deleted revision IDs and manifest fingerprints, but not licensed observations, actions or
+raw payload. This preserves an auditable fact of deletion without laundering provider data
+into the journal. A future durable journal must correlate receipt and acquisition IDs.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

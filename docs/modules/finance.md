@@ -1,6 +1,6 @@
 # Finance module
 
-Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay/revision foundations
+Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay/revision/acquisition/persistence-manifest foundations
 implemented and automatically verified; not deployed. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.
 
@@ -97,9 +97,21 @@ not as investment logic or evidence of profitability.
   canonical normalizer, carries explicit gaps into replay evidence and delegates correction
   membership to the existing immutable assembler. Its journal contains policy/deletion,
   counts, findings and result revision, never authentication material.
+- `HistoricalDatasetManifest` binds exact revision membership to deterministic SHA-256,
+  schema/storage versions, scope and coverage, acquisition and entitlement evidence,
+  counts, correction lineage and retention/deletion obligations without credentials or
+  provider payloads. Only complete manifests may be appended.
+- `IHistoricalDataPersistence` defines exact revision, range bar, corporate-action,
+  quality/gap, lineage, integrity, provider/product/policy enumeration and scoped deletion
+  operations. Its in-memory implementation is a fixture correctness reference: immutable,
+  idempotent for identical input, conflict-rejecting and atomic at its public boundary.
+- Scoped deletion removes affected fixture payload/revisions while preserving a sanitized
+  receipt with scope, deleted revision IDs, manifest fingerprints and policy evidence. It
+  neither deletes unrelated revisions nor retains prices/actions as an audit workaround.
 
-This code has no IO, network, persistence, durable logging or provider SDK. Tests use only the
-synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
+The domain implementation has no network, production persistence, durable logging or
+provider SDK. The benchmark tool performs bounded temporary JSONL/SQLite IO using only the
+synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures and deletes its temporary files.
 
 Production exchange-calendar resolution is deliberately absent. Only supplied fixture
 knowledge can establish trading or closure; unknown dates remain unknown.
@@ -109,15 +121,24 @@ future backtests must resolve the provider reference at the historical session d
 This replay primitive is not the M3 backtest engine: it has no strategy, portfolio,
 position, fill, fee, slippage, P&L, risk expansion, paper executor or order capability.
 
-## Derived persistence requirements (not implemented)
+## Measured persistence direction (not activated)
 
 The verified model requires future storage to support append-oriented revision metadata,
 immutable member bodies, parent/supersession links, original→replacement correction chains,
 UTC event/availability indexes, canonical observation identity, provider/product/policy
 provenance, deterministic revision membership queries and entitlement/deletion metadata.
-Expected EOD volume, replay range/query shape, backup/restore/deletion time, checksum cost
-and concurrent readers must be measured before selecting SQLite, files or another engine.
-No database, migration or storage abstraction is introduced by this slice.
+The 2026-08-11 repeatable benchmark compared JSONL and SQLite at 2,520, 126,000 and
+1,260,000 deterministic rows. At the largest scale JSONL used 155,992,420 bytes and wrote
+in 793.331 ms but required 153.477 ms for a 100-row instrument range scan. SQLite used
+356,208,640 bytes and wrote in 9,674.985 ms, while the indexed range query took 0.053 ms
+and transactional publication protected completeness. These single-host measurements are
+architectural evidence, not precision promises.
+
+The recommended direction is immutable append-oriented payload files with content hashes,
+plus SQLite for transactional manifest publication, indexes, lineage and deletion scope.
+Confidence is medium: backup/restore, concurrency, cancellation deletion across backups and
+the exact payload format still require bounded validation before an ADR or product store.
+No Finance migration, production database or retained provider payload is activated.
 
 ## Deliberately deferred
 

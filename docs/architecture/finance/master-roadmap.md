@@ -123,10 +123,13 @@ or persistence. BB-071-class exact entitlement and explicit owner review remain 
 
 ### Next safe M2 implementation while BB-071 is open
 
-The synthetic acquisition foundation is complete. If entitlement evidence is still absent,
-the next safe milestone is **SYNTHETIC ACQUISITION MANIFEST / PERSISTENCE BENCHMARK DESIGN**:
-measure fixture EOD volume, append/checksum/idempotency, replay-query shapes and licensed
-deletion/backup behavior without selecting storage or accessing a provider. Only after an
+The synthetic acquisition and persistence-manifest/benchmark foundations are complete.
+JSONL and SQLite were measured at up to 1,260,000 fixture rows; immutable files plus a
+transactional SQLite catalog/index is the provisional direction, with medium confidence.
+If entitlement evidence is still absent, the next safe milestone is **SYNTHETIC LOCAL
+HISTORICAL MEMORY PROTOTYPE / BACKUP-RESTORE VALIDATION**: validate transactional manifest
+publication, concurrent replay reads and licensed deletion across primary/backup copies
+without provider data. Only after an
 exact free/free-adjacent entitlement is accepted may an explicitly owner-approved **FIRST
 AUTHORIZED FREE HISTORICAL DATA ADAPTER** milestone begin.
 

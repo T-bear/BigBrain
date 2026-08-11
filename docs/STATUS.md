@@ -130,18 +130,26 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   storage/backtest/derived uses before adapter execution. The `SyntheticFixture` adapter,
   deterministic retries/overlap, acquisition journal and orchestration reuse existing
   normalization, gap/replay and revision assembly without IO or persistence.
-- Automated verification 2026-08-11: .NET 10 restore/build passed; 316 API tests and 32
-  Sentinel tests passed (348 total). This includes 12 synthetic acquisition/gate/journal/
-  integration tests plus all prior correction/no-lookahead invariants.
+- Implemented persistence-foundation slice: immutable dataset manifests bind revision,
+  coverage, counts, checksum, acquisition/policy/provenance, storage format and deletion
+  obligations. A provider-neutral contract plus in-memory correctness reference supports
+  immutable append, exact/range/action/gap queries, lineage, integrity, scoped enumeration
+  and auditable payload deletion without retaining licensed facts in deletion receipts.
+  JSONL and SQLite fixture benchmarks measured up to 1,260,000 rows; the evidence supports
+  a provisional immutable-file + transactional SQLite catalog/index direction, not an
+  activated production store or final ADR.
+- Automated verification 2026-08-11: .NET 10 restore/build passed; 328 API tests and 32
+  Sentinel tests passed (360 total). This includes 12 persistence manifest/roundtrip/
+  integrity/deletion/replay tests plus all prior acquisition and no-lookahead invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: obtain exact BB-071-class written evidence for EODHD Free Starter and
   Twelve Data Basic, covering US/XSTO retention, non-display backtesting, derived data and
-  termination. If still blocked, benchmark only synthetic acquisition manifests, bounded
-  storage/query shapes and deletion/backup behavior. No provider account, SDK or credential
-  is authorized; physical storage selection remains measurement-gated.
-- Known limitations: no persistence, external market data, real strategy, full Risk Engine,
+  termination. If still blocked, validate a bounded synthetic hybrid local-memory prototype,
+  backup/restore and deletion propagation before any durable product implementation. No
+  provider account, SDK or credential is authorized; the measured direction remains review-gated.
+- Known limitations: no production persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit
   product-owner architecture review on 2026-08-10; its acceptance does not activate a

@@ -203,7 +203,17 @@ completeness/provenance, stable observation IDs, explicit gaps/corrections and a
 audit journal. The gate evaluates analysis, backtest, derived metrics, long-term storage and
 persistence before invoking an adapter. Accepted synthetic facts reuse canonical
 normalization and immutable assembly; content is never silently repaired or overwritten.
-No durable memory, provider transport or real entitlement was added.
+No durable provider memory, provider transport or real entitlement was added.
+
+Implemented 2026-08-11: `HistoricalDataPersistence.cs` defines the immutable manifest,
+SHA-256 content identity, storage contract and fixture reference implementation. A bounded
+benchmark compared append-oriented JSONL and transactional indexed SQLite at 2,520,
+126,000 and 1,260,000 synthetic EOD rows. JSONL favored compact sequential initial writes;
+SQLite favored exact/range queries, transactions and catalog operations. The provisional
+direction is therefore immutable content-addressed payload files plus SQLite manifest,
+index, lineage and deletion metadata. Confidence is medium pending backup/restore,
+concurrent-reader and deletion-across-backup validation. No ADR or production store is
+accepted by this measurement alone.
 
 ## Persistence requirements derived from revision assembly
 
@@ -211,6 +221,6 @@ Future storage must support append-only revision metadata; immutable observation
 finding bodies; parent and superseding revision links; original→replacement correction
 chains; UTC event-time and availability-time indexes; canonical logical identity; provider,
 product, policy, provenance and deletion metadata; deterministic membership/as-of queries;
-and checksums/backups that retain entitlement. Measure bounded EOD sizes, correction rate,
-range-replay latency, concurrent readers, backup/restore and licensed deletion before a
-technology decision. No persistence technology is selected or activated here.
+and checksums/backups that retain entitlement. The first bounded size/range/deletion
+measurement is complete; concurrent readers, backup/restore and licensed deletion across
+backup copies remain. No production persistence technology is selected or activated here.

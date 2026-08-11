@@ -67,7 +67,11 @@ Ett nytt fixture-only acquisition-lager binder framtida providerbatcher till exa
 policy, provenance och destination revision, journalför deterministiska utfall och återanvänder
 befintlig normalisering, gap/replay och revision assembly. Dess `SyntheticFixture`-adapter
 kan inte auktorisera eller representera en riktig provider.
-Ingen persistence,
+Ett nytt fixture-only manifest- och persistencekontrakt definierar immutable append,
+integritet, revisionsfrågor och policyavgränsad deletion. En in-memory referens och en
+reproducerbar JSONL/SQLite-benchmark använder endast syntetiska EOD-rader; mätningen stödjer
+provisoriskt SQLite som transaktionellt katalog/index tillsammans med immutable filer för
+payload, men aktiverar ingen produktionslagring. Ingen verklig providerpersistence,
 verklig provideradapter, executor, brokerintegration, UI eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska

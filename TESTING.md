@@ -67,6 +67,12 @@ docker compose config --quiet
   repeated batches, overlapping pagination, correction supersession, journal evidence,
   canonical normalization, explicit provider gaps, immutable revision assembly, repeated
   replay/no-lookahead and absence of secret-bearing contract fields.
+  Persistence-foundation tests cover deterministic manifests/checksums, immutable exact
+  revision roundtrip, idempotent duplicate append, explicit conflicts, correction lineage,
+  gap/action queries, policy-scoped enumeration/deletion receipts, partial-write rejection,
+  replay compatibility and no-lookahead. Run the reproducible fixture benchmark with
+  `dotnet run --project tools/BigBrain.Finance.PersistenceBenchmarks -c Release --no-build -- --full`;
+  it writes only process-scoped temporary files and compares JSONL/SQLite without external IO.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

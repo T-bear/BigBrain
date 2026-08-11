@@ -13,6 +13,14 @@ supersession; acquisition journal counts/deletion evidence; canonical normalizat
 explicit gap/replay; immutable assembly; repeated replay/no-lookahead; and the absence of
 credential/header fields. These tests do not constitute external-data acceptance evidence.
 
+The persistence-foundation suite adds deterministic manifest serialization/checksums,
+mutation detection, exact immutable roundtrip, idempotent duplicate append, conflict and
+partial-manifest rejection, correction lineage, bar/action/gap queries, provider/policy
+enumeration, scoped deletion receipts, entitlement preservation, replay compatibility and
+revision-catalog no-lookahead. The standalone full benchmark deterministically compares
+JSONL and SQLite at 2,520, 126,000 and 1,260,000 rows; timings are architectural samples,
+not CI performance thresholds.
+
 Required layers are unit, integration, simulation, backtest regression, property/invariant,
 paper integration, broker sandbox, failure injection, reconciliation, security, UI,
 accessibility, performance and long-running soak tests.

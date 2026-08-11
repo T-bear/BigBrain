@@ -22,6 +22,10 @@ free/free-adjacent source products were compared; none passed the complete durab
 retention and personal non-display backtesting gate. EODHD Free Starter is the best
 conditional evaluation lead and Twelve Data Basic the Nordic technical lead, but neither
 is authorized. The synthetic acquisition contract, entitlement gate, journal and fixture
-pipeline are implemented and verified without external IO. Next is exact written
-entitlement evidence; if it remains blocked, continue with a synthetic manifest/persistence
-benchmark design. BB-071 remains mandatory before real ingestion or storage.
+pipeline are implemented and verified without external IO. The next synthetic slice has
+now added an immutable manifest/persistence contract and measured JSONL versus SQLite at up
+to 1,260,000 fixture rows. The provisional direction is immutable payload files plus a
+transactional SQLite catalog/index; it is evidence, not a production storage selection or
+activation. Next is exact written entitlement evidence or, while blocked, a bounded
+synthetic local-memory prototype/backup-and-restore validation. BB-071 remains mandatory
+before real ingestion or provider-data storage.

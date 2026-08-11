@@ -53,6 +53,12 @@ that exact revision ID in evidence. A later correction never changes an older re
 an earlier as-of selection. M3 still must bind the chosen assembled membership into replay
 and report configuration; this slice adds no strategy or simulation behavior.
 
+The persistence manifest/checksum now gives future M3 reports a verifiable storage-level
+revision reference. Range reads require an exact revision ID and preserve canonical dates;
+later corrections remain separate child revisions. The benchmark exercises sequential and
+instrument-range access shapes only—it does not implement strategy logic or relax the
+supplied replay-as-of boundary.
+
 ## Paper trading and Strategy Lab
 
 Paper trading uses live or near-live observations but persistent simulated cash,

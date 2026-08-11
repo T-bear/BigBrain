@@ -162,7 +162,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data
 - Typ: Implementation
 - Prioritet: P2
-- Status: Pågår – synthetic acquisition/gate/journal foundation verifierad
+- Status: Pågår – synthetic acquisition + manifest/persistence benchmark foundation verifierad
 - Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
   remain reproducible and enforceable.
 - Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
@@ -209,7 +209,18 @@ trading is the eventual destination, never the starting state or a guaranteed re
   overlap is deterministic, conflicts fail, and the immutable journal records policy,
   retention/deletion, counts, findings, failure and resulting revision without secrets.
   Twelve focused tests passed; full solution: 348/348 tests.
-- Kvar: richer quality aggregation, measured persistence, entitlement evidence for an
+- Evidens 2026-08-11 (synthetic persistence): immutable manifests bind dataset/revision,
+  coverage/counts, SHA-256 content identity, acquisition/policy/provenance, storage version
+  and retention/deletion obligations. The provider-neutral contract and in-memory reference
+  prove atomic complete-only append, exact/range/action/gap/lineage reads, idempotency,
+  conflict rejection, integrity and policy-scoped auditable deletion. A repeatable JSONL/
+  SQLite benchmark measured 2,520, 126,000 and 1,260,000 fixture rows. Large-case JSONL was
+  155,992,420 bytes and queried 100 instrument rows in 153.477 ms; SQLite was 356,208,640
+  bytes and 0.053 ms, with slower initial write (9,674.985 ms versus 793.331 ms). This
+  supports a provisional immutable-file + SQLite catalog/index direction, not activation.
+  Twelve focused tests passed; full solution: 360/360 tests.
+- Kvar: production-store/backup benchmarks and implementation, richer quality aggregation,
+  entitlement evidence for an
   eligible source, authorized provider adapter and external acceptance. Actual
   provider ingestion/persistence remains blocked by BB-071.
 
