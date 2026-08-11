@@ -1,6 +1,7 @@
 # Finance module
 
-Status: M1 foundation implemented and automatically verified; not deployed. Finance is
+Status: M1 and provider-neutral BB-045 entitlement/instrument/normalization foundations
+implemented and automatically verified; not deployed. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.
 
 Finance is a future first-party BigBrain module for research, simulation and eventually
@@ -55,9 +56,24 @@ not as investment logic or evidence of profitability.
 - Immutable dataset revisions and provenance envelopes bind checksum, adapter/schema,
   UTC source/retrieval time, instrument/venue, policy, quality and raw/derived lineage.
   Derived provenance requires input revisions and receives no automatic entitlement.
+- `CanonicalInstrument` provides a stable BigBrain ID, Equity/ETF type, currency, venue,
+  MIC, lifecycle and validity independent of any current ticker. Provider/product/symbol
+  mappings use inclusive `valid_from`/`valid_to`; rename boundaries are historical and
+  overlapping mappings for one instrument/product/MIC fail configuration.
+- Synthetic input contracts normalize without IO into decimal daily OHLCV or separately
+  typed cash-dividend/stock-split actions. Raw/adjusted basis, immutable revision and policy
+  identity survive normalization; split ratios are exact positive rationals.
+- Stable quality codes explain missing/ambiguous mappings, invalid ranges/volume/currency,
+  duplicates and conflicts. Within one revision an exact duplicate is ignored with a
+  finding; a conflicting duplicate is rejected and never overwrites the first observation.
 
 This code has no IO, network, persistence, logging or provider SDK. Tests use only the
 synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
+
+True exchange-calendar resolution is deliberately absent. Expected no-trading days,
+unknown missing observations and provider gaps must remain explicit rather than inferred.
+Renamed, inactive or delisted instruments remain historically addressable by canonical ID;
+future backtests must resolve the provider reference at the historical session date.
 
 ## Deliberately deferred
 

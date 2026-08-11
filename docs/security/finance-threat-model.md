@@ -64,3 +64,9 @@ and a pure evaluator. Evidence is an opaque validated reference, not content or 
 There is no logger, raw payload, network client, provider credential, persistence or
 execution path. Exact provider/product matching prevents a policy from authorizing data
 from another product accidentally.
+
+Implementation review 2026-08-11: the canonical normalization slice remains pure in-memory
+code over synthetic fixtures. It rejects ambiguous/unknown identity, overlapping history,
+invalid OHLCV/currency/actions and conflicting duplicates without repair or overwrite.
+There is no deserialization surface, network, credential, real payload, persistence,
+broker code, execution capability, container change or paid dependency.

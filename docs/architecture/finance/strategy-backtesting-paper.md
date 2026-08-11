@@ -39,6 +39,11 @@ bind every report to an immutable dataset version and use availability timestamp
 than later corrections. A current-survivor-only universe cannot qualify a strategy unless
 the survivorship limitation is explicit and accepted.
 
+The canonical identity foundation keeps renamed, inactive and delisted instruments
+historically addressable. Replay must resolve provider symbols using each session date,
+never today's ticker. Exchange-calendar/gap resolution and adjusted replay are not yet
+implemented; adjusted observations remain explicitly classified and are not raw evidence.
+
 ## Paper trading and Strategy Lab
 
 Paper trading uses live or near-live observations but persistent simulated cash,

@@ -164,9 +164,18 @@ exact provider/product scope and returns the source decision plus a stable reaso
 effective use remains denied for missing, unknown, denied, mismatched or expired policy.
 Tests are synthetic and deterministic. Persistence and external adapters remain absent.
 
+Implemented 2026-08-11: `CanonicalMarketData.cs` adds stable Equity/ETF identity and
+inclusive effective-date provider/product/symbol/MIC mappings. Synthetic daily decimal
+OHLCV and separate dividend/split actions normalize deterministically while preserving
+raw/adjusted basis, dataset revision, policy identity and source/retrieval provenance.
+Overlaps, unknown mappings, invalid ranges, negative volume/currency mismatches and invalid
+actions fail explicitly. Exact/conflicting duplicate outcomes are stable and non-overwriting.
+Without an exchange-calendar implementation, expected closure, unknown missing observation
+and provider gap remain separate concepts and are never guessed.
+
 BB-071 remains the external gate for selecting an entitlement and retaining actual
 provider data. BB-045 remains the ingestion/storage implementation and must not activate a
-provider until BB-071 passes. The next recommended implementation is canonical instrument
-identity with venue/MIC and time-bounded provider-symbol mappings, then synthetic OHLCV
-and corporate-action normalization. Persistence selection and external adapter activation
-remain separately gated.
+provider until BB-071 passes. The next recommended implementation is a small versioned
+market-session/calendar abstraction and richer gap findings, then deterministic historical
+replay over immutable synthetic revisions. Persistence selection and external adapter
+activation remain separately gated.

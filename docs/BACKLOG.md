@@ -118,7 +118,7 @@ broker connection or live authority exists. Dependencies refer to BB items and t
 - Modul: Finance
 - Typ: Epic
 - Prioritet: P2
-- Status: Pågår – provider-neutral policy/provenance foundation verifierad
+- Status: Pågår – entitlement/provenance + canonical instrument/normalization foundation verifierad
 - Upptäckt: 2026-08-10
 - Beroenden: BB-043; all promotion gates in the master roadmap.
 
@@ -162,7 +162,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data
 - Typ: Implementation
 - Prioritet: P2
-- Status: Planerad
+- Status: Pågår – entitlement/provenance + canonical instrument/normalization foundation verifierad
 - Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
   remain reproducible and enforceable.
 - Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
@@ -184,8 +184,13 @@ trading is the eventual destination, never the starting state or a guaranteed re
   provenance quality/classification and derived parent lineage are implemented. Synthetic
   tests cover explicit allowed/denied/unknown, missing/expired/mismatched policy,
   persistence, post-subscription retention and determinism. Full solution: 291/291 tests.
-- Kvar: canonical instrument mapping, OHLCV/corporate actions, quality findings,
-  normalization/replay, measured persistence and an authorized provider adapter. Actual
+- Evidens 2026-08-11: stable canonical Equity/ETF identity and inclusive effective-date
+  provider symbol mappings distinguish MIC venues and preserve identity across renames.
+  Synthetic decimal daily OHLCV, raw/adjusted basis, cash dividends, exact rational splits,
+  stable findings and duplicate/conflict handling normalize deterministically while
+  preserving dataset revision and entitlement policy. Full solution: 305/305 tests.
+- Kvar: market-calendar/session-aware gap handling, richer quality findings, deterministic
+  historical replay, measured persistence and an authorized provider adapter. Actual
   provider ingestion/persistence remains blocked by BB-071.
 
 ### BB-046 – Market-data licensing, retention and provider research

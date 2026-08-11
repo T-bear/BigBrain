@@ -41,3 +41,12 @@ denial, missing/not-current/provider-product-mismatched policy, raw and derived 
 post-subscription retention, required derived parents, raw lineage rejection, immutable
 dataset revision state and deterministic results/reason codes. Fixtures contain no real
 provider DTO or payload and no test opens a network, database or runtime connection.
+
+## BB-045 canonical normalization coverage
+
+Synthetic tests verify canonical identity across an exact ticker-change boundary, MIC
+distinction, overlap and unknown-mapping rejection, decimal daily OHLCV ranges and volume,
+dataset/policy preservation, explicit raw/adjusted basis, dividends, exact positive split
+ratios, duplicate/conflict non-overwrite and repeated-input determinism. Tests are fast,
+clock-independent, network-free and storage-free. A future calendar test layer must keep
+expected closure, unknown missing observation and provider gap distinct.

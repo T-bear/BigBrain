@@ -80,5 +80,7 @@ policy/provenance types may be implemented against fixtures before BB-071; real 
 payloads may not be persisted or reused until their exact policy returns `Allowed`.
 
 BB-045 now implements this provider-neutral contract in `BigBrain.Modules.Finance` with no
-adapter or IO. Evaluation additionally matches the requested provider/product exactly;
+adapter or IO. Canonical IDs survive ticker changes; provider/product/symbol/MIC mappings
+are effective-dated, and synthetic daily OHLCV/corporate actions normalize with immutable
+revision and entitlement references. Evaluation additionally matches provider/product exactly;
 an otherwise valid policy for another product fails closed with a stable diagnostic code.

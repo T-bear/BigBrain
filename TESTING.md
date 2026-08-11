@@ -49,6 +49,11 @@ docker compose config --quiet
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.
+  Canonical-normalization tests additionally cover historical symbol boundaries, MIC venue
+  distinction, overlap/unknown mapping rejection, decimal daily OHLCV invariants, raw and
+  adjusted classification, dividends, exact split ratios, immutable revision/policy
+  references, duplicates/conflicts and repeatable output. No calendar is guessed: future
+  expected no-trading days, unknown missing observations and provider gaps remain distinct.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

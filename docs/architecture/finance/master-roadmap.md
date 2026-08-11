@@ -19,14 +19,15 @@ enabled before all M13 gates are evidenced and explicitly approved.
 
 ## Current state and next gate
 
-- Current phase/milestone: RESEARCH / M1 complete.
+- Current phase/milestone: RESEARCH / early M2, BB-045 in progress.
 - Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
 - Active work: BB-071 waits for written provider confirmation.
 - Next safe task: send the BB-071 provider inquiry, then evaluate the written response.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
-- Safe parallel foundation: implement only provider-neutral entitlement/provenance types,
-  fail-closed evaluation and synthetic invariants from BB-045. Provider payload ingestion,
+- Safe parallel foundation: entitlement/provenance plus canonical instrument and synthetic
+  normalization foundations are verified. Next, define provider-neutral sessions/gaps and
+  deterministic replay. Provider payload ingestion,
   persistence and account work remain blocked.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
@@ -74,7 +75,7 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Definition of Done/gate: deterministic contracts, no write capability, green tests.
 - Rollback: remove module registration and domain-only types; no schema or data migration exists.
 
-### M2 – Historical market-data foundation — PLANNED
+### M2 – Historical market-data foundation — IN PROGRESS
 
 - Objective: ingest reproducible, licensed historical datasets with provenance.
 - Scope/tasks: provider adapter, corporate-action/timezone handling, quality checks,
@@ -95,6 +96,12 @@ Nordic/global EOD, with Tiingo/Massive as US specialists. Public terms now show 
 requirements after cancellation and leave parts of deterministic backtest/derived-data
 use product-dependent. This does not start M2: BB-071 must establish an adequate written
 entitlement first.
+
+Provider-neutral BB-045 progress through 2026-08-11 includes fail-closed entitlement and
+provenance, stable canonical instrument identity, effective-dated provider symbols, daily
+decimal OHLCV, cash dividends, exact stock splits, basic quality findings and deterministic
+synthetic normalization/duplicate handling. Calendar-aware gaps, replay, measured storage,
+authorized adapters and external acceptance remain incomplete.
 
 ### M3 – Backtest engine — PLANNED
 

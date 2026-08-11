@@ -1,7 +1,7 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-08-10 (Europe/Stockholm)
-- Verifierad mot commit: Finance-planeringen publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
+- Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
+- Verifierad mot commit: BB-045 instrument/normalization foundation publiceras i detta uppdrag; senaste runtimeevidens är oförändrad.
 - Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
@@ -89,7 +89,8 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 
 - Current phase: RESEARCH.
 - Current milestone: M2 / BB-045 in progress. M1 is complete; the first provider-neutral
-  entitlement/provenance slice is implemented, automatically verified and not deployed.
+  entitlement/provenance and canonical instrument/normalization slices are implemented,
+  automatically verified and not deployed.
 - Completed work: M0 planning plus decimal-based money/price/quantity/risk primitives,
   UTC market observations, provider-neutral market-data and strategy contracts, explicit
   risk/policy decision boundary, in-memory append-oriented decision journal, future
@@ -105,16 +106,20 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   provider/product/evidence/validity/retention/deletion metadata; immutable dataset
   revision and provenance models; raw/derived parent lineage; stable reason codes and a
   deterministic evaluator where missing, mismatched, expired or uncertain scope denies.
-- Automated verification 2026-08-10: .NET 10 restore/build passed; 259 API tests and 32
-  Sentinel tests passed (291 total), including synthetic entitlement/provenance invariants.
+- Implemented canonical slice: stable Equity/ETF identity independent of ticker; lifecycle,
+  currency, venue and MIC; inclusive effective-date symbol mappings; decimal daily OHLCV;
+  raw/adjusted basis; cash dividends; exact rational splits; quality findings and
+  deterministic duplicate/conflict handling with immutable revision/policy provenance.
+- Automated verification 2026-08-11: .NET 10 restore/build passed; 273 API tests and 32
+  Sentinel tests passed (305 total), including synthetic mapping/normalization invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: the product owner sends the prepared BB-071 provider inquiry, starting
   with Twelve Data. BB-045 ingestion remains blocked; no provider account, SDK or
   credential is authorized.
-- Next safe implementation slice: canonical instrument identity with time-bounded
-  provider-symbol mappings, followed by synthetic OHLCV/corporate-action normalization;
+- Next safe implementation slice: a provider-neutral market-calendar/session abstraction
+  and richer explicit gap classification, followed by deterministic historical replay;
   no provider adapter or persistence while BB-071 remains open.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
