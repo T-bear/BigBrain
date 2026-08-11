@@ -197,6 +197,14 @@ conditional evidence leads and the recommendation is `DO NOT INGEST YET`. Only e
 written entitlement plus product-owner review may precede an adapter/acceptance slice.
 Persistence selection remains separately measurement-gated.
 
+Implemented fixture-only acquisition preparation now provides the future ingress contract:
+exact request/product/range/policy/destination revision, immutable batch/pagination/
+completeness/provenance, stable observation IDs, explicit gaps/corrections and an immutable
+audit journal. The gate evaluates analysis, backtest, derived metrics, long-term storage and
+persistence before invoking an adapter. Accepted synthetic facts reuse canonical
+normalization and immutable assembly; content is never silently repaired or overwritten.
+No durable memory, provider transport or real entitlement was added.
+
 ## Persistence requirements derived from revision assembly
 
 Future storage must support append-only revision metadata; immutable observation/action/

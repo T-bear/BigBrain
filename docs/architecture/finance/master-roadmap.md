@@ -27,7 +27,8 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - Blocker for M2 implementation: BB-071. ADR 0021 was accepted by the product owner on
   2026-08-10, but acceptance authorizes no provider or ingestion.
 - Safe parallel foundation: entitlement/provenance, identity/normalization,
-  session/gap/replay and immutable correction/supersession assembly are verified.
+  session/gap/replay, immutable correction/supersession assembly and synthetic acquisition
+  gate/journal orchestration are verified.
   BB-072 has researched eligible zero-cost historical sources. Provider payload ingestion,
   persistence and account work remain blocked.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
@@ -104,8 +105,10 @@ decimal OHLCV, cash dividends, exact stock splits, basic quality findings and de
 synthetic normalization/duplicate handling. Explicit timezone-safe fixture sessions,
 closure/unknown/missing/provider-gap semantics and single-revision no-lookahead replay are
 also verified. Immutable parent/member assembly now preserves original→replacement correction
-availability and old-revision reproduction. Measured storage, authorized adapters and
-external acceptance remain incomplete.
+availability and old-revision reproduction. A fixture-only acquisition boundary now binds
+request/batch/pagination/provenance, requires all storage/backtest/derived entitlements,
+journals stable outcomes and reuses normalization/revision/replay. Measured storage,
+authorized real adapters and external acceptance remain incomplete.
 
 ### BB-072 – FREE HISTORICAL DATA INGESTION preparation/research — COMPLETE
 
@@ -117,6 +120,15 @@ quality. No source passed the complete durable-retention/non-display-backtesting
 the decision is `DO NOT INGEST YET`. EODHD Free Starter and Twelve Data Basic remain
 conditional evidence leads only. This milestone created no account, key, adapter, download
 or persistence. BB-071-class exact entitlement and explicit owner review remain mandatory.
+
+### Next safe M2 implementation while BB-071 is open
+
+The synthetic acquisition foundation is complete. If entitlement evidence is still absent,
+the next safe milestone is **SYNTHETIC ACQUISITION MANIFEST / PERSISTENCE BENCHMARK DESIGN**:
+measure fixture EOD volume, append/checksum/idempotency, replay-query shapes and licensed
+deletion/backup behavior without selecting storage or accessing a provider. Only after an
+exact free/free-adjacent entitlement is accepted may an explicitly owner-approved **FIRST
+AUTHORIZED FREE HISTORICAL DATA ADAPTER** milestone begin.
 
 ### M3 – Backtest engine — PLANNED
 

@@ -63,8 +63,12 @@ explicita marknadssessioner/gap och revision-bunden historisk replay utan lookah
 Immutable in-memory datasetrevisioner bevarar nu observation membership och applicerar
 corrections/supersession först vid deras explicita availability-gräns utan att skriva om
 äldre revisions-ID:n.
+Ett nytt fixture-only acquisition-lager binder framtida providerbatcher till exakt request,
+policy, provenance och destination revision, journalför deterministiska utfall och återanvänder
+befintlig normalisering, gap/replay och revision assembly. Dess `SyntheticFixture`-adapter
+kan inte auktorisera eller representera en riktig provider.
 Ingen persistence,
-provideradapter, executor, brokerintegration, UI eller live trading
+verklig provideradapter, executor, brokerintegration, UI eller live trading
 är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och

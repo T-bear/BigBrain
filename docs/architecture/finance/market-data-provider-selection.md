@@ -70,6 +70,12 @@ matrix are in the
 [BB-072 report](../../reports/features/finance/free-historical-data-source-research-20260811.md).
 BB-071's fail-closed standard still applies to the exact source/product/market.
 
+The synthetic acquisition foundation does not change this decision. It proves only the
+provider-neutral adapter handoff: a real adapter cannot be invoked by the prepared pipeline
+unless one exact policy explicitly permits historical analysis, non-display backtesting,
+derived metrics, long-term storage and persistence. `SyntheticFixture` policies are
+structurally isolated from any external provider identity.
+
 ## Initial M2 dataset
 
 - A small owner-approved allowlist of US and Swedish/Nordic equities and ETFs.

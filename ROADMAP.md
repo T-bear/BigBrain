@@ -21,5 +21,7 @@ ingestion or durable provider data remains blocked.
 free/free-adjacent source products were compared; none passed the complete durable
 retention and personal non-display backtesting gate. EODHD Free Starter is the best
 conditional evaluation lead and Twelve Data Basic the Nordic technical lead, but neither
-is authorized. Next is exact written entitlement evidence plus synthetic acquisition-
-contract planning. BB-071 remains mandatory before real ingestion or storage.
+is authorized. The synthetic acquisition contract, entitlement gate, journal and fixture
+pipeline are implemented and verified without external IO. Next is exact written
+entitlement evidence; if it remains blocked, continue with a synthetic manifest/persistence
+benchmark design. BB-071 remains mandatory before real ingestion or storage.

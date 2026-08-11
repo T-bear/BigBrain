@@ -162,7 +162,7 @@ trading is the eventual destination, never the starting state or a guaranteed re
 - Modul: Finance / Market Data
 - Typ: Implementation
 - Prioritet: P2
-- Status: Pågår – immutable correction/supersession assembly verifierad
+- Status: Pågår – synthetic acquisition/gate/journal foundation verifierad
 - Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
   remain reproducible and enforceable.
 - Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
@@ -201,6 +201,14 @@ trading is the eventual destination, never the starting state or a guaranteed re
   future correction. Old revisions remain directly reproducible and linear supersession,
   cycle/reference/scope/future-member invariants fail closed. Corporate-action and
   session/gap evidence retain source revision and policy. Full solution: 336/336 tests.
+- Evidens 2026-08-11 (synthetic acquisition): provider-neutral request/batch/observation,
+  pagination, completeness, provenance and correction contracts feed the existing canonical
+  normalizer and immutable revision assembler. The gate requires explicit analysis,
+  backtest, derived-metric, long-term-storage and persistence permission before adapter
+  invocation. `SyntheticFixture` cannot masquerade as real authorization. Identical retry/
+  overlap is deterministic, conflicts fail, and the immutable journal records policy,
+  retention/deletion, counts, findings, failure and resulting revision without secrets.
+  Twelve focused tests passed; full solution: 348/348 tests.
 - Kvar: richer quality aggregation, measured persistence, entitlement evidence for an
   eligible source, authorized provider adapter and external acceptance. Actual
   provider ingestion/persistence remains blocked by BB-071.

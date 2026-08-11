@@ -98,3 +98,13 @@ record and instead relates active original and newly introduced replacement memb
 an explicit UTC availability time. A linear acyclic supersession catalog makes old revision
 IDs reproducible and chooses current knowledge through inclusive `available <= as-of`.
 Dataset/provider/product scope cannot change inside the chain. Persistence remains deferred.
+
+The fixture-only acquisition preparation now defines the adapter handoff without adding a
+provider transport. A request fixes source/product, provider and canonical identity, range,
+daily/raw-adjusted scope, UTC acquisition, source timezone, cursor, policy and destination
+revision. Immutable batches add response identity, pagination, completeness, provenance,
+raw observations/actions, gaps and correction declarations. Before adapter invocation, the
+gate requires exact permission for historical analysis, backtesting, derived metrics,
+long-term storage and persistence. The pipeline then reuses canonical normalization and
+revision assembly; an acquisition journal records reproducibility/audit counts and deletion
+metadata without payloads or credentials. Only `SyntheticFixture` evidence is implemented.

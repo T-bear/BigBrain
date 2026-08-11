@@ -83,3 +83,11 @@ IDs, change dataset/provider/product scope, precede source availability or creat
 branches. As-of resolution is supplied UTC input and fails when no revision was available.
 All state is synthetic immutable in-memory data; there is no serializer, database, network,
 credential, provider payload, migration, paid dependency, runtime or trading capability.
+
+Implementation review 2026-08-11 (synthetic acquisition): the pre-adapter gate requires
+explicit permission for analysis, backtesting, derived metrics, long-term storage and
+persistence before adapter invocation. Fixture authorization requires unmistakable
+synthetic provider/product/evidence identifiers. Immutable batch IDs reject conflicting
+retries, corrections reuse the existing assembler, and journal contracts expose no key,
+token, header or raw-payload field. No transport, serializer, credential, external data,
+durable store, runtime capability or trading authority was introduced.

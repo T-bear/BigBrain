@@ -27,6 +27,13 @@ knowledge/as-of boundary. Correction ID, original/replacement member IDs, reason
 and superseding revision make later facts explainable without rewriting earlier decisions.
 The current assembler is in-memory only and creates no persisted journal.
 
+The M2 acquisition journal is a separate immutable evidence model, not the future trading
+decision journal. It records the acquisition request/source/range, policy evidence and
+retention/deletion obligations, received/accepted/rejected/duplicate counts, quality
+findings, outcome reason and resulting revision. It deliberately excludes credentials,
+headers and raw payloads. A future persistent correlation graph may reference its request
+and revision IDs but must not copy licensed data into audit records to evade deletion.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

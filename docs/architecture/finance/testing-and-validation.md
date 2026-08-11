@@ -5,6 +5,14 @@ executable test surface; documentation verification, whitespace validation and C
 configuration validation are its applicable automated gates. External-data acceptance
 tests remain forbidden until BB-071 authorizes an exact entitlement.
 
+The subsequent synthetic acquisition slice tests the pre-adapter entitlement boundary and
+adapter-to-domain orchestration without network or storage. It covers deterministic request,
+batch and pagination order; deny-before-adapter; synthetic-only policy identity; unauthorized
+source/retention; identical retry and overlap; conflicting batch identity; correction
+supersession; acquisition journal counts/deletion evidence; canonical normalization;
+explicit gap/replay; immutable assembly; repeated replay/no-lookahead; and the absence of
+credential/header fields. These tests do not constitute external-data acceptance evidence.
+
 Required layers are unit, integration, simulation, backtest regression, property/invariant,
 paper integration, broker sandbox, failure injection, reconciliation, security, UI,
 accessibility, performance and long-running soak tests.

@@ -124,15 +124,23 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   original→replacement corrections, linear supersession, inclusive availability-as-of
   selection and deterministic ordering. Old revision IDs remain exactly reproducible;
   invalid references, cycles, branches, future members and scope changes fail explicitly.
-- Automated verification 2026-08-11: .NET 10 restore/build passed; 304 API tests and 32
-  Sentinel tests passed (336 total), including synthetic correction/no-lookahead invariants.
+- Implemented acquisition slice: provider-neutral requests and immutable batches carry
+  exact source/product, canonical/provider identity, range, timezone, pagination,
+  provenance, completeness and destination revision. A fail-closed gate requires all
+  storage/backtest/derived uses before adapter execution. The `SyntheticFixture` adapter,
+  deterministic retries/overlap, acquisition journal and orchestration reuse existing
+  normalization, gap/replay and revision assembly without IO or persistence.
+- Automated verification 2026-08-11: .NET 10 restore/build passed; 316 API tests and 32
+  Sentinel tests passed (348 total). This includes 12 synthetic acquisition/gate/journal/
+  integration tests plus all prior correction/no-lookahead invariants.
 - Active work: BB-071 is waiting for written provider confirmation. Current public terms
   require deletion after cancellation for Twelve Data, Tiingo and Massive, and do not
   establish the complete intended retention/backtesting entitlement.
 - Next safe task: obtain exact BB-071-class written evidence for EODHD Free Starter and
   Twelve Data Basic, covering US/XSTO retention, non-display backtesting, derived data and
-  termination. Any acquisition-contract work remains synthetic. No provider account, SDK
-  or credential is authorized; physical storage selection remains measurement-gated.
+  termination. If still blocked, benchmark only synthetic acquisition manifests, bounded
+  storage/query shapes and deletion/backup behavior. No provider account, SDK or credential
+  is authorized; physical storage selection remains measurement-gated.
 - Known limitations: no persistence, external market data, real strategy, full Risk Engine,
   paper executor, custom Finance API/UI, broker adapter or runtime deployment.
 - Blockers: BB-071 blocks external data ingestion. ADR 0021 was accepted after explicit

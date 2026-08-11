@@ -62,6 +62,11 @@ docker compose config --quiet
   immutable old revisions, explicit linear supersession, correction references/cycles,
   deterministic multi-correction order, policy/provenance, corporate-action time,
   inherited session/gap evidence and rejection of future/unavailable membership.
+  Acquisition tests require exact multi-use entitlement before adapter invocation and cover
+  deterministic requests/batches, synthetic-only identity, unauthorized provider/retention,
+  repeated batches, overlapping pagination, correction supersession, journal evidence,
+  canonical normalization, explicit provider gaps, immutable revision assembly, repeated
+  replay/no-lookahead and absence of secret-bearing contract fields.
   Sprint 1 testar decimalprecision, invariants, UTC, provider-neutral fixture-data,
   strategy-/orderseparation, fail-closed risk/policy, NO TRADE/REJECTED-journal,
   korrelationskedja och att endast PAPER kan skapa ett lokalt paper-intent.

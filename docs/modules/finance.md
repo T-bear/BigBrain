@@ -85,8 +85,20 @@ not as investment logic or evidence of profitability.
   whose creation/availability is `<=` the supplied knowledge boundary. Exact old revision
   lookup never changes after later corrections. Member/correction output order is ordinal
   and independent of input collection order.
+- `HistoricalDataAcquisitionRequest` and immutable acquisition batches bind future adapter
+  output to exact provider/product, instrument/reference/MIC, date range, daily/raw-adjusted
+  scope, UTC acquisition, timezone, pagination, provenance, policy and destination revision.
+- The acquisition gate requires explicit HistoricalAnalysis, Backtest, DerivedMetrics,
+  LongTermStorage and persistence permission before calling an adapter. Missing, unknown,
+  denied or mismatched scope returns a stable denial. Fixture authorization is restricted
+  to unmistakable `SyntheticFixture`/`Synthetic-`/`fixture:` evidence.
+- The synthetic ingestion pipeline deterministically deduplicates identical batches and
+  overlapping observations, rejects conflicting batch identity, calls the existing
+  canonical normalizer, carries explicit gaps into replay evidence and delegates correction
+  membership to the existing immutable assembler. Its journal contains policy/deletion,
+  counts, findings and result revision, never authentication material.
 
-This code has no IO, network, persistence, logging or provider SDK. Tests use only the
+This code has no IO, network, persistence, durable logging or provider SDK. Tests use only the
 synthetic `ExampleData`/`Synthetic-EOD-Personal` fixtures.
 
 Production exchange-calendar resolution is deliberately absent. Only supplied fixture
