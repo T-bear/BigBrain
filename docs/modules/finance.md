@@ -252,6 +252,8 @@ revisions and indexes.
 
 BB-080 adds the first production research-backtest capability. `daily-next-session-open-v1` consumes only exact immutable market and feature revisions, causally visible features and current simulated cash/long position state. Buy-and-hold/v1, SMA crossover/v1 and momentum/v1 return research intents only. Whole-share equal initial allocation, explicit zero/conservative cost models and seed participate in immutable run identity. SQLite retains event journal, simulated fills, equity/drawdown and metrics; `/api/v1/modules/finance/backtests` and run detail are read-only. EODHD deletion covers all dependent backtest evidence. There is no mutation endpoint, broker order, PAPER/LIVE mode or recommendation.
 
+BB-081 adds `chronological-oos-walk-forward/v1`. Exact lineage plus split/embargo, fixed walk-forward, bounded diagnostic grid, cost ladder, sufficiency thresholds and `transparent-robustness-score-v2` create immutable evaluation IDs/checksums. `/api/v1/modules/finance/robustness` and exact detail are bounded read-only surfaces. A 50-session embargo isolates the current maximum feature lookback; test evidence cannot influence train runs or parameter selection. SQLite owns evaluation/window/sensitivity evidence, all of which inherits EODHD deletion scope. Numerical score labels never override `INSUFFICIENT_DATA` and grant no trading authority.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

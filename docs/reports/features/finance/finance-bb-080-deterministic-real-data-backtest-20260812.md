@@ -1,10 +1,18 @@
 # BB-080 first deterministic real-data backtest engine
 
-## Status and scope
+## Metadata
+
+- Date: 2026-08-12
+- Scope: Finance BB-080
+- Runtime outcome: implemented, persisted, deployed and restart-verified
+
+## Status
 
 Implemented, automatically verified, deployed and restart-verified on 2026-08-12. Finance remains read-only `RESEARCH`. Simulated fills are historical evidence objects, not orders. No broker, credential, PAPER, LIVE or external execution surface was added.
 
-## Exact BB-078/079 evidence run
+## Evidence
+
+### Exact BB-078/079 evidence run
 
 - Market revisions: `eodhd-23b42bae32d6d7de`, `eodhd-2973b33284f6f946`, `eodhd-4d13774721c95b71`, `eodhd-53854b703d52c45f`, `eodhd-6a8d44394900aefd`, `eodhd-8a8b419115043082`, `eodhd-8e7a62bd62a5708b`, `eodhd-bfdfa7770fbebed0`.
 - Feature revision: `feature-5d0397a53d094a2f`.
@@ -24,7 +32,9 @@ Implemented, automatically verified, deployed and restart-verified on 2026-08-12
 
 The six result checksums are recorded by the immutable catalog. Repeated execution returned the same IDs/checksums and `idempotent=True`. The first build read 42,168 feature rows, created 612 simulated fills and 14,166 stored events in 4,241 ms. It made no provider request; request accounting was eight before and after that command.
 
-## Semantics and verification
+## Changes
+
+### Semantics and verification
 
 Strategies receive only the completed bar, causally visible features and current simulated portfolio. Transition intents fill at the next available open; end-of-data intents remain unfilled. Whole-share allocation never borrows or creates negative cash. Journal rows retain market/feature references, intent, fill, cash/position transitions and mark-to-market. Curves retain cash, holdings, equity and drawdown; metrics include gross/net return, annualized return where valid, volatility, Sharpe-like daily/252 ratio, drawdown, exits, turnover, costs and benchmark/excess.
 
@@ -32,12 +42,22 @@ Golden tests prove next-open timing, future-feature masking, future-bar independ
 
 EODHD deletion preview/confirmation now inventories dependent runs, journals, fills, curves, metrics and indexes before feature/market deletion. Generic strategy definitions remain.
 
+## Security
+
+The engine is offline/read-only research. It exposes no broker credential, order API, PAPER/LIVE mode or external execution and publishes no licensed rows.
+
 ## Runtime state note
 
 Deployment occurred on the next UTC schedule date. The pre-existing acquisition worker—not the backtest command—performed its normal bounded daily ingestion independently, so runtime later gained newer immutable market/feature revisions and corresponding new run IDs. This does not mutate the six exact BB-078/079 runs above. The offline run was request-free; no provider call is required by or implemented inside the backtest engine.
 
-## Limitations and next gate
+## Remaining work
 
 Raw OHLC is not corporate-action adjusted, corporate-action coverage is incomplete, the universe is current-survivor-selected, fills assume full liquidity, and roughly one year is engineering evidence only. Results are not recommendations or profitability validation. The next safe slice is BB-081 robustness/out-of-sample and cost-sensitivity foundations; do not proceed directly to PAPER.
 
-This sanitized report contains no licensed price rows, raw payload, secret, account identity, private address or sensitive filesystem path.
+## Resumption
+
+Use `finance-backtests-build` for an idempotent local-memory build and verify exact catalog/detail run IDs and checksums. No provider request is part of the command.
+
+## Sanitization
+
+Detta är en sanerad GitHub-version. This report contains no licensed price rows, raw payload, secret, account identity, private address or sensitive filesystem path.

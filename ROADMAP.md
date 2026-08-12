@@ -70,6 +70,7 @@ korrekthet, idempotent checksumma, explicit warmup, causal no-lookahead, SQLite-
 retention lineage samt API/UI är verifierade och deployade. Nästa säkra gate är en minimal
 M3 research-backtest som binder exakt market revision + feature revision; ingen PAPER/trading.
 **BB-080 FIRST DETERMINISTIC REAL-DATA BACKTEST ENGINE** levererar nu M3:s första offline researchmotor med exact revision pinning, buy-and-hold/SMA10-20/momentum20, next-open fills, whole-share portfolio, explicita zero/conservative costs, immutable journal/result/checksum, metrics/curves och read-only API/UI. BB-078/079-runs är deterministiskt restart-verifierade. Nästa säkra gate är BB-081 robustness/out-of-sample; inte PAPER.
+**BB-081 ROBUSTNESS / OUT-OF-SAMPLE FOUNDATION** levererar immutable 70/30-evidens med 50-sessioners embargo, fixed expanding walk-forward, bounded parameter- och cost-sensitivity samt transparent versionerad score. Den korta reala testdelen ger korrekt `INSUFFICIENT_DATA` för alla tre referensstrategier. Nästa säkra steg är längre/andra rättighetsklarerade historiska minnen eller corporate-action-adjusterad lineage; inte PAPER.
 
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/

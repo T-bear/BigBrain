@@ -25,6 +25,9 @@ public static class FinanceEndpoints
             return Results.Json(result with { Events=result.Events.Skip(boundedEventOffset).Take(boundedEventLimit).ToArray(),
                 Fills=result.Fills.Skip(boundedFillOffset).Take(boundedFillLimit).ToArray(), EquityCurve=result.EquityCurve.Take(500).ToArray() },JsonOptions);
         });
+        endpoints.MapGet("/api/v1/modules/finance/robustness",(IFinanceRobustnessReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/robustness/{evaluationId}",(string evaluationId,IFinanceRobustnessReader reader)=>
+            reader.GetEvaluation(evaluationId) is { } result?Results.Json(result,JsonOptions):Results.NotFound());
         return endpoints;
     }
 

@@ -447,6 +447,11 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
 .finance-backtest-tabs small,.finance-limitations { color:var(--bb-color-text-muted); font-size:var(--bb-font-size-xs); }
 .finance-limitations { margin-top:14px!important; }
 .finance-chart .finance-drawdown-path { stroke:var(--bb-color-warning); stroke-dasharray:3 2; }
+.finance-insufficient { padding:10px 14px; border:1px solid var(--bb-color-warning); border-radius:var(--bb-radius-md); color:var(--bb-color-warning); font-weight:var(--bb-font-weight-bold); text-align:center; }
+.finance-robustness-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:16px; }
+.finance-robustness-grid article { padding:12px; border:1px solid var(--bb-color-border); border-radius:var(--bb-radius-md); background:var(--bb-color-bg-subtle); }
+.finance-robustness-grid h4,.finance-robustness-grid p { margin:0 0 6px; }.finance-robustness-grid small { color:var(--bb-color-text-muted); }
+.finance-cost-row { display:flex; justify-content:space-between; gap:8px; font-size:var(--bb-font-size-sm); }
 .finance-entitlement { border-color:color-mix(in srgb,var(--bb-color-warning) 45%,var(--bb-color-border)); }
 
 @media (max-width:720px) {
@@ -454,6 +459,7 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
   .finance-panel { grid-column:1/-1; padding:14px; }
   .finance-instrument { min-height:98px; }
   .finance-details { grid-template-columns:1fr; }
+  .finance-robustness-grid { grid-template-columns:1fr; }
 }
 
 @media(max-width:760px){

@@ -98,7 +98,7 @@ internal sealed partial class EodhdMarketMemory
         var existing = ScalarTextOrNull(connection, "SELECT checksum FROM backtest_runs WHERE run_id=$id", ("$id", result.RunId));
         if (existing is not null)
         {
-            if (existing != result.Checksum) throw new InvalidOperationException("Immutable backtest identity conflict.");
+            if (existing != result.Checksum) throw new InvalidOperationException($"Immutable backtest identity conflict for {result.RunId}: stored {existing}, computed {result.Checksum}.");
             return false;
         }
         using var transaction = connection.BeginTransaction();

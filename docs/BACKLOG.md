@@ -503,6 +503,16 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Verifierat: golden/no-lookahead/determinism/cost/edge/retention tests, real BB-078/079 offline run, idempotent restart, build/deploy/runtime. Ingen trading capability.
 - Report: `docs/reports/features/finance/finance-bb-080-deterministic-real-data-backtest-20260812.md`.
 
+### BB-081 – Robustness / out-of-sample strategy evaluation foundation
+
+- Modul: Finance / Strategy Lab / Web
+- Typ: Implementation / immutable evidence / runtime verification
+- Prioritet: P1
+- Status: Klar 2026-08-12
+- Resultat: versionerad exact-lineage evaluation plan, kronologiska splits och embargo, expanding walk-forward, bounded parameter/cost sensitivity, transparent score, hård insufficiency override, immutable SQLite evidence samt read-only API/UI.
+- Verifierat: 70 reala underliggande runs över buy-and-hold/SMA/momentum, no-leakage/determinism/cost/split/retention tests, persistence/restart och runtime. Alla verdict är korrekt `INSUFFICIENT_DATA`; ingen PAPER/LIVE/trading.
+- Report: `docs/reports/features/finance/finance-bb-081-robustness-out-of-sample-20260812.md`.
+
 ### BB-048 – Transaction-cost, slippage and fill simulation
 
 - Modul: Finance / Backtesting
@@ -518,7 +528,7 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Strategy Lab
 - Typ: Statistical validation
 - Prioritet: P1
-- Status: Planerad
+- Status: Grund levererad genom BB-081; längre historik, train/validation/test-selection governance och multiple-hypothesis correction återstår
 - Beroenden: BB-047, BB-048.
 - Syfte/scope: prevent research selection from being mistaken for durable expectancy by
   governing split design, repeated testing, parameter/regime sensitivity and sequence risk.

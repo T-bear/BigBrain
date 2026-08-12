@@ -108,3 +108,7 @@ Validation explicitly addresses multiple testing/data mining and selection bias 
 addition to overfitting, survivorship, look-ahead, leakage, regime change, costs and
 slippage. Promotion requires current lifecycle evidence, Risk policy and explicit owner
 approval. See [market-data memory and provenance](market-data-memory-and-provenance.md).
+
+## BB-081 chronological evaluation governance
+
+`chronological-oos-walk-forward/v1` keeps train earlier than embargo and test, never shuffles time and evaluates fixed parameters in each expanding walk-forward window. The 50-session default embargo matches `core-daily-v1` maximum lookback. SMA and momentum neighborhoods plus the five-point cost ladder are bounded diagnostics, not selection. `transparent-robustness-score-v2` publishes weighted components, while minimum train/test/window requirements have absolute precedence. Evaluation identity, all run references and checksum are immutable; changing test rows cannot change train or an earlier completed window.

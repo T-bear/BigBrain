@@ -59,6 +59,7 @@ enabled before all M13 gates are evidenced and explicitly approved.
   no-lookahead, persistence/restart, API/UI and EODHD deletion lineage are runtime-verified.
   BB-080 subsequently delivered the minimal M3 research backtest bound to exact market + feature revisions; live remains a separate entitlement/source gate.
 - BB-080: buy-and-hold, SMA10/20 and momentum20 now run through deterministic next-open, whole-share and explicit zero/conservative cost models. Immutable SQLite runs/journal/fills/curves/metrics, read-only API/UI, no-lookahead tests and EODHD deletion lineage are deployed and restart-verified. Next: BB-081 robustness/out-of-sample foundation, not PAPER.
+- BB-081: chronological split/embargo, fixed expanding walk-forward, bounded parameter and five-level cost sensitivity, transparent scoring and insufficiency override are now immutable, deployed and restart-verified. Current 26-session OOS evidence is insufficient. Next: longer/second entitled history or adjusted corporate-action lineage; not PAPER.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.

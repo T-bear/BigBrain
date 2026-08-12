@@ -41,7 +41,12 @@ public sealed record FinanceRetentionSummary(
     int CoveredBacktestRunCount = 0,
     int CoveredBacktestEventCount = 0,
     int CoveredBacktestFillCount = 0,
-    int CoveredBacktestEquityPointCount = 0);
+    int CoveredBacktestEquityPointCount = 0,
+    int CoveredRobustnessEvaluationCount = 0,
+    int CoveredRobustnessWindowCount = 0,
+    int CoveredRobustnessParameterPointCount = 0,
+    int CoveredRobustnessCostPointCount = 0,
+    int CoveredRobustnessRunReferenceCount = 0);
 
 public sealed record FinanceInstrumentObservation(
     string InstrumentId,

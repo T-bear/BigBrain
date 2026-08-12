@@ -59,6 +59,14 @@ docker compose run --rm --no-deps --entrypoint dotnet api BigBrain.Api.dll finan
 
 This command performs no provider request. Its sanitized output includes exact market/feature revisions, run IDs/checksums, sessions, feature reads, simulated fills, events, elapsed time and idempotency. Deletion preview must include dependent backtest runs, events, fills and equity points; result JSON also contains metrics. Generic strategy definitions may remain.
 
+Build or idempotently verify BB-081 robustness evidence from the same local memory:
+
+```bash
+docker compose run --rm --no-deps --entrypoint dotnet api BigBrain.Api.dll finance-robustness-build
+```
+
+The command performs no provider request. Its output is sanitized to lineage, evaluation IDs/checksums, bounded run/window/variant counts, elapsed time and idempotency. Preview/confirm deletion additionally covers evaluations, run references, walk-forward windows, parameter sensitivity, cost sensitivity, aggregate results and indexes. Generic evaluation-plan code may remain.
+
 ## Record termination or expiry
 
 Set `FINANCE__EODHD__ACCOUNTACTIVE=false` and

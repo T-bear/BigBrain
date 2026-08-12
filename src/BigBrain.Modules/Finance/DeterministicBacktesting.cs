@@ -69,7 +69,7 @@ public sealed record BacktestCostModel(string Id, string Version, decimal Commis
 public sealed record BacktestRunConfiguration(IReadOnlyList<string> MarketRevisionIds, string FeatureRevisionId,
     StrategyIdentity Strategy, IReadOnlyDictionary<string, decimal> StrategyParameters, string SimulationModel,
     BacktestCostModel CostModel, decimal InitialCapital, IReadOnlyList<string> Universe, DateOnly From, DateOnly To,
-    string SizingPolicy, int Seed);
+    string SizingPolicy, int Seed,string? EvaluationContext=null);
 public sealed record BacktestFill(string FillId, string InstrumentId, DateOnly IntentSession, DateOnly FillSession,
     string Side, int Quantity, decimal ReferenceOpen, decimal FillPrice, decimal Commission, decimal EstimatedSlippage,
     decimal CashBefore, decimal CashAfter, int PositionBefore, int PositionAfter);

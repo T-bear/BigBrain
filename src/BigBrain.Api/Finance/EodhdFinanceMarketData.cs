@@ -132,7 +132,8 @@ internal sealed class EodhdAdapter : IDisposable
 
 internal sealed record EodhdDeletionPreview(string PreviewId, int Observations, int Revisions, int Payloads,
     int FeatureValues, int FeatureRevisions, int BacktestRuns, int BacktestEvents, int BacktestFills,
-    int BacktestEquityPoints, DateTimeOffset? DeadlineUtc, string Scope);
+    int BacktestEquityPoints,int RobustnessEvaluations,int RobustnessWindows,int RobustnessParameterPoints,
+    int RobustnessCostPoints,int RobustnessRunReferences,DateTimeOffset? DeadlineUtc, string Scope);
 
 internal sealed record EodhdRuntimeEvidence(int ExternalRequests, int AcquisitionAttempts, int SuccessfulAttempts,
     int FailedAttempts, int Retries, int Observations, int Revisions, int Payloads, DateOnly? CoverageFrom,
@@ -183,6 +184,7 @@ internal sealed partial class EodhdMarketMemory
             """; command.ExecuteNonQuery();
         InitializeFeatureStorage(connection);
         InitializeBacktestStorage(connection);
+        InitializeRobustnessStorage(connection);
     }
 
     internal string Store(EodhdInstrument instrument, IReadOnlyList<EodhdDailyBar> bars, byte[] payload,
@@ -287,9 +289,10 @@ internal sealed partial class EodhdMarketMemory
         var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values");
         var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
         var backtestRuns=Scalar(connection,"SELECT COUNT(*) FROM backtest_runs");var backtestEvents=Scalar(connection,"SELECT COUNT(*) FROM backtest_events");var backtestFills=Scalar(connection,"SELECT COUNT(*) FROM backtest_fills");var backtestEquity=Scalar(connection,"SELECT COUNT(*) FROM backtest_equity");
-        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}";
-        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,
-            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtest runs/events/fills/equity/metrics and catalog indexes");
+        var evaluations=Scalar(connection,"SELECT COUNT(*) FROM robustness_evaluations");var windows=Scalar(connection,"SELECT COUNT(*) FROM robustness_windows");var parameterPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_parameter_sensitivity");var costPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_cost_sensitivity");var runReferences=Scalar(connection,"SELECT COUNT(*) FROM robustness_run_references");
+        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}|{evaluations}|{windows}|{parameterPoints}|{costPoints}|{runReferences}";
+        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,evaluations,windows,parameterPoints,costPoints,runReferences,
+            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtests and robustness evaluations/windows/sensitivity/metrics/indexes");
     }
 
     internal string ExecuteDeletion(EodhdDeletionPreview preview, string confirmation, DateTimeOffset deletedAtUtc)
@@ -300,6 +303,7 @@ internal sealed partial class EodhdMarketMemory
         var paths = new List<string>(); using (var command = connection.CreateCommand()) { command.Transaction = transaction; command.CommandText = "SELECT path FROM payloads"; using var reader = command.ExecuteReader(); while (reader.Read()) paths.Add(reader.GetString(0)); }
         foreach (var path in paths.Where(File.Exists)) File.Delete(path);
         if (paths.Any(File.Exists)) throw new IOException("One or more covered EODHD payloads could not be deleted.");
+        Execute(connection,transaction,"DELETE FROM robustness_run_references");Execute(connection,transaction,"DELETE FROM robustness_windows");Execute(connection,transaction,"DELETE FROM robustness_parameter_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_cost_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_evaluations");
         Execute(connection,transaction,"DELETE FROM backtest_events");Execute(connection,transaction,"DELETE FROM backtest_fills");Execute(connection,transaction,"DELETE FROM backtest_equity");Execute(connection,transaction,"DELETE FROM backtest_runs");
         Execute(connection, transaction, "DELETE FROM feature_values"); Execute(connection, transaction, "DELETE FROM feature_revisions");
         Execute(connection, transaction, "DELETE FROM observations"); Execute(connection, transaction, "DELETE FROM revisions"); Execute(connection, transaction, "DELETE FROM payloads");
@@ -310,6 +314,7 @@ internal sealed partial class EodhdMarketMemory
         Execute(connection, transaction, "INSERT INTO feature_deletion_receipts VALUES($id,$values,$revisions)",
             ("$id", receipt), ("$values", preview.FeatureValues), ("$revisions", preview.FeatureRevisions));
         Execute(connection,transaction,"INSERT INTO backtest_deletion_receipts VALUES($id,$runs,$events,$fills,$equity)",( "$id",receipt),("$runs",preview.BacktestRuns),("$events",preview.BacktestEvents),("$fills",preview.BacktestFills),("$equity",preview.BacktestEquityPoints));
+        Execute(connection,transaction,"INSERT INTO robustness_deletion_receipts VALUES($id,$evaluations,$windows,$parameters,$costs,$runs)",( "$id",receipt),("$evaluations",preview.RobustnessEvaluations),("$windows",preview.RobustnessWindows),("$parameters",preview.RobustnessParameterPoints),("$costs",preview.RobustnessCostPoints),("$runs",preview.RobustnessRunReferences));
         transaction.Commit(); return receipt;
     }
 
@@ -347,12 +352,13 @@ internal sealed partial class EodhdMarketMemory
         var observations = Scalar(connection, "SELECT COUNT(*) FROM observations"); var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
         var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values"); var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
         var backtestRuns=Scalar(connection,"SELECT COUNT(*) FROM backtest_runs");var backtestEvents=Scalar(connection,"SELECT COUNT(*) FROM backtest_events");var backtestFills=Scalar(connection,"SELECT COUNT(*) FROM backtest_fills");var backtestEquity=Scalar(connection,"SELECT COUNT(*) FROM backtest_equity");
+        var evaluations=Scalar(connection,"SELECT COUNT(*) FROM robustness_evaluations");var windows=Scalar(connection,"SELECT COUNT(*) FROM robustness_windows");var parameterPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_parameter_sensitivity");var costPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_cost_sensitivity");var runReferences=Scalar(connection,"SELECT COUNT(*) FROM robustness_run_references");
         string? receipt = null; using (var command = connection.CreateCommand()) { command.CommandText = "SELECT receipt_id FROM deletion_receipts ORDER BY deleted_utc DESC LIMIT 1"; receipt = command.ExecuteScalar() as string; }
         var deadline = _options.EntitlementEndsAtUtc?.AddMonths(1); var state = receipt is not null && observations == 0 ? FinanceRetentionState.DeletionComplete :
             accountActive ? FinanceRetentionState.Active : deadline is null ? FinanceRetentionState.Unknown : DateTimeOffset.UtcNow > deadline ? FinanceRetentionState.ExpiredBlocked : FinanceRetentionState.DeletionRequired;
         return new(state, _options.EntitlementEndsAtUtc, deadline, observations, revisions, payloads,
             "raw payloads, normalized observations, market revisions, derived feature values/revisions and catalog indexes", receipt,
-            featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity);
+            featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,evaluations,windows,parameterPoints,costPoints,runReferences);
     }
 
     private static int Scalar(SqliteConnection connection, string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; return Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
@@ -410,7 +416,8 @@ internal static class EodhdMaintenanceCommand
     {
         if (args.Length == 0 || !(args[0].StartsWith("finance-eodhd-", StringComparison.Ordinal) ||
             args[0].StartsWith("finance-features-", StringComparison.Ordinal) ||
-            args[0].StartsWith("finance-backtests-", StringComparison.Ordinal))) return false;
+            args[0].StartsWith("finance-backtests-", StringComparison.Ordinal) ||
+            args[0].StartsWith("finance-robustness-", StringComparison.Ordinal))) return false;
         var options = new EodhdFinanceOptions(); configuration.GetSection(EodhdFinanceOptions.Section).Bind(options);
         var memory = new EodhdMarketMemory(options);
         if (args[0] == "finance-features-build")
@@ -424,6 +431,11 @@ internal static class EodhdMaintenanceCommand
             var result = memory.BuildReferenceBacktests();
             Console.WriteLine($"feature-revision={result.FeatureRevisionId} market-revisions={string.Join(',', result.MarketRevisionIds)} runs={string.Join(',', result.RunIds)} checksums={string.Join(',', result.Checksums)} sessions={result.Sessions} instruments={result.Instruments} feature-reads={result.FeatureReads} fills={result.Fills} events={result.Events} elapsed-ms={result.ElapsedMilliseconds} idempotent={result.Idempotent}");
             return true;
+        }
+        if(args[0]=="finance-robustness-build")
+        {
+            var result=memory.BuildRobustnessEvaluations();
+            Console.WriteLine($"feature-revision={result.FeatureRevisionId} market-revisions={string.Join(',',result.MarketRevisionIds)} evaluations={string.Join(',',result.EvaluationIds)} checksums={string.Join(',',result.Checksums)} unique-runs={result.UniqueBacktestRuns} windows={result.EvaluationWindows} parameter-variants={result.ParameterVariants} cost-variants={result.CostVariants} elapsed-ms={result.ElapsedMilliseconds} idempotent={result.Idempotent}");return true;
         }
         if (args[0] == "finance-eodhd-runtime-evidence")
         {
@@ -442,7 +454,7 @@ internal static class EodhdMaintenanceCommand
         var preview = memory.PreviewDeletion();
         if (args[0] == "finance-eodhd-deletion-preview")
         {
-            Console.WriteLine($"preview={preview.PreviewId} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} feature-values={preview.FeatureValues} feature-revisions={preview.FeatureRevisions} backtest-runs={preview.BacktestRuns} backtest-events={preview.BacktestEvents} backtest-fills={preview.BacktestFills} backtest-equity={preview.BacktestEquityPoints} deadline={preview.DeadlineUtc:O}");
+            Console.WriteLine($"preview={preview.PreviewId} observations={preview.Observations} revisions={preview.Revisions} payloads={preview.Payloads} feature-values={preview.FeatureValues} feature-revisions={preview.FeatureRevisions} backtest-runs={preview.BacktestRuns} backtest-events={preview.BacktestEvents} backtest-fills={preview.BacktestFills} backtest-equity={preview.BacktestEquityPoints} evaluations={preview.RobustnessEvaluations} evaluation-windows={preview.RobustnessWindows} parameter-points={preview.RobustnessParameterPoints} cost-points={preview.RobustnessCostPoints} run-references={preview.RobustnessRunReferences} deadline={preview.DeadlineUtc:O}");
             return true;
         }
         if (args[0] == "finance-eodhd-deletion-execute" && args.Length == 2)

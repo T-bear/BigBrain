@@ -24,6 +24,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0022](../adr/0022-finance-owner-accepted-zero-cost-personal-research.md) | Accepted | Finance owner-accepted zero-cost personal research |
 | [0023](../adr/0023-finance-immutable-feature-revisions-and-causal-lineage.md) | Accepted | Finance immutable feature revisions and causal lineage |
 | [0024](../adr/0024-finance-deterministic-research-backtest-evidence.md) | Accepted | Finance deterministic research backtest evidence |
+| [0025](../adr/0025-finance-immutable-chronological-evaluation-evidence.md) | Accepted | Finance immutable chronological evaluation evidence |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

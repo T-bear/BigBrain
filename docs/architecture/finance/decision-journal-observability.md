@@ -64,6 +64,8 @@ materialization alone is not a decision and creates no recommendation or authori
 
 BB-080 adds a separate historical research journal. It records deterministic session/market/knowledge time, exact market and feature references, strategy intent, simulated fill request/result, fees/slippage, cash and position transitions, mark-to-market and equity. This journal is immutable backtest evidence, not the future broker/order decision journal, and it inherits EODHD deletion scope.
 
+BB-081 adds an aggregate evaluation journal without copying market/feature payloads: exact split and embargo boundaries, walk-forward windows, bounded parameter/cost variants, underlying run IDs, decomposed score, sufficiency reasons, verdict and checksum. Later data creates new windows/evaluations and never revises earlier evidence.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

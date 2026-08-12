@@ -159,6 +159,8 @@ retention/deletion. See accepted ADR 0023. It creates no strategy or execution a
 
 BB-080 implements the first M3 boundary: exact market revisions plus exact feature revision plus versioned research strategy, simulation, sizing, cost and seed produce immutable deterministic backtest evidence. Decisions occur after completed bars and transition intents fill only at the next available session open. Local SQLite owns runs, event journal, simulated fills, equity/drawdown curves and metrics; Web/API are read-only. Historical simulated fills are not Finance order types and create no PAPER/LIVE authority. See accepted ADR 0024.
 
+BB-081 composes those exact runs into immutable chronological evaluation evidence. The versioned evaluation plan owns train/test ratio, session embargo, expanding walk-forward windows, bounded sensitivity inputs, cost ladder, sufficiency thresholds and transparent score components. No random shuffle or test-period selection is allowed. Provider lineage flows through evaluations and deletion inventory; ordinary API/Web remain read-only. See accepted ADR 0025.
+
 The fixture persistence boundary now adds an immutable manifest, deterministic content
 fingerprint and provider-neutral storage contract around those revisions. Complete-only
 append, idempotent identity, explicit conflicts, range/action/gap reads, lineage, integrity,

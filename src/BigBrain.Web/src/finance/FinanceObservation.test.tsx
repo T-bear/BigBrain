@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { FinanceObservation } from './FinanceObservation'
-import type { FinanceFeatureSnapshot, FinanceObservationSnapshot } from '../types'
+import type { FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceRobustnessCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -73,5 +73,14 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getAllByText(/inga köp- eller säljsignaler/i).at(-1)).toBeVisible()
     expect(screen.queryByText(/realtid/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /köp|sälj|order|trade/i })).not.toBeInTheDocument()
+  })
+
+  test('shows neutral insufficient out-of-sample evidence without optimization or trading controls', () => {
+    const robustness: FinanceRobustnessCatalog={generatedAtUtc:'2026-08-12T08:00:00Z',operatingMode:'RESEARCH',plans:[],evaluations:[{evaluationId:'evaluation-1',checksum:'sha256:evidence',planId:'chronological-oos-walk-forward',planVersion:'v1',strategyId:'momentum',strategyVersion:'v1',verdict:'insufficientData',score:58.09,evidenceLabel:'mixedEvidence',trainSessions:176,testSessions:26,embargoSessions:50,walkForwardWindows:3,parameterVariants:3,costVariants:5,featureRevisionId:'feature-1',marketRevisionIds:['market-1'],limitations:['Engineering evidence only.']}]}
+    render(<FinanceObservation initialSnapshot={empty} initialRobustness={robustness}/>)
+    expect(screen.getAllByText('Robusthet / Out-of-sample').at(-1)).toBeVisible()
+    expect(screen.getAllByText('DATA INSUFFICIENT').at(-1)).toBeVisible()
+    expect(screen.getAllByText(/176 \/ 26 \/ 50 sessions/).at(-1)).toBeVisible()
+    expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
   })
 })

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Microsoft.Data.Sqlite;
 using BigBrain.Api.Finance;
 using BigBrain.Modules.Finance;
 
@@ -123,6 +124,18 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         Assert.DoesNotContain("token", snapshot.Provider.Reason, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(FinanceOperatingMode.Research, snapshot.Safety.Mode);
         Assert.False(snapshot.Safety.BrokerConnected);
+    }
+
+    [Fact]
+    public void DeletionInventoryIncludesRobustnessArtifactsAndProtectsUnrelatedFiles()
+    {
+        var options=Options();var memory=new EodhdMarketMemory(options);var unrelated=Path.Combine(_root,"unrelated-evaluation.txt");File.WriteAllText(unrelated,"keep");
+        using(var connection=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=options.DatabasePath}.ToString())){connection.Open();
+            Execute("INSERT INTO robustness_evaluations VALUES('evaluation-1','sha256:x','plan','v1','momentum','v1','feature-1','[]','InsufficientData','10','{}','2026-08-12T00:00:00Z')");
+            Execute("INSERT INTO robustness_windows VALUES('evaluation-1','wf-1','{}')");Execute("INSERT INTO robustness_parameter_sensitivity VALUES('evaluation-1',0,'{}')");Execute("INSERT INTO robustness_cost_sensitivity VALUES('evaluation-1',0,'{}')");Execute("INSERT INTO robustness_run_references VALUES('evaluation-1','run-1')");
+            void Execute(string sql){using var command=connection.CreateCommand();command.CommandText=sql;command.ExecuteNonQuery();}}
+        var preview=memory.PreviewDeletion();Assert.Equal(1,preview.RobustnessEvaluations);Assert.Equal(1,preview.RobustnessWindows);Assert.Equal(1,preview.RobustnessParameterPoints);Assert.Equal(1,preview.RobustnessCostPoints);Assert.Equal(1,preview.RobustnessRunReferences);
+        memory.ExecuteDeletion(preview,$"DELETE {preview.PreviewId}",DateTimeOffset.UtcNow);Assert.True(File.Exists(unrelated));Assert.Equal(0,memory.PreviewDeletion().RobustnessEvaluations);
     }
 
     [Fact]
