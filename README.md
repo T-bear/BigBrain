@@ -77,18 +77,20 @@ Ett nytt fixture-only manifest- och persistencekontrakt definierar immutable app
 integritet, revisionsfrågor och policyavgränsad deletion. En in-memory referens och en
 reproducerbar JSONL/SQLite-benchmark använder endast syntetiska EOD-rader; mätningen stödjer
 provisoriskt SQLite som transaktionellt katalog/index tillsammans med immutable filer för
-payload, men aktiverar ingen produktionslagring. Ingen verklig providerpersistence,
-verklig provideradapter, executor, brokerintegration eller live trading
-är implementerad eller deployad. Den publicerade planen går från RESEARCH via backtesting
+payload, men aktiverade då ingen produktionslagring. Detta var BB-045:s syntetiska baseline;
+avsaknaden av verklig providerpersistence och provideradapter ersattes senare av BB-077/078.
+Executor, brokerintegration och live trading är fortfarande inte implementerade eller
+deployade. Den publicerade planen går från RESEARCH via backtesting
 och PAPER till eventuellt policy-governed AUTO. Se den kanoniska
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md) och
 [Finance-modulen](docs/modules/finance.md). Finance följer “free first” och “collect once,
 reuse when permitted”: providerneutral lokal historik prioriteras kostnadsmedvetet, men
 okänd licens eller retention stoppar lagring och användning.
-BB-072:s daterade jämförelse av tio gratis eller gratisnära källprodukter fann ingen som
+BB-072:s daterade, historiska jämförelse av tio gratis eller gratisnära källprodukter fann ingen som
 verifierar hela kombinationen varaktig lokal retention och personlig non-display
-backtesting. Rekommendationen är `DO NOT INGEST YET`; EODHD Free Starter och Twelve Data
-Basic är villkorade evidensspår, inte valda providers.
+backtesting. Dåvarande rekommendation `DO NOT INGEST YET` och de villkorade spåren för EODHD
+Free Starter och Twelve Data Basic ersattes av BB-077:s auktorisering och BB-078:s aktivering
+av nuvarande EODHD Free.
 En synthetic-only live-observationsgrund skiljer nu market event-, provider-, received-
 och knowledge-tid, beskriver realtid/delay ärligt och simulerar observationer, sessioner,
 luckor, outage, dubbletter och corrections utan väggklocka. En uttryckligt icke-handlande
@@ -98,15 +100,16 @@ Twelve Data Basic endast är evaluation/trial och att BigBrains beskrivna privat
 kräver en betald Personal-plan. För den planen stöds lokal lagring och retention,
 research/testing, post-termination retention, derived data, auditmetadata och
 investeringsbeslut med endast ägarens egna medel. Twelve Data är därför en entitlement-
-cleared betald fallback, inte vald eller aktiverad provider. Cost-first-grinden går härnäst
-vidare med osänd Alpaca Basic/free IEX entitlement-research; inget konto, key, adapter eller
-verklig data har skapats. Ingen fri svensk/nordisk källa är berättigandeverifierad.
+cleared betald fallback, inte vald eller aktiverad provider. Den dåvarande cost-first-grinden
+gick vidare med Alpaca Basic/free IEX entitlement-research; påståendet att inget konto, key,
+adapter eller verklig data fanns är historiskt och ersatt av BB-077/078. Ingen fri svensk/
+nordisk källa är berättigandeverifierad.
 Produktägaren har nu satt Finance externa market-data-budget till exakt **0 SEK** tills ett
 nytt explicit beslut tas. En färsk sweep av Alpaca, Stooq, Yahoo/yfinance, Nasdaq Data Link,
 EODHD, Alpha Vantage, Finnhub, FMP och direkta exchange/open-spår fann ingen källa med
-komplett verifierad automation-, retention- och research/backtesting-rätt. Finance förblir
-fail-closed utan riktig data; Twelve Data Personal är en inaktiv entitlement-cleared paid
-fallback. API-grinden visar nu `ZERO-COST ENTITLEMENT GATE` i stället för ersatt BB-071 State B.
+komplett verifierad automation-, retention- och research/backtesting-rätt. BB-075 stoppade då
+aktivering; det tillståndet ersattes av BB-077/078 för EODHD Free. Twelve Data Personal är
+fortsatt en inaktiv entitlement-cleared paid fallback. API-grinden ersatte BB-071 State B.
 BB-076 inför en capability-specifik `OwnerAcceptedPersonalResearch`-klass för legitima
 0-SEK-källor där inga identifierade villkor förbjuder avgränsad privat research. Klassen
 kan aldrig åsidosätta negativa villkor, betalningskrav eller tekniska åtkomstkontroller.

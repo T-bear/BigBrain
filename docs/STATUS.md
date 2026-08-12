@@ -6,11 +6,12 @@ grace are active. API PID-1 crash recovered as `UNCLEAN`; Finance requests remai
 no duplicate evidence. Host unit install, Docker restart and reboot are blocked by interactive
 sudo; physical power test is pending. Finance remains `RESEARCH`; no shutdown/trading API.
 
-- Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
-- Verifierad mot commit: BB-073 synthetic live-observation/shadow-learning foundation and
-  current free-live research are complete for publication from current main; published SHA
-  is assigned after commit. Latest runtime evidence is unchanged.
-- Runtime senast verifierad: 2026-08-10 (produktägarens manuella Sprint 2-verifiering; ingen runtime ändrades under closure)
+- Senast uppdaterad: 2026-08-12 (Europe/Stockholm)
+- Verifierad mot commit: `eaa3a0446356316dc21b2fee3e0e0a2b30c5211c` (BB-083 resilience
+  documentation baseline on `origin/main`).
+- Runtime senast verifierad: 2026-08-12 (BB-083 container-runtime: Compose deployment and
+  API PID-1 crash recovery verified; host install, Docker-daemon restart/reboot and physical
+  power-cycle are not verified)
 
 Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deployat och manuellt verifierat. Detaljerad evidens finns i [rapportkatalogen](reports/REPORT-CATALOG.md).
 

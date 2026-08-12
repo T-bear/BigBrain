@@ -14,17 +14,15 @@ duplicating their detailed gates.
 The canonical Finance delivery sequence is the
 [Finance master roadmap](docs/architecture/finance/master-roadmap.md). Finance is in
 RESEARCH with M0 and M1 complete. BB-046 provider research and ADR 0021 owner review are
-complete. BB-071 now contains positive human Twelve Data evidence for a qualifying paid
-Personal plan, but M2 ingestion remains blocked by cost-first provider selection and explicit
-activation approval.
-External data, PAPER execution, live connectivity and real-money authority are not implemented.
+complete. BB-077/078 passed the EODHD Free authorization and activation gates for M2 daily
+EOD ingestion; persistent real provider data, replay and read-only API/UI are deployed.
+PAPER execution, live connectivity and real-money authority are not implemented.
 Provider-neutral policy/provenance, canonical identity, normalization, market-session/gap
 semantics and deterministic synthetic replay may be built before BB-071. Those BB-045
 foundations, inklusive immutable correction/supersession assembly, are implemented and verified;
-actual provider
-ingestion or durable provider data remains blocked.
+their former real-ingestion block was superseded by BB-077/078 for EODHD Free.
 
-**FREE HISTORICAL DATA INGESTION preparation/research** (BB-072) is complete. Ten
+**FREE HISTORICAL DATA INGESTION preparation/research** (BB-072) is a completed historical gate. Ten
 free/free-adjacent source products were compared; none passed the complete durable
 retention and personal non-display backtesting gate. EODHD Free Starter is the best
 conditional evaluation lead and Twelve Data Basic the Nordic technical lead, but neither
@@ -33,33 +31,33 @@ pipeline are implemented and verified without external IO. The next synthetic sl
 now added an immutable manifest/persistence contract and measured JSONL versus SQLite at up
 to 1,260,000 fixture rows. The provisional direction is immutable payload files plus a
 transactional SQLite catalog/index; it is evidence, not a production storage selection or
-activation. Provider-specific entitlement plus explicit selection remains mandatory before
-real ingestion or provider-data storage.
+activation. Its pre-ingestion block was later passed for EODHD Free by BB-077/078; the
+synthetic benchmark remains historical evidence rather than the current storage state.
 
 **LIVE MARKET OBSERVATION / SHADOW LEARNING preparation** (BB-073) now has a verified
 synthetic foundation: explicit event/provider/received/knowledge time, honest freshness,
 deterministic outage/gap/correction feed, immutable versioned predictions, later outcomes
 and prospective metrics with no broker/order path. The dated free-provider research is now
-superseded for Twelve Data by human evidence requiring a paid Personal plan. No free source
-is authorized, and external observation remains blocked by provider selection and approval.
+superseded for Twelve Data by human evidence requiring a paid Personal plan. Its former
+provider-selection block was later superseded for EODHD Free by BB-077/078.
 The earlier **STATE B — HUMAN CONFIRMATION REQUIRED** is resolved for Twelve Data Personal:
 direct human evidence supports the submitted personal storage/research/retention scope,
 including post-termination derived and audit retention. Basic/free is expressly insufficient,
-so Twelve Data is a paid fallback rather than the free lead. The next action is an unsent
-Alpaca Basic/free IEX entitlement inquiry and zero-cost comparison, not an adapter. Only
-after explicit provider selection may **FIRST AUTHORIZED MARKET DATA INGESTION** begin.
+so Twelve Data is a paid fallback rather than the free lead. The recorded next action was an
+Alpaca Basic/free IEX entitlement inquiry and zero-cost comparison, not an adapter. That
+historical gate was subsequently passed by the explicitly authorized EODHD Free activation.
 
-**ZERO-COST REAL MARKET DATA ACTIVATION** (BB-075) is fail-closed. The current external
+**ZERO-COST REAL MARKET DATA ACTIVATION** (BB-075) records a historical fail-closed gate. The external
 market-data budget is exactly 0 SEK. A fresh first-party sweep found no exact free product
 with complete automation, local-retention, replay/backtest and artifact-lifecycle rights.
-No adapter, account, key, payload, real memory or deployment activation was created. Alpaca
-Basic/free IEX remains the first human-confirmation track; EODHD Free Starter is second.
+No adapter, account, key, payload, real memory or deployment activation was created in that
+slice. This status was superseded by BB-077/078 for EODHD Free.
 
 **BB-076 PRAGMATIC ZERO-COST PERSONAL-RESEARCH ACTIVATION** ändrar evidenssemantiken men
 inte säkerhetsgränsen. Ägaraccepterad personlig forskning kan beslutas per capability för
 legitima 0-SEK-källor utan identifierat förbud. Stooq nådde denna evidensklass för avgränsad
 daily history, men den offentliga CSV-ytan svarade med en JavaScript-verifieringskontroll.
-BigBrain kringgår inte kontrollen; ingen adapter, data eller deployment aktiverades.
+BigBrain kringgår inte kontrollen; i den slicen aktiverades ingen adapter, data eller deployment.
 
 **BB-077 EODHD FREE ACTIVATION** är implementerad till credential-gränsen. Nuvarande tier
 heter `Free`: €0, 20 anrop/dag och ett års EOD. Adapter, SQLite/content-addressed memory,

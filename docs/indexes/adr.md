@@ -1,7 +1,5 @@
 # ADR Index
 
-- [ADR 0026: appliance lifecycle and recovery](../adr/0026-bigbrain-appliance-lifecycle-and-recovery.md)
-
 Proposed records are not accepted authority merely because related code exists.
 
 | ADR | Status | Subject |
@@ -27,6 +25,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0023](../adr/0023-finance-immutable-feature-revisions-and-causal-lineage.md) | Accepted | Finance immutable feature revisions and causal lineage |
 | [0024](../adr/0024-finance-deterministic-research-backtest-evidence.md) | Accepted | Finance deterministic research backtest evidence |
 | [0025](../adr/0025-finance-immutable-chronological-evaluation-evidence.md) | Accepted | Finance immutable chronological evaluation evidence |
+| [0026](../adr/0026-bigbrain-appliance-lifecycle-and-recovery.md) | Accepted | Appliance lifecycle and recovery |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

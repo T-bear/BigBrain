@@ -11,7 +11,7 @@
   4,016 raw observations and 16 immutable revisions.
 - Report: `docs/reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md`.
 
-Senast uppdaterad: 2026-08-10
+Senast uppdaterad: 2026-08-12
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
 
