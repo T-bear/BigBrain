@@ -24,6 +24,7 @@
 - [Finance BB-079 first real feature / indicator engine](../reports/features/finance/finance-bb-079-first-real-feature-engine-20260811.md)
 - [Finance BB-080 deterministic real-data backtests](../reports/features/finance/finance-bb-080-deterministic-real-data-backtest-20260812.md)
 - [Finance BB-081 robustness / out-of-sample foundation](../reports/features/finance/finance-bb-081-robustness-out-of-sample-20260812.md)
+- [Finance BB-082 zero-cost longer-history reassessment](../reports/features/finance/finance-bb-082-zero-cost-history-reassessment-20260812.md)
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.

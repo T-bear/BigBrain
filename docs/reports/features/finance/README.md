@@ -26,6 +26,7 @@ Current implementation evidence:
 - [BB-079 first real feature / indicator engine](finance-bb-079-first-real-feature-engine-20260811.md)
 - [BB-080 first deterministic real-data backtest engine](finance-bb-080-deterministic-real-data-backtest-20260812.md)
 - [BB-081 robustness / out-of-sample foundation](finance-bb-081-robustness-out-of-sample-20260812.md)
+- [BB-082 zero-cost longer-history reassessment](finance-bb-082-zero-cost-history-reassessment-20260812.md)
 - [BB-074 read-only market observation UI foundation](finance-read-only-market-observation-ui-foundation-20260811.md)
 - [BB-074 read-only observation UI deployment](finance-read-only-market-observation-ui-deployment-20260811.md)
 

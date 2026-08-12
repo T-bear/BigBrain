@@ -237,6 +237,14 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   were verified. Dependent EODHD feature artifacts are in deletion scope.
 - BB-080 runtime evidence 2026-08-12: the first offline deterministic M3 engine binds exact market/feature revisions, strategy/version/parameters, next-open simulation, whole-share sizing, cost model and seed to immutable run IDs/checksums. Six BB-078/079 runs for buy-and-hold, SMA10/20 and momentum20 under zero and conservative costs are persisted, API/UI-visible and idempotent across restart. Golden/no-lookahead/cost/retention tests pass. Deployment-day scheduled ingestion ran independently; the backtest engine made no provider request and old exact runs remain immutable.
 - BB-081 runtime evidence 2026-08-12: `chronological-oos-walk-forward/v1` and `transparent-robustness-score-v2` bind 16 exact market revisions plus `feature-a04bcf61e20a79ec`. The 70/30 plan with 50-session embargo yields 176/26 sessions and three expanding walk-forward windows. Seventy unique runs cover three strategies, seven bounded parameter variants and fifteen cost points. All verdicts are correctly `INSUFFICIENT_DATA`; SMA and momentum underperform buy-and-hold in the primary test. Immutable API/UI evidence, deletion lineage, no-leakage and restart determinism are deployed/runtime-verified. The evaluator made no provider request; Finance remains RESEARCH.
+- BB-082 provider reassessment 2026-08-12: Stooq remains owner-accepted only at the
+  entitlement layer, but both its public terms route and daily CSV route returned an active
+  JavaScript verification control. No challenge solution, browser automation or alternate
+  endpoint was attempted. EODHD Free still exposes about one year; Alpha Vantage full daily
+  history and Nasdaq Data Link US EOD are paid. The legitimate blocked path therefore
+  applies: zero historical downloads, no adapter/runtime/deployment change and no new
+  features/backtests/evaluations. Existing EODHD memory and BB-078–081 evidence remain intact;
+  all three robustness verdicts remain `INSUFFICIENT_DATA` and Finance remains `RESEARCH`.
 - Known limitations: no live/near-live feed, corporate-action ingestion, robust out-of-sample strategy validation,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.

@@ -78,6 +78,15 @@ retained IEX use remains human-confirmation-required. EODHD's personal storage/a
 grant applies while subscribed and carries a one-month deletion duty after expiry. BB-077
 implemented that lifecycle and BB-078 subsequently activated the bounded EOD capability.
 
+BB-082 repeated the bounded check on 2026-08-12. Both the Stooq terms route and the
+documented `q/d/l` daily CSV route returned the same JavaScript proof-of-work/browser
+verification page. This is an access control under ADR 0022 and the owner rule cannot
+override it. pandas-datareader remains only a wrapper around that same route and supplies
+no independent entitlement. EODHD Free remained approximately one year, Alpha Vantage
+documented full daily output as premium-only, and Nasdaq Data Link classified QuoteMedia US
+EOD as premium. No second provider is selected; no source precedence or stitching policy is
+activated.
+
 ## BB-077 EODHD Free selection
 
 Current first-party material checked 2026-08-11 names the tier `Free` rather than Free

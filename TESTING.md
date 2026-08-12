@@ -106,6 +106,10 @@ docker compose config --quiet
   fail-closed language are covered by documentation verification and `git diff --check`.
   The BB-071 resolution is likewise documentation-only: the existing 376-test synthetic
   baseline is rerun, while no provider/network acceptance test is authorized.
+  BB-082 follows the legitimate blocked path and changes no executable contract. Provider
+  research is verified through dated primary-source links, bounded request accounting,
+  documentation link/BB-ID validation and `git diff --check`; no live market-data test,
+  fixture parser test or runtime deployment is applicable because no adapter/data exists.
   BB-074 tests prove fail-closed RESEARCH/no-provider/no-order API state and deterministic
   synthetic mapping. Web tests cover navigation, no-real-money and entitlement warnings,
   empty/synthetic/stale/gap/memory/chart states, native keyboard controls and no trade UI.

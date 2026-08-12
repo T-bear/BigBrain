@@ -254,6 +254,13 @@ BB-080 adds the first production research-backtest capability. `daily-next-sessi
 
 BB-081 adds `chronological-oos-walk-forward/v1`. Exact lineage plus split/embargo, fixed walk-forward, bounded diagnostic grid, cost ladder, sufficiency thresholds and `transparent-robustness-score-v2` create immutable evaluation IDs/checksums. `/api/v1/modules/finance/robustness` and exact detail are bounded read-only surfaces. A 50-session embargo isolates the current maximum feature lookback; test evidence cannot influence train runs or parameter selection. SQLite owns evaluation/window/sensitivity evidence, all of which inherits EODHD deletion scope. Numerical score labels never override `INSUFFICIENT_DATA` and grant no trading authority.
 
+BB-082 rechecked longer zero-cost history on 2026-08-12. No provider passed both the
+entitlement and technical-access gates: Stooq presented a JavaScript verification control,
+EODHD Free remained bounded to roughly one year, and qualifying Alpha Vantage/Nasdaq Data
+Link history required payment. The module therefore has no second provider, cross-provider
+merge, overlap state or long-history revision. Existing provider-specific EODHD retention
+and all derived lineage remain unchanged.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

@@ -124,6 +124,12 @@ och volymmått. API/UI visar read-only indikatorer och EODHD-raderingsinventerin
 BB-080 lägger ovanpå detta en helt offline deterministisk research-backtestmotor. Exakta market/feature-revisioner, versionerad strategi, next-open simulation, kostnadsmodell, whole-share sizing och seed ger immutable run-ID, journal, fills, equity/drawdown, metrics och checksum. Buy-and-hold, SMA10/20 och momentum20 visas read-only med cost comparison; ingen broker, order, PAPER eller LIVE-förmåga finns.
 
 BB-081 lägger ett immutable kronologiskt robusthetslager ovanpå BB-080: train/test med feature-lookback-embargo, fixed-parameter expanding walk-forward, små förutbestämda parametergrannskap, femstegs kostnadsladder, transparent dekomponerbar score och hårda data-sufficiency-regler. API/UI visar neutral out-of-sample-evidens och `DATA INSUFFICIENT`; testperioden väljer aldrig parametrar och ingen tradingförmåga tillkommer.
+
+BB-082 omprövade 2026-08-12 aktuella nollkostnadskällor för längre dagshistorik. Stooqs
+offentliga CSV-yta svarade med en aktiv JavaScript-verifiering som BigBrain inte kringgår;
+EODHD Free är fortsatt cirka ett år och relevant full historik hos Alpha Vantage respektive
+Nasdaq Data Link är premium. Ingen historik, adapter eller ny research-evidens skapades.
+BB-078–081 är oförändrade, `INSUFFICIENT_DATA` kvarstår och Finance är fortsatt `RESEARCH`.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsruntime är RESEARCH med EODHD Free,
 ägargodkänd personlig research och beständig real EOD-memory. Syntetiska UI-fixtures

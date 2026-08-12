@@ -513,6 +513,25 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Verifierat: 70 reala underliggande runs över buy-and-hold/SMA/momentum, no-leakage/determinism/cost/split/retention tests, persistence/restart och runtime. Alla verdict är korrekt `INSUFFICIENT_DATA`; ingen PAPER/LIVE/trading.
 - Report: `docs/reports/features/finance/finance-bb-081-robustness-out-of-sample-20260812.md`.
 
+### BB-082 – Longer zero-cost historical market memory
+
+- Modul: Finance / Market Data / Strategy Lab
+- Typ: Provider research / entitlement / conditional implementation
+- Prioritet: P1
+- Status: Blockerad 2026-08-12 – legitimt stoppvillkor; ingen ny data ingested
+- Budget: 0 SEK.
+- Resultat: aktuell kontroll av Stooq, EODHD Free, Alpha Vantage Free och Nasdaq Data Link
+  fann ingen implementerbar nollkostnadskälla som materiellt förlänger den nuvarande
+  US-equity/ETF-historiken. Stooqs villkors- och CSV-ytor kräver JavaScript-verifiering;
+  kontrollen kringgicks inte. EODHD Free stannar vid cirka ett år, Alpha Vantage full daily
+  history är premium och Nasdaq Data Links relevanta US EOD-produkt är premium.
+- Bevarat: all BB-078–081-evidens, EODHD daily acquisition och Finance `RESEARCH` är
+  oförändrade. Inga feature-revisioner, backtests eller robustness-evaluations skapades.
+- Nästa nollkostnadsväg: begär en normalt stödd Stooq bulk/API-väg med uttrycklig
+  automations- och lagringsklarhet, eller utvärdera en namngiven offentlig/open-datafil med
+  verifierbar redistribution/provenance; ändra inte budget eller kringgå åtkomstkontroll.
+- Report: `docs/reports/features/finance/finance-bb-082-zero-cost-history-reassessment-20260812.md`.
+
 ### BB-048 – Transaction-cost, slippage and fill simulation
 
 - Modul: Finance / Backtesting
