@@ -26,6 +26,8 @@ SMA20/EMA20/RSI14/ATR14/volatility20/momentum20/volume-ratio20 values. The bound
 The page describes measurements only; it must not render BUY/SELL, recommendations or order
 controls. EODHD request accounting must remain unchanged during local feature builds.
 
+BB-080 additionally requires the read-only Backtests / Strategiforskning section, exact lineage, zero/conservative cost comparison, equity/drawdown chart, immutable run/checksum and prominent RESEARCH/no-real-money language. `GET /api/v1/modules/finance/backtests` and a bounded exact run detail must work; no HTTP mutation or trade control is permitted. Offline backtest builds must not change provider request accounting.
+
 - `/api/v1/system/health` and Web root are healthy.
 - `/api/v1/modules/finance/observation` reports RESEARCH, EODHD Free, REAL EOD/delayed,
   active retention, eight instruments, 2,008 observations and durable persistence;

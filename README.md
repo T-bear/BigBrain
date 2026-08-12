@@ -121,6 +121,7 @@ utan nya provideranrop. Första immutable feature-revisionen innehåller 42 168 
 (39 616 tillgängliga, 2 552 warmup) för returns, SMA/EMA, momentum, volatilitet, RSI, ATR
 och volymmått. API/UI visar read-only indikatorer och EODHD-raderingsinventeringen omfattar
 även beroende feature-artefakter. Detta är mätning i RESEARCH, inte signal eller trading.
+BB-080 lägger ovanpå detta en helt offline deterministisk research-backtestmotor. Exakta market/feature-revisioner, versionerad strategi, next-open simulation, kostnadsmodell, whole-share sizing och seed ger immutable run-ID, journal, fills, equity/drawdown, metrics och checksum. Buy-and-hold, SMA10/20 och momentum20 visas read-only med cost comparison; ingen broker, order, PAPER eller LIVE-förmåga finns.
 BB-074 ger nu Finance en navigerbar, responsiv read-only observationsvy och ett versionssatt
 `GET /api/v1/modules/finance/observation`. Produktionsruntime är RESEARCH med EODHD Free,
 ägargodkänd personlig research och beständig real EOD-memory. Syntetiska UI-fixtures

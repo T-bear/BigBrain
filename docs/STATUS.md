@@ -235,7 +235,8 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
   reported quality issues) over 2025-08-11–2026-08-10. Rebuild checksum/idempotency,
   no-lookahead tests, SQLite persistence/restart, feature API/UI and retention inventory
   were verified. Dependent EODHD feature artifacts are in deletion scope.
-- Known limitations: no live/near-live feed, corporate-action ingestion, real strategy,
+- BB-080 runtime evidence 2026-08-12: the first offline deterministic M3 engine binds exact market/feature revisions, strategy/version/parameters, next-open simulation, whole-share sizing, cost model and seed to immutable run IDs/checksums. Six BB-078/079 runs for buy-and-hold, SMA10/20 and momentum20 under zero and conservative costs are persisted, API/UI-visible and idempotent across restart. Golden/no-lookahead/cost/retention tests pass. Deployment-day scheduled ingestion ran independently; the backtest engine made no provider request and old exact runs remain immutable.
+- Known limitations: no live/near-live feed, corporate-action ingestion, robust out-of-sample strategy validation,
   full Risk Engine, paper executor, broker adapter or trading runtime. The deployed Finance
   API/UI is read-only observation only.
 - Blockers: no zero-cost live/near-live source is selected; strategy and trading gates remain. ADR 0021 was accepted after explicit

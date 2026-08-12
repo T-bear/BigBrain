@@ -250,6 +250,8 @@ and Web displays a compact indicator subset. These are
 measurements, not recommendations. EODHD retention/deletion covers dependent feature rows,
 revisions and indexes.
 
+BB-080 adds the first production research-backtest capability. `daily-next-session-open-v1` consumes only exact immutable market and feature revisions, causally visible features and current simulated cash/long position state. Buy-and-hold/v1, SMA crossover/v1 and momentum/v1 return research intents only. Whole-share equal initial allocation, explicit zero/conservative cost models and seed participate in immutable run identity. SQLite retains event journal, simulated fills, equity/drawdown and metrics; `/api/v1/modules/finance/backtests` and run detail are read-only. EODHD deletion covers all dependent backtest evidence. There is no mutation endpoint, broker order, PAPER/LIVE mode or recommendation.
+
 Conceptual read capabilities include portfolio, positions, pending orders, market data,
 trading/risk state, daily P&L and history. Future mutation capabilities may include an
 order preview, exact approved submission, cancellation and position close. Names and

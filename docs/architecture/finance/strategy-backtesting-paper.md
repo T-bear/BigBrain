@@ -65,6 +65,8 @@ feature revision. Future M3 runs must cite both market and feature revision and 
 features by causal knowledge time; a fully materialized later table is never universally
 visible to an earlier replay horizon. This is feature evidence only, not a signal or fill.
 
+BB-080 implements the first bounded M3 engine. The strategy sees a completed daily bar, features with `knowledgeTime <= decisionTime`, and simulated portfolio state, then returns only `NO_ACTION`, `TARGET_LONG` or `TARGET_FLAT`. An intent after session T may fill only at the next available session open. `zero-cost-v1` is diagnostic; `conservative-cost-v1` explicitly models USD 0.01/share, USD 1 minimum and 5 bps adverse slippage. Initial sizing divides capital equally across the exact universe and floors to whole shares without borrowing. Immutable results report gross/net return, annualization where valid, drawdown, volatility, a zero-risk-free daily/252 Sharpe-like ratio, trade/exits, turnover, costs and SPY-universe benchmark comparison. This one-year raw-OHLC/current-survivor evidence is engineering validation only.
+
 ## Prospective shadow evaluation
 
 Forward evidence complements historical replay: at time T an immutable prediction records

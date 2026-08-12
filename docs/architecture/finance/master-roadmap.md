@@ -57,8 +57,8 @@ enabled before all M13 gates are evidenced and explicitly approved.
 - BB-079: `core-daily-v1` produced immutable revision `feature-5d0397a53d094a2f` with
   42,168 causal feature values from all eight real market revisions. Determinism,
   no-lookahead, persistence/restart, API/UI and EODHD deletion lineage are runtime-verified.
-  Next: minimal M3 research backtest bound to exact market + feature revisions; live remains
-  a separate entitlement/source gate.
+  BB-080 subsequently delivered the minimal M3 research backtest bound to exact market + feature revisions; live remains a separate entitlement/source gate.
+- BB-080: buy-and-hold, SMA10/20 and momentum20 now run through deterministic next-open, whole-share and explicit zero/conservative cost models. Immutable SQLite runs/journal/fills/curves/metrics, read-only API/UI, no-lookahead tests and EODHD deletion lineage are deployed and restart-verified. Next: BB-081 robustness/out-of-sample foundation, not PAPER.
 - Blockers for real money: M1–M9, accepted paper evidence, legal/operational research,
   broker sandbox evidence, secured credentials, reconciliation, emergency controls and
   explicit owner approval.
@@ -168,11 +168,10 @@ Only after an
 exact provider entitlement is accepted may an explicitly owner-approved **FIRST AUTHORIZED
 MARKET DATA INGESTION** milestone begin.
 
-### M3 – Backtest engine — PLANNED
+### M3 – Backtest engine — IMPLEMENTED FIRST BOUNDED SLICE
 
 - Objective: deterministic, cost-aware portfolio and order simulation.
-- Scope/tasks: event clock, fills, partial/rejected/delayed orders, fees, spread, slippage,
-  FX/tax-fee assumptions, benchmarks, metrics and reproducible reports.
+- Scope/tasks delivered by BB-080: event clock, next-open full simulated fills, commission/slippage, benchmark, portfolio, metrics and reproducible reports. Partial/rejected fills, FX and tax-fee assumptions remain future robustness work.
 - Non-goals: claiming future profitability or using live execution.
 - Prerequisites: M2 and the BB-079 immutable feature-revision foundation (complete).
 - Architecture impact: simulation ports isolated from future broker ports.

@@ -51,6 +51,14 @@ This command performs no provider request. Retain its sanitized feature revision
 warmup/quality counts and checksum. Inspect bounded values through
 `GET /api/v1/modules/finance/features`; never dump the database or licensed payloads.
 
+Build or idempotently verify immutable reference backtests from local memory only:
+
+```bash
+docker compose run --rm --no-deps --entrypoint dotnet api BigBrain.Api.dll finance-backtests-build
+```
+
+This command performs no provider request. Its sanitized output includes exact market/feature revisions, run IDs/checksums, sessions, feature reads, simulated fills, events, elapsed time and idempotency. Deletion preview must include dependent backtest runs, events, fills and equity points; result JSON also contains metrics. Generic strategy definitions may remain.
+
 ## Record termination or expiry
 
 Set `FINANCE__EODHD__ACCOUNTACTIVE=false` and

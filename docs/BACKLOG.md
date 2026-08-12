@@ -488,10 +488,20 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Backtesting
 - Typ: Implementation
 - Prioritet: P2
-- Status: Planerad
+- Status: Klar genom BB-080; implementerad, automatiskt verifierad, deployad och runtime-verifierad 2026-08-12
 - Beroenden: BB-045 och BB-079.
 - Definition of Done: versioned datasets/parameters replay deterministically with order
   and portfolio simulation, benchmarks, gross/net metrics and reproducible reports.
+
+### BB-080 – First deterministic real-data backtest engine
+
+- Modul: Finance / Backtesting / Web
+- Typ: Implementation / persistence / runtime evidence
+- Prioritet: P1
+- Status: Klar 2026-08-12
+- Resultat: immutable exact-revision runs för buy-and-hold, SMA10/20 och momentum20 med next-session-open, whole-share portfolio, zero/conservative costs, journal, fills, curves, metrics, benchmark, read-only API/UI och EODHD deletion lineage.
+- Verifierat: golden/no-lookahead/determinism/cost/edge/retention tests, real BB-078/079 offline run, idempotent restart, build/deploy/runtime. Ingen trading capability.
+- Report: `docs/reports/features/finance/finance-bb-080-deterministic-real-data-backtest-20260812.md`.
 
 ### BB-048 – Transaction-cost, slippage and fill simulation
 

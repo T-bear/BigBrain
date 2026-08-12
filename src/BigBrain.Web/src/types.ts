@@ -64,7 +64,7 @@ export interface FinanceObservationSnapshot {
   dataKind: FinanceDataKind
   watchlist: Array<{ instrumentId: string; symbol: string; displayName: string; price: number | null; currency: string | null; dailyChangePercent: number | null; observedAtUtc: string | null; freshness: FinanceFreshness; session: FinanceSession; quality: FinanceQuality; dataKind: FinanceDataKind; history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }> }>
   historicalMemory: { observationCount: number; activeRevisionId: string | null; parentRevisionId: string | null; coverageFrom: string | null; coverageTo: string | null; lastAcquiredAtUtc: string | null; gapCount: number; correctionCount: number; persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'; provider: string; product: string; policy: string; provenance: string }
-  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null; coveredFeatureValueCount?: number; coveredFeatureRevisionCount?: number } | null
+  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null; coveredFeatureValueCount?: number; coveredFeatureRevisionCount?: number; coveredBacktestRunCount?:number; coveredBacktestEventCount?:number; coveredBacktestFillCount?:number; coveredBacktestEquityPointCount?:number } | null
 }
 
 export type FinanceFeatureState = 'unknown' | 'available' | 'warmup' | 'unavailable'
@@ -80,6 +80,14 @@ export interface FinanceFeatureSnapshot {
   historyDefinitionId: string
   history: Array<{ sessionDate: string; value: number | null; state: FinanceFeatureState; quality: FinanceFeatureQuality; knowledgeTimeUtc: string }>
 }
+
+export interface FinanceBacktestRunSummary {
+  runId:string; checksum:string; strategyId:string; strategyVersion:string; parameters:Record<string,number>; costModel:string; from:string; to:string;
+  initialEquity:number; finalEquity:number; grossReturn:number; netReturn:number; maxDrawdown:number; trades:number; costImpact:number;
+  benchmarkReturn:number|null; excessReturn:number|null; marketRevisionIds:string[]; featureRevisionId:string; simulationModel:string; sizingPolicy:string; status:string; limitations:string[]
+}
+export interface FinanceBacktestCatalog { generatedAtUtc:string; operatingMode:string; strategies:Array<{id:string;version:string;name:string;defaultParameters:Record<string,number>}>; runs:FinanceBacktestRunSummary[] }
+export interface FinanceBacktestResult { runId:string; checksum:string; equityCurve:Array<{session:string;cash:number;holdingsValue:number;totalEquity:number;drawdown:number}>; fills:Array<unknown>; events:Array<unknown>; metrics:Record<string,number|null> }
 
 export interface MediaServiceStatus {
   serviceName: string

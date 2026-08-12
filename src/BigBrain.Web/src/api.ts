@@ -28,6 +28,8 @@ import type {
   DownloadBatchResult,
   FinanceObservationSnapshot,
   FinanceFeatureSnapshot,
+  FinanceBacktestCatalog,
+  FinanceBacktestResult,
 } from './types'
 
 export class ApiError extends Error {
@@ -82,6 +84,8 @@ export const getFinanceObservation = (signal?: AbortSignal) =>
 
 export const getFinanceFeatures = (instrumentId: string, signal?: AbortSignal) =>
   getJson<FinanceFeatureSnapshot>(`/api/v1/modules/finance/features?instrumentId=${encodeURIComponent(instrumentId)}&featureId=sma.20&limit=260`, signal)
+export const getFinanceBacktests = (signal?: AbortSignal) => getJson<FinanceBacktestCatalog>('/api/v1/modules/finance/backtests', signal)
+export const getFinanceBacktest = (runId:string, signal?:AbortSignal) => getJson<FinanceBacktestResult>(`/api/v1/modules/finance/backtests/${encodeURIComponent(runId)}`,signal)
 
 export const getMediaOverview = (signal?: AbortSignal) =>
   getJson<MediaOverview>('/api/v1/modules/media', signal)

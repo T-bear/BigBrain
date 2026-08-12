@@ -65,7 +65,7 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getByText(/REAL EOD-MARKET DATA/)).toBeVisible()
     expect(screen.getByText('Ägargodkänd personlig research')).toBeVisible()
     expect(screen.getAllByText('Aktiv').length).toBeGreaterThan(0)
-    expect(screen.getByText('2 observationer / 1 market-revisioner / 1 payloads / 42 feature-värden / 1 feature-revisioner')).toBeVisible()
+    expect(screen.getByText(/2 observationer \/ 1 market-revisioner \/ 1 payloads \/ 42 feature-värden \/ 1 feature-revisioner/)).toBeVisible()
     expect(screen.getAllByText('Indikatorer / Features').at(-1)).toBeVisible()
     expect(screen.getByText('SMA 20')).toBeVisible()
     expect(screen.getByText('101.250000')).toBeVisible()

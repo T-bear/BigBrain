@@ -199,6 +199,8 @@ account and confirmed deletion lifecycle. See ADR 0023 and the BB-079 report. Th
 slice is an offline deterministic M3 research harness referencing exact market and feature
 revision IDs.
 
+BB-080 completes that first harness. Backtest runs, event journals, simulated fills, equity/drawdown curves, metrics and indexes retain exact source market/feature lineage and the EODHD subscription-only deletion obligation. Generic versioned strategy definitions contain no licensed values and may remain. The engine performs no provider IO.
+
 Provider-neutral work may proceed before BB-071: typed policy/usage/classification models,
 an in-memory fail-closed entitlement evaluator, provenance envelopes, fixture-only dataset
 revisions and invariant tests. No real provider payload may be persisted.

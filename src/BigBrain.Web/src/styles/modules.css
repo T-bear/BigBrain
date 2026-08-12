@@ -441,6 +441,12 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
 .finance-feature { display:grid; gap:4px; min-width:0; padding:12px; border:1px solid var(--bb-color-border); border-radius:var(--bb-radius-md); background:var(--bb-color-bg-subtle); }
 .finance-feature span { font-size:var(--bb-font-size-lg); font-weight:var(--bb-font-weight-bold); font-variant-numeric:tabular-nums; }
 .finance-feature small { color:var(--bb-color-text-muted); overflow-wrap:anywhere; }
+.finance-backtest-tabs { display:flex; gap:8px; overflow:auto; margin-bottom:16px; padding-bottom:4px; }
+.finance-backtest-tabs button { display:grid; flex:0 0 auto; gap:2px; padding:9px 12px; border:1px solid var(--bb-color-border); border-radius:var(--bb-radius-md); background:var(--bb-color-bg-subtle); color:var(--bb-color-text); }
+.finance-backtest-tabs button[aria-pressed="true"] { border-color:var(--bb-color-primary); }
+.finance-backtest-tabs small,.finance-limitations { color:var(--bb-color-text-muted); font-size:var(--bb-font-size-xs); }
+.finance-limitations { margin-top:14px!important; }
+.finance-chart .finance-drawdown-path { stroke:var(--bb-color-warning); stroke-dasharray:3 2; }
 .finance-entitlement { border-color:color-mix(in srgb,var(--bb-color-warning) 45%,var(--bb-color-border)); }
 
 @media (max-width:720px) {

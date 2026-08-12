@@ -62,6 +62,8 @@ feature revision ID, feature-set fingerprint, engine version, exact source marke
 and checksum. Per-value knowledge time remains a mandatory causal filter. Feature
 materialization alone is not a decision and creates no recommendation or authorization.
 
+BB-080 adds a separate historical research journal. It records deterministic session/market/knowledge time, exact market and feature references, strategy intent, simulated fill request/result, fees/slippage, cash and position transitions, mark-to-market and equity. This journal is immutable backtest evidence, not the future broker/order decision journal, and it inherits EODHD deletion scope.
+
 M1 provides an in-memory append-oriented model that captures NO TRADE, REJECTED and paper
 intent decisions, risk/policy results, reason codes and observation→evaluation→decision
 correlation. Persistence, integrity protection, retention and outcome reconciliation are

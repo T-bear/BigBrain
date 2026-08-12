@@ -69,6 +69,7 @@ immutable, revisionsbundna feature-värden över de åtta reala marknadsrevision
 korrekthet, idempotent checksumma, explicit warmup, causal no-lookahead, SQLite-restart,
 retention lineage samt API/UI är verifierade och deployade. Nästa säkra gate är en minimal
 M3 research-backtest som binder exakt market revision + feature revision; ingen PAPER/trading.
+**BB-080 FIRST DETERMINISTIC REAL-DATA BACKTEST ENGINE** levererar nu M3:s första offline researchmotor med exact revision pinning, buy-and-hold/SMA10-20/momentum20, next-open fills, whole-share portfolio, explicita zero/conservative costs, immutable journal/result/checksum, metrics/curves och read-only API/UI. BB-078/079-runs är deterministiskt restart-verifierade. Nästa säkra gate är BB-081 robustness/out-of-sample; inte PAPER.
 
 **READ-ONLY MARKET OBSERVATION UI FOUNDATION** (BB-074) is implemented as an early M2
 research surface: provider-neutral fail-closed snapshot, research watchlist, honest empty/

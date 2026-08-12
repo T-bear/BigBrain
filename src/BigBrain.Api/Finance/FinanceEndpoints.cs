@@ -15,6 +15,16 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/features", (string? instrumentId, string? featureId,
             DateOnly? from, DateOnly? to, DateTimeOffset? knowledgeAsOfUtc, int? limit, IFinanceFeatureReader reader) =>
             Results.Json(reader.GetSnapshot(instrumentId, featureId, from, to, knowledgeAsOfUtc, limit ?? 260), JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/backtests", (IFinanceBacktestReader reader) => Results.Json(reader.GetCatalog(), JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/backtests/{runId}", (string runId, int? eventOffset, int? eventLimit,
+            int? fillOffset, int? fillLimit, IFinanceBacktestReader reader) =>
+        {
+            if (reader.GetResult(runId) is not { } result) return Results.NotFound();
+            var boundedEventOffset=Math.Max(0,eventOffset??0);var boundedEventLimit=Math.Clamp(eventLimit??250,1,500);
+            var boundedFillOffset=Math.Max(0,fillOffset??0);var boundedFillLimit=Math.Clamp(fillLimit??250,1,500);
+            return Results.Json(result with { Events=result.Events.Skip(boundedEventOffset).Take(boundedEventLimit).ToArray(),
+                Fills=result.Fills.Skip(boundedFillOffset).Take(boundedFillLimit).ToArray(), EquityCurve=result.EquityCurve.Take(500).ToArray() },JsonOptions);
+        });
         return endpoints;
     }
 

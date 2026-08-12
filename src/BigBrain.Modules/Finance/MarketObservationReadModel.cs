@@ -37,7 +37,11 @@ public sealed record FinanceRetentionSummary(
     string DeletionScope,
     string? LastReceiptId,
     int CoveredFeatureValueCount = 0,
-    int CoveredFeatureRevisionCount = 0);
+    int CoveredFeatureRevisionCount = 0,
+    int CoveredBacktestRunCount = 0,
+    int CoveredBacktestEventCount = 0,
+    int CoveredBacktestFillCount = 0,
+    int CoveredBacktestEquityPointCount = 0);
 
 public sealed record FinanceInstrumentObservation(
     string InstrumentId,

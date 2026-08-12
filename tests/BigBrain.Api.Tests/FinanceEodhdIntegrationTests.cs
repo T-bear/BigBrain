@@ -91,6 +91,7 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         var memory = new EodhdMarketMemory(options); var instrument = EodhdCatalog.Watchlist[3]; var acquired = DateTimeOffset.UtcNow;
         var revision = memory.Store(instrument, EodhdAdapter.Parse(Fixture()), Fixture(), new(2026, 8, 1), new(2026, 8, 11), acquired.AddSeconds(-1), acquired, 0);
         var featureRevision = memory.BuildFeatures();
+        var backtests = memory.BuildReferenceBacktests();
         var blocked = memory.Snapshot(true, true, false); var preview = memory.PreviewDeletion();
         var beforeDeletion = memory.ReplayChecksum(revision, new(2026, 8, 1), new(2026, 8, 11));
 
@@ -98,6 +99,8 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         Assert.Equal(FinanceRetentionState.ExpiredBlocked, blocked.Retention!.State);
         Assert.Equal(featureRevision.ValueCount, preview.FeatureValues);
         Assert.Equal(1, preview.FeatureRevisions);
+        Assert.Equal(6, preview.BacktestRuns);
+        Assert.NotEmpty(backtests.RunIds);
         Assert.Throws<InvalidOperationException>(() => memory.ExecuteDeletion(preview, "DELETE", acquired));
         var receipt = memory.ExecuteDeletion(preview, $"DELETE {preview.PreviewId}", acquired);
         Assert.StartsWith("eodhd-delete-", receipt);
@@ -107,6 +110,7 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
         Assert.Equal(FinanceRetentionState.DeletionComplete, complete.Retention!.State);
         Assert.Equal(0, complete.HistoricalMemory.ObservationCount);
         Assert.Equal(0, complete.Retention.CoveredFeatureValueCount);
+        Assert.Equal(0, complete.Retention.CoveredBacktestRunCount);
     }
 
     [Fact]

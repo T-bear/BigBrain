@@ -67,6 +67,7 @@ docker compose config --quiet
   idempotency, retention deletion scope, bounded feature API and responsive feature UI.
   Runtime feature builds consume only the existing local memory and must not trigger an
   EODHD request.
+  BB-080 adds hand-verifiable next-open/cash/position/whole-share/fee/slippage/exit/final-equity tests; explicit future-bar/feature and same-close no-lookahead proofs; repeated-run identity/checksum/journal/curve determinism; insufficient-cash, warmup, repeated-signal, missing-next-session and retention inventory coverage. Real runs are offline maintenance commands and must not call a provider.
   BB-045 policy/provenance tests use only `ExampleData` synthetic fixtures and cover
   exact provider/product scope, missing/unknown/denied/expired policy, persistence,
   post-subscription retention, immutable revision state and raw/derived lineage.

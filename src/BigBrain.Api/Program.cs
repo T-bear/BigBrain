@@ -157,8 +157,10 @@ public partial class Program
         builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions));
         builder.Services.AddHostedService<EodhdAcquisitionWorker>();
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
+        builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
         builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();
+        builder.Services.AddSingleton<IFinanceBacktestReader, EodhdFinanceBacktestReader>();
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 
