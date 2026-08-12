@@ -1,5 +1,11 @@
 # BigBrain Status
 
+BB-083 resilience baseline 2026-08-12 is deployed at Compose level. Durable lifecycle,
+clean/unclean state, storage/clock/disk gates, recovery API/UI, Sentinel readiness and stop
+grace are active. API PID-1 crash recovered as `UNCLEAN`; Finance requests remained 16 with
+no duplicate evidence. Host unit install, Docker restart and reboot are blocked by interactive
+sudo; physical power test is pending. Finance remains `RESEARCH`; no shutdown/trading API.
+
 - Senast uppdaterad: 2026-08-11 (Europe/Stockholm)
 - Verifierad mot commit: BB-073 synthetic live-observation/shadow-learning foundation and
   current free-live research are complete for publication from current main; published SHA

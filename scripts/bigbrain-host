@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+action=${1:-}
+project_dir=${2:-}
+test -n "$project_dir"
+test -f "$project_dir/compose.yaml"
+case "$action" in
+  preflight)
+    /usr/bin/docker info >/dev/null
+    /usr/bin/docker compose --project-directory "$project_dir" config --quiet
+    test -d /var/lib/docker
+    ;;
+  ready)
+    /usr/bin/docker compose --project-directory "$project_dir" ps --status running >/dev/null
+    ;;
+  stop)
+    /usr/bin/docker compose --project-directory "$project_dir" stop --timeout 35
+    ;;
+  *) echo "usage: bigbrain-host {preflight|ready|stop} PROJECT_DIR" >&2; exit 64 ;;
+esac

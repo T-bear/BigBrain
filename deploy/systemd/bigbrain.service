@@ -1,0 +1,21 @@
+[Unit]
+Description=BigBrain appliance Compose lifecycle
+Documentation=https://github.com/T-bear/BigBrain
+Requires=docker.service
+After=docker.service network-online.target local-fs.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/bigbrain/bigbrain.conf
+ExecStartPre=/usr/local/libexec/bigbrain-host preflight ${BIGBRAIN_PROJECT_DIR}
+ExecStart=/usr/bin/docker compose --project-directory ${BIGBRAIN_PROJECT_DIR} up -d --wait --wait-timeout 120
+ExecStartPost=/usr/local/libexec/bigbrain-host ready ${BIGBRAIN_PROJECT_DIR}
+ExecStop=/usr/local/libexec/bigbrain-host stop ${BIGBRAIN_PROJECT_DIR}
+TimeoutStartSec=180
+TimeoutStopSec=50
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target

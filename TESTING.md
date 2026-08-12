@@ -1,5 +1,9 @@
 # Testa BigBrain
 
+BB-083 tests clean/unclean markers, idempotent recovery, missed-run policies and conservative
+interrupted EODHD acquisition without live calls. systemd/reboot remain separate host tests;
+CI need not run systemd as PID 1. The verifier prints sanitized states/counts only.
+
 Detta dokument är en kort karta. Auktoritativa procedurer ligger i respektive runbook och modulkontrakt.
 
 ## Automatiska tester

@@ -1,5 +1,7 @@
 # ADR Index
 
+- [ADR 0026: appliance lifecycle and recovery](../adr/0026-bigbrain-appliance-lifecycle-and-recovery.md)
+
 Proposed records are not accepted authority merely because related code exists.
 
 | ADR | Status | Subject |

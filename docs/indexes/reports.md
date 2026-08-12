@@ -1,5 +1,7 @@
 # Reports Index
 
+- [BB-083 appliance resilience](../reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md)
+
 - [Report library](../reports/README.md)
 - [Report catalog](../reports/REPORT-CATALOG.md)
 - [Report schema](../reports/report-schema.md)

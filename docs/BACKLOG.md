@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+### BB-083 – Appliance lifecycle and crash recovery baseline
+
+- Modul: Platform / Operations / Finance safety; prioritet P0.
+- Status: implementerad och container-runtime-verifierad 2026-08-12; hostinstall,
+  Docker-daemon restart/reboot blocked by interactive sudo; physical power-cycle pending.
+- Delivered: ADR 0026, clean/unclean journal, recovery/storage/disk/clock gate, explicit job
+  policies, interrupted EODHD safety, API/UI, Compose grace/readiness, systemd and scripts.
+- Evidence: API PID-1 crash returned healthy/`UNCLEAN`; Finance stayed at 16 requests,
+  4,016 raw observations and 16 immutable revisions.
+- Report: `docs/reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md`.
+
 Senast uppdaterad: 2026-08-10
 
 Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.

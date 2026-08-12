@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getDockerContainers, getModules, getSystemOverview } from './api'
+import { getDockerContainers, getModules, getSystemOverview, getSystemRecovery } from './api'
 import { DashboardWorkspace } from './dashboard/DashboardWorkspace'
 import { createAppWidgetRegistry, dashboardRegistry } from './dashboard/appWidgets'
 import { WidgetProvider, useWidgets } from './dashboard/widgetFramework'
 import { MobileNavigation } from './MobileNavigation'
-import type { DockerInventory, ModuleDefinition, SystemOverview } from './types'
+import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from './types'
 import { ThemeProvider } from './ThemeProvider'
 
 const POLL_INTERVAL_MS = 5_000
@@ -35,6 +35,8 @@ function AppContent() {
   const [systemError, setSystemError] = useState(false)
   const [docker, setDocker] = useState<DockerInventory | null>(null)
   const [dockerError, setDockerError] = useState(false)
+  const [recovery, setRecovery] = useState<SystemRecoverySnapshot | null>(null)
+  const [recoveryError, setRecoveryError] = useState(false)
   const systemRequestActive = useRef(false)
 
   useEffect(() => {
@@ -44,6 +46,9 @@ function AppContent() {
     })
     getDockerContainers(controller.signal).then(setDocker).catch((error: unknown) => {
       if (error instanceof Error && error.name !== 'AbortError') setDockerError(true)
+    })
+    getSystemRecovery(controller.signal).then(setRecovery).catch((error: unknown) => {
+      if (error instanceof Error && error.name !== 'AbortError') setRecoveryError(true)
     })
     const refreshSystem = async () => {
       if (systemRequestActive.current) return
@@ -57,7 +62,7 @@ function AppContent() {
     return () => { window.clearInterval(interval); controller.abort() }
   }, [])
 
-  const registry = useMemo(() => createAppWidgetRegistry({ docker, dockerError, moduleError, modules, system, systemError }), [docker, dockerError, moduleError, modules, system, systemError])
+  const registry = useMemo(() => createAppWidgetRegistry({ docker, dockerError, moduleError, modules, recovery, recoveryError, system, systemError }), [docker, dockerError, moduleError, modules, recovery, recoveryError, system, systemError])
   return <WidgetProvider registry={registry}><AppShell /></WidgetProvider>
 }
 

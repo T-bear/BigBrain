@@ -29,6 +29,16 @@ export interface SystemOverview {
   warnings: string[]
 }
 
+export interface SystemRecoverySnapshot {
+  overall: 'starting' | 'recovering' | 'healthy' | 'degraded' | 'quiescing' | 'stopping' | 'recoveryRequired'
+  bootId: string; bootedAtUtc: string; previousShutdown: 'unknown' | 'clean' | 'unclean'; recoveryCompleted: boolean
+  clockSynchronized: boolean; clockSource: string; availableBytes: number | null; lowDisk: boolean
+  lastCleanShutdownUtc: string | null; lastIntegrityCheckUtc: string | null; interruptedJobs: number; operatingMode: 'RESEARCH'
+  components: Array<{ id: string; state: 'healthy' | 'degraded' | 'recovering' | 'unavailable'; critical: boolean; summary: string; checkedAtUtc: string }>
+  recoveryActions: Array<{ code: string; outcome: string; atUtc: string }>
+  scheduledJobs: Array<{ job: string; policy: string; reason: string }>
+}
+
 export interface DockerContainer {
   id: string
   name: string

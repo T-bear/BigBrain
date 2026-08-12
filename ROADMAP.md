@@ -1,5 +1,10 @@
 # BigBrain Roadmap
 
+**BB-083 APPLIANCE RESILIENCE BASELINE** pauses the next Finance slice. Lifecycle/recovery,
+clean/unclean journal, storage/clock/disk gates, crash-safe Finance requests, recovery API/UI,
+Compose readiness/grace and systemd artifacts are implemented. Container crash passed without
+request/data loss. Host reboot and physical power-cycle remain gates; not PAPER.
+
 Product work is tracked in [BACKLOG](docs/BACKLOG.md); current verified reality is in
 [STATUS](docs/STATUS.md). This file points to dedicated canonical roadmaps rather than
 duplicating their detailed gates.

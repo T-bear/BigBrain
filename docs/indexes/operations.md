@@ -1,5 +1,7 @@
 # Operations Index
 
+- [BigBrain appliance lifecycle](../operations/runbooks/bigbrain-appliance-lifecycle.md)
+
 - [Operations overview](../operations/README.md)
 - [Runbook index](../operations/runbooks/README.md)
 - [Dashboard verification](../operations/runbooks/dashboard-widget-framework-verification.md)

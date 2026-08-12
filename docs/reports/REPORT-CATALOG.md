@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+| Area | Evidence | Artifact | Status |
+| --- | --- | --- | --- |
+| BB-083 appliance resilience | Sanitized host/runtime/crash evidence | [Report](features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md) | Compose deployed; host/reboot/physical gates pending |
+
 | Area | Local evidence classification | Published artifact | Status |
 | --- | --- | --- | --- |
 | Dashboard Phase 1 implementation | Sanitized full report | [Implementation](features/dashboard/dashboard-views-widget-framework-phase1-20260804.md) | Published |

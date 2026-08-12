@@ -85,6 +85,25 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     }
 
     [Fact]
+    public void InterruptedRequestIsRecoveredConservativelyWithoutPublishingOrSameDayRetry()
+    {
+        var options = Options(); var instrument = EodhdCatalog.Watchlist.Single(value => value.Symbol == "AAPL");
+        var started = new DateTimeOffset(2026, 8, 12, 8, 0, 0, TimeSpan.Zero);
+        var memory = new EodhdMarketMemory(options);
+        memory.RecordStarted(instrument, new(2025, 8, 12), new(2026, 8, 12), started);
+
+        var reopened = new EodhdMarketMemory(options);
+
+        Assert.False(reopened.ShouldAcquire(instrument.ProviderSymbol, new(2026, 8, 12)));
+        Assert.True(reopened.ShouldAcquire(instrument.ProviderSymbol, new(2026, 8, 13)));
+        Assert.Equal(0, reopened.Snapshot(true, true, true).HistoricalMemory.ObservationCount);
+        var evidence = reopened.RuntimeEvidence();
+        Assert.Equal(1, evidence.ExternalRequests);
+        Assert.Equal(1, evidence.AcquisitionAttempts);
+        Assert.Equal(0, evidence.SuccessfulAttempts);
+    }
+
+    [Fact]
     public void ExpiryBlocksUseAndDeletionRequiresExactFreshPreview()
     {
         var unrelated = Path.Combine(_root, "unrelated.txt"); Directory.CreateDirectory(_root); File.WriteAllText(unrelated, "preserve");

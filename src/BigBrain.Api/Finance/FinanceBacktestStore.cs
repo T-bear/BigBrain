@@ -136,7 +136,7 @@ public interface IFinanceBacktestReader { FinanceBacktestCatalog GetCatalog(); B
 internal sealed class EodhdFinanceBacktestReader(EodhdMarketMemory memory):IFinanceBacktestReader
 { public FinanceBacktestCatalog GetCatalog()=>memory.BacktestCatalog(); public BacktestResult? GetResult(string runId)=>memory.BacktestResult(runId); }
 
-internal sealed class FinanceBacktestBuildWorker(EodhdFinanceOptions options,EodhdMarketMemory memory):BackgroundService
+internal sealed class FinanceBacktestBuildWorker(EodhdFinanceOptions options,EodhdMarketMemory memory,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery):BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken token){if(!options.Enabled||!options.AccountActive)return;await Task.Delay(TimeSpan.FromSeconds(18),token);try{memory.BuildReferenceBacktests();}catch(InvalidOperationException){}}
+    protected override async Task ExecuteAsync(CancellationToken token){await recovery.WaitUntilRecoveredAsync(token);if(!options.Enabled||!options.AccountActive)return;await Task.Delay(TimeSpan.FromSeconds(18),token);try{memory.BuildReferenceBacktests();}catch(InvalidOperationException){}}
 }

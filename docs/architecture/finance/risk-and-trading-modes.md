@@ -1,5 +1,11 @@
 # Finance risk, exits, compounding and trading modes
 
+## Crash-reconciliation promotion invariant
+
+Future LIVE/external orders must enter `RECONCILIATION_REQUIRED` after unclean restart until
+local journal, broker orders, positions and account truth reconcile. Persistent idempotency
+and duplicate prevention must be proven. BB-083 grants no execution authority.
+
 ## Hard Risk Engine
 
 The Risk Engine is authoritative below AI and strategies. Versioned policy must cover

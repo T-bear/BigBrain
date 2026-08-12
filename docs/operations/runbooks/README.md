@@ -1,5 +1,7 @@
 # Runbooks
 
+- [BigBrain appliance lifecycle](bigbrain-appliance-lifecycle.md)
+
 - [Dashboard and Widget Framework verification](dashboard-widget-framework-verification.md)
 - [Download Control safe removal](download-control-safe-removal.md)
 - [Media integration verification](media-integration-verification.md)

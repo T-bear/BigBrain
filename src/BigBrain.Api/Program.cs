@@ -8,10 +8,13 @@ using BigBrain.Api.Sentinel;
 using BigBrain.Api.Finance;
 using BigBrain.Modules.Finance;
 using BigBrain.Sentinel.Contracts;
+using BigBrain.Api.SystemRecovery;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BigBrain.Api;
 
@@ -30,6 +33,10 @@ public partial class Program
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
+        var recoveryOptions = builder.Configuration.GetSection(SystemRecoveryOptions.SectionName).Get<SystemRecoveryOptions>() ?? new();
+        builder.Services.AddSingleton(recoveryOptions);
+        builder.Services.AddSingleton<SystemRecoveryCoordinator>();
+        builder.Services.AddHostedService(serviceProvider => serviceProvider.GetRequiredService<SystemRecoveryCoordinator>());
         var mealPlannerOptions = builder.Configuration
             .GetSection(MealPlannerOptions.SectionName)
             .Get<MealPlannerOptions>() ?? new MealPlannerOptions();
@@ -184,6 +191,9 @@ public partial class Program
                     ? Results.Ok(response)
                     : Results.Json(response, statusCode: StatusCodes.Status503ServiceUnavailable);
             });
+        var recoveryJson = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        recoveryJson.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        app.MapGet("/api/v1/system/recovery", (SystemRecoveryCoordinator recovery) => Results.Json(recovery.Snapshot(), recoveryJson));
 
         app.MapGet(
             "/api/v1/modules",

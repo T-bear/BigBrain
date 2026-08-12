@@ -1,5 +1,9 @@
 # BigBrain Finance – master roadmap
 
+BB-083 temporarily supersedes the next Finance research slice. Future LIVE requires validated
+host recovery, persistent order idempotency, duplicate prevention and broker reconciliation
+after every unclean restart. This baseline covers host/data only.
+
 Status: M0 and M1 complete; Finance remains an undeployed RESEARCH foundation.
 Owner approval required: before every transition toward live or greater autonomy.
 Live trading enabled: **NO**. Current trading mode: **RESEARCH** domain/module status only;

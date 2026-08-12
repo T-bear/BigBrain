@@ -1,5 +1,10 @@
 # Finance module
 
+BB-083 gates automatic workers behind recovery. EODHD records request start durably; an
+unfinished request becomes interrupted, publishes no partial revision and suppresses same-day
+symbol retry. Derived builders consume committed state. Future LIVE must force
+`RECONCILIATION_REQUIRED` after unclean startup; no execution authority exists.
+
 Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay/revision/acquisition/persistence-manifest foundations
 implemented and automatically verified; not deployed. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.

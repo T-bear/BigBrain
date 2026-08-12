@@ -90,5 +90,5 @@ internal sealed partial class EodhdMarketMemory
 
 public interface IFinanceRobustnessReader{FinanceRobustnessCatalog GetCatalog();RobustnessEvaluationResult? GetEvaluation(string id);}
 internal sealed class EodhdFinanceRobustnessReader(EodhdMarketMemory memory):IFinanceRobustnessReader{public FinanceRobustnessCatalog GetCatalog()=>memory.RobustnessCatalog();public RobustnessEvaluationResult? GetEvaluation(string id)=>memory.RobustnessEvaluation(id);}
-internal sealed class FinanceRobustnessBuildWorker(EodhdFinanceOptions options,EodhdMarketMemory memory):BackgroundService
-{protected override async Task ExecuteAsync(CancellationToken token){if(!options.Enabled||!options.AccountActive)return;await Task.Delay(TimeSpan.FromSeconds(24),token);try{memory.BuildRobustnessEvaluations();}catch(InvalidOperationException){}}}
+internal sealed class FinanceRobustnessBuildWorker(EodhdFinanceOptions options,EodhdMarketMemory memory,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery):BackgroundService
+{protected override async Task ExecuteAsync(CancellationToken token){await recovery.WaitUntilRecoveredAsync(token);if(!options.Enabled||!options.AccountActive)return;await Task.Delay(TimeSpan.FromSeconds(24),token);try{memory.BuildRobustnessEvaluations();}catch(InvalidOperationException){}}}

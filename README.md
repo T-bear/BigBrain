@@ -1,5 +1,10 @@
 # BigBrain
 
+BB-083 adds appliance resilience: repository-managed systemd/Compose boot, bounded graceful
+stop, durable clean/unclean journal, storage/clock/disk recovery, recovery API/UI and
+crash-safe Finance request gating. Local core startup does not require internet. Host
+install/reboot follows the root-gated runbook; forced long power hold cannot be software-safe.
+
 BigBrain är ett modulärt control plane och familjegränssnitt för en Debian-baserad hemserver. Produkten samlar dagliga familjeflöden, mediahantering, systemstatus och framtida AI-funktioner i en gemensam React-applikation och ett versionssatt ASP.NET Core-API.
 
 ## Produktvision

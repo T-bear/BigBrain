@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using BigBrain.Modules.Finance;
 using Microsoft.Data.Sqlite;
+using BigBrain.Api.SystemRecovery;
 
 namespace BigBrain.Api.Finance;
 
@@ -185,10 +186,22 @@ internal sealed partial class EodhdMarketMemory
         InitializeFeatureStorage(connection);
         InitializeBacktestStorage(connection);
         InitializeRobustnessStorage(connection);
+        Execute(connection, null, "UPDATE acquisitions SET outcome='interrupted',reason='marketData.acquisition.interruptedBeforeCommit' WHERE outcome='started'");
+    }
+
+    internal long RecordStarted(EodhdInstrument instrument, DateOnly from, DateOnly to, DateTimeOffset startedUtc)
+    {
+        using var connection = new SqliteConnection(ConnectionString); connection.Open();
+        Execute(connection, null, """
+            INSERT INTO acquisitions(provider_symbol,requested_from,requested_to,started_utc,completed_utc,outcome,rows,retries,reason)
+            VALUES($symbol,$from,$to,$started,$started,'started',0,0,'marketData.acquisition.requestStarted')
+            """, ("$symbol", instrument.ProviderSymbol), ("$from", Date(from)), ("$to", Date(to)), ("$started", startedUtc.ToString("O")));
+        using var command = connection.CreateCommand(); command.CommandText = "SELECT last_insert_rowid()";
+        return (long)command.ExecuteScalar()!;
     }
 
     internal string Store(EodhdInstrument instrument, IReadOnlyList<EodhdDailyBar> bars, byte[] payload,
-        DateOnly from, DateOnly to, DateTimeOffset startedUtc, DateTimeOffset completedUtc, int retries)
+        DateOnly from, DateOnly to, DateTimeOffset startedUtc, DateTimeOffset completedUtc, int retries, long? acquisitionId = null)
     {
         var payloadHash = Sha(payload); var revisionId = $"eodhd-{payloadHash[7..23]}";
         var payloadPath = Path.Combine(_options.PayloadDirectory, payloadHash[7..] + ".json");
@@ -210,19 +223,25 @@ internal sealed partial class EodhdMarketMemory
                 ("$volume", bar.Volume), ("$acquired", completedUtc.ToString("O")), ("$revision", revisionId));
         Execute(connection, transaction, "INSERT OR IGNORE INTO revisions VALUES($id,$hash,$created,$count,1)",
             ("$id", revisionId), ("$hash", payloadHash), ("$created", completedUtc.ToString("O")), ("$count", bars.Count));
-        Execute(connection, transaction, """
-            INSERT INTO acquisitions(provider_symbol,requested_from,requested_to,started_utc,completed_utc,outcome,rows,retries,checksum,revision_id,reason)
-            VALUES($symbol,$from,$to,$started,$completed,'success',$rows,$retries,$checksum,$revision,'marketData.entitlement.allowed')
-            """, ("$symbol", instrument.ProviderSymbol), ("$from", Date(from)), ("$to", Date(to)),
-            ("$started", startedUtc.ToString("O")), ("$completed", completedUtc.ToString("O")), ("$rows", bars.Count),
-            ("$retries", retries), ("$checksum", payloadHash), ("$revision", revisionId));
+        if (acquisitionId is { } id)
+            Execute(connection, transaction, """
+                UPDATE acquisitions SET completed_utc=$completed,outcome='success',rows=$rows,retries=$retries,checksum=$checksum,revision_id=$revision,reason='marketData.entitlement.allowed' WHERE id=$id AND outcome='started'
+                """, ("$completed", completedUtc.ToString("O")), ("$rows", bars.Count), ("$retries", retries), ("$checksum", payloadHash), ("$revision", revisionId), ("$id", id));
+        else Execute(connection, transaction, """
+                INSERT INTO acquisitions(provider_symbol,requested_from,requested_to,started_utc,completed_utc,outcome,rows,retries,checksum,revision_id,reason)
+                VALUES($symbol,$from,$to,$started,$completed,'success',$rows,$retries,$checksum,$revision,'marketData.entitlement.allowed')
+                """, ("$symbol", instrument.ProviderSymbol), ("$from", Date(from)), ("$to", Date(to)),
+                ("$started", startedUtc.ToString("O")), ("$completed", completedUtc.ToString("O")), ("$rows", bars.Count),
+                ("$retries", retries), ("$checksum", payloadHash), ("$revision", revisionId));
         transaction.Commit(); return revisionId;
     }
 
-    internal void RecordFailure(EodhdInstrument instrument, DateOnly from, DateOnly to, DateTimeOffset startedUtc, string reason)
+    internal void RecordFailure(EodhdInstrument instrument, DateOnly from, DateOnly to, DateTimeOffset startedUtc, string reason, long? acquisitionId = null)
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
-        Execute(connection, null, """
+        if (acquisitionId is { } id) Execute(connection, null, "UPDATE acquisitions SET completed_utc=$completed,outcome='failure',reason=$reason WHERE id=$id AND outcome='started'",
+            ("$completed", DateTimeOffset.UtcNow.ToString("O")), ("$reason", reason), ("$id", id));
+        else Execute(connection, null, """
             INSERT INTO acquisitions(provider_symbol,requested_from,requested_to,started_utc,completed_utc,outcome,rows,retries,reason)
             VALUES($symbol,$from,$to,$started,$completed,'failure',0,0,$reason)
             """, ("$symbol", instrument.ProviderSymbol), ("$from", Date(from)), ("$to", Date(to)),
@@ -232,7 +251,7 @@ internal sealed partial class EodhdMarketMemory
     internal bool ShouldAcquire(string providerSymbol, DateOnly utcDate)
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open(); using var command = connection.CreateCommand();
-        command.CommandText = "SELECT completed_utc FROM acquisitions WHERE provider_symbol=$symbol AND outcome='success' ORDER BY completed_utc DESC LIMIT 1";
+        command.CommandText = "SELECT completed_utc FROM acquisitions WHERE provider_symbol=$symbol AND outcome IN ('success','started','interrupted') ORDER BY started_utc DESC,id DESC LIMIT 1";
         command.Parameters.AddWithValue("$symbol", providerSymbol); var value = command.ExecuteScalar() as string;
         return value is null || DateOnly.FromDateTime(DateTimeOffset.Parse(value, CultureInfo.InvariantCulture).UtcDateTime) < utcDate;
     }
@@ -385,10 +404,12 @@ internal sealed partial class EodhdMarketMemory
     { using var command = connection.CreateCommand(); command.Transaction = transaction; command.CommandText = sql; foreach (var value in values) command.Parameters.AddWithValue(value.Name, value.Value); command.ExecuteNonQuery(); }
 }
 
-internal sealed class EodhdAcquisitionWorker(EodhdFinanceOptions options, EodhdMarketMemory memory) : BackgroundService
+internal sealed class EodhdAcquisitionWorker(EodhdFinanceOptions options, EodhdMarketMemory memory, SystemRecoveryCoordinator recovery) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await recovery.WaitUntilRecoveredAsync(stoppingToken);
+        if (!recovery.MayStartTimeSensitiveWork) return;
         if (!options.Enabled || !options.AccountActive || string.IsNullOrWhiteSpace(options.ApiToken) ||
             !EodhdEntitlement.AllowsAcquisition(options, DateTimeOffset.UtcNow)) return;
         if (options.EntitlementEndsAtUtc is { } end && end <= DateTimeOffset.UtcNow) return;
@@ -397,9 +418,10 @@ internal sealed class EodhdAcquisitionWorker(EodhdFinanceOptions options, EodhdM
         {
             if (!memory.ShouldAcquire(instrument.ProviderSymbol, to)) continue;
             var started = DateTimeOffset.UtcNow;
-            try { var result = await adapter.FetchAsync(instrument.ProviderSymbol, from, to, stoppingToken); memory.Store(instrument, result.Bars, result.Payload, from, to, started, DateTimeOffset.UtcNow, result.Retries); }
+            var acquisitionId = memory.RecordStarted(instrument, from, to, started);
+            try { var result = await adapter.FetchAsync(instrument.ProviderSymbol, from, to, stoppingToken); memory.Store(instrument, result.Bars, result.Payload, from, to, started, DateTimeOffset.UtcNow, result.Retries, acquisitionId); }
             catch (Exception exception) when (exception is HttpRequestException or JsonException or InvalidDataException or TaskCanceledException)
-            { memory.RecordFailure(instrument, from, to, started, exception.GetType().Name); }
+            { memory.RecordFailure(instrument, from, to, started, exception.GetType().Name, acquisitionId); }
             await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
         }
     }

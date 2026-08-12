@@ -16,6 +16,7 @@ import type {
   MealPlannerTag,
   ModuleDefinition,
   SystemOverview,
+  SystemRecoverySnapshot,
   SmartShuffleDevice,
   SmartShuffleOptions,
   SmartShuffleSession,
@@ -83,6 +84,8 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 
 export const getFinanceObservation = (signal?: AbortSignal) =>
   getJson<FinanceObservationSnapshot>('/api/v1/modules/finance/observation', signal)
+
+export const getSystemRecovery = (signal?: AbortSignal) => getJson<SystemRecoverySnapshot>('/api/v1/system/recovery', signal)
 
 export const getFinanceFeatures = (instrumentId: string, signal?: AbortSignal) =>
   getJson<FinanceFeatureSnapshot>(`/api/v1/modules/finance/features?instrumentId=${encodeURIComponent(instrumentId)}&featureId=sma.20&limit=260`, signal)

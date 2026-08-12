@@ -1,5 +1,9 @@
 # Deployment
 
+Appliance boot/shutdown uses the [lifecycle runbook](../runbooks/bigbrain-appliance-lifecycle.md).
+Docker and `bigbrain.service` must be enabled. The unit performs Compose preflight/readiness
+and bounded stop without embedding secrets. External media and `/mnt/media` are noncritical.
+
 ## Finance EODHD Free
 
 EODHD is disabled by default. The named `finance-market-data` volume is mounted only into

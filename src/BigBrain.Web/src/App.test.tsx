@@ -15,6 +15,7 @@ const overview = {
   temperatureCelsius: null, collectedAtUtc: '2026-07-23T10:00:00Z', status: 'Degraded', warnings: ['Temperature is unavailable.'],
 }
 const dockerUnavailable = { availability: { available: false, reason: 'Docker inventory requires Sentinel integration.' }, collectedAtUtc: '2026-07-23T10:00:00Z', containers: [] }
+const recovery = { overall: 'healthy', bootId: '12345678-abcd', bootedAtUtc: '2026-08-12T10:00:00Z', previousShutdown: 'clean', recoveryCompleted: true, clockSynchronized: true, clockSource: 'systemd-timesync-marker', availableBytes: 100_000_000_000, lowDisk: false, lastCleanShutdownUtc: '2026-08-12T09:59:00Z', lastIntegrityCheckUtc: '2026-08-12T10:00:01Z', interruptedJobs: 0, operatingMode: 'RESEARCH', components: [{ id: 'finance-memory', state: 'healthy', critical: false, summary: 'Fast open/write check passed.', checkedAtUtc: '2026-08-12T10:00:01Z' }], recoveryActions: [], scheduledJobs: [] }
 
 function response(body: unknown) { return { ok: true, json: async () => body } }
 function successfulFetch() {
@@ -23,6 +24,7 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/modules')) return Promise.resolve(response(modules))
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
+    if (url.endsWith('/api/v1/system/recovery')) return Promise.resolve(response(recovery))
     return Promise.reject(new Error('Unexpected URL'))
   })
 }
@@ -88,6 +90,8 @@ test('renders system values and safe Docker state only in Admin', async () => {
   expect(await screen.findByText('bigbrain-host')).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'CPU usage' })).toHaveAttribute('value', '23.5')
   expect(screen.getByText('Docker inventory requires Sentinel integration.')).toBeInTheDocument()
+  expect(screen.getByText('CLEAN')).toBeInTheDocument()
+  expect(screen.getByText('Synkroniserad')).toBeInTheDocument()
 })
 
 test('dashboard settings groups theme, editing and widget library with keyboard dismissal', () => {

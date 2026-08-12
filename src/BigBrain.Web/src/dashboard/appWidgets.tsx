@@ -1,4 +1,4 @@
-import type { DockerInventory, ModuleDefinition, SystemOverview } from '../types'
+import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from '../types'
 import { DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadge } from '../components'
 import { DownloadControl } from '../download-control/DownloadControl'
 import { MealPlanner } from '../meal-planner/MealPlanner'
@@ -9,6 +9,7 @@ import { ShoppingList } from '../shopping-list/ShoppingList'
 import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
 import { CalendarWidget } from '../calendar/Calendar'
 import { FinanceObservation } from '../finance/FinanceObservation'
+import { SystemRecovery } from '../system-recovery/SystemRecovery'
 import { ApplicationWidgetRegistry, DashboardRegistry, type WidgetDefinition } from './widgetFramework'
 
 export interface AppWidgetData {
@@ -16,6 +17,8 @@ export interface AppWidgetData {
   dockerError: boolean
   moduleError: boolean
   modules: ModuleDefinition[]
+  recovery: SystemRecoverySnapshot | null
+  recoveryError: boolean
   system: SystemOverview | null
   systemError: boolean
 }
@@ -98,6 +101,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     planned('ai-suggestions', 'AI-förslag', 'Granska förslag innan någon åtgärd utförs.', '◇', 'ai'),
     planned('automations', 'Automationer', 'Hantera framtida godkända automationer.', '↻', 'ai'),
     { id: 'server-status', title: 'Serverstatus', description: 'CPU, minne, lagring och uptime.', icon: '▤', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemWidget data={data} /> },
+    { id: 'system-recovery', title: 'Start och återställning', description: 'Boot, clean shutdown, storage och recovery.', icon: '↻', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemRecovery recovery={data.recovery} error={data.recoveryError} /> },
     { id: 'containers', title: 'Containers', description: 'Read-only Docker-inventering.', icon: '⬡', category: 'Administration', defaultView: 'admin', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['admin'], permissions: [], render: () => <DockerWidget data={data} /> },
     { id: 'integrations', title: 'Mediaintegrationer', description: 'Teknisk status för mediatjänster.', icon: '⌁', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <MediaDashboard administrationOnly /> },
     { id: 'updates', title: 'Uppdateringar', description: 'Tillgängliga system- och integrationsuppdateringar.', icon: '↑', category: 'Administration', defaultView: 'admin', defaultSize: 'medium', minimumSize: 'small', supportedViews: ['admin'], permissions: [], render: () => <PlannedWidget text="Samlad uppdateringshantering är ännu inte implementerad." /> },

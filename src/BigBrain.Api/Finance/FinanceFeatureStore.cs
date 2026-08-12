@@ -211,10 +211,11 @@ internal sealed class EodhdFinanceFeatureReader(EodhdMarketMemory memory) : IFin
         memory.FeatureSnapshot(instrumentId, featureId, from, to, knowledgeAsOfUtc, limit);
 }
 
-internal sealed class FinanceFeatureBuildWorker(EodhdFinanceOptions options, EodhdMarketMemory memory) : BackgroundService
+internal sealed class FinanceFeatureBuildWorker(EodhdFinanceOptions options, EodhdMarketMemory memory, BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await recovery.WaitUntilRecoveredAsync(stoppingToken);
         if (!options.Enabled || !options.AccountActive || options.EntitlementEndsAtUtc is { } end && end <= DateTimeOffset.UtcNow) return;
         await Task.Delay(TimeSpan.FromSeconds(12), stoppingToken);
         try { memory.BuildFeatures(); }
