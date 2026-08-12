@@ -5,7 +5,7 @@
 - Date: 2026-08-12
 - Baseline: `461b6ac31fa20aa43929005b77ccf99ef589cee1`
 - Scope: host lifecycle, recovery, storage and Finance crash safety
-- Related commit: assigned on publication
+- Implementation commit: `17258da64dd558c127aae2561ef3cee100e16109`
 
 ## Status
 
