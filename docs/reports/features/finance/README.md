@@ -1,5 +1,8 @@
 # Finance reports
 
+- [BB-084 dataset research](finance-bb-084-dataset-research-20260815.md)
+- [BB-084 implementation and runtime](finance-bb-084-implementation-runtime-20260815.md)
+
 Sanitized planning and future milestone evidence for BigBrain Finance. Canonical product
 direction lives in the [master roadmap](../../../architecture/finance/master-roadmap.md).
 

@@ -1,5 +1,9 @@
 # Finance EODHD retention and deletion
 
+BB-084 source-isolation rule: EODHD deletion queries remain provider/policy scoped and must not
+delete `NASDAQ-WIKI`, its public-domain quarantine artifact, `wiki-*` revisions or their exact
+derived lineage. Shared symbols/dates do not establish shared retention.
+
 ## Scope and safety
 
 This runbook covers only data tagged `EODHD` / `Free` /

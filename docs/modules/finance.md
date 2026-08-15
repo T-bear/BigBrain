@@ -1,5 +1,10 @@
 # Finance module
 
+BB-084 adds read-only dataset state and a trusted maintenance-only intake workflow. External
+CSV/ZIP artifacts remain quarantined until all `dataset-promotion-v1` gates pass. Web/API users
+cannot submit URLs. WIKI historical archive and EODHD current EOD remain separate revisions;
+the feature engine defaults to EODHD-only or an explicitly selected exact revision set.
+
 BB-083 gates automatic workers behind recovery. EODHD records request start durably; an
 unfinished request becomes interrupted, publishes no partial revision and suppresses same-day
 symbol retry. Derived builders consume committed state. Future LIVE must force

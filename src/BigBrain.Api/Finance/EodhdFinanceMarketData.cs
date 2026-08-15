@@ -444,7 +444,7 @@ internal static class EodhdMaintenanceCommand
         var memory = new EodhdMarketMemory(options);
         if (args[0] == "finance-features-build")
         {
-            var result = memory.BuildFeatures();
+            var result = memory.BuildFeatures(args.Length>1?args[1..]:null);
             Console.WriteLine($"feature-revision={result.RevisionId} source-revisions={result.SourceMarketRevisions.Count} values={result.ValueCount} available={result.AvailableCount} warmup={result.WarmupCount} quality-issues={result.QualityIssueCount} checksum={result.Checksum} elapsed-ms={result.BuildElapsedMilliseconds} idempotent={result.Idempotent}");
             return true;
         }

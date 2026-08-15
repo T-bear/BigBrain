@@ -1,5 +1,10 @@
 # Finance market-data memory, provenance and learning foundation
 
+BB-084 extends the ingress boundary with `ExternalDatasetCandidate → QuarantineArtifact →
+ValidationEvidence → PromotionDecision → CanonicalDatasetRevision`. Only exact all-pass
+`dataset-promotion-v1` evidence may publish. Provider source revisions are never silently
+stitched; feature construction selects EODHD or explicit exact revision IDs.
+
 Status: provider-neutral entitlement/provenance code implemented and verified; no external
 data, adapter, persistence or runtime is implemented.
 Governing decisions: Accepted ADR 0021 for market-data ownership/retention and Proposed

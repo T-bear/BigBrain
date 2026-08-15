@@ -1,5 +1,19 @@
 # BigBrain Backlog
 
+### BB-084 – Public-domain historical dataset intake, quarantine and validation
+
+- Status: Klar; implemented, automatically verified, deployed and restart-verified 2026-08-15.
+- Resultat: WIKI 2016 snapshot promoted for five mapped watchlist symbols; Zenodo failed closed
+  to manual review; immutable source-specific features/backtests/robustness persisted.
+- Definition of Done: verified by BB-084 research and implementation/runtime reports.
+
+### BB-085 – Provider-tagged Finance backup and quarantine cleanup drill
+
+- Status: Planerad; exact recommended next Finance slice.
+- Scope: backup/restore public-domain WIKI independently of EODHD deletion, exercise rejected
+  and manual-review cleanup without canonical deletion, measure restore integrity and document
+  rollback. No universe expansion, source stitching, broker, PAPER or LIVE.
+
 ### BB-083 – Appliance lifecycle and crash recovery baseline
 
 - Modul: Platform / Operations / Finance safety; prioritet P0.

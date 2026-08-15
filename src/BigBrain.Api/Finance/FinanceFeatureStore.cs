@@ -39,11 +39,11 @@ internal sealed partial class EodhdMarketMemory
             """; command.ExecuteNonQuery();
     }
 
-    internal FinanceFeatureBuildEvidence BuildFeatures()
+    internal FinanceFeatureBuildEvidence BuildFeatures(IReadOnlyList<string>? exactRevisionIds = null)
     {
         var watch = Stopwatch.StartNew();
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
-        var observations = ReadFeatureInputs(connection);
+        var observations = ReadFeatureInputs(connection, exactRevisionIds);
         if (observations.Count == 0) throw new InvalidOperationException("No canonical market observations are available for feature computation.");
         var build = DeterministicDailyFeatureEngine.Build(observations);
         var revisionId = $"feature-{build.DeterministicChecksum[7..23]}";
@@ -156,14 +156,16 @@ internal sealed partial class EodhdMarketMemory
             revision, latest, chosenFeature, history);
     }
 
-    private static List<DailyFeatureObservation> ReadFeatureInputs(SqliteConnection connection)
+    private static List<DailyFeatureObservation> ReadFeatureInputs(SqliteConnection connection,IReadOnlyList<string>? exactRevisionIds)
     {
-        using var command = connection.CreateCommand(); command.CommandText = """
+        using var command = connection.CreateCommand();command.CommandText = """
             SELECT instrument_id,session_date,open,high,low,close,volume,acquired_utc,revision_id FROM (
               SELECT instrument_id,session_date,open,high,low,close,volume,acquired_utc,revision_id,
                 ROW_NUMBER() OVER(PARTITION BY instrument_id,session_date ORDER BY acquired_utc DESC,revision_id DESC) AS rank
-              FROM observations) WHERE rank=1 ORDER BY instrument_id,session_date
+              FROM observations WHERE provider=$provider) WHERE rank=1 ORDER BY instrument_id,session_date
             """;
+        command.Parameters.AddWithValue("$provider",exactRevisionIds is null?Provider:"__exact-revisions__");
+        if(exactRevisionIds is not null){if(exactRevisionIds.Count==0)throw new ArgumentException("At least one exact market revision is required.",nameof(exactRevisionIds));var names=new List<string>();for(var i=0;i<exactRevisionIds.Count;i++){var name=$"$revision{i}";names.Add(name);command.Parameters.AddWithValue(name,exactRevisionIds[i]);}command.CommandText=command.CommandText.Replace("provider=$provider",$"revision_id IN ({string.Join(',',names)})",StringComparison.Ordinal);}
         using var reader = command.ExecuteReader(); var values = new List<DailyFeatureObservation>();
         while (reader.Read()) values.Add(new(new InstrumentId(reader.GetString(0)),
             DateOnly.Parse(reader.GetString(1), CultureInfo.InvariantCulture),

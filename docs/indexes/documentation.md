@@ -1,5 +1,7 @@
 # Documentation Index
 
+- [Finance dataset intake and quarantine](../architecture/finance/dataset-intake-quarantine.md)
+
 ## Authority order
 
 When sources disagree, use this order and resolve the inconsistency explicitly:

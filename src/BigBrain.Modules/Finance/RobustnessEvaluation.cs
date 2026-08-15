@@ -45,12 +45,12 @@ public sealed record RobustnessEvaluationBuild(RobustnessEvaluationResult Evalua
 public static class DeterministicRobustnessEvaluator
 {
     public const string PlanVersion="v1"; public const string GridVersion="bounded-core-daily-v1";
-    public const string RobustnessModelVersion="transparent-robustness-score-v2";
+    public const string RobustnessModelVersion="transparent-robustness-score-v3";
     public static readonly EvaluationThresholds DefaultThresholds=new("v1",126,40,3,0.05m,0.10m,70m);
     public static readonly BacktestCostModel[] CostLadder=
     [BacktestCostModel.Zero,new("cost-low","v1",0.005m,0.50m,2m),BacktestCostModel.Conservative,
      new("cost-high","v1",0.02m,1m,10m),new("cost-stress","v1",0.03m,1m,20m)];
-    private static readonly string[] Limitations=["Approximately one year of data provides engineering/methodology evidence only.","Current-survivor-selected limited universe.","Raw OHLC basis and incomplete corporate actions.","Full-liquidity next-open fill assumptions.","Bounded diagnostics are not parameter optimization or strategy validation."];
+    private static readonly string[] Limitations=["Historical coverage and universe are source-revision specific.","Universe survivorship classification must be read from source lineage.","Raw OHLC basis and incomplete corporate actions.","Full-liquidity next-open fill assumptions.","Bounded diagnostics are not parameter optimization or strategy validation."];
     private static readonly (decimal Fast,decimal Slow)[] SmaVariants=[(5m,20m),(10m,20m),(5m,50m),(10m,50m)];
     private static readonly decimal[] MomentumVariants=[5m,10m,20m];
 
@@ -100,9 +100,10 @@ public static class DeterministicRobustnessEvaluator
         }
         var costSummary=new CostSensitivitySummary(costPoints,EstimateBreakEven(costPoints,plan.CostModels),
             costPoints.Zip(costPoints.Skip(1),(a,b)=>a.NetReturn>=b.NetReturn).All(x=>x));
-        var windows=new List<EvaluationWindow>();var start=plan.WalkForward.InitialTrainSessions;
+        var windows=new List<EvaluationWindow>();var start=plan.WalkForward.InitialTrainSessions;var windowsCapped=false;
         for(var index=0;start+plan.EmbargoSessions+plan.WalkForward.TestSessions<=sessions.Length;index++,start+=plan.WalkForward.StepSessions)
         {
+            if(results.Count+(isBenchmark?2:4)>plan.MaximumRuns){windowsCapped=true;break;}
             var trainFrom=plan.WalkForward.Expanding?sessions[0]:sessions[Math.Max(0,start-plan.WalkForward.InitialTrainSessions)];var trainTo=sessions[start-1];
             var testFrom=sessions[start+plan.EmbargoSessions];var testTo=sessions[start+plan.EmbargoSessions+plan.WalkForward.TestSessions-1];
             var bt=Run(new BuyAndHoldResearchStrategy(),BacktestCostModel.Conservative,trainFrom,trainTo);var bs=Run(new BuyAndHoldResearchStrategy(),BacktestCostModel.Conservative,testFrom,testTo);
@@ -114,8 +115,9 @@ public static class DeterministicRobustnessEvaluator
         var sufficient=split.TrainSessions>=plan.Thresholds.MinimumTrainSessions&&split.TestSessions>=plan.Thresholds.MinimumTestSessions&&windows.Count>=plan.Thresholds.MinimumWalkForwardWindows;
         var score=Score(pair,parameter,costSummary,positive);var verdict=Verdict(sufficient,score,parameter,costSummary,pair);
         var reasons=Reasons(sufficient,split,windows.Count,verdict,parameter,costSummary,pair,plan.Thresholds);
+        var limitations=windowsCapped?[..Limitations,"Walk-forward windows were deterministically capped by the explicit maximum-run budget."]:Limitations;
         var provisional=new RobustnessEvaluationResult("evaluation-"+Hash(Canonical(plan))[7..23],"",plan,pair,parameter,costSummary,windows,positive,score,verdict,reasons,
-            parameterPoints.Count,1,1+windows.Count,split.TrainSessions,split.TestSessions,results.Keys.Order(StringComparer.Ordinal).ToArray(),Limitations);
+            parameterPoints.Count,1,1+windows.Count,split.TrainSessions,split.TestSessions,results.Keys.Order(StringComparer.Ordinal).ToArray(),limitations);
         var evaluation=provisional with{Checksum=Hash(JsonSerializer.Serialize(provisional,JsonOptions))};
         return new(evaluation,results.Values.OrderBy(x=>x.RunId,StringComparer.Ordinal).ToArray());
     }

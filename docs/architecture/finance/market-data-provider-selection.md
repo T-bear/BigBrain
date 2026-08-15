@@ -1,5 +1,9 @@
 # Finance market-data provider selection
 
+Historical archives are now evaluated as dataset candidates, not activated as current
+providers. Nasdaq WIKI public-domain evidence cleared one exact mirror snapshot; Zenodo CC BY
+curation did not clear its underlying Yahoo lineage. See the BB-084 research report.
+
 Status: EODHD Free is active for bounded read-only daily EOD personal research after BB-078;
 zero-cost live/near-live selection remains open. BB-071 separately has positive human
 evidence for a qualifying paid Twelve Data Personal plan.

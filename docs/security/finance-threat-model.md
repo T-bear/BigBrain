@@ -1,5 +1,10 @@
 # Finance threat model
 
+BB-084 treats external dataset bytes as hostile. They remain in a Finance-owned quarantine;
+no downloaded script/macro is run. Size/disk/retry, UTF-8/line, CSV field, ZIP path/file-count/
+expanded-size, ticker formula-prefix, schema, checksum, rights and provenance gates fail closed.
+The Web exposes no URL/download control and canonical publication is transactional and bounded.
+
 Status: planning baseline; review again before credentials, sandbox or live connectivity.
 
 M1 review: the implementation adds only domain types, in-memory evidence and a read-only

@@ -1,5 +1,9 @@
 # Finance testing and validation strategy
 
+External datasets are untrusted fixtures at the validation boundary. Ordinary tests never use
+network/license pages and cover sanitized rights states, safe archive/CSV handling, deterministic
+gates, bounded symbol promotion, source comparison, idempotency and no partial publication.
+
 BB-072 is a documentation/research-only gate. It added no source code, provider payload or
 executable test surface; documentation verification, whitespace validation and Compose
 configuration validation are its applicable automated gates. External-data acceptance

@@ -1,5 +1,12 @@
 # BigBrain Roadmap
 
+## BB-084 – Historical dataset intake (deployed 2026-08-15)
+
+Quarantine, immutable manifests, deterministic validation/promotion, WIKI bounded promotion,
+Zenodo manual-review classification and source-specific feature/backtest/robustness lineage are
+implemented. The exact next Finance slice is BB-085: provider-tagged backup/restore and
+quarantine-cleanup drills; do not expand the universe or proceed to PAPER.
+
 **BB-083 APPLIANCE RESILIENCE BASELINE** pauses the next Finance slice. Lifecycle/recovery,
 clean/unclean journal, storage/clock/disk gates, crash-safe Finance requests, recovery API/UI,
 Compose readiness/grace and systemd artifacts are implemented. Container crash passed without

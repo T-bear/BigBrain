@@ -1,5 +1,10 @@
 # Finance strategy, backtesting and paper methodology
 
+BB-084 reruns the unchanged BB-080 strategies only against exact WIKI revision
+`wiki-5713d7dccfa38f56` and feature revision `feature-3833eb92bb641e51`. No WIKI/EODHD
+continuous series exists. Robustness model v3 caps walk-forward work at the accepted 64-run
+budget and versions the semantic change; results remain research evidence, not PAPER authority.
+
 ## Strategy contract
 
 Initial research candidates are momentum, trend following, breakout, mean reversion,

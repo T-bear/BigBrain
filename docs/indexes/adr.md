@@ -1,5 +1,7 @@
 # ADR Index
 
+- [ADR 0027 – Finance external dataset quarantine and deterministic promotion](../adr/0027-finance-external-dataset-quarantine-and-promotion.md)
+
 Proposed records are not accepted authority merely because related code exists.
 
 | ADR | Status | Subject |

@@ -1,5 +1,10 @@
 # BB-071 provider retention inquiry
 
+BB-084 distinguishes archive rights from provider entitlement. WIKI public-domain evidence is
+independent of EODHD subscription retention. Zenodo CC BY covers curation but does not resolve
+underlying Yahoo redistribution provenance, so local quarantine is permitted while canonical
+promotion remains manual-review blocked.
+
 Status: Twelve Data inquiry answered by a human on 2026-08-11; Alpaca Basic/free IEX
 template prepared but **not sent**. No provider account or credential is required.
 Date prepared: 2026-08-10; Twelve Data answer and Alpaca next track recorded 2026-08-11.

@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+BB-084 tests are network-free and use sanitized CSV/rights fixtures. They cover candidate
+transitions, content/schema hashes, promotion PASS/FAIL/UNKNOWN, CSV quoting, ZIP traversal,
+OHLCV/duplicate policy, symbol-bounded promotion, cross-source classification and idempotent
+re-import. Live WIKI/Zenodo acquisition is a one-time maintenance verification, never an
+ordinary test dependency. Long-history robustness also verifies the explicit run-budget cap.
+
 BB-083 tests clean/unclean markers, idempotent recovery, missed-run policies and conservative
 interrupted EODHD acquisition without live calls. systemd/reboot remain separate host tests;
 CI need not run systemd as PID 1. The verifier prints sanitized states/counts only.

@@ -1,5 +1,8 @@
 # Reports Index
 
+- [BB-084 Finance dataset research](../reports/features/finance/finance-bb-084-dataset-research-20260815.md)
+- [BB-084 Finance implementation/runtime](../reports/features/finance/finance-bb-084-implementation-runtime-20260815.md)
+
 - [BB-083 appliance resilience](../reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md)
 
 - [Report library](../reports/README.md)

@@ -29,7 +29,7 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration)) return;
+        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration)) return;
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
@@ -161,7 +161,10 @@ public partial class Program
         var eodhdOptions = new EodhdFinanceOptions();
         builder.Configuration.GetSection(EodhdFinanceOptions.Section).Bind(eodhdOptions);
         builder.Services.AddSingleton(eodhdOptions);
+        var datasetOptions = builder.Configuration.GetSection(FinanceDatasetOptions.Section).Get<FinanceDatasetOptions>() ?? new();
+        builder.Services.AddSingleton(datasetOptions);
         builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions));
+        builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
         builder.Services.AddHostedService<EodhdAcquisitionWorker>();
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
         builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
@@ -170,6 +173,7 @@ public partial class Program
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();
         builder.Services.AddSingleton<IFinanceBacktestReader, EodhdFinanceBacktestReader>();
         builder.Services.AddSingleton<IFinanceRobustnessReader, EodhdFinanceRobustnessReader>();
+        builder.Services.AddSingleton<IFinanceDatasetReader, FinanceDatasetReader>();
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 

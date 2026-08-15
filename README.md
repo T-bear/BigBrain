@@ -1,5 +1,11 @@
 # BigBrain
 
+BB-084 adds Finance's provider-neutral historical dataset quarantine and deterministic
+promotion boundary. A verified public-domain 2016 WIKI snapshot is promoted only as its own
+five-symbol historical revision; a CC BY Zenodo archive remains quarantined because underlying
+Yahoo provenance is unresolved. Read-only API/Web show source, rights, quality, coverage and
+promotion status. Finance remains `RESEARCH`; no provider stitching or trading was added.
+
 BB-083 adds appliance resilience: repository-managed systemd/Compose boot, bounded graceful
 stop, durable clean/unclean journal, storage/clock/disk recovery, recovery API/UI and
 crash-safe Finance request gating. Local core startup does not require internet. Host

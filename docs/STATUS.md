@@ -1,5 +1,13 @@
 # BigBrain Status
 
+BB-084 is implemented, deployed and runtime-verified 2026-08-15 from baseline `d9eadbb3`.
+Finance now has a fail-closed quarantine/manifest/validation/promotion pipeline. WIKI candidate
+`dd5127…a43e` passed and promoted 3,722 AAPL/MSFT/JPM/XOM/JNJ rows as
+`wiki-5713d7dccfa38f56`; Zenodo DOI 10.5281/zenodo.20192822 remains manual review with zero
+canonical rows. Feature `feature-3833eb92bb641e51` and three robustness v3 evaluations are
+deployed; 523/175 train/test sessions resolve the old insufficiency verdict to MIXED/MIXED/
+FRAGILE without creating trading authority. EODHD memory and retention remain independent.
+
 BB-083 resilience baseline 2026-08-12 is deployed at Compose level. Durable lifecycle,
 clean/unclean state, storage/clock/disk gates, recovery API/UI, Sentinel readiness and stop
 grace are active. API PID-1 crash recovered as `UNCLEAN`; Finance requests remained 16 with

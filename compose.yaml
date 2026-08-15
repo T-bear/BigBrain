@@ -45,6 +45,7 @@ services:
       Finance__Eodhd__ApiToken: ${FINANCE__EODHD__APITOKEN:-}
       Finance__Eodhd__DatabasePath: /finance-data/eodhd-market-memory.db
       Finance__Eodhd__PayloadDirectory: /finance-data/eodhd-payloads
+      Finance__Datasets__QuarantineDirectory: /finance-data/dataset-quarantine
       Finance__Eodhd__EntitlementEndsAtUtc: ${FINANCE__EODHD__ENTITLEMENTENDSATUTC:-}
       SystemRecovery__DatabasePath: /lifecycle-data/lifecycle.db
       SystemRecovery__ClockSyncDirectory: /host-timesync

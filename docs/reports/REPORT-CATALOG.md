@@ -1,5 +1,8 @@
 # Project Report Catalog
 
+- `BB-084` — [dataset research](features/finance/finance-bb-084-dataset-research-20260815.md)
+  and [implementation/runtime](features/finance/finance-bb-084-implementation-runtime-20260815.md)
+
 | Area | Evidence | Artifact | Status |
 | --- | --- | --- | --- |
 | BB-083 appliance resilience | Sanitized host/runtime/crash evidence | [Report](features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md) | Compose deployed; host/reboot/physical gates pending |

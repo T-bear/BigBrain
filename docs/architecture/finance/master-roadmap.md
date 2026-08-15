@@ -1,5 +1,10 @@
 # BigBrain Finance – master roadmap
 
+BB-084 completed 2026-08-15: provider-neutral quarantine, immutable manifests, deterministic
+promotion and a bounded WIKI historical revision are deployed. Zenodo correctly remains
+manual review. Longer WIKI evidence changes robustness sufficiency to MIXED/MIXED/FRAGILE.
+Next is BB-085 provider-tagged backup/restore and quarantine-cleanup verification, not PAPER.
+
 BB-083 temporarily supersedes the next Finance research slice. Future LIVE requires validated
 host recovery, persistent order idempotency, duplicate prevention and broker reconciliation
 after every unclean restart. This baseline covers host/data only.
