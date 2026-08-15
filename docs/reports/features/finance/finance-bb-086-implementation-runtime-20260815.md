@@ -69,8 +69,9 @@ Local publication gates passed: 185 focused Finance tests; 406 API and 32 Sentin
 tests; Release backend build with zero warnings/errors; 109 frontend tests including the Calendar
 regression; frontend production build; documentation verification over 152 Markdown files and 86
 unique backlog IDs; Compose validation and `git diff --check`. Gitleaks scanned the staged 30.15 KB
-BB-086 diff and found no leaks. The four-job published CI result is finalized at
-publication. No provider call is part of ordinary tests.
+BB-086 diff and found no leaks. GitHub Actions run #42 passed frontend, backend, secrets and
+documentation for primary publication commit `594d93304e0b9b5f6746f82fef34b3b2cc95419e`.
+No provider call is part of ordinary tests.
 
 Historical ETF cross-asset and major-regime evidence remains missing. Any future source stays
 source-specific and must traverse BB-084 intake plus BB-085 rights-aware backup classification; no

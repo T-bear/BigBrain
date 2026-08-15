@@ -6,7 +6,8 @@ reviewed; no source passed both underlying-rights/provenance and supported-acces
 single normal SPY request returned verification HTML, not CSV, and no challenge was solved.
 No artifact, observation, revision, feature, backtest, robustness or backup was created; existing
 WIKI/EODHD evidence is untouched. The approved future security/pentest baseline is now recorded
-as a mandatory pre-LIVE roadmap gate. Finance remains `RESEARCH` at 0 SEK.
+as a mandatory pre-LIVE roadmap gate. GitHub Actions run #42 passed frontend, backend, secrets and
+documentation for the BB-086 publication. Finance remains `RESEARCH` at 0 SEK.
 
 BB-085 is implemented, deployed, bounded-runtime-verified and restart-verified 2026-08-15
 from baseline `69aad9d`.
