@@ -30,7 +30,21 @@ public static class FinanceEndpoints
             reader.GetEvaluation(evaluationId) is { } result?Results.Json(result,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/datasets",(IFinanceDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/backups",(IFinanceBackupReader reader)=>Results.Json(reader.GetInventory(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/shadow/predictions",(string? instrument,string? strategy,string? state,
+            DateOnly? from,DateOnly? to,int? limit,EodhdMarketMemory memory)=>ShadowResult(() => memory.ShadowCatalog(instrument,strategy,state,from,to,limit??50)));
+        endpoints.MapGet("/api/v1/modules/finance/shadow/predictions/{id}",(string id,EodhdMarketMemory memory)=>
+            ShadowResult(() => memory.ShadowPrediction(id)));
+        endpoints.MapGet("/api/v1/modules/finance/shadow/scorecard",(EodhdMarketMemory memory)=>
+            Results.Json(memory.ShadowCatalog(null,null,null,null,null,50),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/shadow/status",(EodhdMarketMemory memory,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery)=>
+            Results.Json(memory.ShadowStatus(recovery.MayStartTimeSensitiveWork),JsonOptions));
         return endpoints;
+    }
+
+    private static IResult ShadowResult(Func<object?> read)
+    {
+        try{return Results.Json(read(),JsonOptions);}
+        catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid shadow research query",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.shadow.invalidQuery"}});}
     }
 
     private static JsonSerializerOptions CreateJsonOptions()

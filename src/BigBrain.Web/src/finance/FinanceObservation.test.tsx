@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { FinanceObservation } from './FinanceObservation'
-import type { FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceRobustnessCatalog } from '../types'
+import type { FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -90,5 +90,12 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getAllByText('Dataskydd / Historiskt minne').at(-1)).toBeVisible();expect(screen.getByText('BACKED UP')).toBeVisible();expect(screen.getByText('finance-backup-fixture · 1 market-revisioner')).toBeVisible()
     expect(screen.getByText('NASDAQ-WIKI / WIKI/PRICES')).toBeVisible();expect(screen.getByText('EODHD / Free')).toBeVisible();expect(screen.getByText('SEPARAT FRÅN CANONICAL')).toBeVisible()
     expect(screen.queryByRole('button',{name:/backup|restore|radera|cleanup/i})).not.toBeInTheDocument()
+  })
+  test('separates prospective pending evidence from historical backtests and states sample limits',()=>{
+    const shadow:FinanceShadowCatalog={generatedAtUtc:'2026-08-15T18:00:00Z',operatingMode:'RESEARCH',observationClass:'CURRENT EOD / PROSPECTIVE EOD',total:1,pending:1,evaluated:0,insufficient:0,missed:0,evidenceMaturity:'BOOTSTRAPPING',predictions:[{predictionId:'shadow-fixture',instrumentId:'US:XNAS:AAPL',symbol:'AAPL',sessionDate:'2026-08-14',provider:'EODHD',sourceRevisionId:'eodhd-fixture',observationKnowledgeUtc:'2026-08-15T17:00:00Z',knowledgeCutoffUtc:'2026-08-15T18:00:00Z',featureRevisionId:'feature-fixture',strategyId:'momentum',strategyVersion:'v1',parameterFingerprint:'sha256:fixture',signal:'TargetLong',horizon:'next-eligible-source-session-close-v1',createdAtUtc:'2026-08-15T18:00:00Z',state:'pending',operatingMode:'RESEARCH',reasonCodes:['momentum.positive']}]}
+    render(<FinanceObservation initialSnapshot={empty} initialShadow={shadow}/>)
+    expect(screen.getAllByText('Shadow research').at(-1)).toBeVisible();expect(screen.getByText('TargetLong · PENDING')).toBeVisible()
+    expect(screen.getByText(/samplet bevisar pipelineintegritet, inte strategikvalitet/i)).toBeVisible()
+    expect(screen.getAllByText('Backtests / Strategiforskning').at(-1)).toBeVisible();expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
   })
 })

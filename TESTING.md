@@ -1,5 +1,7 @@
 # Testa BigBrain
 
+BB-087 tests are network-free. They cover deterministic prediction identity, retry idempotence, knowledge cutoff/no-lookahead selection, strategy/parameter/source lineage, explicit horizon, pending-to-evaluated temporal progression, append-only outcomes, clock fail-closed, late-start anti-backfill, bounded/malformed read API, UI pending/sample honesty and absence of mutation/order controls. Full API, Sentinel and frontend regression plus Release/build/documentation/secrets/Compose checks remain required before publication.
+
 BB-086 changes research/planning documentation only because all eight ETF-history candidates
 failed closed before acquisition. No runtime contract or fixture changed. Publication verification
 therefore runs the complete existing backend/frontend suites and builds, documentation verifier,

@@ -1,5 +1,9 @@
 # Finance module
 
+BB-087 adds a persistent prospective shadow journal over approved EODHD current EOD. After BB-083 recovery and clock sanity, an idempotent source-state worker evaluates unchanged strategies against causal `core-daily-v1` features. Predictions pin knowledge cutoff and revision/version lineage; a later eligible source session appends an outcome. Old sessions whose future is already knowable are never labelled prospective.
+
+Read-only `/api/v1/modules/finance/shadow/{predictions,scorecard,status}` surfaces and the Shadow research panel distinguish pending/evaluated prospective evidence from historical backtests and label small samples `BOOTSTRAPPING`. All records are `RESEARCH`; there is no broker, order, PAPER, LIVE/AUTO, recommendation or parameter-learning path. EODHD-derived shadow rows share provider deletion scope and are not placed in indefinite public-domain backup.
+
 BB-086 adds no runtime capability: the bounded SPY/QQQ/IWM search failed closed before acquisition.
 WIKI lacks all three ETF tickers; candidate host licenses did not cure underlying Yahoo/PiTrading/
 undocumented exchange provenance, and Stooq remained technically blocked. Existing current EOD,

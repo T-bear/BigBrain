@@ -1,5 +1,18 @@
 # BigBrain Backlog
 
+### BB-087 – Prospective shadow observation foundation
+
+- Modul: Finance
+- Status: Implementerad, deployad och runtime/restart-verifierad; publication/CI pågår 2026-08-15
+- Resultat: EODHD-specific prediction journal with immutable knowledge cutoff and lineage, append-only next-session outcomes, exactly-once/recovery/clock/anti-backfill gates and read-only scorecard/UI. Historical backtests remain distinct. No execution authority.
+- Definition of Done: complete only after full regression, bounded real-provider drill, restart persistence, publication and green CI are recorded.
+
+### Finance – prospective daily cadence and outcome evaluator maturation
+
+- Modul: Finance
+- Status: Planerad efter BB-087 evidence review
+- Omfattning: prove bounded automatic current-EOD cadence across multiple sessions, missed-session classification and accumulated outcome evidence without daily owner action. No PAPER/order authority and no implicit source stitching.
+
 ### BB-084 – Public-domain historical dataset intake, quarantine and validation
 
 - Status: Klar; implemented, automatically verified, deployed and restart-verified 2026-08-15.

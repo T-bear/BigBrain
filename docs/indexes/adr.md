@@ -1,5 +1,6 @@
 # ADR Index
 
+- [ADR 0029 – Finance prospective knowledge-time evidence](../adr/0029-finance-prospective-knowledge-time-evidence.md)
 - [ADR 0028 – Finance provider-tagged backup, restore and quarantine cleanup](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md)
 - [ADR 0027 – Finance external dataset quarantine and deterministic promotion](../adr/0027-finance-external-dataset-quarantine-and-promotion.md)
 

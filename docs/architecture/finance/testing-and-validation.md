@@ -1,5 +1,7 @@
 # Finance testing and validation strategy
 
+Prospective validation uses a deterministic T0/T1 harness: at T0 only session X is knowable and a prediction is committed; at T1 session X+1 arrives and a separate outcome is committed. Negative controls cover clock failure, duplicate cycles, late-start anti-backfill, warmup, missing outcomes and malformed/bounded reads. Synthetic fixtures never enter runtime scorecards.
+
 External datasets are untrusted fixtures at the validation boundary. Ordinary tests never use
 network/license pages and cover sanitized rights states, safe archive/CSV handling, deterministic
 gates, bounded symbol promotion, source comparison, idempotency and no partial publication.

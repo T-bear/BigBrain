@@ -87,6 +87,15 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
     }
 
     [Fact]
+    public async Task ShadowApiIsBoundedReadOnlyResearchAndRejectsMalformedFilters()
+    {
+        var response=await _client.GetAsync("/api/v1/modules/finance/shadow/scorecard",TestContext.Current.CancellationToken);var raw=await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,response.StatusCode);Assert.Contains("\"operatingMode\":\"RESEARCH\"",raw);Assert.Contains("CURRENT EOD / PROSPECTIVE EOD",raw);Assert.DoesNotContain("apiToken",raw,StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(HttpStatusCode.BadRequest,(await _client.GetAsync("/api/v1/modules/finance/shadow/predictions?limit=999",TestContext.Current.CancellationToken)).StatusCode);
+        using var mutation=new HttpRequestMessage(HttpMethod.Post,"/api/v1/modules/finance/shadow/predictions");Assert.Equal(HttpStatusCode.MethodNotAllowed,(await _client.SendAsync(mutation,TestContext.Current.CancellationToken)).StatusCode);
+    }
+
+    [Fact]
     public void DeterministicSyntheticSnapshotRetainsSafetyAndExplicitClassification()
     {
         var instant = new DateTimeOffset(2026, 8, 11, 10, 0, 0, TimeSpan.Zero);

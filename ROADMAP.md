@@ -1,5 +1,9 @@
 # BigBrain Roadmap
 
+## BB-087 – Prospective shadow observation foundation (implemented 2026-08-15)
+
+Current canonical EODHD observations can produce deterministic, exactly-once `RESEARCH` predictions after recovery and clock gates. Predictions pin their knowledge cutoff, market/feature/strategy/parameter lineage and next-source-session horizon; outcomes append later. Historical backfill is barred from prospective evidence and UI/API scorecards state sample limitations. Next: mature daily current-EOD cadence and outcome evaluation evidence. Hard Risk Engine and the approved security/pentest baseline remain gates before any PAPER eligibility discussion; LIVE additionally requires separate owner authorization.
+
 ## BB-086 – Legitimate zero-cost ETF history (fail-closed 2026-08-15)
 
 Eight bounded candidates were evaluated for SPY/QQQ/IWM. WIKI contains none; Stooq still returns

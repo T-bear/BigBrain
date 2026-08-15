@@ -1,5 +1,7 @@
 # Finance target architecture and capability boundary
 
+BB-087 adds a prospective evidence boundary inside RESEARCH: current source-specific canonical observation → causal feature snapshot → immutable shadow prediction → separate later outcome. It does not cross the existing execution boundary and introduces no broker/order adapter.
+
 ## Conceptual components
 
 ```text

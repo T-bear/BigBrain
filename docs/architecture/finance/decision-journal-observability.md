@@ -1,5 +1,7 @@
 # Finance decision journal and observability
 
+The prospective journal records sanitized creation, duplicate suppression, fail-closed temporal gates and outcome evaluation. Prediction rows are immutable knowledge-time decisions; the linked outcome is append-only and status is the only evaluation transition. API health treats an ordinary no-new-session day as healthy.
+
 Provider entitlement note 2026-08-11: prospective shadow predictions, later outcomes and
 their retained metrics are separate artifact classes in BB-071. Twelve Data's public Basic
 material does not explicitly resolve their forward-testing or post-termination retention.

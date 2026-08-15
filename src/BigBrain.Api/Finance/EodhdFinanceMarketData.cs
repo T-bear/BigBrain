@@ -186,6 +186,7 @@ internal sealed partial class EodhdMarketMemory
         InitializeFeatureStorage(connection);
         InitializeBacktestStorage(connection);
         InitializeRobustnessStorage(connection);
+        InitializeShadowStorage(connection);
         Execute(connection, null, "UPDATE acquisitions SET outcome='interrupted',reason='marketData.acquisition.interruptedBeforeCommit' WHERE outcome='started'");
     }
 
@@ -309,9 +310,10 @@ internal sealed partial class EodhdMarketMemory
         var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
         var backtestRuns=Scalar(connection,"SELECT COUNT(*) FROM backtest_runs");var backtestEvents=Scalar(connection,"SELECT COUNT(*) FROM backtest_events");var backtestFills=Scalar(connection,"SELECT COUNT(*) FROM backtest_fills");var backtestEquity=Scalar(connection,"SELECT COUNT(*) FROM backtest_equity");
         var evaluations=Scalar(connection,"SELECT COUNT(*) FROM robustness_evaluations");var windows=Scalar(connection,"SELECT COUNT(*) FROM robustness_windows");var parameterPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_parameter_sensitivity");var costPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_cost_sensitivity");var runReferences=Scalar(connection,"SELECT COUNT(*) FROM robustness_run_references");
-        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}|{evaluations}|{windows}|{parameterPoints}|{costPoints}|{runReferences}";
+        var shadowPredictions=Scalar(connection,"SELECT COUNT(*) FROM shadow_predictions");var shadowOutcomes=Scalar(connection,"SELECT COUNT(*) FROM shadow_outcomes");
+        var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}|{evaluations}|{windows}|{parameterPoints}|{costPoints}|{runReferences}|{shadowPredictions}|{shadowOutcomes}";
         return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,evaluations,windows,parameterPoints,costPoints,runReferences,
-            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtests and robustness evaluations/windows/sensitivity/metrics/indexes");
+            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtests, robustness and source-dependent prospective shadow evidence");
     }
 
     internal string ExecuteDeletion(EodhdDeletionPreview preview, string confirmation, DateTimeOffset deletedAtUtc)
@@ -322,6 +324,7 @@ internal sealed partial class EodhdMarketMemory
         var paths = new List<string>(); using (var command = connection.CreateCommand()) { command.Transaction = transaction; command.CommandText = "SELECT path FROM payloads"; using var reader = command.ExecuteReader(); while (reader.Read()) paths.Add(reader.GetString(0)); }
         foreach (var path in paths.Where(File.Exists)) File.Delete(path);
         if (paths.Any(File.Exists)) throw new IOException("One or more covered EODHD payloads could not be deleted.");
+        Execute(connection,transaction,"DELETE FROM shadow_outcomes");Execute(connection,transaction,"DELETE FROM shadow_predictions");
         Execute(connection,transaction,"DELETE FROM robustness_run_references");Execute(connection,transaction,"DELETE FROM robustness_windows");Execute(connection,transaction,"DELETE FROM robustness_parameter_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_cost_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_evaluations");
         Execute(connection,transaction,"DELETE FROM backtest_events");Execute(connection,transaction,"DELETE FROM backtest_fills");Execute(connection,transaction,"DELETE FROM backtest_equity");Execute(connection,transaction,"DELETE FROM backtest_runs");
         Execute(connection, transaction, "DELETE FROM feature_values"); Execute(connection, transaction, "DELETE FROM feature_revisions");

@@ -1,5 +1,7 @@
 # Finance market-data memory, provenance and learning foundation
 
+Prospective BB-087 evidence references canonical EODHD market and feature revisions. `observationKnowledgeUtc` records acquisition knowability and `knowledgeCutoffUtc` defines the decision boundary. Identity pins instrument/session, strategy/version, parameter fingerprint and horizon. Later market revisions and outcomes cannot rewrite the original row.
+
 BB-084 extends the ingress boundary with `ExternalDatasetCandidate → QuarantineArtifact →
 ValidationEvidence → PromotionDecision → CanonicalDatasetRevision`. Only exact all-pass
 `dataset-promotion-v1` evidence may publish. Provider source revisions are never silently

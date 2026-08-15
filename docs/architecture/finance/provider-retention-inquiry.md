@@ -1,5 +1,7 @@
 # BB-071 provider retention inquiry
 
+BB-087 prospective records retain EODHD source/revision lineage and remain covered by the existing subscription/deletion policy. Deletion preview identity includes prediction/outcome counts, and confirmed provider deletion removes outcomes before predictions. These records are excluded from ordinary indefinite public-domain backup eligibility.
+
 BB-084 distinguishes archive rights from provider entitlement. WIKI public-domain evidence is
 independent of EODHD subscription retention. Zenodo CC BY covers curation but does not resolve
 underlying Yahoo redistribution provenance, so local quarantine is permitted while canonical

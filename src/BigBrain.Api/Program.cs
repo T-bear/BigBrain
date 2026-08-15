@@ -172,6 +172,7 @@ public partial class Program
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
         builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
         builder.Services.AddHostedService<FinanceRobustnessBuildWorker>();
+        builder.Services.AddHostedService<FinanceShadowWorker>();
         builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();
         builder.Services.AddSingleton<IFinanceBacktestReader, EodhdFinanceBacktestReader>();

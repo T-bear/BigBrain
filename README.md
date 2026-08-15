@@ -1,5 +1,7 @@
 # BigBrain
 
+BB-087 adds the first durable prospective `CURRENT EOD` shadow journal. It records immutable, knowledge-time-bounded predictions from existing versioned strategies and appends later outcomes separately. API/UI are read-only, separate this evidence from backtests, and expose no order or execution path. EODHD retention remains source-dependent.
+
 BB-086 completed a bounded search for legitimate zero-cost SPY/QQQ/IWM history. The existing
 WIKI artifact contains none of those tickers, and none of eight reviewed candidates passed both
 underlying-rights and supported-access gates; therefore no artifact or canonical evidence was

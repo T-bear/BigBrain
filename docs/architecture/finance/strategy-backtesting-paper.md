@@ -1,5 +1,7 @@
 # Finance strategy, backtesting and paper methodology
 
+Historical backtests ask what a strategy would have done over already-known history. Prospective shadow evidence records what the same versioned strategy decided at a real knowledge cutoff before its horizon was knowable. Their metrics must never be merged. Shadow signals are research records, not orders, and outcome evaluation never mutates parameters.
+
 BB-084 reruns the unchanged BB-080 strategies only against exact WIKI revision
 `wiki-5713d7dccfa38f56` and feature revision `feature-3833eb92bb641e51`. No WIKI/EODHD
 continuous series exists. Robustness model v3 caps walk-forward work at the accepted 64-run
