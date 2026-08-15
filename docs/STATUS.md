@@ -1,7 +1,9 @@
 # BigBrain Status
 
 BB-088 is implemented, deployed and runtime/restart-verified on 2026-08-15 from baseline
-`0ab8c7470a1b16e399728ea564cfeb34962d3069`; publication/CI evidence remains to be recorded. The
+`0ab8c7470a1b16e399728ea564cfeb34962d3069`. Implementation commit
+`8653c44fd05fc76460e460ec5c0fef8d4cc9e7ed` passed GitHub Actions run #46: documentation,
+frontend, secrets and backend all succeeded. The
 Saturday drill correctly made no provider request and preserved latest session 2026-08-14, 24
 valid pending predictions, zero outcomes and 24 invalidated audit rows across two restarts. Cadence
 health/clock were healthy; no duplicate prediction/outcome appeared. Actual overview breadth was

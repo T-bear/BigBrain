@@ -3,9 +3,9 @@
 ### BB-088 – Prospective daily cadence and Finance UI v1.0 information hierarchy
 
 - Modul: Finance
-- Status: Implementerad, deployad och runtime/restart-verifierad 2026-08-15; publication/CI-evidence återstår före slutlig stängning
+- Status: Klar 2026-08-15; implementerad, deployad, runtime/restart-verifierad och GitHub Actions-grön
 - Resultat: bounded weekday EODHD cadence, automatic feature/shadow/outcome cycle, read-only overview/cadence API and `Market today → BigBrain now → Prospective result → Details & research` UI. Weekend/no-session is healthy; anti-backfill and RESEARCH-only boundaries remain.
-- Definition of Done: full local regression and weekend/restart drill pass; publication and green GitHub Actions remain.
+- Definition of Done: full local regression, weekend/restart drill, publication and GitHub Actions run #46 passed.
 
 ### BB-087 – Prospective shadow observation foundation
 

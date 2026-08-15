@@ -6,12 +6,12 @@
 - Baseline: `0ab8c7470a1b16e399728ea564cfeb34962d3069`
 - Provider/observation: EODHD Free, `CURRENT EOD / PROSPECTIVE EOD`
 - Mode/budget: `RESEARCH`, 0 SEK; no broker, order, PAPER, LIVE/AUTO or self-learning
-- Published commit: pending publication
+- Implementation commit: `8653c44fd05fc76460e460ec5c0fef8d4cc9e7ed`
 
 ## Status
 
-Implemented, full-regression verified, deployed and bounded runtime/restart verified. GitHub
-Actions evidence is pending and will be recorded after publication. No ADR was added: the
+Implemented, full-regression verified, deployed, bounded runtime/restart verified and published.
+GitHub Actions run #46 passed documentation, frontend, secrets and backend. No ADR was added: the
 cadence applies ADR 0026 recovery and ADR 0029 immutable knowledge-time evidence; the approved UI
 hierarchy is a product/roadmap decision rather than a new cross-system boundary.
 
@@ -61,7 +61,8 @@ native `details`/`summary`.
   `SubscriptionOnly/restricted`.
 - Whole-worktree gitleaks found only pre-existing ignored local `.env`/Sentinel identity material
   plus one tracked documentation false positive; no BB-088 file or Git-tracked new secret was found.
-  The authoritative Git-history gitleaks job remains the publication gate.
+  The authoritative Git-history gitleaks publication gate subsequently passed.
+- GitHub Actions run #46: documentation, frontend, secrets and backend all `success`.
 - Multi-real-session proof: not available in a same-day Saturday implementation; cadence must
   accumulate this evidence naturally.
 
