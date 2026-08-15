@@ -1,5 +1,7 @@
 # Finance reports
 
+- [BB-086 ETF dataset research](finance-bb-086-etf-dataset-research-20260815.md)
+- [BB-086 implementation and runtime](finance-bb-086-implementation-runtime-20260815.md)
 - [BB-085 provider-tagged backup, restore and cleanup](finance-bb-085-provider-tagged-backup-restore-cleanup-20260815.md)
 - [BB-084 dataset research](finance-bb-084-dataset-research-20260815.md)
 - [BB-084 implementation and runtime](finance-bb-084-implementation-runtime-20260815.md)

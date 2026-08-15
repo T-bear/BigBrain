@@ -1,5 +1,13 @@
 # Finance threat model
 
+The approved future BigBrain security/pentest milestone is a mandatory pre-LIVE gate and a strong
+pre-PAPER/execution gate. Continuous secret/dependency/SAST/container/API/header/supply-chain and
+unsafe-configuration checks are paired with controlled black-/grey-box testing. Scope includes
+auth/IDOR/injection/XSS/CSRF/CORS/traversal/resource exhaustion, exposed services/volumes/host
+privilege, Sentinel transport/request proof/replay, malicious Finance CSV/ZIP, provenance and
+revision tampering, mode-gate bypass, crash/recovery and persistence attacks. Destructive cases use
+isolated environments/test data and never intentionally damage important production evidence.
+
 BB-084 treats external dataset bytes as hostile. They remain in a Finance-owned quarantine;
 no downloaded script/macro is run. Size/disk/retry, UTF-8/line, CSV field, ZIP path/file-count/
 expanded-size, ticker formula-prefix, schema, checksum, rights and provenance gates fail closed.

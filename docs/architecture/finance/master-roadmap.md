@@ -1,5 +1,24 @@
 # BigBrain Finance – master roadmap
 
+BB-086 completed 2026-08-15 with a scientifically/legal fail-closed result: WIKI contains no
+SPY/QQQ/IWM and none of eight candidates passed both rights lineage and supported acquisition.
+Historical bootstrap remains strong for five individual equities across 2014–2016 but insufficient
+for multi-regime ETF comparison. Legitimate ETF history discovery is now opportunistic; the exact
+next Finance slice should activate the existing provider-neutral prospective shadow contracts for
+current EOD observations, still RESEARCH and without orders.
+
+Planned sequence: historical research → deterministic strategies → hard Risk Engine → prospective
+shadow observation → comprehensive security/pentest baseline → PAPER eligibility assessment →
+PAPER → further validation → explicit LIVE gates. The security baseline combines continuous
+automated checks with controlled black-/grey-box testing and is mandatory before real-money LIVE;
+it is a strong gate before meaningful PAPER/execution authority. No stage self-promotes.
+
+Prospective evidence is immutable: observation/knowledge timestamp, source and revision, causal
+features, strategy/version/parameters, signal/prediction, confidence when defined and `RESEARCH`
+mode are fixed at prediction time. Outcome evidence appends later. Historical research,
+prospective evaluation and separately versioned parameter updates are distinct; observed outcomes
+cannot silently rewrite predictions or strategy parameters.
+
 BB-085 completed 2026-08-15: provider-tagged atomic backup, isolated restore/corruption
 verification and quarantine cleanup preserve rights, retention and exact lineage. EODHD is
 not copied into WIKI's indefinite backup class. Next is BB-086 bounded legitimate SPY/QQQ/IWM

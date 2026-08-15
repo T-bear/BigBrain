@@ -1,5 +1,14 @@
 # Finance market-data provider selection
 
+## BB-086 ETF-history result (2026-08-15)
+
+No zero-cost SPY/QQQ/IWM source passed the complete gate. WIKI has no target rows; Stooq remains
+behind an access-control challenge; HF Data Library mixes explicitly attributable IEX data with
+pre-2022 PiTrading/consolidated-tape data whose redistribution chain is not established; GitHub,
+Kaggle and academic mirrors inherit similarly unresolved Yahoo or undocumented provenance.
+Nasdaq Data Link ETFG/FUND is not an OHLCV history product. No adapter, account, key or artifact
+was activated. Reassess only exact sources with first-party rights plus supported acquisition.
+
 Historical archives are now evaluated as dataset candidates, not activated as current
 providers. Nasdaq WIKI public-domain evidence cleared one exact mirror snapshot; Zenodo CC BY
 curation did not clear its underlying Yahoo lineage. See the BB-084 research report.

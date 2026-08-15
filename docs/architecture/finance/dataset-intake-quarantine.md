@@ -30,6 +30,10 @@ Insufficient overlap is a recorded limitation, not evidence of equality.
 - Zenodo DOI `10.5281/zenodo.20192822`: CC BY 4.0 covers author curation, but the record says
   rows came from Yahoo Finance/yfinance. Underlying redistribution provenance is unresolved,
   so it remains quarantined/manual-review and published zero canonical rows.
+- BB-086 verified that the retained WIKI artifact has zero SPY/QQQ/IWM rows. Eight bounded ETF
+  candidates failed before acquisition: no new raw artifact entered quarantine. Host-level CC0,
+  CC BY or MIT cannot replace missing underlying market-data rights; Stooq's browser verification
+  remains a technical stop condition. Candidate research evidence lives in the BB-086 report.
 
 ## Retention and cleanup
 

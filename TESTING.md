@@ -1,5 +1,10 @@
 # Testa BigBrain
 
+BB-086 changes research/planning documentation only because all eight ETF-history candidates
+failed closed before acquisition. No runtime contract or fixture changed. Publication verification
+therefore runs the complete existing backend/frontend suites and builds, documentation verifier,
+secret scan, Compose validation and `git diff --check`; ordinary tests remain network-free.
+
 BB-085 tests are network-free and cover WIKI/EODHD/unknown source classification, deterministic
 manifests, atomic/incomplete-state handling, SHA-256 corruption rejection, isolated restore
 identity, derived lineage, disk gates, rejected/manual-review cleanup, idempotence and canonical

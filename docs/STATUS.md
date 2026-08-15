@@ -1,5 +1,13 @@
 # BigBrain Status
 
+BB-086 completed as a legitimate fail-closed research result on 2026-08-15 from baseline
+`aee00db`. The existing WIKI artifact has zero SPY/QQQ/IWM rows. Eight bounded candidates were
+reviewed; no source passed both underlying-rights/provenance and supported-access gates. Stooq's
+single normal SPY request returned verification HTML, not CSV, and no challenge was solved.
+No artifact, observation, revision, feature, backtest, robustness or backup was created; existing
+WIKI/EODHD evidence is untouched. The approved future security/pentest baseline is now recorded
+as a mandatory pre-LIVE roadmap gate. Finance remains `RESEARCH` at 0 SEK.
+
 BB-085 is implemented, deployed, bounded-runtime-verified and restart-verified 2026-08-15
 from baseline `69aad9d`.
 `finance-provider-backup-v1` exports only provider-eligible revisions and exact derived

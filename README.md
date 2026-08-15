@@ -1,5 +1,11 @@
 # BigBrain
 
+BB-086 completed a bounded search for legitimate zero-cost SPY/QQQ/IWM history. The existing
+WIKI artifact contains none of those tickers, and none of eight reviewed candidates passed both
+underlying-rights and supported-access gates; therefore no artifact or canonical evidence was
+added. A future automated-security and controlled penetration-testing baseline is now a mandatory
+roadmap gate before real-money LIVE eligibility. Finance remains read-only `RESEARCH`.
+
 BB-085 adds provider-tagged Finance backup, isolated restore verification and conservative
 quarantine cleanup. Public-domain WIKI memory and its exact derived lineage can enter an
 ordinary local backup; EODHD remains a separately inventoried subscription-only source with

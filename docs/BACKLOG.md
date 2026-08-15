@@ -19,10 +19,25 @@
 
 ### BB-086 – Legitimate zero-cost ETF historical coverage
 
-- Status: Planerad; exact recommended next Finance slice.
+- Status: Klar; fail-closed research completed 2026-08-15.
 - Scope: seek explicitly licensed, provenance-verifiable history for SPY, QQQ and IWM; reuse
   BB-084 quarantine and BB-085 data-protection gates. No stitching, provider-rights shortcut,
   broker, PAPER, order or LIVE execution.
+- Resultat: eight candidates reviewed. Existing WIKI contains no target ETF; Stooq remains behind
+  a browser proof-of-work control; mirror/deposit licenses do not clear underlying market-data
+  provenance. Zero acquisitions, promotions or runtime changes. See the BB-086 reports.
+
+### BigBrain security and penetration-testing baseline
+
+- Modul: Cross-cutting Security; status: Planerad; identifier awaits normal product prioritization.
+- Beslut: implement continuous CI-oriented secret/dependency/SAST/container/API/header/
+  supply-chain/configuration checks and controlled black-/grey-box testing of Web, API,
+  authentication/authorization, IDOR, injection, XSS, CSRF, CORS, malformed input, traversal,
+  resource exhaustion, containers/ports/volumes/host privilege, Sentinel transport/request proof/
+  replay, Finance CSV/ZIP/provenance/revision/mode gates, recovery/persistence tampering and supply
+  chain. Potentially destructive tests must use isolated test environments/data.
+- Gate: mandatory before real-money LIVE eligibility and a strong prerequisite before meaningful
+  PAPER/execution authority. This item is planning only; BB-086 implements none of it.
 
 ### BB-083 – Appliance lifecycle and crash recovery baseline
 

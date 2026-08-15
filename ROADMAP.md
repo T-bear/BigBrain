@@ -1,5 +1,22 @@
 # BigBrain Roadmap
 
+## BB-086 – Legitimate zero-cost ETF history (fail-closed 2026-08-15)
+
+Eight bounded candidates were evaluated for SPY/QQQ/IWM. WIKI contains none; Stooq still returns
+a browser proof-of-work control; CC0/CC BY/MIT mirrors do not establish rights to their underlying
+Yahoo, PiTrading or otherwise undocumented exchange data. No candidate was acquired or promoted,
+so BB-084/085 canonical evidence is unchanged. Historical bootstrap remains incomplete for ETF
+cross-asset evidence; the exact next Finance slice is prospective read-only shadow observation,
+while legitimate ETF-source discovery becomes opportunistic rather than the critical path.
+
+## Security and penetration-testing gate – PLANNED
+
+BigBrain requires continuous automated security checks plus controlled black-/grey-box penetration
+testing across Web, API, auth/access control, containers/Sentinel, Finance untrusted-data and
+mode-gate surfaces. Potentially destructive tests use isolated environments/test data. This
+baseline is mandatory before real-money LIVE eligibility and a strong gate before meaningful
+PAPER/execution authority. BB-086 records the approved milestone only; it does not implement it.
+
 ## BB-085 – Provider-tagged Finance data protection (verified 2026-08-15)
 
 WIKI public-domain memory now has deterministic atomic backup manifests, SHA-256 verification,

@@ -6,6 +6,15 @@ Future LIVE/external orders must enter `RECONCILIATION_REQUIRED` after unclean r
 local journal, broker orders, positions and account truth reconcile. Persistent idempotency
 and duplicate prevention must be proven. BB-083 grants no execution authority.
 
+## Security promotion gate
+
+A comprehensive automated-security and controlled penetration-testing baseline is mandatory before
+real-money LIVE eligibility and is a strong gate before meaningful PAPER/execution authority.
+Potentially destructive tests must use isolated environments/test data. This planned gate includes
+Web/API/auth boundaries, injection/browser controls, containers/Sentinel privilege and replay,
+Finance hostile dataset/provenance/revision/mode-gate inputs, recovery/persistence tampering and
+supply-chain risk. Passing it cannot itself promote a mode; product-owner authorization remains.
+
 ## Hard Risk Engine
 
 The Risk Engine is authoritative below AI and strategies. Versioned policy must cover

@@ -1,5 +1,11 @@
 # Finance module
 
+BB-086 adds no runtime capability: the bounded SPY/QQQ/IWM search failed closed before acquisition.
+WIKI lacks all three ETF tickers; candidate host licenses did not cure underlying Yahoo/PiTrading/
+undocumented exchange provenance, and Stooq remained technically blocked. Existing current EOD,
+WIKI archive, quarantine, revisions, derived evidence and backups are unchanged. Prospective
+shadow observation remains future read-only RESEARCH and immutable predictions may not self-modify.
+
 BB-085 adds `FinanceDataProtectionStore`, maintenance-only backup/verify/restore/corruption
 commands and `GET /api/v1/modules/finance/backups`. Backup selection is by provider/product/
 policy plus candidate rights/provenance, not by shared database or symbol. COMPLETE manifests
