@@ -3,7 +3,7 @@
 ### BB-087 – Prospective shadow observation foundation
 
 - Modul: Finance
-- Status: Implementerad, deployad och runtime/restart-verifierad; publication/CI pågår 2026-08-15
+- Status: Klar 2026-08-15; implementerad, deployad, runtime/restart-verifierad och GitHub Actions-grön
 - Resultat: EODHD-specific prediction journal with immutable knowledge cutoff and lineage, append-only next-session outcomes, exactly-once/recovery/clock/anti-backfill gates and read-only scorecard/UI. Historical backtests remain distinct. No execution authority.
 - Definition of Done: complete only after full regression, bounded real-provider drill, restart persistence, publication and green CI are recorded.
 

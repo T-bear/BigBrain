@@ -8,7 +8,7 @@
 
 ## Status
 
-Implemented, local regression passed, deployed and bounded-runtime/restart verified. Published CI evidence remains to be recorded after publication.
+Implemented, local regression passed, deployed and bounded-runtime/restart verified. Implementation commit `86e92c431cffc1db37684bcfba5a2a785d7b05ad` passed all four jobs in GitHub Actions run #44 on 2026-08-15.
 
 ## Changes
 
@@ -28,7 +28,7 @@ Read-only endpoints cover predictions, detail, scorecard and status with bounded
 - Runtime: eight EODHD instruments for 2026-08-14, 24 valid pending predictions (three strategy versions), zero evaluated outcomes and exact feature revision `feature-c204a8133abaf8a2` over eight source revisions.
 - The first drill exposed 24 rows referencing a WIKI feature revision. They were not deleted or rewritten as successes: the integrity pass classified them `INVALIDATED`, retained the reason, and exact source-revision membership became a hard feature-selection gate.
 - Restart retained 48 total audit rows (24 valid pending + 24 invalidated) and created no duplicate valid prediction. Current health, WIKI memory and backup inventory remained available.
-- Published CI evidence is recorded in `docs/STATUS.md` after publication verification.
+- GitHub Actions run #44: documentation, frontend, secrets and backend all `success`.
 
 No claim is made that a future EOD outcome exists. A real prediction is created only if the deployed current observation and feature revision pass all causal gates; otherwise the journal remains safely armed.
 
