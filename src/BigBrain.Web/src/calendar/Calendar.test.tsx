@@ -42,11 +42,11 @@ describe('CalendarWidget',()=>{
     const longName='synthetic-very-long-calendar-export-filename-that-must-wrap-without-overflow-august-2026.xlsx'
     vi.mocked(fetch).mockImplementation((input:RequestInfo|URL)=>{const url=String(input);if(url.includes('/week'))return ok({from:'2026-08-03',to:'2026-08-09',events:[event]});if(url.includes('/month'))return ok({year:2026,month:8,events:[event]});if(url.endsWith('/imports'))return ok([{importId:'import-1',originalFileName:longName,importedAt:'2026-08-05T12:00:00Z',year:2026,month:8,importedEvents:19,skippedRows:0,warningCount:0,status:'completed'}]);return ok({files:[]})})
     render(<CalendarWidget/>);fireEvent.click(await screen.findByRole('button',{name:'Öppna kalender'}));await screen.findByRole('dialog',{name:/augusti 2026/i})
+    expect(await screen.findByText(longName)).toBeInTheDocument()
     const flow=screen.getByTestId('calendar-content-flow'),month=screen.getByTestId('calendar-month-list'),history=screen.getByTestId('calendar-import-history')
     expect(month.children).toHaveLength(31)
     expect(month.parentElement).toBe(flow);expect(history.parentElement).toBe(flow)
     expect(month.compareDocumentPosition(history)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(history.closest('.calendar-month-list__day')).toBeNull()
-    expect(screen.getByText(longName)).toBeInTheDocument()
   })
 })
