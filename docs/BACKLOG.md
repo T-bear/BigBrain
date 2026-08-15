@@ -9,10 +9,20 @@
 
 ### BB-085 – Provider-tagged Finance backup and quarantine cleanup drill
 
-- Status: Planerad; exact recommended next Finance slice.
+- Status: Klar; implemented and runtime-drilled 2026-08-15.
 - Scope: backup/restore public-domain WIKI independently of EODHD deletion, exercise rejected
   and manual-review cleanup without canonical deletion, measure restore integrity and document
   rollback. No universe expansion, source stitching, broker, PAPER or LIVE.
+- Resultat: atomic `finance-provider-backup-v1`, isolated restore and corruption rejection,
+  provider-tagged inventory/API/UI and conservative rejected-payload cleanup with retained
+  manifests. Exact evidence is in the BB-085 implementation report.
+
+### BB-086 – Legitimate zero-cost ETF historical coverage
+
+- Status: Planerad; exact recommended next Finance slice.
+- Scope: seek explicitly licensed, provenance-verifiable history for SPY, QQQ and IWM; reuse
+  BB-084 quarantine and BB-085 data-protection gates. No stitching, provider-rights shortcut,
+  broker, PAPER, order or LIVE execution.
 
 ### BB-083 – Appliance lifecycle and crash recovery baseline
 

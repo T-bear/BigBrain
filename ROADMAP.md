@@ -1,11 +1,18 @@
 # BigBrain Roadmap
 
+## BB-085 – Provider-tagged Finance data protection (verified 2026-08-15)
+
+WIKI public-domain memory now has deterministic atomic backup manifests, SHA-256 verification,
+isolated restore/corruption drills and exact derived lineage. EODHD is excluded from indefinite
+backup and retains subscription deletion semantics. Rejected quarantine payload cleanup keeps
+audit manifests and cannot address canonical data. The next recommended slice is BB-086:
+legitimate zero-cost historical coverage for SPY/QQQ/IWM, still read-only RESEARCH.
+
 ## BB-084 – Historical dataset intake (deployed 2026-08-15)
 
 Quarantine, immutable manifests, deterministic validation/promotion, WIKI bounded promotion,
 Zenodo manual-review classification and source-specific feature/backtest/robustness lineage are
-implemented. The exact next Finance slice is BB-085: provider-tagged backup/restore and
-quarantine-cleanup drills; do not expand the universe or proceed to PAPER.
+implemented. BB-085 subsequently completed provider-tagged backup/restore and cleanup drills.
 
 **BB-083 APPLIANCE RESILIENCE BASELINE** pauses the next Finance slice. Lifecycle/recovery,
 clean/unclean journal, storage/clock/disk gates, crash-safe Finance requests, recovery API/UI,

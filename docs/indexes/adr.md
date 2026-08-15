@@ -1,5 +1,6 @@
 # ADR Index
 
+- [ADR 0028 – Finance provider-tagged backup, restore and quarantine cleanup](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md)
 - [ADR 0027 – Finance external dataset quarantine and deterministic promotion](../adr/0027-finance-external-dataset-quarantine-and-promotion.md)
 
 Proposed records are not accepted authority merely because related code exists.
@@ -28,6 +29,8 @@ Proposed records are not accepted authority merely because related code exists.
 | [0024](../adr/0024-finance-deterministic-research-backtest-evidence.md) | Accepted | Finance deterministic research backtest evidence |
 | [0025](../adr/0025-finance-immutable-chronological-evaluation-evidence.md) | Accepted | Finance immutable chronological evaluation evidence |
 | [0026](../adr/0026-bigbrain-appliance-lifecycle-and-recovery.md) | Accepted | Appliance lifecycle and recovery |
+| [0027](../adr/0027-finance-external-dataset-quarantine-and-promotion.md) | Accepted | Finance external dataset quarantine and deterministic promotion |
+| [0028](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md) | Accepted | Finance provider-tagged backup, restore and quarantine cleanup |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

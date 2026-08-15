@@ -1,5 +1,14 @@
 # BigBrain Status
 
+BB-085 is implemented, deployed, bounded-runtime-verified and restart-verified 2026-08-15
+from baseline `69aad9d`.
+`finance-provider-backup-v1` exports only provider-eligible revisions and exact derived
+lineage through atomic staging plus deterministic SHA-256 manifests. WIKI revision
+`wiki-5713d7dccfa38f56` restored identically in isolated staging; corruption was rejected.
+EODHD remains `SubscriptionOnly/DeleteAtSubscriptionEnd` and outside indefinite backup.
+Rejected cleanup retains manifest/hash evidence, manual review is conservative and canonical
+promoted observations are not cleanup targets. API/UI are read-only; Finance remains RESEARCH.
+
 BB-084 is implemented, deployed and runtime-verified 2026-08-15 from baseline `d9eadbb3`.
 Finance now has a fail-closed quarantine/manifest/validation/promotion pipeline. WIKI candidate
 `dd5127…a43e` passed and promoted 3,722 AAPL/MSFT/JPM/XOM/JNJ rows as

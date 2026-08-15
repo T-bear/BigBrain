@@ -1,6 +1,8 @@
 # Finance EODHD retention and deletion
 
-BB-084 source-isolation rule: EODHD deletion queries remain provider/policy scoped and must not
+BB-085 inventory rule: EODHD is explicitly `SubscriptionOnly/DeleteAtSubscriptionEnd` and
+excluded from the public-domain indefinite backup. Any separately authorized EODHD backup
+must join this preview/deletion scope and deadline. BB-084 source-isolation remains: queries must not
 delete `NASDAQ-WIKI`, its public-domain quarantine artifact, `wiki-*` revisions or their exact
 derived lineage. Shared symbols/dates do not establish shared retention.
 

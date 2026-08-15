@@ -1,5 +1,10 @@
 # Testa BigBrain
 
+BB-085 tests are network-free and cover WIKI/EODHD/unknown source classification, deterministic
+manifests, atomic/incomplete-state handling, SHA-256 corruption rejection, isolated restore
+identity, derived lineage, disk gates, rejected/manual-review cleanup, idempotence and canonical
+protection. Runtime drills use only existing local Finance evidence and make no provider calls.
+
 BB-084 tests are network-free and use sanitized CSV/rights fixtures. They cover candidate
 transitions, content/schema hashes, promotion PASS/FAIL/UNKNOWN, CSV quoting, ZIP traversal,
 OHLCV/duplicate policy, symbol-bounded promotion, cross-source classification and idempotent

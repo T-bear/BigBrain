@@ -1,5 +1,10 @@
 # BigBrain
 
+BB-085 adds provider-tagged Finance backup, isolated restore verification and conservative
+quarantine cleanup. Public-domain WIKI memory and its exact derived lineage can enter an
+ordinary local backup; EODHD remains a separately inventoried subscription-only source with
+its deletion duty. Read-only API/Web distinguish backed-up, canonical and quarantined state.
+
 BB-084 adds Finance's provider-neutral historical dataset quarantine and deterministic
 promotion boundary. A verified public-domain 2016 WIKI snapshot is promoted only as its own
 five-symbol historical revision; a CC BY Zenodo archive remains quarantined because underlying

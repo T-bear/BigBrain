@@ -29,6 +29,7 @@ import type {
   DownloadBatchResult,
   FinanceObservationSnapshot,
   FinanceDatasetCatalog,
+  FinanceBackupInventory,
   FinanceFeatureSnapshot,
   FinanceBacktestCatalog,
   FinanceBacktestResult,
@@ -86,6 +87,7 @@ export const getDockerContainers = (signal?: AbortSignal) =>
 export const getFinanceObservation = (signal?: AbortSignal) =>
   getJson<FinanceObservationSnapshot>('/api/v1/modules/finance/observation', signal)
 export const getFinanceDatasets = (signal?: AbortSignal) => getJson<FinanceDatasetCatalog>('/api/v1/modules/finance/datasets',signal)
+export const getFinanceBackups = (signal?: AbortSignal) => getJson<FinanceBackupInventory>('/api/v1/modules/finance/backups',signal)
 
 export const getSystemRecovery = (signal?: AbortSignal) => getJson<SystemRecoverySnapshot>('/api/v1/system/recovery', signal)
 

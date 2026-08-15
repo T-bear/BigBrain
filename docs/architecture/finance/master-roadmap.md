@@ -1,9 +1,14 @@
 # BigBrain Finance – master roadmap
 
+BB-085 completed 2026-08-15: provider-tagged atomic backup, isolated restore/corruption
+verification and quarantine cleanup preserve rights, retention and exact lineage. EODHD is
+not copied into WIKI's indefinite backup class. Next is BB-086 bounded legitimate SPY/QQQ/IWM
+history discovery/intake; prospective read-only observation follows repository evidence.
+
 BB-084 completed 2026-08-15: provider-neutral quarantine, immutable manifests, deterministic
 promotion and a bounded WIKI historical revision are deployed. Zenodo correctly remains
 manual review. Longer WIKI evidence changes robustness sufficiency to MIXED/MIXED/FRAGILE.
-Next is BB-085 provider-tagged backup/restore and quarantine-cleanup verification, not PAPER.
+BB-085 provider-tagged backup/restore and quarantine-cleanup verification is complete, not PAPER.
 
 BB-083 temporarily supersedes the next Finance research slice. Future LIVE requires validated
 host recovery, persistent order idempotency, duplicate prevention and broker reconciliation

@@ -26,8 +26,11 @@ public sealed record DatasetCatalogItem(string CandidateId, string Source, strin
     string Status, string LicenseClass, string ProvenanceResult, string ArtifactSha256, long ArtifactBytes,
     string? CoverageFrom, string? CoverageTo, long ObservationCount, int InstrumentCount, string PriceBasis,
     string SurvivorshipBias, string ValidationResult, string PromotionDecision, string? CanonicalRevisionId,
-    long PromotedObservationCount,IReadOnlyList<string> PromotedSymbols, IReadOnlyList<string> Limitations);
+    long PromotedObservationCount,IReadOnlyList<string> PromotedSymbols, IReadOnlyList<string> Limitations,
+    bool CleanupEligible, string CleanupState, bool ManifestRetained);
 public sealed record FinanceDatasetCatalog(DateTimeOffset GeneratedAtUtc, string OperatingMode, IReadOnlyList<DatasetCatalogItem> Datasets);
+internal sealed record QuarantineCleanupResult(int EligibleCandidates, int PayloadsDeleted, long BytesReleased,
+    int ManifestsRetained, int CanonicalRevisionsProtected, bool Idempotent);
 
 internal sealed class FinanceDatasetIntakeStore
 {
@@ -50,7 +53,9 @@ internal sealed class FinanceDatasetIntakeStore
         source_row INTEGER NOT NULL,PRIMARY KEY(candidate_id,symbol,session_date));
       CREATE INDEX IF NOT EXISTS ix_dataset_state ON dataset_candidates(state,updated_utc);
       UPDATE dataset_candidates SET state=CASE WHEN state='Downloading' THEN 'Rejected' ELSE 'Downloaded' END,promotion_result='interruptedBeforeValidation',updated_utc=datetime('now') WHERE state IN ('Downloading','Inspecting','Validating');
-      """;x.ExecuteNonQuery();}
+      """;x.ExecuteNonQuery();if(!ColumnExists(c,"dataset_candidates","cleanup_state"))Exec(c,"ALTER TABLE dataset_candidates ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'Retained'");
+      var pending=new List<(string Id,string File)>();using(var q=c.CreateCommand()){q.CommandText="SELECT candidate_id,filename FROM dataset_candidates WHERE cleanup_state='CleanupPending'";using var r=q.ExecuteReader();while(r.Read())pending.Add((r.GetString(0),r.GetString(1)));}
+      foreach(var item in pending){var exists=File.Exists(Path.Combine(_options.QuarantineDirectory,item.Id,"artifact",SafeName(item.File)));Exec(c,"UPDATE dataset_candidates SET cleanup_state=$state WHERE candidate_id=$id AND cleanup_state='CleanupPending'",("$state",exists?"Retained":"PayloadDeleted"),("$id",item.Id));}}
 
     internal void Discover(ExternalDatasetCandidate candidate,string method)
     {using var c=new SqliteConnection(ConnectionString);c.Open();Exec(c,"INSERT OR IGNORE INTO dataset_candidates(candidate_id,source,source_url,hosting_platform,filename,state,license_class,declared_license,license_evidence_url,license_retrieved_on,provenance,provenance_result,downloader_version,acquisition_method,updated_utc) " +
@@ -89,7 +94,16 @@ internal sealed class FinanceDatasetIntakeStore
         PersistDecision(candidate,parsed,validation,decision,revision);return Catalog().Datasets.Single(x=>x.CandidateId==candidate.CandidateId);
     }
 
-    internal FinanceDatasetCatalog Catalog(){using var c=new SqliteConnection(ConnectionString);c.Open();using var x=c.CreateCommand();x.CommandText="SELECT candidate_id,source,source_url,hosting_platform,state,license_class,provenance_result,artifact_sha256,artifact_bytes,validation_json,promotion_result,canonical_revision_id,(SELECT COUNT(*) FROM observations o WHERE o.revision_id=dataset_candidates.canonical_revision_id) FROM dataset_candidates ORDER BY updated_utc DESC,candidate_id";using var r=x.ExecuteReader();var rows=new List<DatasetCatalogItem>();while(r.Read()){var v=r.IsDBNull(9)?null:JsonSerializer.Deserialize<StoredValidation>(r.GetString(9),Json);var revision=r.IsDBNull(11)?null:r.GetString(11);rows.Add(new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetString(3),r.GetString(4),r.GetString(5),r.GetString(6),r.GetString(7),r.GetInt64(8),v?.From,v?.To,v?.Rows??0,v?.Symbols??0,v?.PriceBasis??"Unclear",v?.Survivorship??"SurvivorshipUnknown",v?.Result??"Unknown",r.IsDBNull(10)?"pending":r.GetString(10),revision,r.GetInt64(12),revision is null?[]:v?.PromotedSymbols??[],v?.Limitations??[]));}return new(DateTimeOffset.UtcNow,"RESEARCH",rows);}
+    internal FinanceDatasetCatalog Catalog(){using var c=new SqliteConnection(ConnectionString);c.Open();using var x=c.CreateCommand();x.CommandText="SELECT candidate_id,source,source_url,hosting_platform,state,license_class,provenance_result,artifact_sha256,artifact_bytes,validation_json,promotion_result,canonical_revision_id,(SELECT COUNT(*) FROM observations o WHERE o.revision_id=dataset_candidates.canonical_revision_id),cleanup_state,manifest_json FROM dataset_candidates ORDER BY updated_utc DESC,candidate_id";using var r=x.ExecuteReader();var rows=new List<DatasetCatalogItem>();while(r.Read()){var v=r.IsDBNull(9)?null:JsonSerializer.Deserialize<StoredValidation>(r.GetString(9),Json);var revision=r.IsDBNull(11)?null:r.GetString(11);var state=r.GetString(4);var cleanup=r.GetString(13);rows.Add(new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetString(3),state,r.GetString(5),r.GetString(6),r.GetString(7),r.GetInt64(8),v?.From,v?.To,v?.Rows??0,v?.Symbols??0,v?.PriceBasis??"Unclear",v?.Survivorship??"SurvivorshipUnknown",v?.Result??"Unknown",r.IsDBNull(10)?"pending":r.GetString(10),revision,r.GetInt64(12),revision is null?[]:v?.PromotedSymbols??[],v?.Limitations??[],state=="Rejected"&&cleanup=="Retained",cleanup,!r.IsDBNull(14)));}return new(DateTimeOffset.UtcNow,"RESEARCH",rows);}
+
+    internal QuarantineCleanupResult CleanupRejected(DateTimeOffset cutoffUtc)
+    {
+        using var c=new SqliteConnection(ConnectionString);c.Open();var candidates=new List<(string Id,string File,long Bytes)>();
+        using(var x=c.CreateCommand()){x.CommandText="SELECT d.candidate_id,d.filename,d.artifact_bytes FROM dataset_candidates d WHERE d.state='Rejected' AND d.cleanup_state='Retained' AND d.updated_utc<=$cutoff ORDER BY d.candidate_id";x.Parameters.AddWithValue("$cutoff",cutoffUtc.ToString("O"));using var r=x.ExecuteReader();while(r.Read())candidates.Add((r.GetString(0),r.GetString(1),r.GetInt64(2)));}
+        var canonical=Convert.ToInt32(Scalar(c,"SELECT CAST(COUNT(*) AS TEXT) FROM dataset_candidates WHERE state='Promoted' AND canonical_revision_id IS NOT NULL")??"0",CultureInfo.InvariantCulture);var deleted=0;long released=0;
+        foreach(var item in candidates){Exec(c,"UPDATE dataset_candidates SET cleanup_state='CleanupPending' WHERE candidate_id=$id AND state='Rejected' AND cleanup_state='Retained'",("$id",item.Id));var path=Path.Combine(_options.QuarantineDirectory,item.Id,"artifact",SafeName(item.File));if(File.Exists(path)){File.Delete(path);deleted++;released+=item.Bytes;}Exec(c,"UPDATE dataset_candidates SET cleanup_state='PayloadDeleted' WHERE candidate_id=$id AND state='Rejected' AND cleanup_state='CleanupPending'",("$id",item.Id));}
+        return new(candidates.Count,deleted,released,candidates.Count,canonical,candidates.Count==0);
+    }
 
     private ParsedDataset ParseCsv(string path,ExternalDatasetCandidate candidate)
     {var rows=new List<ImportBar>();var seen=new Dictionary<string,ImportBar>(StringComparer.Ordinal);long duplicates=0,conflicts=0,invalid=0;using var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read);using var reader=new StreamReader(stream,new UTF8Encoding(false,true),true,65536);
@@ -147,6 +161,7 @@ internal sealed class FinanceDatasetIntakeStore
     internal static List<string> Csv(string line){var fields=new List<string>();var value=new StringBuilder();var quoted=false;for(var i=0;i<line.Length;i++){var ch=line[i];if(ch=='\"'){if(quoted&&i+1<line.Length&&line[i+1]=='\"'){value.Append('\"');i++;}else quoted=!quoted;}else if(ch==','&&!quoted){fields.Add(value.ToString());value.Clear();}else value.Append(ch);}if(quoted)throw new InvalidDataException("Unterminated quoted CSV field.");fields.Add(value.ToString());return fields;}
     private static string SafeName(string x){var name=Path.GetFileName(x);if(string.IsNullOrWhiteSpace(name)||name.IndexOfAny(Path.GetInvalidFileNameChars())>=0)throw new ArgumentException("Invalid artifact filename.");return name;}
     private static string Text(decimal x)=>x.ToString(CultureInfo.InvariantCulture);private static string? Scalar(SqliteConnection c,string sql,params(string,object)[] args){using var x=c.CreateCommand();x.CommandText=sql;foreach(var a in args)x.Parameters.AddWithValue(a.Item1,a.Item2);return x.ExecuteScalar() as string;}
+    private static bool ColumnExists(SqliteConnection c,string table,string column){using var x=c.CreateCommand();x.CommandText=$"PRAGMA table_info({table})";using var r=x.ExecuteReader();while(r.Read())if(string.Equals(r.GetString(1),column,StringComparison.Ordinal))return true;return false;}
     private static void Exec(SqliteConnection c,string sql,params(string,object)[] args)=>Exec(c,null,sql,args);private static void Exec(SqliteConnection c,SqliteTransaction? t,string sql,params(string,object)[] args){using var x=c.CreateCommand();x.Transaction=t;x.CommandText=sql;foreach(var a in args)x.Parameters.AddWithValue(a.Item1,a.Item2);x.ExecuteNonQuery();}
     private sealed record ImportBar(string Symbol,DateOnly Date,decimal Open,decimal High,decimal Low,decimal Close,decimal Volume,string? ExDividend,string? SplitRatio,long Row);
     private sealed record ParsedDataset(string[] Headers,List<ImportBar> Rows,long Duplicates,long Conflicts,long InvalidOhlcv,DatasetOverlapMetrics Overlap,List<string> Limitations);

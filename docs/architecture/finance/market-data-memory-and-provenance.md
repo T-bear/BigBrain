@@ -194,6 +194,12 @@ Backups inherit each record's entitlement and deletion deadline. A backup is not
 evade retention. Restore tests must prove schema/data version compatibility, provenance,
 checksum integrity and licensed deletion across primary copies and backups.
 
+BB-085 implements this as `finance-provider-backup-v1`: source classification precedes
+selection; WIKI public-domain revisions and exact source-only derived rows are serialized in
+stable order, while EODHD is inventoried as restricted and excluded from indefinite backup.
+Only a COMPLETE manifest published after write/hash/verify is restorable. Restore is staged,
+checksum-verified and identity-compared without overwriting healthy canonical memory.
+
 ## Implementation gates and next safe slice
 
 BB-079 implements immutable derived feature memory alongside the market catalog. A feature

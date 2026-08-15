@@ -1,5 +1,11 @@
 # Finance module
 
+BB-085 adds `FinanceDataProtectionStore`, maintenance-only backup/verify/restore/corruption
+commands and `GET /api/v1/modules/finance/backups`. Backup selection is by provider/product/
+policy plus candidate rights/provenance, not by shared database or symbol. COMPLETE manifests
+are the only restorable state. Web shows sanitized read-only protection status; no delete,
+restore or arbitrary backup control is exposed.
+
 BB-084 adds read-only dataset state and a trusted maintenance-only intake workflow. External
 CSV/ZIP artifacts remain quarantined until all `dataset-promotion-v1` gates pass. Web/API users
 cannot submit URLs. WIKI historical archive and EODHD current EOD remain separate revisions;
@@ -10,8 +16,8 @@ unfinished request becomes interrupted, publishes no partial revision and suppre
 symbol retry. Derived builders consume committed state. Future LIVE must force
 `RECONCILIATION_REQUIRED` after unclean startup; no execution authority exists.
 
-Status: M1 and provider-neutral BB-045 entitlement/identity/normalization/session/replay/revision/acquisition/persistence-manifest foundations
-implemented and automatically verified; not deployed. Finance is
+Status: M1 plus real EOD/archive memory, derived research evidence and BB-085 provider-tagged
+data protection are implemented and runtime-verified. Finance is
 read-only RESEARCH and has no broker connection, executor or external order capability.
 
 Finance is a future first-party BigBrain module for research, simulation and eventually

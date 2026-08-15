@@ -38,3 +38,9 @@ backup inventory supports source tags. CC BY evidence retains attribution. Manua
 artifacts remain until an explicit cleanup decision. Rejected large payloads may later be
 removed while retaining sanitized manifest/evidence; cleanup never deletes canonical data.
 EODHD retention/deletion remains independent and must never match WIKI/Zenodo by shared symbol.
+
+BB-085 implements the cleanup state `Retained → CleanupPending → PayloadDeleted` only for
+aged `Rejected` candidates. The raw payload may be removed, but candidate/file metadata,
+SHA-256, manifest, provenance, validation and rejection evidence remain. Restart resolves
+an interrupted pending state from actual payload presence. `ManualReviewRequired` and
+`Promoted` are not automatic cleanup targets; canonical tables are outside this operation.

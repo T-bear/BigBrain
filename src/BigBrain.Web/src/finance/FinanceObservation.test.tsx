@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { FinanceObservation } from './FinanceObservation'
-import type { FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceRobustnessCatalog } from '../types'
+import type { FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceRobustnessCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -20,6 +20,7 @@ const featureFixture: FinanceFeatureSnapshot = {
     {definitionId:'rsi.14',name:'RSI 14',period:14,value:72.125,sessionDate:'2026-08-10',state:'available',quality:'good',knowledgeTimeUtc:'2026-08-11T18:00:00Z'},
   ],historyDefinitionId:'sma.20',history:[]
 }
+const backupFixture:FinanceBackupInventory={generatedAtUtc:'2026-08-15T18:00:00Z',operatingMode:'RESEARCH',backups:[{backupId:'finance-backup-fixture',createdAtUtc:'2026-08-15T18:00:00Z',schemaVersion:'finance-provider-backup-v1',bigBrainVersion:'test',status:'Complete',sources:[{provider:'NASDAQ-WIKI',product:'WIKI/PRICES',rightsClass:'PublicDomain',retentionClass:'Indefinite',deletionRequirement:'None',deletionDeadlineUtc:null,backupEligibility:'Eligible',restoreEligible:true,reason:'verified'}],revisions:[{revisionId:'wiki-fixture',provider:'NASDAQ-WIKI',product:'WIKI/PRICES',policy:'dataset-promotion-v1',checksum:'sha256:fixture',observationCount:50,coverageFrom:'2016-01-01',coverageTo:'2016-02-19'}],featureRevisionIds:['feature-fixture'],backtestRunIds:[],robustnessEvaluationIds:[],artifacts:[{path:'fixture.data.json',bytes:100,sha256:'sha256:fixture'}],contentFingerprint:'sha256:fixture'}],sourcePolicies:[{provider:'NASDAQ-WIKI',product:'WIKI/PRICES',rightsClass:'PublicDomain',retentionClass:'Indefinite',deletionRequirement:'None',deletionDeadlineUtc:null,backupEligibility:'Eligible',restoreEligible:true,reason:'verified'},{provider:'EODHD',product:'Free',rightsClass:'OwnerAcceptedPersonalResearch',retentionClass:'SubscriptionOnly',deletionRequirement:'DeleteAtSubscriptionEnd',deletionDeadlineUtc:null,backupEligibility:'Restricted',restoreEligible:true,reason:'provider-specific'}]}
 
 describe('Finance read-only observation UI', () => {
   test('registers Finance as a navigable dashboard view', () => {
@@ -82,5 +83,12 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getAllByText('DATA INSUFFICIENT').at(-1)).toBeVisible()
     expect(screen.getAllByText(/176 \/ 26 \/ 50 sessions/).at(-1)).toBeVisible()
     expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
+  })
+
+  test('distinguishes backed-up historical memory from canonical and provider-restricted evidence',()=>{
+    render(<FinanceObservation initialSnapshot={empty} initialBackups={backupFixture}/>)
+    expect(screen.getAllByText('Dataskydd / Historiskt minne').at(-1)).toBeVisible();expect(screen.getByText('BACKED UP')).toBeVisible();expect(screen.getByText('finance-backup-fixture · 1 market-revisioner')).toBeVisible()
+    expect(screen.getByText('NASDAQ-WIKI / WIKI/PRICES')).toBeVisible();expect(screen.getByText('EODHD / Free')).toBeVisible();expect(screen.getByText('SEPARAT FRÅN CANONICAL')).toBeVisible()
+    expect(screen.queryByRole('button',{name:/backup|restore|radera|cleanup/i})).not.toBeInTheDocument()
   })
 })

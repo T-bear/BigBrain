@@ -79,6 +79,14 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
     }
 
     [Fact]
+    public async Task BackupInventoryApiIsSanitizedReadOnlyResearch()
+    {
+        var response=await _client.GetAsync("/api/v1/modules/finance/backups",TestContext.Current.CancellationToken);var raw=await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,response.StatusCode);Assert.Contains("\"operatingMode\":\"RESEARCH\"",raw);Assert.DoesNotContain("databasePath",raw,StringComparison.OrdinalIgnoreCase);Assert.DoesNotContain("restoreStagingDirectory",raw,StringComparison.OrdinalIgnoreCase);
+        using var mutation=new HttpRequestMessage(HttpMethod.Post,"/api/v1/modules/finance/backups");Assert.Equal(HttpStatusCode.MethodNotAllowed,(await _client.SendAsync(mutation,TestContext.Current.CancellationToken)).StatusCode);
+    }
+
+    [Fact]
     public void DeterministicSyntheticSnapshotRetainsSafetyAndExplicitClassification()
     {
         var instant = new DateTimeOffset(2026, 8, 11, 10, 0, 0, TimeSpan.Zero);

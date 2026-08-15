@@ -29,6 +29,7 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/robustness/{evaluationId}",(string evaluationId,IFinanceRobustnessReader reader)=>
             reader.GetEvaluation(evaluationId) is { } result?Results.Json(result,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/datasets",(IFinanceDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/backups",(IFinanceBackupReader reader)=>Results.Json(reader.GetInventory(),JsonOptions));
         return endpoints;
     }
 
