@@ -1,5 +1,11 @@
 # BigBrain appliance startup, shutdown and recovery
 
+BB-088 resumes the Finance prospective cadence automatically after recovery and clock sanity.
+Restart may evaluate outcomes for predictions that genuinely predate their target observation, but
+must never backfill a missing prediction after its outcome became knowable. Weekend/no-new-session
+is healthy. Verify sanitized state through `GET /api/v1/modules/finance/cadence/status` and
+`GET /api/v1/modules/finance/overview`; no manual daily trigger is required.
+
 ## Normal operation
 
 Start with one physical power-button press. Stop with one brief press and wait for poweroff.

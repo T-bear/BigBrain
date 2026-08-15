@@ -1,5 +1,10 @@
 # Finance market-data provider selection
 
+BB-088 keeps EODHD Free as the sole approved current provider and adds no entitlement. A normal
+running appliance performs internal checks every 30 minutes but only attempts the bounded daily
+EOD request cycle on weekdays after 22:00 UTC. Holidays may cause a healthy no-new-session result;
+the worker never manufactures a bar or treats EOD as real-time.
+
 ## BB-086 ETF-history result (2026-08-15)
 
 No zero-cost SPY/QQQ/IWM source passed the complete gate. WIKI has no target rows; Stooq remains

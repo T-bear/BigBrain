@@ -36,6 +36,7 @@ import type {
   FinanceRobustnessCatalog,
   FinanceRobustnessEvaluation,
   FinanceShadowCatalog,
+  FinanceOverview,
 } from './types'
 
 export class ApiError extends Error {
@@ -90,6 +91,7 @@ export const getFinanceObservation = (signal?: AbortSignal) =>
 export const getFinanceDatasets = (signal?: AbortSignal) => getJson<FinanceDatasetCatalog>('/api/v1/modules/finance/datasets',signal)
 export const getFinanceBackups = (signal?: AbortSignal) => getJson<FinanceBackupInventory>('/api/v1/modules/finance/backups',signal)
 export const getFinanceShadow = (signal?: AbortSignal) => getJson<FinanceShadowCatalog>('/api/v1/modules/finance/shadow/scorecard',signal)
+export const getFinanceOverview = (signal?: AbortSignal) => getJson<FinanceOverview>('/api/v1/modules/finance/overview',signal)
 
 export const getSystemRecovery = (signal?: AbortSignal) => getJson<SystemRecoverySnapshot>('/api/v1/system/recovery', signal)
 

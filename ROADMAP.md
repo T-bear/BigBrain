@@ -1,5 +1,16 @@
 # BigBrain Roadmap
 
+## BB-088 – Prospective daily cadence and Finance UI v1.0 hierarchy (implemented 2026-08-15)
+
+Finance now resumes a bounded current-EOD cycle automatically after recovery: internal checks run
+every 30 minutes, provider access is limited to eligible weekdays after 22:00 UTC and existing
+adapter retries remain capped with exponential backoff. Genuine predictions mature exactly once;
+missing historical decisions are never invented. Finance UI v1.0 now follows the approved
+`Market today → BigBrain now → Prospective result → Details & research` hierarchy and durable UX
+principle `SUMMARY → EXPLANATION → RAW EVIDENCE`. Multi-real-session proof must accumulate over
+future sessions. Next priority is continued prospective evidence observation, followed by M5 Hard
+Risk Engine when enough operational evidence exists; security remains a gate before execution.
+
 ## BB-087 – Prospective shadow observation foundation (implemented 2026-08-15)
 
 Current canonical EODHD observations can produce deterministic, exactly-once `RESEARCH` predictions after recovery and clock gates. Predictions pin their knowledge cutoff, market/feature/strategy/parameter lineage and next-source-session horizon; outcomes append later. Historical backfill is barred from prospective evidence and UI/API scorecards state sample limitations. Next: mature daily current-EOD cadence and outcome evaluation evidence. Hard Risk Engine and the approved security/pentest baseline remain gates before any PAPER eligibility discussion; LIVE additionally requires separate owner authorization.

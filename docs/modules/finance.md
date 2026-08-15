@@ -1,5 +1,19 @@
 # Finance module
 
+BB-088 replaces the startup-only acquisition/shadow passes with one lightweight prospective cadence.
+After BB-083 recovery, it checks local state every 30 minutes; EODHD requests are allowed only on
+weekdays after 22:00 UTC and at most one successful provider cycle per UTC day. The existing adapter
+caps retries at two with exponential backoff. Every cycle safely rebuilds deterministic features,
+evaluates already-genuine outcomes and inserts eligible new predictions exactly once. Weekend,
+holiday/no-new-session and restart are normal states; clock failure blocks new temporal evidence.
+
+Read-only `/api/v1/modules/finance/overview` and `/finance/cadence/status` drive a human hierarchy:
+actual watched-market breadth, transparent current strategy agreement, prospective results, then
+the existing technical evidence under Details & research. `TargetLong` maps to POSITIVE and
+`TargetFlat` to NEGATIVE research posture; ties/disagreement map to NEUTRAL and remain visibly
+counted. These are not recommendations or orders. Graphs require at least two evaluated source
+sessions and use an explicitly labelled equal-weight shadow-decision basket, never actual P/L.
+
 BB-087 adds a persistent prospective shadow journal over approved EODHD current EOD. After BB-083 recovery and clock sanity, an idempotent source-state worker evaluates unchanged strategies against causal `core-daily-v1` features. Predictions pin knowledge cutoff and revision/version lineage; a later eligible source session appends an outcome. Old sessions whose future is already knowable are never labelled prospective.
 
 Read-only `/api/v1/modules/finance/shadow/{predictions,scorecard,status}` surfaces and the Shadow research panel distinguish pending/evaluated prospective evidence from historical backtests and label small samples `BOOTSTRAPPING`. All records are `RESEARCH`; there is no broker, order, PAPER, LIVE/AUTO, recommendation or parameter-learning path. EODHD-derived shadow rows share provider deletion scope and are not placed in indefinite public-domain backup.

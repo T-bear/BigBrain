@@ -27,7 +27,7 @@ public sealed class FinanceShadowResearchTests:IDisposable
         var before=memory.ShadowCatalog(null,"momentum",null,null,null,50).Predictions.Single();
         var instrument=EodhdCatalog.Watchlist.Single(x=>x.Symbol=="AAPL");var t1=t0.AddDays(2);
         memory.Store(instrument,[new(new(2026,8,17),130,132,129,131,131,1000)],Encoding.UTF8.GetBytes("next"),new(2026,8,17),new(2026,8,17),t1.AddMinutes(-1),t1,0);
-        memory.BuildFeatures();memory.RunShadowCycle(t1,true);
+        memory.BuildFeatures();memory.RunShadowCycle(t1,true);memory.RunShadowCycle(t1.AddMinutes(1),true);
         var after=memory.ShadowPrediction(before.PredictionId)!;
         Assert.Equal(before.PredictionId,after.PredictionId);Assert.Equal(before.KnowledgeCutoffUtc,after.KnowledgeCutoffUtc);
         Assert.Equal(before.Signal,after.Signal);Assert.Equal(FinanceShadowState.Evaluated,after.State);Assert.Equal(before.ReasonCodes,after.ReasonCodes);
@@ -41,6 +41,23 @@ public sealed class FinanceShadowResearchTests:IDisposable
         Assert.Equal(0,memory.RunShadowCycle(now,true));Assert.Empty(memory.ShadowCatalog(null,null,null,null,null,50).Predictions);
         Assert.Throws<ArgumentException>(()=>memory.ShadowCatalog(null,null,null,null,null,201));
         Assert.Throws<ArgumentException>(()=>memory.ShadowPrediction("' OR 1=1 --"));
+    }
+
+    [Fact]
+    public void CadenceScheduleSkipsWeekendAndOverviewUsesActualBreadthAndResearchSignals()
+    {
+        Assert.False(FinanceCadenceSchedule.IsProviderWindow(new(2026,8,15,23,0,0,TimeSpan.Zero),22));
+        Assert.False(FinanceCadenceSchedule.IsProviderWindow(new(2026,8,17,21,59,0,TimeSpan.Zero),22));
+        Assert.True(FinanceCadenceSchedule.IsProviderWindow(new(2026,8,17,22,0,0,TimeSpan.Zero),22));
+        var now=DateTimeOffset.UtcNow.AddMinutes(1);var memory=Ready(now);memory.RunShadowCycle(now,true);memory.RecordCadenceCheck(now,false,false,"no-provider-check");
+        var provider=new EodhdFinanceOptions{Enabled=true,AccountActive=true,ApiToken="fixture",DatabasePath=Path.Combine(_root,"memory.db"),PayloadDirectory=Path.Combine(_root,"payloads")};
+        var overview=memory.Overview(provider,new FinanceCadenceOptions(),true);
+        Assert.Equal("RESEARCH",overview.Mode);Assert.Equal("CURRENT EOD / PROSPECTIVE EOD",overview.ObservationClass);
+        Assert.Contains("bevakade instrument",overview.MarketSummary);Assert.Single(overview.Signals);Assert.Equal(3,overview.Signals[0].StrategyCount);
+        Assert.Equal(3,overview.Prospective.Valid);Assert.Equal(3,overview.Prospective.Pending);Assert.Equal(0,overview.Prospective.Evaluated);Assert.Empty(overview.Prospective.Curve);
+        Assert.Equal("Healthy",overview.Cadence.Health);Assert.Null(overview.Cadence.LastProviderCheckUtc);Assert.Null(overview.Cadence.LastSuccessfulAcquisitionUtc);
+        memory.RecordCadenceCheck(now,true,true,"provider-check-no-new-session");overview=memory.Overview(provider,new FinanceCadenceOptions(),true);
+        Assert.Equal(now,overview.Cadence.LastProviderCheckUtc);Assert.Equal(now,overview.Cadence.LastSuccessfulAcquisitionUtc);Assert.True(overview.Cadence.ClockIntegrity);Assert.Equal("RESEARCH",overview.Cadence.OperatingMode);
     }
 
     private EodhdMarketMemory Ready(DateTimeOffset acquired)

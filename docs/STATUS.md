@@ -1,5 +1,15 @@
 # BigBrain Status
 
+BB-088 is implemented, deployed and runtime/restart-verified on 2026-08-15 from baseline
+`0ab8c7470a1b16e399728ea564cfeb34962d3069`; publication/CI evidence remains to be recorded. The
+Saturday drill correctly made no provider request and preserved latest session 2026-08-14, 24
+valid pending predictions, zero outcomes and 24 invalidated audit rows across two restarts. Cadence
+health/clock were healthy; no duplicate prediction/outcome appeared. Actual overview breadth was
+3 up/5 down across eight tracked instruments, `BOOTSTRAPPING`, with no graph. One WIKI-eligible
+backup and EODHD `SubscriptionOnly/restricted` classification survived. Local verification passed
+412 API tests, 32 Sentinel tests, 111 frontend tests, both builds, docs and Compose. Finance remains
+`RESEARCH`; no PAPER, broker, order, LIVE/AUTO, self-learning or paid service was added.
+
 BB-087 is implemented, deployed and bounded-runtime/restart verified on 2026-08-15 from baseline `31156ec8e9780dc6622891cb4ba46050c302a6f6`. Eight current EODHD instruments at session 2026-08-14 produced 24 causally source-pinned pending predictions across three unchanged strategies; no outcome is yet knowable. The drill detected 24 earlier rows pinned to a WIKI feature revision, preserved them as `INVALIDATED`, then enforced exact source-revision membership and created correct evidence on `feature-c204a8133abaf8a2`. Restart retained 48 audit rows and did not duplicate the 24 valid predictions. Published implementation commit `86e92c431cffc1db37684bcfba5a2a785d7b05ad` passed GitHub Actions run #44 on 2026-08-15: documentation, frontend, secrets and backend all succeeded. Finance remains `RESEARCH`; there is no PAPER, broker, order, LIVE/AUTO or self-learning authority and no paid service.
 
 BB-086 completed as a legitimate fail-closed research result on 2026-08-15 from baseline

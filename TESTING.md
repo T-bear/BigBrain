@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+BB-088 adds network-free tests for weekday/provider-window scheduling, healthy weekend/no-provider
+cycles, cadence timestamps, bounded read-only status/overview endpoints, repeat outcome evaluation,
+actual market breadth, transparent POSITIVE/NEUTRAL/NEGATIVE aggregation, pending/sample honesty,
+historical/prospective separation and absence of fake index, portfolio, real-time or order claims.
+Runtime provider verification is separate and must not manufacture a weekend session.
+
 BB-087 tests are network-free. They cover deterministic prediction identity, retry idempotence, knowledge cutoff/no-lookahead selection, strategy/parameter/source lineage, explicit horizon, pending-to-evaluated temporal progression, append-only outcomes, clock fail-closed, late-start anti-backfill, bounded/malformed read API, UI pending/sample honesty and absence of mutation/order controls. Full API, Sentinel and frontend regression plus Release/build/documentation/secrets/Compose checks remain required before publication.
 
 BB-086 changes research/planning documentation only because all eight ETF-history candidates

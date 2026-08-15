@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-088` — [prospective daily cadence and Finance UI v1.0](features/finance/finance-bb-088-daily-cadence-ui-v1-20260815.md)
 - `BB-085` — [provider-tagged backup, restore and quarantine cleanup](features/finance/finance-bb-085-provider-tagged-backup-restore-cleanup-20260815.md)
 - `BB-084` — [dataset research](features/finance/finance-bb-084-dataset-research-20260815.md)
   and [implementation/runtime](features/finance/finance-bb-084-implementation-runtime-20260815.md)

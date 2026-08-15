@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+### BB-088 – Prospective daily cadence and Finance UI v1.0 information hierarchy
+
+- Modul: Finance
+- Status: Implementerad, deployad och runtime/restart-verifierad 2026-08-15; publication/CI-evidence återstår före slutlig stängning
+- Resultat: bounded weekday EODHD cadence, automatic feature/shadow/outcome cycle, read-only overview/cadence API and `Market today → BigBrain now → Prospective result → Details & research` UI. Weekend/no-session is healthy; anti-backfill and RESEARCH-only boundaries remain.
+- Definition of Done: full local regression and weekend/restart drill pass; publication and green GitHub Actions remain.
+
 ### BB-087 – Prospective shadow observation foundation
 
 - Modul: Finance
@@ -7,11 +14,11 @@
 - Resultat: EODHD-specific prediction journal with immutable knowledge cutoff and lineage, append-only next-session outcomes, exactly-once/recovery/clock/anti-backfill gates and read-only scorecard/UI. Historical backtests remain distinct. No execution authority.
 - Definition of Done: complete only after full regression, bounded real-provider drill, restart persistence, publication and green CI are recorded.
 
-### Finance – prospective daily cadence and outcome evaluator maturation
+### Finance – prospective multi-real-session evidence observation
 
 - Modul: Finance
-- Status: Planerad efter BB-087 evidence review
-- Omfattning: prove bounded automatic current-EOD cadence across multiple sessions, missed-session classification and accumulated outcome evidence without daily owner action. No PAPER/order authority and no implicit source stitching.
+- Status: Planerad efter BB-088; observation/evidence gate, not a daily manual task
+- Omfattning: allow the deployed cadence to accumulate and verify multiple genuine future EOD sessions before strategy-quality claims. No PAPER/order authority and no implicit source stitching.
 
 ### BB-084 – Public-domain historical dataset intake, quarantine and validation
 

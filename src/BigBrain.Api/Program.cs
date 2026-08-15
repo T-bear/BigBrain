@@ -165,14 +165,15 @@ public partial class Program
         builder.Services.AddSingleton(datasetOptions);
         var dataProtectionOptions = builder.Configuration.GetSection(FinanceDataProtectionOptions.Section).Get<FinanceDataProtectionOptions>() ?? new();
         builder.Services.AddSingleton(dataProtectionOptions);
+        var cadenceOptions=builder.Configuration.GetSection(FinanceCadenceOptions.Section).Get<FinanceCadenceOptions>()??new();
+        builder.Services.AddSingleton(cadenceOptions);
         builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions));
         builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
         builder.Services.AddSingleton<FinanceDataProtectionStore>();
-        builder.Services.AddHostedService<EodhdAcquisitionWorker>();
+        builder.Services.AddHostedService<FinanceProspectiveCadenceWorker>();
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
         builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
         builder.Services.AddHostedService<FinanceRobustnessBuildWorker>();
-        builder.Services.AddHostedService<FinanceShadowWorker>();
         builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();
         builder.Services.AddSingleton<IFinanceBacktestReader, EodhdFinanceBacktestReader>();

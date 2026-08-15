@@ -1,5 +1,13 @@
 # BigBrain
 
+BB-088 adds a lightweight automatic `CURRENT EOD` cadence and the first Finance UI v1.0
+information hierarchy. A recovery- and clock-gated worker checks internally every 30 minutes,
+contacts EODHD at most once per eligible weekday after 22:00 UTC, then idempotently builds
+features, matures genuine outcomes and creates new prospective predictions. The UI now leads with
+actual tracked-market breadth, transparent research-signal agreement and prospective evidence,
+with technical research below. It remains `RESEARCH`: no order, broker, PAPER, LIVE/AUTO,
+self-learning, paid dependency, fake index or portfolio result exists.
+
 BB-087 adds the first durable prospective `CURRENT EOD` shadow journal. It records immutable, knowledge-time-bounded predictions from existing versioned strategies and appends later outcomes separately. API/UI are read-only, separate this evidence from backtests, and expose no order or execution path. EODHD retention remains source-dependent.
 
 BB-086 completed a bounded search for legitimate zero-cost SPY/QQQ/IWM history. The existing

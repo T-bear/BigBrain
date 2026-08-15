@@ -38,6 +38,12 @@ public static class FinanceEndpoints
             Results.Json(memory.ShadowCatalog(null,null,null,null,null,50),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/shadow/status",(EodhdMarketMemory memory,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery)=>
             Results.Json(memory.ShadowStatus(recovery.MayStartTimeSensitiveWork),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/overview",(EodhdMarketMemory memory,EodhdFinanceOptions provider,
+            FinanceCadenceOptions cadence,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery)=>
+            Results.Json(memory.Overview(provider,cadence,recovery.MayStartTimeSensitiveWork),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/cadence/status",(EodhdMarketMemory memory,EodhdFinanceOptions provider,
+            FinanceCadenceOptions cadence,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery)=>
+            Results.Json(memory.CadenceSnapshot(provider.Enabled,recovery.MayStartTimeSensitiveWork,cadence.ProviderWindowStartUtcHour,cadence.InternalCheckMinutes),JsonOptions));
         return endpoints;
     }
 

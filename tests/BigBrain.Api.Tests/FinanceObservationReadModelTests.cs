@@ -96,6 +96,18 @@ public sealed class FinanceObservationReadModelTests : IClassFixture<WebApplicat
     }
 
     [Fact]
+    public async Task OverviewApiIsSanitizedReadOnlyAndContainsNoExecutionOrFakeRealtimeSurface()
+    {
+        var response=await _client.GetAsync("/api/v1/modules/finance/overview",TestContext.Current.CancellationToken);var raw=await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,response.StatusCode);Assert.Contains("\"mode\":\"RESEARCH\"",raw);Assert.Contains("CURRENT EOD / PROSPECTIVE EOD",raw);
+        Assert.DoesNotContain("apiToken",raw,StringComparison.OrdinalIgnoreCase);Assert.DoesNotContain("real-time",raw,StringComparison.OrdinalIgnoreCase);Assert.DoesNotContain("portfolioValue",raw,StringComparison.OrdinalIgnoreCase);
+        using var mutation=new HttpRequestMessage(HttpMethod.Post,"/api/v1/modules/finance/overview");Assert.Equal(HttpStatusCode.MethodNotAllowed,(await _client.SendAsync(mutation,TestContext.Current.CancellationToken)).StatusCode);
+        var cadence=await _client.GetAsync("/api/v1/modules/finance/cadence/status",TestContext.Current.CancellationToken);var cadenceRaw=await cadence.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,cadence.StatusCode);Assert.Contains("\"operatingMode\":\"RESEARCH\"",cadenceRaw);Assert.Contains("CURRENT EOD / PROSPECTIVE EOD",cadenceRaw);Assert.DoesNotContain("apiToken",cadenceRaw,StringComparison.OrdinalIgnoreCase);
+        using var cadenceMutation=new HttpRequestMessage(HttpMethod.Delete,"/api/v1/modules/finance/cadence/status");Assert.Equal(HttpStatusCode.MethodNotAllowed,(await _client.SendAsync(cadenceMutation,TestContext.Current.CancellationToken)).StatusCode);
+    }
+
+    [Fact]
     public void DeterministicSyntheticSnapshotRetainsSafetyAndExplicitClassification()
     {
         var instant = new DateTimeOffset(2026, 8, 11, 10, 0, 0, TimeSpan.Zero);

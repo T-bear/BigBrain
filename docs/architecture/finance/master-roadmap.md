@@ -1,5 +1,12 @@
 # BigBrain Finance – master roadmap
 
+BB-088 implements the bounded daily cadence and Finance UI v1.0 product hierarchy. The worker
+separates internal recovery checks from actual provider calls, treats weekends/no-new-session as
+healthy and preserves exactly-once/anti-backfill/clock gates. The read model owns market breadth,
+signal aggregation and prospective metrics; Web renders backend truth in the durable order
+`SUMMARY → EXPLANATION → RAW EVIDENCE`. Future PAPER/LIVE UI may add explicitly mode-labelled
+portfolio/position information only after separate authorization; none exists now.
+
 BB-087 implements the prospective foundation recommended by BB-086: canonical current EOD → causal knowledge snapshot → unchanged strategy → immutable `RESEARCH` shadow prediction → later append-only outcome. Deterministic identity, clock integrity, current-session age and anti-backfill gates protect the scientific claim. Historical backtests and prospective scorecards stay separate.
 
 Near-term ordering: mature automatic daily current-EOD/outcome evidence → M5 Hard Risk Engine as justified → Security/Penetration Testing Baseline → only then separately authorized PAPER eligibility assessment. Security remains mandatory before LIVE, and no LIVE authority follows automatically from shadow evidence.

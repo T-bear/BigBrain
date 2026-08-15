@@ -1,5 +1,10 @@
 # Finance market-data memory, provenance and learning foundation
 
+BB-088 runs the BB-087 knowledge-time contract automatically through a bounded cadence. Internal
+30-minute state checks do not imply provider access; provider calls are weekday-only after 22:00 UTC
+and existing EODHD daily/request/retry gates remain authoritative. Cadence operational metadata
+stores timestamps/counts only. It does not copy provider bars or loosen the EODHD deletion scope.
+
 Prospective BB-087 evidence references canonical EODHD market and feature revisions. `observationKnowledgeUtc` records acquisition knowability and `knowledgeCutoffUtc` defines the decision boundary. Identity pins instrument/session, strategy/version, parameter fingerprint and horizon. Later market revisions and outcomes cannot rewrite the original row.
 
 BB-084 extends the ingress boundary with `ExternalDatasetCandidate → QuarantineArtifact →

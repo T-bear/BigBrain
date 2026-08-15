@@ -1,5 +1,9 @@
 # Backup and Restore
 
+BB-088 cadence rows are operational timestamps/status and add no copied market payload. Prospective
+predictions/outcomes retain their existing EODHD source-dependent classification from BB-087;
+the overview is derived on read and creates no independent backup artifact.
+
 BB-085 implements Finance provider-tagged backup. WIKI public-domain canonical memory plus
 exact WIKI-only feature/backtest/robustness lineage is eligible for local indefinite backup.
 EODHD stays outside that class and remains in its subscription/deletion inventory.
