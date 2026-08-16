@@ -8,11 +8,12 @@ Detta är en sanerad GitHub-version.
 
 **Date:** 2026-08-16
 **Baseline:** `ae2cb91729795df1fb9356015c8e29159f91acc1`
+**Implementation commit:** `6f6cc746ce5d8bea24d19ad48c3596cb9ed0de28`
 **Mode/budget:** RESEARCH / 0 SEK
 
 ## Status
 
-Implemented and focused-tested locally; not deployed, manually production-verified or published at report creation.
+Implemented, locally regression-tested and published. Not deployed or manually production-verified. GitHub Actions could not be inspected because GitHub CLI is unavailable and the public web fallback returned no status; CI remains unverified.
 
 ## Evidence
 

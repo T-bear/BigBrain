@@ -2048,7 +2048,7 @@ En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar
 - Integrationstester, relevant dokumentation och runbook finns.
 # BB-090 — FRED macro and Finance correctness stabilization
 
-**Status:** IN PROGRESS (2026-08-16). Macro Memory, causal features/regime analysis and correctness fixes are implemented and locally regression-tested. DoD remains blocked on adjusted-history audit, production backup/deployment/runtime verification and CI. Backup is currently blocked by a preserved pre-existing API one-off container holding the Finance database.
+**Status:** IN PROGRESS (2026-08-16). Macro Memory, causal features/regime analysis and correctness fixes are implemented, locally regression-tested and published in `6f6cc746ce5d8bea24d19ad48c3596cb9ed0de28`. DoD remains blocked on adjusted-history audit, production backup/deployment/runtime verification and CI. Backup is currently blocked by a preserved pre-existing API one-off container holding the Finance database.
 
 - Deferred data packs: Riksbanken/Sweden, ECB/European FX, commodities, corporate actions, point-in-time universes, fundamentals and additional legitimate OHLCV archives.
 - Avanza remains `MANUAL_REVIEW / RIGHTS_UNKNOWN`.
