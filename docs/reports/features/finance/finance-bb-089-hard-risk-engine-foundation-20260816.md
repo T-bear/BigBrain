@@ -7,12 +7,13 @@
 - Mode/budget: RESEARCH / 0 SEK
 - Authority: no PAPER, broker, order, LIVE/AUTO or self-learning
 - Deployment/runtime: API/Web deployed and restart-verified 2026-08-16
-- Publication/CI: pending commit/push and GitHub Actions; no CI result is inferred
+- Implementation commit: `f8f2e1f871e5532ff906092545e8706d642b941b`
+- Publication/CI: GitHub Actions run #48 completed `success` (documentation, frontend, secrets, backend)
 
 ## Status
 
-Foundation implemented, automatically verified, deployed and restart-verified. CI remains pending
-publication. Sanitization notice: this report contains no secret, credential, private identity,
+Foundation implemented, automatically verified, deployed, restart-verified and published with green
+CI. Sanitization notice: this report contains no secret, credential, private identity,
 private address, raw provider payload, raw log or sensitive filesystem path.
 
 Detta är en sanerad GitHub-version.
@@ -87,8 +88,9 @@ bypass, halt reset and client override.
 Focused backend: 15/15 passed. Full API: 423/423; Sentinel: 32/32; frontend: 111/111. Release build
 passed with zero warnings/errors and frontend production build transformed 57 modules. Documentation
 verification passed 157 Markdown files/89 unique BB IDs; Compose and `git diff --check` passed.
-Redacted gitleaks worktree scan found 11 pre-existing worktree findings; the BB-089 staged/publication
-scan is run after exact staging. Docker API/Web image builds and deployment passed.
+Redacted gitleaks worktree scan found 11 pre-existing worktree findings; the exact staged BB-089 scan
+covered 57.33 KB and found no leak. Docker API/Web image builds and deployment passed. GitHub Actions
+run #48 completed successfully for all four jobs.
 
 Sunday runtime reported policy `research-eod-v1`, healthy/READY, no halt, zero evaluations and no
 execution authority. Zero is correct: all 24 valid pending predictions predate activation and were

@@ -3,8 +3,8 @@
 ### BB-089 – M5 Hard Risk Engine foundation
 
 - Modul: Finance / Risk
-- Status: Implementerad, automatiskt verifierad, deployad och restart-verifierad 2026-08-16;
-  GitHub Actions pending publication
+- Status: Implementerad, automatiskt verifierad, deployad, restart-verifierad och publicerad
+  2026-08-16; GitHub Actions run #48 grön
 - Resultat: central `research-eod-v1` policy, immutable evaluations, fail-closed temporal/data/
   lineage/health/instrument/price/volatility/liquidity/exposure gates, simulated daily-loss/
   drawdown/loss-streak breakers, durable audited halt and read-only API/UI.

@@ -8,7 +8,8 @@ Evaluations are immutable/idempotent; durable system halt and explicit recovery 
 audited across reopen. Four risk endpoints and compact/detailed UI are read-only. Sunday runtime
 preserved 24 valid pending, zero outcomes, 24 invalidated and zero retroactive risk evaluations;
 cadence logged `no-provider-check`. Full local regression passed (423 API, 32 Sentinel, 111 Web),
-both builds, docs, Compose and whitespace. CI is pending publication. Spread, sector and aggregate
+both builds, docs, Compose and whitespace. Implementation commit `f8f2e1f871e5532ff906092545e8706d642b941b`
+passed GitHub Actions run #48 (documentation, frontend, secrets and backend). Spread, sector and aggregate
 portfolio remain explicitly not evaluable. Budget is 0 SEK; no PAPER, broker, order, LIVE/AUTO or
 self-learning exists.
 
