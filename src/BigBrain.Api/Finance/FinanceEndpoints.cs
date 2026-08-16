@@ -44,6 +44,10 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/cadence/status",(EodhdMarketMemory memory,EodhdFinanceOptions provider,
             FinanceCadenceOptions cadence,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery)=>
             Results.Json(memory.CadenceSnapshot(provider.Enabled,recovery.MayStartTimeSensitiveWork,cadence.ProviderWindowStartUtcHour,cadence.InternalCheckMinutes),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/risk/status",(EodhdMarketMemory memory)=>Results.Json(memory.RiskStatus(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/risk/policy",(EodhdMarketMemory memory)=>Results.Json(memory.RiskPolicySnapshot(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/risk/evaluations",(int? limit,EodhdMarketMemory memory)=>ShadowResult(()=>memory.RiskEvaluations(limit??50)));
+        endpoints.MapGet("/api/v1/modules/finance/risk/evaluations/{id}",(string id,EodhdMarketMemory memory)=>ShadowResult(()=>memory.RiskEvaluation(id)));
         return endpoints;
     }
 

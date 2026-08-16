@@ -1,5 +1,11 @@
 # BigBrain
 
+BB-089 establishes the first M5 Hard Risk Engine slice for RESEARCH/shadow decisions. Central
+`research-eod-v1` policy evaluates temporal/data/lineage/health, instrument, price/move,
+20-session volatility, EOD volume-liquidity, hypothetical exposure and simulated loss/drawdown/
+loss-streak breakers. Immutable evaluations and durable audited halts remain separate from strategy
+signals. No broker, order, PAPER or LIVE/AUTO authority exists.
+
 BB-088 adds a lightweight automatic `CURRENT EOD` cadence and the first Finance UI v1.0
 information hierarchy. A recovery- and clock-gated worker checks internally every 30 minutes,
 contacts EODHD at most once per eligible weekday after 22:00 UTC, then idempotently builds

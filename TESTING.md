@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+BB-089 adds network-free policy, invariant and adversarial tests for deterministic identity,
+version/config validation, ALLOW/REDUCE/DENY/HALT/INSUFFICIENT_DATA, EOD weekend freshness,
+clock/lineage/instrument/price/health/volatility/liquidity/exposure failures, client-forged verdicts,
+simulated daily loss/drawdown/consecutive losses, immutable idempotence and durable audited halt
+recovery. Tests never create an order, broker connection, real portfolio or provider call.
+
 BB-088 adds network-free tests for weekday/provider-window scheduling, healthy weekend/no-provider
 cycles, cadence timestamps, bounded read-only status/overview endpoints, repeat outcome evaluation,
 actual market breadth, transparent POSITIVE/NEUTRAL/NEGATIVE aggregation, pending/sample honesty,

@@ -244,7 +244,7 @@ MARKET DATA INGESTION** milestone begin.
 - Definition of Done/gate: every strategy independently reproducible and disableable.
 - Rollback: suspend/retire a version while preserving its reports.
 
-### M5 – Hard Risk Engine — PLANNED
+### M5 – Hard Risk Engine — FOUNDATION IMPLEMENTED (BB-089, 2026-08-16)
 
 - Objective: enforce non-bypassable exposure, loss, liquidity and health policy.
 - Scope/tasks: per-trade/portfolio/instrument/sector limits, position count, daily loss,
@@ -257,6 +257,10 @@ MARKET DATA INGESTION** milestone begin.
 - Security/docs: configuration authorization, immutable evaluation and change audit.
 - Definition of Done/gate: no execution path exists around risk/policy validation.
 - Rollback: HALTED; revert policy version only through audited owner action.
+- Current evidence: `research-eod-v1` enforces server-side RESEARCH proposal evaluation, immutable
+  lineage, EOD freshness, health, price/move, rolling-volatility, volume-liquidity, sizing and
+  simulated daily-loss/drawdown/loss-streak breakers. Durable halt/recovery audit survives restart.
+  Sector, spread and aggregate portfolio rules remain explicitly not evaluable; no execution exists.
 
 ### M6 – Strategy Lab and evaluation — PLANNED
 

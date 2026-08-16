@@ -113,3 +113,8 @@ datasets/volumes remain intact. Never retain prices inside the receipt.
 Deletion is intentionally irreversible. There is no data rollback after execution. Before
 execution, rollback means cancelling the operation and correcting account-state evidence.
 Do not restore deleted EODHD data from a backup after the legal deadline.
+
+BB-089 risk evaluations reference EODHD market/feature revisions and contain minimized derived rule
+evidence; they inherit EODHD deletion scope and are removed before source lineage. Pure risk-halt
+transition metadata contains no copied market values and may remain as indefinite audit evidence.
+EODHD-derived risk evaluations must not enter a public-domain indefinite backup.

@@ -308,6 +308,19 @@ HTTP contracts are intentionally not frozen by M0.
 
 ## Decision and trust flow
 
+BB-089 makes the first Hard Risk Engine slice operational for new prospective RESEARCH decisions.
+Shadow prediction identity is preserved and linked to a separate immutable risk evaluation; a
+positive signal denied by risk remains `TargetLong + DENY`, never rewritten to neutral. Policy and
+evaluations are read through `/api/v1/modules/finance/risk/status`, `/risk/policy`,
+`/risk/evaluations` and `/risk/evaluations/{id}`. All surfaces are GET-only. Existing BB-087
+predictions predate this engine and are not retroactively labelled as contemporaneously approved.
+
+ResearchCapital is deterministic hypothetical simulation capital, not account cash, portfolio
+value or buying power. v1 caps one instrument at 5% and rejects requests above 10%; `REDUCE` emits
+requested/allowed/risk-adjusted research exposure, never broker quantity. Aggregate portfolio,
+sector and spread gates await trustworthy evidence. Risk evaluations inherit source retention;
+sanitized halt audit may remain independently.
+
 ```text
 Strategy or AI proposes
         ↓

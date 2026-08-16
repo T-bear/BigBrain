@@ -1,5 +1,14 @@
 # BigBrain Roadmap
 
+## BB-089 – M5 Hard Risk Engine foundation (implemented 2026-08-16)
+
+Finance now has a mandatory deterministic server-side risk authority for new RESEARCH/shadow
+proposals. Policy `research-eod-v1`, immutable evaluations, fail-closed EOD freshness/lineage/
+health/volatility/liquidity/exposure rules and durable audited halts are implemented. Daily-loss,
+rolling-drawdown and consecutive-loss breakers are proven with deterministic simulation. Spread,
+sector and portfolio aggregation remain explicitly not evaluable. Next gate: Security/Penetration
+Testing Baseline while prospective evidence accumulates; not PAPER.
+
 ## BB-088 – Prospective daily cadence and Finance UI v1.0 hierarchy (implemented 2026-08-15)
 
 Finance now resumes a bounded current-EOD cycle automatically after recovery: internal checks run

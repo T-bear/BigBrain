@@ -84,7 +84,20 @@ internal sealed partial class EodhdMarketMemory
                     bar.Acquired,nowUtc,feature.Value.Revision,strategy.Identity.Id,strategy.Identity.Version,
                     parameterFingerprint,intent.Kind.ToString(),FinanceShadowIdentity.Horizon,nowUtc,
                     insufficient?FinanceShadowState.InsufficientData:FinanceShadowState.Pending,"RESEARCH",intent.ReasonCodes);
-                created+=InsertPrediction(connection,prediction);
+                var inserted=InsertPrediction(connection,prediction);created+=inserted;
+                if(inserted==1)
+                {
+                    var previous=ReadPreviousClose(connection,bar.Instrument,bar.Session);
+                    feature.Value.Values.TryGetValue("volatility.20",out var volatility);
+                    feature.Value.Values.TryGetValue("volume.ratio.20",out var volumeRatio);
+                    var proposal=new FinanceRiskProposal("proposal-"+prediction.PredictionId,bar.Instrument,strategy.Identity.Id,
+                        strategy.Identity.Version,parameterFingerprint,prediction.PredictionId,bar.Revision,feature.Value.Revision,
+                        bar.Session,bar.Acquired,nowUtc,nowUtc,"RESEARCH",intent.Kind.ToString(),bar.Close,previous,
+                        intent.Kind==ResearchIntentKind.TargetLong?RiskPolicy.ResearchCapital*.075m:RiskPolicy.ResearchCapital*.01m,
+                        feature.Value.Values.ContainsKey("volatility.20")?volatility:null,feature.Value.Values.ContainsKey("volume.ratio.20")?volumeRatio:null,
+                        temporalIntegrity,true,true,!insufficient,true,true,0,0,0);
+                    RecordRiskEvaluation(proposal);
+                }
             }
         }
         EvaluatePending(connection,nowUtc);
@@ -130,6 +143,7 @@ internal sealed partial class EodhdMarketMemory
     private static (string Revision,Dictionary<string,decimal> Values)? ReadFeatureContext(SqliteConnection c,string instrument,DateOnly session,DateTimeOffset cutoff)
     {using var rev=c.CreateCommand();rev.CommandText="SELECT fr.revision_id FROM feature_revisions fr JOIN observations o ON o.instrument_id=$i AND o.session_date=$d WHERE fr.created_utc<=$k AND o.revision_id=$source AND EXISTS(SELECT 1 FROM json_each(fr.source_revisions_json) WHERE value=o.revision_id) ORDER BY fr.created_utc DESC,fr.revision_id DESC LIMIT 1";rev.Parameters.AddWithValue("$i",instrument);rev.Parameters.AddWithValue("$d",session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));rev.Parameters.AddWithValue("$source",ReadSourceRevision(c,instrument,session));rev.Parameters.AddWithValue("$k",cutoff.ToString("O"));var id=rev.ExecuteScalar() as string;if(id is null)return null;using var x=c.CreateCommand();x.CommandText="SELECT definition_id,value FROM feature_values WHERE revision_id=$r AND instrument_id=$i AND session_date=$d AND knowledge_utc<=$k AND state='Available' AND value IS NOT NULL";x.Parameters.AddWithValue("$r",id);x.Parameters.AddWithValue("$i",instrument);x.Parameters.AddWithValue("$d",session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));x.Parameters.AddWithValue("$k",cutoff.ToString("O"));using var reader=x.ExecuteReader();var values=new Dictionary<string,decimal>(StringComparer.Ordinal);while(reader.Read())values[reader.GetString(0)]=decimal.Parse(reader.GetString(1),CultureInfo.InvariantCulture);return(id,values);}
     private static string ReadSourceRevision(SqliteConnection c,string instrument,DateOnly session){using var x=c.CreateCommand();x.CommandText="SELECT revision_id FROM observations WHERE provider=$p AND instrument_id=$i AND session_date=$d ORDER BY acquired_utc DESC,revision_id DESC LIMIT 1";x.Parameters.AddWithValue("$p",Provider);x.Parameters.AddWithValue("$i",instrument);x.Parameters.AddWithValue("$d",session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));return (string)x.ExecuteScalar()!;}
+    private static decimal ReadPreviousClose(SqliteConnection c,string instrument,DateOnly session){using var x=c.CreateCommand();x.CommandText="SELECT close FROM observations WHERE provider=$p AND instrument_id=$i AND session_date<$d ORDER BY session_date DESC,acquired_utc DESC LIMIT 1";x.Parameters.AddWithValue("$p",Provider);x.Parameters.AddWithValue("$i",instrument);x.Parameters.AddWithValue("$d",session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));var value=x.ExecuteScalar() as string;return value is null?0:decimal.Parse(value,CultureInfo.InvariantCulture);}
     private static void InvalidateBrokenLineage(SqliteConnection c){using var x=c.CreateCommand();x.CommandText="""
       UPDATE shadow_predictions SET reasons_json='["lineage.feature-revision-does-not-contain-source-revision"]' WHERE state='Invalidated';
       UPDATE shadow_predictions SET state='Invalidated',reasons_json='["lineage.feature-revision-does-not-contain-source-revision"]' WHERE state!='Invalidated' AND NOT EXISTS(SELECT 1 FROM feature_revisions fr,json_each(fr.source_revisions_json) j WHERE fr.revision_id=shadow_predictions.feature_revision_id AND j.value=shadow_predictions.source_revision_id);

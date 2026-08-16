@@ -1,5 +1,27 @@
 # BigBrain Backlog
 
+### BB-089 – M5 Hard Risk Engine foundation
+
+- Modul: Finance / Risk
+- Status: Implementerad, automatiskt verifierad, deployad och restart-verifierad 2026-08-16;
+  GitHub Actions pending publication
+- Resultat: central `research-eod-v1` policy, immutable evaluations, fail-closed temporal/data/
+  lineage/health/instrument/price/volatility/liquidity/exposure gates, simulated daily-loss/
+  drawdown/loss-streak breakers, durable audited halt and read-only API/UI.
+- Avgränsning: RESEARCH only; no PAPER, broker, order, LIVE/AUTO, real portfolio or self-learning.
+
+### Finance – M5 policy maturation
+
+- Status: Framtida förbättring, ej godkänd för implementation
+- Scope: trustworthy sector/spread evidence, hypothetical portfolio aggregation and exchange-calendar
+  refinement after their dependencies exist. Do not fabricate these values.
+
+### Finance – Avanza public-data/MCP entitlement research
+
+- Status: MANUAL_REVIEW / RIGHTS_UNKNOWN; framtida kandidat, ej godkänd för integration
+- Scope: establish automated-access, storage, retention and private-research rights from authoritative
+  Avanza evidence or direct permission. An MIT integration license does not grant market-data rights.
+
 ### BB-088 – Prospective daily cadence and Finance UI v1.0 information hierarchy
 
 - Modul: Finance

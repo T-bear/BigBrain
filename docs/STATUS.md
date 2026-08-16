@@ -1,5 +1,17 @@
 # BigBrain Status
 
+BB-089 Hard Risk Engine foundation is implemented, deployed and restart-verified on 2026-08-16 from
+baseline `7aa202bc88142399cd9a70085cec5bf4f23db16f`. Policy `research-eod-v1` centrally enforces
+fail-closed RESEARCH-only data/time/lineage/health, universe/price/move, rolling-volatility,
+volume-liquidity, hypothetical sizing/exposure and simulated loss/drawdown/loss-streak rules.
+Evaluations are immutable/idempotent; durable system halt and explicit recovery transitions are
+audited across reopen. Four risk endpoints and compact/detailed UI are read-only. Sunday runtime
+preserved 24 valid pending, zero outcomes, 24 invalidated and zero retroactive risk evaluations;
+cadence logged `no-provider-check`. Full local regression passed (423 API, 32 Sentinel, 111 Web),
+both builds, docs, Compose and whitespace. CI is pending publication. Spread, sector and aggregate
+portfolio remain explicitly not evaluable. Budget is 0 SEK; no PAPER, broker, order, LIVE/AUTO or
+self-learning exists.
+
 BB-088 is implemented, deployed and runtime/restart-verified on 2026-08-15 from baseline
 `0ab8c7470a1b16e399728ea564cfeb34962d3069`. Implementation commit
 `8653c44fd05fc76460e460ec5c0fef8d4cc9e7ed` passed GitHub Actions run #46: documentation,

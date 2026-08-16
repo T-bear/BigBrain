@@ -15,6 +15,12 @@ The Web exposes no URL/download control and canonical publication is transaction
 
 Status: planning baseline; review again before credentials, sandbox or live connectivity.
 
+BB-089 expands future penetration scope with omitted evaluation, limit tampering, forged/client-
+supplied `ALLOW`, replay of an old approval, stale-evidence reuse, mode bypass, halt reset across
+restart and client-side override. Current defenses are centralized server configuration,
+deterministic IDs, immutable SQLite evidence, fail-closed inputs, GET-only public risk surfaces and
+durable audited halt transitions. This is foundation evidence, not the full penetration baseline.
+
 M1 review: the implementation adds only domain types, in-memory evidence and a read-only
 module registration. It adds no network client, broker SDK, credential configuration,
 secret-bearing fixture, external order endpoint, persistence or logging sink. Candidate,

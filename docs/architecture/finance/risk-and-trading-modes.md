@@ -17,6 +17,20 @@ supply-chain risk. Passing it cannot itself promote a mode; product-owner author
 
 ## Hard Risk Engine
 
+BB-089 implements bounded RESEARCH policy `research-eod-v1`. Verdicts are `ALLOW` (hypothetical
+research passes), `REDUCE` (bounded to cap), `DENY` (invalid/unsafe), `HALT` (circuit breaker) and
+`INSUFFICIENT_DATA` (required evidence unavailable). Results are deterministic and immutable.
+Defaults are hypothetical research capital 100,000 USD, 5% per-instrument cap, 10% maximum request,
+15% daily-move cap, 8% maximum population standard deviation of 20 simple daily returns, volume
+ratio 0.10 minimum, 3% simulated daily-loss halt, 10% rolling 20-session drawdown halt and three
+consecutive losses. These are conservative safety assumptions, not tuned profitability claims.
+
+Friday EOD remains fresh during weekends; freshness counts completed weekdays. Reliable spread,
+sector metadata and a coherent hypothetical portfolio are absent, so those rules are explicitly
+`NOT_EVALUABLE`. System halt is durable and recovery is audited. Future broker invariant: no
+execution request may reach an adapter without a current matching risk evaluation, proposal
+identity, policy/evidence version, permitted mode and execution gates. BB-089 implements no broker.
+
 The Risk Engine is authoritative below AI and strategies. Versioned policy must cover
 maximum capital and percentage risk per trade, total/instrument/sector exposure,
 concurrent positions, daily loss, rolling drawdown, consecutive losses, liquidity,

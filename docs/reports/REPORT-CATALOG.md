@@ -7,6 +7,7 @@
 
 | Area | Evidence | Artifact | Status |
 | --- | --- | --- | --- |
+| Finance BB-089 Hard Risk Engine | Versioned policy, immutable evaluations, fail-closed rules, durable halt and bypass tests | [BB-089 report](features/finance/finance-bb-089-hard-risk-engine-foundation-20260816.md) | Foundation implemented; runtime/CI status in report |
 | BB-083 appliance resilience | Sanitized host/runtime/crash evidence | [Report](features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md) | Compose deployed; host/reboot/physical gates pending |
 
 | Area | Local evidence classification | Published artifact | Status |

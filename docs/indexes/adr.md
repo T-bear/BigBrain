@@ -1,5 +1,6 @@
 # ADR Index
 
+- [ADR 0030 – Finance Hard Risk authority and immutable policy evidence](../adr/0030-finance-hard-risk-authority-and-immutable-policy-evidence.md)
 - [ADR 0029 – Finance prospective knowledge-time evidence](../adr/0029-finance-prospective-knowledge-time-evidence.md)
 - [ADR 0028 – Finance provider-tagged backup, restore and quarantine cleanup](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md)
 - [ADR 0027 – Finance external dataset quarantine and deterministic promotion](../adr/0027-finance-external-dataset-quarantine-and-promotion.md)
@@ -32,6 +33,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0026](../adr/0026-bigbrain-appliance-lifecycle-and-recovery.md) | Accepted | Appliance lifecycle and recovery |
 | [0027](../adr/0027-finance-external-dataset-quarantine-and-promotion.md) | Accepted | Finance external dataset quarantine and deterministic promotion |
 | [0028](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md) | Accepted | Finance provider-tagged backup, restore and quarantine cleanup |
+| [0030](../adr/0030-finance-hard-risk-authority-and-immutable-policy-evidence.md) | Accepted | Finance Hard Risk authority and immutable policy evidence |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.
