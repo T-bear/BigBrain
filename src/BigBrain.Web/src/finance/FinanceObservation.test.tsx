@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
-import { FinanceObservation } from './FinanceObservation'
+import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
 import type { FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
@@ -115,5 +115,12 @@ describe('Finance read-only observation UI', () => {
     const exact:FinanceOverview={...overviewFixture,signals:overviewFixture.signals.map((signal,index)=>({...signal,predictionIds:index===0?['shadow-fixture']:[]}))}
     render(<FinanceObservation initialSnapshot={empty} initialOverview={exact} initialRiskStatus={riskStatusFixture} initialRiskEvaluations={[riskEvaluationFixture]}/>)
     expect(screen.getByText('Risk: Godkänd')).toBeVisible();expect(screen.getAllByText('Riskbedömning saknas').length).toBeGreaterThan(0)
+  })
+  test('aggregates multiple exact risk evaluations conservatively without arbitrary first-match selection',()=>{
+    const allow={...riskEvaluationFixture,evaluationId:'risk-allow',shadowPredictionId:'shadow-a',verdict:'allow' as const,evaluatedAtUtc:'2026-08-15T18:00:00Z'}
+    const deny={...riskEvaluationFixture,evaluationId:'risk-deny',shadowPredictionId:'shadow-b',verdict:'deny' as const,evaluatedAtUtc:'2026-08-15T18:01:00Z'}
+    expect(aggregateSignalRisk(['shadow-a','shadow-b'],[allow,deny])).toBe('Risk: Blockerad (blandad)')
+    expect(aggregateSignalRisk(['shadow-a','shadow-missing'],[allow])).toBe('Risk: Godkänd (blandad)')
+    expect(aggregateSignalRisk(['shadow-missing'],[allow])).toBe('Riskbedömning saknas')
   })
 })

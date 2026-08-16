@@ -25,14 +25,15 @@ public static class FredMacroPackV1
 
 public static class MacroFeatureEngine
 {
-    public static IReadOnlyList<MacroFeature> At(DateOnly session,DateTimeOffset cutoff,IReadOnlyList<MacroObservation> source,string macroRevision)
+    public static IReadOnlyList<MacroFeature> At(DateOnly session,DateTimeOffset cutoff,IReadOnlyList<MacroObservation> source,string macroRevision,MacroEvidenceClass? requiredEvidenceClass=null)
     {
-        MacroObservation? Latest(string id)=>source.Where(x=>x.SeriesId==id&&x.KnowledgeTimeUtc<=cutoff&&x.ReferencePeriod<=session&&x.Value.HasValue).OrderByDescending(x=>x.KnowledgeTimeUtc).ThenByDescending(x=>x.ReferencePeriod).FirstOrDefault();
+        var eligible=requiredEvidenceClass is null?source:source.Where(x=>x.EvidenceClass==requiredEvidenceClass).ToArray();
+        MacroObservation? Latest(string id)=>eligible.Where(x=>x.SeriesId==id&&x.KnowledgeTimeUtc<=cutoff&&x.ReferencePeriod<=session&&x.Value.HasValue).OrderByDescending(x=>x.KnowledgeTimeUtc).ThenByDescending(x=>x.ReferencePeriod).FirstOrDefault();
         var list=new List<MacroFeature>();
         void Add(string id,decimal? value,string units,string transform,params MacroObservation?[] used)=>list.Add(new(id,session,value,units,transform,used.Where(x=>x is not null).Select(x=>x!.KnowledgeTimeUtc).DefaultIfEmpty(cutoff).Max(),FredMacroPackV1.FeatureRevision));
         var dff=Latest("DFF");var two=Latest("DGS2");var ten=Latest("DGS10");Add("policy-rate.level",dff?.Value,"Percent","latest known, forward-filled only after knowledge time",dff);Add("treasury.2y",two?.Value,"Percent","latest known",two);Add("treasury.10y",ten?.Value,"Percent","latest known",ten);Add("yield-curve.10y2y",ten?.Value-two?.Value,"Percentage points","DGS10 minus DGS2",two,ten);
-        var cpi=source.Where(x=>x.SeriesId=="CPIAUCSL"&&x.KnowledgeTimeUtc<=cutoff&&x.Value.HasValue).OrderBy(x=>x.ReferencePeriod).ToArray();var current=cpi.LastOrDefault();var prior=current is null?null:cpi.LastOrDefault(x=>x.ReferencePeriod<=current.ReferencePeriod.AddYears(-1));Add("inflation.cpi-yoy",current is null||prior?.Value is null?null:(current.Value!.Value/prior.Value.Value-1)*100,"Percent","year-over-year",current,prior);
-        var unemployment=Latest("UNRATE");var old=unemployment is null?null:source.Where(x=>x.SeriesId=="UNRATE"&&x.KnowledgeTimeUtc<=cutoff&&x.ReferencePeriod<=unemployment.ReferencePeriod.AddMonths(-3)&&x.Value.HasValue).OrderByDescending(x=>x.ReferencePeriod).FirstOrDefault();Add("labor.unemployment",unemployment?.Value,"Percent","latest known",unemployment);Add("labor.unemployment-change-3m",unemployment?.Value-old?.Value,"Percentage points","three-month change",unemployment,old);return list;
+        var cpi=eligible.Where(x=>x.SeriesId=="CPIAUCSL"&&x.KnowledgeTimeUtc<=cutoff&&x.Value.HasValue).OrderBy(x=>x.ReferencePeriod).ToArray();var current=cpi.LastOrDefault();var prior=current is null?null:cpi.LastOrDefault(x=>x.ReferencePeriod<=current.ReferencePeriod.AddYears(-1));Add("inflation.cpi-yoy",current is null||prior?.Value is null?null:(current.Value!.Value/prior.Value.Value-1)*100,"Percent","year-over-year",current,prior);
+        var unemployment=Latest("UNRATE");var old=unemployment is null?null:eligible.Where(x=>x.SeriesId=="UNRATE"&&x.KnowledgeTimeUtc<=cutoff&&x.ReferencePeriod<=unemployment.ReferencePeriod.AddMonths(-3)&&x.Value.HasValue).OrderByDescending(x=>x.ReferencePeriod).FirstOrDefault();Add("labor.unemployment",unemployment?.Value,"Percent","latest known",unemployment);Add("labor.unemployment-change-3m",unemployment?.Value-old?.Value,"Percentage points","three-month change",unemployment,old);return list;
     }
 
     public static MarketRegime Regime(DateOnly session,DateTimeOffset cutoff,IReadOnlyList<MacroFeature> f,string macroRevision,MacroEvidenceClass evidence)

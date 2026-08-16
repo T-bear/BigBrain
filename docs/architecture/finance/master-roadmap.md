@@ -171,6 +171,8 @@ safe mode or disabling the new capability; it never means erasing financial evid
 - Definition of Done/gate: identical dataset version produces identical normalized data.
 - Rollback: disable adapter and retain referenced datasets/evidence per policy.
 
+BB-090 closure evidence (2026-08-16) strengthens this active epic without completing all future data packs: Finance SQLite now has one ordered transactional migration coordinator with legacy bootstrap and lock serialization; Macro artifacts use quarantine/hash/rights/schema/validation/promotion evidence; and market revisions have explicit raw/adjusted capabilities. Production backup, isolated migration drill, deployment and restart idempotence passed. The remaining BB-090 gate is the owner-configured secret plus bounded first-party FRED/ALFRED vintage drill and published CI verification. BB-091, security/pentest, PAPER and later epics are not activated.
+
 BB-046 research is complete. The provisional primary candidate is Twelve Data for
 Nordic/global EOD, with Tiingo/Massive as US specialists. Public terms now show deletion
 requirements after cancellation and leave parts of deterministic backtest/derived-data

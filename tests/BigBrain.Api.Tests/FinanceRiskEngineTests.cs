@@ -107,11 +107,30 @@ public sealed class FinanceRiskEngineTests:IDisposable
         Assert.Equal("shadow-existing",result.ShadowPredictionId);
     }
 
+    [Fact]
+    public void RiskEngineUsesFinancePoliciesWithoutProviderOrStrategyBranching()
+    {
+        var engine=new FinanceRiskEngine(new FinanceRiskOptions(),new TestUniverse(),new TestStrategies());
+        var approved=engine.Evaluate(Proposal(instrument:"TEST:INSTRUMENT",strategy:"fixture",strategyVersion:"v9"));
+        Assert.Equal(FinanceRiskVerdict.Allow,approved.Verdict);
+        var denied=engine.Evaluate(Proposal(instrument:"US:XNAS:AAPL",strategy:"momentum",strategyVersion:"v1"));
+        Assert.Equal(FinanceRiskVerdict.Deny,denied.Verdict);Assert.Contains(denied.Rules,x=>x.RuleId=="instrument.universe"&&x.Category==FinanceRiskReasonCategory.PolicyDenial);
+    }
+
+    [Fact]
+    public void TypedWarmupCategoryDoesNotDependOnHumanText()
+    {
+        var rule=new FinanceRiskEngine(new FinanceRiskOptions()).Evaluate(Proposal(warmup:false)).Rules.Single(x=>x.RuleId=="feature.warmup");
+        Assert.Equal(FinanceRiskReasonCategory.WarmupIncomplete,rule.Category);Assert.Equal(FinanceRiskVerdict.InsufficientData,new FinanceRiskEngine(new FinanceRiskOptions()).Evaluate(Proposal(warmup:false)).Verdict);
+    }
+
     private EodhdFinanceOptions Options()=>new(){DatabasePath=Path.Combine(_root,"risk.db"),PayloadDirectory=Path.Combine(_root,"payloads")};
-    private static FinanceRiskProposal Proposal(string id="proposal-1",string instrument="US:XNAS:AAPL",string mode="RESEARCH",string direction="TargetLong",
+    private static FinanceRiskProposal Proposal(string id="proposal-1",string instrument="US:XNAS:AAPL",string mode="RESEARCH",string direction="TargetLong",string strategy="momentum",string strategyVersion="v1",
         decimal price=101,decimal previous=100,decimal requested=4_000,decimal? volatility=.02m,decimal? volume=1m,bool clock=true,
         bool sourceValid=true,bool featureValid=true,bool warmup=true,bool provider=true,decimal dailyLoss=0,decimal drawdown=0,int losses=0,
         string? clientVerdict=null,DateTimeOffset? at=null,DateOnly? session=null)
-    {var when=at??T0;return new(id,instrument,"momentum","v1","sha256:parameters","shadow-existing","source-revision","feature-revision",session??new(2026,8,14),when.AddHours(-1),when.AddMinutes(-1),when,mode,direction,price,previous,requested,volatility,volume,clock,sourceValid,featureValid,warmup,provider,true,dailyLoss,drawdown,losses,clientVerdict);}
+    {var when=at??T0;return new(id,instrument,strategy,strategyVersion,"sha256:parameters","shadow-existing","source-revision","feature-revision",session??new(2026,8,14),when.AddHours(-1),when.AddMinutes(-1),when,mode,direction,price,previous,requested,volatility,volume,clock,sourceValid,featureValid,warmup,provider,true,dailyLoss,drawdown,losses,clientVerdict);}
+    private sealed class TestUniverse:IResearchUniversePolicy{public string Version=>"fixture-universe-v1";public bool IsApproved(string instrumentId)=>instrumentId=="TEST:INSTRUMENT";}
+    private sealed class TestStrategies:IResearchStrategyPolicy{public string Version=>"fixture-strategies-v1";public bool IsApproved(string strategyId,string version)=>strategyId=="fixture"&&version=="v9";}
     public void Dispose(){if(Directory.Exists(_root))Directory.Delete(_root,true);GC.SuppressFinalize(this);}
 }

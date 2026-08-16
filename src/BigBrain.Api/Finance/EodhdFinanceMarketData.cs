@@ -156,6 +156,7 @@ internal sealed partial class EodhdMarketMemory
         var directory = Path.GetDirectoryName(options.DatabasePath);
         if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
         Directory.CreateDirectory(options.PayloadDirectory);
+        FinanceSchemaMigrator.Migrate(options.DatabasePath);
         Initialize();
     }
 
@@ -228,6 +229,8 @@ internal sealed partial class EodhdMarketMemory
                 ("$volume", bar.Volume), ("$acquired", completedUtc.ToString("O")), ("$revision", revisionId));
         Execute(connection, transaction, "INSERT OR IGNORE INTO revisions VALUES($id,$hash,$created,$count,1)",
             ("$id", revisionId), ("$hash", payloadHash), ("$created", completedUtc.ToString("O")), ("$count", bars.Count));
+        Execute(connection, transaction, "INSERT OR IGNORE INTO revision_price_capabilities VALUES($id,'RAW_ONLY_VALID','RawAndAdjustedValid','eodhd-adapter-v1',$evidence,$at)",
+            ("$id", revisionId), ("$evidence", "EODHD adapter validated distinct source close and adjusted_close fields; immutable payload hash retained."), ("$at", completedUtc.ToString("O")));
         if (acquisitionId is { } id)
             Execute(connection, transaction, """
                 UPDATE acquisitions SET completed_utc=$completed,outcome='success',rows=$rows,retries=$retries,checksum=$checksum,revision_id=$revision,reason='marketData.entitlement.allowed' WHERE id=$id AND outcome='started'

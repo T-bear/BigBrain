@@ -49,6 +49,10 @@ services:
       Finance__DataProtection__BackupDirectory: /finance-data/backups
       Finance__DataProtection__RestoreStagingDirectory: /finance-data/restore-staging
       Finance__Eodhd__EntitlementEndsAtUtc: ${FINANCE__EODHD__ENTITLEMENTENDSATUTC:-}
+      Finance__Fred__Enabled: ${FINANCE__FRED__ENABLED:-false}
+      Finance__Fred__ApiKey: ${FINANCE__FRED__APIKEY:-}
+      Finance__Fred__BaseUrl: https://api.stlouisfed.org
+      Finance__Fred__QuarantineDirectory: /finance-data/macro-quarantine
       SystemRecovery__DatabasePath: /lifecycle-data/lifecycle.db
       SystemRecovery__ClockSyncDirectory: /host-timesync
       MealPlanner__DatabasePath: /data/meal-planner.db

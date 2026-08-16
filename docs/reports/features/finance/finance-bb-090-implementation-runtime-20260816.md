@@ -8,12 +8,12 @@ Detta är en sanerad GitHub-version.
 
 **Date:** 2026-08-16
 **Baseline:** `ae2cb91729795df1fb9356015c8e29159f91acc1`
-**Implementation commit:** `6f6cc746ce5d8bea24d19ad48c3596cb9ed0de28`
+**Implementation commit:** `6f6cc743b91b9d0c2cb52fb297d0215fd7125b50`
 **Mode/budget:** RESEARCH / 0 SEK
 
 ## Status
 
-Implemented, locally regression-tested and published. Not deployed or manually production-verified. GitHub Actions could not be inspected because GitHub CLI is unavailable and the public web fallback returned no status; CI remains unverified.
+Implementation and closure stabilization are locally regression-tested and deployed. BB-090 remains **IN PROGRESS** because the runtime FRED key is not configured, so the official bounded vintage drill was correctly not attempted; final publication/Actions evidence is also pending at the time of this report update.
 
 ## Evidence
 
@@ -27,27 +27,39 @@ This evidence is `REVISED_HISTORY_EXPLORATORY`. Acquisition time is the conserva
 
 ### Implemented contracts
 
-- Macro Memory owns series/revision/observation tables and ordered migration 90 in the existing Finance SQLite database.
+- Macro Memory owns bounded tables in the existing Finance SQLite database. One Finance schema coordinator applies ordered, transactional, restart-safe versions `1,90,91,92` under SQLite `BEGIN IMMEDIATE`; it safely baselines a legacy database without treating an empty migration journal as an empty database.
 - `macro-context-v1` implements latest-known rate/yield values, causal 10Y–2Y spread, CPI year-over-year and unemployment/three-month change. Missing history remains missing.
 - `market-regime-v1` preserves rate, curve, inflation and labor dimensions. Thresholds are explicit research assumptions; the rate-trend dimension remains `UNKNOWN` until a causal trend definition is added.
 - Read-only API: `/macro/status`, `/macro/series`, `/macro/regime`, `/research/regime-analysis`. Analysis groups unchanged backtest runs by composite regime and reports sessions, compounded return, drawdown and insufficient-sample warnings; it does not optimize strategy logic. Absence reports bootstrapping/unavailable and does not affect BigBrain health or EODHD cadence.
 - `us-equities-ny-v1` replaces fixed UTC opens/closes and weekday-only risk freshness with New York timezone/DST and bounded US holiday/exception rules.
 - Dataset promotion now preserves distinct adjusted close, represents absence without copying raw close, uses candidate provider/product identity and provider-aware revision prefixes. Old WIKI revisions are untouched; their adjusted-price capability remains historically limited and requires an explicit audit before adjusted-price research.
-- Hard Risk approval is behind an instrument/strategy policy contract; machine decisions use typed reason categories. Human strings remain presentation only.
-- Overview signals carry exact prediction IDs. UI risk matching requires `shadowPredictionId`; old/unmatched signals show `Riskbedömning saknas`.
+- Hard Risk approval consumes Finance-level configured research-universe and approved-strategy/version policies, not EODHD catalog types or per-strategy engine branches. Machine decisions use typed reason categories; human strings remain presentation only.
+- Overview signals carry exact prediction IDs. UI risk matching requires `shadowPredictionId`; old/unmatched signals show `Riskbedömning saknas`. Multiple exact verdicts aggregate deterministically and visibly: HALT, then DENY, INSUFFICIENT, REDUCE, and only unanimous complete ALLOW becomes allowed; missing or disagreeing lineage is marked `blandad`.
+- FRED options use `Finance:Fred`; deployment variables are `FINANCE__FRED__ENABLED` and secret `FINANCE__FRED__APIKEY`. Diagnostics disclose only configured/not configured. The key is never returned, logged, persisted or committed.
+- Macro candidates are copied to bounded quarantine before parsing. Candidate evidence stores first-party URL, provider, artifact hashes/names, acquisition time, rights evidence, series identity, schema fingerprint, validation result and promotion decision. Malformed candidates remain rejected evidence and cannot reach canonical tables.
 
 ## Security
 
-No credentials are stored or logged by the macro contract. API keys use configuration/secret conventions if ALFRED is activated later. No trading authority or external write path exists.
+No credentials are stored or logged by the macro contract. The official client is bounded to `https://api.stlouisfed.org/fred/series/observations`, requires HTTPS first-party host validation, and accepts CPIAUCSL/UNRATE only for the vintage drill. No trading authority or external write path exists.
 
 ## Remaining work
 
-### Verification and limitations
+### Closure verification and limitations
 
-Focused macro/session/dataset/backtest/risk suite: 29 passed. Full API: 428 passed. Sentinel: 32 passed. Frontend: 112 passed; production build passed. Documentation, Compose and diff checks passed. The real drill did not call EODHD and did not create a Sunday session, prediction or outcome. Production deployment/promotion is blocked because a pre-existing long-running API one-off container holds the Finance database; it was preserved rather than stopped without separate authority. The main API was restored healthy after the attempted backup. Complete early-close history and complete audit/remediation of existing adjusted-price revisions remain unfinished; BB-090 must not be called complete until these are resolved.
+The pre-existing container `bigbrain-sprint1-api-run-6cc339e7da09` used an older image that did not recognize its requested maintenance command and had run the normal web host for five days. It shared the named Finance volume and held no separate work. After evidence capture it was gracefully stopped and removed; the volume and main services remained intact.
 
-No PAPER, broker, order, LIVE/AUTO or self-learning path was introduced. Recommended next work is additional Finance correctness stabilization to close the stated BB-090 limitations, while prospective accumulation continues independently—not BB-091 or PAPER.
+Before migration, a full SQLite copy plus SHA-256 manifest was created under the Finance backup inventory with explicit provider-aware retention: EODHD remains deletion-controlled, WIKI is public-domain, and macro follows revision rights. An isolated copy migrated to versions `1,90,91,92`. Before/after counts were identical: 25 market revisions, 9,746 observations, 6 feature revisions, 473 backtests, 13 robustness evaluations, 48 shadow predictions, 0 outcomes, 0 risk evaluations and 0 halt-audit rows. Production migration, deploy, restart, second restart and a post-promotion restart passed without duplicate migrations or data.
+
+`adjusted-history-audit-v1` classified 24 EODHD revisions `RAW_AND_ADJUSTED_VALID`. `wiki-5713d7dccfa38f56` is `ADJUSTED_SEMANTICS_INVALID` because the pre-BB-090 importer equated adjusted with raw close. The immutable observation was preserved; adjusted research fails closed and raw research remains allowed. New EODHD and generic dataset promotions record explicit capability without fabrication.
+
+Production Macro Memory contains one candidate, revision `fred-a98118273a99adc9` and 58,196 observations. Re-ingest returned the same revision/count. This remains `REVISED_HISTORY_EXPLORATORY`; it was not upgraded when the product owner created a key. `fredApiKeyConfigured=false`, so no official FRED/ALFRED vintage response or point-in-time production observation exists. Configure `FINANCE__FRED__APIKEY` outside source and set `FINANCE__FRED__ENABLED=true`; then run a small CPIAUCSL or UNRATE date-range drill. Knowledge time is conservatively the day after `realtime_start` at 00:00 UTC when only an authoritative date exists. Point-in-time feature requests never fall back to revised history.
+
+The calendar tests cover both DST transitions, weekends, ordinary holidays, Juneteenth beginning with exchange observance in 2022, and documented exceptional full-day closures. Early closes are not modeled in v1. This is non-blocking for the current daily session-identity/EOD research and freshness rules, which do not trade intraday or use close time as execution truth; it must be added before intraday or exact early-close execution semantics.
+
+Focused closure tests: 26 passed. Full API: 438 passed. Sentinel: 32 passed. Frontend: 113 passed. Release, frontend production and container builds passed. The Sunday deployment made no EODHD acquisition, new prediction or outcome: 24 valid rows remain PENDING and 24 prior rows remain INVALIDATED audit evidence.
+
+No PAPER, broker, order, LIVE/AUTO or self-learning path was introduced. The smallest remaining closure step is owner-side FRED secret configuration, bounded vintage drill and final published CI verification—not BB-091 or PAPER.
 
 ## Resumption
 
-Resume from ADR 0031, `docs/modules/finance.md`, `docs/STATUS.md` and this report. The smallest safe next step is to complete full regression and the remaining BB-090 correctness work before production backup/deployment.
+Resume from ADR 0031, `docs/modules/finance.md`, `docs/STATUS.md` and this report. Do not begin BB-091 while the vintage/CI closure gate remains open.

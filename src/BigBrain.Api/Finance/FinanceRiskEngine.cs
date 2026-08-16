@@ -22,6 +22,10 @@ public sealed record FinanceRiskOptions
     public int RollingDrawdownWindowSessions { get; set; } = 20;
     public int ConsecutiveLossesToHalt { get; set; } = 3;
     public int MaximumCompletedSessionsSinceObservation { get; set; } = 1;
+    public string ResearchUniverseVersion { get; set; } = "us-research-universe-v1";
+    public string[] ApprovedInstrumentIds { get; set; } = ["US:ARCX:SPY","US:XNAS:QQQ","US:ARCX:IWM","US:XNAS:AAPL","US:XNAS:MSFT","US:XNYS:JPM","US:XNYS:XOM","US:XNYS:JNJ"];
+    public string StrategyPolicyVersion { get; set; } = "deterministic-research-strategies-v1";
+    public string[] ApprovedStrategies { get; set; } = ["buy-and-hold/v1","sma-crossover/v1","momentum/v1"];
 
     internal void Validate()
     {
@@ -30,7 +34,10 @@ public sealed record FinanceRiskOptions
             MaximumPositionFraction > MaximumRequestedExposureFraction || MaximumDailyMoveFraction is <= 0 or > 1 ||
             MaximumRollingVolatility20 <= 0 || MinimumVolumeRatio < 0 || DailyLossHaltFraction is <= 0 or > 1 ||
             RollingDrawdownHaltFraction is <= 0 or > 1 || RollingDrawdownWindowSessions < 2 ||
-            ConsecutiveLossesToHalt < 1 || MaximumCompletedSessionsSinceObservation < 0)
+            ConsecutiveLossesToHalt < 1 || MaximumCompletedSessionsSinceObservation < 0 ||
+            string.IsNullOrWhiteSpace(ResearchUniverseVersion) || string.IsNullOrWhiteSpace(StrategyPolicyVersion) ||
+            ApprovedInstrumentIds.Length==0 || ApprovedStrategies.Length==0 ||
+            ApprovedInstrumentIds.Any(string.IsNullOrWhiteSpace) || ApprovedStrategies.Any(x=>string.IsNullOrWhiteSpace(x)||!x.Contains('/',StringComparison.Ordinal)))
             throw new InvalidOperationException("Finance risk policy configuration is invalid.");
     }
 }
@@ -39,13 +46,19 @@ internal enum FinanceRiskVerdict { Allow, Reduce, Deny, Halt, InsufficientData }
 internal enum FinanceRiskRuleState { Pass, Fail, NotEvaluable }
 internal enum FinanceRiskReasonCategory { None, DataMissing, WarmupIncomplete, StaleData, InvalidLineage, PolicyDenial, SystemHalt }
 internal sealed record FinanceRiskRuleResult(string RuleId, FinanceRiskRuleState State, FinanceRiskReasonCategory Category, string ReasonCode, string Explanation, string Evidence);
-internal interface IResearchRiskPolicy { bool InstrumentApproved(string instrumentId); bool StrategyApproved(string strategyId,string version); }
-internal sealed class ResearchEodRiskPolicy : IResearchRiskPolicy
+internal interface IResearchUniversePolicy { string Version { get; } bool IsApproved(string instrumentId); }
+internal interface IResearchStrategyPolicy { string Version { get; } bool IsApproved(string strategyId,string version); }
+internal sealed class ConfiguredResearchUniversePolicy(FinanceRiskOptions options) : IResearchUniversePolicy
 {
-    private static readonly HashSet<string> Instruments=EodhdCatalog.Watchlist.Select(x=>x.InstrumentId).ToHashSet(StringComparer.Ordinal);
-    private static readonly HashSet<string> Strategies=new(StringComparer.Ordinal){"buy-and-hold/v1","sma-crossover/v1","momentum/v1"};
-    public bool InstrumentApproved(string id)=>Instruments.Contains(id);
-    public bool StrategyApproved(string id,string version)=>Strategies.Contains($"{id}/{version}");
+    private readonly HashSet<string> _approved=options.ApprovedInstrumentIds.ToHashSet(StringComparer.Ordinal);
+    public string Version=>options.ResearchUniverseVersion;
+    public bool IsApproved(string id)=>_approved.Contains(id);
+}
+internal sealed class ConfiguredResearchStrategyPolicy(FinanceRiskOptions options) : IResearchStrategyPolicy
+{
+    private readonly HashSet<string> _approved=options.ApprovedStrategies.ToHashSet(StringComparer.Ordinal);
+    public string Version=>options.StrategyPolicyVersion;
+    public bool IsApproved(string id,string version)=>_approved.Contains($"{id}/{version}");
 }
 internal sealed record FinanceRiskProposal(string ProposalId,string InstrumentId,string StrategyId,string StrategyVersion,
     string ParameterFingerprint,string? ShadowPredictionId,string SourceRevisionId,string FeatureRevisionId,
@@ -80,8 +93,9 @@ internal static class FinanceRiskIdentity
 internal sealed class FinanceRiskEngine
 {
     private readonly FinanceRiskOptions _policy;
-    private readonly IResearchRiskPolicy _approval;
-    internal FinanceRiskEngine(FinanceRiskOptions policy,IResearchRiskPolicy? approval=null){policy.Validate();_policy=policy;_approval=approval??new ResearchEodRiskPolicy();}
+    private readonly IResearchUniversePolicy _universe;
+    private readonly IResearchStrategyPolicy _strategies;
+    internal FinanceRiskEngine(FinanceRiskOptions policy,IResearchUniversePolicy? universe=null,IResearchStrategyPolicy? strategies=null){policy.Validate();_policy=policy;_universe=universe??new ConfiguredResearchUniversePolicy(policy);_strategies=strategies??new ConfiguredResearchStrategyPolicy(policy);}
 
     internal FinanceRiskEvaluation Evaluate(FinanceRiskProposal p,bool activeHalt=false,string? haltReason=null)
     {
@@ -90,8 +104,8 @@ internal sealed class FinanceRiskEngine
         void NotEvaluable(string id,string code,string explanation)=>rules.Add(new(id,FinanceRiskRuleState.NotEvaluable,FinanceRiskReasonCategory.DataMissing,code,explanation,"not available in CURRENT EOD research"));
         Rule("mode.research",p.OperatingMode=="RESEARCH","risk.mode.invalid","Riskmotorn godkänner endast RESEARCH i BB-089.",p.OperatingMode);
         Rule("proposal.client-verdict",string.IsNullOrWhiteSpace(p.ClientSuppliedVerdict),"risk.clientVerdict.rejected","Klienten får inte ange riskutfall.","server authority");
-        Rule("instrument.universe",_approval.InstrumentApproved(p.InstrumentId),"risk.instrument.notAllowed","Instrumentet ingår inte i den godkända researchuniversen.",p.InstrumentId);
-        Rule("strategy.approved",_approval.StrategyApproved(p.StrategyId,p.StrategyVersion),"risk.strategy.notApproved","Strategin eller versionen är inte godkänd för researchpolicyn.",$"{p.StrategyId}/{p.StrategyVersion}");
+        Rule("instrument.universe",_universe.IsApproved(p.InstrumentId),"risk.instrument.notAllowed","Instrumentet ingår inte i den godkända researchuniversen.",$"{_universe.Version}:{p.InstrumentId}");
+        Rule("strategy.approved",_strategies.IsApproved(p.StrategyId,p.StrategyVersion),"risk.strategy.notApproved","Strategin eller versionen är inte godkänd för researchpolicyn.",$"{_strategies.Version}:{p.StrategyId}/{p.StrategyVersion}");
         Rule("signal.known",p.Direction is "TargetLong" or "TargetFlat" or "NoAction","risk.signal.invalid","Strategisignalen är okänd eller ogiltig.",p.Direction);
         Rule("price.positive",p.Price>0&&p.PreviousClose>0,"risk.price.invalid","Prisunderlaget är ogiltigt.","positive close and previous close required");
         Rule("lineage.source",p.SourceLineageValid&&!string.IsNullOrWhiteSpace(p.SourceRevisionId),"risk.lineage.sourceInvalid","Källans lineage är ogiltig eller saknas.",p.SourceRevisionId,FinanceRiskReasonCategory.InvalidLineage);
