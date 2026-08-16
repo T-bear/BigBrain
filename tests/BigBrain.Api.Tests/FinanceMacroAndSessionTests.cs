@@ -82,10 +82,26 @@ public sealed class FinanceMacroAndSessionTests : IDisposable
     {
         var options=new EodhdFinanceOptions{DatabasePath=Path.Combine(_root,"finance.db"),PayloadDirectory=Path.Combine(_root,"payloads")};
         var fred=new FinanceFredOptions{QuarantineDirectory=Path.Combine(_root,"quarantine")};
-        var artifact=Encoding.UTF8.GetBytes("{\"observations\":[{\"realtime_start\":\"2026-08-12\",\"realtime_end\":\"9999-12-31\",\"date\":\"2026-07-01\",\"value\":\"330.0\"}]}");
+        var artifact=Encoding.UTF8.GetBytes("{\"output_type\":2,\"realtime_end\":\"2026-08-16\",\"observations\":[{\"date\":\"2026-07-01\",\"CPIAUCSL_20260812\":\"330.0\"}]}");
         var acquired=new DateTimeOffset(2026,8,13,0,0,0,TimeSpan.Zero);
         var first=new FinanceMacroMemory(options);var id=first.StageAndPromoteVintage("CPIAUCSL",artifact,fred,acquired);
         var second=new FinanceMacroMemory(options);Assert.Equal(id,second.StageAndPromoteVintage("CPIAUCSL",artifact,fred,acquired));Assert.Equal(1,second.Snapshot().Status.RevisionCount);Assert.Equal(1,second.Snapshot().Status.ObservationCount);
+    }
+
+    [Fact]
+    public void OfficialOutputTypeTwoColumnsBecomeCausalVintages()
+    {
+        var options=new EodhdFinanceOptions{DatabasePath=Path.Combine(_root,"vintages.db"),PayloadDirectory=Path.Combine(_root,"payloads")};var fred=new FinanceFredOptions{QuarantineDirectory=Path.Combine(_root,"quarantine")};
+        var artifact=Encoding.UTF8.GetBytes("{\"output_type\":2,\"realtime_end\":\"2021-02-01\",\"observations\":[{\"date\":\"2020-01-01\",\"CPIAUCSL_20200213\":\"258.7\",\"CPIAUCSL_20210113\":\"258.8\"}]}");var acquired=new DateTimeOffset(2026,8,16,0,0,0,TimeSpan.Zero);
+        _=new FinanceMacroMemory(options).StageAndPromoteVintage("CPIAUCSL",artifact,fred,acquired);var rows=new FinanceMacroMemory(options).Snapshot().Observations;
+        Assert.Equal(2,rows.Count);Assert.Equal(new DateTimeOffset(2020,2,14,0,0,0,TimeSpan.Zero),rows[0].KnowledgeTimeUtc);Assert.Equal(new DateOnly(2021,1,12),rows[0].RealtimeEnd);Assert.Equal(258.8m,rows[1].Value);Assert.All(rows,x=>Assert.Equal(MacroEvidenceClass.PointInTimeCausal,x.EvidenceClass));
+    }
+
+    [Fact]
+    public void MalformedVintageArtifactIsRetainedAndRejected()
+    {
+        var database=Path.Combine(_root,"bad-vintage.db");var options=new EodhdFinanceOptions{DatabasePath=database,PayloadDirectory=Path.Combine(_root,"payloads")};var fred=new FinanceFredOptions{QuarantineDirectory=Path.Combine(_root,"quarantine")};var artifact=Encoding.UTF8.GetBytes("{\"output_type\":1,\"realtime_end\":\"2021-02-01\",\"observations\":[]}");
+        Assert.Throws<InvalidDataException>(()=>new FinanceMacroMemory(options).StageAndPromoteVintage("CPIAUCSL",artifact,fred,new DateTimeOffset(2026,8,16,0,0,0,TimeSpan.Zero)));using var c=new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={database}");c.Open();using var x=c.CreateCommand();x.CommandText="SELECT validation_result||'|'||promotion_decision||'|'||COALESCE(canonical_revision_id,'') FROM macro_candidates";Assert.Equal("FAIL|REJECTED|",x.ExecuteScalar());Assert.True(Directory.EnumerateFiles(fred.QuarantineDirectory,"*.json",SearchOption.AllDirectories).Any());
     }
 
     private static MacroObservation Observation(decimal value,DateOnly known){var knowledge=At(known);return new("CPIAUCSL",new(2026,7,1),value,knowledge,knowledge.AddHours(1),known,new(9999,12,31),"sha256:fixture",MacroEvidenceClass.PointInTimeCausal);}
