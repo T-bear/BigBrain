@@ -10,11 +10,12 @@ Detta är en sanerad GitHub-version.
 **Baseline:** `ae2cb91729795df1fb9356015c8e29159f91acc1`
 **Implementation commit:** `6f6cc743b91b9d0c2cb52fb297d0215fd7125b50`
 **Closure stabilization commit:** `ef5b090b84b498c68304021e7e57426466b2c4b4`
+**Vintage finalization commit:** `0f2ba9c3e7d5e7b3bf088c9094bdd79b3a35db1e`
 **Mode/budget:** RESEARCH / 0 SEK
 
 ## Status
 
-Implementation and closure stabilization are locally regression-tested, deployed and published. GitHub Actions run 53 passed backend, frontend, documentation and gitleaks for the closure commit. Finalization runtime, vintage and regression gates pass; BB-090 remains **IN PROGRESS only until the finalization publication has green GitHub Actions**.
+Implementation, closure stabilization and vintage finalization are regression-tested, deployed and published. GitHub Actions run 55 passed backend, frontend, documentation and secrets for the vintage finalization commit. All hard gates pass; **BB-090 is COMPLETE**.
 
 ## Evidence
 
@@ -59,8 +60,8 @@ The calendar tests cover both DST transitions, weekends, ordinary holidays, June
 
 Focused finalization tests: 11 passed. Full API: 440 passed. Sentinel: 32 passed. Frontend: 113 passed. Release, frontend production and API container builds passed; documentation and Compose verification are green. API, Web and Sentinel remained healthy through restart and recreate. The Sunday deployment made no EODHD acquisition, new prediction or outcome: 24 valid rows remain PENDING and 24 prior rows remain INVALIDATED audit evidence. Market/risk evidence counts remain 25 revisions, 9,746 observations and 0 risk evaluations.
 
-No PAPER, broker, order, LIVE/AUTO or self-learning path was introduced. The only remaining closure step is final published CI verification—not BB-091 or PAPER.
+No PAPER, broker, order, LIVE/AUTO or self-learning path was introduced. BB-090 has no remaining closure blocker. The next separately approved Finance slice may be BB-091; it was not started here.
 
 ## Resumption
 
-Resume from ADR 0031, `docs/modules/finance.md`, `docs/STATUS.md` and this report. Do not begin BB-091 while the final CI gate remains open.
+Resume from ADR 0031, `docs/modules/finance.md`, `docs/STATUS.md` and this report. BB-091 requires its own explicit scope.
