@@ -108,7 +108,12 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getByText(/Ingen resultatgraf ännu/)).toBeVisible();expect(screen.getByText('Forskningsresultat – inga pengar handlas')).toBeVisible()
     expect(screen.getAllByText('Detaljer & forskning').at(-1)).toBeVisible();expect(screen.queryByText(/Nasdaq ↑|S&P 500|portföljvärde|faktisk P\/L|realtid/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
-    expect(screen.getByText('Risk: Godkänd')).toBeVisible();expect(screen.getAllByText('research-eod-v1').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Riskbedömning saknas').length).toBe(2);expect(screen.getAllByText('research-eod-v1').length).toBeGreaterThan(0)
     expect(screen.getByText(/Godkänd betyder endast att hypotetisk research passerar policyn/)).toBeVisible()
+  })
+  test('matches risk only through exact shadow prediction lineage',()=>{
+    const exact:FinanceOverview={...overviewFixture,signals:overviewFixture.signals.map((signal,index)=>({...signal,predictionIds:index===0?['shadow-fixture']:[]}))}
+    render(<FinanceObservation initialSnapshot={empty} initialOverview={exact} initialRiskStatus={riskStatusFixture} initialRiskEvaluations={[riskEvaluationFixture]}/>)
+    expect(screen.getByText('Risk: Godkänd')).toBeVisible();expect(screen.getAllByText('Riskbedömning saknas').length).toBeGreaterThan(0)
   })
 })

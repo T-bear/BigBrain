@@ -156,3 +156,6 @@ docker compose config --quiet
 Automatiska tester använder fakes/mocks och får aldrig anropa live write-endpoints. De får inte starta Jellyfin-uppspelning, ta bort eller ändra torrents, mutera Sonarr/Radarr/Prowlarr, ändra media, starta om externa tjänster eller använda riktiga credentials. Verkliga mutationer får endast ske genom dokumenterat UI-flöde efter uttrycklig användaråtgärd och separat scope.
 
 Media har både read- och smala write-kontrakt. Påståendet att Media saknar POST/write-endpoints är historiskt och gäller inte dagens implementation. Läs [Mediamodulen](docs/modules/media.md) för aktuella gränser.
+# BB-090 test additions
+
+Network-free fixtures and tests cover macro release/knowledge cutoffs, vintage selection, forward-fill only after knowledge time, migration restart/idempotence, New York DST, regular holidays, weekends and bounded exceptional closures. Dataset/risk regression covers adjusted semantics, provider-aware promotion, typed insufficient/warmup categories and exact prediction-risk lineage. Live FRED acquisition is a bounded maintenance drill and never an automated-test dependency.

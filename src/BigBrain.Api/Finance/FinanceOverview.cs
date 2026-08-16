@@ -5,7 +5,7 @@ namespace BigBrain.Api.Finance;
 
 internal sealed record FinanceOverviewSignal(string InstrumentId,string Symbol,string Name,string State,
     decimal? SessionChangePercent,int PositiveStrategies,int NeutralStrategies,int NegativeStrategies,int StrategyCount,
-    string Agreement,string Freshness);
+    string Agreement,string Freshness,IReadOnlyList<string> PredictionIds);
 internal sealed record FinanceOverviewProspective(int Valid,int Pending,int Evaluated,int Invalidated,int Correct,int Incorrect,
     decimal? DirectionalAccuracy,decimal? MeanRealizedReturn,string EvidenceMaturity,IReadOnlyList<FinanceOverviewCurvePoint> Curve);
 internal sealed record FinanceOverviewCurvePoint(DateOnly Session,decimal CumulativeReturn);
@@ -31,7 +31,7 @@ internal sealed partial class EodhdMarketMemory
             var values=latest.Where(x=>x.InstrumentId==item.InstrumentId).ToArray();var positive=values.Count(x=>x.Signal=="TargetLong");var negative=values.Count(x=>x.Signal=="TargetFlat");var neutral=values.Length-positive-negative;
             var state=values.Length==0?"INSUFFICIENT":positive>negative?"POSITIVE":negative>positive?"NEGATIVE":"NEUTRAL";
             var agreement=values.Length==0?"No eligible prospective strategy output":$"{Math.Max(positive,Math.Max(negative,neutral))}/{values.Length} strategies agree; positive {positive}, neutral {neutral}, negative {negative}";
-            return new FinanceOverviewSignal(item.InstrumentId,item.Symbol,item.DisplayName,state,item.DailyChangePercent,positive,neutral,negative,values.Length,agreement,item.Freshness.ToString());
+            return new FinanceOverviewSignal(item.InstrumentId,item.Symbol,item.DisplayName,state,item.DailyChangePercent,positive,neutral,negative,values.Length,agreement,item.Freshness.ToString(),values.Select(x=>x.PredictionId).Order(StringComparer.Ordinal).ToArray());
         }).ToArray();
         var prospective=ProspectiveOverview();
         return new(DateTimeOffset.UtcNow,"RESEARCH",Provider,"CURRENT EOD / PROSPECTIVE EOD",latestSession,

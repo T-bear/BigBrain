@@ -371,3 +371,6 @@ planned. Frontend state is never authoritative for mode, risk or execution.
 
 See the [master roadmap](../architecture/finance/master-roadmap.md) and the proposed
 [Finance boundary ADR](../adr/0017-finance-policy-governed-trading-boundary.md).
+# BB-090 macro research boundary (2026-08-16)
+
+Macro Memory is a separate Finance domain in the existing SQLite store, not an OHLCV extension and not an EODHD persistence responsibility. Pack v1 is `DFF`, `DGS2`, `DGS10`, `CPIAUCSL`, `UNRATE`; spread is derived. Observation/reference time and UTC knowledge time are distinct. Current-history CSV is revised-history exploratory unless an ALFRED vintage proves point-in-time availability. `macro-context-v1`, `market-regime-v1` and `us-equities-ny-v1` are deterministic/versioned. Macro context is explanatory only and cannot select or mutate strategies. Missing macro data degrades macro read models only.

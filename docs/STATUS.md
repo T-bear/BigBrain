@@ -335,3 +335,6 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 Retry-verifieringen i BB-023 utförs separat när ett naturligt säkert testobjekt finns och är inte ett villkor för att starta eller avsluta Sprint 3.
 
 Inga mediafiler eller externa tjänsters konfiguration ändrades av Dashboard Phase 1 eller dokumentationskonsolideringen. Aktuellt kvarvarande arbete finns i [BACKLOG](BACKLOG.md); arbets- och completion-regler finns i [AGENTS](../AGENTS.md).
+# BB-090 in progress (2026-08-16)
+
+FRED macro and Finance correctness implementation is locally built and fully regression-tested but not deployed or yet published. The isolated authoritative FRED drill promoted 58,196 observations from five public-domain/citation-requested series as `REVISED_HISTORY_EXPLORATORY`; no production macro claim is available. DST/session, adjusted-close, provider-neutral promotion, typed risk reason, exact risk/prediction lineage and regime-aware backtest grouping are implemented. Production backup/migration/deployment is blocked by a pre-existing long-running API one-off container holding the Finance database; it was preserved. Adjusted-history audit remains pending. Finance stays RESEARCH.

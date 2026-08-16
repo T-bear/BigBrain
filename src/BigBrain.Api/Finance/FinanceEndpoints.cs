@@ -48,6 +48,10 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/risk/policy",(EodhdMarketMemory memory)=>Results.Json(memory.RiskPolicySnapshot(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/risk/evaluations",(int? limit,EodhdMarketMemory memory)=>ShadowResult(()=>memory.RiskEvaluations(limit??50)));
         endpoints.MapGet("/api/v1/modules/finance/risk/evaluations/{id}",(string id,EodhdMarketMemory memory)=>ShadowResult(()=>memory.RiskEvaluation(id)));
+        endpoints.MapGet("/api/v1/modules/finance/macro/status",(FinanceMacroMemory memory)=>Results.Json(memory.Snapshot().Status,JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/macro/series",(FinanceMacroMemory memory)=>Results.Json(memory.Snapshot(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/macro/regime",(FinanceMacroMemory memory)=>memory.Snapshot().LatestRegime is { } regime?Results.Json(regime,JsonOptions):Results.NotFound());
+        endpoints.MapGet("/api/v1/modules/finance/research/regime-analysis",(FinanceMacroMemory macro,EodhdMarketMemory market)=>Results.Json(macro.Analyze(market),JsonOptions));
         return endpoints;
     }
 

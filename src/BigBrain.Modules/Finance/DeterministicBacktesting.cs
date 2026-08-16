@@ -100,7 +100,7 @@ public static class DeterministicBacktestEngine
         Validate(configuration, strategy);
         var bars = market.Where(x => configuration.Universe.Contains(x.InstrumentId.Value, StringComparer.Ordinal) &&
             x.SessionDate >= configuration.From && x.SessionDate <= configuration.To &&
-            configuration.MarketRevisionIds.Contains(x.MarketRevisionId, StringComparer.Ordinal))
+            configuration.MarketRevisionIds.Contains(x.MarketRevisionId, StringComparer.Ordinal) && UsMarketCalendar.IsSession(x.SessionDate))
             .OrderBy(x => x.SessionDate).ThenBy(x => x.InstrumentId.Value, StringComparer.Ordinal).ToArray();
         if (bars.Length == 0) throw new ArgumentException("The exact pinned market revisions contain no bars in scope.", nameof(market));
         var featureRows = features.Where(x => x.FeatureRevisionId == configuration.FeatureRevisionId)
@@ -201,8 +201,8 @@ public static class DeterministicBacktestEngine
     private static decimal[] Returns(IReadOnlyList<BacktestEquityPoint> curve) => curve.Zip(curve.Skip(1), (a, b) => a.TotalEquity == 0 ? 0 : b.TotalEquity / a.TotalEquity - 1m).ToArray();
     private static double Std(IEnumerable<double> source) { var x = source.ToArray(); if (x.Length == 0) return 0; var mean = x.Average(); return Math.Sqrt(x.Average(v => (v - mean) * (v - mean))); }
     private static decimal Round(decimal value, int places = 2) => Math.Round(value, places, MidpointRounding.AwayFromZero);
-    private static DateTimeOffset AtOpen(DateOnly date) => new(date.ToDateTime(new TimeOnly(14, 30)), TimeSpan.Zero);
-    private static DateTimeOffset AtClose(DateOnly date) => new(date.ToDateTime(new TimeOnly(21, 0)), TimeSpan.Zero);
+    private static DateTimeOffset AtOpen(DateOnly date) => UsMarketCalendar.Session(date)?.OpenUtc ?? throw new InvalidOperationException($"{date} is not a {UsMarketCalendar.Version} session.");
+    private static DateTimeOffset AtClose(DateOnly date) => UsMarketCalendar.Session(date)?.CloseUtc ?? throw new InvalidOperationException($"{date} is not a {UsMarketCalendar.Version} session.");
     private static string Canonical(BacktestRunConfiguration c) => JsonSerializer.Serialize(c with { MarketRevisionIds = c.MarketRevisionIds.Order(StringComparer.Ordinal).ToArray(), Universe = c.Universe.Order(StringComparer.Ordinal).ToArray(), StrategyParameters = c.StrategyParameters.OrderBy(x => x.Key).ToDictionary() }, JsonOptions);
     private static string Hash(string value) => "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = false };

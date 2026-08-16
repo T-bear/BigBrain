@@ -41,3 +41,4 @@ Current implementation evidence:
 
 Provider research and retention-gate reports do not authorize provider activation; use
 `docs/STATUS.md` and `docs/BACKLOG.md` for the current gate state.
+- [BB-090 FRED macro foundation and Finance correctness stabilization](finance-bb-090-implementation-runtime-20260816.md)

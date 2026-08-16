@@ -37,3 +37,4 @@ Proposed records are not accepted authority merely because related code exists.
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.
+- [ADR 0031 — Finance macro knowledge time and US session calendar](../adr/0031-finance-macro-knowledge-time-and-us-session-calendar.md)

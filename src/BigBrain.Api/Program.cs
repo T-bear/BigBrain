@@ -29,7 +29,7 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDataProtectionMaintenanceCommand.TryRun(args, builder.Configuration)) return;
+        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDataProtectionMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceMacroMaintenanceCommand.TryRun(args,builder.Configuration)) return;
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
@@ -171,6 +171,7 @@ public partial class Program
         riskOptions.Validate();
         builder.Services.AddSingleton(riskOptions);
         builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions,riskOptions));
+        builder.Services.AddSingleton(_ => new FinanceMacroMemory(eodhdOptions));
         builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
         builder.Services.AddSingleton<FinanceDataProtectionStore>();
         builder.Services.AddHostedService<FinanceProspectiveCadenceWorker>();

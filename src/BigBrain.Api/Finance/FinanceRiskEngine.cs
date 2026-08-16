@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using BigBrain.Modules.Finance;
 
 namespace BigBrain.Api.Finance;
 
@@ -36,7 +37,16 @@ public sealed record FinanceRiskOptions
 
 internal enum FinanceRiskVerdict { Allow, Reduce, Deny, Halt, InsufficientData }
 internal enum FinanceRiskRuleState { Pass, Fail, NotEvaluable }
-internal sealed record FinanceRiskRuleResult(string RuleId, FinanceRiskRuleState State, string ReasonCode, string Explanation, string Evidence);
+internal enum FinanceRiskReasonCategory { None, DataMissing, WarmupIncomplete, StaleData, InvalidLineage, PolicyDenial, SystemHalt }
+internal sealed record FinanceRiskRuleResult(string RuleId, FinanceRiskRuleState State, FinanceRiskReasonCategory Category, string ReasonCode, string Explanation, string Evidence);
+internal interface IResearchRiskPolicy { bool InstrumentApproved(string instrumentId); bool StrategyApproved(string strategyId,string version); }
+internal sealed class ResearchEodRiskPolicy : IResearchRiskPolicy
+{
+    private static readonly HashSet<string> Instruments=EodhdCatalog.Watchlist.Select(x=>x.InstrumentId).ToHashSet(StringComparer.Ordinal);
+    private static readonly HashSet<string> Strategies=new(StringComparer.Ordinal){"buy-and-hold/v1","sma-crossover/v1","momentum/v1"};
+    public bool InstrumentApproved(string id)=>Instruments.Contains(id);
+    public bool StrategyApproved(string id,string version)=>Strategies.Contains($"{id}/{version}");
+}
 internal sealed record FinanceRiskProposal(string ProposalId,string InstrumentId,string StrategyId,string StrategyVersion,
     string ParameterFingerprint,string? ShadowPredictionId,string SourceRevisionId,string FeatureRevisionId,
     DateOnly ObservationSession,DateTimeOffset ObservationKnowledgeUtc,DateTimeOffset KnowledgeCutoffUtc,
@@ -70,34 +80,34 @@ internal static class FinanceRiskIdentity
 internal sealed class FinanceRiskEngine
 {
     private readonly FinanceRiskOptions _policy;
-    internal FinanceRiskEngine(FinanceRiskOptions policy){policy.Validate();_policy=policy;}
+    private readonly IResearchRiskPolicy _approval;
+    internal FinanceRiskEngine(FinanceRiskOptions policy,IResearchRiskPolicy? approval=null){policy.Validate();_policy=policy;_approval=approval??new ResearchEodRiskPolicy();}
 
     internal FinanceRiskEvaluation Evaluate(FinanceRiskProposal p,bool activeHalt=false,string? haltReason=null)
     {
         var rules=new List<FinanceRiskRuleResult>();
-        void Rule(string id,bool pass,string code,string explanation,string evidence)=>rules.Add(new(id,pass?FinanceRiskRuleState.Pass:FinanceRiskRuleState.Fail,code,explanation,evidence));
-        void NotEvaluable(string id,string code,string explanation)=>rules.Add(new(id,FinanceRiskRuleState.NotEvaluable,code,explanation,"not available in CURRENT EOD research"));
+        void Rule(string id,bool pass,string code,string explanation,string evidence,FinanceRiskReasonCategory category=FinanceRiskReasonCategory.PolicyDenial)=>rules.Add(new(id,pass?FinanceRiskRuleState.Pass:FinanceRiskRuleState.Fail,pass?FinanceRiskReasonCategory.None:category,code,explanation,evidence));
+        void NotEvaluable(string id,string code,string explanation)=>rules.Add(new(id,FinanceRiskRuleState.NotEvaluable,FinanceRiskReasonCategory.DataMissing,code,explanation,"not available in CURRENT EOD research"));
         Rule("mode.research",p.OperatingMode=="RESEARCH","risk.mode.invalid","Riskmotorn godkänner endast RESEARCH i BB-089.",p.OperatingMode);
         Rule("proposal.client-verdict",string.IsNullOrWhiteSpace(p.ClientSuppliedVerdict),"risk.clientVerdict.rejected","Klienten får inte ange riskutfall.","server authority");
-        Rule("instrument.universe",EodhdCatalog.Watchlist.Any(x=>x.InstrumentId==p.InstrumentId),"risk.instrument.notAllowed","Instrumentet ingår inte i den godkända researchuniversen.",p.InstrumentId);
-        var approvedStrategy=(p.StrategyId,p.StrategyVersion) is ("buy-and-hold","v1") or ("sma-crossover","v1") or ("momentum","v1");
-        Rule("strategy.approved",approvedStrategy,"risk.strategy.notApproved","Strategin eller versionen är inte godkänd för researchpolicyn.",$"{p.StrategyId}/{p.StrategyVersion}");
+        Rule("instrument.universe",_approval.InstrumentApproved(p.InstrumentId),"risk.instrument.notAllowed","Instrumentet ingår inte i den godkända researchuniversen.",p.InstrumentId);
+        Rule("strategy.approved",_approval.StrategyApproved(p.StrategyId,p.StrategyVersion),"risk.strategy.notApproved","Strategin eller versionen är inte godkänd för researchpolicyn.",$"{p.StrategyId}/{p.StrategyVersion}");
         Rule("signal.known",p.Direction is "TargetLong" or "TargetFlat" or "NoAction","risk.signal.invalid","Strategisignalen är okänd eller ogiltig.",p.Direction);
         Rule("price.positive",p.Price>0&&p.PreviousClose>0,"risk.price.invalid","Prisunderlaget är ogiltigt.","positive close and previous close required");
-        Rule("lineage.source",p.SourceLineageValid&&!string.IsNullOrWhiteSpace(p.SourceRevisionId),"risk.lineage.sourceInvalid","Källans lineage är ogiltig eller saknas.",p.SourceRevisionId);
-        Rule("lineage.feature",p.FeatureLineageValid&&!string.IsNullOrWhiteSpace(p.FeatureRevisionId),"risk.lineage.featureInvalid","Feature-lineage är ogiltig eller saknas.",p.FeatureRevisionId);
-        Rule("feature.warmup",p.WarmupComplete,"risk.feature.insufficientWarmup","Featurehistoriken har inte tillräcklig warmup.",p.FeatureRevisionId);
+        Rule("lineage.source",p.SourceLineageValid&&!string.IsNullOrWhiteSpace(p.SourceRevisionId),"risk.lineage.sourceInvalid","Källans lineage är ogiltig eller saknas.",p.SourceRevisionId,FinanceRiskReasonCategory.InvalidLineage);
+        Rule("lineage.feature",p.FeatureLineageValid&&!string.IsNullOrWhiteSpace(p.FeatureRevisionId),"risk.lineage.featureInvalid","Feature-lineage är ogiltig eller saknas.",p.FeatureRevisionId,FinanceRiskReasonCategory.InvalidLineage);
+        Rule("feature.warmup",p.WarmupComplete,"risk.feature.insufficientWarmup","Featurehistoriken har inte tillräcklig warmup.",p.FeatureRevisionId,FinanceRiskReasonCategory.WarmupIncomplete);
         Rule("clock.integrity",p.ClockIntegrity&&p.EvaluationUtc.Offset==TimeSpan.Zero&&p.ObservationKnowledgeUtc<=p.KnowledgeCutoffUtc&&p.KnowledgeCutoffUtc<=p.EvaluationUtc,"risk.clock.invalid","Tidsintegriteten kan inte verifieras.","UTC causal ordering");
         Rule("provider.health",p.ProviderHealthy,"risk.provider.unhealthy","Dataproviderns hälsa räcker inte för ett nytt riskgodkännande.","provider health");
         Rule("cadence.health",p.CadenceHealthy,"risk.cadence.unhealthy","Finance-cadencen är inte verifierat frisk.","cadence health");
-        var age=CompletedWeekdaysAfter(p.ObservationSession,DateOnly.FromDateTime(p.EvaluationUtc.UtcDateTime));
-        Rule("data.current-eod-freshness",age<=_policy.MaximumCompletedSessionsSinceObservation,"risk.data.stale","Marknadsdatan är för gammal för ett nytt riskgodkännande.",$"completedWeekdays={age}; maximum={_policy.MaximumCompletedSessionsSinceObservation}");
+        var age=UsMarketCalendar.CompletedSessionsAfter(p.ObservationSession,DateOnly.FromDateTime(p.EvaluationUtc.UtcDateTime));
+        Rule("data.current-eod-freshness",age<=_policy.MaximumCompletedSessionsSinceObservation,"risk.data.stale","Marknadsdatan är för gammal för ett nytt riskgodkännande.",$"completedSessions={age}; maximum={_policy.MaximumCompletedSessionsSinceObservation}",FinanceRiskReasonCategory.StaleData);
         var move=p.PreviousClose>0?Math.Abs(p.Price/p.PreviousClose-1):decimal.MaxValue;
         Rule("market.daily-move",move<=_policy.MaximumDailyMoveFraction,"risk.move.excessive","Den senaste prisrörelsen överskrider policyn.",$"fraction={move.ToString(CultureInfo.InvariantCulture)}");
         Rule("market.volatility",p.RollingVolatility20.HasValue&&p.RollingVolatility20>=0&&p.RollingVolatility20<=_policy.MaximumRollingVolatility20,
-            p.RollingVolatility20.HasValue?"risk.volatility.excessive":"risk.volatility.insufficientData","20-sessioners populationsstandardavvikelse för enkla dagsavkastningar saknas eller överskrider policyn.",p.RollingVolatility20?.ToString(CultureInfo.InvariantCulture)??"missing");
+            p.RollingVolatility20.HasValue?"risk.volatility.excessive":"risk.volatility.insufficientData","20-sessioners populationsstandardavvikelse för enkla dagsavkastningar saknas eller överskrider policyn.",p.RollingVolatility20?.ToString(CultureInfo.InvariantCulture)??"missing",p.RollingVolatility20.HasValue?FinanceRiskReasonCategory.PolicyDenial:FinanceRiskReasonCategory.DataMissing);
         Rule("market.liquidity",p.VolumeRatio.HasValue&&p.VolumeRatio>=_policy.MinimumVolumeRatio,
-            p.VolumeRatio.HasValue?"risk.liquidity.insufficient":"risk.liquidity.insufficientData","Volymunderlaget saknas eller understiger policyn.",p.VolumeRatio?.ToString(CultureInfo.InvariantCulture)??"missing");
+            p.VolumeRatio.HasValue?"risk.liquidity.insufficient":"risk.liquidity.insufficientData","Volymunderlaget saknas eller understiger policyn.",p.VolumeRatio?.ToString(CultureInfo.InvariantCulture)??"missing",p.VolumeRatio.HasValue?FinanceRiskReasonCategory.PolicyDenial:FinanceRiskReasonCategory.DataMissing);
         NotEvaluable("market.spread","risk.spread.notAvailable","Tillförlitlig bid/ask-spread finns inte i EODHD Free och fabriceras inte.");
         NotEvaluable("portfolio.sector","risk.sector.notEvaluable","Tillförlitlig sektorklassificering finns inte i denna slice.");
         Rule("exposure.positive",p.RequestedExposure>0,"risk.exposure.invalid","Föreslagen hypotetisk exponering måste vara positiv.",p.RequestedExposure.ToString(CultureInfo.InvariantCulture));
@@ -106,7 +116,7 @@ internal sealed class FinanceRiskEngine
         Rule("circuit-breaker",!breaker,activeHalt?(haltReason??"risk.halt.active"):p.HypotheticalDailyLoss>=_policy.DailyLossHaltFraction?"risk.dailyLoss.halt":p.HypotheticalRollingDrawdown>=_policy.RollingDrawdownHaltFraction?"risk.drawdown.halt":"risk.consecutiveLosses.halt","En hard risk-spärr blockerar ny hypotetisk exponering.","hypothetical research evidence");
 
         var failed=rules.Where(x=>x.State==FinanceRiskRuleState.Fail).ToArray();
-        var insufficient=failed.Any(x=>x.ReasonCode.Contains("insufficientData",StringComparison.Ordinal)||x.ReasonCode.Contains("Warmup",StringComparison.OrdinalIgnoreCase));
+        var insufficient=failed.Any(x=>x.Category is FinanceRiskReasonCategory.DataMissing or FinanceRiskReasonCategory.WarmupIncomplete);
         var verdict=breaker?FinanceRiskVerdict.Halt:insufficient?FinanceRiskVerdict.InsufficientData:failed.Length>0?FinanceRiskVerdict.Deny:
             p.RequestedExposure>_policy.ResearchCapital*_policy.MaximumPositionFraction?FinanceRiskVerdict.Reduce:FinanceRiskVerdict.Allow;
         var cap=_policy.ResearchCapital*_policy.MaximumPositionFraction;
