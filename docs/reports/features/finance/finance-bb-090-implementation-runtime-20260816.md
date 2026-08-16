@@ -9,11 +9,12 @@ Detta är en sanerad GitHub-version.
 **Date:** 2026-08-16
 **Baseline:** `ae2cb91729795df1fb9356015c8e29159f91acc1`
 **Implementation commit:** `6f6cc743b91b9d0c2cb52fb297d0215fd7125b50`
+**Closure stabilization commit:** `ef5b090b84b498c68304021e7e57426466b2c4b4`
 **Mode/budget:** RESEARCH / 0 SEK
 
 ## Status
 
-Implementation and closure stabilization are locally regression-tested and deployed. BB-090 remains **IN PROGRESS** because the runtime FRED key is not configured, so the official bounded vintage drill was correctly not attempted; final publication/Actions evidence is also pending at the time of this report update.
+Implementation and closure stabilization are locally regression-tested, deployed and published. GitHub Actions run 53 passed backend, frontend, documentation and gitleaks for the closure commit. BB-090 remains **IN PROGRESS** only because the runtime FRED key is not configured, so the official bounded vintage drill was correctly not attempted.
 
 ## Evidence
 
