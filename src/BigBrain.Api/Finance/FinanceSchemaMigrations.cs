@@ -10,7 +10,7 @@ internal sealed record FinanceSchemaState(int CurrentVersion,IReadOnlyList<int> 
 
 internal static class FinanceSchemaMigrator
 {
-    internal const int LatestVersion=92;
+    internal const int LatestVersion=93;
     private sealed record Migration(int Version,string Name,string Sql);
     private static readonly Migration[] Migrations=
     [
@@ -24,6 +24,15 @@ internal static class FinanceSchemaMigrator
           """),
         new(92,"macro quarantine evidence","""
           CREATE TABLE IF NOT EXISTS macro_candidates(candidate_id TEXT PRIMARY KEY,provider TEXT NOT NULL,source_url TEXT NOT NULL,artifact_path TEXT NOT NULL,artifact_hash TEXT NOT NULL,acquired_utc TEXT NOT NULL,rights_class TEXT NOT NULL,rights_evidence_url TEXT NOT NULL,series_json TEXT NOT NULL,schema_fingerprint TEXT NOT NULL,validation_result TEXT NOT NULL,promotion_decision TEXT NOT NULL,canonical_revision_id TEXT);
+          """)
+        ,new(93,"BB-091 provider-neutral macro and FX metadata","""
+          ALTER TABLE macro_observations ADD COLUMN provider TEXT NOT NULL DEFAULT 'FRED';
+          ALTER TABLE macro_observations ADD COLUMN region TEXT NOT NULL DEFAULT 'Us';
+          ALTER TABLE macro_observations ADD COLUMN unit TEXT NOT NULL DEFAULT '';
+          ALTER TABLE macro_observations ADD COLUMN frequency TEXT NOT NULL DEFAULT '';
+          ALTER TABLE macro_observations ADD COLUMN base_currency TEXT;
+          ALTER TABLE macro_observations ADD COLUMN quote_currency TEXT;
+          CREATE INDEX IF NOT EXISTS ix_macro_asof ON macro_observations(region,evidence_class,knowledge_time_utc);
           """)
     ];
 

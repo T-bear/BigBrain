@@ -35,3 +35,4 @@
 
 Repository reports are sanitized evidence. Full local reports remain internal unless
 reviewed and deliberately published.
+- [BB-091 Finance Sweden / Europe macro and FX](../reports/features/finance/finance-bb-091-european-macro-fx-20260817.md)

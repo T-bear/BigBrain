@@ -2053,3 +2053,12 @@ En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar
 - Deferred data packs: Riksbanken/Sweden, ECB/European FX, commodities, corporate actions, point-in-time universes, fundamentals and additional legitimate OHLCV archives.
 - Avanza remains `MANUAL_REVIEW / RIGHTS_UNKNOWN`.
 - Security/Pentest remains mandatory before PAPER; PAPER is not approved.
+
+# BB-091 — Sweden / Europe macro and FX
+
+**Status:** IN PROGRESS (2026-08-17). Provider-neutral implementation and network-free focused tests are green. Closure still requires verified production backup/migration, bounded official Riksbank/ECB promotion, repeat/idempotence, preservation/restart/full regression and published green CI.
+
+- Initial Riksbank pack: `SECBREPOEFF`, `SEKEURPMI`, `SEKUSDPMI`.
+- Initial ECB pack: `EXR.D.USD.EUR.SP00.A`, `EXR.D.SEK.EUR.SP00.A`, `FM.D.U2.EUR.4F.KR.MRR_FR.LEV`.
+- All bootstrap evidence is conservatively `REVISED_HISTORY_EXPLORATORY`; causal as-of never falls back.
+- Deferred: unattended acquisition and `FINANCE AUTONOMOUS RESEARCH v1` orchestration. No PAPER, broker, order, LIVE/AUTO or self-learning.

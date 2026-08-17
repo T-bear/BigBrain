@@ -4,8 +4,9 @@ using System.Text;
 namespace BigBrain.Modules.Finance;
 
 public enum MacroEvidenceClass { RevisedHistoryExploratory, PointInTimeCausal }
+public enum MacroRegion { Us, Sweden, EuroArea, Global }
 public sealed record MacroSeriesDefinition(string SeriesId,string Title,string Units,string Frequency,string Source,string RightsClass,string Transformation);
-public sealed record MacroObservation(string SeriesId,DateOnly ReferencePeriod,decimal? Value,DateTimeOffset KnowledgeTimeUtc,DateTimeOffset AcquiredAtUtc,DateOnly RealtimeStart,DateOnly RealtimeEnd,string ArtifactHash,MacroEvidenceClass EvidenceClass);
+public sealed record MacroObservation(string SeriesId,DateOnly ReferencePeriod,decimal? Value,DateTimeOffset KnowledgeTimeUtc,DateTimeOffset AcquiredAtUtc,DateOnly RealtimeStart,DateOnly RealtimeEnd,string ArtifactHash,MacroEvidenceClass EvidenceClass,string Provider="FRED",MacroRegion Region=MacroRegion.Us,string Unit="",string Frequency="",string? BaseCurrency=null,string? QuoteCurrency=null);
 public sealed record MacroFeature(string Id,DateOnly Session,decimal? Value,string Units,string Transformation,DateTimeOffset KnowledgeTimeUtc,string Revision);
 public sealed record MarketRegime(string PolicyVersion,DateOnly Session,string RateTrend,string YieldCurve,string Inflation,string Labor,string Composite,string MacroRevision,string FeatureRevision,MacroEvidenceClass EvidenceClass,DateTimeOffset CausalCutoffUtc);
 
@@ -21,6 +22,41 @@ public static class FredMacroPackV1
         new("CPIAUCSL","CPI All Urban Consumers","Index 1982-1984=100","Monthly","BLS via FRED","PublicDomainCitationRequested","year-over-year percent change"),
         new("UNRATE","Unemployment Rate","Percent","Monthly","BLS via FRED","PublicDomainCitationRequested","level and 3-month change")
     ];
+}
+
+public static class EuropeanMacroPackV1
+{
+    public static readonly IReadOnlyList<MacroSeriesDefinition> Riksbank=
+    [
+        new("SECBREPOEFF","Swedish policy rate","Percent","Daily","Sveriges Riksbank","LocalResearchAttributionRequired","level"),
+        new("SEKEURPMI","EUR/SEK","SEK per EUR","Daily","Sveriges Riksbank","LocalResearchAttributionRequired","source observation"),
+        new("SEKUSDPMI","USD/SEK","SEK per USD","Daily","Sveriges Riksbank","LocalResearchAttributionRequired","source observation")
+    ];
+    public static readonly IReadOnlyList<MacroSeriesDefinition> Ecb=
+    [
+        new("EXR.D.USD.EUR.SP00.A","EUR/USD","USD per EUR","Daily","European Central Bank","LocalResearchAttributionRequired","source observation"),
+        new("EXR.D.SEK.EUR.SP00.A","EUR/SEK","SEK per EUR","Daily","European Central Bank","LocalResearchAttributionRequired","source observation"),
+        new("FM.D.U2.EUR.4F.KR.MRR_FR.LEV","ECB main refinancing operations rate","Percent","Daily","European Central Bank","LocalResearchAttributionRequired","level")
+    ];
+}
+
+public sealed record FxComparison(DateOnly ReferencePeriod,string Classification,decimal? RiksbankValue,decimal? EcbValue,decimal? AbsoluteDifference,string Rule);
+
+public static class MacroAsOf
+{
+    public static IReadOnlyList<MacroObservation> Select(IEnumerable<MacroObservation> source,MacroRegion region,DateTimeOffset asOfUtc,MacroEvidenceClass evidenceClass) =>
+        source.Where(x=>x.Region==region&&x.EvidenceClass==evidenceClass&&x.KnowledgeTimeUtc<=asOfUtc)
+            .GroupBy(x=>(x.Provider,x.SeriesId,x.ReferencePeriod))
+            .Select(x=>x.OrderByDescending(v=>v.KnowledgeTimeUtc).First()).OrderBy(x=>x.Provider).ThenBy(x=>x.SeriesId).ThenBy(x=>x.ReferencePeriod).ToArray();
+}
+
+public static class FxCrossProviderValidator
+{
+    public static IReadOnlyList<FxComparison> CompareEurSek(IEnumerable<MacroObservation> source,decimal expectedTolerance=0.0001m,decimal mismatchTolerance=0.02m)
+    {
+        var rows=source.Where(x=>x.BaseCurrency=="EUR"&&x.QuoteCurrency=="SEK").ToArray();var days=rows.Select(x=>x.ReferencePeriod).Distinct().Order().ToArray();var result=new List<FxComparison>();
+        foreach(var day in days){var r=rows.SingleOrDefault(x=>x.ReferencePeriod==day&&x.Provider=="RIKSBANK");var e=rows.SingleOrDefault(x=>x.ReferencePeriod==day&&x.Provider=="ECB");if(day<new DateOnly(2023,11,27)){result.Add(new(day,"INSUFFICIENT_COMPARABILITY",r?.Value,e?.Value,null,"Riksbank used a different FX source methodology before 2023-11-27"));continue;}if(r?.Value is null||e?.Value is null){result.Add(new(day,"INSUFFICIENT_COMPARABILITY",r?.Value,e?.Value,null,"same reference date and EUR base/SEK quote required"));continue;}var d=Math.Abs(r.Value.Value-e.Value.Value);result.Add(new(day,d<=expectedTolerance?"CONSISTENT":d<=mismatchTolerance?"EXPECTED_METHODOLOGY_DIFFERENCE":"MISMATCH",r.Value,e.Value,d,$"absolute tolerance {expectedTolerance}/{mismatchTolerance}"));}return result;
+    }
 }
 
 public static class MacroFeatureEngine
