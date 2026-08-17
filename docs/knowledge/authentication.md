@@ -18,6 +18,10 @@ Skilja implementerade skydd från framtida identitets- och behörighetsmål.
 
 - Bekräftelsetoken för en mediarequest är inte generell användarautentisering.
 - En nätverksgräns ersätter inte auktorisation.
+- Enhets- eller nätverksidentitet är inte användaridentitet. MAC-adress får inte användas som
+  betrodd autentiseringsidentitet, och BigBrain ska aldrig ta emot eller lagra biometriska data.
+- Passkeys, trusted-device och step-up är en framtida standardsbaserad utredning, inte en
+  implementerad autentiseringsförmåga eller Finance-exekveringsauktoritet.
 
 ## Relaterade runbooks
 
@@ -27,6 +31,7 @@ Skilja implementerade skydd från framtida identitets- och behörighetsmål.
 
 - [Sentinels säkerhetsmodell](../security/sentinel-security-model.md)
 - [Arkitektur](../../ARCHITECTURE.md)
+- [Future product planning](../reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md)
 
 ## Senast verifierad
 

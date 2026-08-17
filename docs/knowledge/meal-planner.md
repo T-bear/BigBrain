@@ -18,6 +18,9 @@ Samla verifierad kunskap om modulen Matlista.
 
 - Recept, ingredienskoppling och automatisk inköpslistegenerering är framtidsplaner, inte implementation.
 - Backup/restore och fleranvändarkonflikter är inte lösta.
+- Externa skolmåltider och skolmedveten hushållsmenygenerering är planerade framtida förbättringar,
+  inte implementerade funktioner. De hör till den befintliga veckoplaneraren, inte en separat Home-
+  modul, och kräver verifierade officiella källor och automatiseringsrättigheter före implementation.
 
 ## Relaterade runbooks
 
@@ -27,6 +30,7 @@ Samla verifierad kunskap om modulen Matlista.
 
 - [Status](../STATUS.md)
 - [Arkitektur](../../ARCHITECTURE.md)
+- [Future product planning](../reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md)
 
 ## Senast verifierad
 

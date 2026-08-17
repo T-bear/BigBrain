@@ -8,6 +8,7 @@
 - [BB-083 appliance resilience](../reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md)
 
 - [Report library](../reports/README.md)
+- [Product, UX, authentication and school-meals backlog capture](../reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md)
 - [Report catalog](../reports/REPORT-CATALOG.md)
 - [Report schema](../reports/report-schema.md)
 - [Publication policy](../reports/publication-policy.md)

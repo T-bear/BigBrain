@@ -81,6 +81,86 @@
 - Gate: mandatory before real-money LIVE eligibility and a strong prerequisite before meaningful
   PAPER/execution authority. This item is planning only; BB-086 implements none of it.
 
+## Future product, UX, authentication and Meal Planner capture
+
+These entries preserve product intent without changing the active Finance direction. They await
+normal prioritization and therefore have no BB identifiers. Detailed boundaries and the repository-
+wide duplicate assessment are recorded in the [2026-08-17 planning record](reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md).
+
+### BigBrain-wide design system and less-is-more hierarchy
+
+- Module: BigBrain Web; status: future UX/consolidation candidate, not approved for implementation.
+- Intent: evolve the existing token/theme foundation into consistent typography, text hierarchy,
+  controls, surfaces, spacing, radii, icons, status and interaction states, responsive behavior and
+  accessible focus states. `Obsidian Gold` is the product owner's preferred candidate direction,
+  with a dark foundation and restrained gold for focus/action/emphasis rather than decoration; it
+  is not an approved final visual specification.
+- Product principle: the interface should not explain what is already self-evident. Prefer one
+  heading per real information level, data/content first, short contextual labels and progressive
+  disclosure of secondary or technical evidence. Apply this BigBrain-wide; do not redesign Finance
+  in this item.
+- Definition of Done: an owner-approved cross-module specification, accessible component/token
+  contracts and responsive/manual verification criteria exist before any rollout.
+
+### Passwordless authentication, trusted devices and step-up investigation
+
+- Module: BigBrain-wide Identity/Security; status: future consolidation/security investigation.
+- Intent: evaluate standards-based WebAuthn/passkeys, passwordless and trusted-device enrollment,
+  naming, management, revocation, recovery/bootstrap and lost-device handling, platform
+  authenticators and cross-device/phone-assisted QR or proximity authentication.
+- Security boundary: MAC addresses are not authentication identities. BigBrain never receives or
+  stores Face ID, Touch ID or equivalent biometric data; local biometrics may only unlock a device's
+  cryptographic credential. No custom biometric protocol is permitted.
+- Authorization: trusted low-risk reads should minimize friction, while sensitive administration,
+  device enrollment/removal and any separately approved future high-risk Finance operation may
+  require fresh step-up authentication. A dashboard session grants no Finance execution authority.
+- Scope: investigate device/use roles such as owner or adult personal device, shared family tablet,
+  kitchen/kiosk display and service device without hardcoding family members. Tailscale/device
+  identity or an equivalent private-network layer may complement, but never replace, application
+  user identity and authorization.
+- Roadmap: place this in the future BigBrain consolidation/security and authentication hardening
+  phase according to the current roadmap; do not change the evidenced pentest or Finance ordering.
+
+### External school meals in Meal Planner
+
+- Module: Meal Planner; status: future enhancement, source rights `MANUAL_REVIEW` until verified.
+- Initial use case: weekday Lunch within the existing weekly Meal Planner shows authoritative meals
+  for Rosenfeldtskolan and Musikugglan in Karlskrona; Calendar remains unrelated and school meals
+  are not a separate Home module. Weekend Lunch remains the household's planned lunch.
+- Architecture direction: a generic external meal-source concept may later represent school,
+  preschool, workplace or another institution, with source identity, provider and provenance.
+  Rosenfeldtskolan and Musikugglan must not be assumed to share a provider.
+- Acquisition gate: before implementation, establish each official source, structured API/feed or
+  endpoint, automated-access rights and retention/caching terms. Prefer official structured access
+  over HTML scraping. Unclear rights remain `MANUAL_REVIEW`; no automation starts. Later acquisition
+  should approximate provider-appropriate weekly cadence, bounded retries and isolated truthful
+  unavailable states without fabricated menus or disruption to household planning.
+
+### School-aware household menu generation
+
+- Module: Meal Planner / Shopping List; status: future Meal Planner intelligence.
+- Intent: household weekly generation considers all relevant school sources alongside household
+  preferences, meal history, variation, leftovers, budget, supported available ingredients and
+  shopping-list integration. Avoid materially similar home food most strongly on the same day,
+  strongly around adjacent days and more softly farther away; exact weights remain future design.
+- Similarity: reason over protein, carbohydrate/base, dish type, preparation, sauce/style and broad
+  flavor/cuisine family rather than dish-name strings alone. This task authorizes no classifier.
+- Control: similarity is a soft optimization constraint across every relevant external source;
+  manual household choice wins. Generated household meals may create shopping requirements, but
+  school meals never add their own ingredients to the household shopping list.
+
+### Home Calendar past-day presentation and mobile swipe investigation
+
+- Module: BigBrain Web / Home; status: future UX enhancement/investigation.
+- Calendar intent: Calendar is a module in Home, not a standalone view. Past days should visually
+  recede so current/upcoming days are immediately understandable. Exact styling remains open and
+  must not rely on color or opacity alone; reduced emphasis or appropriate strike-through may be
+  evaluated with accessible state semantics.
+- Swipe intent: evaluate mobile-first touch navigation only between appropriate BigBrain views or
+  contexts. It must coexist with browser/system back gestures and horizontal controls, retain
+  visible and keyboard/mouse navigation, preserve accessibility and avoid accidental destructive
+  actions. This is not an approved interaction specification.
+
 ### BB-083 – Appliance lifecycle and crash recovery baseline
 
 - Modul: Platform / Operations / Finance safety; prioritet P0.

@@ -24,6 +24,7 @@
 | Obsidian Gold | Catalog metadata only; full reports local | [STATUS](../STATUS.md#designsystem-och-teman) and [theme contract](../design-system/theme-contract-v1.md) | Local full evidence retained |
 | Early ARR recovery and diagnostics | Local only or superseded | [History](../history/early-sprints.md) | Not published as raw reports |
 | Repository consolidation | Sanitized full report | [Publication report](documentation/repository-consolidation-and-documentation-governance-20260804-214358.md) | Published |
+| Product/UX/auth/school-meals backlog capture | Sanitized planning record | [Planning record](documentation/product-ux-auth-school-meals-backlog-capture-20260817.md) | Planned only; no implementation or priority change |
 | Finance policy-governed trading epic | Sanitized planning baseline | [Finance epic planning](features/finance/finance-epic-planning-20260810.md) | M0 complete; runtime and trading not implemented |
 | Finance Sprint 1 foundation | Sanitized implementation evidence | [Sprint 1 foundation](features/finance/finance-sprint-1-foundation-20260810.md) | M1 domain/evidence foundation automatically verified; not deployed |
 | Finance Sprint 2 market-data research | Sanitized provider/licensing research | [Sprint 2 research](features/finance/finance-sprint-2-market-data-research-20260810.md) | BB-046 complete; provider activation blocked by BB-071 |
