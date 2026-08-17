@@ -2056,7 +2056,7 @@ En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar
 
 # BB-091 — Sweden / Europe macro and FX
 
-**Status:** IN PROGRESS (2026-08-17). Provider-neutral implementation and network-free focused tests are green. Closure still requires verified production backup/migration, bounded official Riksbank/ECB promotion, repeat/idempotence, preservation/restart/full regression and published green CI.
+**Status:** COMPLETE (2026-08-17). Provider-neutral implementation, verified production backup/migration, bounded official Riksbank/ECB promotion, exact retry idempotence, preservation/restart/full regression and GitHub Actions run 31997421033 are green in implementation commit `dc42d47f8712023984d653b0c34977145476b2e3`.
 
 - Initial Riksbank pack: `SECBREPOEFF`, `SEKEURPMI`, `SEKUSDPMI`.
 - Initial ECB pack: `EXR.D.USD.EUR.SP00.A`, `EXR.D.SEK.EUR.SP00.A`, `FM.D.U2.EUR.4F.KR.MRR_FR.LEV`.

@@ -13,7 +13,7 @@ Detta är en sanerad GitHub-version.
 **Mode/budget:** RESEARCH / 0 SEK
 ## Status
 
-IN PROGRESS until production migration, bounded acquisition, restart, full regression and published GitHub Actions are verified.
+COMPLETE. Implementation commit `dc42d47f8712023984d653b0c34977145476b2e3` passed GitHub Actions run 31997421033 (backend, frontend, documentation and secrets).
 
 BB-091 adds narrow Riksbank and ECB adapters to BB-090 Macro Memory. It preserves all FRED revisions and uses the same quarantine → hash → rights/provenance → schema/semantic validation → immutable promotion path. Ordered migration 93 adds provider-neutral region, unit, frequency and FX quote metadata without changing old FRED rows.
 
@@ -52,8 +52,8 @@ EUR/SEK comparison respects the Riksbank source-method boundary. From 2023-11-27
 
 Preservation is exact: 25 market revisions, 9,746 market observations, 6 feature revisions, 473 backtests, 13 robustness evaluations, 48 shadow rows, 0 outcomes, 0 risk evaluations and 0 halt audit. The original 58,196 exploratory plus 72 causal FRED observations remain unchanged. API, Web and Sentinel are healthy after recreate and restart; acquisition created no market session, prediction, outcome or risk verdict.
 
-Final local verification: 24 focused tests, 449 API tests, 32 Sentinel tests and 113 frontend tests passed. Release solution build, frontend production build, API container build, documentation verifier, Compose validation, diff whitespace and sanitized diff secret pattern scan passed. Published GitHub Actions remains the only completion gate.
+Final local verification: 24 focused tests, 449 API tests, 32 Sentinel tests and 113 frontend tests passed. Release solution build, frontend production build, API container build, documentation verifier, Compose validation, diff whitespace and sanitized diff secret pattern scan passed. Published GitHub Actions run 31997421033 passed all four required jobs.
 
 ## Resumption
 
-Resume with a verified full SQLite backup and isolated migration-93 drill. Do not mark complete until production proof, preservation, restarts, full regression and published CI are green.
+BB-091 has no remaining closure work. Start the next separately approved Finance slice from the master roadmap, with special consideration for the minimal deterministic `FINANCE AUTONOMOUS RESEARCH v1` orchestration boundary rather than another broad provider pack.
