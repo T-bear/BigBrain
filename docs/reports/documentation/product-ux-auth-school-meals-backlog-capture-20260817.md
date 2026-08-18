@@ -1,5 +1,9 @@
 # Product, UX, authentication and school-meals backlog capture
 
+> Historical planning record. On 2026-08-18 the Family-specific requirements were consolidated,
+> without duplication or implementation, into the canonical
+> [Family View & Family Coordination epic](../../architecture/family-view-family-coordination.md).
+
 - Date: 2026-08-17
 - Scope: repository-wide duplicate assessment and future product-intent capture
 - Status: planning only; not approved for implementation

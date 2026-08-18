@@ -141,17 +141,23 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 - Kända begränsningar: manuell tvärmodul- och Tizen-verifiering följs i BB-015.
 - Dokument: [temakontrakt](design-system/theme-contract-v1.md), [manuell verifiering](design-system/manual-verification.md), [ADR 0012](adr/0012-design-system-theme-contract-and-jellyfin-adapter.md), [Jellyfin-adapter](../themes/jellyfin/README.md).
 
-## Future product planning capture
+## Future product planning and Family coordination
 
 - Status: planned only; no feature, redesign, authentication flow, external integration or runtime
   change was implemented by the 2026-08-17 capture.
 - Captured: a candidate BigBrain-wide Obsidian Gold/less-is-more design direction; passwordless,
   passkey, trusted-device and step-up investigation; external school meals and school-aware
   household menu generation; and Home Calendar past-day plus mobile swipe UX investigations.
+- Family epic consolidation 2026-08-18: planned-only Family View & Family Coordination now links the
+  existing school-meal/menu and Calendar/Home work with BB-029, BB-036 and BB-027 dependencies, and
+  captures school schedules, holidays, study days, attendance-aware meals, member context,
+  daily/weekly aggregation, generic conflict semantics, provenance/freshness and privacy. No feature,
+  sprint, provider research, deployment or runtime change occurred.
 - Priority: the active Finance direction remains the smallest deterministic foundation toward
   `FINANCE AUTONOMOUS RESEARCH v1`. These entries await normal prioritization and do not move the
   existing consolidation/security or penetration-testing gates.
-- Documents: [backlog](BACKLOG.md#future-product-ux-authentication-and-meal-planner-capture) and
+- Documents: [Family epic](architecture/family-view-family-coordination.md),
+  [backlog](BACKLOG.md#future-family-view--family-coordination-epic) and historical
   [planning record](reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md).
 
 ## Sentinel och systemstatus

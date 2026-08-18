@@ -81,6 +81,27 @@
 - Gate: mandatory before real-money LIVE eligibility and a strong prerequisite before meaningful
   PAPER/execution authority. This item is planning only; BB-086 implements none of it.
 
+## Future Family View & Family Coordination epic
+
+- Status: future umbrella epic, planning only; not prioritized or approved for implementation.
+- Goal: reduce family logistics the user must remember and manually compare by coordinating facts
+  owned by Calendar, school sources, Meal Planner, Shopping List, activities, reminders and
+  household/member context.
+- Principle: Family View is a coordination layer, not another independent-widget dashboard or a
+  competing source of truth. Source modules retain ownership; future coordination consumes
+  versioned capabilities and may normalize references without cloning or editing source records.
+- Scope captured: member association, school schedules/calendars/holidays/study days, attendance,
+  Family Context, hard/soft/information evaluation, Family Day/Week, provenance/freshness, manual
+  override, privacy/security and sparse notification relationships.
+- Consolidated existing work: the existing school-meals and school-aware menu requirements below
+  are members of this epic while Meal Planner and Shopping List retain module ownership.
+- Referenced dependencies: BB-029 Calendar/external sync, BB-036 shared-data real-time capability,
+  BB-027 profiles/roles/layouts, authentication hardening and the Home Calendar/swipe investigation.
+- Canonical planning baseline and full inventory:
+  [Family View & Family Coordination](architecture/family-view-family-coordination.md).
+- Priority guardrail: BB-091 remains complete; current Finance direction toward
+  `FINANCE AUTONOMOUS RESEARCH v1` is unchanged. No Family sprint or implementation starts here.
+
 ## Future product, UX, authentication and Meal Planner capture
 
 These entries preserve product intent without changing the active Finance direction. They await
@@ -121,7 +142,7 @@ wide duplicate assessment are recorded in the [2026-08-17 planning record](repor
 - Roadmap: place this in the future BigBrain consolidation/security and authentication hardening
   phase according to the current roadmap; do not change the evidenced pentest or Finance ordering.
 
-### External school meals in Meal Planner
+### Existing Family-epic member: External school meals in Meal Planner
 
 - Module: Meal Planner; status: future enhancement, source rights `MANUAL_REVIEW` until verified.
 - Initial use case: weekday Lunch within the existing weekly Meal Planner shows authoritative meals
@@ -136,7 +157,7 @@ wide duplicate assessment are recorded in the [2026-08-17 planning record](repor
   should approximate provider-appropriate weekly cadence, bounded retries and isolated truthful
   unavailable states without fabricated menus or disruption to household planning.
 
-### School-aware household menu generation
+### Existing Family-epic member: School-aware household menu generation
 
 - Module: Meal Planner / Shopping List; status: future Meal Planner intelligence.
 - Intent: household weekly generation considers all relevant school sources alongside household
@@ -149,7 +170,7 @@ wide duplicate assessment are recorded in the [2026-08-17 planning record](repor
   manual household choice wins. Generated household meals may create shopping requirements, but
   school meals never add their own ingredients to the household shopping list.
 
-### Home Calendar past-day presentation and mobile swipe investigation
+### Referenced Home/Calendar work: past-day presentation and mobile swipe investigation
 
 - Module: BigBrain Web / Home; status: future UX enhancement/investigation.
 - Calendar intent: Calendar is a module in Home, not a standalone view. Past days should visually

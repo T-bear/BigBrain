@@ -33,6 +33,7 @@ are not repository authority. Only reviewed, sanitized knowledge is published un
 
 ## Product and architecture
 
+- [Family View & Family Coordination epic](../architecture/family-view-family-coordination.md)
 - [Dashboard and Widget Framework](../architecture/dashboard-widget-framework.md)
 - [Media module](../modules/media.md)
 - [Calendar module](../modules/calendar.md)

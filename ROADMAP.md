@@ -64,6 +64,15 @@ Product work is tracked in [BACKLOG](docs/BACKLOG.md); current verified reality 
 [STATUS](docs/STATUS.md). This file points to dedicated canonical roadmaps rather than
 duplicating their detailed gates.
 
+## Future Family View & Family Coordination epic (planned only)
+
+The [Family epic](docs/architecture/family-view-family-coordination.md) consolidates existing
+school-meal, school-aware Meal Planner and Home/Calendar planning with future member, school
+schedule/calendar, daily/weekly context and generic conflict semantics. It is not an active sprint
+and creates no implementation order. BB-091 remains complete and the current Finance direction
+toward `FINANCE AUTONOMOUS RESEARCH v1` retains priority; Family planning does not start Finance or
+Family implementation.
+
 ## Finance epic
 
 The canonical Finance delivery sequence is the
