@@ -81,13 +81,51 @@ public sealed class FinanceResearchSchedulerTests
         using var fixture=Ready();var status=new FinanceResearchOrchestrator(Enabled(),fixture.Memory).Status(Due(fixture));Assert.Equal("RESEARCH",status.OperatingMode);Assert.Equal(0m,status.BudgetSek);Assert.Equal("NONE",status.ExecutionAuthority);Assert.False(status.ResearchCurrentlyRunning);
     }
 
+    [Fact]
+    public void PartialUniverseDefersWithoutResearchThenSameOpportunityProceedsWhenCoherent()
+    {
+        using var fixture=Ready();using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="DELETE FROM observations WHERE instrument_id='US:XNYS:XOM' AND session_date=$date";x.Parameters.AddWithValue("$date",fixture.LastSession.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));x.ExecuteNonQuery();}
+        var options=Enabled();var orchestrator=new FinanceResearchOrchestrator(options,fixture.Memory);var now=Due(fixture);var deferred=orchestrator.CheckAndRun(now,true,CancellationToken.None);
+        Assert.Equal(FinanceResearchOpportunityState.Deferred,deferred!.State);Assert.Equal("finance.research.scheduler.universeIncomplete",deferred.Reason);Assert.Empty(fixture.Memory.ResearchRuns(0,10).Runs);Assert.Empty(fixture.Memory.ResearchExperiments(0,10,null,null,null,null,null).Experiments);
+        Store(fixture,EodhdCatalog.Watchlist.Single(x=>x.Symbol=="XOM"),fixture.Bars,"restored",now);fixture.Memory.BuildFeatures();var completed=orchestrator.CheckAndRun(now.AddMinutes(options.CheckIntervalMinutes),true,CancellationToken.None);
+        Assert.Equal(FinanceResearchOpportunityState.Completed,completed!.State);Assert.Equal(deferred.OpportunityId,completed.OpportunityId);Assert.Single(fixture.Memory.ResearchRuns(0,10).Runs);
+    }
+
+    [Fact]
+    public void CurrentMarketRequiresMatchingCurrentFeatureGeneration()
+    {
+        using var fixture=Ready();var next=NextSession(fixture.LastSession);var bars=new[]{new EodhdDailyBar(next,150m,151m,149m,150.5m,150.5m,2000)};var acquired=new DateTimeOffset(next.AddDays(1),new TimeOnly(0,30),TimeSpan.Zero);foreach(var instrument in EodhdCatalog.Watchlist)Store(fixture,instrument,bars,"advance-"+instrument.Symbol,acquired);
+        var options=Enabled();var orchestrator=new FinanceResearchOrchestrator(options,fixture.Memory);var now=new DateTimeOffset(next.AddDays(1),new TimeOnly(3,0),TimeSpan.Zero);var deferred=orchestrator.CheckAndRun(now,true,CancellationToken.None);
+        Assert.Equal("finance.research.scheduler.featuresNotReady",deferred!.Reason);Assert.Empty(fixture.Memory.ResearchRuns(0,10).Runs);
+        fixture.Memory.BuildFeatures();var completed=orchestrator.CheckAndRun(now.AddMinutes(options.CheckIntervalMinutes),true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Completed,completed!.State);Assert.Equal(deferred.OpportunityId,completed.OpportunityId);
+    }
+
+    [Fact]
+    public void FeatureLineageMismatchFailsClosedDeterministically()
+    {
+        using var fixture=Ready();using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="UPDATE feature_revisions SET source_revisions_json='[]'";x.ExecuteNonQuery();}
+        var readiness=fixture.Memory.ResearchDataReadiness(fixture.LastSession);var again=fixture.Memory.ResearchDataReadiness(fixture.LastSession);
+        Assert.False(readiness.IsReady);Assert.Equal("finance.research.scheduler.featureLineageIncomplete",readiness.ReasonCode);Assert.Equal(readiness.ReasonCode,again.ReasonCode);Assert.Equal(readiness.FeatureRevisionId,again.FeatureRevisionId);Assert.Equal(readiness.CurrentInstruments,again.CurrentInstruments);
+        var result=new FinanceResearchOrchestrator(Enabled(),fixture.Memory).CheckAndRun(Due(fixture),true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Deferred,result!.State);Assert.Empty(fixture.Memory.ResearchRuns(0,10).Runs);
+    }
+
+    [Fact]
+    public void DeferredPriorDateIsExplicitlySupersededWithoutCatchUp()
+    {
+        using var fixture=Ready();using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="DELETE FROM observations WHERE instrument_id='US:XNYS:XOM' AND session_date=$date";x.Parameters.AddWithValue("$date",fixture.LastSession.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));x.ExecuteNonQuery();}
+        var orchestrator=new FinanceResearchOrchestrator(Enabled(),fixture.Memory);var first=orchestrator.CheckAndRun(Due(fixture),true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Deferred,first!.State);
+        _=orchestrator.CheckAndRun(Due(fixture).AddDays(1),true,CancellationToken.None);var old=fixture.Memory.ResearchOpportunity(first.OpportunityId)!;Assert.Equal(FinanceResearchOpportunityState.Skipped,old.State);Assert.Equal("finance.research.scheduler.superseded",old.Reason);Assert.NotNull(old.CompletedAtUtc);
+    }
+
     private static FinanceResearchSchedulerOptions Enabled()=>new(){Enabled=true,CheckIntervalMinutes=60,ScheduledUtcHour=2,MaximumExperimentsPerRun=2};
     private static DateTimeOffset Due(Fixture fixture)=>new(fixture.LastSession.AddDays(1),new TimeOnly(3,0),TimeSpan.Zero);
     private static Fixture Ready()
     {
-        var root=Path.Combine(Path.GetTempPath(),"bb093-scheduler",Guid.NewGuid().ToString("N"));var options=new EodhdFinanceOptions{DatabasePath=Path.Combine(root,"finance.db"),PayloadDirectory=Path.Combine(root,"payloads")};var memory=new EodhdMarketMemory(options);var instrument=EodhdCatalog.Watchlist.Single(x=>x.Symbol=="AAPL");var bars=new List<EodhdDailyBar>();var date=new DateOnly(2025,1,2);
-        for(var i=0;i<280;i++){while(date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)date=date.AddDays(1);var close=100m+i*.1m+(i%17-8)*.2m;bars.Add(new(date,close-.1m,close+.5m,close-.5m,close,close,1000+i));date=date.AddDays(1);}var acquired=new DateTimeOffset(2026,8,22,12,0,0,TimeSpan.Zero);memory.Store(instrument,bars,System.Text.Encoding.UTF8.GetBytes("bb093-fixture"),bars[0].Date,bars[^1].Date,acquired.AddMinutes(-1),acquired,0);memory.BuildFeatures();return new(root,options,memory,bars[^1].Date);
+        var root=Path.Combine(Path.GetTempPath(),"bb093-scheduler",Guid.NewGuid().ToString("N"));var options=new EodhdFinanceOptions{DatabasePath=Path.Combine(root,"finance.db"),PayloadDirectory=Path.Combine(root,"payloads")};var memory=new EodhdMarketMemory(options);var bars=new List<EodhdDailyBar>();var date=new DateOnly(2025,1,2);
+        for(var i=0;i<280;i++){while(date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)date=date.AddDays(1);var close=100m+i*.1m+(i%17-8)*.2m;bars.Add(new(date,close-.1m,close+.5m,close-.5m,close,close,1000+i));date=date.AddDays(1);}var acquired=new DateTimeOffset(2026,8,22,12,0,0,TimeSpan.Zero);foreach(var instrument in EodhdCatalog.Watchlist)memory.Store(instrument,bars,System.Text.Encoding.UTF8.GetBytes("bb093-fixture-"+instrument.Symbol),bars[0].Date,bars[^1].Date,acquired.AddMinutes(-1),acquired,0);memory.BuildFeatures();return new(root,options,memory,bars[^1].Date,bars);
     }
+    private static DateOnly NextSession(DateOnly date){do date=date.AddDays(1);while(!UsMarketCalendar.IsSession(date));return date;}
+    private static void Store(Fixture fixture,EodhdInstrument instrument,IReadOnlyList<EodhdDailyBar> bars,string suffix,DateTimeOffset acquired)=>fixture.Memory.Store(instrument,bars,System.Text.Encoding.UTF8.GetBytes("bb093-"+suffix),bars[0].Date,bars[^1].Date,acquired.AddMinutes(-1),acquired,0);
     private static SqliteConnection Open(Fixture fixture){var c=new SqliteConnection($"Data Source={fixture.Options.DatabasePath}");c.Open();return c;}
-    private sealed record Fixture(string Root,EodhdFinanceOptions Options,EodhdMarketMemory Memory,DateOnly LastSession):IDisposable{public void Dispose(){if(Directory.Exists(Root))Directory.Delete(Root,true);}}
+    private sealed record Fixture(string Root,EodhdFinanceOptions Options,EodhdMarketMemory Memory,DateOnly LastSession,IReadOnlyList<EodhdDailyBar> Bars):IDisposable{public void Dispose(){if(Directory.Exists(Root))Directory.Delete(Root,true);}}
 }

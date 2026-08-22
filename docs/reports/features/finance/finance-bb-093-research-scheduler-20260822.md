@@ -14,6 +14,14 @@ Detta är en sanerad GitHub-version; hemligheter, privata adresser, identiteter 
 
 BB-093 adds the first bounded unattended orchestration layer over BB-092. Implementation is verified and published in `0f952f88e3ec630b0a000e3d7565dd6274f63c09`. It does not add research methodology, acquisition behavior, PAPER, broker, order, portfolio, LIVE/AUTO, champion promotion or risk-policy authority.
 
+## Readiness remediation
+
+Post-implementation review found that `MAX(session_date)` could report readiness when only one instrument was current. The remediation replaces it with an explicit fail-closed read model over the exact eight-instrument research watchlist. Every instrument must end on the required US market session. The eligible feature revision must cover that date, contain feature evidence for every instrument, and pin exactly the normalized canonical source-revision set used through that date. Partial market acquisition, stale/missing features, and source-lineage mismatch are distinct retryable deferrals and create no BB-092 run or experiment evidence.
+
+The normal acquisition/prospective cadence remains solely responsible for provider polling and feature generation. Once committed evidence becomes coherent, the same opportunity ID proceeds exactly once on a later bounded check. If the date advances first, the older deferred opportunity becomes durable `Skipped` evidence with `finance.research.scheduler.superseded`; it is not executed as catch-up work.
+
+Local remediation verification passed 479 API tests (including 13 scheduler cases), 32 Sentinel tests and 115 frontend tests. Release solution build, frontend production build, API container build, documentation verifier (167 Markdown files / 89 unique BB IDs), Compose validation, `git diff --check` and sanitized changed-file secret review passed. No deployed runtime was changed; GitHub Actions evidence is pending publication.
+
 ## Evidence
 
 Deterministic unit/integration coverage exercises the persisted scheduler against isolated SQLite fixtures without provider access or real-time waiting. Local verification passed 475 API tests, 32 Sentinel tests and 115 frontend tests, including nine scheduler orchestration cases and UI/API contracts. Release solution, frontend production and API container builds, documentation verification, Compose validation, diff whitespace and sanitized secret-pattern scan passed. No deployed runtime was changed. GitHub Actions run 32591633284 passed backend, frontend, documentation and secrets. BB-093 is complete.
