@@ -327,6 +327,8 @@ sanitized halt audit may remain independently.
 
 Run start is a durable SQLite single-flight transaction: one global run may be `Running`, irrespective of idempotency key. A same-key call returns the original running, completed or failed result; a different key receives `409 finance.research.alreadyRunning` while the lease is occupied. On startup, stale work becomes a complete recovered `FAILED` audit record before new work can start. `research_run_experiments` preserves explicit run lineage for partial and reused experiments. Per-experiment parameter attempts are immutable and family attempt totals are their actual sum, distinct from experiment count. Global and per-run verdict counts separately report rejected, inconclusive, not evaluable, promising and challenger outcomes.
 
+Evidence selection consumes only the exact IDs/checksums returned by the current robustness build. It verifies the latest feature revision, its complete normalized source-market lineage, persisted evaluation/result identity, relational completeness, and the approved `momentum/v1` plus `sma-crossover/v1` identities. Both current families must exist before experiment creation. Older evaluations are never substitutes; incomplete or conflicting current evidence returns `409 finance.research.currentEvidenceUnavailable` and remains a durable failed-run audit result.
+
 `research-integrity-v1` requires sample, held-out OOS/excess, expanding walk-forward, explicit hypothetical costs, revision lineage, attempt accounting, complexity and the existing robustness result. DSR and PBO/CSCV remain honestly not evaluable. A Challenger has no prospective, champion, risk or execution authority. Macro, background scheduling and negative controls are not used in v1; see ADR 0033.
 
 ```text

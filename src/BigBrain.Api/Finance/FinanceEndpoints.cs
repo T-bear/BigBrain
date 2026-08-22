@@ -63,6 +63,7 @@ public static class FinanceEndpoints
             try{return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey,request.MaximumExperiments??FinanceResearchContracts.MaximumTotalExperimentsPerRun),JsonOptions);}
             catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid autonomous research request",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.invalidRequest"}});}
             catch(AutonomousResearchBusyException exception){return Results.Problem(statusCode:409,title:"Autonomous research already running",detail:"Another bounded research run is active.",extensions:new Dictionary<string,object?>{{"code","finance.research.alreadyRunning"},{"currentRunId",exception.CurrentRunId}});}
+            catch(CurrentResearchEvidenceUnavailableException exception){return Results.Problem(statusCode:409,title:"Current research evidence unavailable",detail:"The complete current robustness evidence set is unavailable; no older evidence was substituted.",extensions:new Dictionary<string,object?>{{"code","finance.research.currentEvidenceUnavailable"},{"reason",exception.ReasonCode}});}
             catch(InvalidOperationException exception){return Results.Problem(statusCode:409,title:"Autonomous research unavailable",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.conflict"}});}
         });
         return endpoints;

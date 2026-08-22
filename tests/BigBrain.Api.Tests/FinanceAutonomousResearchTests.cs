@@ -104,6 +104,55 @@ public sealed class FinanceAutonomousResearchTests
     }
 
     [Fact]
+    public void LatestEligibleGenerationWinsDespiteLexicallyEarlierStaleEvaluationAndRemainsDeterministic()
+    {
+        var fixture=Ready();try
+        {
+            var generationA=fixture.Memory.RunAutonomousResearch("generation-a",2);var old=generationA.Experiments[0];
+            using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="INSERT INTO robustness_evaluations SELECT '000-stale-evaluation',checksum,plan_id,plan_version,strategy_id,strategy_version,feature_revision_id,market_revisions_json,verdict,score,result_json,created_utc FROM robustness_evaluations WHERE evaluation_id=$id";x.Parameters.AddWithValue("$id",old.RobustnessEvaluationId);x.ExecuteNonQuery();}
+            var featureB=AdvanceGeneration(fixture,"generation-b",1.25m);var generationB=fixture.Memory.RunAutonomousResearch("generation-b",2);var repeated=fixture.Memory.RunAutonomousResearch("generation-b-repeat",2);
+            Assert.All(generationB.Experiments,x=>{Assert.Equal(featureB.RevisionId,x.FeatureRevisionId);Assert.Equal(featureB.SourceMarketRevisions.Order(),x.MarketRevisionIds.Order());Assert.DoesNotContain(x.RobustnessEvaluationId,generationA.Experiments.Select(a=>a.RobustnessEvaluationId));Assert.NotEqual("000-stale-evaluation",x.RobustnessEvaluationId);});
+            Assert.Equal(generationB.Experiments.Select(x=>x.RobustnessEvaluationId),repeated.Experiments.Select(x=>x.RobustnessEvaluationId));Assert.Equal(generationB.Experiments.Select(x=>x.HypothesisId),repeated.Experiments.Select(x=>x.HypothesisId));Assert.Equal(generationB.Experiments.Select(x=>x.ExperimentId),repeated.Experiments.Select(x=>x.ExperimentId));
+        }
+        finally{fixture.Dispose();}
+    }
+
+    [Fact]
+    public void IncompleteCurrentGenerationFailsWithoutStaleFamilyFallback()
+    {
+        var fixture=Ready();try
+        {
+            fixture.Memory.RunAutonomousResearch("complete-a",2);var featureB=AdvanceGeneration(fixture,"incomplete-b",2m);
+            fixture.Memory.AutonomousResearchTestHook=phase=>{if(phase!="robustness-built")return;using var c=Open(fixture);using var x=c.CreateCommand();x.CommandText="DELETE FROM robustness_evaluations WHERE feature_revision_id=$feature AND strategy_id='sma-crossover'";x.Parameters.AddWithValue("$feature",featureB.RevisionId);x.ExecuteNonQuery();};
+            var error=Assert.Throws<CurrentResearchEvidenceUnavailableException>(()=>fixture.Memory.RunAutonomousResearch("incomplete-b",2));Assert.Equal("finance.research.currentEvidenceIncomplete",error.ReasonCode);
+            var failed=fixture.Memory.ResearchRuns(0,10).Runs.Single(x=>x.State==ResearchExperimentState.Failed);var detail=Assert.IsType<AutonomousResearchRun>(fixture.Memory.ResearchRun(failed.RunId));Assert.Empty(detail.Experiments);Assert.Equal("finance.research.currentEvidenceIncomplete",detail.FailureReason);
+        }
+        finally{fixture.Dispose();}
+    }
+
+    [Fact]
+    public void CurrentMarketLineageMismatchFailsClosed()
+    {
+        var fixture=Ready();try
+        {
+            var feature=fixture.Memory.BuildFeatures();fixture.Memory.AutonomousResearchTestHook=phase=>{if(phase!="robustness-built")return;using var c=Open(fixture);using var x=c.CreateCommand();x.CommandText="UPDATE robustness_evaluations SET market_revisions_json='[\"mismatched-revision\"]' WHERE feature_revision_id=$feature AND strategy_id='momentum'";x.Parameters.AddWithValue("$feature",feature.RevisionId);x.ExecuteNonQuery();};
+            var error=Assert.Throws<CurrentResearchEvidenceUnavailableException>(()=>fixture.Memory.RunAutonomousResearch("market-mismatch",2));Assert.Equal("finance.research.currentEvidenceLineageInvalid",error.ReasonCode);Assert.Empty(fixture.Memory.ResearchExperiments(0,10,null,null,null,null,null).Experiments);
+        }
+        finally{fixture.Dispose();}
+    }
+
+    [Fact]
+    public void CurrentStrategyVersionMismatchFailsClosed()
+    {
+        var fixture=Ready();try
+        {
+            var feature=fixture.Memory.BuildFeatures();fixture.Memory.AutonomousResearchTestHook=phase=>{if(phase!="robustness-built")return;using var c=Open(fixture);using var x=c.CreateCommand();x.CommandText="UPDATE robustness_evaluations SET strategy_version='v0' WHERE feature_revision_id=$feature AND strategy_id='momentum'";x.Parameters.AddWithValue("$feature",feature.RevisionId);x.ExecuteNonQuery();};
+            var error=Assert.Throws<CurrentResearchEvidenceUnavailableException>(()=>fixture.Memory.RunAutonomousResearch("strategy-mismatch",2));Assert.Equal("finance.research.currentEvidenceLineageInvalid",error.ReasonCode);Assert.Empty(fixture.Memory.ResearchExperiments(0,10,null,null,null,null,null).Experiments);
+        }
+        finally{fixture.Dispose();}
+    }
+
+    [Fact]
     public void FeatureLibraryIsVersionedAllowlistedAndRejectsUnknownIds()
     {
         Assert.Equal("finance-research-signals-v1", FinanceResearchFeatureLibrary.Version);
@@ -184,5 +233,11 @@ public sealed class FinanceAutonomousResearchTests
         var root=Path.Combine(Path.GetTempPath(),"bb-autonomous-remediation",Guid.NewGuid().ToString("N"));var options=new EodhdFinanceOptions{DatabasePath=Path.Combine(root,"finance.db"),PayloadDirectory=Path.Combine(root,"payloads")};var memory=new EodhdMarketMemory(options);var instrument=EodhdCatalog.Watchlist.Single(x=>x.Symbol=="AAPL");var bars=new List<EodhdDailyBar>();var date=new DateOnly(2025,1,2);
         for(var i=0;i<280;i++){while(date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)date=date.AddDays(1);var close=100m+i*.1m+(i%17-8)*.2m;bars.Add(new(date,close-.1m,close+.5m,close-.5m,close,close,1000+i));date=date.AddDays(1);}var acquired=new DateTimeOffset(2026,8,21,22,0,0,TimeSpan.Zero);memory.Store(instrument,bars,System.Text.Encoding.UTF8.GetBytes("bb092-remediation-fixture"),bars[0].Date,bars[^1].Date,acquired.AddMinutes(-1),acquired,0);memory.BuildFeatures();return new(root,options,memory);
     }
+    private static FinanceFeatureBuildEvidence AdvanceGeneration(ResearchFixture fixture,string identity,decimal offset)
+    {
+        var instrument=EodhdCatalog.Watchlist.Single(x=>x.Symbol=="AAPL");var bars=new List<EodhdDailyBar>();var date=new DateOnly(2025,1,2);
+        for(var i=0;i<280;i++){while(date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)date=date.AddDays(1);var close=100m+offset+i*.1m+(i%17-8)*.2m;bars.Add(new(date,close-.1m,close+.5m,close-.5m,close,close,2000+i));date=date.AddDays(1);}var acquired=new DateTimeOffset(2026,8,22,12,0,0,TimeSpan.Zero);fixture.Memory.Store(instrument,bars,System.Text.Encoding.UTF8.GetBytes(identity),bars[0].Date,bars[^1].Date,acquired.AddMinutes(-1),acquired,0);return fixture.Memory.BuildFeatures();
+    }
+    private static SqliteConnection Open(ResearchFixture fixture){var c=new SqliteConnection($"Data Source={fixture.Options.DatabasePath}");c.Open();return c;}
     private sealed record ResearchFixture(string Root,EodhdFinanceOptions Options,EodhdMarketMemory Memory):IDisposable{public void Dispose(){if(Directory.Exists(Root))Directory.Delete(Root,true);}}
 }
