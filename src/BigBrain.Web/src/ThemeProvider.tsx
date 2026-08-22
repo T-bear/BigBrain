@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { applyTheme, isThemeId, resolveInitialTheme, THEME_STORAGE_KEY, type ThemeId } from './theme'
+import { applyTheme, normalizeTheme, resolveInitialTheme, THEME_STORAGE_KEY, type ThemeId } from './theme'
 
 type ThemeContextValue = { theme: ThemeId; setTheme: (theme: ThemeId) => Promise<void>; error: string }
 const ThemeContext = createContext<ThemeContextValue | null>(null)
@@ -8,8 +8,9 @@ async function readTheme(signal?: AbortSignal): Promise<{ theme: ThemeId; config
   const response = await fetch('/api/v1/settings/theme', { signal })
   if (!response.ok) throw new Error('Temainställningen kunde inte hämtas.')
   const value = await response.json() as { theme?: string; configured?: boolean }
-  if (!isThemeId(value.theme ?? null)) throw new Error('Servern returnerade ett ogiltigt tema.')
-  return { theme: value.theme as ThemeId, configured: value.configured !== false }
+  const theme = normalizeTheme(value.theme ?? null)
+  if (!theme) throw new Error('Servern returnerade ett ogiltigt tema.')
+  return { theme, configured: value.configured !== false }
 }
 
 async function writeTheme(theme: ThemeId): Promise<void> {

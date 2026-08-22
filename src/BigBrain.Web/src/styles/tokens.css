@@ -22,9 +22,9 @@
   --bb-space-8: 2rem;
   --bb-space-10: 2.5rem;
   --bb-space-12: 3rem;
-  --bb-radius-sm: .5rem;
-  --bb-radius-md: .625rem;
-  --bb-radius-lg: .875rem;
+  --bb-radius-sm: .55rem;
+  --bb-radius-md: .75rem;
+  --bb-radius-lg: 1rem;
   --bb-radius-pill: 999px;
   --bb-border-width: 1px;
   --bb-control-height: 2.75rem;
@@ -33,8 +33,16 @@
   --bb-duration-fast: 120ms;
   --bb-duration-normal: 200ms;
   --bb-easing-standard: cubic-bezier(.2, 0, 0, 1);
-  --bb-page-padding: clamp(1rem, 4vw, 3rem);
+  --bb-page-padding: clamp(.9rem, 3vw, 2.5rem);
   --bb-section-gap: var(--bb-space-6);
   --bb-card-padding: var(--bb-space-5);
   --bb-header-height: 4rem;
+  --bb-theme-preview-obsidian: linear-gradient(145deg, #080a0d 55%, #d3a22e);
+  --bb-theme-preview-arctic: linear-gradient(145deg, #071320 45%, #52c9ee);
+  --bb-theme-preview-forest: linear-gradient(145deg, #06130e 50%, #d6a341);
+  --surface: var(--bb-color-surface);
+  --border: var(--bb-color-border);
+  --muted: var(--bb-color-text-muted);
+  --accent: var(--bb-color-accent);
+  --danger: var(--bb-color-danger);
 }

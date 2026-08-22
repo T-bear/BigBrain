@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
 import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
@@ -28,6 +28,7 @@ const autonomousFixture:FinanceAutonomousResearch={generatedAtUtc:'2026-08-22T10
 const schedulerFixture:FinanceResearchSchedulerStatus={currentUtc:'2026-08-23T01:00:00Z',enabled:true,schedulerVersion:'finance-research-scheduler-v1',nextDueUtc:'2026-08-23T02:00:00Z',lastOpportunity:{opportunityId:'finance-research-scheduler-v1:2026-08-22',researchDate:'2026-08-22',dueAtUtc:'2026-08-23T02:00:00Z',attemptedAtUtc:'2026-08-23T02:03:00Z',completedAtUtc:'2026-08-23T02:04:00Z',state:'Completed',researchRunId:'research-run-fixture',reason:'finance.research.scheduler.completed',nextEligibilityUtc:null},lastResearchRunId:'research-run-fixture',lastOutcome:'Completed',lastReason:'finance.research.scheduler.completed',researchCurrentlyRunning:false,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE',dataReady:true,readinessReason:'finance.research.scheduler.ready',currentInstrumentCount:8,expectedInstrumentCount:8}
 const governorFixture:FinanceResearchResourceDecision={decision:'defer',evaluatedAtUtc:'2026-08-23T01:00:00Z',governorVersion:'finance-research-resource-governor-v1',reasonCodes:['finance.research.scheduler.resource.memory'],evidence:{cpuUsagePercent:32,memoryUsagePercent:88,availableMemoryBytes:536870912,minimumAvailableDiskBytes:107374182400,availableDiskCount:1,temperatureCelsius:null,temperatureSupported:false,metricsStatus:'Healthy',collectedAtUtc:'2026-08-23T01:00:00Z'},operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
 const operationsFixture:FinanceResearchOperationsStatus={operationsVersion:'finance-research-operations-v1',evaluatedAtUtc:'2026-08-23T03:00:00Z',state:'attentionRequired',requiresAttention:true,currentActivity:'OPERATIONAL_FAILURE_STREAK',schedulerEnabled:true,maintenancePaused:false,lastSchedulerEvaluationUtc:'2026-08-23T03:00:00Z',lastSuccessfulResearchUtc:'2026-08-22T02:04:00Z',lastOperationalFailureUtc:'2026-08-23T03:00:00Z',consecutiveOperationalFailures:3,lastFailureReason:'finance.research.scheduler.unexpected.SqliteException',lastSuccessfulEvidenceRefreshUtc:'2026-08-22T22:10:00Z',dataReadiness:'READY',resourceDecision:'DEFER',activeResearchRunId:null,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
+const openResearchDetails = () => fireEvent.click(screen.getAllByText('Detaljer & forskning').at(-1)!)
 
 describe('Finance read-only observation UI', () => {
   test('registers Finance as a navigable dashboard view', () => {
@@ -35,6 +36,7 @@ describe('Finance read-only observation UI', () => {
   })
   test('renders unmistakable fail-closed research and empty states without trading controls', () => {
     render(<FinanceObservation initialSnapshot={empty} />)
+    openResearchDetails()
     expect(screen.getAllByText('RESEARCH').length).toBeGreaterThan(0)
     expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
     expect(screen.getByText('Ingen provider auktoriserad')).toBeVisible()
@@ -51,6 +53,7 @@ describe('Finance read-only observation UI', () => {
       { observedAtUtc: '2026-08-11T09:00:00Z', value: 100, beginsAfterGap: false }, { observedAtUtc: '2026-08-11T09:15:00Z', value: 101, beginsAfterGap: false }, { observedAtUtc: '2026-08-11T10:00:00Z', value: 99, beginsAfterGap: true }, { observedAtUtc: '2026-08-11T10:15:00Z', value: 101, beginsAfterGap: false },
     ] }], historicalMemory: { ...empty.historicalMemory, observationCount: 4, activeRevisionId: 'fixture-revision-1', gapCount: 1, persistence: 'fixtureMemory' } }
     const { container } = render(<FinanceObservation initialSnapshot={fixture} />)
+    openResearchDetails()
     expect(screen.getByText(/SYNTHETISK FIXTURE/)).toBeVisible()
     expect(screen.getByText('Inaktuell · Datagap')).toBeVisible()
     expect(screen.getByText('Kvalitet: Varning')).toBeVisible()
@@ -70,6 +73,7 @@ describe('Finance read-only observation UI', () => {
       retention: { state: 'active', entitlementEndsAtUtc: null, deletionDeadlineUtc: null, coveredObservationCount: 2, coveredRevisionCount: 1, coveredPayloadCount: 1, deletionScope: 'covered data', lastReceiptId: null, coveredFeatureValueCount:42, coveredFeatureRevisionCount:1 },
     }
     render(<FinanceObservation initialSnapshot={fixture} initialFeatures={featureFixture} />)
+    openResearchDetails()
     expect(screen.getByText(/REAL EOD-MARKET DATA/)).toBeVisible()
     expect(screen.getByText('Ägargodkänd personlig research')).toBeVisible()
     expect(screen.getAllByText('Aktiv').length).toBeGreaterThan(0)
@@ -86,6 +90,7 @@ describe('Finance read-only observation UI', () => {
   test('shows neutral insufficient out-of-sample evidence without optimization or trading controls', () => {
     const robustness: FinanceRobustnessCatalog={generatedAtUtc:'2026-08-12T08:00:00Z',operatingMode:'RESEARCH',plans:[],evaluations:[{evaluationId:'evaluation-1',checksum:'sha256:evidence',planId:'chronological-oos-walk-forward',planVersion:'v1',strategyId:'momentum',strategyVersion:'v1',verdict:'insufficientData',score:58.09,evidenceLabel:'mixedEvidence',trainSessions:176,testSessions:26,embargoSessions:50,walkForwardWindows:3,parameterVariants:3,costVariants:5,featureRevisionId:'feature-1',marketRevisionIds:['market-1'],limitations:['Engineering evidence only.']}]}
     render(<FinanceObservation initialSnapshot={empty} initialRobustness={robustness}/>)
+    openResearchDetails()
     expect(screen.getAllByText('Robusthet / Out-of-sample').at(-1)).toBeVisible()
     expect(screen.getAllByText('DATA INSUFFICIENT').at(-1)).toBeVisible()
     expect(screen.getAllByText(/176 \/ 26 \/ 50 sessions/).at(-1)).toBeVisible()
@@ -94,6 +99,7 @@ describe('Finance read-only observation UI', () => {
 
   test('distinguishes backed-up historical memory from canonical and provider-restricted evidence',()=>{
     render(<FinanceObservation initialSnapshot={empty} initialBackups={backupFixture}/>)
+    openResearchDetails()
     expect(screen.getAllByText('Dataskydd / Historiskt minne').at(-1)).toBeVisible();expect(screen.getByText('BACKED UP')).toBeVisible();expect(screen.getByText('finance-backup-fixture · 1 market-revisioner')).toBeVisible()
     expect(screen.getByText('NASDAQ-WIKI / WIKI/PRICES')).toBeVisible();expect(screen.getByText('EODHD / Free')).toBeVisible();expect(screen.getByText('SEPARAT FRÅN CANONICAL')).toBeVisible()
     expect(screen.queryByRole('button',{name:/backup|restore|radera|cleanup/i})).not.toBeInTheDocument()
@@ -101,6 +107,7 @@ describe('Finance read-only observation UI', () => {
   test('separates prospective pending evidence from historical backtests and states sample limits',()=>{
     const shadow:FinanceShadowCatalog={generatedAtUtc:'2026-08-15T18:00:00Z',operatingMode:'RESEARCH',observationClass:'CURRENT EOD / PROSPECTIVE EOD',total:1,pending:1,evaluated:0,insufficient:0,missed:0,evidenceMaturity:'BOOTSTRAPPING',predictions:[{predictionId:'shadow-fixture',instrumentId:'US:XNAS:AAPL',symbol:'AAPL',sessionDate:'2026-08-14',provider:'EODHD',sourceRevisionId:'eodhd-fixture',observationKnowledgeUtc:'2026-08-15T17:00:00Z',knowledgeCutoffUtc:'2026-08-15T18:00:00Z',featureRevisionId:'feature-fixture',strategyId:'momentum',strategyVersion:'v1',parameterFingerprint:'sha256:fixture',signal:'TargetLong',horizon:'next-eligible-source-session-close-v1',createdAtUtc:'2026-08-15T18:00:00Z',state:'pending',operatingMode:'RESEARCH',reasonCodes:['momentum.positive']}]}
     render(<FinanceObservation initialSnapshot={empty} initialShadow={shadow}/>)
+    openResearchDetails()
     expect(screen.getAllByText('Shadow research').at(-1)).toBeVisible();expect(screen.getByText('TargetLong · PENDING')).toBeVisible()
     expect(screen.getByText(/samplet bevisar pipelineintegritet, inte strategikvalitet/i)).toBeVisible()
     expect(screen.getAllByText('Backtests / Strategiforskning').at(-1)).toBeVisible();expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
@@ -129,6 +136,7 @@ describe('Finance read-only observation UI', () => {
   })
   test('renders autonomous research evidence conservatively with progressive details and no profitability claim',()=>{
     render(<FinanceObservation initialSnapshot={empty} initialAutonomousResearch={autonomousFixture}/>)
+    openResearchDetails()
     expect(screen.getAllByText('Autonomous Research').length).toBeGreaterThan(1)
     expect(screen.getByText('1 experiment')).toBeVisible();expect(screen.getAllByText('1').length).toBeGreaterThan(1)
     expect(screen.getByText(/family-momentum-v1 · REJECTED/)).toBeVisible();expect(screen.getByText(/INTEGRITY FAIL/)).toBeVisible()
@@ -138,6 +146,7 @@ describe('Finance read-only observation UI', () => {
   })
   test('renders bounded scheduler status as research-only operations',()=>{
     render(<FinanceObservation initialSnapshot={empty} initialAutonomousResearch={autonomousFixture} initialResearchScheduler={schedulerFixture} initialResearchGovernor={governorFixture} initialResearchOperations={operationsFixture}/>)
+    openResearchDetails()
     expect(screen.getByText('AKTIV')).toBeVisible();expect(screen.getByText('Completed')).toBeVisible();expect(screen.getByText('RESEARCH · 0 SEK · NONE')).toBeVisible()
     expect(screen.getByText('PAUSAD — SYSTEMBELASTNING')).toBeVisible();expect(screen.getByText('finance.research.scheduler.resource.memory')).toBeVisible()
     expect(screen.getByText('BEHÖVER UPPMÄRKSAMHET')).toBeVisible();expect(screen.getAllByText('3').length).toBeGreaterThan(0)

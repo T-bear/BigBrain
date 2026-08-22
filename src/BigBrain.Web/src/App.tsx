@@ -1,32 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getDockerContainers, getModules, getSystemOverview, getSystemRecovery } from './api'
-import { DashboardWorkspace } from './dashboard/DashboardWorkspace'
-import { createAppWidgetRegistry, dashboardRegistry } from './dashboard/appWidgets'
-import { WidgetProvider, useWidgets } from './dashboard/widgetFramework'
-import { MobileNavigation } from './MobileNavigation'
+import { createAppWidgetRegistry } from './dashboard/appWidgets'
+import { WidgetProvider } from './dashboard/widgetFramework'
 import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from './types'
 import { ThemeProvider } from './ThemeProvider'
+import { AppShell } from './AppShell'
 
 const POLL_INTERVAL_MS = 5_000
-
-function AppShell() {
-  const { activeView, setActiveView } = useWidgets()
-
-  return <div className="shell bb-page-shell">
-    <aside className="sidebar">
-      <button className="brand" onClick={() => setActiveView('home')} type="button">
-        <img alt="" className="brand__mark" height="34" src="/icons/bigbrain-192.png" width="34" />
-        <span>BigBrain</span>
-      </button>
-      <nav aria-label="Dashboardvyer" className="desktop-navigation">
-        <p className="nav-label">Vyer</p>
-        {dashboardRegistry.getAll().map(view => <button aria-current={activeView === view.id ? 'page' : undefined} className="nav-link" key={view.id} onClick={() => setActiveView(view.id)} type="button"><span aria-hidden="true">{view.icon}</span><span>{view.title}</span></button>)}
-      </nav>
-    </aside>
-    <DashboardWorkspace dashboards={dashboardRegistry} />
-    <MobileNavigation dashboards={dashboardRegistry} />
-  </div>
-}
 
 function AppContent() {
   const [modules, setModules] = useState<ModuleDefinition[]>([])

@@ -8,6 +8,8 @@ BB-094 resource-governor tests inject deterministic `ISystemMetricsProvider` sna
 
 BB-095 operations tests use isolated SQLite stores and injected timestamps. They cover disabled/maintenance semantics, stale enabled scheduling, persistent readiness/resource waits, operational-versus-scientific failure classification, deduplicated incident streaks, success recovery, pre-run interruption, partial experiment preservation, post-run scheduler reconciliation, repeated reconciliation, bounded read APIs, compact metadata backup/restore and unchanged `RESEARCH / 0 SEK / NONE` authority. Hosted-service tests never wait for real scheduled time or contact providers.
 
+BB-096 frontend regression covers the three stable theme IDs, default/fallback and migration aliases, local/server persistence, immediate switching, shared token completeness, five-item primary navigation, secondary AI/Admin access, Family relocation without functional removal, dashboard editing and the existing module interaction suites. Visual review uses temporary, uncommitted browser captures at mobile and desktop sizes; the local design mockup binaries are references and are not test fixtures.
+
 BB-089 adds network-free policy, invariant and adversarial tests for deterministic identity,
 version/config validation, ALLOW/REDUCE/DENY/HALT/INSUFFICIENT_DATA, EOD weekend freshness,
 clock/lineage/instrument/price/health/volatility/liquidity/exposure failures, client-forged verdicts,

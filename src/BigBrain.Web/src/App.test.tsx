@@ -29,15 +29,23 @@ function successfulFetch() {
   })
 }
 function switchView(name: string) {
-  fireEvent.click(within(screen.getByRole('navigation', { name: 'Dashboardvyer' })).getByRole('button', { name: new RegExp(name) }))
+  const primary = screen.getByRole('navigation', { name: 'Primär navigation' })
+  const direct = within(primary).queryByRole('button', { name: new RegExp(name) })
+  if (direct) fireEvent.click(direct)
+  else {
+    fireEvent.click(within(primary).getByRole('button', { name: 'Mer' }))
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(name) }))
+  }
 }
 
 beforeEach(() => { window.localStorage.clear(); vi.stubGlobal('fetch', successfulFetch()) })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
 
-test('starts on Home with the family-priority widgets in registry order', () => {
+test('starts on the calm Home launcher and keeps family tools in Family', () => {
   const { container } = render(<App />)
   expect(screen.getByRole('heading', { level: 1, name: 'Hem' })).toBeInTheDocument()
+  expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['home-launcher'])
+  switchView('Familj')
   expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
   expect(screen.getByRole('navigation', { name: 'Snabbnavigation' })).toBeInTheDocument()
 })
@@ -53,7 +61,7 @@ test('switches dashboard without reload and remembers the active view', () => {
 test('restores the last selected dashboard and falls back from invalid storage', () => {
   window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'ai', views: {} }))
   const { unmount } = render(<App />)
-  expect(screen.getByRole('heading', { level: 1, name: 'AI' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { level: 1, name: 'BigBrain AI' })).toBeInTheDocument()
   unmount()
   window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, '{invalid')
   render(<App />)
@@ -62,17 +70,19 @@ test('restores the last selected dashboard and falls back from invalid storage',
 
 test('widget library hides a widget without deleting data and persists visibility', () => {
   render(<App />)
+  switchView('Familj')
   fireEvent.click(screen.getByRole('button', { name: 'Dashboardinställningar' }))
   fireEvent.click(screen.getByRole('button', { name: 'Öppna widgetbibliotek' }))
   const dialog = screen.getByRole('dialog', { name: 'Visa widgets' })
   fireEvent.click(within(dialog).getByRole('checkbox', { name: /Kalender/ }))
   fireEvent.click(within(dialog).getByRole('button', { name: 'Klar' }))
   expect(screen.queryByRole('heading', { name: 'Kalender' })).not.toBeInTheDocument()
-  expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}').views.home.hidden).toContain('calendar')
+  expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}').views.family.hidden).toContain('calendar')
 })
 
 test('edit mode reorders widgets and collapsed state is persisted', () => {
   const { container } = render(<App />)
+  switchView('Familj')
   fireEvent.click(screen.getByRole('button', { name: 'Dashboardinställningar' }))
   fireEvent.click(screen.getByRole('button', { name: 'Aktivera redigeringsläge' }))
   fireEvent.click(screen.getByRole('button', { name: 'Flytta Inköpslista upp' }))
@@ -80,8 +90,8 @@ test('edit mode reorders widgets and collapsed state is persisted', () => {
   const shoppingWidget = container.querySelector('[data-widget-id="shopping-list"]') as HTMLElement
   fireEvent.click(within(shoppingWidget).getAllByRole('button', { name: 'Minimera Inköpslista' })[0])
   const stored = JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')
-  expect(stored.views.home.order.slice(0, 2)).toEqual(['shopping-list', 'meal-plan'])
-  expect(stored.views.home.collapsed).toContain('shopping-list')
+  expect(stored.views.family.order.slice(0, 2)).toEqual(['shopping-list', 'meal-plan'])
+  expect(stored.views.family.collapsed).toContain('shopping-list')
 })
 
 test('renders system values and safe Docker state only in Admin', async () => {
@@ -99,7 +109,7 @@ test('dashboard settings groups theme, editing and widget library with keyboard 
   const trigger = screen.getByRole('button', { name: 'Dashboardinställningar' })
   fireEvent.click(trigger)
   const settings = screen.getByRole('dialog', { name: 'Dashboardinställningar' })
-  expect(within(settings).getByRole('combobox', { name: 'Tema' })).toBeInTheDocument()
+  expect(within(settings).getByRole('group', { name: 'Tema' })).toBeInTheDocument()
   expect(within(settings).getByRole('button', { name: 'Aktivera redigeringsläge' })).toBeInTheDocument()
   expect(within(settings).getByRole('button', { name: 'Öppna widgetbibliotek' })).toBeInTheDocument()
   fireEvent.keyDown(document, { key: 'Escape' })

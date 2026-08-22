@@ -1,7 +1,7 @@
 @import './tokens.css';
-@import './themes/bigbrain-dark.css';
-@import './themes/bigbrain-light.css';
-@import './themes/bigbrain-obsidian-gold.css';
+@import './themes/obsidian-gold.css';
+@import './themes/arctic-wind.css';
+@import './themes/forest-night.css';
 @import './foundation.css';
 @import './components.css';
 @import './modules.css';

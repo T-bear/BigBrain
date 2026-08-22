@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import type { AppIconName } from '../AppIcon'
 
-export const dashboardViewIds = ['home', 'media', 'finance', 'ai', 'admin'] as const
+export const dashboardViewIds = ['home', 'family', 'media', 'finance', 'more', 'ai', 'admin'] as const
 export type DashboardViewId = typeof dashboardViewIds[number]
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full'
 
@@ -26,7 +27,7 @@ export interface DashboardDefinition {
   id: DashboardViewId
   title: string
   description: string
-  icon: string
+  icon: AppIconName
 }
 
 export class ApplicationWidgetRegistry {

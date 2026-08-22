@@ -1,0 +1,35 @@
+[data-theme="forest-night"] {
+  color-scheme: dark;
+  --bb-color-bg: #06130e;
+  --bb-color-bg-subtle: #0b2118;
+  --bb-color-surface: #10281e;
+  --bb-color-surface-raised: #183328;
+  --bb-color-surface-overlay: #0b1d16;
+  --bb-color-surface-interactive: #143024;
+  --bb-color-border: #2b4a3a;
+  --bb-color-border-strong: #806a38;
+  --bb-color-text: #f0f2e8;
+  --bb-color-text-secondary: #c8cfbf;
+  --bb-color-text-muted: #98aa98;
+  --bb-color-text-inverse: #171207;
+  --bb-color-primary: #d99f2b;
+  --bb-color-primary-hover: #ebb548;
+  --bb-color-primary-active: #b77d16;
+  --bb-color-primary-contrast: #171207;
+  --bb-color-accent: #d6a341;
+  --bb-color-accent-soft: rgb(214 163 65 / 14%);
+  --bb-color-success: #62bd75;
+  --bb-color-success-contrast: #06180b;
+  --bb-color-warning: #efb743;
+  --bb-color-warning-contrast: #201503;
+  --bb-color-danger: #f06455;
+  --bb-color-danger-contrast: #270704;
+  --bb-color-info: #5ca6dd;
+  --bb-color-info-contrast: #061522;
+  --bb-color-backdrop: rgb(2 10 7 / 84%);
+  --bb-page-glow: radial-gradient(ellipse at 70% -4%, rgb(54 112 72 / 27%), transparent 39%), radial-gradient(circle at 8% 45%, rgb(214 163 65 / 6%), transparent 30%);
+  --bb-shadow-sm: 0 1px 0 rgb(230 246 227 / 5%) inset, 0 .5rem 1.6rem rgb(0 8 4 / 34%);
+  --bb-shadow-md: 0 1px 0 rgb(230 246 227 / 6%) inset, 0 1rem 3rem rgb(0 8 4 / 50%);
+  --bb-shadow-lg: 0 1px 0 rgb(230 246 227 / 7%) inset, 0 2rem 5rem rgb(0 8 4 / 70%);
+  --bb-focus-ring: 0 0 0 3px rgb(214 163 65 / 58%);
+}

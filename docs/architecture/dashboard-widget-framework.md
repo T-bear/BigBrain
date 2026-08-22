@@ -2,15 +2,17 @@
 
 ## Scope
 
-The framework now exposes five instant client-side views:
+The framework exposes seven instant client-side views through one reusable shell:
 
-- **Hem** – Matlista, Inköpslista and honest placeholders for Calendar and Reminders.
+- **Hem** – a calm module launcher and attention-only system signal.
+- **Familj** – Matlista, Inköpslista, Calendar and the existing honest Reminders placeholder.
 - **Media** – Media Search, Downloads, Smart Shuffle, active jobs and Jellyfin/integration overview.
 - **Finance** – a compiled read-only RESEARCH observation widget; no provider or trading controls.
+- **Mer** – theme settings and discoverable secondary destinations.
 - **AI** – registered placeholders for AI Chat, Agents, Voice Assistant, suggestions and automations; no AI capability is claimed yet.
-- **Admin** – server metrics, container inventory, media integrations and future update information.
+- **Admin** – server metrics, recovery, container inventory, media integrations and future update information.
 
-The bottom and desktop navigation use the same `DashboardRegistry`. Selecting a view changes React state and writes local preferences; it does not reload the document.
+The mobile dock and desktop rail expose Hem, Familj, Media, Finance and Mer. AI and Admin remain registered, bookmark-safe application states reached through Mer. Selecting a view changes React state and writes local preferences; it does not reload the document.
 
 ## Widget contract
 

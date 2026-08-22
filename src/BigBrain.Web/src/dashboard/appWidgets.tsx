@@ -11,6 +11,9 @@ import { CalendarWidget } from '../calendar/Calendar'
 import { FinanceObservation } from '../finance/FinanceObservation'
 import { SystemRecovery } from '../system-recovery/SystemRecovery'
 import { ApplicationWidgetRegistry, DashboardRegistry, type WidgetDefinition } from './widgetFramework'
+import { AppIcon } from '../AppIcon'
+import { useWidgets } from './widgetFramework'
+import { ThemeControl } from '../ThemeControl'
 
 export interface AppWidgetData {
   docker: DockerInventory | null
@@ -73,22 +76,40 @@ function DockerWidget({ data }: { data: AppWidgetData }) {
 }
 
 export const dashboardRegistry = new DashboardRegistry([
-  { id: 'home', title: 'Hem', description: 'Familjens dagliga översikt', icon: '⌂' },
-  { id: 'media', title: 'Media', description: 'Sök, spela och hantera media', icon: '▶' },
-  { id: 'finance', title: 'Finance', description: 'Read-only marknadsobservation i researchläge', icon: '◇' },
-  { id: 'ai', title: 'AI', description: 'Assistenter och automation', icon: '✦' },
-  { id: 'admin', title: 'Admin', description: 'System, tjänster och drift', icon: '⚙' },
+  { id: 'home', title: 'Hem', description: 'Det viktigaste just nu', icon: 'home' },
+  { id: 'family', title: 'Familj', description: 'Mat, inköp och kalender', icon: 'family' },
+  { id: 'media', title: 'Media', description: 'Sök, spela och hantera media', icon: 'media' },
+  { id: 'finance', title: 'Finance', description: 'Marknaden och forskning', icon: 'finance' },
+  { id: 'more', title: 'Mer', description: 'Inställningar och verktyg', icon: 'more' },
+  { id: 'ai', title: 'BigBrain AI', description: 'Assistenter och automation', icon: 'ai' },
+  { id: 'admin', title: 'Admin', description: 'System, tjänster och drift', icon: 'admin' },
 ])
+
+function HomeLauncher({ data }: { data: AppWidgetData }) {
+  const { setActiveView } = useWidgets()
+  const items = [
+    { id: 'family' as const, icon: 'family' as const, title: 'Familj', detail: 'Mat, inköp och kalender' },
+    { id: 'media' as const, icon: 'media' as const, title: 'Media', detail: 'Sök, spela och följ flöden' },
+    { id: 'finance' as const, icon: 'finance' as const, title: 'Finance', detail: 'RESEARCH · inga riktiga pengar' },
+  ]
+  return <div className="module-launcher">{items.map(item => <button key={item.id} onClick={() => setActiveView(item.id)} type="button"><AppIcon name={item.icon} size={26} /><span><strong>{item.title}</strong><small>{item.detail}</small></span><AppIcon name="chevron" /></button>)}{data.recovery && data.recovery.overall !== 'healthy' && <button className="module-launcher__attention" onClick={() => setActiveView('admin')} type="button"><AppIcon name="admin" /><span><strong>Systemet behöver uppmärksamhet</strong><small>{data.recovery.overall}</small></span><AppIcon name="chevron" /></button>}</div>
+}
+
+function MoreNavigation() {
+  const { setActiveView } = useWidgets()
+  return <div className="more-hub"><div className="module-launcher"><button onClick={() => setActiveView('ai')} type="button"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></button><button onClick={() => setActiveView('admin')} type="button"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></button></div><section aria-labelledby="theme-heading" className="settings-surface"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /></section></div>
+}
 
 export function createAppWidgetRegistry(data: AppWidgetData) {
   const planned = (id: string, title: string, description: string, icon: string, defaultView: 'home' | 'ai'): WidgetDefinition => ({
     id, title, description, icon, category: defaultView === 'home' ? 'Familj' : 'AI', defaultView, defaultSize: 'medium', minimumSize: 'small', supportedViews: [defaultView], permissions: [], render: () => <PlannedWidget text={description} />,
   })
   return new ApplicationWidgetRegistry([
-    { id: 'meal-plan', title: 'Matlista', description: 'Planera familjens måltider.', icon: '◫', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <MealPlanner expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'meal-planner')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
-    { id: 'shopping-list', title: 'Inköpslista', description: 'Familjens aktiva inköpslista.', icon: '✓', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <ShoppingList expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'shopping-list')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
-    { id: 'calendar', title: 'Kalender', description: 'Veckans arbetsschema och säker Heroma-import.', icon: '▦', category: 'Familj', defaultView: 'home', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['home'], permissions: ['calendar.events.read'], render: () => <CalendarWidget /> },
-    planned('reminders', 'Påminnelser', 'Visa familjens viktigaste påminnelser.', '◉', 'home'),
+    { id: 'home-launcher', title: 'BigBrain', description: 'Välj område.', icon: '⌂', category: 'Översikt', defaultView: 'home', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <HomeLauncher data={data} /> },
+    { id: 'meal-plan', title: 'Matlista', description: 'Planera familjens måltider.', icon: '◫', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: [], render: () => <MealPlanner expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'meal-planner')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
+    { id: 'shopping-list', title: 'Inköpslista', description: 'Familjens aktiva inköpslista.', icon: '✓', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: [], render: () => <ShoppingList expanded onToggle={() => undefined} status={data.modules.find(module => module.id === 'shopping-list')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
+    { id: 'calendar', title: 'Kalender', description: 'Veckans arbetsschema och säker Heroma-import.', icon: '▦', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: ['calendar.events.read'], render: () => <CalendarWidget /> },
+    { id: 'reminders', title: 'Påminnelser', description: 'Visa familjens viktigaste påminnelser.', icon: '◉', category: 'Familj', defaultView: 'family', defaultSize: 'medium', minimumSize: 'small', supportedViews: ['family'], permissions: [], render: () => <PlannedWidget text="Visa familjens viktigaste påminnelser." /> },
     { id: 'media-search', title: 'Mediesökning', description: 'Hitta filmer och serier.', icon: '⌕', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaSearch /> },
     { id: 'downloads', title: 'Nedladdningskö', description: 'Hantera aktiva nedladdningar.', icon: '⇣', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <DownloadControl /> },
     { id: 'smart-shuffle', title: 'Smart Shuffle', description: 'Starta en rättvis serieblandning på TV:n.', icon: '⤨', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <SmartShuffle /> },
@@ -100,6 +121,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     planned('voice-assistant', 'Röstassistent', 'Röststyr familjens BigBrain.', '◖', 'ai'),
     planned('ai-suggestions', 'AI-förslag', 'Granska förslag innan någon åtgärd utförs.', '◇', 'ai'),
     planned('automations', 'Automationer', 'Hantera framtida godkända automationer.', '↻', 'ai'),
+    { id: 'settings', title: 'Inställningar', description: 'Tema och sekundära destinationer.', icon: '⚙', category: 'Inställningar', defaultView: 'more', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['more'], permissions: [], render: () => <MoreNavigation /> },
     { id: 'server-status', title: 'Serverstatus', description: 'CPU, minne, lagring och uptime.', icon: '▤', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemWidget data={data} /> },
     { id: 'system-recovery', title: 'Start och återställning', description: 'Boot, clean shutdown, storage och recovery.', icon: '↻', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemRecovery recovery={data.recovery} error={data.recoveryError} /> },
     { id: 'containers', title: 'Containers', description: 'Read-only Docker-inventering.', icon: '⬡', category: 'Administration', defaultView: 'admin', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['admin'], permissions: [], render: () => <DockerWidget data={data} /> },

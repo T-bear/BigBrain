@@ -19,12 +19,12 @@ public sealed class SettingsTests : IDisposable
         await using var factory = Factory();
         using var first = factory.CreateClient();
         var initial = (await first.GetFromJsonAsync<ThemeSetting>("/api/v1/settings/theme", TestContext.Current.CancellationToken))!;
-        Assert.Equal("bigbrain-dark", initial.Theme); Assert.False(initial.Configured);
-        var changed = await first.PutAsJsonAsync("/api/v1/settings/theme", new ThemeSetting("bigbrain-obsidian-gold"), TestContext.Current.CancellationToken);
+        Assert.Equal("obsidian-gold", initial.Theme); Assert.False(initial.Configured);
+        var changed = await first.PutAsJsonAsync("/api/v1/settings/theme", new ThemeSetting("forest-night"), TestContext.Current.CancellationToken);
         changed.EnsureSuccessStatusCode();
         using var second = factory.CreateClient();
         var persisted = (await second.GetFromJsonAsync<ThemeSetting>("/api/v1/settings/theme", TestContext.Current.CancellationToken))!;
-        Assert.Equal("bigbrain-obsidian-gold", persisted.Theme); Assert.True(persisted.Configured);
+        Assert.Equal("forest-night", persisted.Theme); Assert.True(persisted.Configured);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class SettingsTests : IDisposable
         var response = await client.PutAsJsonAsync("/api/v1/settings/theme", new ThemeSetting("unknown"), TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains("settingsInvalidTheme", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken), StringComparison.Ordinal);
-        Assert.Equal("bigbrain-dark", (await client.GetFromJsonAsync<ThemeSetting>("/api/v1/settings/theme", TestContext.Current.CancellationToken))!.Theme);
+        Assert.Equal("obsidian-gold", (await client.GetFromJsonAsync<ThemeSetting>("/api/v1/settings/theme", TestContext.Current.CancellationToken))!.Theme);
     }
 
     private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>

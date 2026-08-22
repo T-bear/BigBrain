@@ -10,7 +10,7 @@ describe('theme contract', () => {
     localStorage.clear()
     delete document.documentElement.dataset.theme
     vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ theme: 'bigbrain-dark' }), { status: 200, headers: { 'Content-Type': 'application/json' } })))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ theme: 'obsidian-gold', configured: true }), { status: 200, headers: { 'Content-Type': 'application/json' } })))
   })
 
   const renderControl = () => render(<ThemeProvider><ThemeControl /></ThemeProvider>)
@@ -18,16 +18,15 @@ describe('theme contract', () => {
   it('uses and applies the default theme without stored state', () => {
     expect(resolveInitialTheme()).toBe(DEFAULT_THEME)
     applyTheme(resolveInitialTheme())
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-dark')
+    expect(document.documentElement.dataset.theme).toBe('obsidian-gold')
   })
 
   it('switches without reload and persists the Swedish-labelled selection', () => {
     renderControl()
-    const control = screen.getByLabelText('Tema')
-    fireEvent.change(control, { target: { value: 'bigbrain-light' } })
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-light')
-    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('bigbrain-light')
-    expect(screen.getByRole('option', { name: 'Ljust' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /Arctic Wind/ }))
+    expect(document.documentElement.dataset.theme).toBe('arctic-wind')
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('arctic-wind')
+    expect(screen.getByRole('radio', { name: /Arctic Wind/ })).toBeChecked()
   })
 
   it('falls back when storage contains an invalid theme', () => {
@@ -37,26 +36,23 @@ describe('theme contract', () => {
   })
 
   it('uses the stored theme on a new render', () => {
-    localStorage.setItem(THEME_STORAGE_KEY, 'bigbrain-light')
+    localStorage.setItem(THEME_STORAGE_KEY, 'arctic-wind')
     renderControl()
-    expect(screen.getByLabelText('Tema')).toHaveValue('bigbrain-light')
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-light')
+    expect(screen.getByRole('radio', { name: /Arctic Wind/ })).toBeChecked()
+    expect(document.documentElement.dataset.theme).toBe('arctic-wind')
   })
 
   it('registers, selects and restores Obsidian Gold', () => {
-    expect(themes).toContain('bigbrain-obsidian-gold')
+    expect(themes).toContain('obsidian-gold')
     const { unmount } = renderControl()
-    const control = screen.getByLabelText('Tema')
-
-    expect(screen.getByRole('option', { name: 'Obsidian Gold' })).toBeInTheDocument()
-    fireEvent.change(control, { target: { value: 'bigbrain-obsidian-gold' } })
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-obsidian-gold')
-    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('bigbrain-obsidian-gold')
+    fireEvent.click(screen.getByRole('radio', { name: /Forest Night/ }))
+    expect(document.documentElement.dataset.theme).toBe('forest-night')
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('forest-night')
 
     unmount()
     renderControl()
-    expect(screen.getByLabelText('Tema')).toHaveValue('bigbrain-obsidian-gold')
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-obsidian-gold')
+    expect(screen.getByRole('radio', { name: /Forest Night/ })).toBeChecked()
+    expect(document.documentElement.dataset.theme).toBe('forest-night')
   })
 
   it('keeps every registered theme unique', () => {
@@ -64,13 +60,13 @@ describe('theme contract', () => {
   })
 
   it('seeds an unconfigured shared setting from the existing browser theme', async () => {
-    localStorage.setItem(THEME_STORAGE_KEY, 'bigbrain-light')
+    localStorage.setItem(THEME_STORAGE_KEY, 'arctic-wind')
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'bigbrain-dark', configured: false }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'bigbrain-light', configured: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'obsidian-gold', configured: false }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'arctic-wind', configured: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
     vi.stubGlobal('fetch', fetchMock)
     renderControl()
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/v1/settings/theme', expect.objectContaining({ method: 'PUT' })))
-    expect(document.documentElement.dataset.theme).toBe('bigbrain-light')
+    expect(document.documentElement.dataset.theme).toBe('arctic-wind')
   })
 })

@@ -139,8 +139,9 @@ test('mobile navigation has stable destinations and marks the active view', () =
   expect(screen.getByRole('button', { name: /Hem/ })).toHaveAttribute('aria-current', 'page')
   fireEvent.click(screen.getByRole('button', { name: /Media/ }))
   expect(screen.getByRole('button', { name: /Media/ })).toHaveAttribute('aria-current', 'page')
-  expect(screen.getByRole('button', { name: /AI/ })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /Admin/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Familj/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Mer/ })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Admin/ })).not.toBeInTheDocument()
 })
 
 test('provider timeout is shown with a Swedish safe message', async () => {

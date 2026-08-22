@@ -1,0 +1,35 @@
+[data-theme="arctic-wind"] {
+  color-scheme: dark;
+  --bb-color-bg: #071320;
+  --bb-color-bg-subtle: #0b1d2e;
+  --bb-color-surface: #10263a;
+  --bb-color-surface-raised: #17344c;
+  --bb-color-surface-overlay: #0b1b2b;
+  --bb-color-surface-interactive: #12304a;
+  --bb-color-border: #29506b;
+  --bb-color-border-strong: #4a7c98;
+  --bb-color-text: #eef7ff;
+  --bb-color-text-secondary: #c1d8e7;
+  --bb-color-text-muted: #8dafc4;
+  --bb-color-text-inverse: #03131d;
+  --bb-color-primary: #42b7ed;
+  --bb-color-primary-hover: #62c9f3;
+  --bb-color-primary-active: #2599d0;
+  --bb-color-primary-contrast: #03131d;
+  --bb-color-accent: #52c9ee;
+  --bb-color-accent-soft: rgb(82 201 238 / 14%);
+  --bb-color-success: #42c5a6;
+  --bb-color-success-contrast: #031a14;
+  --bb-color-warning: #f3bf55;
+  --bb-color-warning-contrast: #211704;
+  --bb-color-danger: #ef7076;
+  --bb-color-danger-contrast: #260607;
+  --bb-color-info: #55aaf2;
+  --bb-color-info-contrast: #041624;
+  --bb-color-backdrop: rgb(2 11 19 / 80%);
+  --bb-page-glow: radial-gradient(ellipse at 72% -4%, rgb(46 187 231 / 24%), transparent 38%), radial-gradient(circle at 18% 15%, rgb(85 130 210 / 12%), transparent 28%);
+  --bb-shadow-sm: 0 1px 0 rgb(220 248 255 / 7%) inset, 0 .5rem 1.6rem rgb(0 7 14 / 28%);
+  --bb-shadow-md: 0 1px 0 rgb(220 248 255 / 8%) inset, 0 1rem 3rem rgb(0 7 14 / 44%);
+  --bb-shadow-lg: 0 1px 0 rgb(220 248 255 / 9%) inset, 0 2rem 5rem rgb(0 7 14 / 65%);
+  --bb-focus-ring: 0 0 0 3px rgb(82 201 238 / 55%);
+}

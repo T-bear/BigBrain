@@ -10,6 +10,6 @@ public sealed record ThemeSetting(string Theme, bool Configured = true);
 
 public static class ThemeIds
 {
-    public const string Default = "bigbrain-dark";
-    public static readonly HashSet<string> All = [Default, "bigbrain-light", "bigbrain-obsidian-gold"];
+    public const string Default = "obsidian-gold";
+    public static readonly HashSet<string> All = [Default, "arctic-wind", "forest-night", "bigbrain-dark", "bigbrain-light", "bigbrain-obsidian-gold"];
 }
