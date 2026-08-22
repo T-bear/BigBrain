@@ -13,7 +13,7 @@ Detta är en sanerad GitHub-version; hemligheter, privata adresser, identiteter 
 
 ## Status
 
-Implemented and locally verified; publication and CI evidence remain pending until the final commit is pushed.
+Implemented, verified and published in `8f6e83904aa3b0a9e6995c22c699a7344777739d`. GitHub Actions run 32595755361 passed all required jobs.
 
 ## Changes
 
@@ -29,7 +29,7 @@ Manual BB-092 research remains explicit and is not silently gated. System recove
 
 ## Evidence
 
-Deterministic fake-metric tests cover healthy allow, CPU/memory/disk pressure, critical-disk precedence, multiple reasons, unavailable/stale/throwing providers, configuration bounds, scheduled defer/recovery on the same opportunity, persisted/reopened audit evidence and unchanged `RESEARCH / 0 SEK / NONE` authority. Local verification passed 486 API tests, 32 Sentinel tests and 115 frontend tests; Release solution, frontend production and API image builds, documentation (169 Markdown files / 89 unique BB IDs), Compose, diff and sanitized changed-file secret-pattern checks passed. No deployed runtime was changed. Publication and CI evidence are recorded in `docs/STATUS.md` after verification.
+Deterministic fake-metric tests cover healthy allow, CPU/memory/disk pressure, critical-disk precedence, multiple reasons, unavailable/stale/throwing providers, configuration bounds, scheduled defer/recovery on the same opportunity, persisted/reopened audit evidence and unchanged `RESEARCH / 0 SEK / NONE` authority. Local verification passed 486 API tests, 32 Sentinel tests and 115 frontend tests; Release solution, frontend production and API image builds, documentation (169 Markdown files / 89 unique BB IDs), Compose, diff and sanitized changed-file secret-pattern checks passed. GitHub Actions run 32595755361 passed backend, frontend, documentation and secrets. No deployed runtime was changed.
 
 ## Remaining work
 
