@@ -1,6 +1,7 @@
 # Project Report Catalog
 
 - `BB-096` — [BigBrain UX Sprint v1 / Unified Design System](features/dashboard/bb-096-unified-design-system-20260822.md)
+- `BB-096 deployment` — [UX deployment / commissioning](deployments/bb-096-ux-commissioning-20260823.md)
 
 - `BB-092` — [Finance Autonomous Research v1 foundation](features/finance/finance-bb-092-autonomous-research-foundation-20260822.md)
 - `BB-093` — [Finance Research Scheduler / Orchestrator v1](features/finance/finance-bb-093-research-scheduler-20260822.md)
