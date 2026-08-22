@@ -12,7 +12,7 @@ Detta är en sanerad GitHub-version; hemligheter, privata adresser, identiteter 
 
 ## Status
 
-Implemented and locally verified; publication/CI evidence is pending.
+Implemented, locally verified and published in `31c11865b430a137b7eb5be77681158d1d6adb1f`. GitHub Actions run 32597319341 completed successfully with backend, frontend, documentation and secrets all green.
 
 ## Evidence
 
@@ -38,14 +38,15 @@ The operations layer cannot change data, research methodology, resource threshol
 - BB-092 bounded research and integrity: complete.
 - BB-093 scheduler and coherent readiness: complete.
 - BB-094 resource governor: complete.
-- BB-095 recovery/operations tests: locally complete.
+- BB-095 recovery/operations tests: complete locally and in published CI.
 - Scheduler default: off.
 - Authority: `RESEARCH`, `0 SEK`, `NONE`.
-- Final code review: pending; CI requires publication.
+- Final code review: complete; no unresolved blocker found.
+- Published CI: GitHub Actions run 32597319341 passed all four required jobs.
 
 ## Remaining work
 
-After acceptance, Finance may be eligible for an explicit deployment decision enabling continuous unattended RESEARCH. That is not automatic activation and not trading. External notifications and future research methodology remain separate evidence-driven work.
+The complete checklist makes Finance eligible for a separate explicit deployment decision enabling continuous unattended RESEARCH. Scheduler activation remains default-off and was not performed by BB-095. This is not trading. External notifications and future research methodology remain separate evidence-driven work.
 
 ## Resumption
 
