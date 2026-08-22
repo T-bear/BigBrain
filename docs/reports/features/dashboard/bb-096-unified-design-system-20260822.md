@@ -4,12 +4,12 @@
 
 - Date: 2026-08-22
 - Scope: frontend design system, shell, navigation, themes and functional regression
-- Related commit: pending publication
+- Related commit: `1293d36a04013bb65469ca2191f2f1683d52a50d`
 
 ## Status
 
 - Implemented: yes
-- Automatically tested: frontend suite/build and repository build passed locally
+- Automatically tested: complete local validation and GitHub Actions run 32600293268 passed
 - Deployed: no
 - Manually verified: temporary mobile and desktop Obsidian Gold renders inspected; broader owner review remains
 
@@ -40,12 +40,12 @@ Detta är en sanerad GitHub-version. It contains no secrets, private network add
 
 ## Remaining work
 
-Final publication and GitHub Actions evidence remain pending. Manual owner review across the supplied full mockup matrix can identify later presentation-only refinements; it must not be interpreted as authorization for Family Epic or Finance methodology work.
+Manual owner review can identify later presentation-only refinements; it must not be interpreted as authorization for Family Epic or Finance methodology work. This sprint did not deploy the new frontend to the appliance.
 
 ## Resumption
 
-Authoritative contracts are `docs/design-system/theme-contract-v1.md`, `docs/architecture/dashboard-widget-framework.md`, `docs/BACKLOG.md` and this report. The smallest safe next step is to complete full repository validation, publish BB-096, inspect CI and then stop.
+Authoritative contracts are `docs/design-system/theme-contract-v1.md`, `docs/architecture/dashboard-widget-framework.md`, `docs/BACKLOG.md` and this report. Any deployment or later refinement is a separate explicitly authorized task.
 
 ## Verification
 
-Focused frontend tests and production build passed during implementation. Temporary 390×844 and 1440×900 browser renders were visually inspected for shell, depth, content width and dock overlap. Final full-suite, container, documentation, Compose, secret and CI evidence must be appended before this report is marked complete.
+Local verification passed 495 API tests, 32 Sentinel tests and 115 frontend tests. Release solution, frontend production, API image and Web image builds passed, as did documentation verification (172 Markdown files / 90 unique BB IDs), Compose validation, diff checking and a sanitized changed-file secret-pattern review. `gitleaks` was unavailable locally; GitHub Actions run 32600293268 supplied the authoritative successful secrets job alongside successful backend, frontend and documentation jobs. Temporary browser renders covered all five primary views across the three themes at 390×844, 430×932, 768×1024, 1024×768 and 1440×900; representative outputs were visually inspected for hierarchy, contrast, overflow, dock/safe-area clearance and desktop width.
