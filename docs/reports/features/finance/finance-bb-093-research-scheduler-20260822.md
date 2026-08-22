@@ -20,7 +20,7 @@ Post-implementation review found that `MAX(session_date)` could report readiness
 
 The normal acquisition/prospective cadence remains solely responsible for provider polling and feature generation. Once committed evidence becomes coherent, the same opportunity ID proceeds exactly once on a later bounded check. If the date advances first, the older deferred opportunity becomes durable `Skipped` evidence with `finance.research.scheduler.superseded`; it is not executed as catch-up work.
 
-Local remediation verification passed 479 API tests (including 13 scheduler cases), 32 Sentinel tests and 115 frontend tests. Release solution build, frontend production build, API container build, documentation verifier (167 Markdown files / 89 unique BB IDs), Compose validation, `git diff --check` and sanitized changed-file secret review passed. No deployed runtime was changed; GitHub Actions evidence is pending publication.
+Local remediation verification passed 479 API tests (including 13 scheduler cases), 32 Sentinel tests and 115 frontend tests. Release solution build, frontend production build, API container build, documentation verifier (167 Markdown files / 89 unique BB IDs), Compose validation, `git diff --check` and sanitized changed-file secret review passed. Implementation commit `adf930a6aacbfab2e314f558a0307b7643edb7e0` is published, and GitHub Actions run 32592856198 passed backend, frontend, documentation and secrets. No deployed runtime was changed.
 
 ## Evidence
 
