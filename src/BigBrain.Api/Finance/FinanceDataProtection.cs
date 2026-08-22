@@ -209,7 +209,8 @@ internal sealed class FinanceDataProtectionStore
             new("research_hypotheses", Rows(connection,"research_hypotheses","hypothesis_id",researchHypothesisSet)),
             new("research_experiments", researchExperiments),
             new("research_runs", Rows(connection,"research_runs","run_id",researchRunSet)),
-            new("research_run_experiments", Rows(connection,"research_run_experiments","run_id",researchRunSet))
+            new("research_run_experiments", Rows(connection,"research_run_experiments","run_id",researchRunSet)),
+            new("research_schedule_opportunities", SchedulerRows(connection,researchRunSet))
         };
         return new(FinanceBackupPolicyV1.Version, revisions, observations, featureIds, backtestIds, robustnessIds, tables);
     }
@@ -243,6 +244,12 @@ internal sealed class FinanceDataProtectionStore
         while(reader.Read()){var run=reader.GetString(0);if(!runs.TryGetValue(run,out var experiments)){experiments=[];runs.Add(run,experiments);}experiments.Add(reader.GetString(1));}
         foreach(var run in runs)if(run.Value.Count>0&&run.Value.All(eligibleExperiments.Contains))eligibleRuns.Add(run.Key);
         return eligibleRuns;
+    }
+
+    private static List<SortedDictionary<string,string?>> SchedulerRows(SqliteConnection connection,HashSet<string> eligibleRuns)
+    {
+        if(!TableExists(connection,"research_schedule_opportunities"))return [];using var command=connection.CreateCommand();command.CommandText="SELECT * FROM research_schedule_opportunities ORDER BY opportunity_id";using var reader=command.ExecuteReader();var rows=new List<SortedDictionary<string,string?>>();
+        while(reader.Read()){var runOrdinal=reader.GetOrdinal("research_run_id");if(!reader.IsDBNull(runOrdinal)&&!eligibleRuns.Contains(reader.GetString(runOrdinal)))continue;var row=new SortedDictionary<string,string?>(StringComparer.Ordinal);for(var i=0;i<reader.FieldCount;i++)row[reader.GetName(i)]=reader.IsDBNull(i)?null:Convert.ToString(reader.GetValue(i),CultureInfo.InvariantCulture);rows.Add(row);}return rows;
     }
 
     private static List<SortedDictionary<string,string?>> Rows(SqliteConnection connection, string table, string filterColumn, HashSet<string> accepted)

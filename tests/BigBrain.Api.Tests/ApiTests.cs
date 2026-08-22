@@ -35,6 +35,13 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task ResearchSchedulerStatusIsDisabledByDefaultAndHistoryIsBounded()
+    {
+        var status=await _client.GetAsync("/api/v1/modules/finance/research/scheduler/status",TestContext.Current.CancellationToken);var history=await _client.GetAsync("/api/v1/modules/finance/research/scheduler/history?offset=0&limit=10",TestContext.Current.CancellationToken);var invalid=await _client.GetAsync("/api/v1/modules/finance/research/scheduler/history?limit=101",TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,status.StatusCode);var body=await status.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);Assert.Contains("\"enabled\":false",body,StringComparison.Ordinal);Assert.Contains("\"operatingMode\":\"RESEARCH\"",body,StringComparison.Ordinal);Assert.Contains("\"executionAuthority\":\"NONE\"",body,StringComparison.Ordinal);Assert.Equal(HttpStatusCode.OK,history.StatusCode);Assert.Equal(HttpStatusCode.BadRequest,invalid.StatusCode);
+    }
+
+    [Fact]
     public async Task SystemOverviewReturnsUnavailableWithoutHostMetrics()
     {
         var response = await _client.GetAsync("/api/v1/system/overview", TestContext.Current.CancellationToken);

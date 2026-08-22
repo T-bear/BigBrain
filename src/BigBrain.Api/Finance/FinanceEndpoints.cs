@@ -58,6 +58,8 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/research/autonomous/runs/{runId}",(string runId,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchRun(runId),true));
         endpoints.MapGet("/api/v1/modules/finance/research/autonomous/experiments",(int? offset,int? limit,string? family,string? verdict,string? state,string? hypothesis,string? run,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchExperiments(offset??0,limit??25,family,verdict,state,hypothesis,run)));
         endpoints.MapGet("/api/v1/modules/finance/research/autonomous/experiments/{experimentId}",(string experimentId,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchExperiment(experimentId),true));
+        endpoints.MapGet("/api/v1/modules/finance/research/scheduler/status",(FinanceResearchOrchestrator orchestrator,TimeProvider clock)=>Results.Json(orchestrator.Status(clock.GetUtcNow()),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/scheduler/history",(int? offset,int? limit,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchSchedulerHistory(offset??0,limit??25)));
         endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run",(AutonomousResearchRunRequest request,EodhdMarketMemory memory)=>
         {
             try{return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey,request.MaximumExperiments??FinanceResearchContracts.MaximumTotalExperimentsPerRun),JsonOptions);}

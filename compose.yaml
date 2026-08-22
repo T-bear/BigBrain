@@ -53,6 +53,7 @@ services:
       Finance__Fred__ApiKey: ${FINANCE__FRED__APIKEY:-}
       Finance__Fred__BaseUrl: https://api.stlouisfed.org
       Finance__Fred__QuarantineDirectory: /finance-data/macro-quarantine
+      Finance__ResearchScheduler__Enabled: ${FINANCE__RESEARCHSCHEDULER__ENABLED:-false}
       SystemRecovery__DatabasePath: /lifecycle-data/lifecycle.db
       SystemRecovery__ClockSyncDirectory: /host-timesync
       MealPlanner__DatabasePath: /data/meal-planner.db

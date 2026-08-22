@@ -193,6 +193,7 @@ internal sealed partial class EodhdMarketMemory
         InitializeCadenceStorage(connection);
         InitializeRiskStorage(connection);
         InitializeAutonomousResearchStorage(connection);
+        InitializeResearchSchedulerStorage(connection);
         Execute(connection, null, "UPDATE acquisitions SET outcome='interrupted',reason='marketData.acquisition.interruptedBeforeCommit' WHERE outcome='started'");
     }
 

@@ -167,6 +167,9 @@ public partial class Program
         builder.Services.AddSingleton(dataProtectionOptions);
         var cadenceOptions=builder.Configuration.GetSection(FinanceCadenceOptions.Section).Get<FinanceCadenceOptions>()??new();
         builder.Services.AddSingleton(cadenceOptions);
+        var researchSchedulerOptions=builder.Configuration.GetSection(FinanceResearchSchedulerOptions.Section).Get<FinanceResearchSchedulerOptions>()??new();
+        researchSchedulerOptions.Validate();
+        builder.Services.AddSingleton(researchSchedulerOptions);
         var riskOptions=builder.Configuration.GetSection(FinanceRiskOptions.Section).Get<FinanceRiskOptions>()??new();
         riskOptions.Validate();
         builder.Services.AddSingleton(riskOptions);
@@ -182,6 +185,9 @@ public partial class Program
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
         builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
         builder.Services.AddHostedService<FinanceRobustnessBuildWorker>();
+        builder.Services.AddSingleton<FinanceResearchOrchestrator>();
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddHostedService<FinanceResearchSchedulerWorker>();
         builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();
         builder.Services.AddSingleton<IFinanceBacktestReader, EodhdFinanceBacktestReader>();

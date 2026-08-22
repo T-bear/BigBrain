@@ -1,6 +1,7 @@
 # Finance reports
 
 - [BB-092 Autonomous Research v1 foundation](finance-bb-092-autonomous-research-foundation-20260822.md)
+- [BB-093 Research Scheduler / Orchestrator v1](finance-bb-093-research-scheduler-20260822.md)
 - [BB-091 Sweden / Europe macro and FX](finance-bb-091-european-macro-fx-20260817.md)
 - [BB-089 Hard Risk Engine foundation](finance-bb-089-hard-risk-engine-foundation-20260816.md)
 - [BB-088 prospective daily cadence and Finance UI v1.0](finance-bb-088-daily-cadence-ui-v1-20260815.md)

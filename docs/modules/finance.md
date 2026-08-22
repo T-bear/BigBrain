@@ -329,6 +329,12 @@ Run start is a durable SQLite single-flight transaction: one global run may be `
 
 Evidence selection consumes only the exact IDs/checksums returned by the current robustness build. It verifies the latest feature revision, its complete normalized source-market lineage, persisted evaluation/result identity, relational completeness, and the approved `momentum/v1` plus `sma-crossover/v1` identities. Both current families must exist before experiment creation. Older evaluations are never substitutes; incomplete or conflicting current evidence returns `409 finance.research.currentEvidenceUnavailable` and remains a durable failed-run audit result.
 
+## BB-093 bounded research scheduling
+
+`Finance:ResearchScheduler` is explicitly disabled by default. When enabled, `finance-research-scheduler-v1` checks hourly for one 02:00 UTC opportunity covering the previous completed US market-session date. The hour follows the normal 22:00 UTC provider window; the scheduler itself performs no acquisition and does not touch prospective shadow cadence. It uses only the latest/current opportunity after downtime, so missed days never create a catch-up storm.
+
+Each `finance-research-scheduler-v1:yyyy-MM-dd` identity has one durable SQLite journal row and is also the BB-092 idempotency key. Recovery/data-not-ready/manual-research-busy are bounded `Deferred` states; non-session dates are `Skipped`; current-evidence or research failure is durable `Failed`. Restart reconciles the linked BB-092 run without duplicating experiments. `GET /api/v1/modules/finance/research/scheduler/status` and `/history` are read-only; history uses offset/limit up to 100. See ADR 0034. Resource/load gating and final continuous-operation hardening remain future work.
+
 `research-integrity-v1` requires sample, held-out OOS/excess, expanding walk-forward, explicit hypothetical costs, revision lineage, attempt accounting, complexity and the existing robustness result. DSR and PBO/CSCV remain honestly not evaluable. A Challenger has no prospective, champion, risk or execution authority. Macro, background scheduling and negative controls are not used in v1; see ADR 0033.
 
 ```text

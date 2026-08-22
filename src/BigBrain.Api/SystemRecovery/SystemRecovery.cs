@@ -58,6 +58,7 @@ public sealed class SystemRecoveryCoordinator : BackgroundService
         new("finance-features", MissedRunPolicy.DerivedFromSourceState, "Build only from a committed market revision."),
         new("finance-backtests", MissedRunPolicy.DerivedFromSourceState, "Build only from exact committed market and feature revisions."),
         new("finance-robustness", MissedRunPolicy.DerivedFromSourceState, "Build only from exact committed runs and revisions."),
+        new("finance-autonomous-research", MissedRunPolicy.SkipToNext, "Use only the current deterministic scheduled opportunity; never backfill missed research days."),
         new("media-refresh", MissedRunPolicy.SkipToNext, "External integrations recover on their next bounded poll."),
         new("deep-integrity-check", MissedRunPolicy.Manual, "Potentially expensive and never required for local read availability.")
     ];

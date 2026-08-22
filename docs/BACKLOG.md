@@ -2173,3 +2173,11 @@ The bounded deterministic hypothesis/challenger loop, versioned signal library, 
 **Remediation/finalization (2026-08-22): COMPLETE.** Commit `4f5e2b3272c92b3ad072bc13849b374824f50299` implements interrupted-run recovery, durable global single-flight, explicit run↔experiment audit lineage, immutable actual attempt counts, target/horizon consistency, distinct verdict totals and bounded historical query APIs. Regression passed 461 API, 32 Sentinel and 114 frontend tests plus all applicable local build/documentation/configuration gates; GitHub Actions run 32589143795 passed all four required jobs. This remains BB-092; it does not create BB-093 or start the Scheduler/Orchestrator.
 
 **Final evidence-selection remediation (2026-08-22): COMPLETE.** Commit `6796953533fb72cb12e5546964033e2939cf74c0` makes Autonomous Research use only the exact current robustness-build generation, require both approved strategy versions with complete feature/market lineage, and fail closed without stale fallback. Regression passed 465 API, 32 Sentinel and 114 frontend tests plus all applicable local gates; GitHub Actions run 32590079318 passed all four required jobs. This remains BB-092.
+
+# BB-093 — Finance Research Scheduler / Orchestrator v1
+
+**Status:** LOCALLY VERIFIED / PUBLICATION PENDING (2026-08-22).
+
+Add one disabled-by-default, UTC-scheduled, durable and idempotent research opportunity per eligible market session over the existing BB-092 path. Persist scheduler decisions, expose bounded read-only status/history and keep market acquisition, prospective shadow, Resource Governor, Hard Risk and execution authority separate. No missed-window backfill, provider polling, PAPER, broker, order, LIVE/AUTO or champion promotion belongs in this slice.
+
+Local regression passed 475 API, 32 Sentinel and 115 frontend tests plus all applicable build, documentation, Compose, diff and sanitized secret-pattern gates. Publication and current GitHub Actions evidence remain pending.

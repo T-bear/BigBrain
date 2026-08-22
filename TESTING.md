@@ -2,6 +2,8 @@
 
 BB-092 adds network-free tests for the allowlisted research feature registry, invalid IDs and bounds, deterministic hypothesis fingerprints, explainable complexity, OOS/cost/lineage fail-closed integrity, family attempt visibility, DSR/PBO `NOT_EVALUABLE`, and conservative read-only UI language. Remediation coverage also exercises partial-run evidence retention, persisted restart recovery, cross-key global single-flight, same-key failed-result idempotency, actual 3/5/2 attempt accumulation, bounded/filterable history, count reconciliation and target/horizon consistency. Final evidence-selection cases prove that a second feature/robustness generation wins over lexically earlier stale history, incomplete current families do not fall back, exact market lineage and approved strategy versions are mandatory, and repeated unchanged selection stays deterministic. It reuses BB-081's train/test leakage, cost monotonicity and real expanding-window tests. Research tests never call providers or create PAPER, broker, order, portfolio, LIVE/AUTO or risk-policy state.
 
+BB-093 scheduler tests use injected times/direct orchestrator calls rather than real sleeps. They cover default-disabled startup, due completion, repeated ticks, completed and pre-run restart recovery, no catch-up storm, recovery/data deferral, manual-run busy deferral, current-evidence failure, option bounds, cancellation, bounded APIs, read-only UI wording and unchanged `RESEARCH / 0 SEK / NONE` authority.
+
 BB-089 adds network-free policy, invariant and adversarial tests for deterministic identity,
 version/config validation, ALLOW/REDUCE/DENY/HALT/INSUFFICIENT_DATA, EOD weekend freshness,
 clock/lineage/instrument/price/health/volatility/liquidity/exposure failures, client-forged verdicts,
