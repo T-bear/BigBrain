@@ -2176,8 +2176,8 @@ The bounded deterministic hypothesis/challenger loop, versioned signal library, 
 
 # BB-093 — Finance Research Scheduler / Orchestrator v1
 
-**Status:** LOCALLY VERIFIED / PUBLICATION PENDING (2026-08-22).
+**Status:** COMPLETE (2026-08-22). Implementation commit `0f952f88e3ec630b0a000e3d7565dd6274f63c09`; GitHub Actions run 32591633284 passed backend, frontend, documentation and secrets.
 
 Add one disabled-by-default, UTC-scheduled, durable and idempotent research opportunity per eligible market session over the existing BB-092 path. Persist scheduler decisions, expose bounded read-only status/history and keep market acquisition, prospective shadow, Resource Governor, Hard Risk and execution authority separate. No missed-window backfill, provider polling, PAPER, broker, order, LIVE/AUTO or champion promotion belongs in this slice.
 
-Local regression passed 475 API, 32 Sentinel and 115 frontend tests plus all applicable build, documentation, Compose, diff and sanitized secret-pattern gates. Publication and current GitHub Actions evidence remain pending.
+Local regression passed 475 API, 32 Sentinel and 115 frontend tests plus all applicable build, documentation, Compose, diff and sanitized secret-pattern gates. The next recommended bounded slice is Finance Resource & Safety Governor; it is not implemented here.

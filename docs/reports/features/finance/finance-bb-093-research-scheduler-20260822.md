@@ -12,11 +12,11 @@ Detta är en sanerad GitHub-version; hemligheter, privata adresser, identiteter 
 
 ## Status
 
-BB-093 adds the first bounded unattended orchestration layer over BB-092. Implementation is locally verified and pending final publication evidence. It does not add research methodology, acquisition behavior, PAPER, broker, order, portfolio, LIVE/AUTO, champion promotion or risk-policy authority.
+BB-093 adds the first bounded unattended orchestration layer over BB-092. Implementation is verified and published in `0f952f88e3ec630b0a000e3d7565dd6274f63c09`. It does not add research methodology, acquisition behavior, PAPER, broker, order, portfolio, LIVE/AUTO, champion promotion or risk-policy authority.
 
 ## Evidence
 
-Deterministic unit/integration coverage exercises the persisted scheduler against isolated SQLite fixtures without provider access or real-time waiting. Local verification passed 475 API tests, 32 Sentinel tests and 115 frontend tests, including nine scheduler orchestration cases and UI/API contracts. Release solution, frontend production and API container builds, documentation verification, Compose validation, diff whitespace and sanitized secret-pattern scan passed. No deployed runtime was changed. Publication and current GitHub Actions evidence remain pending.
+Deterministic unit/integration coverage exercises the persisted scheduler against isolated SQLite fixtures without provider access or real-time waiting. Local verification passed 475 API tests, 32 Sentinel tests and 115 frontend tests, including nine scheduler orchestration cases and UI/API contracts. Release solution, frontend production and API container builds, documentation verification, Compose validation, diff whitespace and sanitized secret-pattern scan passed. No deployed runtime was changed. GitHub Actions run 32591633284 passed backend, frontend, documentation and secrets. BB-093 is complete.
 
 ## Changes
 
