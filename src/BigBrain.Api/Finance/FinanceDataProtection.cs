@@ -188,7 +188,9 @@ internal sealed class FinanceDataProtectionStore
         var robustnessIds = RelatedIds(connection, "robustness_evaluations", "evaluation_id", "market_revisions_json", revisionSet, "feature_revision_id", featureIds);
         var featureSet=featureIds.ToHashSet(StringComparer.Ordinal);var backtestSet=backtestIds.ToHashSet(StringComparer.Ordinal);var robustnessSet=robustnessIds.ToHashSet(StringComparer.Ordinal);
         var researchExperiments=Rows(connection,"research_experiments","robustness_evaluation_id",robustnessSet);
+        var researchExperimentSet=researchExperiments.Select(x=>x["experiment_id"]!).ToHashSet(StringComparer.Ordinal);
         var researchHypothesisSet=researchExperiments.Select(x=>x["hypothesis_id"]!).ToHashSet(StringComparer.Ordinal);
+        var researchRunSet=EligibleResearchRunIds(connection,researchExperimentSet);
         var tables = new List<BackupTable>
         {
             new("dataset_candidates", Rows(connection,"dataset_candidates","canonical_revision_id",revisionSet)),
@@ -205,7 +207,9 @@ internal sealed class FinanceDataProtectionStore
             new("robustness_parameter_sensitivity", Rows(connection,"robustness_parameter_sensitivity","evaluation_id",robustnessSet)),
             new("robustness_cost_sensitivity", Rows(connection,"robustness_cost_sensitivity","evaluation_id",robustnessSet)),
             new("research_hypotheses", Rows(connection,"research_hypotheses","hypothesis_id",researchHypothesisSet)),
-            new("research_experiments", researchExperiments)
+            new("research_experiments", researchExperiments),
+            new("research_runs", Rows(connection,"research_runs","run_id",researchRunSet)),
+            new("research_run_experiments", Rows(connection,"research_run_experiments","run_id",researchRunSet))
         };
         return new(FinanceBackupPolicyV1.Version, revisions, observations, featureIds, backtestIds, robustnessIds, tables);
     }
@@ -228,6 +232,17 @@ internal sealed class FinanceDataProtectionStore
         if (!TableExists(connection,"dataset_corporate_actions")) return [];
         var candidates = Rows(connection,"dataset_candidates","canonical_revision_id",revisions).Select(x => x["candidate_id"]!).ToHashSet(StringComparer.Ordinal);
         return Rows(connection,"dataset_corporate_actions","candidate_id",candidates);
+    }
+
+    private static HashSet<string> EligibleResearchRunIds(SqliteConnection connection, HashSet<string> eligibleExperiments)
+    {
+        var eligibleRuns=new HashSet<string>(StringComparer.Ordinal);
+        if(eligibleExperiments.Count==0||!TableExists(connection,"research_run_experiments"))return eligibleRuns;
+        using var command=connection.CreateCommand();command.CommandText="SELECT run_id,experiment_id FROM research_run_experiments ORDER BY run_id,ordinal";
+        using var reader=command.ExecuteReader();var runs=new Dictionary<string,List<string>>(StringComparer.Ordinal);
+        while(reader.Read()){var run=reader.GetString(0);if(!runs.TryGetValue(run,out var experiments)){experiments=[];runs.Add(run,experiments);}experiments.Add(reader.GetString(1));}
+        foreach(var run in runs)if(run.Value.Count>0&&run.Value.All(eligibleExperiments.Contains))eligibleRuns.Add(run.Key);
+        return eligibleRuns;
     }
 
     private static List<SortedDictionary<string,string?>> Rows(SqliteConnection connection, string table, string filterColumn, HashSet<string> accepted)

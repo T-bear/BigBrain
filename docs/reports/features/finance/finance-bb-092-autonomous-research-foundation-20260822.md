@@ -47,3 +47,22 @@ The smallest next operationalization slices are a separately approved bounded sc
 ## Resumption
 
 Resume from ADR 0033, `docs/modules/finance.md`, `docs/STATUS.md`, `docs/BACKLOG.md` and this report. Do not begin continuous scheduling, PAPER, broker integration or champion promotion without a new approved slice.
+
+## Remediation/finalization — 2026-08-22
+
+Post-implementation review found four foundation defects: stale interrupted rows could retain a unique key without readable result JSON; only the latest run was exposed; different keys could execute concurrently; and family multiplicity inferred historic attempts from the current variant count. The remediation preserves the original verification history above and corrects those stronger-than-implemented claims.
+
+The durable contract is now:
+
+- startup converts stale `Pending`/`Running` rows to complete queryable `FAILED` results with recovery time, interruption reason and linked partial experiments;
+- the original idempotency row is immutable, so the same key returns its completed, running or recovered-failed run and a retry uses a new key;
+- an atomic SQLite immediate transaction and partial unique running index enforce one global research execution, with safe `409 finance.research.alreadyRunning` behavior for another key;
+- a `research_run_experiments` relation preserves every run association while deterministic experiment identity prevents evidence inflation;
+- immutable `attempt_count` stores actual variants per experiment, so changing histories such as 3, 5 and 2 yield cumulative family totals 3, 8 and 10;
+- next-session expectancy is consistently horizon 1;
+- rejected, inconclusive, not-evaluable, promising and challenger totals are separate and reconcile per run and globally;
+- bounded run/experiment catalogs and detail endpoints preserve historical audit access without arbitrary filtering or unbounded payloads.
+
+Migration is additive and repository-native. Existing experiment metrics are not recalculated. Attempt counts are backfilled only from the row's own stored complexity metadata; unavailable legacy facts remain null. Public-domain backups include run/link records only when all linked experiments are already eligible, preventing restricted source evidence from being pulled into indefinite backup scope. The Finance UI now distinguishes uncertain verdicts and exposes latest-run recovery and attempt lineage under progressive disclosure.
+
+The remediation adds no new methodology, indicator, scheduler, governor, macro input, negative control, DSR, PBO/CSCV, champion promotion or trading authority. Local finalization passed 461 API tests, 32 Sentinel tests and 114 frontend tests; Release solution and frontend production builds; API container build; documentation verification; Compose validation; diff whitespace and a sanitized private-key/token pattern scan. The recovery, partial-run and cross-key concurrency cases pass within the API total. No deployed production runtime was mutated; storage/reopen and bounded-cycle runtime behavior were verified with isolated persisted SQLite fixtures. Publication and current GitHub Actions evidence remain pending.

@@ -24,6 +24,17 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task AutonomousResearchHistoryEndpointsAreBoundedReadOnlyContracts()
+    {
+        var runs=await _client.GetAsync("/api/v1/modules/finance/research/autonomous/runs?offset=0&limit=10",TestContext.Current.CancellationToken);
+        var experiments=await _client.GetAsync("/api/v1/modules/finance/research/autonomous/experiments?offset=0&limit=10&state=completed",TestContext.Current.CancellationToken);
+        var invalid=await _client.GetAsync("/api/v1/modules/finance/research/autonomous/experiments?limit=101",TestContext.Current.CancellationToken);
+        var missingRun=await _client.GetAsync("/api/v1/modules/finance/research/autonomous/runs/research-run-missing",TestContext.Current.CancellationToken);
+        var missingExperiment=await _client.GetAsync("/api/v1/modules/finance/research/autonomous/experiments/experiment-missing",TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,runs.StatusCode);Assert.Equal(HttpStatusCode.OK,experiments.StatusCode);Assert.Equal(HttpStatusCode.BadRequest,invalid.StatusCode);Assert.Equal(HttpStatusCode.NotFound,missingRun.StatusCode);Assert.Equal(HttpStatusCode.NotFound,missingExperiment.StatusCode);
+    }
+
+    [Fact]
     public async Task SystemOverviewReturnsUnavailableWithoutHostMetrics()
     {
         var response = await _client.GetAsync("/api/v1/system/overview", TestContext.Current.CancellationToken);

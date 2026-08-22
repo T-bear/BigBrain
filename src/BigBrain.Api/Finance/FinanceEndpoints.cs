@@ -54,10 +54,15 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/macro/regime",(FinanceMacroMemory memory)=>memory.Snapshot().LatestRegime is { } regime?Results.Json(regime,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/research/regime-analysis",(FinanceMacroMemory macro,EodhdMarketMemory market)=>Results.Json(macro.Analyze(market),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/research/autonomous",(EodhdMarketMemory memory)=>Results.Json(memory.AutonomousResearchSnapshot(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/autonomous/runs",(int? offset,int? limit,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchRuns(offset??0,limit??25)));
+        endpoints.MapGet("/api/v1/modules/finance/research/autonomous/runs/{runId}",(string runId,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchRun(runId),true));
+        endpoints.MapGet("/api/v1/modules/finance/research/autonomous/experiments",(int? offset,int? limit,string? family,string? verdict,string? state,string? hypothesis,string? run,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchExperiments(offset??0,limit??25,family,verdict,state,hypothesis,run)));
+        endpoints.MapGet("/api/v1/modules/finance/research/autonomous/experiments/{experimentId}",(string experimentId,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchExperiment(experimentId),true));
         endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run",(AutonomousResearchRunRequest request,EodhdMarketMemory memory)=>
         {
             try{return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey,request.MaximumExperiments??FinanceResearchContracts.MaximumTotalExperimentsPerRun),JsonOptions);}
             catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid autonomous research request",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.invalidRequest"}});}
+            catch(AutonomousResearchBusyException exception){return Results.Problem(statusCode:409,title:"Autonomous research already running",detail:"Another bounded research run is active.",extensions:new Dictionary<string,object?>{{"code","finance.research.alreadyRunning"},{"currentRunId",exception.CurrentRunId}});}
             catch(InvalidOperationException exception){return Results.Problem(statusCode:409,title:"Autonomous research unavailable",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.conflict"}});}
         });
         return endpoints;
@@ -67,6 +72,12 @@ public static class FinanceEndpoints
     {
         try{return Results.Json(read(),JsonOptions);}
         catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid shadow research query",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.shadow.invalidQuery"}});}
+    }
+
+    private static IResult ResearchQuery(Func<object?> read,bool notFound=false)
+    {
+        try{var value=read();return value is null&&notFound?Results.Problem(statusCode:404,title:"Autonomous research evidence not found",detail:"The requested research evidence does not exist.",extensions:new Dictionary<string,object?>{{"code","finance.research.notFound"}}):Results.Json(value,JsonOptions);}
+        catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid autonomous research query",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.invalidQuery"}});}
     }
 
     private static JsonSerializerOptions CreateJsonOptions()
