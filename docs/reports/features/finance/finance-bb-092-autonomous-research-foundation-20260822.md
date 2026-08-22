@@ -8,15 +8,15 @@ Detta är en sanerad GitHub-version; hemligheter, privata adresser, identiteter 
 
 - Date: 2026-08-22
 - Scope: BB-092 bounded research foundation
-- Related commit: pending publication
+- Related implementation commit: `8f8358c990b871c986bf0ee30ce434cb68a2394e`
 
 ## Status
 
-Implemented and locally verified. Deployment, manual verification and GitHub Actions are not claimed.
+Implemented, locally verified and published. GitHub Actions run 32587285183 passed all four required jobs. Production deployment and manual production verification were not performed.
 
 ## Evidence
 
-Local verification passed: 455 API tests, 32 Sentinel tests and 114 frontend tests, including 6 BB-092 backend tests and the Finance UI cases. Release solution build, frontend production build, API container build, documentation verification, Compose validation, diff whitespace and sanitized secret-pattern scan passed. GitHub Actions evidence is recorded only after publication.
+Local verification passed: 455 API tests, 32 Sentinel tests and 114 frontend tests, including 6 BB-092 backend tests and the Finance UI cases. Release solution build, frontend production build, API container build, documentation verification, Compose validation, diff whitespace and sanitized secret-pattern scan passed. GitHub Actions run 32587285183 passed backend, frontend, documentation and secrets for the implementation commit.
 
 ## Changes
 
