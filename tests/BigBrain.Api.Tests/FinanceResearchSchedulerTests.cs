@@ -67,6 +67,14 @@ public sealed class FinanceResearchSchedulerTests
     }
 
     [Fact]
+    public void RestartPreservesPartialEvidenceAndRecordsOperationalInterruption()
+    {
+        using var fixture=Ready();var options=Enabled();var now=Due(fixture);var completed=Orchestrator(options,fixture.Memory).CheckAndRun(now,true,CancellationToken.None)!;var original=fixture.Memory.ResearchRun(completed.ResearchRunId!)!;Assert.NotEmpty(original.Experiments);
+        using(var c=Open(fixture)){using var run=c.CreateCommand();run.CommandText="UPDATE research_runs SET state='Running',completed_utc=NULL,result_json=NULL WHERE run_id=$run";run.Parameters.AddWithValue("$run",original.RunId);run.ExecuteNonQuery();using var opportunity=c.CreateCommand();opportunity.CommandText="UPDATE research_schedule_opportunities SET state='Started',completed_utc=NULL,reason='finance.research.scheduler.researchRunning' WHERE opportunity_id=$id";opportunity.Parameters.AddWithValue("$id",completed.OpportunityId);opportunity.ExecuteNonQuery();}
+        var restarted=new EodhdMarketMemory(fixture.Options);restarted.ReconcileResearchOperations(now.AddMinutes(5));restarted.ReconcileResearchOperations(now.AddMinutes(5));var recoveredRun=restarted.ResearchRun(original.RunId)!;var recoveredOpportunity=restarted.ResearchOpportunity(completed.OpportunityId)!;Assert.Equal(ResearchExperimentState.Failed,recoveredRun.State);Assert.Equal("RECOVERED_AFTER_RESTART",recoveredRun.RecoveryStatus);Assert.Equal(original.ExperimentCount,recoveredRun.ExperimentCount);Assert.Equal(FinanceResearchOpportunityState.Failed,recoveredOpportunity.State);Assert.Equal(original.RunId,recoveredOpportunity.ResearchRunId);Assert.Single(restarted.ResearchOperationalIncidents(0,10).Incidents);Assert.Equal(original.ExperimentCount,restarted.ResearchExperiments(0,10,null,null,null,null,original.RunId).Total);
+    }
+
+    [Fact]
     public async Task DisabledDefaultAndCancellationNeverCreateResearchOrFailure()
     {
         using var fixture=Ready();var disabled=new FinanceResearchSchedulerOptions();var orchestrator=Orchestrator(disabled,fixture.Memory);Assert.Null(orchestrator.CheckAndRun(Due(fixture),true,CancellationToken.None));Assert.Empty(fixture.Memory.ResearchSchedulerHistory(0,10).Opportunities);
@@ -124,6 +132,13 @@ public sealed class FinanceResearchSchedulerTests
         var deferred=await orchestrator.CheckAndRunAsync(now,true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Deferred,deferred!.State);Assert.NotNull(deferred.ResourceDecision);Assert.Equal(pressure.Decision,deferred.ResourceDecision.Decision);Assert.Equal(pressure.ReasonCodes,deferred.ResourceDecision.ReasonCodes);Assert.Equal(pressure.Evidence,deferred.ResourceDecision.Evidence);Assert.Empty(fixture.Memory.ResearchRuns(0,10).Runs);Assert.Empty(fixture.Memory.ResearchExperiments(0,10,null,null,null,null,null).Experiments);
         var completed=await orchestrator.CheckAndRunAsync(now.AddHours(1),true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Completed,completed!.State);Assert.Equal(deferred.OpportunityId,completed.OpportunityId);Assert.NotNull(completed.ResourceDecision);Assert.Equal(allowed.Decision,completed.ResourceDecision.Decision);Assert.Equal(allowed.ReasonCodes,completed.ResourceDecision.ReasonCodes);Assert.Single(fixture.Memory.ResearchRuns(0,10).Runs);
         var reopened=new EodhdMarketMemory(fixture.Options).ResearchOpportunity(completed.OpportunityId)!;Assert.NotNull(reopened.ResourceDecision);Assert.Equal(allowed.Decision,reopened.ResourceDecision.Decision);Assert.Equal(allowed.ReasonCodes,reopened.ResourceDecision.ReasonCodes);Assert.Equal(allowed.Evidence,reopened.ResourceDecision.Evidence);
+    }
+
+    [Fact]
+    public async Task MaintenancePauseDefersWithoutResearchAndResumeUsesSameOpportunity()
+    {
+        using var fixture=Ready();var now=Due(fixture);var operations=new FinanceResearchOperationsOptions{MaintenancePaused=true};var governor=new ScriptedGovernor(Resource(FinanceResearchResourceDecisionKind.Allow,now,"finance.research.scheduler.resource.ready"));var orchestrator=new FinanceResearchOrchestrator(Enabled(),fixture.Memory,governor,operations);var paused=await orchestrator.CheckAndRunAsync(now,true,CancellationToken.None);Assert.Equal(FinanceResearchOpportunityState.Deferred,paused!.State);Assert.Equal("finance.research.scheduler.maintenancePaused",paused.Reason);Assert.Empty(fixture.Memory.ResearchRuns(0,10).Runs);
+        operations.MaintenancePaused=false;var completed=await orchestrator.CheckAndRunAsync(now.AddHours(1),true,CancellationToken.None);Assert.Equal(paused.OpportunityId,completed!.OpportunityId);Assert.Equal(FinanceResearchOpportunityState.Completed,completed.State);Assert.Single(fixture.Memory.ResearchRuns(0,10).Runs);
     }
 
     private static FinanceResearchSchedulerOptions Enabled()=>new(){Enabled=true,CheckIntervalMinutes=60,ScheduledUtcHour=2,MaximumExperimentsPerRun=2};

@@ -210,7 +210,9 @@ internal sealed class FinanceDataProtectionStore
             new("research_experiments", researchExperiments),
             new("research_runs", Rows(connection,"research_runs","run_id",researchRunSet)),
             new("research_run_experiments", Rows(connection,"research_run_experiments","run_id",researchRunSet)),
-            new("research_schedule_opportunities", SchedulerRows(connection,researchRunSet))
+            new("research_schedule_opportunities", SchedulerRows(connection,researchRunSet)),
+            new("research_operations", AllRows(connection,"research_operations","singleton")),
+            new("research_operational_incidents", AllRows(connection,"research_operational_incidents","incident_id"))
         };
         return new(FinanceBackupPolicyV1.Version, revisions, observations, featureIds, backtestIds, robustnessIds, tables);
     }
@@ -261,6 +263,11 @@ internal sealed class FinanceDataProtectionStore
             var row = new SortedDictionary<string,string?>(StringComparer.Ordinal); for (var i=0;i<reader.FieldCount;i++) row[reader.GetName(i)] = reader.IsDBNull(i) ? null : Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture); rows.Add(row);
         }
         return rows.OrderBy(x => string.Join('\u001f', x.Values), StringComparer.Ordinal).ToList();
+    }
+
+    private static List<SortedDictionary<string,string?>> AllRows(SqliteConnection connection,string table,string orderColumn)
+    {
+        if(!TableExists(connection,table))return [];using var command=connection.CreateCommand();command.CommandText=$"SELECT * FROM {table} ORDER BY {orderColumn}";using var reader=command.ExecuteReader();var rows=new List<SortedDictionary<string,string?>>();while(reader.Read()){var row=new SortedDictionary<string,string?>(StringComparer.Ordinal);for(var i=0;i<reader.FieldCount;i++)row[reader.GetName(i)]=reader.IsDBNull(i)?null:Convert.ToString(reader.GetValue(i),CultureInfo.InvariantCulture);rows.Add(row);}return rows;
     }
 
     private static bool TableExists(SqliteConnection connection, string table)

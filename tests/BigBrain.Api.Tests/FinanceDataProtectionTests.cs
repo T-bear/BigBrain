@@ -23,14 +23,14 @@ public sealed class FinanceDataProtectionTests
     [Fact]
     public void PublicDomainBackupIsDeterministicVerifiableAndRestoresExactIdentity()
     {
-        using var fixture=new ProtectionFixture();var promoted=fixture.PromoteWiki();fixture.AddEodhd();
+        using var fixture=new ProtectionFixture();var promoted=fixture.PromoteWiki();fixture.AddEodhd();var operationalAt=new DateTimeOffset(2026,8,15,17,0,0,TimeSpan.Zero);var opportunity=fixture.Memory.CreateOrReadResearchOpportunity("finance-research-scheduler-v1:2026-08-14",FinanceResearchSchedulerOptions.CurrentVersion,new(2026,8,14),operationalAt,operationalAt);var failed=fixture.Memory.UpdateResearchOpportunity(opportunity.OpportunityId,FinanceResearchOpportunityState.Failed,operationalAt,null,"finance.research.scheduler.unexpected.SqliteException",null);fixture.Memory.RecordResearchOperationsEvaluation(operationalAt,failed);
         var feature=fixture.Memory.BuildFeatures([promoted.CanonicalRevisionId!]);
         var first=fixture.Protection.CreatePublicDomainBackup(new DateTimeOffset(2026,8,15,18,0,0,TimeSpan.Zero),"test");
         var repeated=fixture.Protection.CreatePublicDomainBackup(new DateTimeOffset(2026,8,16,18,0,0,TimeSpan.Zero),"test");
         Assert.Equal(first.BackupId,repeated.BackupId);Assert.Single(first.Revisions);Assert.Equal(promoted.CanonicalRevisionId,first.Revisions[0].RevisionId);
         Assert.Equal(promoted.PromotedObservationCount,first.Revisions[0].ObservationCount);Assert.Contains(feature.RevisionId,first.FeatureRevisionIds);
         Assert.DoesNotContain(first.Sources,x=>x.Provider==EodhdMarketMemory.Provider);Assert.True(fixture.Protection.Verify(first.BackupId));
-        var drill=fixture.Protection.DrillRestore(first.BackupId);Assert.True(drill.Verified);Assert.True(drill.RestoredIdentityMatches);Assert.Equal(first.Revisions[0].ObservationCount,drill.ObservationCount);
+        var drill=fixture.Protection.DrillRestore(first.BackupId);Assert.True(drill.Verified);Assert.True(drill.RestoredIdentityMatches);Assert.Equal(first.Revisions[0].ObservationCount,drill.ObservationCount);Assert.Single(fixture.Memory.ResearchOperationalIncidents(0,10).Incidents);
         var corruption=fixture.Protection.DrillCorruption(first.BackupId);Assert.True(corruption.ChecksumMismatchDetected);Assert.True(corruption.RestoreRejected);
         var inventory=fixture.Protection.Inventory();Assert.Contains(inventory.SourcePolicies,x=>x.Provider==EodhdMarketMemory.Provider&&x.BackupEligibility==FinanceBackupEligibility.Restricted);Assert.Single(inventory.Backups);
     }

@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
-import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
+import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -27,6 +27,7 @@ const riskEvaluationFixture:FinanceRiskEvaluation={evaluationId:'risk-fixture',p
 const autonomousFixture:FinanceAutonomousResearch={generatedAtUtc:'2026-08-22T10:00:00Z',operatingMode:'RESEARCH',budgetSek:0,engineVersion:'autonomous-research-v1',featureLibraryVersion:'finance-research-signals-v1',totalExperiments:1,rejectedCount:1,inconclusiveCount:0,notEvaluableCount:0,promisingCount:0,challengerCount:0,status:'CONTINUE_RESEARCH',executionAuthority:'NONE',features:[],hypotheses:[],latestRun:{runId:'research-run-fixture',state:'completed',experimentCount:1,rejectedCount:1,inconclusiveCount:0,notEvaluableCount:0,promisingCount:0,challengerCount:0,failureReason:null,recoveryStatus:'NONE',experiments:[{experimentId:'experiment-fixture',familyId:'family-momentum-v1',familyAttemptCount:3,attemptCount:3,runId:'research-run-fixture',runIds:['research-run-fixture'],verdict:'rejected',rejectionReason:'integrity.out-of-sample.failed',outOfSampleNetReturn:-.02,costModel:'hypothetical-conservative-v1',featureRevisionId:'feature-fixture',marketRevisionIds:['market-fixture'],knowledgeCutoffUtc:'2026-08-21T22:00:00Z',complexity:{score:6},integrity:{state:'fail',checks:[{id:'out-of-sample',state:'fail',evidence:'net=-0.02'},{id:'dsr',state:'notEvaluable',evidence:'inputs unavailable'}]}}]}}
 const schedulerFixture:FinanceResearchSchedulerStatus={currentUtc:'2026-08-23T01:00:00Z',enabled:true,schedulerVersion:'finance-research-scheduler-v1',nextDueUtc:'2026-08-23T02:00:00Z',lastOpportunity:{opportunityId:'finance-research-scheduler-v1:2026-08-22',researchDate:'2026-08-22',dueAtUtc:'2026-08-23T02:00:00Z',attemptedAtUtc:'2026-08-23T02:03:00Z',completedAtUtc:'2026-08-23T02:04:00Z',state:'Completed',researchRunId:'research-run-fixture',reason:'finance.research.scheduler.completed',nextEligibilityUtc:null},lastResearchRunId:'research-run-fixture',lastOutcome:'Completed',lastReason:'finance.research.scheduler.completed',researchCurrentlyRunning:false,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE',dataReady:true,readinessReason:'finance.research.scheduler.ready',currentInstrumentCount:8,expectedInstrumentCount:8}
 const governorFixture:FinanceResearchResourceDecision={decision:'defer',evaluatedAtUtc:'2026-08-23T01:00:00Z',governorVersion:'finance-research-resource-governor-v1',reasonCodes:['finance.research.scheduler.resource.memory'],evidence:{cpuUsagePercent:32,memoryUsagePercent:88,availableMemoryBytes:536870912,minimumAvailableDiskBytes:107374182400,availableDiskCount:1,temperatureCelsius:null,temperatureSupported:false,metricsStatus:'Healthy',collectedAtUtc:'2026-08-23T01:00:00Z'},operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
+const operationsFixture:FinanceResearchOperationsStatus={operationsVersion:'finance-research-operations-v1',evaluatedAtUtc:'2026-08-23T03:00:00Z',state:'attentionRequired',requiresAttention:true,currentActivity:'OPERATIONAL_FAILURE_STREAK',schedulerEnabled:true,maintenancePaused:false,lastSchedulerEvaluationUtc:'2026-08-23T03:00:00Z',lastSuccessfulResearchUtc:'2026-08-22T02:04:00Z',lastOperationalFailureUtc:'2026-08-23T03:00:00Z',consecutiveOperationalFailures:3,lastFailureReason:'finance.research.scheduler.unexpected.SqliteException',lastSuccessfulEvidenceRefreshUtc:'2026-08-22T22:10:00Z',dataReadiness:'READY',resourceDecision:'DEFER',activeResearchRunId:null,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
 
 describe('Finance read-only observation UI', () => {
   test('registers Finance as a navigable dashboard view', () => {
@@ -136,9 +137,10 @@ describe('Finance read-only observation UI', () => {
     expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
   })
   test('renders bounded scheduler status as research-only operations',()=>{
-    render(<FinanceObservation initialSnapshot={empty} initialAutonomousResearch={autonomousFixture} initialResearchScheduler={schedulerFixture} initialResearchGovernor={governorFixture}/>)
+    render(<FinanceObservation initialSnapshot={empty} initialAutonomousResearch={autonomousFixture} initialResearchScheduler={schedulerFixture} initialResearchGovernor={governorFixture} initialResearchOperations={operationsFixture}/>)
     expect(screen.getByText('AKTIV')).toBeVisible();expect(screen.getByText('Completed')).toBeVisible();expect(screen.getByText('RESEARCH · 0 SEK · NONE')).toBeVisible()
     expect(screen.getByText('PAUSAD — SYSTEMBELASTNING')).toBeVisible();expect(screen.getByText('finance.research.scheduler.resource.memory')).toBeVisible()
+    expect(screen.getByText('BEHÖVER UPPMÄRKSAMHET')).toBeVisible();expect(screen.getAllByText('3').length).toBeGreaterThan(0)
     expect(screen.queryByText(/trading active/i)).not.toBeInTheDocument()
   })
 })

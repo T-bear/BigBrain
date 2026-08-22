@@ -174,6 +174,9 @@ public partial class Program
         researchGovernorOptions.Validate();
         builder.Services.AddSingleton(researchGovernorOptions);
         builder.Services.AddSingleton<IFinanceResearchResourceGovernor,FinanceResearchResourceGovernor>();
+        var researchOperationsOptions=builder.Configuration.GetSection(FinanceResearchOperationsOptions.Section).Get<FinanceResearchOperationsOptions>()??new();
+        researchOperationsOptions.Validate();
+        builder.Services.AddSingleton(researchOperationsOptions);
         var riskOptions=builder.Configuration.GetSection(FinanceRiskOptions.Section).Get<FinanceRiskOptions>()??new();
         riskOptions.Validate();
         builder.Services.AddSingleton(riskOptions);
@@ -189,6 +192,8 @@ public partial class Program
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
         builder.Services.AddHostedService<FinanceBacktestBuildWorker>();
         builder.Services.AddHostedService<FinanceRobustnessBuildWorker>();
+        builder.Services.AddSingleton<FinanceResearchOperationsCoordinator>();
+        builder.Services.AddHostedService<FinanceResearchOperationsWorker>();
         builder.Services.AddSingleton<FinanceResearchOrchestrator>();
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddHostedService<FinanceResearchSchedulerWorker>();

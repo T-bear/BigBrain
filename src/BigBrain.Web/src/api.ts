@@ -42,6 +42,7 @@ import type {
   FinanceAutonomousResearch,
   FinanceResearchSchedulerStatus,
   FinanceResearchResourceDecision,
+  FinanceResearchOperationsStatus,
 } from './types'
 
 export class ApiError extends Error {
@@ -100,6 +101,7 @@ export const getFinanceOverview = (signal?: AbortSignal) => getJson<FinanceOverv
 export const getFinanceAutonomousResearch = (signal?:AbortSignal)=>getJson<FinanceAutonomousResearch>('/api/v1/modules/finance/research/autonomous',signal)
 export const getFinanceResearchSchedulerStatus = (signal?:AbortSignal)=>getJson<FinanceResearchSchedulerStatus>('/api/v1/modules/finance/research/scheduler/status',signal)
 export const getFinanceResearchGovernorStatus = (signal?:AbortSignal)=>getJson<FinanceResearchResourceDecision>('/api/v1/modules/finance/research/governor/status',signal)
+export const getFinanceResearchOperationsStatus = (signal?:AbortSignal)=>getJson<FinanceResearchOperationsStatus>('/api/v1/modules/finance/research/operations/status',signal)
 export const getFinanceRiskStatus = (signal?: AbortSignal) => getJson<FinanceRiskStatus>('/api/v1/modules/finance/risk/status',signal)
 export const getFinanceRiskEvaluations = (signal?: AbortSignal) => getJson<FinanceRiskEvaluation[]>('/api/v1/modules/finance/risk/evaluations?limit=50',signal)
 
