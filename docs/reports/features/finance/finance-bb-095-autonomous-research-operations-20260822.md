@@ -48,6 +48,12 @@ The operations layer cannot change data, research methodology, resource threshol
 
 The complete checklist makes Finance eligible for a separate explicit deployment decision enabling continuous unattended RESEARCH. Scheduler activation remains default-off and was not performed by BB-095. This is not trading. External notifications and future research methodology remain separate evidence-driven work.
 
+## Controlled commissioning — 2026-08-22
+
+The appliance was updated from an older image to repository HEAD and commissioned at 20:55 UTC through the deployment-only `FINANCE__RESEARCHSCHEDULER__ENABLED=true` override. Source defaults remain off. The deployed schedule is one 02:00 UTC opportunity checked every 60 minutes with at most two experiments; maintenance pause is false. Recovery was healthy/clean, Sentinel-backed governor evidence returned `ALLOW`, EODHD remained authorized over the same eight-symbol cadence and Finance remained `RESEARCH / 0 SEK / NONE`.
+
+The first natural opportunity, `finance-research-scheduler-v1:2026-08-21`, safely became `Deferred` because current feature lineage was incomplete. It created zero runs and zero experiments. One controlled API restart retained exactly one opportunity and zero runs/experiments, with no operational incident or attention state. A commissioning review also corrected the aggregate operations readiness label for `featureLineageIncomplete`; the authoritative scheduler gate had already remained fail-closed. Backup policy stayed unchanged: EODHD is restricted/subscription-only and public-domain evidence remains separately eligible. Rollback is the deployment override `FINANCE__RESEARCHSCHEDULER__ENABLED=false` followed by an API recreate; history must not be deleted.
+
 ## Resumption
 
-Resume from ADR 0036 and this report. Do not enable scheduling or start PAPER, broker, champion or research-feature expansion without separate authorization.
+Resume from ADR 0036 and this report. Scheduling is explicitly enabled only on the commissioned appliance; source remains default-off. Do not start PAPER, broker, champion or research-feature expansion without separate authorization.
