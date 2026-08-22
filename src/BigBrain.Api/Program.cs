@@ -170,6 +170,10 @@ public partial class Program
         var researchSchedulerOptions=builder.Configuration.GetSection(FinanceResearchSchedulerOptions.Section).Get<FinanceResearchSchedulerOptions>()??new();
         researchSchedulerOptions.Validate();
         builder.Services.AddSingleton(researchSchedulerOptions);
+        var researchGovernorOptions=builder.Configuration.GetSection(FinanceResearchResourceGovernorOptions.Section).Get<FinanceResearchResourceGovernorOptions>()??new();
+        researchGovernorOptions.Validate();
+        builder.Services.AddSingleton(researchGovernorOptions);
+        builder.Services.AddSingleton<IFinanceResearchResourceGovernor,FinanceResearchResourceGovernor>();
         var riskOptions=builder.Configuration.GetSection(FinanceRiskOptions.Section).Get<FinanceRiskOptions>()??new();
         riskOptions.Validate();
         builder.Services.AddSingleton(riskOptions);

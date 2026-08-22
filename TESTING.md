@@ -4,6 +4,8 @@ BB-092 adds network-free tests for the allowlisted research feature registry, in
 
 BB-093 scheduler tests use injected times/direct orchestrator calls rather than real sleeps. They cover default-disabled startup, due completion, repeated ticks, completed and pre-run restart recovery, no catch-up storm, recovery/data deferral, manual-run busy deferral, current-evidence failure, option bounds, cancellation, bounded APIs, read-only UI wording and unchanged `RESEARCH / 0 SEK / NONE` authority. Readiness remediation additionally covers one-current/rest-stale rejection, full-universe recovery on the same opportunity, stale feature deferral, exact source-lineage mismatch, deterministic readiness, zero experiment evidence on partial acquisition and explicit cross-date supersession of deferred work.
 
+BB-094 resource-governor tests inject deterministic `ISystemMetricsProvider` snapshots; they never depend on workstation load. Coverage includes healthy allow, independent and combined CPU/memory/disk pressure, critical-disk precedence, unavailable/stale/throwing metrics, option bounds, no-run deferral followed by same-opportunity completion, restart-readable compact audit, read-only API/UI state and unchanged `RESEARCH / 0 SEK / NONE` authority. Temperature remains explicitly unsupported and is not faked.
+
 BB-089 adds network-free policy, invariant and adversarial tests for deterministic identity,
 version/config validation, ALLOW/REDUCE/DENY/HALT/INSUFFICIENT_DATA, EOD weekend freshness,
 clock/lineage/instrument/price/health/volatility/liquidity/exposure failures, client-forged verdicts,

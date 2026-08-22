@@ -42,6 +42,13 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task ResearchGovernorStatusFailsClosedWithoutSentinelAndRemainsResearchOnly()
+    {
+        var response=await _client.GetAsync("/api/v1/modules/finance/research/governor/status",TestContext.Current.CancellationToken);var body=await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK,response.StatusCode);Assert.Contains("\"decision\":\"defer\"",body,StringComparison.Ordinal);Assert.Contains("finance.research.scheduler.resource.metricsUnavailable",body,StringComparison.Ordinal);Assert.Contains("\"temperatureSupported\":false",body,StringComparison.Ordinal);Assert.Contains("\"operatingMode\":\"RESEARCH\"",body,StringComparison.Ordinal);Assert.Contains("\"budgetSek\":0",body,StringComparison.Ordinal);Assert.Contains("\"executionAuthority\":\"NONE\"",body,StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task SystemOverviewReturnsUnavailableWithoutHostMetrics()
     {
         var response = await _client.GetAsync("/api/v1/system/overview", TestContext.Current.CancellationToken);

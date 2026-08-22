@@ -60,6 +60,7 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/research/autonomous/experiments/{experimentId}",(string experimentId,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchExperiment(experimentId),true));
         endpoints.MapGet("/api/v1/modules/finance/research/scheduler/status",(FinanceResearchOrchestrator orchestrator,TimeProvider clock)=>Results.Json(orchestrator.Status(clock.GetUtcNow()),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/research/scheduler/history",(int? offset,int? limit,EodhdMarketMemory memory)=>ResearchQuery(()=>memory.ResearchSchedulerHistory(offset??0,limit??25)));
+        endpoints.MapGet("/api/v1/modules/finance/research/governor/status",async (IFinanceResearchResourceGovernor governor,TimeProvider clock,CancellationToken token)=>Results.Json(await governor.EvaluateAsync(clock.GetUtcNow(),token),JsonOptions));
         endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run",(AutonomousResearchRunRequest request,EodhdMarketMemory memory)=>
         {
             try{return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey,request.MaximumExperiments??FinanceResearchContracts.MaximumTotalExperimentsPerRun),JsonOptions);}

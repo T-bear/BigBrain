@@ -6,6 +6,7 @@
 - [BB-089 Hard Risk Engine foundation](finance-bb-089-hard-risk-engine-foundation-20260816.md)
 - [BB-088 prospective daily cadence and Finance UI v1.0](finance-bb-088-daily-cadence-ui-v1-20260815.md)
 - [BB-087 prospective shadow foundation](finance-bb-087-prospective-shadow-foundation-20260815.md)
+- [BB-094 research resource governor](finance-bb-094-research-resource-governor-20260822.md)
 - [BB-086 ETF dataset research](finance-bb-086-etf-dataset-research-20260815.md)
 - [BB-086 implementation and runtime](finance-bb-086-implementation-runtime-20260815.md)
 - [BB-085 provider-tagged backup, restore and cleanup](finance-bb-085-provider-tagged-backup-restore-cleanup-20260815.md)

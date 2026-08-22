@@ -27,7 +27,8 @@ public sealed record FinanceResearchSchedulerOptions
 public enum FinanceResearchOpportunityState{Pending,Skipped,Deferred,Started,Completed,Failed}
 public sealed record FinanceResearchOpportunity(string OpportunityId,string SchedulerVersion,DateOnly ResearchDate,
     DateTimeOffset DueAtUtc,DateTimeOffset CreatedAtUtc,DateTimeOffset? AttemptedAtUtc,DateTimeOffset? CompletedAtUtc,
-    FinanceResearchOpportunityState State,string? ResearchRunId,string? Reason,DateTimeOffset? NextEligibilityUtc);
+    FinanceResearchOpportunityState State,string? ResearchRunId,string? Reason,DateTimeOffset? NextEligibilityUtc,
+    FinanceResearchResourceDecision? ResourceDecision=null);
 public sealed record FinanceResearchSchedulerStatus(DateTimeOffset CurrentUtc,bool Enabled,string SchedulerVersion,
     DateTimeOffset? NextDueUtc,FinanceResearchOpportunity? LastOpportunity,string? LastResearchRunId,string LastOutcome,
     string? LastReason,bool ResearchCurrentlyRunning,string OperatingMode,decimal BudgetSek,string ExecutionAuthority,
@@ -58,12 +59,12 @@ internal sealed partial class EodhdMarketMemory
           CREATE INDEX IF NOT EXISTS ix_research_schedule_history ON research_schedule_opportunities(due_utc DESC,opportunity_id DESC);
           UPDATE research_schedule_opportunities SET state='Deferred',reason='finance.research.scheduler.interruptedBeforeResearch',next_eligibility_utc=NULL
             WHERE state='Started' AND NOT EXISTS(SELECT 1 FROM research_runs WHERE idempotency_key=research_schedule_opportunities.opportunity_id);
-          """;command.ExecuteNonQuery();
+          """;command.ExecuteNonQuery();AddColumn(connection,"research_schedule_opportunities","resource_decision_json","TEXT");
     }
 
     internal FinanceResearchOpportunity CreateOrReadResearchOpportunity(string id,string version,DateOnly researchDate,DateTimeOffset due,DateTimeOffset now)
     {
-        using var c=new SqliteConnection(ConnectionString);c.Open();Execute(c,null,"INSERT OR IGNORE INTO research_schedule_opportunities VALUES($id,$version,$date,$due,$created,NULL,NULL,'Pending',NULL,NULL,NULL)",("$id",id),("$version",version),("$date",researchDate.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$due",due.ToString("O",CultureInfo.InvariantCulture)),("$created",now.ToString("O",CultureInfo.InvariantCulture)));return ReadResearchOpportunity(c,id)!;
+        using var c=new SqliteConnection(ConnectionString);c.Open();Execute(c,null,"INSERT OR IGNORE INTO research_schedule_opportunities(opportunity_id,scheduler_version,research_date,due_utc,created_utc,state) VALUES($id,$version,$date,$due,$created,'Pending')",("$id",id),("$version",version),("$date",researchDate.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$due",due.ToString("O",CultureInfo.InvariantCulture)),("$created",now.ToString("O",CultureInfo.InvariantCulture)));return ReadResearchOpportunity(c,id)!;
     }
     internal bool TryClaimResearchOpportunity(string id,DateTimeOffset now)
     {
@@ -73,6 +74,8 @@ internal sealed partial class EodhdMarketMemory
     {
         using var c=new SqliteConnection(ConnectionString);c.Open();Execute(c,null,"UPDATE research_schedule_opportunities SET state=$state,research_run_id=COALESCE($run,research_run_id),reason=$reason,next_eligibility_utc=$next,completed_utc=CASE WHEN $terminal=1 THEN $now ELSE NULL END WHERE opportunity_id=$id",("$state",state.ToString()),("$run",runId??(object)DBNull.Value),("$reason",reason??(object)DBNull.Value),("$next",next?.ToString("O",CultureInfo.InvariantCulture)??(object)DBNull.Value),("$terminal",state is FinanceResearchOpportunityState.Completed or FinanceResearchOpportunityState.Failed or FinanceResearchOpportunityState.Skipped?1:0),("$now",now.ToString("O",CultureInfo.InvariantCulture)),("$id",id));return ReadResearchOpportunity(c,id)!;
     }
+    internal FinanceResearchOpportunity RecordResearchResourceDecision(string id,FinanceResearchResourceDecision decision)
+    {using var c=new SqliteConnection(ConnectionString);c.Open();Execute(c,null,"UPDATE research_schedule_opportunities SET resource_decision_json=$json WHERE opportunity_id=$id",("$json",JsonSerializer.Serialize(decision)),("$id",id));return ReadResearchOpportunity(c,id)!;}
     internal AutonomousResearchRun? AutonomousResearchRunByKey(string key){using var c=new SqliteConnection(ConnectionString);c.Open();return ReadRunByKey(c,key);}
     internal bool AutonomousResearchIsRunning(){using var c=new SqliteConnection(ConnectionString);c.Open();return ResearchScalar(c,"SELECT run_id FROM research_runs WHERE state='Running' LIMIT 1") is not null;}
     internal FinanceResearchDataReadiness ResearchDataReadiness(DateOnly requiredDate)
@@ -102,12 +105,13 @@ internal sealed partial class EodhdMarketMemory
         if(offset<0||limit is<1 or>100)throw new ArgumentException("Research scheduler history requires offset >= 0 and limit between 1 and 100.");using var c=new SqliteConnection(ConnectionString);c.Open();using var count=c.CreateCommand();count.CommandText="SELECT COUNT(*) FROM research_schedule_opportunities";var total=Convert.ToInt32(count.ExecuteScalar(),CultureInfo.InvariantCulture);using var x=c.CreateCommand();x.CommandText="SELECT opportunity_id FROM research_schedule_opportunities ORDER BY due_utc DESC,opportunity_id DESC LIMIT $limit OFFSET $offset";x.Parameters.AddWithValue("$limit",limit);x.Parameters.AddWithValue("$offset",offset);using var r=x.ExecuteReader();var ids=new List<string>();while(r.Read())ids.Add(r.GetString(0));r.Close();return new(DateTimeOffset.UtcNow,"RESEARCH",offset,limit,total,ids.Select(id=>ReadResearchOpportunity(c,id)!).ToArray());
     }
     internal FinanceResearchOpportunity? LatestResearchOpportunity(){using var c=new SqliteConnection(ConnectionString);c.Open();var id=ResearchScalar(c,"SELECT opportunity_id FROM research_schedule_opportunities ORDER BY due_utc DESC,opportunity_id DESC LIMIT 1");return id is null?null:ReadResearchOpportunity(c,id);}
-    private static FinanceResearchOpportunity? ReadResearchOpportunity(SqliteConnection c,string id){using var x=c.CreateCommand();x.CommandText="SELECT scheduler_version,research_date,due_utc,created_utc,attempted_utc,completed_utc,state,research_run_id,reason,next_eligibility_utc FROM research_schedule_opportunities WHERE opportunity_id=$id";x.Parameters.AddWithValue("$id",id);using var r=x.ExecuteReader();if(!r.Read())return null;return new(id,r.GetString(0),DateOnly.Parse(r.GetString(1),CultureInfo.InvariantCulture),DateTimeOffset.Parse(r.GetString(2),CultureInfo.InvariantCulture),DateTimeOffset.Parse(r.GetString(3),CultureInfo.InvariantCulture),r.IsDBNull(4)?null:DateTimeOffset.Parse(r.GetString(4),CultureInfo.InvariantCulture),r.IsDBNull(5)?null:DateTimeOffset.Parse(r.GetString(5),CultureInfo.InvariantCulture),Enum.Parse<FinanceResearchOpportunityState>(r.GetString(6)),r.IsDBNull(7)?null:r.GetString(7),r.IsDBNull(8)?null:r.GetString(8),r.IsDBNull(9)?null:DateTimeOffset.Parse(r.GetString(9),CultureInfo.InvariantCulture));}
+    private static FinanceResearchOpportunity? ReadResearchOpportunity(SqliteConnection c,string id){using var x=c.CreateCommand();x.CommandText="SELECT scheduler_version,research_date,due_utc,created_utc,attempted_utc,completed_utc,state,research_run_id,reason,next_eligibility_utc,resource_decision_json FROM research_schedule_opportunities WHERE opportunity_id=$id";x.Parameters.AddWithValue("$id",id);using var r=x.ExecuteReader();if(!r.Read())return null;return new(id,r.GetString(0),DateOnly.Parse(r.GetString(1),CultureInfo.InvariantCulture),DateTimeOffset.Parse(r.GetString(2),CultureInfo.InvariantCulture),DateTimeOffset.Parse(r.GetString(3),CultureInfo.InvariantCulture),r.IsDBNull(4)?null:DateTimeOffset.Parse(r.GetString(4),CultureInfo.InvariantCulture),r.IsDBNull(5)?null:DateTimeOffset.Parse(r.GetString(5),CultureInfo.InvariantCulture),Enum.Parse<FinanceResearchOpportunityState>(r.GetString(6)),r.IsDBNull(7)?null:r.GetString(7),r.IsDBNull(8)?null:r.GetString(8),r.IsDBNull(9)?null:DateTimeOffset.Parse(r.GetString(9),CultureInfo.InvariantCulture),r.IsDBNull(10)?null:JsonSerializer.Deserialize<FinanceResearchResourceDecision>(r.GetString(10)));}
 }
 
-internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOptions options,EodhdMarketMemory memory)
+internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOptions options,EodhdMarketMemory memory,IFinanceResearchResourceGovernor governor)
 {
-    internal FinanceResearchOpportunity? CheckAndRun(DateTimeOffset nowUtc,bool mayStartTimeSensitiveWork,CancellationToken token)
+    internal FinanceResearchOpportunity? CheckAndRun(DateTimeOffset nowUtc,bool mayStartTimeSensitiveWork,CancellationToken token)=>CheckAndRunAsync(nowUtc,mayStartTimeSensitiveWork,token).GetAwaiter().GetResult();
+    internal async Task<FinanceResearchOpportunity?> CheckAndRunAsync(DateTimeOffset nowUtc,bool mayStartTimeSensitiveWork,CancellationToken token)
     {
         options.Validate();if(!options.Enabled)return null;if(nowUtc.Offset!=TimeSpan.Zero)throw new ArgumentException("Research scheduler requires UTC time.");token.ThrowIfCancellationRequested();var due=FinanceResearchSchedule.DueFor(nowUtc,options.ScheduledUtcHour);if(nowUtc<due)return null;var researchDate=FinanceResearchSchedule.ResearchDate(due);memory.SupersedeDeferredResearchOpportunities(researchDate,nowUtc);var id=FinanceResearchSchedule.OpportunityId(options.SchedulerVersion,researchDate);var opportunity=memory.CreateOrReadResearchOpportunity(id,options.SchedulerVersion,researchDate,due,nowUtc);
         if(opportunity.State is FinanceResearchOpportunityState.Completed or FinanceResearchOpportunityState.Failed or FinanceResearchOpportunityState.Skipped)return opportunity;
@@ -115,6 +119,7 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
         if(!UsMarketCalendar.IsSession(researchDate))return memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Skipped,nowUtc,null,"finance.research.scheduler.nonResearchDay",null);
         if(!mayStartTimeSensitiveWork)return memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Deferred,nowUtc,null,"finance.research.scheduler.recoveryNotReady",nowUtc.AddMinutes(options.CheckIntervalMinutes));
         var readiness=memory.ResearchDataReadiness(researchDate);if(!readiness.IsReady)return memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Deferred,nowUtc,null,readiness.ReasonCode,nowUtc.AddMinutes(options.CheckIntervalMinutes));
+        var resource=await governor.EvaluateAsync(nowUtc,token);memory.RecordResearchResourceDecision(id,resource);if(resource.Decision!=FinanceResearchResourceDecisionKind.Allow)return memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Deferred,nowUtc,null,resource.ReasonCodes[0],nowUtc.AddMinutes(options.CheckIntervalMinutes));
         token.ThrowIfCancellationRequested();
         if(!memory.TryClaimResearchOpportunity(id,nowUtc)){var current=memory.ResearchOpportunity(id)!;return Reconcile(current,nowUtc);}
         try{var run=memory.RunAutonomousResearch(id,options.MaximumExperimentsPerRun);return run.State switch{ResearchExperimentState.Completed=>memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Completed,nowUtc,run.RunId,"finance.research.scheduler.completed",null),ResearchExperimentState.Failed=>memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Failed,nowUtc,run.RunId,run.FailureReason??"finance.research.scheduler.researchFailed",null),_=>memory.UpdateResearchOpportunity(id,FinanceResearchOpportunityState.Started,nowUtc,run.RunId,"finance.research.scheduler.researchRunning",null)};}
@@ -134,6 +139,6 @@ internal sealed class FinanceResearchSchedulerWorker(FinanceResearchSchedulerOpt
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if(!options.Enabled)return;await recovery.WaitUntilRecoveredAsync(stoppingToken);Started(logger,options.SchedulerVersion,null);using var timer=new PeriodicTimer(TimeSpan.FromMinutes(options.CheckIntervalMinutes),clock);string? lastLogged=null;
-        while(!stoppingToken.IsCancellationRequested){var result=orchestrator.CheckAndRun(clock.GetUtcNow(),recovery.MayStartTimeSensitiveWork,stoppingToken);var signature=result is null?null:$"{result.OpportunityId}:{result.State}:{result.Reason}";if(result is not null&&signature!=lastLogged){Outcome(logger,result.OpportunityId,result.State.ToString(),null);lastLogged=signature;}if(!await timer.WaitForNextTickAsync(stoppingToken))break;}
+        while(!stoppingToken.IsCancellationRequested){var result=await orchestrator.CheckAndRunAsync(clock.GetUtcNow(),recovery.MayStartTimeSensitiveWork,stoppingToken);var signature=result is null?null:$"{result.OpportunityId}:{result.State}:{result.Reason}";if(result is not null&&signature!=lastLogged){Outcome(logger,result.OpportunityId,result.State.ToString(),null);lastLogged=signature;}if(!await timer.WaitForNextTickAsync(stoppingToken))break;}
     }
 }
