@@ -187,6 +187,8 @@ internal sealed class FinanceDataProtectionStore
         var backtestIds = RelatedIds(connection, "backtest_runs", "run_id", "market_revisions_json", revisionSet, "feature_revision_id", featureIds);
         var robustnessIds = RelatedIds(connection, "robustness_evaluations", "evaluation_id", "market_revisions_json", revisionSet, "feature_revision_id", featureIds);
         var featureSet=featureIds.ToHashSet(StringComparer.Ordinal);var backtestSet=backtestIds.ToHashSet(StringComparer.Ordinal);var robustnessSet=robustnessIds.ToHashSet(StringComparer.Ordinal);
+        var researchExperiments=Rows(connection,"research_experiments","robustness_evaluation_id",robustnessSet);
+        var researchHypothesisSet=researchExperiments.Select(x=>x["hypothesis_id"]!).ToHashSet(StringComparer.Ordinal);
         var tables = new List<BackupTable>
         {
             new("dataset_candidates", Rows(connection,"dataset_candidates","canonical_revision_id",revisionSet)),
@@ -201,7 +203,9 @@ internal sealed class FinanceDataProtectionStore
             new("robustness_run_references", Rows(connection,"robustness_run_references","evaluation_id",robustnessSet)),
             new("robustness_windows", Rows(connection,"robustness_windows","evaluation_id",robustnessSet)),
             new("robustness_parameter_sensitivity", Rows(connection,"robustness_parameter_sensitivity","evaluation_id",robustnessSet)),
-            new("robustness_cost_sensitivity", Rows(connection,"robustness_cost_sensitivity","evaluation_id",robustnessSet))
+            new("robustness_cost_sensitivity", Rows(connection,"robustness_cost_sensitivity","evaluation_id",robustnessSet)),
+            new("research_hypotheses", Rows(connection,"research_hypotheses","hypothesis_id",researchHypothesisSet)),
+            new("research_experiments", researchExperiments)
         };
         return new(FinanceBackupPolicyV1.Version, revisions, observations, featureIds, backtestIds, robustnessIds, tables);
     }

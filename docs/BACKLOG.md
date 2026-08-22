@@ -2163,3 +2163,9 @@ En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar
 - Initial ECB pack: `EXR.D.USD.EUR.SP00.A`, `EXR.D.SEK.EUR.SP00.A`, `FM.D.U2.EUR.4F.KR.MRR_FR.LEV`.
 - All bootstrap evidence is conservatively `REVISED_HISTORY_EXPLORATORY`; causal as-of never falls back.
 - Deferred: unattended acquisition and `FINANCE AUTONOMOUS RESEARCH v1` orchestration. No PAPER, broker, order, LIVE/AUTO or self-learning.
+
+# BB-092 — Finance Autonomous Research v1 foundation
+
+**Status:** IMPLEMENTED LOCALLY / VERIFICATION IN PROGRESS (2026-08-22).
+
+The bounded deterministic hypothesis/challenger loop, versioned signal library, immutable attempt registry, family accounting, complexity and fail-closed Research Integrity gate are implemented over BB-079–081 evidence. The UI is read-only. DSR and PBO/CSCV are explicitly `NOT_EVALUABLE`; seeded negative control, stronger multiple-testing statistics, continuous scheduler, resource governor and operations/recovery orchestrator are future bounded work. No PAPER, broker, order, champion promotion, LIVE/AUTO or self-modification is authorized.

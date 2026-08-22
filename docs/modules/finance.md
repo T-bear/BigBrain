@@ -321,6 +321,12 @@ requested/allowed/risk-adjusted research exposure, never broker quantity. Aggreg
 sector and spread gates await trustworthy evidence. Risk evaluations inherit source retention;
 sanitized halt audit may remain independently.
 
+## BB-092 bounded autonomous research
+
+`finance-research-signals-v1` is a code allowlist over existing immutable feature values; it stores no expressions or executable user code. `POST /api/v1/modules/finance/research/autonomous/run` accepts only an idempotency key and a server-clamped experiment limit of 1–3. `GET /api/v1/modules/finance/research/autonomous` returns the feature catalog, structured hypotheses, all retained experiment summaries, family attempts and integrity evidence. The endpoint creates research evidence only.
+
+`research-integrity-v1` requires sample, held-out OOS/excess, expanding walk-forward, explicit hypothetical costs, revision lineage, attempt accounting, complexity and the existing robustness result. DSR and PBO/CSCV remain honestly not evaluable. A Challenger has no prospective, champion, risk or execution authority. Macro, background scheduling and negative controls are not used in v1; see ADR 0033.
+
 ```text
 Strategy or AI proposes
         ↓

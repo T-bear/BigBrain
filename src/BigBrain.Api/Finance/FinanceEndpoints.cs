@@ -53,6 +53,13 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/macro/context",(FinanceMacroMemory memory,MacroRegion region,DateTimeOffset asOfUtc,MacroEvidenceClass evidenceClass)=>Results.Json(memory.AsOf(region,asOfUtc,evidenceClass),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/macro/regime",(FinanceMacroMemory memory)=>memory.Snapshot().LatestRegime is { } regime?Results.Json(regime,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/research/regime-analysis",(FinanceMacroMemory macro,EodhdMarketMemory market)=>Results.Json(macro.Analyze(market),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/autonomous",(EodhdMarketMemory memory)=>Results.Json(memory.AutonomousResearchSnapshot(),JsonOptions));
+        endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run",(AutonomousResearchRunRequest request,EodhdMarketMemory memory)=>
+        {
+            try{return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey,request.MaximumExperiments??FinanceResearchContracts.MaximumTotalExperimentsPerRun),JsonOptions);}
+            catch(ArgumentException exception){return Results.Problem(statusCode:400,title:"Invalid autonomous research request",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.invalidRequest"}});}
+            catch(InvalidOperationException exception){return Results.Problem(statusCode:409,title:"Autonomous research unavailable",detail:exception.Message,extensions:new Dictionary<string,object?>{{"code","finance.research.conflict"}});}
+        });
         return endpoints;
     }
 

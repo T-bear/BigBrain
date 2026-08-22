@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
-import type { FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
+import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -24,6 +24,7 @@ const backupFixture:FinanceBackupInventory={generatedAtUtc:'2026-08-15T18:00:00Z
 const overviewFixture:FinanceOverview={generatedAtUtc:'2026-08-15T19:00:00Z',mode:'RESEARCH',provider:'EODHD',observationClass:'CURRENT EOD / PROSPECTIVE EOD',latestSession:'2026-08-14',freshness:'CURRENT EOD',tracked:2,up:1,down:1,unchanged:0,marketSummary:'1 av 2 bevakade instrument steg under senaste tillgängliga marknadssessionen; 1 föll och 0 var oförändrade.',signals:[{instrumentId:'US:XNAS:AAPL',symbol:'AAPL',name:'Apple',state:'POSITIVE',sessionChangePercent:1.2,positiveStrategies:2,neutralStrategies:0,negativeStrategies:1,strategyCount:3,agreement:'2/3 strategies agree; positive 2, neutral 0, negative 1',freshness:'Delayed'},{instrumentId:'US:XNAS:MSFT',symbol:'MSFT',name:'Microsoft',state:'NEUTRAL',sessionChangePercent:-.2,positiveStrategies:1,neutralStrategies:1,negativeStrategies:1,strategyCount:3,agreement:'1/3 strategies agree; positive 1, neutral 1, negative 1',freshness:'Delayed'}],prospective:{valid:24,pending:24,evaluated:0,invalidated:24,correct:0,incorrect:0,directionalAccuracy:null,meanRealizedReturn:null,evidenceMaturity:'BOOTSTRAPPING',curve:[]},cadence:{enabled:true,provider:'EODHD',observationClass:'CURRENT EOD / PROSPECTIVE EOD',health:'Healthy',lastProviderCheckUtc:'2026-08-15T19:00:00Z',lastSuccessfulAcquisitionUtc:null,latestCanonicalSession:'2026-08-14',lastPredictionUtc:'2026-08-15T18:00:00Z',lastOutcomeUtc:null,pending:24,evaluated:0,invalidated:24,clockIntegrity:true,nextAction:'Waiting for next weekday EOD provider window',pollingPolicy:'internal check every 30 minutes',operatingMode:'RESEARCH'},disclaimer:'Research results — no money is traded. Signals are not recommendations.',evidenceSeparation:'Prospective evidence records prior decisions; historical backtests remain separate and are not included.'}
 const riskStatusFixture:FinanceRiskStatus={policyVersion:'research-eod-v1',operatingMode:'RESEARCH',engineHealth:'Healthy',safetyState:'READY',activeHalt:false,haltScope:'SYSTEM',haltReason:null,haltedAtUtc:null,evaluationCount:1,lastEvaluationUtc:'2026-08-16T10:00:00Z',executionAuthority:'NONE — research evidence only; no orders'}
 const riskEvaluationFixture:FinanceRiskEvaluation={evaluationId:'risk-fixture',policyVersion:'research-eod-v1',proposalId:'proposal-fixture',instrumentId:'US:XNAS:AAPL',strategyId:'momentum',strategyVersion:'v1',parameterFingerprint:'sha256:fixture',shadowPredictionId:'shadow-fixture',sourceRevisionId:'source-fixture',featureRevisionId:'feature-fixture',knowledgeCutoffUtc:'2026-08-16T09:59:00Z',evaluatedAtUtc:'2026-08-16T10:00:00Z',operatingMode:'RESEARCH',direction:'TargetLong',researchCapital:100000,requestedExposure:4000,allowedExposure:4000,riskAdjustedExposure:4000,verdict:'allow',reasonCodes:[],rules:[],evidenceLineage:'source=source-fixture'}
+const autonomousFixture:FinanceAutonomousResearch={generatedAtUtc:'2026-08-22T10:00:00Z',operatingMode:'RESEARCH',budgetSek:0,engineVersion:'autonomous-research-v1',featureLibraryVersion:'finance-research-signals-v1',totalExperiments:1,rejectedCount:1,challengerCount:0,status:'CONTINUE_RESEARCH',executionAuthority:'NONE',features:[],hypotheses:[],latestRun:{runId:'research-run-fixture',state:'completed',experimentCount:1,rejectedCount:1,challengerCount:0,experiments:[{experimentId:'experiment-fixture',familyId:'family-momentum-v1',familyAttemptCount:3,verdict:'rejected',rejectionReason:'integrity.out-of-sample.failed',outOfSampleNetReturn:-.02,costModel:'hypothetical-conservative-v1',featureRevisionId:'feature-fixture',marketRevisionIds:['market-fixture'],knowledgeCutoffUtc:'2026-08-21T22:00:00Z',complexity:{score:6},integrity:{state:'fail',checks:[{id:'out-of-sample',state:'fail',evidence:'net=-0.02'},{id:'dsr',state:'notEvaluable',evidence:'inputs unavailable'}]}}]}}
 
 describe('Finance read-only observation UI', () => {
   test('registers Finance as a navigable dashboard view', () => {
@@ -122,5 +123,14 @@ describe('Finance read-only observation UI', () => {
     expect(aggregateSignalRisk(['shadow-a','shadow-b'],[allow,deny])).toBe('Risk: Blockerad (blandad)')
     expect(aggregateSignalRisk(['shadow-a','shadow-missing'],[allow])).toBe('Risk: Godkänd (blandad)')
     expect(aggregateSignalRisk(['shadow-missing'],[allow])).toBe('Riskbedömning saknas')
+  })
+  test('renders autonomous research evidence conservatively with progressive details and no profitability claim',()=>{
+    render(<FinanceObservation initialSnapshot={empty} initialAutonomousResearch={autonomousFixture}/>)
+    expect(screen.getAllByText('Autonomous Research').length).toBeGreaterThan(1)
+    expect(screen.getByText('1 experiment')).toBeVisible();expect(screen.getAllByText('1 / 0').length).toBeGreaterThan(0)
+    expect(screen.getByText(/family-momentum-v1 · REJECTED/)).toBeVisible();expect(screen.getByText(/INTEGRITY FAIL/)).toBeVisible()
+    expect(screen.getByText(/Research-only · 0 SEK · ingen execution authority/)).toBeVisible()
+    expect(screen.queryByText(/vinnare|lönsam strategi|garanterad/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:/köp|sälj|order|trade/i})).not.toBeInTheDocument()
   })
 })
