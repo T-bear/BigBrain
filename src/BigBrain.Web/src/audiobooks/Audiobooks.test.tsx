@@ -1,6 +1,9 @@
 import { fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { expect,test,vi } from 'vitest'
 import { Audiobooks } from './Audiobooks'
+import { createAppWidgetRegistry } from '../dashboard/appWidgets'
+
+test('is registered as a first-class Media view',()=>{const registry=createAppWidgetRegistry({modules:[],moduleError:false,system:null,systemError:false,docker:null,dockerError:false,recovery:null,recoveryError:false});expect(registry.getAll().some(widget=>widget.id==='audiobooks'&&widget.defaultView==='media')).toBe(true)})
 
 test('renders configured library and language-aware local search',async()=>{const fetch=vi.spyOn(globalThis,'fetch').mockResolvedValueOnce(new Response(JSON.stringify({state:'configuredHealthy',message:null,continueListening:{id:'one',title:'Smashed',author:'A',series:null,narrator:'N',language:'sv',languageLabel:'Svenska',durationSeconds:10,progressPercent:63,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null},library:[],recent:[],acquisition:{state:'notConfigured',canSearch:false,canRequest:false,message:null}}),{status:200,headers:{'Content-Type':'application/json'}})).mockResolvedValueOnce(new Response(JSON.stringify({library:[],discovery:[],acquisition:{state:'notConfigured',canSearch:false,canRequest:false,message:null}}),{status:200,headers:{'Content-Type':'application/json'}}));render(<Audiobooks/>);expect(await screen.findByText('Smashed')).toBeInTheDocument();fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'bok'}});fireEvent.change(screen.getByLabelText('Språk'),{target:{value:'sv'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}));await waitFor(()=>expect(fetch.mock.calls[1][0]).toContain('language=sv'));fetch.mockRestore()})
 

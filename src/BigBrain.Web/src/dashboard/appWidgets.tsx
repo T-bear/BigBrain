@@ -15,6 +15,7 @@ import { AppIcon } from '../AppIcon'
 import { useWidgets } from './widgetFramework'
 import { ThemeControl } from '../ThemeControl'
 import { AudiobookSettings } from '../audiobooks/AudiobookSettings'
+import { Audiobooks } from '../audiobooks/Audiobooks'
 import { HomeOverview } from './HomeOverview'
 
 export interface AppWidgetData {
@@ -110,6 +111,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     { id: 'calendar', title: 'Kalender', description: 'Veckans arbetsschema och säker Heroma-import.', icon: '▦', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: ['calendar.events.read'], render: () => <CalendarWidget /> },
     { id: 'reminders', title: 'Påminnelser', description: 'Visa familjens viktigaste påminnelser.', icon: '◉', category: 'Familj', defaultView: 'family', defaultSize: 'medium', minimumSize: 'small', supportedViews: ['family'], permissions: [], render: () => <PlannedWidget text="Visa familjens viktigaste påminnelser." /> },
     { id: 'media-search', title: 'Mediesökning', description: 'Hitta filmer och serier.', icon: '⌕', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaSearch /> },
+    { id: 'audiobooks', title: 'Ljudböcker', description: 'Bibliotek, lyssningsprogress och sökning.', icon: '◉', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <Audiobooks /> },
     { id: 'downloads', title: 'Nedladdningskö', description: 'Hantera aktiva nedladdningar.', icon: '⇣', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <DownloadControl /> },
     { id: 'smart-shuffle', title: 'Smart Shuffle', description: 'Starta en rättvis serieblandning på TV:n.', icon: '⤨', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <SmartShuffle /> },
     { id: 'media-jobs', title: 'Medieflöde', description: 'Följ film och serier från sökning till bibliotek.', icon: '↧', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaJobs showHeading={false} /> },
