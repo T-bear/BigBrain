@@ -7,12 +7,12 @@ import type { FrequentItem,ShoppingItem,ShoppingSnapshot,ShoppingSuggestion } fr
 import { ShoppingItemRow } from './ShoppingItemRow'
 import { ShoppingSuggestions } from './ShoppingSuggestions'
 
-export function ShoppingList({expanded,onToggle,status}:{expanded:boolean;onToggle:()=>void;status:string}){
+export function ShoppingList({expanded,onToggle,status,presentation='dashboard'}:{expanded:boolean;onToggle:()=>void;status:string;presentation?:'dashboard'|'family'}){
  const [data,setData]=useState<ShoppingSnapshot>({items:[],sessionId:null}),[frequent,setFrequent]=useState<FrequentItem[]>([]),[error,setError]=useState(false),[mode,setMode]=useState(false)
  const load=async()=>{try{setData(await api.getShoppingList());setFrequent(await api.getFrequentItems());setError(false)}catch{setError(true)}}
  useEffect(()=>{void load()},[])
  const remaining=data.items.filter(x=>!x.purchased)
- return <><CollapsibleModule className="shopping-list" moduleId="shopping-list" title="Inköpslista" expanded={expanded} onToggle={onToggle} actions={!['available','loading'].includes(status.toLowerCase())?<span className="status-badge status-badge--unavailable">{status}</span>:undefined} collapsedSummary={<div className="shopping-compact"><strong>{remaining.length} kvar</strong><QuickAdd inputId="shopping-collapsed-input" onAdded={load}/>{remaining.slice(0,3).map(x=><span key={x.id}>{x.name}{x.quantity>1?` × ${x.quantity}`:''}</span>)}{data.items.length===0&&<span>Inköpslistan är tom.</span>}<button className="secondary-button" onClick={()=>setMode(true)} type="button">Öppna inköpslistan</button></div>}>
+ return <><CollapsibleModule className="shopping-list" moduleId="shopping-list" title="Inköpslista" expanded={expanded} onToggle={onToggle} variant={presentation==='family'?'family':'dashboard'} actions={!['available','loading'].includes(status.toLowerCase())?<span className="status-badge status-badge--unavailable">{status}</span>:undefined} collapsedSummary={<div className="shopping-compact"><strong>{remaining.length} kvar</strong><QuickAdd inputId="shopping-collapsed-input" onAdded={load}/>{remaining.slice(0,3).map(x=><span key={x.id}>{x.name}{x.quantity>1?` × ${x.quantity}`:''}</span>)}{data.items.length===0&&<span>Inköpslistan är tom.</span>}<button className="secondary-button" onClick={()=>setMode(true)} type="button">Öppna inköpslistan</button></div>}>
   {error?<p className="notice notice--error" role="alert">Inköpslistan kunde inte laddas.</p>:<><QuickAdd inputId="shopping-expanded-input" onAdded={load}/><p>{remaining.length} kvar</p><button className="primary-button" onClick={()=>setMode(true)} type="button">Öppna handlingsläge</button></>}
  </CollapsibleModule>{mode&&createPortal(<ShoppingMode data={data} frequent={frequent} reload={load} onClose={()=>setMode(false)}/>,document.body)}</>
 }

@@ -41,12 +41,19 @@ function switchView(name: string) {
 beforeEach(() => { window.localStorage.clear(); vi.stubGlobal('fetch', successfulFetch()) })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
 
-test('starts on the calm Home launcher and keeps family tools in Family', () => {
+test('starts on the calm Home launcher and keeps family tools in Family', async () => {
   const { container } = render(<App />)
   expect(screen.getByRole('heading', { level: 1, name: 'Hem' })).toBeInTheDocument()
   expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['home-launcher'])
   switchView('Familj')
   expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
+  expect(container.querySelector('#family')).toHaveClass('family-experience')
+  expect(container.querySelector('#family .dashboard-widget')).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Dashboardinställningar' })).toHaveAttribute('aria-haspopup', 'dialog')
+  expect(await screen.findByRole('tab', { name: 'Matsedel' })).toHaveAttribute('aria-selected', 'true')
+  expect(container.querySelector('[data-family-section="shopping-list"]')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Öppna kalender' })).toBeInTheDocument()
   expect(screen.getByRole('navigation', { name: 'Snabbnavigation' })).toBeInTheDocument()
 })
 

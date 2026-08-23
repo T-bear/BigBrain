@@ -59,11 +59,13 @@ export function MealPlanner({
   onToggle = () => undefined,
   status = 'Available',
   today = localToday(),
+  presentation = 'dashboard',
 }: {
   expanded?: boolean
   onToggle?: () => void
   status?: string
   today?: string
+  presentation?: 'dashboard' | 'family'
 }) {
   const [meals, setMeals] = useState<MealPlannerMeal[]>([])
   const [tags, setTags] = useState<MealPlannerTag[]>([])
@@ -194,6 +196,7 @@ export function MealPlanner({
       moduleId="meal-planner"
       onToggle={onToggle}
       title="Matlista"
+      variant={presentation === 'family' ? 'family' : 'dashboard'}
     >
       {error && <p className="notice notice--error" role="alert">{error}</p>}
       {notice && <p className="notice notice--success" role="status">{notice}</p>}

@@ -1,5 +1,9 @@
 # Family View & Family Coordination epic
 
+## BB-097 presentation boundary
+
+The normal Family route uses a dedicated `FamilyExperience` composition rather than the generic dashboard-widget frame. This is a frontend presentation boundary only: Meal Planner, Shopping List and Calendar retain their existing modules, API contracts and data ownership. Widget registry metadata continues to provide visibility/order preferences and edit mode, but it does not dictate Family's visible card anatomy, headings or grouping. Other views continue to use `DashboardWorkspace` and `DashboardWidget`; no shared component is deleted. This exception is intentionally narrow until the product owner approves the Family/Obsidian Gold reference direction.
+
 ## Status, purpose and priority
 
 This is a future product epic and planning baseline, not an approved sprint, architecture schema or

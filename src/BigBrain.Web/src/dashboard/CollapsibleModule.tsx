@@ -10,6 +10,7 @@ export function CollapsibleModule({
   moduleId,
   onToggle,
   title,
+  variant = 'dashboard',
 }: {
   actions?: ReactNode
   children: ReactNode
@@ -21,10 +22,13 @@ export function CollapsibleModule({
   moduleId: string
   onToggle: () => void
   title: string
+  variant?: 'dashboard' | 'family'
 }) {
   const contentId = `${moduleId}-content`
   const headingId = `${moduleId}-heading`
   const Heading = headingLevel === 2 ? 'h2' : 'h3'
+
+  if (variant === 'family') return <div className={className} data-family-module={moduleId} id={moduleId}>{children}</div>
 
   return (
     <section

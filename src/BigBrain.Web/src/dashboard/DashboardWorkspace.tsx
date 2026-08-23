@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ThemeControl } from '../ThemeControl'
 import type { DashboardRegistry, DashboardViewId, WidgetDefinition } from './widgetFramework'
 import { useWidgets } from './widgetFramework'
+import { FamilyExperience } from '../family/FamilyExperience'
 
 function WidgetLibrary({ onClose, view }: { onClose: () => void; view: DashboardViewId }) {
   const { preferences, registry, setVisible } = useWidgets()
@@ -95,6 +96,17 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     document.addEventListener('mousedown', close)
     return () => { document.removeEventListener('keydown', close); document.removeEventListener('mousedown', close) }
   }, [settingsOpen])
+
+  const settings = settingsOpen && <div aria-label="Familjeinställningar" className="dashboard-settings family-settings" ref={settingsRef} role="dialog">
+    <ThemeControl />
+    <button aria-pressed={editMode} className="secondary-button" onClick={() => setEditMode(current => !current)} type="button">{editMode ? 'Avsluta redigering' : 'Aktivera redigeringsläge'}</button>
+    <button className="secondary-button" onClick={() => { setSettingsOpen(false); setLibraryOpen(true) }} type="button">Öppna widgetbibliotek</button>
+  </div>
+
+  if (activeView === 'family' && !editMode) return <>
+    <FamilyExperience onOpenSettings={() => setSettingsOpen(current => !current)} settings={settings} settingsButtonRef={settingsButtonRef} settingsOpen={settingsOpen} widgets={ordered} />
+    {libraryOpen && <WidgetLibrary onClose={() => { setLibraryOpen(false); window.setTimeout(() => settingsButtonRef.current?.focus(), 0) }} view={activeView} />}
+  </>
 
   return <main className="main bb-page dashboard-workspace" id={activeView}>
     <header className="page-header dashboard-workspace__header">

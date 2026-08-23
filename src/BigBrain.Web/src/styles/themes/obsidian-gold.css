@@ -1,24 +1,24 @@
 :root,
 [data-theme="obsidian-gold"] {
   color-scheme: dark;
-  --bb-color-bg: #080a0d;
-  --bb-color-bg-subtle: #101419;
-  --bb-color-surface: #15191e;
-  --bb-color-surface-raised: #1d2228;
-  --bb-color-surface-overlay: #11151a;
-  --bb-color-surface-interactive: #1a1f25;
-  --bb-color-border: #34383d;
-  --bb-color-border-strong: #74633f;
+  --bb-color-bg: #090b0d;
+  --bb-color-bg-subtle: #0f1215;
+  --bb-color-surface: #15191c;
+  --bb-color-surface-raised: #1b2024;
+  --bb-color-surface-overlay: #101316;
+  --bb-color-surface-interactive: #181c20;
+  --bb-color-border: #2b3033;
+  --bb-color-border-strong: #6d592c;
   --bb-color-text: #f3f0e9;
   --bb-color-text-secondary: #c9c4ba;
   --bb-color-text-muted: #99958d;
   --bb-color-text-inverse: #171208;
-  --bb-color-primary: #d3a22e;
-  --bb-color-primary-hover: #e3b544;
-  --bb-color-primary-active: #b88618;
+  --bb-color-primary: #d9a62e;
+  --bb-color-primary-hover: #e7b946;
+  --bb-color-primary-active: #b98217;
   --bb-color-primary-contrast: #171208;
-  --bb-color-accent: #d3a22e;
-  --bb-color-accent-soft: rgb(211 162 46 / 13%);
+  --bb-color-accent: #d9a62e;
+  --bb-color-accent-soft: rgb(217 166 46 / 11%);
   --bb-color-success: #52b66c;
   --bb-color-success-contrast: #06170b;
   --bb-color-warning: #efb43b;
@@ -28,7 +28,7 @@
   --bb-color-info: #5797df;
   --bb-color-info-contrast: #061321;
   --bb-color-backdrop: rgb(2 3 4 / 82%);
-  --bb-page-glow: radial-gradient(circle at 72% -5%, rgb(211 162 46 / 8%), transparent 34%);
+  --bb-page-glow: radial-gradient(circle at 72% -5%, rgb(217 166 46 / 7%), transparent 34%);
   --bb-shadow-sm: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 .45rem 1.4rem rgb(0 0 0 / 30%);
   --bb-shadow-md: 0 1px 0 rgb(255 255 255 / 5%) inset, 0 1rem 2.7rem rgb(0 0 0 / 46%);
   --bb-shadow-lg: 0 1px 0 rgb(255 255 255 / 6%) inset, 0 1.8rem 5rem rgb(0 0 0 / 70%);
