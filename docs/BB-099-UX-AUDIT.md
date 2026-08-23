@@ -8,7 +8,7 @@ Family is the owner-approved golden design reference. This audit covers the seve
 
 | View/state | Purpose / primary user goal | Current problems found | Mobile reachability / hierarchy | Required change | Status |
 |---|---|---|---|---|---|
-| Home | Understand what matters now | Three launcher rows duplicated the persistent dock and provided no information | Reachable but mostly empty; navigation dominated | Compose real meal, calendar, shopping, Media and Finance signals before contextual navigation | implemented locally |
+| Home | Understand what matters now | Three launcher rows duplicated the persistent dock; initial implementation also waited for its slowest summary endpoint | Reachable but mostly empty; navigation dominated | Compose real signals before contextual navigation and resolve each source independently | implemented and deployed |
 | Family normal | Coordinate meals, shopping and calendar | Approved composition | Audit last content, tabs, Byt, dialogs and keyboard against shared clearance | Keep composition; adopt shared dock clearance | implemented locally |
 | Family Byt/settings/dialogs | Contextual Family actions | No new composition defect found | Overlays already dock/safe-area aware | Regression only | verified locally |
 | Media search/request | Find, play or request media | Primary workflow still sits among several equally framed modules | Search remains first but needs section rhythm rather than dashboard framing | Retain search first; use purpose sections and shared clearance | implemented locally |

@@ -20,7 +20,7 @@ Repository truth exposes seven application views—Home, Family, Media, Finance,
 
 ## Changes
 
-Home previously duplicated the persistent dock with three launcher rows. It now makes one read-only, non-polling request per existing Family meal, calendar, shopping, Media overview and Finance overview endpoint, then presents actual current signals before contextual navigation. Missing endpoint data remains honestly unavailable; no reminder, continue-watching or fabricated performance data is synthesized.
+Home previously duplicated the persistent dock with three launcher rows. It now makes one read-only, non-polling request per existing Family meal, calendar, shopping, Media overview and Finance overview endpoint, then presents actual current signals before contextual navigation. Each source resolves independently so a slow Finance response cannot block already available Family or Media context. Missing endpoint data remains honestly unavailable; no reminder, continue-watching or fabricated performance data is synthesized.
 
 Media's obstruction came from insufficient shared page-end clearance combined with Smart Shuffle's nested checkbox scroller and a lower select, followed by technical integration content expanded by default. A single semantic dock-clearance token now reserves dock height, safe area and breathing room for every view. Smart Shuffle uses one continuous selectable list without nested scrolling, Media search is composed as its primary purpose section, and the Jellyfin/ARR technical surface remains available but starts collapsed.
 

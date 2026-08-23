@@ -20,30 +20,20 @@ const eventTime = (event: CalendarEvent) => event.isAllDay ? 'Hela dagen' : [eve
 
 export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | null }) {
   const { setActiveView } = useWidgets()
-  const [snapshot, setSnapshot] = useState<HomeSnapshot | null>(null)
+  const [snapshot, setSnapshot] = useState<HomeSnapshot>({ todayMeals: [], nextEvent: null, shoppingRemaining: null, media: null, finance: null })
 
   useEffect(() => {
     let current = true
-    Promise.allSettled([getMealPlannerSchedules(), getCalendarWeek(), getShoppingList(), getMediaOverview(), getFinanceOverview()]).then(results => {
-      if (!current) return
-      const schedules = results[0].status === 'fulfilled' ? results[0].value : []
-      const calendar = results[1].status === 'fulfilled' ? results[1].value : null
-      const shopping = results[2].status === 'fulfilled' ? results[2].value : null
-      const media = results[3].status === 'fulfilled' ? results[3].value : null
-      const finance = results[4].status === 'fulfilled' ? results[4].value : null
-      const today = localDate()
-      setSnapshot({
-        todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today),
-        nextEvent: calendar?.events.filter(event => event.date >= today).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ?? null,
-        shoppingRemaining: shopping ? shopping.items.filter(item => !item.purchased).length : null,
-        media,
-        finance,
-      })
-    })
+    const update = (change: Partial<HomeSnapshot>) => { if (current) setSnapshot(previous => ({ ...previous, ...change })) }
+    const today = localDate()
+    void getMealPlannerSchedules().then(schedules => update({ todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today) })).catch(() => undefined)
+    void getCalendarWeek().then(calendar => update({ nextEvent: calendar.events.filter(event => event.date >= today).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ?? null })).catch(() => undefined)
+    void getShoppingList().then(shopping => update({ shoppingRemaining: shopping.items.filter(item => !item.purchased).length })).catch(() => undefined)
+    void getMediaOverview().then(media => update({ media })).catch(() => undefined)
+    void getFinanceOverview().then(finance => update({ finance })).catch(() => undefined)
     return () => { current = false }
   }, [])
 
-  if (!snapshot) return <div aria-busy="true" className="home-overview"><p aria-live="polite">Samlar det viktigaste just nu…</p></div>
   const mediaActive = snapshot.media?.qBittorrent.activeCount ?? 0
   const mediaWarnings = snapshot.media?.insights.filter(item => item.severity === 'warning' || item.severity === 'critical') ?? []
   const needsAttention = recovery && recovery.overall !== 'healthy' ? `Systemstatus: ${recovery.overall}` : mediaWarnings[0]?.title
