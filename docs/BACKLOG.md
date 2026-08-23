@@ -2,7 +2,7 @@
 
 ## BB-100 — Audiobooks Platform Foundation
 
-- Status: Implementerad lokalt 2026-08-23; automatisk verifiering, CI och deployment pågår.
+- Status: Tekniskt implementerad, publicerad, CI-verifierad och foundation-deployad 2026-08-23. Audiobookshelf first-run/library/API identity requires the documented owner action; integration state is truthfully `NotConfigured` until then.
 - Scope: Audiobookshelf library/progress/continue listening, BigBrain-owned API and premium Media/Ljudböcker UX, normalized language and edition contracts, secure cover proxy, persisted language preference and provider abstraction.
 - Provider decision: `None`. Official Readarr is retired. Chaptarr, Librarr/Librarry and resurrected forks remain too immature or operationally/security-sensitive for an unattended dependency in this slice.
 - Safety: no acquisition/download request exists; Prowlarr and qBittorrent are unchanged. BB-099 remains owner-review pending.

@@ -9,7 +9,7 @@
 
 ## Status
 
-Implemented locally; CI/deployment evidence pending. BB-099 remains technically complete with owner UX review pending.
+Technically implemented, published, CI-verified and foundation-deployed. Audiobookshelf is running loopback-only; its library and dedicated API identity require the documented owner first-run action, so BigBrain truthfully reports `notConfigured`. BB-099 remains technically complete with owner UX review pending.
 
 ## Decision
 
@@ -23,7 +23,9 @@ Media/Ljudböcker renders continue listening when genuine progress exists, a cov
 
 ## Evidence
 
-Network-free API fixtures cover healthy, authentication failure, malformed payload and provider-None states. Web tests cover configured/not-configured rendering and language-filtered local search. Final totals and runtime evidence are appended after publication/deployment.
+Network-free API fixtures cover healthy, authentication failure, malformed payload and provider-None states. Web tests cover configured/not-configured rendering, language-filtered local search and first-class registration in the actual Media route. Local validation passed 124 frontend, 506 API and 32 Sentinel tests; Vite production and full Release builds, documentation verification (179 Markdown files), Compose and diff checks passed. CI runs `32646849659` and `32647803354` passed.
+
+The first deployed browser review exposed that the component had been placed in the unused non-admin `MediaDashboard` branch while the real Media route is registry-composed. Commit `7911505187ca6c316fc050ed349f1980938d1ad6` moved it to the widget registry and added the route regression. The final deployed Web image is `sha256:e6b04941152dc4efed4fd6a7e2ddb64e7b025d8b766f5f6a122554599103ef19`; API is healthy and ABS image `sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e` is running. Normal viewport captures at `/tmp/bb100-{obsidian-gold,forest-night,arctic-wind}-audiobooks-{390x844,430x932}.png` show the truthful setup state in all themes with no horizontal overflow. Obsidian Gold was restored after theme verification.
 
 ## Security
 
@@ -39,7 +41,7 @@ BB-099 remains **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**. Finance is ou
 
 ## Remaining work
 
-Manual ABS first-run, dedicated least-privilege API identity, library ID injection, configured-library runtime validation, CI and deployment remain until evidenced. BB-101 may later evaluate a provider and explicit acquisition flow; it is not implemented here.
+Manual ABS first-run, dedicated least-privilege API identity, library ID injection and configured-library runtime validation remain owner actions. BB-101 may later evaluate a provider and explicit acquisition flow; it is not implemented here.
 
 ## Resumption
 
