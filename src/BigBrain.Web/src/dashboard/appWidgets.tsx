@@ -1,5 +1,5 @@
 import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from '../types'
-import { DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadge } from '../components'
+import { BBButton, BBSurface, DockerContainerList, MetricCard, ModuleCard, ProgressMetric, StatusBadge } from '../components'
 import { DownloadControl } from '../download-control/DownloadControl'
 import { MealPlanner } from '../meal-planner/MealPlanner'
 import { MediaDashboard } from '../MediaDashboard'
@@ -92,12 +92,12 @@ function HomeLauncher({ data }: { data: AppWidgetData }) {
     { id: 'media' as const, icon: 'media' as const, title: 'Media', detail: 'Sök, spela och följ flöden' },
     { id: 'finance' as const, icon: 'finance' as const, title: 'Finance', detail: 'RESEARCH · inga riktiga pengar' },
   ]
-  return <div className="module-launcher">{items.map(item => <button key={item.id} onClick={() => setActiveView(item.id)} type="button"><AppIcon name={item.icon} size={26} /><span><strong>{item.title}</strong><small>{item.detail}</small></span><AppIcon name="chevron" /></button>)}{data.recovery && data.recovery.overall !== 'healthy' && <button className="module-launcher__attention" onClick={() => setActiveView('admin')} type="button"><AppIcon name="admin" /><span><strong>Systemet behöver uppmärksamhet</strong><small>{data.recovery.overall}</small></span><AppIcon name="chevron" /></button>}</div>
+  return <div className="module-launcher">{items.map(item => <BBButton key={item.id} onClick={() => setActiveView(item.id)} type="button" variant="contextual"><AppIcon name={item.icon} size={26} /><span><strong>{item.title}</strong><small>{item.detail}</small></span><AppIcon name="chevron" /></BBButton>)}{data.recovery && data.recovery.overall !== 'healthy' && <BBButton className="module-launcher__attention" onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Systemet behöver uppmärksamhet</strong><small>{data.recovery.overall}</small></span><AppIcon name="chevron" /></BBButton>}</div>
 }
 
 function MoreNavigation() {
   const { setActiveView } = useWidgets()
-  return <div className="more-hub"><div className="module-launcher"><button onClick={() => setActiveView('ai')} type="button"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></button><button onClick={() => setActiveView('admin')} type="button"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></button></div><section aria-labelledby="theme-heading" className="settings-surface"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /></section></div>
+  return <div className="more-hub"><div className="module-launcher"><BBButton onClick={() => setActiveView('ai')} type="button" variant="contextual"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></BBButton><BBButton onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></BBButton></div><BBSurface aria-labelledby="theme-heading" className="settings-surface" as="section"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /></BBSurface></div>
 }
 
 export function createAppWidgetRegistry(data: AppWidgetData) {

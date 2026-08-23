@@ -3,6 +3,8 @@ import { ThemeControl } from '../ThemeControl'
 import type { DashboardRegistry, DashboardViewId, WidgetDefinition } from './widgetFramework'
 import { useWidgets } from './widgetFramework'
 import { FamilyExperience } from '../family/FamilyExperience'
+import { AppIcon } from '../AppIcon'
+import { BBButton, BBEmptyState } from '../components'
 
 function WidgetLibrary({ onClose, view }: { onClose: () => void; view: DashboardViewId }) {
   const { preferences, registry, setVisible } = useWidgets()
@@ -27,7 +29,7 @@ function WidgetLibrary({ onClose, view }: { onClose: () => void; view: Dashboard
 
   return <div className="widget-library-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose() }}>
     <div aria-labelledby="widget-library-title" aria-modal="true" className="widget-library" onKeyDown={event => { if (event.key === 'Escape') onClose() }} ref={dialogRef} role="dialog">
-      <header><div><p className="eyebrow">Widgetbibliotek</p><h2 id="widget-library-title">Visa widgets</h2></div><button aria-label="Stäng widgetbibliotek" className="secondary-button" onClick={onClose} type="button">×</button></header>
+      <header><div><p className="eyebrow">Anpassa vy</p><h2 id="widget-library-title">Visa widgets</h2></div><BBButton aria-label="Stäng widgetbibliotek" onClick={onClose} type="button" variant="icon">×</BBButton></header>
       <p className="muted">Ändringen sparas lokalt på den här enheten. Ingen widgetdata raderas.</p>
       <div className="widget-library__list">
         {widgets.map(widget => <label key={widget.id}>
@@ -35,7 +37,7 @@ function WidgetLibrary({ onClose, view }: { onClose: () => void; view: Dashboard
           <span aria-hidden="true">{widget.icon}</span><span><strong>{widget.title}</strong><small>{widget.description}</small></span>
         </label>)}
       </div>
-      <button className="primary-button" onClick={onClose} type="button">Klar</button>
+      <BBButton onClick={onClose} type="button" variant="primary">Klar</BBButton>
     </div>
   </div>
 }
@@ -46,25 +48,25 @@ function WidgetFrame({ definition, editMode, index, total, view }: { definition:
 
   return <section
     aria-labelledby={`${definition.id}-widget-title`}
-    className={`dashboard-widget dashboard-widget--${definition.defaultSize}${editMode ? ' dashboard-widget--editing' : ''}`}
+    className={`workspace-module workspace-module--${definition.defaultSize}${editMode ? ' workspace-module--editing' : ''}`}
     data-widget-id={definition.id}
     draggable={editMode}
     onDragOver={event => { if (editMode) event.preventDefault() }}
     onDrop={event => { if (editMode) moveWidgetTo(view, event.dataTransfer.getData('text/widget-id'), definition.id) }}
     onDragStart={event => event.dataTransfer.setData('text/widget-id', definition.id)}
   >
-    <header className="dashboard-widget__header">
-      <div className="dashboard-widget__identity"><span aria-hidden="true">{definition.icon}</span><div><p>{definition.category}</p><h2 id={`${definition.id}-widget-title`}>{definition.title}</h2></div></div>
-      <div className="dashboard-widget__actions">
+    <header className="workspace-module__header">
+      <div className="workspace-module__identity"><span aria-hidden="true" /><div><p>{definition.category}</p><h2 id={`${definition.id}-widget-title`}>{definition.title}</h2></div></div>
+      <div className="workspace-module__actions">
         {editMode && <>
-          <button aria-label={`Flytta ${definition.title} upp`} disabled={index === 0} onClick={() => moveWidget(view, definition.id, -1)} type="button">↑</button>
-          <button aria-label={`Flytta ${definition.title} ned`} disabled={index === total - 1} onClick={() => moveWidget(view, definition.id, 1)} type="button">↓</button>
-          <button aria-label={`Dölj ${definition.title}`} onClick={() => setVisible(view, definition.id, false)} type="button">Dölj</button>
+          <BBButton aria-label={`Flytta ${definition.title} upp`} disabled={index === 0} onClick={() => moveWidget(view, definition.id, -1)} type="button" variant="icon">↑</BBButton>
+          <BBButton aria-label={`Flytta ${definition.title} ned`} disabled={index === total - 1} onClick={() => moveWidget(view, definition.id, 1)} type="button" variant="icon">↓</BBButton>
+          <BBButton aria-label={`Dölj ${definition.title}`} onClick={() => setVisible(view, definition.id, false)} type="button" variant="tertiary">Dölj</BBButton>
         </>}
-        <button aria-controls={`${definition.id}-widget-content`} aria-expanded={!collapsed} aria-label={`${collapsed ? 'Expandera' : 'Minimera'} ${definition.title}`} onClick={() => toggleCollapsed(view, definition.id)} type="button">⌄</button>
+        <BBButton aria-controls={`${definition.id}-widget-content`} aria-expanded={!collapsed} aria-label={`${collapsed ? 'Expandera' : 'Minimera'} ${definition.title}`} onClick={() => toggleCollapsed(view, definition.id)} type="button" variant="icon"><AppIcon name="chevron" /></BBButton>
       </div>
     </header>
-    <div className="dashboard-widget__content" hidden={collapsed} id={`${definition.id}-widget-content`}>{definition.render({ expanded: !collapsed })}</div>
+    <div className="workspace-module__content" hidden={collapsed} id={`${definition.id}-widget-content`}>{definition.render({ expanded: !collapsed })}</div>
   </section>
 }
 
@@ -108,11 +110,11 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     {libraryOpen && <WidgetLibrary onClose={() => { setLibraryOpen(false); window.setTimeout(() => settingsButtonRef.current?.focus(), 0) }} view={activeView} />}
   </>
 
-  return <main className="main bb-page dashboard-workspace" id={activeView}>
+  return <main className={`main bb-page dashboard-workspace dashboard-workspace--${activeView}`} id={activeView}>
     <header className="page-header dashboard-workspace__header">
       <div><p className="eyebrow">{dashboard.description}</p><h1>{dashboard.title}</h1></div>
       <div className="dashboard-workspace__actions">
-        <button aria-expanded={settingsOpen} aria-haspopup="dialog" aria-label="Dashboardinställningar" className="secondary-button dashboard-settings__trigger" onClick={() => setSettingsOpen(current => !current)} ref={settingsButtonRef} type="button"><span aria-hidden="true">⚙</span><span>Dashboardinställningar</span></button>
+        <BBButton aria-expanded={settingsOpen} aria-haspopup="dialog" aria-label="Dashboardinställningar" className="dashboard-settings__trigger" onClick={() => setSettingsOpen(current => !current)} ref={settingsButtonRef} type="button" variant="icon"><AppIcon name="settings" /></BBButton>
         {settingsOpen && <div aria-label="Dashboardinställningar" className="dashboard-settings" ref={settingsRef} role="dialog">
           <ThemeControl />
           <button aria-pressed={editMode} className="secondary-button" onClick={() => setEditMode(current => !current)} type="button">{editMode ? 'Avsluta redigering' : 'Aktivera redigeringsläge'}</button>
@@ -121,10 +123,10 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
       </div>
     </header>
     {editMode && <p aria-live="polite" className="notice">Redigeringsläge är aktivt. Dra widgets eller använd pilknapparna för att ändra ordning.</p>}
-    <div className="dashboard-widget-grid">
+    <div className="workspace-module-grid">
       {ordered.map((widget, index) => <WidgetFrame definition={widget} editMode={editMode} index={index} key={widget.id} total={ordered.length} view={activeView} />)}
     </div>
-    {ordered.length === 0 && <section className="empty-state"><h2>Inga widgets visas</h2><p>Öppna widgetbiblioteket för att lägga till widgets i den här vyn.</p><button className="primary-button" onClick={() => setLibraryOpen(true)} type="button">Öppna widgetbiblioteket</button></section>}
+    {ordered.length === 0 && <BBEmptyState detail="Välj vilket innehåll som ska visas i den här vyn." title="Inget innehåll visas"><BBButton onClick={() => setLibraryOpen(true)} type="button" variant="primary">Visa innehåll</BBButton></BBEmptyState>}
     {libraryOpen && <WidgetLibrary onClose={() => { setLibraryOpen(false); window.setTimeout(() => settingsButtonRef.current?.focus(), 0) }} view={activeView} />}
   </main>
 }

@@ -3,6 +3,6 @@
 @import './themes/arctic-wind.css';
 @import './themes/forest-night.css';
 @import './foundation.css';
-@import './components.css';
 @import './modules.css';
+@import './components.css';
 @import './family.css';

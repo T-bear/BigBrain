@@ -1,9 +1,32 @@
-import type { PropsWithChildren } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type InputHTMLAttributes, type PropsWithChildren, type SelectHTMLAttributes } from 'react'
 import type { DockerContainer } from './types'
 
 export function StatusBadge({ status, compact = false }: { status: string; compact?: boolean }) {
   const normalized = status.toLowerCase()
   return <span className={`bb-badge status-badge status-badge--${normalized} ${compact ? 'status-badge--compact' : ''}`}>{status}</span>
+}
+
+export type BBButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'icon' | 'contextual'
+
+export const BBButton = forwardRef<HTMLButtonElement, PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { variant?: BBButtonVariant; busy?: boolean }>>(function BBButton({ variant = 'secondary', className = '', busy = false, children, disabled, ...props }, ref) {
+  return <button aria-busy={busy || undefined} className={`bb-button bb-button--${variant} ${className}`.trim()} disabled={disabled || busy} ref={ref} {...props}>{busy ? <><span aria-hidden="true" className="bb-spinner" />Vänta…</> : children}</button>
+})
+
+export function BBInput({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={`bb-input ${className}`.trim()} {...props} />
+}
+
+export function BBSelect({ className = '', children, ...props }: PropsWithChildren<SelectHTMLAttributes<HTMLSelectElement>>) {
+  return <select className={`bb-select ${className}`.trim()} {...props}>{children}</select>
+}
+
+export function BBSurface({ as = 'section', className = '', children, ...props }: PropsWithChildren<HTMLAttributes<HTMLElement> & { as?: 'section' | 'article' | 'div' }>) {
+  const Component = as
+  return <Component className={`bb-surface ${className}`.trim()} {...props}>{children}</Component>
+}
+
+export function BBEmptyState({ title, detail, children }: PropsWithChildren<{ title: string; detail?: string }>) {
+  return <div className="bb-empty-state" role="status"><strong>{title}</strong>{detail && <span>{detail}</span>}{children}</div>
 }
 
 export function MetricCard({ label, value }: { label: string; value: string }) {

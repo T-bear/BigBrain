@@ -1,5 +1,9 @@
 # BigBrain Status
 
+## BB-098 global premium UI rollout (2026-08-23)
+
+Implementation is in progress from baseline `0e60ffe970e231c9af6c594c8e23b8e1e15f2600`. The owner has approved BB-097 Family as BigBrain's golden design direction. The current frontend migration replaces the central non-Family DashboardWidget presentation with route-aware material sections, introduces semantic React control/surface primitives, normalizes every current button and native form control through the shared material/focus/motion contract, aligns mobile and desktop navigation, and gives Arctic Wind its full cold/light material identity. Home, Media, Finance, More/Settings, AI and Admin are in scope; Family behavior and all Finance backend semantics remain frozen. Local validation passed 119 frontend, 495 API and 32 Sentinel tests, both production/Release builds, documentation (175 files / 89 BB IDs), Compose and diff checks. CI, deployment and appliance evidence remain pending until this status is updated with actual results.
+
 BB-089 Hard Risk Engine foundation is implemented, deployed and restart-verified on 2026-08-16 from
 baseline `7aa202bc88142399cd9a70085cec5bf4f23db16f`. Policy `research-eod-v1` centrally enforces
 fail-closed RESEARCH-only data/time/lineage/health, universe/price/move, rolling-volatility,

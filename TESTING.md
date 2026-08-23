@@ -1,5 +1,9 @@
 # Testa BigBrain
 
+## BB-098 global UI migration
+
+Treat BB-097 Family as the visual canary. Frontend regression must cover semantic button variants including busy/disabled state, native label/value behavior for inputs and selects, theme switching and existing route actions. Normal viewport review—not stitched full-page capture—covers Home, Family, Media, Finance, More/Settings, AI and Admin in Obsidian Gold, Forest Night and Arctic Wind at 390 × 844, plus 430 × 932, 768 × 1024 and 1440 × 900 responsive checks. Finance advanced disclosure remains accessible and Finance must stay `RESEARCH / 0 SEK / NONE`. The owner-confirmed iOS Safari full-page screenshot artifact remains a known limitation and is not a BB-098 acceptance surface.
+
 ## BB-097 Family reference validation
 
 Family behavioral regression verifies the dedicated reference composition, absence of a normal-mode `DashboardWidget` wrapper, semantic page heading, settings access, meal tabs, shopping mode and calendar access. Existing Meal Planner, Shopping List, Calendar, AppShell, theme and navigation suites remain authoritative for detailed actions and accessibility. Pixel snapshots are deliberately not used. Separate manual browser evidence must render both Obsidian Gold and Forest Night repeatedly at 390 × 844 and then at 430 × 932, using normal viewport captures and additional scroll positions where needed. Compare atmosphere, materiality, tonal and typographic hierarchy, accent restraint, border/radius treatment, lighting, dock placement and theme identity against the original local mockups. Full-page capture is diagnostic only because fixed/composited backgrounds may produce stitching artifacts; it never replaces normal viewport review. Fixture-only visual runs must be identified as such and never represented as deployed evidence.

@@ -17,7 +17,7 @@ The shared component contract uses a 44 px minimum interaction target, visible `
 ## First-party themes
 
 - `obsidian-gold` uses layered graphite surfaces, warm off-white text and restrained brass-gold interaction accents.
-- `arctic-wind` uses deep cold-blue surfaces, cyan interaction accents and an airy aurora treatment from the supplied visual reference.
+- `arctic-wind` uses an icy light canvas, cold white raised materials, blue-gray text, restrained blue interaction accents and softly dimensional shadows from the supplied visual reference.
 - `forest-night` uses deep green surface hierarchy and restrained amber interaction accents.
 
 Legacy stored IDs (`bigbrain-dark`, `bigbrain-light`, `bigbrain-obsidian-gold`) are accepted as migration aliases and normalized to the new IDs. They are not selectable themes.
@@ -28,7 +28,7 @@ Nya teman förblir token-only: lägg till filen under `src/BigBrain.Web/src/styl
 
 ## Component and layout system
 
-`AppShell` owns the global background, desktop rail, mobile dock, safe areas and content width. The five primary destinations are Hem, Familj, Media, Finance and Mer. AI and Admin are secondary destinations under Mer. `DashboardWorkspace` retains widget editing, hiding, ordering and collapse behavior. Shared styles define button, input, card, status, metric, empty/error, dialog and disclosure treatments from the same semantic tokens, spacing scale and radius scale. Numeric Finance/system values use tabular figures.
+`AppShell` owns the global background, desktop rail, mobile dock, safe areas and content width. The five primary destinations are Hem, Familj, Media, Finance and Mer. AI and Admin are secondary destinations under Mer. `DashboardWorkspace` retains widget editing, hiding, ordering and collapse behavior while its `workspace-module` composition deliberately avoids the legacy framed DashboardWidget presentation. Shared `BBButton`, `BBInput`, `BBSelect`, `BBSurface` and `BBEmptyState` primitives provide explicit intent without theme branching; specialized module controls inherit the same semantic states. Shared styles define button, input, card, status, metric, empty/error, dialog and disclosure treatments from the same semantic tokens, spacing scale and radius scale. Numeric Finance/system values use tabular figures.
 
 Mobile is the primary composition at approximately 390 px. The floating dock adds `env(safe-area-inset-bottom)` and content reserves the dock height. At desktop widths the dock becomes the persistent rail while content is constrained instead of stretched across the viewport.
 
