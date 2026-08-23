@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   createMealPlannerMeal, createMealPlannerTag, deleteMealPlannerMeal, deleteMealPlannerSchedule,
   deleteMealPlannerTag, generateMealPlannerSchedule, getMealPlannerMeals, getMealPlannerSchedules,
@@ -93,6 +93,11 @@ export function MealPlanner({
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(true)
+  const replaceActionRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (replaceKey) window.requestAnimationFrame(() => replaceActionRef.current?.focus({ preventScroll: true }))
+  }, [replaceKey])
 
   const reload = async () => {
     const [nextMeals, nextTags, nextSchedules] = await Promise.all([
@@ -237,15 +242,18 @@ export function MealPlanner({
                       const key = `${day.date}:${day.mealType}`
                       return <div className="meal-planner__meal-entry" key={key}>
                         <div className="meal-planner__day-meal"><small>{day.mealType === 'lunch' ? 'Lunch' : 'Middag'}</small><strong>{day.mealName}</strong>{day.isManuallyReplaced && <small>Utbytt</small>}</div>
-                        <button aria-expanded={replaceKey === key} aria-label={`Byt ${day.mealType === 'lunch' ? 'lunch' : 'middag'} ${dayNames[day.dayOfWeek]}`} className="meal-planner__replace-button secondary-button" onClick={() => replaceKey === key ? setReplaceKey(null) : openReplace(day)} type="button">Byt</button>
-                        {replaceKey === key && <div className="meal-planner__replace-panel">
-                          <button disabled={busyDay === key} onClick={() => void replaceAutomatically(day)} type="button">{busyDay === key ? 'Byter…' : 'Föreslå en annan'}</button>
-                          {!manualMode && <button className="secondary-button" onClick={() => setManualMode(true)} type="button">Välj maträtt manuellt</button>}
+                        <button aria-controls={`meal-replace-${key}`} aria-expanded={replaceKey === key} aria-label={`Byt ${day.mealType === 'lunch' ? 'lunch' : 'middag'} ${dayNames[day.dayOfWeek]}`} className="meal-planner__replace-button secondary-button" onClick={() => replaceKey === key ? setReplaceKey(null) : openReplace(day)} type="button">Byt</button>
+                        {replaceKey === key && <div aria-label={`Ändra ${day.mealName}`} className="meal-planner__replace-panel" id={`meal-replace-${key}`} onKeyDown={event => { if (event.key === 'Escape') { setReplaceKey(null); setManualMode(false) } }} role="group">
+                          <header><span>Ändra måltid</span><strong>{day.mealName}</strong></header>
+                          <div className="meal-planner__replace-actions">
+                            <button className="meal-planner__replace-action meal-planner__replace-action--primary" disabled={busyDay === key} onClick={() => void replaceAutomatically(day)} ref={replaceActionRef} type="button">{busyDay === key ? 'Byter…' : 'Föreslå en annan'}</button>
+                            {!manualMode && <button className="meal-planner__replace-action" onClick={() => setManualMode(true)} type="button">Välj maträtt manuellt</button>}
+                          </div>
                           {manualMode && <div className="meal-planner__manual-choice">
                             <label>Välj maträtt<select value={manualMealId} onChange={event => setManualMealId(event.target.value)}>{meals.map(meal => <option key={meal.id} value={meal.id}>{meal.name}</option>)}</select></label>
                             <button disabled={busyDay === key || !manualMealId} onClick={() => void replaceManually(day)} type="button">Använd vald</button>
                           </div>}
-                          <button className="secondary-button" onClick={() => { setReplaceKey(null); setManualMode(false) }} type="button">Avbryt</button>
+                          <button className="meal-planner__replace-dismiss" onClick={() => { setReplaceKey(null); setManualMode(false) }} type="button">Avbryt</button>
                         </div>}
                       </div>
                     })}</div>

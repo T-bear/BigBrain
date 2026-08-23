@@ -9,10 +9,10 @@
 .family-header p,.family-header h1 { margin:0; }
 .family-header p { margin-bottom:2px; color:var(--bb-color-text-tertiary); font-size:.72rem; line-height:1.25; }
 .family-header h1 { font-size:1.68rem; font-weight:600; letter-spacing:-.026em; line-height:1.12; }
-.family-settings-trigger { display:grid; width:44px; height:44px; place-items:center; border:1px solid var(--bb-surface-edge); border-radius:var(--bb-radius-control); background:var(--bb-material-control); color:var(--bb-color-text-secondary); box-shadow:var(--bb-shadow-sm); cursor:pointer; transition:transform var(--bb-duration-fast) var(--bb-easing-standard),color var(--bb-duration-fast) var(--bb-easing-standard),filter var(--bb-duration-fast) var(--bb-easing-standard); }
+.family-settings-trigger { display:grid; width:44px; height:44px; place-items:center; border:1px solid transparent; border-radius:var(--bb-radius-control); background:var(--bb-material-control) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text-secondary); box-shadow:var(--bb-shadow-sm),inset 0 1px var(--bb-surface-highlight); cursor:pointer; transition:transform var(--bb-motion-press) var(--bb-easing-standard),color var(--bb-duration-fast) var(--bb-easing-standard),filter var(--bb-motion-press) var(--bb-easing-standard); }
 .family-settings-trigger:hover { color:var(--bb-color-accent-highlight); filter:brightness(1.06); }
 .family-settings-trigger:active { transform:translateY(1px) scale(.985); filter:brightness(.94); }
-.family-settings-trigger .app-icon { width:19px; height:19px; stroke-width:1.7; }
+.family-settings-trigger .app-icon { width:19px; height:19px; transform:translateY(-.5px); stroke-width:1.7; }
 .family-settings { top:52px; }
 .family-context { display:grid; grid-template-columns:28px minmax(0,1fr); align-items:center; gap:10px; margin-bottom:22px; padding:10px 2px 13px; border-bottom:1px solid color-mix(in srgb,var(--bb-surface-edge) 70%,transparent); }
 .family-context>span { color:var(--bb-color-accent-muted); font-size:1.25rem; }
@@ -30,15 +30,17 @@
 .family-section .card { border:1px solid transparent; border-radius:var(--bb-radius-panel); background:var(--bb-material-panel) padding-box,var(--bb-material-panel-edge) border-box; box-shadow:var(--bb-shadow-md); }
 .family-section .meal-planner { margin:0; }
 .family-section .meal-planner__tabs { gap:2px; margin-bottom:12px; padding:3px; border:1px solid color-mix(in srgb,var(--bb-surface-edge) 55%,transparent); border-radius:var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-1) 78%,transparent); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
-.family-section .meal-planner button.meal-planner__tab { min-height:38px; padding:7px 5px; border:0; border-radius:calc(var(--bb-radius-control) - 3px); background:transparent; color:var(--bb-color-text-tertiary); font-size:.71rem; font-weight:500; }
+.family-section .meal-planner button.meal-planner__tab { min-height:38px; padding:7px 5px; border:0; border-radius:calc(var(--bb-radius-control) - 3px); background:transparent; color:var(--bb-color-text-tertiary); font-size:.71rem; font-weight:500; transition:color var(--bb-duration-fast) var(--bb-easing-standard),background var(--bb-motion-component) var(--bb-easing-standard),box-shadow var(--bb-motion-component) var(--bb-easing-standard),transform var(--bb-motion-press) var(--bb-easing-standard); }
 .family-section .meal-planner button.meal-planner__tab:hover { color:var(--bb-color-text-secondary); }
 .family-section .meal-planner button.meal-planner__tab[aria-selected=true] { background:var(--bb-material-selection),var(--bb-material-control); color:var(--bb-color-text); box-shadow:0 1px 0 var(--bb-surface-highlight) inset,0 3px 9px color-mix(in srgb,var(--bb-surface-shadow) 66%,transparent); }
+.family-section .meal-planner button.meal-planner__tab:active { transform:translateY(1px); }
 .family-section .meal-planner__week { gap:9px; padding:4px 0 0; background:transparent; box-shadow:none; }
 .family-section .meal-planner__week-heading { grid-template-columns:44px minmax(0,1fr) 44px; margin-bottom:4px; padding:0 3px; }
 .family-section .meal-planner__week-heading h3 { font-size:.91rem; font-weight:600; letter-spacing:-.01em; }
 .family-section .meal-planner__week-heading .eyebrow { color:var(--bb-color-text-tertiary); font-size:.63rem; font-weight:500; letter-spacing:0; text-transform:none; }
-.family-section .meal-planner .meal-planner__week-button { width:44px; min-height:44px; border:0; background:transparent; color:var(--bb-color-accent-muted); font-weight:400; }
+.family-section .meal-planner .meal-planner__week-button { width:44px; min-height:44px; padding:0; border:0; border-radius:var(--bb-radius-control); background:transparent; color:var(--bb-color-accent-muted); font-size:1.3rem; font-weight:400; line-height:1; transition:color var(--bb-duration-fast) var(--bb-easing-standard),background-color var(--bb-duration-fast) var(--bb-easing-standard),transform var(--bb-motion-press) var(--bb-easing-standard); }
 .family-section .meal-planner .meal-planner__week-button:hover { color:var(--bb-color-accent-highlight); }
+.family-section .meal-planner .meal-planner__week-button:active:not(:disabled) { background:var(--bb-color-accent-soft); transform:scale(.94); }
 .family-section .meal-planner__days { gap:0; overflow:hidden; border:1px solid transparent; border-radius:var(--bb-radius-panel); background:var(--bb-material-panel) padding-box,var(--bb-material-panel-edge) border-box; box-shadow:var(--bb-shadow-md); }
 .family-section .meal-planner__day { grid-template-columns:90px minmax(0,1fr); min-height:59px; gap:10px; padding:8px 12px; border:0; border-radius:0; background:transparent; }
 .family-section .meal-planner__day+.meal-planner__day { border-top:1px solid color-mix(in srgb,var(--bb-surface-edge) 38%,transparent); }
@@ -49,21 +51,45 @@
 .family-section .meal-planner__today-label { padding:1px 4px; background:transparent; color:var(--bb-color-accent-highlight); font-size:.6rem!important; font-weight:600; white-space:nowrap; }
 .family-section .meal-planner__day-meal small { color:color-mix(in srgb,var(--bb-color-accent-muted) 36%,var(--bb-color-text-tertiary)); font-size:.56rem; font-weight:600; letter-spacing:.01em; line-height:1.2; text-transform:uppercase; }
 .family-section .meal-planner__day-meal strong { color:var(--bb-color-text); font-size:.83rem; font-weight:500; line-height:1.26; }
-.family-section .meal-planner .meal-planner__replace-button { min-width:44px; min-height:40px; padding:6px 7px; border:0; background:transparent; color:var(--bb-color-text-tertiary); font-size:.71rem; font-weight:500; }
+.family-section .meal-planner .meal-planner__replace-button { min-width:44px; min-height:40px; padding:6px 7px; border:0; border-radius:var(--bb-radius-control); background:transparent; color:var(--bb-color-text-tertiary); font-size:.71rem; font-weight:500; transition:color var(--bb-duration-fast) var(--bb-easing-standard),background-color var(--bb-duration-fast) var(--bb-easing-standard),transform var(--bb-motion-press) var(--bb-easing-standard); }
 .family-section .meal-planner .meal-planner__replace-button:hover { color:var(--bb-color-text-secondary); }
+.family-section .meal-planner .meal-planner__replace-button:active,.family-section .meal-planner .meal-planner__replace-button[aria-expanded=true] { background:color-mix(in srgb,var(--bb-surface-3) 72%,transparent); color:var(--bb-color-text-secondary); }
+.family-section .meal-planner__replace-panel { position:relative; display:grid; gap:7px; margin:4px 0 3px; padding:10px; overflow:hidden; border:1px solid transparent; border-radius:var(--bb-radius-control); background:var(--bb-material-control) padding-box,var(--bb-material-panel-edge) border-box; box-shadow:0 10px 24px color-mix(in srgb,var(--bb-surface-shadow) 62%,transparent),inset 0 1px var(--bb-surface-highlight); transform-origin:top right; animation:bb-replace-open var(--bb-motion-component) var(--bb-easing-standard) both; }
+.family-section .meal-planner__replace-panel::before { position:absolute; top:0; right:16px; left:16px; height:1px; background:linear-gradient(90deg,transparent,var(--bb-color-accent-muted),transparent); opacity:.45; content:""; }
+.family-section .meal-planner__replace-panel header { display:grid; gap:1px; padding:1px 3px 5px; }
+.family-section .meal-planner__replace-panel header span { color:var(--bb-color-text-tertiary); font-size:.57rem; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
+.family-section .meal-planner__replace-panel header strong { overflow:hidden; color:var(--bb-color-text-secondary); font-size:.72rem; font-weight:500; line-height:1.25; text-overflow:ellipsis; white-space:nowrap; }
+.family-section .meal-planner__replace-actions { display:grid; overflow:hidden; border-radius:calc(var(--bb-radius-control) - 3px); background:color-mix(in srgb,var(--bb-surface-1) 62%,transparent); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
+.family-section .meal-planner button.meal-planner__replace-action { min-height:44px; padding:8px 11px; border:0; border-radius:0; background:transparent; color:var(--bb-color-text-secondary); text-align:left; font-size:.72rem; font-weight:500; transition:background-color var(--bb-duration-fast) var(--bb-easing-standard),color var(--bb-duration-fast) var(--bb-easing-standard),transform var(--bb-motion-press) var(--bb-easing-standard); }
+.family-section .meal-planner button.meal-planner__replace-action+button { border-top:1px solid color-mix(in srgb,var(--bb-surface-edge) 42%,transparent); }
+.family-section .meal-planner button.meal-planner__replace-action--primary { color:var(--bb-color-accent-highlight); font-weight:600; }
+.family-section .meal-planner button.meal-planner__replace-action:focus-visible { position:relative; z-index:1; outline:0; box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bb-color-accent) 72%,transparent); }
+.family-section .meal-planner button.meal-planner__replace-action:active { background:var(--bb-color-accent-soft); transform:translateY(1px); }
+.family-section .meal-planner button.meal-planner__replace-dismiss { justify-self:end; min-height:40px; padding:7px 9px; border:0; background:transparent; color:var(--bb-color-text-tertiary); font-size:.69rem; font-weight:500; }
+.family-section .meal-planner button.meal-planner__replace-dismiss:active { color:var(--bb-color-text); transform:translateY(1px); }
+.family-section .meal-planner__manual-choice { padding:8px; border-radius:calc(var(--bb-radius-control) - 3px); background:color-mix(in srgb,var(--bb-surface-2) 76%,transparent); }
+@keyframes bb-replace-open { from { opacity:0; transform:translateY(-3px) scale(.985) } to { opacity:1; transform:none } }
 .family-section .meal-planner__meal-entry+.meal-planner__meal-entry { border-color:color-mix(in srgb,var(--bb-surface-edge) 68%,transparent); }
 .family-section--shopping-list,.family-section--calendar { padding-top:3px; border-top:1px solid color-mix(in srgb,var(--bb-surface-edge) 58%,transparent); }
 .family-section .shopping-list { display:grid; gap:11px; }
 .family-section .shopping-list>.shopping-quick-add { margin:0; }
+.family-section .shopping-quick-add { gap:7px; padding:3px; border-radius:calc(var(--bb-radius-control) + 3px); background:color-mix(in srgb,var(--bb-surface-1) 60%,transparent); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
+.family-section .shopping-quick-add input { min-height:44px; padding:9px 11px; border:1px solid transparent; border-radius:var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-2) 78%,transparent) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
+.family-section .shopping-quick-add input::placeholder { color:var(--bb-color-text-tertiary); opacity:.82; }
+.family-section .shopping-quick-add input:focus-visible { background:var(--bb-material-control) padding-box,var(--bb-metallic-accent) border-box; }
 .family-section .shopping-quick-add button { border:1px solid transparent; background:var(--bb-material-primary-action) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text); box-shadow:var(--bb-shadow-sm); font-weight:600; }
+.family-section .shopping-quick-add button:active { transform:translateY(1px) scale(.99); filter:brightness(.94); }
 .family-section .shopping-list>p { margin:0; color:var(--bb-color-text-tertiary); font-size:.75rem; }
-.family-section .shopping-list>.primary-button { justify-self:start; border:0; background:transparent; color:var(--bb-color-text-secondary); box-shadow:inset 0 0 0 1px var(--bb-surface-edge); font-weight:600; }
+.family-section .shopping-list>.primary-button { justify-self:start; border:0; background:var(--bb-material-control); color:var(--bb-color-text-secondary); box-shadow:inset 0 1px var(--bb-surface-highlight); font-weight:600; }
+.family-section .shopping-list>.primary-button:active { transform:translateY(1px); filter:brightness(.94); }
 .family-section .calendar-widget { padding:0; border:0; background:transparent; box-shadow:none; }
 .family-section .calendar-widget>header h3,.family-section .calendar-widget>header p { display:none; }
 .family-section .calendar-widget>header { justify-content:flex-end; margin-bottom:5px; }
-.family-section .calendar-widget>header button { min-height:40px; border:0; background:transparent; color:var(--bb-color-text-tertiary); }
+.family-section .calendar-widget>header button { min-height:40px; padding:7px 2px 7px 10px; border:0; background:transparent; color:var(--bb-color-text-tertiary); font-weight:500; }
+.family-section .calendar-widget>header button::after { margin-left:6px; color:var(--bb-color-accent-muted); content:"›"; }
+.family-section .calendar-widget>header button:active { color:var(--bb-color-text-secondary); transform:translateX(1px); }
 .family-section .calendar-week { gap:0; overflow:hidden; border:1px solid transparent; border-radius:var(--bb-radius-panel); background:var(--bb-material-panel) padding-box,var(--bb-material-panel-edge) border-box; box-shadow:var(--bb-shadow-md); }
-.family-section .calendar-week li { min-height:58px; padding:9px 12px; border:0; border-radius:0; background:transparent; }
+.family-section .calendar-week li { min-height:58px; padding:9px 13px; border:0; border-radius:0; background:transparent; }
 .family-section .calendar-week li+li { border-top:1px solid color-mix(in srgb,var(--bb-surface-edge) 58%,transparent); }
 .family-section .calendar-event__marker { width:7px; height:7px; flex:none; border:1px solid var(--bb-color-accent-muted); border-radius:50%; box-shadow:0 0 0 2px var(--bb-color-accent-soft); }
 .family-section .calendar-event__marker--day,.family-section .calendar-event__marker--vacation { background:var(--bb-color-accent-muted); }
@@ -73,11 +99,11 @@
 .family-section--reminders .widget-placeholder span { color:var(--bb-color-text-tertiary); font-size:.69rem; }
 .mobile-navigation { border-color:transparent; border-radius:var(--bb-radius-dock); background:var(--bb-material-dock) padding-box,var(--bb-material-panel-edge) border-box; box-shadow:var(--bb-shadow-lg); backdrop-filter:blur(16px) saturate(112%); }
 .mobile-navigation::before { position:absolute; top:0; right:11%; left:11%; height:1px; background:linear-gradient(90deg,transparent,var(--bb-surface-highlight),transparent); content:""; }
-.mobile-navigation button { position:relative; border-radius:var(--bb-radius-control); transition:color var(--bb-duration-fast) var(--bb-easing-standard),transform var(--bb-duration-fast) var(--bb-easing-standard),background-color var(--bb-duration-fast) var(--bb-easing-standard); }
+.mobile-navigation button { position:relative; border-radius:var(--bb-radius-control); transition:color var(--bb-duration-fast) var(--bb-easing-standard),transform var(--bb-motion-press) var(--bb-easing-standard),background var(--bb-motion-component) var(--bb-easing-standard),box-shadow var(--bb-motion-component) var(--bb-easing-standard); }
 .mobile-navigation button .app-icon { width:20px; height:20px; stroke-width:1.75; }
 .mobile-navigation button[aria-current=page] { background:var(--bb-material-selection); color:var(--bb-color-accent-highlight); box-shadow:inset 0 1px var(--bb-surface-highlight); font-weight:500; }
 .mobile-navigation button[aria-current=page]::after { position:absolute; top:5px; width:13px; height:1px; border-radius:1px; background:var(--bb-metallic-accent); box-shadow:0 0 7px var(--bb-color-accent-shadow); content:""; }
 .mobile-navigation button:active { transform:translateY(1px) scale(.975); }
 @media(max-width:899px){.shell:has(.family-experience)>.sidebar{display:none}.family-experience{padding-right:16px;padding-left:16px}.family-settings{position:fixed;top:auto;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));left:12px;width:auto}}
 @media(min-width:900px){.family-experience{max-width:880px;padding-top:48px}.family-flow{grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);align-items:start}.family-section--meal-plan{grid-row:span 3}.family-section .meal-planner__day{grid-template-columns:110px minmax(0,1fr)}}
-@media(prefers-reduced-motion:reduce){.family-settings-trigger,.mobile-navigation button{transition:none}}
+@media(prefers-reduced-motion:reduce){.family-settings-trigger,.family-section .meal-planner button,.family-section .calendar-widget>header button,.family-section .shopping-list button,.mobile-navigation button{transition:none}.family-section .meal-planner__replace-panel{animation:none}}

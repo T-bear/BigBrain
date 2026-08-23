@@ -35,6 +35,8 @@
   --bb-content-max-width: 78.75rem;
   --bb-duration-fast: 120ms;
   --bb-duration-normal: 200ms;
+  --bb-motion-press: 100ms;
+  --bb-motion-component: 180ms;
   --bb-easing-standard: cubic-bezier(.2, 0, 0, 1);
   --bb-page-padding: clamp(.9rem, 3vw, 2.5rem);
   --bb-section-gap: var(--bb-space-6);

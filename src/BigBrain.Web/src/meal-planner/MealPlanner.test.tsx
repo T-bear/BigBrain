@@ -148,7 +148,13 @@ describe('Matlista UX', () => {
     render(<MealPlanner today="2026-08-03" />)
     await screen.findByRole('heading', { name: /Vecka 1/ })
     fireEvent.click(screen.getAllByRole('button', { name: /Byt middag/ })[0])
-    expect(screen.getByRole('button', { name: 'Föreslå en annan' })).toBeInTheDocument()
+    const automatic = screen.getByRole('button', { name: 'Föreslå en annan' })
+    expect(screen.getByRole('group', { name: 'Ändra Pasta pesto' })).toBeInTheDocument()
+    await waitFor(() => expect(automatic).toHaveFocus())
+    fireEvent.keyDown(automatic, { key: 'Escape' })
+    expect(screen.queryByRole('button', { name: 'Föreslå en annan' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getAllByRole('button', { name: /Byt middag/ })[0])
     fireEvent.click(screen.getByRole('button', { name: 'Avbryt' }))
     expect(screen.queryByRole('button', { name: 'Föreslå en annan' })).not.toBeInTheDocument()
 
