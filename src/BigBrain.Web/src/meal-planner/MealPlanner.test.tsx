@@ -103,7 +103,7 @@ describe('Matlista UX', () => {
     schedules = []
     render(<MealPlanner expanded={false} />)
     await screen.findByRole('button', { name: 'Expandera Matlista' })
-    expect(document.querySelector('.dashboard-module__summary')).toHaveTextContent('Ingen matsedel skapad')
+    await waitFor(() => expect(document.querySelector('.dashboard-module__summary')).toHaveTextContent('Ingen matsedel skapad'))
   })
 
   test('collapsed weekend summary shows lunch and dinner with the same people count', async () => {
