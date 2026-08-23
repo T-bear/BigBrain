@@ -4,7 +4,7 @@
 
 - Date: 2026-08-23
 - Scope: Family frontend presentation and Obsidian Gold reference validation
-- Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`
+- Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`, deployment-evidence publication `f5e992d3db14bce61172c48d17f98b50bd70a879`
 
 ## Status
 
