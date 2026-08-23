@@ -4,7 +4,7 @@
 
 - Date: 2026-08-23
 - Scope: Family frontend presentation, Obsidian Gold reference validation and Obsidian Gold/Forest Night premium art direction
-- Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`, deployment-evidence publication `f5e992d3db14bce61172c48d17f98b50bd70a879`
+- Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`, initial deployment-evidence publication `f5e992d3db14bce61172c48d17f98b50bd70a879`, premium art-direction implementation `4da8de726963b59dfa467c1f73d1aaf876b9d9d3`
 
 ## Status
 
@@ -43,6 +43,18 @@ Typography uses less tracking and a clearer primary/secondary/tertiary tonal lad
 The dock now uses a theme-owned translucent material, a single centered top highlight and a local selected-item surface with a 13 px accent glint. It no longer has a theme-specific gold outline. The settings control uses the same control material, edge, icon scale and tactile press response. Tabs use an inset parent track and locally raised active material. Today uses a bounded two-tone marker and soft local illumination rather than selecting the whole row; its compact label is `Idag` and cannot wrap vertically.
 
 The reported full-page-only geometric artifact was traced to the combination of `background-attachment: fixed` and an unbounded diagonal Family pseudo-element during screenshot stitching. The page background now scrolls normally with a bounded background size, and Family illumination uses locally bounded radial layers. Diagnostic full-page captures after the change showed no large geometric artifact; normal viewport captures remain the acceptance evidence.
+
+### Premium refinement visual and deployment evidence
+
+The art-direction comparison ran two opened implementation iterations for each dark theme at both 390 × 844 and 430 × 932. Obsidian evidence is `/tmp/bb097-art-iteration1-obsidian-gold-390x844.png`, `/tmp/bb097-art-iteration2-obsidian-gold-390x844.png` and their 430 × 932 counterparts. Forest evidence follows the same `iteration1`/`iteration2` naming with `forest-night`. Additional normal 390 × 844 scroll frames at 620 and 1180 CSS pixels verified Today, weekend multi-meal rows, Shopping, Calendar and Reminders. The diagnostic, non-acceptance full-page capture is `/tmp/bb097-art-iteration2-forest-night-fullpage.png`.
+
+The final deployed PWA was opened at `/tmp/bb097-art-deployed-obsidian-gold-390x844.png`, `/tmp/bb097-art-deployed-forest-night-390x844.png` and the corresponding 430 × 932 paths. All four Family sections and four meal tabs were present, `Idag` remained unbroken, alerts were zero and horizontal overflow was absent. The dock measured 358 × 64 at 390 and 398 × 64 at 430. `/tmp/bb097-art-deployed-arctic-wind-390x844.png` verified shared-token readability and layout compatibility. Temporary screenshots are local runtime evidence and are intentionally not publication artifacts.
+
+Final frontend image `sha256:bc92125c7b5613dcc9db9b9661bd97f04e01db5119feeb2394463b37f7beff52` was deployed by recreating only Web with `--no-deps`; databases, volumes, API, Sentinel and external services were not recreated. Web, API and Sentinel were healthy; recovery reported healthy/clean. The shared theme setting was returned to Obsidian Gold. Finance remained `RESEARCH / 0 SEK / NONE` with scheduler enabled unchanged.
+
+GitHub Actions run 32624929631 passed backend, frontend, documentation and secrets for the art-direction implementation. Local evidence included 115/115 frontend tests before the final label adjustment, 12/12 targeted Meal Planner tests after it, frontend production build, Release build with zero warnings/errors, 32/32 Sentinel tests, documentation verification over 174 Markdown files and 89 unique backlog IDs, Compose validation and `git diff --check`. The authoritative CI backend job passed the complete API/Sentinel suite; CI frontend passed the complete 115-test suite and production build. Local gitleaks was unavailable, while the authoritative CI secrets job passed.
+
+Remaining visual differences require owner judgment rather than silent scope growth: the production Family week remains denser than the mockup summary, no mockup people/conflict content is invented, and the global center AI emblem/navigation silhouette remains outside this Family-only pass. Technical completion is **YES**. **OWNER VISUAL APPROVAL PENDING.**
 
 ## Evidence
 
