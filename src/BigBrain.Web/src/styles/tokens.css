@@ -25,6 +25,9 @@
   --bb-radius-sm: .55rem;
   --bb-radius-md: .75rem;
   --bb-radius-lg: 1rem;
+  --bb-radius-panel: 1.05rem;
+  --bb-radius-control: .7rem;
+  --bb-radius-dock: 1.45rem;
   --bb-radius-pill: 999px;
   --bb-border-width: 1px;
   --bb-control-height: 2.75rem;
@@ -40,6 +43,7 @@
   --bb-theme-preview-obsidian: linear-gradient(145deg, #080a0d 55%, #d3a22e);
   --bb-theme-preview-arctic: linear-gradient(145deg, #071320 45%, #52c9ee);
   --bb-theme-preview-forest: linear-gradient(145deg, #06130e 50%, #d6a341);
+  --bb-material-light-direction: 145deg;
   --surface: var(--bb-color-surface);
   --border: var(--bb-color-border);
   --muted: var(--bb-color-text-muted);

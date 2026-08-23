@@ -230,7 +230,7 @@ export function MealPlanner({
                   const first = dayMeals[0]
                   return <li className={`meal-planner__day${date === today ? ' meal-planner__day--today' : ''}`} key={date}>
                     <div className="meal-planner__day-copy">
-                      <div><strong>{dayNames[first.dayOfWeek]}</strong>{date === today && <small className="meal-planner__today-label">I dag</small>}</div>
+                      <div><strong>{dayNames[first.dayOfWeek]}</strong>{date === today && <small className="meal-planner__today-label">Idag</small>}</div>
                       <span>{formatDate(date)} · {first.peopleCount} personer</span>
                     </div>
                     <div className="meal-planner__day-meals">{dayMeals.map(day => {

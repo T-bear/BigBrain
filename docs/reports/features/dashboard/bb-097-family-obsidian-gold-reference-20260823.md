@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-23
-- Scope: Family frontend presentation and Obsidian Gold reference validation
+- Scope: Family frontend presentation, Obsidian Gold reference validation and Obsidian Gold/Forest Night premium art direction
 - Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`, deployment-evidence publication `f5e992d3db14bce61172c48d17f98b50bd70a879`
 
 ## Status
@@ -27,6 +27,22 @@ Normal Family rendering now uses `FamilyExperience`, with compact `FamilyHeader`
 Calendar preview classification uses restrained CSS markers with screen-reader text instead of permanent emoji icons; emoji originating in actual event titles remains content and is not rewritten.
 
 Obsidian Gold was refined to warmer `#090b0d` background, quieter `#2b3033` boundary, layered `#15191c`/`#1b2024` materials and `#d9a62e` accent. Gold identifies active navigation, semantic labels, today and important focus/interaction; ordinary tabs and inline actions remain neutral. Meal days share one raised material with hairline dividers, a subtle today rail and compact multi-meal anatomy. Borders no longer outline every row or section.
+
+## Premium art-direction refinement
+
+Owner feedback explicitly accepted the new Family composition while withholding visual approval because the deployed result still read as a competent dark web UI rather than a premium consumer application. This pass preserves `FamilyExperience`, its section ordering and every underlying interaction. It uses only the original 1536 × 1024 mockups listed above and actual browser renders; no generated or unrelated image was used as design truth.
+
+The semantic theme contract now adds canvas/ambient, three surface levels, surface highlight/edge/shadow, muted/highlight/shadow accent roles, tertiary text and deliberate panel/control/dock radius roles. A coherent 145-degree upper-left lighting model feeds low-opacity top responses and one compact shadow scale. Components consume these roles without theme-name branches or theme-specific hardcoded colors.
+
+Obsidian Gold moved away from black plus flat yellow toward neutral-warm charcoal, smoked stone panels and subtly warmer upper-left material response. Its gold system separates deep/muted, main and highlight tones; the strongest tone is reserved for active navigation, focus and the narrow Today marker. `Byt`, ordinary metadata and secondary navigation remain neutral.
+
+Forest Night is no longer the Obsidian component palette recolored green. Its canvas uses three bounded, low-contrast radial illumination fields inspired by the original lake/forest atmosphere, while panels use deep pine and green-black tonal variation. The treatment uses CSS only—no downloaded, generated or extracted bitmap—and keeps functional text off distracting imagery.
+
+Typography uses less tracking and a clearer primary/secondary/tertiary tonal ladder. Section eyebrows retain restrained uppercase semantics but use half the previous tracking; headings and meal names use natural weight and spacing. Panel, control and dock radii are differentiated instead of repeating one generic rounded rectangle. Borders are low-opacity material edges; row separation uses quieter partial edge color.
+
+The dock now uses a theme-owned translucent material, a single centered top highlight and a local selected-item surface with a 13 px accent glint. It no longer has a theme-specific gold outline. The settings control uses the same control material, edge, icon scale and tactile press response. Tabs use an inset parent track and locally raised active material. Today uses a bounded two-tone marker and soft local illumination rather than selecting the whole row; its compact label is `Idag` and cannot wrap vertically.
+
+The reported full-page-only geometric artifact was traced to the combination of `background-attachment: fixed` and an unbounded diagonal Family pseudo-element during screenshot stitching. The page background now scrolls normally with a bounded background size, and Family illumination uses locally bounded radial layers. Diagnostic full-page captures after the change showed no large geometric artifact; normal viewport captures remain the acceptance evidence.
 
 ## Evidence
 

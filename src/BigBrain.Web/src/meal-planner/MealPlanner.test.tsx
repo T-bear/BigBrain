@@ -131,7 +131,7 @@ describe('Matlista UX', () => {
     render(<MealPlanner today="2026-08-03" />)
     expect(await screen.findByRole('heading', { name: /Vecka 1/ })).toBeInTheDocument()
     expect(document.querySelectorAll('.meal-planner__day')).toHaveLength(7)
-    expect(document.querySelector('.meal-planner__day--today')).toHaveTextContent('I dag')
+    expect(document.querySelector('.meal-planner__day--today')).toHaveTextContent('Idag')
     expect(screen.getByRole('button', { name: 'Föregående vecka' })).toBeDisabled()
     expect(screen.queryByLabelText(/Välj maträtt för/)).not.toBeInTheDocument()
     const saturday = document.querySelectorAll('.meal-planner__day')[5]
