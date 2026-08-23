@@ -1,5 +1,18 @@
 # BigBrain Backlog
 
+## BB-100 — Audiobooks Platform Foundation
+
+- Status: Implementerad lokalt 2026-08-23; automatisk verifiering, CI och deployment pågår.
+- Scope: Audiobookshelf library/progress/continue listening, BigBrain-owned API and premium Media/Ljudböcker UX, normalized language and edition contracts, secure cover proxy, persisted language preference and provider abstraction.
+- Provider decision: `None`. Official Readarr is retired. Chaptarr, Librarr/Librarry and resurrected forks remain too immature or operationally/security-sensitive for an unattended dependency in this slice.
+- Safety: no acquisition/download request exists; Prowlarr and qBittorrent are unchanged. BB-099 remains owner-review pending.
+
+## BB-101 — Audiobook Acquisition & Automation
+
+- Status: Planerad framtida slice; inte påbörjad och inte godkänd för implementation.
+- Candidate scope: security-reviewed provider selection, explicit edition/language request, bounded download status, import reconciliation, Audiobookshelf rescan and optional Home continue-listening summary.
+- Gate: provider maintenance/API/security evidence and owner approval are required before implementation.
+
 ### BB-089 – M5 Hard Risk Engine foundation
 
 - Modul: Finance / Risk

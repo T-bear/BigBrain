@@ -46,5 +46,46 @@ public sealed class SettingsStore : IDisposable
         finally { gate.Release(); }
     }
 
+    public async Task<AudiobookLanguageSetting> GetAudiobookLanguagesAsync(CancellationToken token)
+    {
+        await using var connection = new SqliteConnection(connectionString);
+        await connection.OpenAsync(token);
+        async Task<string?> Value(string key)
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT Value FROM Settings WHERE Key=$key";
+            command.Parameters.AddWithValue("$key", key);
+            return await command.ExecuteScalarAsync(token) as string;
+        }
+        return new(await Value("audiobooks.preferredLanguage") ?? "sv", await Value("audiobooks.fallbackLanguage") ?? "en");
+    }
+
+    public async Task<AudiobookLanguageSetting> SetAudiobookLanguagesAsync(AudiobookLanguageSetting setting, CancellationToken token)
+    {
+        var preferred = Media.AudiobookLanguages.Normalize(setting.PreferredLanguage);
+        var fallback = Media.AudiobookLanguages.Normalize(setting.FallbackLanguage);
+        if (preferred == Media.AudiobookLanguages.Unknown || fallback == Media.AudiobookLanguages.Unknown)
+            throw new ArgumentException("Språkkoden stöds inte.", nameof(setting));
+        await gate.WaitAsync(token);
+        try
+        {
+            await using var connection = new SqliteConnection(connectionString);
+            await connection.OpenAsync(token);
+            await using var transaction = await connection.BeginTransactionAsync(token);
+            foreach (var pair in new[] { ("audiobooks.preferredLanguage", preferred), ("audiobooks.fallbackLanguage", fallback) })
+            {
+                await using var command = connection.CreateCommand();
+                command.Transaction = (SqliteTransaction)transaction;
+                command.CommandText = "INSERT INTO Settings(Key,Value) VALUES($key,$value) ON CONFLICT(Key) DO UPDATE SET Value=excluded.Value";
+                command.Parameters.AddWithValue("$key", pair.Item1);
+                command.Parameters.AddWithValue("$value", pair.Item2);
+                await command.ExecuteNonQueryAsync(token);
+            }
+            await transaction.CommitAsync(token);
+            return new(preferred, fallback);
+        }
+        finally { gate.Release(); }
+    }
+
     public void Dispose() => gate.Dispose();
 }

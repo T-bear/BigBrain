@@ -385,6 +385,11 @@ export interface MediaServiceLink {
   enabled: boolean
 }
 
+export interface AudiobookItem { id:string; title:string; author:string|null; series:string|null; narrator:string|null; language:string; languageLabel:string; durationSeconds:number|null; progressPercent:number|null; description:string|null; coverUrl:string|null; publishedYear:string|null; isAbridged:boolean|null; playbackUrl:string|null }
+export interface AudiobookAcquisitionCapabilities { state:string; canSearch:boolean; canRequest:boolean; message:string|null }
+export interface AudiobookOverview { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'; message:string|null; continueListening:AudiobookItem|null; library:AudiobookItem[]; recent:AudiobookItem[]; acquisition:AudiobookAcquisitionCapabilities }
+export interface AudiobookSearchResponse { library:AudiobookItem[]; discovery:unknown[]; acquisition:AudiobookAcquisitionCapabilities }
+
 export interface MediaAddOption {
   id: string
   displayName: string

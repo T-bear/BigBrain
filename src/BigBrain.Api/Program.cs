@@ -90,6 +90,8 @@ public partial class Program
         AddMediaClient<ISonarrClient, SonarrClient>(builder.Services, "Sonarr", options => options.Sonarr.BaseUrl);
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, "Radarr", options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
+        AddMediaClient<IAudiobookshelfClient, AudiobookshelfClient>(builder.Services, "Audiobookshelf", options => options.Audiobookshelf.BaseUrl);
+        builder.Services.AddSingleton<IAudiobookAcquisitionProvider, NoAudiobookAcquisitionProvider>();
         builder.Services.AddHttpClient<IQBittorrentClient, QBittorrentClient>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();
@@ -311,6 +313,8 @@ public partial class Program
         app.MapGet(
             "/api/v1/modules/media/service-links",
             (MediaOptions options) => Results.Ok(MediaServiceLinks.From(options)));
+
+        app.MapAudiobookEndpoints();
 
         app.MapGet(
             "/api/v1/modules/media/posters/{token}",

@@ -43,6 +43,8 @@ import type {
   FinanceResearchSchedulerStatus,
   FinanceResearchResourceDecision,
   FinanceResearchOperationsStatus,
+  AudiobookOverview,
+  AudiobookSearchResponse,
 } from './types'
 
 export class ApiError extends Error {
@@ -119,6 +121,11 @@ export const getMediaOverview = (signal?: AbortSignal) =>
 
 export const getMediaServiceLinks = (signal?: AbortSignal) =>
   getJson<MediaServiceLink[]>('/api/v1/modules/media/service-links', signal)
+
+export const getAudiobookOverview = (signal?: AbortSignal) => getJson<AudiobookOverview>('/api/v1/modules/media/audiobooks/overview',signal)
+export const searchAudiobooks = (query:string,language:string,signal?:AbortSignal) => getJson<AudiobookSearchResponse>(`/api/v1/modules/media/audiobooks/search?query=${encodeURIComponent(query.trim())}&language=${encodeURIComponent(language)}`,signal)
+export const getAudiobookLanguages = (signal?:AbortSignal) => getJson<{preferredLanguage:string;fallbackLanguage:string}>('/api/v1/settings/audiobooks/languages',signal)
+export const setAudiobookLanguages = (preferredLanguage:string,fallbackLanguage:string) => sendJson<{preferredLanguage:string;fallbackLanguage:string}>('/api/v1/settings/audiobooks/languages','PUT',{preferredLanguage,fallbackLanguage})
 
 const mealPlannerBase = '/api/v1/modules/meal-planner'
 export const getMealPlannerMeals = (tagIds: string[] = []) =>

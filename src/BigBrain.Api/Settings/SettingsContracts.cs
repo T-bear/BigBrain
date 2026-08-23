@@ -7,6 +7,7 @@ public sealed class SettingsOptions
 }
 
 public sealed record ThemeSetting(string Theme, bool Configured = true);
+public sealed record AudiobookLanguageSetting(string PreferredLanguage, string FallbackLanguage);
 
 public static class ThemeIds
 {

@@ -15,6 +15,12 @@ public static class SettingsEndpoints
                     extensions: new Dictionary<string, object?> { ["code"] = "settingsInvalidTheme" });
             }
         });
+        group.MapGet("/audiobooks/languages", (SettingsStore store, CancellationToken token) => store.GetAudiobookLanguagesAsync(token));
+        group.MapPut("/audiobooks/languages", async (AudiobookLanguageSetting request, SettingsStore store, CancellationToken token) =>
+        {
+            try { return Results.Ok(await store.SetAudiobookLanguagesAsync(request, token)); }
+            catch (ArgumentException exception) { return Results.Problem(statusCode: 400, title: "Invalid audiobook language", detail: exception.Message); }
+        });
         return app;
     }
 }

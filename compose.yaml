@@ -83,6 +83,11 @@ services:
       Media__Radarr__ApiKey: ${MEDIA__RADARR__APIKEY:-}
       Media__Prowlarr__BaseUrl: ${MEDIA__PROWLARR__BASEURL:-http://prowlarr:9696}
       Media__Prowlarr__ApiKey: ${MEDIA__PROWLARR__APIKEY:-}
+      Media__Audiobookshelf__BaseUrl: ${MEDIA__AUDIOBOOKSHELF__BASEURL:-http://audiobookshelf:80}
+      Media__Audiobookshelf__ApiKey: ${MEDIA__AUDIOBOOKSHELF__APIKEY:-}
+      Media__Audiobookshelf__LibraryId: ${MEDIA__AUDIOBOOKSHELF__LIBRARYID:-}
+      Media__Audiobookshelf__PublicUrl: ${MEDIA__AUDIOBOOKSHELF__PUBLICURL:-}
+      Media__Audiobookshelf__PageSize: ${MEDIA__AUDIOBOOKSHELF__PAGESIZE:-24}
       Media__QBittorrent__BaseUrl: ${MEDIA__QBITTORRENT__BASEURL:-http://qbittorrent:8080}
       Media__QBittorrent__ApiKey: ${MEDIA__QBITTORRENT__APIKEY:-}
       Media__ServiceLinks__Jellyfin__Url: ${MEDIA__SERVICELINKS__JELLYFIN__URL:-}
@@ -143,6 +148,21 @@ services:
     restart: unless-stopped
     stop_grace_period: 10s
 
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:2.36.0
+    environment:
+      TZ: ${TZ:-Europe/Stockholm}
+    volumes:
+      - audiobookshelf-config:/config
+      - audiobookshelf-metadata:/metadata
+      - ${AUDIOBOOKS_LIBRARY_PATH:-/srv/media/audiobooks}:/audiobooks
+    networks:
+      - media
+    ports:
+      - "127.0.0.1:${AUDIOBOOKSHELF_PORT:-13378}:80"
+    restart: unless-stopped
+    stop_grace_period: 30s
+
   flaresolverr:
     image: flaresolverr/flaresolverr:v3.5.0
     environment:
@@ -173,3 +193,5 @@ volumes:
   settings-data:
   finance-market-data:
   lifecycle-data:
+  audiobookshelf-config:
+  audiobookshelf-metadata:

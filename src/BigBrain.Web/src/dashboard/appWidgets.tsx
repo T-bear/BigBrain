@@ -14,6 +14,7 @@ import { ApplicationWidgetRegistry, DashboardRegistry } from './widgetFramework'
 import { AppIcon } from '../AppIcon'
 import { useWidgets } from './widgetFramework'
 import { ThemeControl } from '../ThemeControl'
+import { AudiobookSettings } from '../audiobooks/AudiobookSettings'
 import { HomeOverview } from './HomeOverview'
 
 export interface AppWidgetData {
@@ -98,7 +99,7 @@ export const dashboardRegistry = new DashboardRegistry([
 
 function MoreNavigation() {
   const { setActiveView } = useWidgets()
-  return <div className="more-hub"><div className="module-launcher"><BBButton onClick={() => setActiveView('ai')} type="button" variant="contextual"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></BBButton><BBButton onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></BBButton></div><BBSurface aria-labelledby="theme-heading" className="settings-surface" as="section"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /></BBSurface></div>
+  return <div className="more-hub"><div className="module-launcher"><BBButton onClick={() => setActiveView('ai')} type="button" variant="contextual"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></BBButton><BBButton onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></BBButton></div><BBSurface aria-labelledby="theme-heading" className="settings-surface" as="section"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /><AudiobookSettings /></BBSurface></div>
 }
 
 export function createAppWidgetRegistry(data: AppWidgetData) {

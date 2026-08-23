@@ -1,5 +1,13 @@
 # Testa BigBrain
 
+## BB-100 audiobook platform foundation
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore` covers network-free ABS mapping/degradation, auth failures, malformed payloads, provider None, language normalization/ranking and edition distinction.
+- `npm test -- --run` covers configured and not-configured audiobook UI plus language-filtered local search without a real ABS dependency.
+- `npm run build`, Release build, Sentinel tests, Compose validation, documentation verification and `git diff --check` remain publication gates.
+- Runtime verification checks the audiobook overview, Media/Ljudböcker in all themes, dock clearance, existing Media flows and Finance `RESEARCH / 0 / NONE`.
+- A configured library test requires an owner-created ABS service identity/API key and library ID; secrets never enter fixtures, documentation or frontend.
+
 ## BB-099 whole-app UX audit
 
 Render every registered view plus embedded Settings at 390 × 844, scroll long views from top to bottom and exercise their primary controls. Use normal viewport captures, never stitched full-page iOS captures, as reachability evidence. Verify that the last actionable element can scroll entirely above the persistent dock through the shared `--bb-mobile-dock-clearance`, and specifically exercise Media search/request, downloads, Smart Shuffle, its lower select and collapsed technical integrations. Home tests must prove that existing read-only API data appears before contextual navigation. Finance must keep its default narrative and advanced disclosure without API or safety changes. Repeat representative checks at 430 × 932, 768 × 1024 and 1440 × 900 and across all three themes. Family remains the regression canary. Finance must remain `RESEARCH / 0 SEK / NONE` with unchanged scheduler and governor.

@@ -1,5 +1,13 @@
 # Media Module
 
+## Ljudböcker (BB-100)
+
+Audiobookshelf owns audiobook files, metadata and listening progress. BigBrain Web calls only the versioned BigBrain API; the API key remains server-side. The adapter implements bounded overview, paged library, detail, local search and a same-origin cover proxy. Missing credentials return `notConfigured`, and upstream failure returns a controlled unavailable state without affecting the existing Media stack.
+
+Language identifiers are normalized (`sv`, `en`, `de`, `und`). Audio-edition language is not inferred from a translated work title; unknown stays explicit. Narrator and edition IDs remain distinct metadata. Acquisition is behind `IAudiobookAcquisitionProvider`; BB-100 registers the safe None provider and does not request or download anything.
+
+Future flow (not implemented): discovery → explicit edition/language confirmation → provider → qBittorrent → `/srv/media/audiobooks` → ABS scan → BigBrain library.
+
 ## Sprint 4 – Media Experience
 
 **Goal:** Improve the existing BigBrain 1.0 media search, request, status and mobile
