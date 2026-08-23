@@ -5,14 +5,14 @@
 - Date: 2026-08-23
 - Baseline: `f6ffd92645f4d0d0b96dafa52a7336991c32abb6`
 - Scope: frontend composition and reachability only
-- Implemented: locally
+- Implemented: published
 - Automatically verified: complete local repository-native validation
-- Deployed: pending CI
+- Deployed: Web only; API, Sentinel and volumes preserved
 - Owner status: **OWNER UX REVIEW PENDING**
 
 ## Status
 
-Implemented and fully verified locally. CI, deployment and appliance evidence remain pending and will not be inferred.
+Technically complete and deployed. Home, Media, Finance, More/Settings, Admin and AI remain pending owner UX review.
 
 ## Audit and decisions
 
@@ -40,7 +40,11 @@ Evidence consists of the checked-in audit matrix, behavioral tests, production b
 
 ## Validation and deployment evidence
 
-Local validation passes 121 frontend tests across 21 files, 495 API tests and 32 Sentinel tests. The Vite production build and complete Release solution build pass with zero warnings/errors. Documentation verification passes 177 Markdown files and 89 unique backlog IDs; Compose and `git diff --check` pass. `gitleaks` is not installed locally, so the GitHub Actions secrets job remains authoritative. CI, deployment and runtime Finance evidence are appended only after they actually pass. The first API run exhausted the 3.9 GiB tmpfs while creating isolated SQLite fixtures; the unchanged suite passed 495/495 when rerun with a task-specific temporary directory on the repository disk.
+Local validation passes 121 frontend tests across 21 files, 495 API tests and 32 Sentinel tests. The Vite production build and complete Release solution build pass with zero warnings/errors. Documentation verification passes 177 Markdown files and 89 unique backlog IDs; Compose and `git diff --check` pass. `gitleaks` is not installed locally; GitHub Actions runs 32643858026 and 32644787645 passed backend, frontend, documentation and secrets. The first API run exhausted the 3.9 GiB tmpfs while creating isolated SQLite fixtures; the unchanged suite passed 495/495 when rerun with a task-specific temporary directory on the repository disk.
+
+Only Web was rebuilt and recreated with `--no-deps`. Final image `sha256:ae1d52afd99e5dfd3b680dcae19c69e15fa5b76a0d7d0dd27d8d7b52a325c14c` is healthy. API and Sentinel remained healthy with their pre-deployment start times. Deployed Home at `/tmp/bb099-deployed-obsidian-gold-home-390x844.png` shows actual meal, shopping and Media activity without waiting for Finance. Finance loaded its real default narrative at `/tmp/bb099-deployed-obsidian-gold-finance-390x844.png`. Media's expanded Smart Shuffle select measured 44 px high with bottom 443.5 px against dock top 772 px, and the technical disclosure remained closed. The deployed route/theme matrix and 430 × 932, 768 × 1024 and 1440 × 900 checks found no horizontal overflow.
+
+Post-deploy Finance is `OperatingMode = RESEARCH`, `BudgetSek = 0`, `ExecutionAuthority = NONE`. Scheduler remains enabled, last outcome `Skipped` for `finance.research.scheduler.nonResearchDay`, and `researchCurrentlyRunning = false`. Operations is `waiting`, requires no attention, reports READY data and has no active resource decision. No Finance container or state was changed.
 
 ## Security and scope
 
@@ -48,7 +52,7 @@ Detta är en sanerad GitHub-version. The new Home composition consumes only exis
 
 ## Remaining work
 
-The implementation can become technically complete only after green CI, Web-only deployment and post-deploy appliance QA. Home, Media, Finance, More/Settings, Admin and AI then require owner UX review. They are not self-approved by this report.
+Home, Media, Finance, More/Settings, Admin and AI require owner UX review. They are not self-approved by this report. The known iOS full-page screenshot artifact also remains honestly separate and reproducible by owner evidence.
 
 ## Resumption
 

@@ -48,7 +48,7 @@ Family is the owner-approved golden design reference. This audit covers the seve
 | Admin | pass | pass | pass | pass | pass | pass | status/disclosures | pass |
 | AI | pass | pass | pass | pass | pass | n/a | truthful planned states | pass |
 
-The normal-viewport matrix rendered all seven views in all three themes at 390 × 844 (21 captures), including top and lower scroll frames for the long Family, Media, Finance and Admin compositions. Family also passed its stabilized Arctic canary capture after the theme transition; an earlier immediate capture was discarded because it sampled the intentional 200 ms theme transition rather than steady-state UI. Responsive review covered 430 × 932, 768 × 1024 and 1440 × 900 without horizontal overflow. Final deployed evidence is appended to the implementation report after publication and appliance rollout.
+The normal-viewport matrix rendered all seven views in all three themes at 390 × 844 (21 captures), including top and lower scroll frames for the long Family, Media, Finance and Admin compositions. Family also passed its stabilized Arctic canary capture after the theme transition; an earlier immediate capture was discarded because it sampled the intentional 200 ms theme transition rather than steady-state UI. Responsive review covered 430 × 932, 768 × 1024 and 1440 × 900 without horizontal overflow. Deployed content checks confirmed Home's independent real summaries, Finance's complete default narrative and Media's lower Smart Shuffle select at 44 px with bottom 443.5 px against dock top 772 px. The Media technical disclosure remained closed.
 
 ## Known separate limitation
 
