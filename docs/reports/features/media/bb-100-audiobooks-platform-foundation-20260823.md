@@ -27,6 +27,8 @@ Network-free API fixtures cover healthy, authentication failure, malformed paylo
 
 The first deployed browser review exposed that the component had been placed in the unused non-admin `MediaDashboard` branch while the real Media route is registry-composed. Commit `7911505187ca6c316fc050ed349f1980938d1ad6` moved it to the widget registry and added the route regression. The final deployed Web image is `sha256:e6b04941152dc4efed4fd6a7e2ddb64e7b025d8b766f5f6a122554599103ef19`; API is healthy and ABS image `sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e` is running. Normal viewport captures at `/tmp/bb100-{obsidian-gold,forest-night,arctic-wind}-audiobooks-{390x844,430x932}.png` show the truthful setup state in all themes with no horizontal overflow. Obsidian Gold was restored after theme verification.
 
+The final appliance inventory also found the separately deployed Sentinel container restarting with `AddressInUseException` for `/run/bigbrain/sentinel.sock`. The BB-100 Web-only correction neither changed nor restarted Sentinel. Read-only inspection found its dedicated runtime volume and no visible listening socket owner; deleting the socket or recreating Sentinel was not performed because that would exceed the explicitly restricted resumption scope. Automated Sentinel tests and CI remain green, but current Sentinel runtime health must not be reported as passing until that independent appliance condition is remediated and reverified.
+
 ## Security
 
 Detta är en sanerad GitHub-version. No secret, private address, raw production log or user library data is published.
