@@ -10,8 +10,8 @@
 
 - Implemented: locally
 - Automatically tested: complete local repository-native validation
-- Deployed: no
-- Manually verified: local normal viewports; final deployed review pending
+- Deployed: Web only; API, Sentinel and volumes preserved
+- Manually verified: local route/theme matrix and deployed responsive Home/theme persistence
 
 ## Scope and reference
 
@@ -71,7 +71,15 @@ This is a frontend presentation migration. No Finance endpoint, scheduler, gover
 
 ## Remaining work
 
-Complete repository-native validation, publish through CI, deploy only Web, recheck the appliance and record Finance as `RESEARCH / 0 SEK / NONE`. Migrated modules require owner review; Family direction approval does not pre-approve them.
+Migrated modules require owner review; Family direction approval does not pre-approve them. The known iOS full-page capture artifact requires equivalent real-iOS evidence before its status can change.
+
+## Publication and deployment evidence
+
+The implementation was published in three coherent code/test commits ending at `bdfef76335e6f218899d2be8a02deb9dc105e715`. The first CI run exposed a pre-existing timing race in the Meal Planner empty-state test; the test now waits for the asynchronous state it asserts without changing product code. Final GitHub Actions run 32632208758 passed backend, frontend, documentation and secrets.
+
+Only Web was rebuilt and recreated with `--no-deps`. Final image `sha256:5410d787fadfd368587c1113675c2801e558c41c43aced8512bd94e984d3aa8e` is healthy; the pre-existing API and Sentinel containers stayed healthy and were not recreated. Deployed Home was opened at `/tmp/bb098-deployed-final-obsidian-home-390x844.png`, its 430 × 932 counterpart and `/tmp/bb098-deployed-final-obsidian-home-1440x900.png`. The initial normal capture found the mobile settings control incorrectly stretching across the page; the final evidence confirms the corrected 44 × 44 control, clear dock, stable content width and shared desktop material rail. The deployed Settings API accepted and persisted Obsidian Gold, Forest Night and Arctic Wind selections, then was restored to Obsidian Gold. Local pre-deployment browser evidence covered all seven views in all three themes at 390 × 844 plus responsive sizes; no horizontal overflow was observed.
+
+Post-deployment Finance remained `RESEARCH`, `BudgetSek = 0`, `ExecutionAuthority = NONE`, status `CONTINUE_RESEARCH`. Scheduler remained enabled, idle and unchanged with `finance.research.scheduler.nonResearchDay`; recovery retained clean previous shutdown, completed recovery, synchronized clock, no low-disk condition and zero interrupted jobs.
 
 ## Resumption
 
