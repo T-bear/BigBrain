@@ -40,8 +40,12 @@
   --bb-surface-edge: rgb(160 224 244 / 10%);
   --bb-surface-shadow: rgb(0 7 14 / 60%);
   --bb-material-panel: linear-gradient(var(--bb-material-light-direction),color-mix(in srgb,var(--bb-surface-2) 94%,white 6%),var(--bb-surface-1));
+  --bb-material-panel-edge:linear-gradient(165deg,var(--bb-surface-edge),transparent 68%);
   --bb-material-control: linear-gradient(var(--bb-material-light-direction),var(--bb-surface-3),var(--bb-surface-2));
   --bb-material-dock: linear-gradient(165deg,rgb(23 52 76 / 96%),rgb(8 27 43 / 97%));
+  --bb-material-selection:linear-gradient(155deg,var(--bb-color-accent-soft),transparent);
+  --bb-metallic-accent:linear-gradient(180deg,var(--bb-color-accent-highlight),var(--bb-color-accent));
+  --bb-material-primary-action:var(--bb-material-control);
   --bb-page-glow: radial-gradient(ellipse at 72% -4%, rgb(46 187 231 / 24%), transparent 38%), radial-gradient(circle at 18% 15%, rgb(85 130 210 / 12%), transparent 28%);
   --bb-family-atmosphere:radial-gradient(ellipse 82% 22rem at 74% -5rem,var(--bb-canvas-ambient),transparent 70%);
   --bb-shadow-sm: 0 1px 0 rgb(220 248 255 / 7%) inset, 0 .5rem 1.6rem rgb(0 7 14 / 28%);
