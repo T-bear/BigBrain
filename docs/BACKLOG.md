@@ -14,6 +14,13 @@
 - Import boundary: framtida provideroutput får endast lösas relativt den serverstyrda importroten; traversal och överskrivning av befintligt innehåll avvisas. Automatisk flytt/rescan kräver en faktisk godkänd provider och är inte simulerad.
 - Gate: en provider måste erbjuda underhållen och autentiserad API/Docker-distribution, tydlig språk-/utgåve-/uppläsarmetadata, säkert status/cancel-flöde, Prowlarr/qBittorrent-orkestrering och kontrollerad output till importroten. Ägarbeslut och säkerhetsgranskning krävs före installation.
 
+## BB-102 — Librarr acquisition provider
+
+- Status: **BLOCKED BEFORE DEPLOYMENT** efter upstream- och säkerhetsgranskning 2026-08-23. Ägaren har valt `JeremiahM37/librarr`, men den granskade stabila versionen `v1.2.0` (`df1fc5a6951f693a492a38270c261cb863308fc4`) uppfyller inte BigBrains obligatoriska no-overwrite-policy.
+- Ägaren godkände 2026-08-23 en minimal BigBrain-patch/image. Upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` är pinnad och patchen stoppar overwrite, katalog-/filkollisioner, partiella bokdestinationer och path escape; 59 organizer-tester passerar (11 patchregressioner).
+- Implementerat och automatiskt verifierat: intern-only Compose-service, Prowlarr-only registry, dedikerad qBittorrent-kategori/path, provider-neutral Librarr-adapter, opaque kandidater, verklig statusmappning och säker `CanCancel=false`. Runtime commissioning/deployment återstår eftersom tre hemliga `.env`-värden saknas. Första acquisition förblir uttryckligen ägargatad.
+- Nästa beslut: invänta upstream-fix för konflikt/no-overwrite, eller godkänn separat scope för en pinned och testad BigBrain-maintained patch/image. Därefter återupptas implementation bakom befintlig `IAudiobookAcquisitionProvider`; första live acquisition kräver fortfarande uttryckligt ägarval.
+
 ### BB-089 – M5 Hard Risk Engine foundation
 
 - Modul: Finance / Risk

@@ -1,5 +1,5 @@
 import { useEffect,useState,type FormEvent } from 'react'
-import { getAudiobookAcquisitionJobs,getAudiobookAcquisitionStatus,getAudiobookOverview,requestAudiobookAcquisition,searchAudiobooks } from '../api'
+import { getAudiobookAcquisitionJob,getAudiobookAcquisitionJobs,getAudiobookAcquisitionStatus,getAudiobookOverview,requestAudiobookAcquisition,searchAudiobooks } from '../api'
 import { BBButton,BBEmptyState,BBInput,BBSelect,BBSurface } from '../components'
 import type { AudiobookAcquisitionCandidate,AudiobookAcquisitionJob,AudiobookAcquisitionProviderStatus,AudiobookItem,AudiobookOverview } from '../types'
 
@@ -51,6 +51,13 @@ export function Audiobooks(){
     void getAudiobookAcquisitionStatus(c.signal).then(setProvider).catch(()=>setProvider({state:'unavailable',provider:'unknown',canSearch:false,canRequest:false,canCancel:false,message:'Anskaffningsleverantören kunde inte nås.'}))
     void getAudiobookAcquisitionJobs(c.signal).then(activity=>setJobs(activity.items)).catch(()=>setJobs([]))
     return()=>c.abort()},[])
+
+  useEffect(()=>{
+    const active=jobs.filter(job=>!['completed','failed','cancelled'].includes(job.status)).slice(0,10)
+    if(!active.length)return
+    const timer=window.setInterval(()=>{void Promise.all(active.map(job=>getAudiobookAcquisitionJob(job.id).catch(()=>job))).then(updated=>setJobs(current=>current.map(job=>updated.find(item=>item.id===job.id)??job)))},10000)
+    return()=>window.clearInterval(timer)
+  },[jobs])
 
   async function search(e:FormEvent){e.preventDefault();if(query.trim().length<2)return;setBusy(true);setNotice(null);try{const result=await searchAudiobooks(query,language,author);setLocalResults(result.library);setDiscovery(result.discovery);setProvider(result.acquisition)}catch{setNotice('Sökningen kunde inte genomföras. Försök igen.')}finally{setBusy(false)}}
   async function add(candidate:AudiobookAcquisitionCandidate){if(!provider?.canRequest){setNotice(provider?.message??'Automatisk hämtning är inte konfigurerad ännu.');return}setBusy(true);try{const job=await requestAudiobookAcquisition(candidate);setJobs(current=>[job,...current]);setNotice('Hämtningen har begärts.')}catch{setNotice('Hämtningen kunde inte begäras.')}finally{setBusy(false)}}

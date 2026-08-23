@@ -1,0 +1,26 @@
+FROM golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 AS builder
+
+ARG LIBRARR_UPSTREAM_COMMIT=1208254c20b31fbf217558c0fb987f779fed1cf8
+RUN apk add --no-cache git
+WORKDIR /build
+RUN git clone --filter=blob:none https://github.com/JeremiahM37/librarr.git source \
+    && cd source \
+    && git checkout --detach "${LIBRARR_UPSTREAM_COMMIT}" \
+    && test "$(git rev-parse HEAD)" = "${LIBRARR_UPSTREAM_COMMIT}"
+
+COPY infrastructure/librarr/patches/0001-audiobook-import-no-overwrite.patch /tmp/no-overwrite.patch
+RUN cd source \
+    && git apply --check /tmp/no-overwrite.patch \
+    && git apply /tmp/no-overwrite.patch \
+    && test -z "$(gofmt -l internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go)" \
+    && go test ./internal/organize \
+    && CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /librarr ./cmd/librarr/
+
+FROM alpine:3.21@sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d
+RUN apk add --no-cache ca-certificates tzdata \
+    && adduser -D -u 1000 librarr
+COPY --from=builder /librarr /usr/local/bin/librarr
+COPY --chmod=0555 infrastructure/librarr/entrypoint.sh /usr/local/bin/bigbrain-librarr-entrypoint
+USER librarr
+EXPOSE 5050
+ENTRYPOINT ["/usr/local/bin/bigbrain-librarr-entrypoint"]

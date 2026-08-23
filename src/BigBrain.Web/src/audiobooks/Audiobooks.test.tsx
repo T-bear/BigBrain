@@ -43,3 +43,13 @@ test('shows truthful Audiobookshelf not-configured state',async()=>{
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{state:'notConfigured',message:null,continueListening:null,library:[],recent:[],acquisition:provider})
   render(<Audiobooks/>);expect(await screen.findByText('Audiobookshelf väntar på konfigurering')).toBeInTheDocument()
 })
+
+test('polls real provider state for active jobs without inventing progress',async()=>{
+  vi.spyOn(window,'setInterval').mockImplementation(handler=>{if(typeof handler==='function')void handler();return 1})
+  const fetch=vi.spyOn(globalThis,'fetch')
+  const active={id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate:{workId:'work',editionId:'edition',title:'Boken',author:'Författaren',narrator:null,language:'sv',languageLabel:'Svenska',edition:'Release',durationSeconds:null,publicationYear:null,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'unknown'},status:'queued',createdAtUtc:'2026-08-23T10:00:00Z',updatedAtUtc:'2026-08-23T10:00:00Z',message:null}
+  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({...active,status:'downloading'}))
+  render(<Audiobooks/>)
+  await waitFor(()=>expect(screen.getByText('downloading')).toBeInTheDocument())
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+})

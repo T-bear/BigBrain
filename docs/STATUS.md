@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-102 Librarr provider continuation (2026-08-23)
+
+Den tidigare import-säkerhetsgaten accepterades av ägaren med alternativ 2: en minimal BigBrain-underhållen patch/image. Upstream är pinnad till commit `1208254c20b31fbf217558c0fb987f779fed1cf8`; image `bigbrain-librarr:1208254-bb1` byggs reproducerbart och kör 59 organizer-tester, varav 11 nya regressionsfall för no-overwrite, katalogkonflikt, partiell destination, path escape samt source-preservation i move/copy/hardlink.
+
+Provider-adaptern och intern-only Compose-konfigurationen är implementerade och automatiskt verifierade, men deployment är ännu blockerad: appliance `.env` saknar `LIBRARR_API_KEY`, `LIBRARR_QBITTORRENT_USERNAME` och `LIBRARR_QBITTORRENT_PASSWORD`. Inga värden ska lämnas i chat eller Git. Ingen Librarr-container har startats och ingen acquisition har gjorts. BB-100:s Audiobookshelf-baslinje påverkas inte; BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+
 ## BB-101 audiobook acquisition foundation (2026-08-23)
 
 BB-101:s provider-neutrala vertikala slice är implementerad, publicerad, CI-verifierad och deployad ovanpå den commissionade BB-100-baslinjen i `1ef411a99a6b57e057099597366aaa64004bc801`. BigBrain äger nu sökresultat/utgåvor, providerstatus och beständiga acquisition-jobb med stabila BigBrain-ID:n samt bounded API-kontrakt för search, request, list/detail och cancel. Media/Ljudböcker visar svensk språkpreferens, valfri författare, tydligt separerade utgåvor/uppläsare, detaljer och aktivitet i den verkliga registry-komponerade Media-vyn. Den deployade providern förblir sanningsenligt `None / NotConfigured`; därför skapas inget jobb och ingen falsk progress. Importpolicyn tillåter bara relativa destinationer under serverstyrd rot och vägrar både traversal och överskrivning.

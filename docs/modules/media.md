@@ -12,6 +12,10 @@ BB-101 extends the existing boundary without selecting a third party. `IAudioboo
 
 BigBrain owns `AudiobookAcquisitionCandidate`, `AudiobookAcquisitionJob` and stable job IDs. Candidate metadata keeps title, author, narrator, normalized audio language, edition, source and confidence distinct. Jobs use the existing API SQLite persistence volume, are bounded in list APIs and never contain credentials. The Web UI defaults to Swedish, permits English/all-language selection, shows local and provider results separately and renders activity only for actual stored jobs.
 
+## Librarr provider continuation (BB-102)
+
+The owner approved a minimal BigBrain-maintained patch/image after upstream overwrite-on-destination behavior blocked deployment. Commit `1208254c20b31fbf217558c0fb987f779fed1cf8` is pinned; the isolated patch reserves a new book directory, uses exclusive file creation and fails closed on existing/partial destinations and path escapes. Librarr remains internal-only, Prowlarr is the sole discovery source, Web receives opaque candidate IDs, `CanCancel=false`, and weak release-name language hints remain `Probable` while missing language remains `und`. The provider code is implemented but runtime still reports the BB-101 safe fallback until required local secrets are installed and commissioning succeeds.
+
 Endpoints:
 
 - `GET /api/v1/modules/media/audiobooks/acquisition/provider-status`

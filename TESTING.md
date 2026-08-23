@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-102 patched Librarr provider
+
+- `docker build -t bigbrain-librarr:1208254-bb1 -f infrastructure/librarr/Dockerfile .` applies the pinned patch and runs all upstream organizer tests plus 11 no-overwrite regressions inside the build.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --filter 'FullyQualifiedName~LibrarrAudiobookAcquisitionProviderTests|FullyQualifiedName~AudiobookAcquisitionTests' --no-restore` covers authenticated health, dependency degradation, bounded/opaque candidates, request cache, language hints, state mapping and safe cancellation semantics without a network.
+- `npm test -- --run src/audiobooks/Audiobooks.test.tsx` covers the real registry-composed Media view and bounded polling of real job states without fabricated percentage progress.
+- Runtime search and downstream health are commissioning checks. They must not initiate the first download; secrets remain outside Git, test output and chat.
+
 ## BB-101 audiobook acquisition foundation
 
 - `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --filter FullyQualifiedName~Audiobook --no-restore` covers provider None, bounded search, Swedish/English/unknown ranking, narrator/edition distinction, stable job IDs, state mapping, controlled provider failure, missing-job 404, cancellation and safe import paths including no-overwrite.

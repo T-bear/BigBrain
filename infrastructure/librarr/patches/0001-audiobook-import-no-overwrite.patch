@@ -1,0 +1,446 @@
+diff --git a/internal/organize/pipeline.go b/internal/organize/pipeline.go
+index fa07a63..c765fae 100644
+--- a/internal/organize/pipeline.go
++++ b/internal/organize/pipeline.go
+@@ -129,6 +129,12 @@ func (o *Organizer) OrganizeAudiobook(filePath, title, author string) (string, e
+ 	if author == "" {
+ 		author = "Unknown"
+ 	}
++	if err := validateAudiobookPathComponent(title); err != nil {
++		return filePath, err
++	}
++	if err := validateAudiobookPathComponent(author); err != nil {
++		return filePath, err
++	}
+ 
+ 	// If source is a directory, move its contents.
+ 	info, err := os.Lstat(filePath)
+@@ -146,25 +152,218 @@ func (o *Organizer) OrganizeAudiobook(filePath, title, author string) (string, e
+ 	if err != nil {
+ 		return filePath, err
+ 	}
++	if err := reserveAudiobookDestination(o.cfg.AudiobookDir, safeAuthor, destDir); err != nil {
++		return filePath, err
++	}
++	committed := false
++	defer func() {
++		if !committed {
++			_ = os.Remove(destDir)
++		}
++	}()
+ 	if info.IsDir() {
+-		if err := o.placeDirTree(filePath, destDir); err != nil {
++		if err := o.placeAudiobookDirTree(filePath, destDir); err != nil {
+ 			return filePath, err
+ 		}
++		committed = true
+ 		return destDir, nil
+ 	}
+ 
+-	if err := os.MkdirAll(destDir, 0755); err != nil {
+-		return filePath, err
+-	}
+-
+ 	destPath := filepath.Join(destDir, filepath.Base(filePath))
+-	if err := o.placeFile(filePath, destPath); err != nil {
++	if err := o.placeAudiobookFile(filePath, destPath); err != nil {
+ 		return filePath, err
+ 	}
++	committed = true
+ 
+ 	return destPath, nil
+ }
+ 
++var errAudiobookImportConflict = errors.New("audiobook import destination conflict")
++
++func validateAudiobookPathComponent(value string) error {
++	value = strings.TrimSpace(value)
++	if value == "" {
++		return nil
++	}
++	if filepath.IsAbs(value) || value == "." || value == ".." ||
++		strings.Contains(value, "/") || strings.Contains(value, `\`) {
++		return fmt.Errorf("invalid audiobook destination component")
++	}
++	return nil
++}
++
++// reserveAudiobookDestination creates the final book directory atomically.
++// Existing or partially populated book directories are always conflicts: an
++// audiobook import never merges with or replaces existing library content.
++func reserveAudiobookDestination(root, safeAuthor, destDir string) error {
++	if err := os.MkdirAll(root, 0755); err != nil {
++		return err
++	}
++	authorDir, err := joinUnder(root, safeAuthor)
++	if err != nil {
++		return err
++	}
++	if info, statErr := os.Lstat(authorDir); statErr == nil {
++		if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
++			return fmt.Errorf("%w: author destination is not a regular directory", errAudiobookImportConflict)
++		}
++	} else if os.IsNotExist(statErr) {
++		if mkdirErr := os.Mkdir(authorDir, 0755); mkdirErr != nil && !os.IsExist(mkdirErr) {
++			return mkdirErr
++		}
++	} else {
++		return statErr
++	}
++	if err := os.Mkdir(destDir, 0755); err != nil {
++		if os.IsExist(err) {
++			return fmt.Errorf("%w: book destination already exists", errAudiobookImportConflict)
++		}
++		return err
++	}
++	return nil
++}
++
++// placeAudiobookFile uses exclusive creation for every mode. Move mode copies
++// and syncs before deleting the source so a failed placement preserves it.
++func (o *Organizer) placeAudiobookFile(src, dst string) error {
++	switch o.importMode() {
++	case config.ImportModeHardlink:
++		if err := linkFile(src, dst); err == nil {
++			return nil
++		} else if errors.Is(err, fs.ErrExist) {
++			return fmt.Errorf("%w: file already exists", errAudiobookImportConflict)
++		}
++		return copyFileForAudiobook(src, dst)
++	case config.ImportModeCopy:
++		return copyFileForAudiobook(src, dst)
++	default:
++		if err := copyFileForAudiobook(src, dst); err != nil {
++			return err
++		}
++		if err := syncFile(dst); err != nil {
++			_ = os.Remove(dst)
++			return err
++		}
++		if err := os.Remove(src); err != nil {
++			_ = os.Remove(dst)
++			return err
++		}
++		return nil
++	}
++}
++
++func copyFileForAudiobook(src, dst string) error {
++	srcFile, err := os.Open(src)
++	if err != nil {
++		return err
++	}
++	defer srcFile.Close()
++	dstFile, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
++	if err != nil {
++		if os.IsExist(err) {
++			return fmt.Errorf("%w: file already exists", errAudiobookImportConflict)
++		}
++		return err
++	}
++	ok := false
++	defer func() {
++		_ = dstFile.Close()
++		if !ok {
++			_ = os.Remove(dst)
++		}
++	}()
++	if _, err := io.Copy(dstFile, srcFile); err != nil {
++		return err
++	}
++	if err := dstFile.Sync(); err != nil {
++		return err
++	}
++	ok = true
++	return nil
++}
++
++func (o *Organizer) placeAudiobookDirTree(srcDir, dstDir string) error {
++	type entry struct {
++		src string
++		dst string
++		dir bool
++	}
++	entries := make([]entry, 0)
++	err := filepath.WalkDir(srcDir, func(path string, d os.DirEntry, walkErr error) error {
++		if walkErr != nil {
++			return walkErr
++		}
++		if path == srcDir {
++			return nil
++		}
++		if d.Type()&os.ModeSymlink != 0 {
++			if d.IsDir() {
++				return filepath.SkipDir
++			}
++			return nil
++		}
++		rel, err := filepath.Rel(srcDir, path)
++		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
++			return fmt.Errorf("invalid audiobook source path")
++		}
++		dst := filepath.Join(dstDir, rel)
++		if _, err := joinUnder(dstDir, rel); err != nil {
++			return err
++		}
++		entries = append(entries, entry{src: path, dst: dst, dir: d.IsDir()})
++		return nil
++	})
++	if err != nil {
++		return err
++	}
++
++	createdFiles := make([]string, 0)
++	createdDirs := make([]string, 0)
++	cleanup := func() {
++		for i := len(createdFiles) - 1; i >= 0; i-- {
++			_ = os.Remove(createdFiles[i])
++		}
++		for i := len(createdDirs) - 1; i >= 0; i-- {
++			_ = os.Remove(createdDirs[i])
++		}
++	}
++	for _, item := range entries {
++		if item.dir {
++			if err := os.Mkdir(item.dst, 0755); err != nil {
++				cleanup()
++				if os.IsExist(err) {
++					return fmt.Errorf("%w: directory already exists", errAudiobookImportConflict)
++				}
++				return err
++			}
++			createdDirs = append(createdDirs, item.dst)
++			continue
++		}
++		var placeErr error
++		if o.importMode() == config.ImportModeMove {
++			// Keep the complete source tree until every destination file has
++			// been placed successfully; only then remove it as one operation.
++			placeErr = copyFileForAudiobook(item.src, item.dst)
++		} else {
++			placeErr = o.placeAudiobookFile(item.src, item.dst)
++		}
++		if placeErr != nil {
++			cleanup()
++			return placeErr
++		}
++		createdFiles = append(createdFiles, item.dst)
++	}
++	if o.importMode() == config.ImportModeMove {
++		if err := os.RemoveAll(srcDir); err != nil {
++			// Destination placement is already complete. Do not remove it if
++			// source cleanup partially failed: that could leave neither tree
++			// complete. Return the error and retain the completed destination.
++			return err
++		}
++	}
++	return nil
++}
++
+ // OrganizeManga moves manga files into the organized directory structure: {MangaDir}/{Series}/{file}
+ // Also copies to KAVITA_MANGA_LIBRARY_PATH if configured.
+ func (o *Organizer) OrganizeManga(filePath, seriesTitle string) (string, error) {
+diff --git a/internal/organize/audiobook_conflict_test.go b/internal/organize/audiobook_conflict_test.go
+new file mode 100644
+index 0000000..dd9c49d
+--- /dev/null
++++ b/internal/organize/audiobook_conflict_test.go
+@@ -0,0 +1,197 @@
++package organize
++
++import (
++	"errors"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/JeremiahM37/librarr/internal/config"
++)
++
++func audiobookOrganizer(t *testing.T, mode string) (*Organizer, string, string) {
++	t.Helper()
++	root := t.TempDir()
++	incoming := filepath.Join(root, "incoming")
++	library := filepath.Join(root, "audiobooks")
++	if err := os.MkdirAll(incoming, 0755); err != nil {
++		t.Fatal(err)
++	}
++	return NewOrganizer(&config.Config{FileOrgEnabled: true, AudiobookDir: library, ImportMode: mode}), incoming, library
++}
++
++func TestAudiobookMoveEmptyDestinationSucceeds(t *testing.T) {
++	o, incoming, _ := audiobookOrganizer(t, config.ImportModeMove)
++	src := filepath.Join(incoming, "book.m4b")
++	writeFile(t, src, []byte("new"))
++	dst, err := o.OrganizeAudiobook(src, "Book", "Author")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := os.Stat(src); !os.IsNotExist(err) {
++		t.Fatalf("source must be removed after successful move: %v", err)
++	}
++	assertFileContent(t, dst, "new")
++}
++
++func TestAudiobookMoveExistingBookDirectoryFailsClosed(t *testing.T) {
++	o, incoming, library := audiobookOrganizer(t, config.ImportModeMove)
++	src := filepath.Join(incoming, "book.m4b")
++	existing := filepath.Join(library, "Author", "Book", "book.m4b")
++	writeFile(t, src, []byte("new"))
++	writeFile(t, existing, []byte("existing"))
++	_, err := o.OrganizeAudiobook(src, "Book", "Author")
++	assertConflict(t, err)
++	assertFileContent(t, src, "new")
++	assertFileContent(t, existing, "existing")
++}
++
++func TestAudiobookMoveDirectoryConflictPreservesSourceTree(t *testing.T) {
++	o, incoming, library := audiobookOrganizer(t, config.ImportModeMove)
++	src := filepath.Join(incoming, "download")
++	writeFile(t, filepath.Join(src, "01.mp3"), []byte("one"))
++	writeFile(t, filepath.Join(src, "02.mp3"), []byte("two"))
++	existing := filepath.Join(library, "Author", "Book", "01.mp3")
++	writeFile(t, existing, []byte("existing"))
++	_, err := o.OrganizeAudiobook(src, "Book", "Author")
++	assertConflict(t, err)
++	assertFileContent(t, filepath.Join(src, "01.mp3"), "one")
++	assertFileContent(t, filepath.Join(src, "02.mp3"), "two")
++	assertFileContent(t, existing, "existing")
++}
++
++func TestAudiobookCopyExistingDestinationFailsWithoutTruncation(t *testing.T) {
++	dir := t.TempDir()
++	src := filepath.Join(dir, "src.m4b")
++	dst := filepath.Join(dir, "dst.m4b")
++	writeFile(t, src, []byte("new"))
++	writeFile(t, dst, []byte("existing"))
++	err := copyFileForAudiobook(src, dst)
++	assertConflict(t, err)
++	assertFileContent(t, src, "new")
++	assertFileContent(t, dst, "existing")
++}
++
++func TestAudiobookHardlinkExistingDestinationFailsWithoutReplacement(t *testing.T) {
++	o, incoming, _ := audiobookOrganizer(t, config.ImportModeHardlink)
++	src := filepath.Join(incoming, "src.m4b")
++	dst := filepath.Join(incoming, "dst.m4b")
++	writeFile(t, src, []byte("new"))
++	writeFile(t, dst, []byte("existing"))
++	err := o.placeAudiobookFile(src, dst)
++	assertConflict(t, err)
++	assertFileContent(t, src, "new")
++	assertFileContent(t, dst, "existing")
++}
++
++func TestAudiobookHardlinkUnsupportedFallsBackSafely(t *testing.T) {
++	o, incoming, _ := audiobookOrganizer(t, config.ImportModeHardlink)
++	src := filepath.Join(incoming, "src.m4b")
++	dst := filepath.Join(incoming, "dst.m4b")
++	writeFile(t, src, []byte("new"))
++	original := linkFile
++	linkFile = func(string, string) error { return errors.New("cross-device link") }
++	defer func() { linkFile = original }()
++	if err := o.placeAudiobookFile(src, dst); err != nil {
++		t.Fatal(err)
++	}
++	assertFileContent(t, src, "new")
++	assertFileContent(t, dst, "new")
++}
++
++func TestAudiobookPartialDestinationFailsClosed(t *testing.T) {
++	o, incoming, library := audiobookOrganizer(t, config.ImportModeCopy)
++	src := filepath.Join(incoming, "download")
++	writeFile(t, filepath.Join(src, "01.mp3"), []byte("one"))
++	partial := filepath.Join(library, "Author", "Book", "partial.tmp")
++	writeFile(t, partial, []byte("partial"))
++	_, err := o.OrganizeAudiobook(src, "Book", "Author")
++	assertConflict(t, err)
++	assertFileContent(t, partial, "partial")
++	assertFileContent(t, filepath.Join(src, "01.mp3"), "one")
++}
++
++func TestAudiobookFileDirectoryCollisionFailsClosed(t *testing.T) {
++	o, incoming, library := audiobookOrganizer(t, config.ImportModeCopy)
++	src := filepath.Join(incoming, "book.m4b")
++	writeFile(t, src, []byte("new"))
++	writeFile(t, filepath.Join(library, "Author", "Book"), []byte("blocking-file"))
++	_, err := o.OrganizeAudiobook(src, "Book", "Author")
++	assertConflict(t, err)
++	assertFileContent(t, src, "new")
++	assertFileContent(t, filepath.Join(library, "Author", "Book"), "blocking-file")
++}
++
++func TestAudiobookAuthorSymlinkRejected(t *testing.T) {
++	o, incoming, library := audiobookOrganizer(t, config.ImportModeCopy)
++	src := filepath.Join(incoming, "book.m4b")
++	writeFile(t, src, []byte("new"))
++	outside := filepath.Join(filepath.Dir(library), "outside")
++	if err := os.MkdirAll(library, 0755); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.MkdirAll(outside, 0755); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.Symlink(outside, filepath.Join(library, "Author")); err != nil {
++		t.Fatal(err)
++	}
++	_, err := o.OrganizeAudiobook(src, "Book", "Author")
++	if err == nil {
++		t.Fatal("expected symlink destination rejection")
++	}
++	assertFileContent(t, src, "new")
++	if _, err := os.Stat(filepath.Join(outside, "Book")); !os.IsNotExist(err) {
++		t.Fatalf("symlink escape created outside destination: %v", err)
++	}
++}
++
++func TestAudiobookTraversalAndAbsoluteComponentsRejected(t *testing.T) {
++	o, incoming, _ := audiobookOrganizer(t, config.ImportModeCopy)
++	for _, tc := range []struct{ title, author string }{
++		{"../Book", "Author"},
++		{"Book", "../Author"},
++		{"/absolute", "Author"},
++		{"Book", "/absolute"},
++		{`..\Book`, "Author"},
++	} {
++		src := filepath.Join(incoming, "book.m4b")
++		writeFile(t, src, []byte("new"))
++		if _, err := o.OrganizeAudiobook(src, tc.title, tc.author); err == nil {
++			t.Fatalf("expected rejection for title=%q author=%q", tc.title, tc.author)
++		}
++		assertFileContent(t, src, "new")
++	}
++}
++
++func TestAudiobookSourceSymlinkRejected(t *testing.T) {
++	o, incoming, _ := audiobookOrganizer(t, config.ImportModeCopy)
++	real := filepath.Join(incoming, "real.m4b")
++	link := filepath.Join(incoming, "link.m4b")
++	writeFile(t, real, []byte("real"))
++	if err := os.Symlink(real, link); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := o.OrganizeAudiobook(link, "Book", "Author"); err == nil {
++		t.Fatal("expected source symlink rejection")
++	}
++	assertFileContent(t, real, "real")
++}
++
++func assertConflict(t *testing.T, err error) {
++	t.Helper()
++	if !errors.Is(err, errAudiobookImportConflict) {
++		t.Fatalf("error = %v, want audiobook import conflict", err)
++	}
++}
++
++func assertFileContent(t *testing.T, path, want string) {
++	t.Helper()
++	got, err := os.ReadFile(path)
++	if err != nil {
++		t.Fatalf("read %s: %v", path, err)
++	}
++	if string(got) != want {
++		t.Fatalf("%s content = %q, want %q", path, got, want)
++	}
++}
+

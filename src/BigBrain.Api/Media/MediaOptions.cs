@@ -9,6 +9,7 @@ public sealed class MediaOptions
     public MediaApiKeyOptions Radarr { get; init; } = new("http://radarr:7878");
     public MediaApiKeyOptions Prowlarr { get; init; } = new("http://prowlarr:9696");
     public AudiobookshelfOptions Audiobookshelf { get; init; } = new();
+    public LibrarrOptions Librarr { get; init; } = new();
     public QBittorrentOptions QBittorrent { get; init; } = new();
     public MediaRequestOptions Requests { get; init; } = new();
     public SmartShuffleOptions SmartShuffle { get; init; } = new();
@@ -22,6 +23,8 @@ public sealed class MediaOptions
         && IsHttpUrl(options.Radarr.BaseUrl)
         && IsHttpUrl(options.Prowlarr.BaseUrl)
         && IsHttpUrl(options.Audiobookshelf.BaseUrl)
+        && IsHttpUrl(options.Librarr.BaseUrl)
+        && options.Librarr.CandidateLifetimeMinutes is >= 5 and <= 60
         && (string.IsNullOrWhiteSpace(options.Audiobookshelf.PublicUrl) || IsHttpUrl(options.Audiobookshelf.PublicUrl))
         && options.Audiobookshelf.PageSize is >= 1 and <= 50
         && IsHttpUrl(options.QBittorrent.BaseUrl)
@@ -47,6 +50,13 @@ public sealed class MediaOptions
 
     private static bool IsValidServiceLink(MediaServiceLinkOptions link) =>
         !link.Enabled || IsHttpUrl(link.Url);
+}
+
+public sealed class LibrarrOptions
+{
+    public string BaseUrl { get; init; } = "http://librarr:5050";
+    public string? ApiKey { get; init; }
+    public int CandidateLifetimeMinutes { get; init; } = 15;
 }
 
 public sealed class AudiobookshelfOptions

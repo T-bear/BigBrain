@@ -91,7 +91,16 @@ public partial class Program
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, "Radarr", options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
         AddMediaClient<IAudiobookshelfClient, AudiobookshelfClient>(builder.Services, "Audiobookshelf", options => options.Audiobookshelf.BaseUrl);
-        builder.Services.AddSingleton<IAudiobookAcquisitionProvider, NoAudiobookAcquisitionProvider>();
+        builder.Services.AddHttpClient<IAudiobookAcquisitionProvider, LibrarrAudiobookAcquisitionProvider>((serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<MediaOptions>();
+            ConfigureMediaClient(httpClient, options.Librarr.BaseUrl, Math.Max(options.TimeoutSeconds, 10));
+            if (!string.IsNullOrWhiteSpace(options.Librarr.ApiKey))
+                httpClient.DefaultRequestHeaders.Add("X-Api-Key", options.Librarr.ApiKey);
+        }).AddHttpMessageHandler(serviceProvider =>
+            new ProviderHttpLoggingHandler(
+                "Librarr",
+                serviceProvider.GetRequiredService<ILogger<ProviderHttpLoggingHandler>>()));
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<AudiobookAcquisitionStore>();
         builder.Services.AddSingleton<AudiobookAcquisitionService>();
