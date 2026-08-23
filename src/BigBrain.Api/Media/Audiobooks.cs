@@ -102,7 +102,12 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
     public async Task<AudiobookItem?> GetItemAsync(string id, CancellationToken token)
     {
         if (!Configured || !SafeId(id)) return null;
-        using var document = await GetAsync($"api/items/{Uri.EscapeDataString(id)}?expanded=1&include=progress", token);
+        using var request = Request(HttpMethod.Get, $"api/items/{Uri.EscapeDataString(id)}?expanded=1&include=progress");
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        EnsureSuccess(response);
+        await using var stream = await response.Content.ReadAsStreamAsync(token);
+        using var document = await JsonDocument.ParseAsync(stream, new JsonDocumentOptions { MaxDepth = 32 }, token);
         return MapItem(document.RootElement);
     }
 

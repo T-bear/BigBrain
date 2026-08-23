@@ -9,7 +9,7 @@
 
 ## Status
 
-Technically implemented, published, CI-verified and foundation-deployed. Audiobookshelf is running loopback-only; its library and dedicated API identity require the documented owner first-run action, so BigBrain truthfully reports `notConfigured`. BB-099 remains technically complete with owner UX review pending.
+Technically implemented, published, CI-verified and commissioned. Audiobookshelf is initialized and tailnet-only for owner access; BigBrain authenticates server-side as the dedicated non-admin `bigbrain` identity and reports `configuredHealthy`. BB-099 remains technically complete with owner UX review pending.
 
 ## Decision
 
@@ -29,6 +29,8 @@ The first deployed browser review exposed that the component had been placed in 
 
 The final appliance inventory also found the separately deployed Sentinel container restarting with `AddressInUseException` for `/run/bigbrain/sentinel.sock`. The BB-100 Web-only correction neither changed nor restarted Sentinel. Read-only inspection found its dedicated runtime volume and no visible listening socket owner; deleting the socket or recreating Sentinel was not performed because that would exceed the explicitly restricted resumption scope. Automated Sentinel tests and CI remain green, but current Sentinel runtime health must not be reported as passing until that independent appliance condition is remediated and reverified.
 
+Final commissioning found exactly one library named `Ljudböcker` and installed its non-secret ID through the ignored appliance environment. `/api/me` confirmed that the key acts as active type `user`, not root/admin, without access to all libraries and without update, delete, upload or e-reader creation privileges. Overview returned `configuredHealthy`; library and local search returned zero items as a successful empty state. The detail adapter was corrected to map an upstream missing item to 404, matching the already controlled cover-proxy 404. Only API was rebuilt/recreated. Deployed Media smoke checks remained HTTP 200 and all five existing integrations reported online. Three-theme mobile browser review showed the connected empty-library composition at 390 × 844 and 430 × 932 without horizontal overflow.
+
 ## Security
 
 Detta är en sanerad GitHub-version. No secret, private address, raw production log or user library data is published.
@@ -37,13 +39,13 @@ Secrets remain server-side. Cover access accepts only bounded opaque ABS item ID
 
 ## Deployment model
 
-Compose pins the official image, joins the internal media network, binds only `/srv/media/audiobooks` and exposes setup on loopback. Config and metadata use named volumes; large media is excluded from application backups. Manual creation of the ABS library and dedicated API identity is required and is not complete without runtime evidence.
+Compose pins the official image, joins the internal media network, binds only `/srv/media/audiobooks` and exposes owner access only on the runtime-configured Tailscale address. Config and metadata use named volumes; large media is excluded from application backups. BigBrain uses the Docker-internal `http://audiobookshelf:80` endpoint and keeps its key, library ID and owner-facing URL outside Git.
 
 BB-099 remains **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**. Finance is outside this change. BB-101 is planning only and has not started.
 
 ## Remaining work
 
-Manual ABS first-run, dedicated least-privilege API identity, library ID injection and configured-library runtime validation remain owner actions. BB-101 may later evaluate a provider and explicit acquisition flow; it is not implemented here.
+No BB-100 commissioning action remains. BB-101 may later evaluate a provider and explicit acquisition flow; it is not implemented here.
 
 ## Resumption
 

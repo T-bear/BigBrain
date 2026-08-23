@@ -159,7 +159,7 @@ services:
     networks:
       - media
     ports:
-      - "127.0.0.1:${AUDIOBOOKSHELF_PORT:-13378}:80"
+      - "${AUDIOBOOKSHELF_BIND_ADDRESS:-127.0.0.1}:${AUDIOBOOKSHELF_PORT:-13378}:80"
     restart: unless-stopped
     stop_grace_period: 30s
 

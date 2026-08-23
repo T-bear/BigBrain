@@ -67,6 +67,13 @@ public sealed class AudiobookTests
         Assert.Equal(AudiobookIntegrationStates.NotConfigured, overview.State);
     }
 
+    [Fact]
+    public async Task MissingLibraryItemReturnsNull()
+    {
+        var item = await Client(new HttpResponseMessage(HttpStatusCode.NotFound)).GetItemAsync("missing-item", CancellationToken.None);
+        Assert.Null(item);
+    }
+
     private static AudiobookDiscoveryResult Result(string edition, string language, string confidence, string? narrator = null) =>
         new("work", edition, "Title", "Author", narrator, language, AudiobookLanguages.DisplayName(language), null, null, null, "test", "available", confidence);
     private static AudiobookshelfClient Client(HttpResponseMessage response)
