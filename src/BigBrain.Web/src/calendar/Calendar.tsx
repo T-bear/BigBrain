@@ -4,14 +4,14 @@ import { confirmCalendarImport, getCalendarImports, getCalendarMonth, getCalenda
 
 const sv = new Intl.DateTimeFormat('sv-SE',{weekday:'short',day:'numeric',month:'short'})
 const monthName = new Intl.DateTimeFormat('sv-SE',{month:'long',year:'numeric'})
-const symbols:Record<string,{symbol:string;label:string}> = {
-  Day:{symbol:'☀️',label:'Dagpass'}, Evening:{symbol:'🌙',label:'Kvällspass'}, Education:{symbol:'📚',label:'Utbildning'}, Collaboration:{symbol:'🚗',label:'Samverkan'}, Vacation:{symbol:'🏖️',label:'Semester'}, Other:{symbol:'•',label:'Annan schemapost'}, Unknown:{symbol:'•',label:'Okänd schemapost'},
+const symbols:Record<string,{tone:string;label:string}> = {
+  Day:{tone:'day',label:'Dagpass'}, Evening:{tone:'evening',label:'Kvällspass'}, Education:{tone:'education',label:'Utbildning'}, Collaboration:{tone:'collaboration',label:'Samverkan'}, Vacation:{tone:'vacation',label:'Semester'}, Other:{tone:'other',label:'Annan schemapost'}, Unknown:{tone:'other',label:'Okänd schemapost'},
 }
 const errorText=(error:unknown)=> error instanceof ApiError ? ({calendarImportDuplicate:'Filen har redan importerats.',calendarImportConflict:'Två olika pass hittades för samma datum.',calendarImportExpiredPreview:'Importförhandsgranskningen har gått ut. Försök igen.',calendarImportTooLarge:'Filen är för stor.',calendarImportInvalidStructure:'Filen verkar inte vara ett Heroma-schema.',calendarImportNoEventsFound:'Inga schemaposter kunde hittas.'}[error.code] ?? error.message) : 'Kalendern kunde inte laddas.'
 const dateValue=(date:string)=>new Date(`${date}T12:00:00`)
 const eventTime=(event:CalendarEvent)=>event.startTime&&event.endTime?`${event.startTime.slice(0,5)}–${event.endTime.slice(0,5)}${event.endsNextDay?' (+1)':''}`:''
 
-function EventLine({event,compact=false}:{event:CalendarEvent;compact?:boolean}) { const visual=symbols[event.visualClassification]??symbols.Unknown; return <div className={`calendar-event ${compact?'calendar-event--compact':''}`}><span role="img" aria-label={visual.label}>{visual.symbol}</span><span>{event.title}{eventTime(event)&&<> · <time>{eventTime(event)}</time></>}</span></div> }
+function EventLine({event,compact=false}:{event:CalendarEvent;compact?:boolean}) { const visual=symbols[event.visualClassification]??symbols.Unknown; return <div className={`calendar-event ${compact?'calendar-event--compact':''}`}><span aria-hidden="true" className={`calendar-event__marker calendar-event__marker--${visual.tone}`}/><span className="sr-only">{visual.label}: </span><span>{event.title}{eventTime(event)&&<> · <time>{eventTime(event)}</time></>}</span></div> }
 
 export function CalendarWidget() {
   const [events,setEvents]=useState<CalendarEvent[]|null>(null),[error,setError]=useState(''),[open,setOpen]=useState(false)

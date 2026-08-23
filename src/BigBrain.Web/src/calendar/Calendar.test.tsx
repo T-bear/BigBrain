@@ -12,7 +12,8 @@ describe('CalendarWidget',()=>{
   it('shows the current week with accessible symbol and time',async()=>{
     render(<CalendarWidget/>)
     expect(await screen.findByText(/07:00–15:00/)).toBeInTheDocument()
-    expect(screen.getByRole('img',{name:'Dagpass'})).toHaveTextContent('☀️')
+    expect(screen.getByText('Dagpass:',{selector:'.sr-only'})).toBeInTheDocument()
+    expect(document.querySelector('.calendar-event__marker--day')).toBeInTheDocument()
     expect(screen.getByRole('button',{name:'Öppna kalender'})).toBeEnabled()
   })
 

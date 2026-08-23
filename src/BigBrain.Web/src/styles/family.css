@@ -55,6 +55,9 @@
 .family-section .calendar-week { gap:0; overflow:hidden; border-radius:14px; background:linear-gradient(145deg,var(--bb-color-surface),var(--bb-color-bg-subtle)); box-shadow:inset 0 1px rgb(255 255 255 / 5%),0 12px 30px rgb(0 0 0 / 20%); }
 .family-section .calendar-week li { min-height:58px; padding:9px 12px; border:0; border-radius:0; background:transparent; }
 .family-section .calendar-week li+li { border-top:1px solid rgb(255 255 255 / 5%); }
+.family-section .calendar-event__marker { width:7px; height:7px; flex:none; border:1px solid var(--bb-color-accent); border-radius:50%; box-shadow:0 0 0 2px var(--bb-color-accent-soft); }
+.family-section .calendar-event__marker--day,.family-section .calendar-event__marker--vacation { background:var(--bb-color-accent); }
+.family-section .calendar-event__marker--education { border-radius:2px; transform:rotate(45deg); }
 .family-section--reminders .widget-placeholder { min-height:0; justify-items:start; padding:13px 2px; text-align:left; }
 .family-section--reminders .widget-placeholder p { font-size:.82rem; font-weight:500; }
 .family-section--reminders .widget-placeholder span { font-size:.7rem; }
