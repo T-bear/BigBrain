@@ -58,6 +58,16 @@ Iteration 2 addressed only the largest remaining differences: Forest received a 
 
 Gold quantity did not increase: existing accents gained deep/main/champagne tonal roles only on the active dock glint, Today edge and semantic selection response. Body text, section surfaces and ordinary actions remain non-metallic. Forest remains predominantly neutral-black/deep pine, with smoked emerald, muted moss and a small cool atmospheric contribution rather than uniform green.
 
+### Owner-directed publication and deployment evidence
+
+Implementation commit `cdad8fcca5ed5742d97aadbb07b54b4628b0b867` passed GitHub Actions run 32626737721: backend, frontend, documentation and secrets all completed successfully. Local verification passed 115/115 frontend tests across 20 files, the frontend production build, 495 API tests, 32/32 Sentinel tests, Release build with zero warnings/errors, documentation verification over 174 Markdown files and 89 unique backlog IDs, Compose validation and `git diff --check`. Local gitleaks was unavailable; the authoritative CI secrets job passed.
+
+Only Web was rebuilt and recreated with `--no-deps`. Deployed image `sha256:a4c89f10d3e54c97d4d4fe91118f5235e96d858a49c32ff10311f2c145ed0fa4` is healthy; API and Sentinel remained healthy and were not recreated. Recovery reported `healthy`, previous shutdown `clean`, completed recovery, synchronized clock, no low-disk condition and zero interrupted jobs. The shared theme was restored to Obsidian Gold after validation.
+
+Opened deployed evidence is `/tmp/bb097-art-owner-deployed-obsidian-gold-390x844.png`, `/tmp/bb097-art-owner-deployed-forest-night-390x844.png` and their normal 620 CSS-pixel scroll frames. Both dark themes retained four Family sections, all four meal tabs, zero alerts and no horizontal overflow. Opened 430 × 932 counterparts retained the same composition; the dock measured 358 × 64 at 390 and 398 × 64 at 430. `/tmp/bb097-art-owner-deployed-arctic-wind-390x844.png` passed the requested readability/layout smoke test without an Arctic art-direction pass. Finance runtime remained `RESEARCH / 0 SEK / NONE`; the enabled scheduler and all Finance behavior were unchanged.
+
+The known iOS limitation is unchanged and is not hidden by desktop evidence: **FULL-PAGE IOS SAFARI SCREENSHOT ARTIFACT: STILL REPRODUCIBLE** for Obsidian Gold and Forest Night based on owner-provided real-iPhone evidence. Equivalent iOS Safari full-page stitching was unavailable locally, so no fix is claimed. Normal interaction and normal viewport captures remain unaffected. The owner-directed pass is technically complete; **OWNER VISUAL APPROVAL PENDING.**
+
 ### Premium refinement visual and deployment evidence
 
 The art-direction comparison ran two opened implementation iterations for each dark theme at both 390 × 844 and 430 × 932. Obsidian evidence is `/tmp/bb097-art-iteration1-obsidian-gold-390x844.png`, `/tmp/bb097-art-iteration2-obsidian-gold-390x844.png` and their 430 × 932 counterparts. Forest evidence follows the same `iteration1`/`iteration2` naming with `forest-night`. Additional normal 390 × 844 scroll frames at 620 and 1180 CSS pixels verified Today, weekend multi-meal rows, Shopping, Calendar and Reminders. The diagnostic, non-acceptance full-page capture is `/tmp/bb097-art-iteration2-forest-night-fullpage.png`.
