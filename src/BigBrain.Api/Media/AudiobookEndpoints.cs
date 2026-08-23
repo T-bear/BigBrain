@@ -14,16 +14,42 @@ public static class AudiobookEndpoints
             if (query?.Length > 120) return Problem("queryTooLong", "Sökningen får vara högst 120 tecken.");
             return Results.Ok(await client.GetLibraryAsync(normalizedPage, normalizedLimit, query, language, token));
         });
-        group.MapGet("/search", async (string? query, string? language, IAudiobookshelfClient client, IAudiobookAcquisitionProvider provider, CancellationToken token) =>
+        group.MapGet("/search", async (string? query, string? author, string? language, IAudiobookshelfClient client, AudiobookAcquisitionService acquisition, CancellationToken token) =>
         {
             var value = query?.Trim() ?? string.Empty;
             if (value.Length is < 2 or > 120) return Problem("invalidQuery", "Sökningen måste vara 2–120 tecken.");
             var normalizedLanguage = string.IsNullOrWhiteSpace(language) || language.Equals("all", StringComparison.OrdinalIgnoreCase) ? null : AudiobookLanguages.Normalize(language);
             var local = await client.GetLibraryAsync(0, 25, value, normalizedLanguage, token);
-            var capabilities = await provider.GetCapabilitiesAsync(token);
-            var discovery = capabilities.CanSearch ? await provider.SearchAsync(value, normalizedLanguage ?? AudiobookLanguages.Unknown, token) : [];
-            return Results.Ok(new { library = local.Items, discovery = AudiobookRanking.Rank(discovery), acquisition = capabilities });
+            AudiobookAcquisitionProviderStatus status;
+            IReadOnlyList<AudiobookAcquisitionCandidate> discovery;
+            try
+            {
+                status = await acquisition.StatusAsync(token);
+                discovery = await acquisition.SearchAsync(value, author, normalizedLanguage ?? AudiobookLanguages.Unknown, token);
+            }
+            catch (AudiobookAcquisitionException exception)
+            {
+                status = new("unavailable", "unknown", false, false, false, exception.SafeMessage);
+                discovery = [];
+            }
+            return Results.Ok(new { library = local.Items, discovery, acquisition = status });
         });
+        group.MapGet("/acquisition/provider-status", async (AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            Results.Ok(await acquisition.StatusAsync(token)));
+        group.MapPost("/acquisition/search", (AudiobookAcquisitionSearchInput input, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            Execute(async () => Results.Ok(await acquisition.SearchAsync(input.Query ?? "", input.Author, input.Language ?? AudiobookLanguages.Unknown, token))));
+        group.MapPost("/acquisition/jobs", (AudiobookAcquisitionCandidate input, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            Execute(async () =>
+            {
+                var job = await acquisition.RequestAsync(input, token);
+                return Results.Created($"/api/v1/modules/media/audiobooks/acquisition/jobs/{job.Id}", job);
+            }));
+        group.MapGet("/acquisition/jobs", (int? offset, int? limit, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            Execute(async () => Results.Ok(await acquisition.ListAsync(Math.Max(0, offset ?? 0), Math.Clamp(limit ?? 25, 1, 50), token))));
+        group.MapGet("/acquisition/jobs/{id}", (string id, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            SafeId(id) ? Execute(async () => Results.Ok(await acquisition.GetAsync(id, token))) : Task.FromResult(Problem("invalidJobId", "Jobb-ID är ogiltigt.")));
+        group.MapPost("/acquisition/jobs/{id}/cancel", (string id, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+            SafeId(id) ? Execute(async () => Results.Ok(await acquisition.CancelAsync(id, token))) : Task.FromResult(Problem("invalidJobId", "Jobb-ID är ogiltigt.")));
         group.MapGet("/{id}", async (string id, IAudiobookshelfClient client, CancellationToken token) =>
             await client.GetItemAsync(id, token) is { } item ? Results.Ok(item) : Results.NotFound());
         group.MapGet("/{id}/cover", async (string id, IAudiobookshelfClient client, HttpContext context, CancellationToken token) =>
@@ -41,4 +67,17 @@ public static class AudiobookEndpoints
         title: "Audiobook request could not be completed",
         detail: detail,
         extensions: new Dictionary<string, object?> { ["code"] = code });
+
+    private static async Task<IResult> Execute(Func<Task<IResult>> action)
+    {
+        try { return await action(); }
+        catch (AudiobookAcquisitionException exception)
+        {
+            return Results.Problem(statusCode: exception.StatusCode, title: "Audiobook acquisition could not be completed",
+                detail: exception.SafeMessage, extensions: new Dictionary<string, object?> { ["code"] = exception.Code });
+        }
+    }
+    private static bool SafeId(string value) => value.Length is > 0 and <= 64 && value.All(char.IsLetterOrDigit);
 }
+
+public sealed record AudiobookAcquisitionSearchInput(string? Query, string? Author, string? Language);

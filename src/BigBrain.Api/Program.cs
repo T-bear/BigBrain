@@ -92,6 +92,9 @@ public partial class Program
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
         AddMediaClient<IAudiobookshelfClient, AudiobookshelfClient>(builder.Services, "Audiobookshelf", options => options.Audiobookshelf.BaseUrl);
         builder.Services.AddSingleton<IAudiobookAcquisitionProvider, NoAudiobookAcquisitionProvider>();
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<AudiobookAcquisitionStore>();
+        builder.Services.AddSingleton<AudiobookAcquisitionService>();
         builder.Services.AddHttpClient<IQBittorrentClient, QBittorrentClient>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();

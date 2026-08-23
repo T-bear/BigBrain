@@ -1,5 +1,13 @@
 # Testa BigBrain
 
+## BB-101 audiobook acquisition foundation
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --filter FullyQualifiedName~Audiobook --no-restore` covers provider None, bounded search, Swedish/English/unknown ranking, narrator/edition distinction, stable job IDs, state mapping, controlled provider failure, missing-job 404, cancellation and safe import paths including no-overwrite.
+- The complete API suite proves the new store and provider boundary do not alter existing modules. Provider fixtures are network-free and never download media.
+- `npm test -- --run src/audiobooks/Audiobooks.test.tsx` covers actual Media registry placement, Swedish-default search, explicit provider-unavailable UI, absence of fake progress, edition detail and disabled request controls.
+- Runtime verification must preserve BB-100 `configuredHealthy`, show provider `NotConfigured`, return an empty job list, reject a fabricated request without persisting a job and inspect Media/Ljudböcker at 390 × 844 and 430 × 932 in all three themes.
+- No real provider is part of ordinary validation. Installing one requires an owner decision plus a separate maintenance/API/security review.
+
 ## BB-100 audiobook platform foundation
 
 - `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore` covers network-free ABS mapping/degradation, auth failures, malformed payloads, provider None, language normalization/ranking and edition distinction.

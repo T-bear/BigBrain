@@ -6,7 +6,22 @@ Audiobookshelf owns audiobook files, metadata and listening progress. BigBrain W
 
 Language identifiers are normalized (`sv`, `en`, `de`, `und`). Audio-edition language is not inferred from a translated work title; unknown stays explicit. Narrator and edition IDs remain distinct metadata. Acquisition is behind `IAudiobookAcquisitionProvider`; BB-100 registers the safe None provider and does not request or download anything.
 
-Future flow (not implemented): discovery → explicit edition/language confirmation → provider → qBittorrent → `/srv/media/audiobooks` → ABS scan → BigBrain library.
+## Anskaffningsflöde (BB-101)
+
+BB-101 extends the existing boundary without selecting a third party. `IAudiobookAcquisitionProvider` truthfully reports status and capabilities and can support bounded search, explicit edition request, provider-job status and safe cancellation. The active implementation is still provider `None / NotConfigured`; library search continues to work, while request creation returns controlled Problem Details and persists no fake job.
+
+BigBrain owns `AudiobookAcquisitionCandidate`, `AudiobookAcquisitionJob` and stable job IDs. Candidate metadata keeps title, author, narrator, normalized audio language, edition, source and confidence distinct. Jobs use the existing API SQLite persistence volume, are bounded in list APIs and never contain credentials. The Web UI defaults to Swedish, permits English/all-language selection, shows local and provider results separately and renders activity only for actual stored jobs.
+
+Endpoints:
+
+- `GET /api/v1/modules/media/audiobooks/acquisition/provider-status`
+- `POST /api/v1/modules/media/audiobooks/acquisition/search`
+- `POST /api/v1/modules/media/audiobooks/acquisition/jobs`
+- `GET /api/v1/modules/media/audiobooks/acquisition/jobs`
+- `GET /api/v1/modules/media/audiobooks/acquisition/jobs/{id}`
+- `POST /api/v1/modules/media/audiobooks/acquisition/jobs/{id}/cancel`
+
+Future provider flow: discovery → explicit edition/language confirmation → approved provider → qBittorrent under provider control → validated relative output under `/srv/media/audiobooks` → ABS scan → BigBrain library. Web cannot provide filesystem paths or arbitrary URLs. Traversal and an existing import destination fail closed; existing books are never overwritten. Import movement and ABS rescan are intentionally not simulated before a real provider is approved.
 
 ## Sprint 4 – Media Experience
 

@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-101` — [Audiobook Acquisition Foundation](features/media/bb-101-audiobook-acquisition-foundation-20260823.md)
 - `BB-100` — [Audiobooks Platform Foundation](features/media/bb-100-audiobooks-platform-foundation-20260823.md)
 
 - `BB-096` — [BigBrain UX Sprint v1 / Unified Design System](features/dashboard/bb-096-unified-design-system-20260822.md)

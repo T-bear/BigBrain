@@ -45,17 +45,23 @@ public sealed record AudiobookDiscoveryResult(
 
 public interface IAudiobookAcquisitionProvider
 {
-    Task<AudiobookAcquisitionCapabilities> GetCapabilitiesAsync(CancellationToken token);
-    Task<IReadOnlyList<AudiobookDiscoveryResult>> SearchAsync(string query, string language, CancellationToken token);
+    Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token);
+    Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token);
+    Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request, CancellationToken token);
+    Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId, CancellationToken token);
+    Task<AudiobookProviderJob> CancelAsync(string providerJobId, CancellationToken token);
 }
 
 public sealed class NoAudiobookAcquisitionProvider : IAudiobookAcquisitionProvider
 {
-    private static readonly AudiobookAcquisitionCapabilities Capabilities =
-        new("notConfigured", false, false, "Ingen granskad anskaffningsleverantör är konfigurerad.");
-    public Task<AudiobookAcquisitionCapabilities> GetCapabilitiesAsync(CancellationToken token) => Task.FromResult(Capabilities);
-    public Task<IReadOnlyList<AudiobookDiscoveryResult>> SearchAsync(string query, string language, CancellationToken token) =>
-        Task.FromResult<IReadOnlyList<AudiobookDiscoveryResult>>([]);
+    private static readonly AudiobookAcquisitionProviderStatus Status =
+        new("notConfigured", "none", false, false, false, "Ingen granskad anskaffningsleverantör är konfigurerad.");
+    public Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token) => Task.FromResult(Status);
+    public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token) => Task.FromResult<IReadOnlyList<AudiobookAcquisitionCandidate>>([]);
+    public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request, CancellationToken token) => throw Unavailable();
+    public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId, CancellationToken token) => Task.FromResult<AudiobookProviderJob?>(null);
+    public Task<AudiobookProviderJob> CancelAsync(string providerJobId, CancellationToken token) => throw Unavailable();
+    private static AudiobookAcquisitionException Unavailable() => new("providerNotConfigured", Status.Message!, StatusCodes.Status409Conflict);
 }
 
 public interface IAudiobookshelfClient
@@ -73,7 +79,13 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
 
     public async Task<AudiobookOverview> GetOverviewAsync(CancellationToken token)
     {
-        var capabilities = await acquisition.GetCapabilitiesAsync(token);
+        AudiobookAcquisitionProviderStatus providerStatus;
+        try { providerStatus = await acquisition.GetStatusAsync(token); }
+        catch (AudiobookAcquisitionException exception)
+        {
+            providerStatus = new("unavailable", "unknown", false, false, false, exception.SafeMessage);
+        }
+        var capabilities = new AudiobookAcquisitionCapabilities(providerStatus.State, providerStatus.CanSearch, providerStatus.CanRequest, providerStatus.Message);
         if (!Configured) return new(AudiobookIntegrationStates.NotConfigured, "Audiobookshelf är inte konfigurerat.", null, [], [], capabilities);
         try
         {
@@ -190,8 +202,9 @@ public static class AudiobookRanking
 {
     public static IReadOnlyList<AudiobookDiscoveryResult> Rank(IEnumerable<AudiobookDiscoveryResult> values, string preferred = "sv", string fallback = "en") =>
         values.OrderBy(x => Score(x, preferred, fallback)).ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase).ThenBy(x => x.EditionId, StringComparer.Ordinal).ToArray();
-    private static int Score(AudiobookDiscoveryResult value, string preferred, string fallback) =>
-        value.Language == AudiobookLanguages.Normalize(preferred) && value.LanguageConfidence == "verified" ? 0 :
-        value.Language == AudiobookLanguages.Normalize(fallback) && value.LanguageConfidence == "verified" ? 1 :
-        value.Language != AudiobookLanguages.Unknown ? 2 : 3;
+    private static int Score(AudiobookDiscoveryResult value, string preferred, string fallback) => Score(value.Language, value.LanguageConfidence, preferred, fallback);
+    public static int Score(string language, string confidence, string preferred = "sv", string fallback = "en") =>
+        language == AudiobookLanguages.Normalize(preferred) && confidence == "verified" ? 0 :
+        language == AudiobookLanguages.Normalize(fallback) && confidence == "verified" ? 1 :
+        language != AudiobookLanguages.Unknown ? 2 : 3;
 }

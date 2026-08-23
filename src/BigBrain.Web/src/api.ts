@@ -123,7 +123,10 @@ export const getMediaServiceLinks = (signal?: AbortSignal) =>
   getJson<MediaServiceLink[]>('/api/v1/modules/media/service-links', signal)
 
 export const getAudiobookOverview = (signal?: AbortSignal) => getJson<AudiobookOverview>('/api/v1/modules/media/audiobooks/overview',signal)
-export const searchAudiobooks = (query:string,language:string,signal?:AbortSignal) => getJson<AudiobookSearchResponse>(`/api/v1/modules/media/audiobooks/search?query=${encodeURIComponent(query.trim())}&language=${encodeURIComponent(language)}`,signal)
+export const searchAudiobooks = (query:string,language:string,author:string,signal?:AbortSignal) => getJson<AudiobookSearchResponse>(`/api/v1/modules/media/audiobooks/search?query=${encodeURIComponent(query.trim())}&author=${encodeURIComponent(author.trim())}&language=${encodeURIComponent(language)}`,signal)
+export const getAudiobookAcquisitionStatus = (signal?:AbortSignal) => getJson<import('./types').AudiobookAcquisitionProviderStatus>('/api/v1/modules/media/audiobooks/acquisition/provider-status',signal)
+export const getAudiobookAcquisitionJobs = (signal?:AbortSignal) => getJson<import('./types').AudiobookAcquisitionJobPage>('/api/v1/modules/media/audiobooks/acquisition/jobs?offset=0&limit=25',signal)
+export const requestAudiobookAcquisition = (candidate:import('./types').AudiobookAcquisitionCandidate) => sendJson<import('./types').AudiobookAcquisitionJob>('/api/v1/modules/media/audiobooks/acquisition/jobs','POST',candidate)
 export const getAudiobookLanguages = (signal?:AbortSignal) => getJson<{preferredLanguage:string;fallbackLanguage:string}>('/api/v1/settings/audiobooks/languages',signal)
 export const setAudiobookLanguages = (preferredLanguage:string,fallbackLanguage:string) => sendJson<{preferredLanguage:string;fallbackLanguage:string}>('/api/v1/settings/audiobooks/languages','PUT',{preferredLanguage,fallbackLanguage})
 

@@ -56,6 +56,7 @@ public sealed class AudiobookshelfOptions
     public string? LibraryId { get; init; }
     public string? PublicUrl { get; init; }
     public int PageSize { get; init; } = 24;
+    public string AcquisitionDatabasePath { get; init; } = "/data/audiobook-acquisition.db";
 }
 
 public sealed class MediaRequestOptions

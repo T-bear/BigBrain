@@ -388,7 +388,11 @@ export interface MediaServiceLink {
 export interface AudiobookItem { id:string; title:string; author:string|null; series:string|null; narrator:string|null; language:string; languageLabel:string; durationSeconds:number|null; progressPercent:number|null; description:string|null; coverUrl:string|null; publishedYear:string|null; isAbridged:boolean|null; playbackUrl:string|null }
 export interface AudiobookAcquisitionCapabilities { state:string; canSearch:boolean; canRequest:boolean; message:string|null }
 export interface AudiobookOverview { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'; message:string|null; continueListening:AudiobookItem|null; library:AudiobookItem[]; recent:AudiobookItem[]; acquisition:AudiobookAcquisitionCapabilities }
-export interface AudiobookSearchResponse { library:AudiobookItem[]; discovery:unknown[]; acquisition:AudiobookAcquisitionCapabilities }
+export interface AudiobookAcquisitionProviderStatus extends AudiobookAcquisitionCapabilities { provider:string; canCancel:boolean }
+export interface AudiobookAcquisitionCandidate { workId:string; editionId:string; title:string; author:string|null; narrator:string|null; language:string; languageLabel:string; edition:string|null; durationSeconds:number|null; publicationYear:number|null; coverUrl:string|null; source:string; availability:string; languageConfidence:string }
+export interface AudiobookAcquisitionJob { id:string; providerJobId:string|null; candidate:AudiobookAcquisitionCandidate; status:string; createdAtUtc:string; updatedAtUtc:string; message:string|null }
+export interface AudiobookAcquisitionJobPage { items:AudiobookAcquisitionJob[]; offset:number; limit:number; total:number }
+export interface AudiobookSearchResponse { library:AudiobookItem[]; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
 
 export interface MediaAddOption {
   id: string

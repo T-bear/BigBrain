@@ -2,16 +2,17 @@
 
 ## BB-100 — Audiobooks Platform Foundation
 
-- Status: Tekniskt implementerad, publicerad, CI-verifierad och foundation-deployad 2026-08-23. Audiobookshelf first-run/library/API identity requires the documented owner action; integration state is truthfully `NotConfigured` until then.
+- Status: Tekniskt implementerad, publicerad, CI-verifierad, deployad och commissionad 2026-08-23. Audiobookshelf och BigBrains läsflöde är `configuredHealthy`; anskaffningsleverantören är separat och sanningsenligt `NotConfigured`.
 - Scope: Audiobookshelf library/progress/continue listening, BigBrain-owned API and premium Media/Ljudböcker UX, normalized language and edition contracts, secure cover proxy, persisted language preference and provider abstraction.
 - Provider decision: `None`. Official Readarr is retired. Chaptarr, Librarr/Librarry and resurrected forks remain too immature or operationally/security-sensitive for an unattended dependency in this slice.
 - Safety: no acquisition/download request exists; Prowlarr and qBittorrent are unchanged. BB-099 remains owner-review pending.
 
 ## BB-101 — Audiobook Acquisition & Automation
 
-- Status: Planerad framtida slice; inte påbörjad och inte godkänd för implementation.
-- Candidate scope: security-reviewed provider selection, explicit edition/language request, bounded download status, import reconciliation, Audiobookshelf rescan and optional Home continue-listening summary.
-- Gate: provider maintenance/API/security evidence and owner approval are required before implementation.
+- Status: Provider-neutral foundation implementerad och automatiskt verifierad 2026-08-23; publication, CI och deployment verifieras innan teknisk stängning. Ingen anskaffningsleverantör är vald eller aktiverad.
+- Scope: BigBrain-owned sök-/utgåvemodell, beständiga jobb, providerstatus, request/status/cancel-kontrakt, säkra API-gränser och ett mobilanpassat Media/Ljudböcker-flöde. Provider `None` skapar aldrig falska jobb eller progress.
+- Import boundary: framtida provideroutput får endast lösas relativt den serverstyrda importroten; traversal och överskrivning av befintligt innehåll avvisas. Automatisk flytt/rescan kräver en faktisk godkänd provider och är inte simulerad.
+- Gate: en provider måste erbjuda underhållen och autentiserad API/Docker-distribution, tydlig språk-/utgåve-/uppläsarmetadata, säkert status/cancel-flöde, Prowlarr/qBittorrent-orkestrering och kontrollerad output till importroten. Ägarbeslut och säkerhetsgranskning krävs före installation.
 
 ### BB-089 – M5 Hard Risk Engine foundation
 
