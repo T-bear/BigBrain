@@ -4,14 +4,14 @@
 
 - Date: 2026-08-23
 - Scope: Family frontend presentation and Obsidian Gold reference validation
-- Related commit: pending
+- Related commits: `d29f0f88253752809042d0c5687e6d1b2d6b1d1a`, `cb9c9caa0efc66119616767bc3d9507d9a83562b`
 
 ## Status
 
-- Implemented: yes, locally
-- Tested: frontend suite and production build passed before the final test/documentation delta; final full rerun pending
-- Deployed: no
-- Manually verified: local fixture-backed browser composition only
+- Implemented: yes
+- Tested: full local suite and two GitHub Actions runs passed
+- Deployed: yes, Web only; volumes and other services preserved
+- Manually verified: local fixture-backed comparison and deployed PWA browser review
 - Owner approved: no
 
 ## Why BB-096 was insufficient
@@ -49,19 +49,21 @@ No Family backend, API contract, Finance behavior or mock production data change
 
 Iteration 1 rendered the new structure at 390 × 844, 430 × 932 and 1440 × 900 and exposed two dominant defects: preview API errors obscured the real density, and inherited button specificity turned every meal tab gold. Iteration 2 used sanitized production-shaped Swedish fixture data, corrected the tab hierarchy and was opened beside the source mockup. At 390 × 844 the view has no horizontal overflow, a 358 × 64 dock above the bottom edge, a compact 149 px header/context lead-in and a single 346 px-wide meal material. Five weekdays plus the start of the weekend remain visible before the dock; the remainder scrolls naturally. At 430 × 932 widths and spacing remain stable rather than stretching awkwardly. At 1440 × 900 the sidebar remains and Family becomes an intentionally bounded two-column composition; horizontal overflow is absent.
 
-Local screenshot evidence is retained outside the repository at `/tmp/bb097-family-390x844-iteration2.png`, `/tmp/bb097-family-430x932-iteration2.png` and `/tmp/bb097-family-1440x900-iteration2.png`. These are fixture-backed implementation evidence, not deployed evidence or mockup source artifacts.
+Local fixture-backed comparison evidence is retained at `/tmp/bb097-family-390x844-iteration2.png`, `/tmp/bb097-family-430x932-iteration2.png` and `/tmp/bb097-family-1440x900-iteration2.png`. Deployed evidence is `/tmp/bb097-deployed-family-390x844.png`, `/tmp/bb097-deployed-family-430x932.png` and `/tmp/bb097-deployed-family-1440x900.png`. These runtime screenshots are intentionally not publication artifacts.
 
 Known visual differences are deliberate or pending owner judgment: the production meal week is denser and more operational than the mockup's summary treatment; Family does not copy the mockup's sample alert/people data because no matching Family API contract exists; the center BigBrain AI dock emblem is not enlarged because BB-097 preserves the five agreed destinations and does not redesign global AI navigation.
 
 ### Verification state
 
 - Frontend: 115 tests passed; production build passed.
+- Backend: 495 API and 32 Sentinel tests passed; Release build passed with zero warnings/errors.
 - Accessibility: semantic heading/regions, labeled settings, touch-size controls, keyboard tablist, focus-visible foundation, non-color today label and reduced-motion handling retained.
 - Arctic Wind / Forest Night: shared semantic tokens remain compatible; no cross-theme redesign performed.
-- CI: pending publication.
-- Finance runtime safety: pending pre-deployment read-only verification.
-- Appliance deployment and deployed screenshot: pending.
-- Technical completion: **NO — pending CI and deployment evidence.**
+- CI: GitHub Actions runs 32618788138 and 32619102449 passed backend, frontend, documentation and secrets.
+- Finance runtime safety: `RESEARCH / 0 SEK / NONE`, zero experiments before and after Web recreation; scheduler configuration/operation unchanged.
+- Appliance deployment: final Web image `sha256:5f37b814b1ccb03dcd25353721a4ddd42e94a0f5bcea257f2b3389e59775f312` healthy; API/Sentinel/volumes/external services untouched; recovery healthy/clean.
+- Deployed PWA: real Family data, Obsidian Gold, four sections, four meal tabs, no alerts or horizontal overflow at 390 × 844, 430 × 932 and 1440 × 900.
+- Technical completion: **YES.**
 - **OWNER VISUAL APPROVAL PENDING.**
 
 ## Security
@@ -72,8 +74,8 @@ This report is sanitized. It contains no secrets, credentials, private runtime i
 
 ## Remaining work
 
-Run final full validation, publish and confirm GitHub Actions, verify Finance authority, deploy without removing volumes, render the served PWA at the acceptance viewport and request owner visual approval. BB-097 remains the only active design-reference work item; no other module rollout is authorized.
+Request owner visual approval. BB-097 remains the only design-reference work item; no other module rollout is authorized.
 
 ## Resumption
 
-Authoritative context is `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/architecture/family-view-family-coordination.md`, this report and the BB-096 implementation/deployment reports. The smallest safe next step is final local validation, followed by a scoped commit/push and CI inspection; only then may the documented appliance deployment proceed.
+Authoritative context is `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/architecture/family-view-family-coordination.md`, this report and the BB-096 implementation/deployment reports. The smallest safe next step is owner review of the deployed Family reference. Stop before any other module or theme rollout.

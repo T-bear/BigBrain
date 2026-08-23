@@ -2202,7 +2202,7 @@ Local regression passed 475 API, 32 Sentinel and 115 frontend tests plus all app
 
 # BB-097 — Premium UX Reference: Family / Obsidian Gold
 
-**Status (2026-08-23): IN PROGRESS — implementation and local visual validation complete; CI, appliance deployment and owner visual approval pending.**
+**Status (2026-08-23): TECHNICALLY COMPLETE — owner visual approval pending.** Implementation commits `d29f0f88253752809042d0c5687e6d1b2d6b1d1a` and `cb9c9caa0efc66119616767bc3d9507d9a83562b` passed GitHub Actions runs 32618788138 and 32619102449. The latter Web image was deployed without touching volumes, API, Sentinel, Finance or external services; deployed Obsidian Gold Family checks passed at 390 × 844, 430 × 932 and 1440 × 900. This status does not constitute product-owner visual approval and authorizes no rollout to another module.
 
 BB-096 established the shared shell, navigation, themes and semantic token contract, but its Family view retained the legacy dashboard information architecture: four generic widgets, stacked accordion/module wrappers, nested cards, repeated borders and mechanically repeated headings. The result was predominantly a reskin. BB-097 makes Family the single canonical design-reference candidate and replaces that presentation architecture without changing Family APIs or backend behavior.
 
