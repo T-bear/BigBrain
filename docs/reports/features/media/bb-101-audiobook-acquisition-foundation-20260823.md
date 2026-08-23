@@ -9,7 +9,7 @@
 
 ## Status
 
-BB-101 implements the smallest safe vertical slice that does not require an unapproved third party. Audiobookshelf remains solely the library, metadata, playback and progress system. BigBrain owns discovery candidates, explicit edition selection, acquisition jobs and the Web/API contract. The runtime provider remains `None / NotConfigured`; request controls are unavailable, no request is represented as successful and no download/import progress is fabricated.
+BB-101 is technically complete, published, CI-verified and deployed as `1ef411a99a6b57e057099597366aaa64004bc801`. It implements the smallest safe vertical slice that does not require an unapproved third party. Audiobookshelf remains solely the library, metadata, playback and progress system. BigBrain owns discovery candidates, explicit edition selection, acquisition jobs and the Web/API contract. The runtime provider remains `None / NotConfigured`; request controls are unavailable, no request is represented as successful and no download/import progress is fabricated.
 
 A provider decision remains an explicit owner gate. A viable provider must have current maintenance evidence, a versioned authenticated API, Docker support, reliable audiobook edition/language/narrator metadata, status and safe cancellation capabilities, normal Prowlarr/qBittorrent orchestration, controlled output beneath the configured import root and a reviewed security posture. Readarr remains retired and is not selected. No Chaptarr, Librarr/Librarry, Readarr fork or native download adapter was installed in this slice.
 
@@ -29,13 +29,17 @@ The actual registry-composed Media/Ljudböcker view retains BB-100 library/conti
 
 ## Evidence
 
-Local automated verification on 2026-08-23 passed 20 focused audiobook API tests, 515 complete API tests, 125 Web tests and 32 Sentinel tests. The Vite production build passed; the complete Release solution build passed with zero warnings and errors. Documentation verification passed 180 Markdown files and 89 unique BB IDs; Compose and diff checks passed. Publication CI, deployment and runtime/browser evidence are appended only after those checks actually complete.
+Local automated verification on 2026-08-23 passed 20 focused audiobook API tests, 515 complete API tests, 125 Web tests and 32 Sentinel tests. The Vite production build passed; the complete Release solution build passed with zero warnings and errors. Documentation verification passed 180 Markdown files and 89 unique BB IDs; Compose and diff checks passed. GitHub Actions run `32655261525` passed backend, frontend, documentation and secrets.
+
+Only API and Web were built/recreated. Their deployed images are `sha256:77bc7249fb62635c28ecd1ea2b67d001ca8b23a029c630868d54d195f808ea9d` and `sha256:cb17d65b96bd323a2cebc89cc26624392393c3ef21fa8d1102d3c0e032acb4f7`; both containers are healthy. Audiobookshelf was not recreated and reports `configuredHealthy` through BigBrain. Provider status is `none / notConfigured`, job count is zero, local Swedish search returns a truthful empty result and a synthetic bounded request returns controlled HTTP 409 `providerNotConfigured` without creating a job. Cover proxy missing-item behavior remains controlled 404.
+
+Deployed normal-viewport browser QA covered Obsidian Gold, Forest Night and Arctic Wind at 390 × 844 and 430 × 932. All six runs showed connected empty-library state, Swedish default, explicit provider-unavailable explanation, no fake progress, no horizontal overflow and the last audiobook control fully above the dock. The reviewed images are `/tmp/bb101-{theme}-audiobooks-{390x844,430x932}-{normal,searched}.png`; these are local runtime evidence, not tracked artifacts. Obsidian Gold was restored. Deployed Home, Family, Media, Finance and More routes rendered without console errors or overflow; Media retained Ljudböcker, Downloads, Smart Shuffle, Jellyfin, Sonarr, Radarr and Prowlarr surfaces.
 
 ## Security
 
 Detta är en sanerad GitHub-version. No secret, private address, raw production identifier, credential, log payload or private audiobook title is included.
 
-BB-100's commissioned Audiobookshelf configuration, restricted service identity, server-side key, tailnet-only owner access and persistent volumes are unchanged. Existing Jellyfin/Sonarr/Radarr/Prowlarr/qBittorrent contracts are unchanged. Finance, its scheduler/governor and execution authority are outside the diff. BB-099 remains **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**. The independent Sentinel socket/runtime incident is not remediated by BB-101 and must be reported from current runtime truth.
+BB-100's commissioned Audiobookshelf configuration, restricted service identity, server-side key, tailnet-only owner access and persistent volumes are unchanged. Existing Jellyfin/Sonarr/Radarr/Prowlarr/qBittorrent contracts are unchanged and all five services report online after deployment. Finance remains `RESEARCH / 0 SEK / NONE`; scheduler is enabled and idle, and the governor remains active with no execution authority. BB-099 remains **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**. The independent Sentinel socket runtime problem remains visible as a restarting container and was neither caused nor remediated by BB-101.
 
 ## Remaining work
 

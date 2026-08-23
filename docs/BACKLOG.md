@@ -9,7 +9,7 @@
 
 ## BB-101 — Audiobook Acquisition & Automation
 
-- Status: Provider-neutral foundation implementerad och automatiskt verifierad 2026-08-23; publication, CI och deployment verifieras innan teknisk stängning. Ingen anskaffningsleverantör är vald eller aktiverad.
+- Status: Provider-neutral foundation tekniskt komplett, publicerad, CI-verifierad och deployad 2026-08-23 i `1ef411a99a6b57e057099597366aaa64004bc801`. Ingen anskaffningsleverantör är vald eller aktiverad; providerbeslutet är nästa ägargate.
 - Scope: BigBrain-owned sök-/utgåvemodell, beständiga jobb, providerstatus, request/status/cancel-kontrakt, säkra API-gränser och ett mobilanpassat Media/Ljudböcker-flöde. Provider `None` skapar aldrig falska jobb eller progress.
 - Import boundary: framtida provideroutput får endast lösas relativt den serverstyrda importroten; traversal och överskrivning av befintligt innehåll avvisas. Automatisk flytt/rescan kräver en faktisk godkänd provider och är inte simulerad.
 - Gate: en provider måste erbjuda underhållen och autentiserad API/Docker-distribution, tydlig språk-/utgåve-/uppläsarmetadata, säkert status/cancel-flöde, Prowlarr/qBittorrent-orkestrering och kontrollerad output till importroten. Ägarbeslut och säkerhetsgranskning krävs före installation.
