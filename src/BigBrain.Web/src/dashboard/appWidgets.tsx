@@ -10,10 +10,11 @@ import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
 import { CalendarWidget } from '../calendar/Calendar'
 import { FinanceObservation } from '../finance/FinanceObservation'
 import { SystemRecovery } from '../system-recovery/SystemRecovery'
-import { ApplicationWidgetRegistry, DashboardRegistry, type WidgetDefinition } from './widgetFramework'
+import { ApplicationWidgetRegistry, DashboardRegistry } from './widgetFramework'
 import { AppIcon } from '../AppIcon'
 import { useWidgets } from './widgetFramework'
 import { ThemeControl } from '../ThemeControl'
+import { HomeOverview } from './HomeOverview'
 
 export interface AppWidgetData {
   docker: DockerInventory | null
@@ -45,6 +46,16 @@ function formatUptime(seconds: number | null) {
 
 function PlannedWidget({ text }: { text: string }) {
   return <div className="widget-placeholder"><p>{text}</p><span>Förberedd för en kommande modul</span></div>
+}
+
+function AIOverview() {
+  const planned = [
+    ['AI-chatt', 'Samtal med en framtida deklarerad assistent.'],
+    ['Agenter', 'Överblick över framtida auktoriserade agenter.'],
+    ['Röstassistent', 'Röststyrning är ännu inte tillgänglig.'],
+    ['Förslag och automationer', 'Inga automationer utförs utan deklarerad capability och godkännande.'],
+  ]
+  return <section aria-labelledby="ai-current-title" className="ai-overview"><header><p className="eyebrow">Nuvarande läge</p><h2 id="ai-current-title">AI-funktioner är planerade</h2><p>BigBrain visar inga kontroller förrän en verklig, auktoriserad capability finns.</p></header><ul>{planned.map(([title, detail]) => <li key={title}><strong>{title}</strong><span>{detail}</span></li>)}</ul></section>
 }
 
 function SystemWidget({ data }: { data: AppWidgetData }) {
@@ -85,27 +96,14 @@ export const dashboardRegistry = new DashboardRegistry([
   { id: 'admin', title: 'Admin', description: 'System, tjänster och drift', icon: 'admin' },
 ])
 
-function HomeLauncher({ data }: { data: AppWidgetData }) {
-  const { setActiveView } = useWidgets()
-  const items = [
-    { id: 'family' as const, icon: 'family' as const, title: 'Familj', detail: 'Mat, inköp och kalender' },
-    { id: 'media' as const, icon: 'media' as const, title: 'Media', detail: 'Sök, spela och följ flöden' },
-    { id: 'finance' as const, icon: 'finance' as const, title: 'Finance', detail: 'RESEARCH · inga riktiga pengar' },
-  ]
-  return <div className="module-launcher">{items.map(item => <BBButton key={item.id} onClick={() => setActiveView(item.id)} type="button" variant="contextual"><AppIcon name={item.icon} size={26} /><span><strong>{item.title}</strong><small>{item.detail}</small></span><AppIcon name="chevron" /></BBButton>)}{data.recovery && data.recovery.overall !== 'healthy' && <BBButton className="module-launcher__attention" onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Systemet behöver uppmärksamhet</strong><small>{data.recovery.overall}</small></span><AppIcon name="chevron" /></BBButton>}</div>
-}
-
 function MoreNavigation() {
   const { setActiveView } = useWidgets()
   return <div className="more-hub"><div className="module-launcher"><BBButton onClick={() => setActiveView('ai')} type="button" variant="contextual"><AppIcon name="ai" /><span><strong>BigBrain AI</strong><small>Befintliga och planerade AI-funktioner</small></span><AppIcon name="chevron" /></BBButton><BBButton onClick={() => setActiveView('admin')} type="button" variant="contextual"><AppIcon name="admin" /><span><strong>Admin</strong><small>System, recovery och integrationer</small></span><AppIcon name="chevron" /></BBButton></div><BBSurface aria-labelledby="theme-heading" className="settings-surface" as="section"><div><AppIcon name="settings" /><h3 id="theme-heading">Utseende</h3></div><ThemeControl /></BBSurface></div>
 }
 
 export function createAppWidgetRegistry(data: AppWidgetData) {
-  const planned = (id: string, title: string, description: string, icon: string, defaultView: 'home' | 'ai'): WidgetDefinition => ({
-    id, title, description, icon, category: defaultView === 'home' ? 'Familj' : 'AI', defaultView, defaultSize: 'medium', minimumSize: 'small', supportedViews: [defaultView], permissions: [], render: () => <PlannedWidget text={description} />,
-  })
   return new ApplicationWidgetRegistry([
-    { id: 'home-launcher', title: 'BigBrain', description: 'Välj område.', icon: '⌂', category: 'Översikt', defaultView: 'home', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <HomeLauncher data={data} /> },
+    { id: 'home-launcher', title: 'Just nu', description: 'Det viktigaste i BigBrain.', icon: '⌂', category: 'Översikt', defaultView: 'home', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['home'], permissions: [], render: () => <HomeOverview recovery={data.recovery} /> },
     { id: 'meal-plan', title: 'Matlista', description: 'Planera familjens måltider.', icon: '◫', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: [], render: () => <MealPlanner expanded onToggle={() => undefined} presentation="family" status={data.modules.find(module => module.id === 'meal-planner')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
     { id: 'shopping-list', title: 'Inköpslista', description: 'Familjens aktiva inköpslista.', icon: '✓', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: [], render: () => <ShoppingList expanded onToggle={() => undefined} presentation="family" status={data.modules.find(module => module.id === 'shopping-list')?.status ?? (data.moduleError ? 'Unavailable' : 'Loading')} /> },
     { id: 'calendar', title: 'Kalender', description: 'Veckans arbetsschema och säker Heroma-import.', icon: '▦', category: 'Familj', defaultView: 'family', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['family'], permissions: ['calendar.events.read'], render: () => <CalendarWidget /> },
@@ -114,13 +112,9 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     { id: 'downloads', title: 'Nedladdningskö', description: 'Hantera aktiva nedladdningar.', icon: '⇣', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <DownloadControl /> },
     { id: 'smart-shuffle', title: 'Smart Shuffle', description: 'Starta en rättvis serieblandning på TV:n.', icon: '⤨', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <SmartShuffle /> },
     { id: 'media-jobs', title: 'Medieflöde', description: 'Följ film och serier från sökning till bibliotek.', icon: '↧', category: 'Media', defaultView: 'media', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['media'], permissions: [], render: () => <MediaJobs showHeading={false} /> },
-    { id: 'jellyfin-overview', title: 'Jellyfin och integrationer', description: 'Bibliotek, tjänster, köer och nyligen tillagt.', icon: '▶', category: 'Media', defaultView: 'media', defaultSize: 'full', minimumSize: 'large', supportedViews: ['media', 'admin'], permissions: [], render: () => <MediaDashboard administrationOnly /> },
+    { id: 'jellyfin-overview', title: 'Tekniska integrationer', description: 'Jellyfin, Sonarr, Radarr och Prowlarr.', icon: '▶', category: 'Avancerat', defaultView: 'media', defaultSize: 'full', minimumSize: 'large', supportedViews: ['media', 'admin'], permissions: [], render: () => <MediaDashboard administrationOnly administrationOpen={false} /> },
     { id: 'finance-observation', title: 'Finance observation', description: 'Read-only watchlist, historik och entitlementstatus.', icon: '◇', category: 'Finance', defaultView: 'finance', defaultSize: 'full', minimumSize: 'large', supportedViews: ['finance'], permissions: ['finance.research.read'], render: () => <FinanceObservation /> },
-    planned('ai-chat', 'AI-chatt', 'Samtala med BigBrains framtida AI-assistent.', '✦', 'ai'),
-    planned('agents', 'Agenter', 'Överblick över framtida AI-agenter.', '◎', 'ai'),
-    planned('voice-assistant', 'Röstassistent', 'Röststyr familjens BigBrain.', '◖', 'ai'),
-    planned('ai-suggestions', 'AI-förslag', 'Granska förslag innan någon åtgärd utförs.', '◇', 'ai'),
-    planned('automations', 'Automationer', 'Hantera framtida godkända automationer.', '↻', 'ai'),
+    { id: 'ai-overview', title: 'AI i BigBrain', description: 'Nuvarande och planerade capability-gränser.', icon: '✦', category: 'AI', defaultView: 'ai', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['ai'], permissions: [], render: () => <AIOverview /> },
     { id: 'settings', title: 'Inställningar', description: 'Tema och sekundära destinationer.', icon: '⚙', category: 'Inställningar', defaultView: 'more', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['more'], permissions: [], render: () => <MoreNavigation /> },
     { id: 'server-status', title: 'Serverstatus', description: 'CPU, minne, lagring och uptime.', icon: '▤', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemWidget data={data} /> },
     { id: 'system-recovery', title: 'Start och återställning', description: 'Boot, clean shutdown, storage och recovery.', icon: '↻', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemRecovery recovery={data.recovery} error={data.recoveryError} /> },

@@ -25,6 +25,11 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
     if (url.endsWith('/api/v1/system/recovery')) return Promise.resolve(response(recovery))
+    if (url.endsWith('/api/v1/modules/meal-planner/schedules')) return Promise.resolve(response([{ id: 'week', startDate: '2026-08-17', endDate: '2026-08-23', createdAtUtc: '', updatedAtUtc: '', title: null, generationVersion: 1, days: [{ date: new Date().toLocaleDateString('sv-SE'), mealType: 'dinner', dayOfWeek: 'Sunday', peopleCount: 4, mealId: 'meal', mealName: 'Pappas soppa', tagSummary: [], isManuallyReplaced: false }] }]))
+    if (url.endsWith('/api/v1/modules/calendar/week')) return Promise.resolve(response({ from: '2026-08-17', to: '2026-08-23', events: [] }))
+    if (url.endsWith('/api/v1/modules/shopping-list/items')) return Promise.resolve(response({ sessionId: 'active', items: [{ id: 'item', name: 'Mjölk', normalizedName: 'mjölk', quantity: 1, purchased: false, createdAtUtc: '', updatedAtUtc: '', sortOrdinal: 1 }] }))
+    if (url.endsWith('/api/v1/modules/media')) return Promise.resolve(response({ healthSummary: 'Allt lugnt', insights: [], qBittorrent: { activeCount: 0 } }))
+    if (url.endsWith('/api/v1/modules/finance/overview')) return Promise.resolve(response({ marketSummary: 'Marknaden är blandad', signals: [], prospective: { curve: [] } }))
     return Promise.reject(new Error('Unexpected URL'))
   })
 }
@@ -57,12 +62,30 @@ test('starts on the calm Home launcher and keeps family tools in Family', async 
   expect(screen.getByRole('navigation', { name: 'Snabbnavigation' })).toBeInTheDocument()
 })
 
+test('Home presents real glanceable data before contextual navigation', async () => {
+  render(<App />)
+  expect(await screen.findByText('Pappas soppa')).toBeInTheDocument()
+  expect(screen.getByText('1 vara kvar att handla')).toBeInTheDocument()
+  expect(screen.getByText('Allt lugnt')).toBeInTheDocument()
+  expect(screen.getByText('Marknaden är blandad')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /Familj.*1 vara kvar/ }))
+  expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
+})
+
 test('switches dashboard without reload and remembers the active view', () => {
   render(<App />)
   switchView('Media')
   expect(screen.getByRole('heading', { level: 1, name: 'Media' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Mediesökning' })).toBeInTheDocument()
   expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({ activeView: 'media', version: 2 })
+})
+
+test('Media keeps technical integrations progressively disclosed', () => {
+  const { container } = render(<App />)
+  switchView('Media')
+  const administration = container.querySelector('[data-widget-id="jellyfin-overview"] details.administration')
+  expect(administration).toBeInTheDocument()
+  expect(administration).not.toHaveAttribute('open')
 })
 
 test('restores the last selected dashboard and falls back from invalid storage', () => {

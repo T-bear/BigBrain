@@ -1,6 +1,6 @@
 .family-experience {
   position:relative; width:100%; min-height:100dvh;
-  padding-top:max(22px,env(safe-area-inset-top)); padding-bottom:calc(104px + env(safe-area-inset-bottom));
+  padding-top:max(22px,env(safe-area-inset-top)); padding-bottom:var(--bb-mobile-dock-clearance);
   background:var(--bb-family-atmosphere),linear-gradient(180deg,color-mix(in srgb,var(--bb-canvas) 94%,var(--bb-surface-2) 6%),var(--bb-canvas) 42rem);
   isolation:isolate;
 }

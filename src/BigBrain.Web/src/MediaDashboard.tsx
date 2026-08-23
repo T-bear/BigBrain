@@ -19,11 +19,13 @@ const secondarySections: readonly DashboardModuleId[] = ['activity', 'details']
 
 export function MediaDashboard({
   administrationOnly = false,
+  administrationOpen = true,
   children,
   expanded,
   onToggle,
 }: {
   administrationOnly?: boolean
+  administrationOpen?: boolean
   children?: ReactNode
   expanded?: DashboardExpandedState
   onToggle?: (moduleId: DashboardModuleId) => void
@@ -86,7 +88,7 @@ export function MediaDashboard({
         <div id="queue"><p className="media-flow-intro">Följ film och serier genom sökning, nedladdning och bearbetning tills de finns i biblioteket. En titel kan därför synas här samtidigt som själva nedladdningen visas i Nedladdningskö.</p><MediaJobs showHeading={false} /></div>
       </CollapsibleModule>
     </>}
-    <details className="administration" id="administration" open={administrationOnly || undefined}>
+    <details className="administration" id="administration" open={(administrationOnly && administrationOpen) || undefined}>
       <summary><span><strong>Administration</strong><small>Systemstatus, tjänster och diagnostik</small></span></summary>
       <div className="administration__content">
         <div className="administration__heading"><div><p className="eyebrow">Teknisk översikt</p><h2>Administration</h2></div><div className="section-actions"><StatusBadge status={overview?.status ?? (error ? 'error' : 'loading')} /><button type="button" className="secondary-button" onClick={() => void refresh()} disabled={loading}>Uppdatera</button></div></div>

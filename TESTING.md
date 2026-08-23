@@ -1,5 +1,9 @@
 # Testa BigBrain
 
+## BB-099 whole-app UX audit
+
+Render every registered view plus embedded Settings at 390 × 844, scroll long views from top to bottom and exercise their primary controls. Use normal viewport captures, never stitched full-page iOS captures, as reachability evidence. Verify that the last actionable element can scroll entirely above the persistent dock through the shared `--bb-mobile-dock-clearance`, and specifically exercise Media search/request, downloads, Smart Shuffle, its lower select and collapsed technical integrations. Home tests must prove that existing read-only API data appears before contextual navigation. Finance must keep its default narrative and advanced disclosure without API or safety changes. Repeat representative checks at 430 × 932, 768 × 1024 and 1440 × 900 and across all three themes. Family remains the regression canary. Finance must remain `RESEARCH / 0 SEK / NONE` with unchanged scheduler and governor.
+
 ## BB-098 global UI migration
 
 Treat BB-097 Family as the visual canary. Frontend regression must cover semantic button variants including busy/disabled state, native label/value behavior for inputs and selects, theme switching and existing route actions. Normal viewport review—not stitched full-page capture—covers Home, Family, Media, Finance, More/Settings, AI and Admin in Obsidian Gold, Forest Night and Arctic Wind at 390 × 844, plus 430 × 932, 768 × 1024 and 1440 × 900 responsive checks. Finance advanced disclosure remains accessible and Finance must stay `RESEARCH / 0 SEK / NONE`. The owner-confirmed iOS Safari full-page screenshot artifact remains a known limitation and is not a BB-098 acceptance surface.

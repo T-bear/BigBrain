@@ -42,6 +42,7 @@
   --bb-section-gap: var(--bb-space-6);
   --bb-card-padding: var(--bb-space-5);
   --bb-header-height: 4rem;
+  --bb-mobile-dock-clearance: calc(112px + env(safe-area-inset-bottom));
   --bb-theme-preview-obsidian: linear-gradient(145deg, #080a0d 55%, #d3a22e);
   --bb-theme-preview-arctic: linear-gradient(145deg, #071320 45%, #52c9ee);
   --bb-theme-preview-forest: linear-gradient(145deg, #06130e 50%, #d6a341);

@@ -82,7 +82,7 @@ export function MediaSearch() {
     window.setTimeout(() => document.getElementById('media-search-query')?.focus(), 0)
   }
 
-  return <section className="media-search card" aria-labelledby="media-search-heading">
+  return <section className="media-search" aria-labelledby="media-search-heading">
     <div className="media-search-intro">
       <p className="eyebrow">Mediasökning</p>
       <h3 id="media-search-heading">Hitta film och serier</h3>
