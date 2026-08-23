@@ -496,9 +496,9 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
 }
 
 @media(max-width:760px){
-  .dashboard-workspace__header { align-items:stretch; flex-direction:column; }
-  .dashboard-workspace__actions { justify-content:stretch; }
-  .dashboard-settings__trigger { flex:1; justify-content:center; }
+  .dashboard-workspace__header { align-items:center; flex-direction:row; }
+  .dashboard-workspace__actions { flex:0 0 auto; justify-content:flex-end; }
+  .dashboard-settings__trigger { flex:0 0 44px; width:44px; justify-content:center; }
   .dashboard-settings { position:fixed; top:auto; right:12px; bottom:calc(76px + env(safe-area-inset-bottom)); left:12px; width:auto; }
   .workspace-module,.workspace-module--small { grid-column:1/-1; }
   .workspace-module__header { align-items:flex-start; }
