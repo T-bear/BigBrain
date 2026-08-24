@@ -2,7 +2,7 @@
 
 ## BB-105 — AudioBookBay Parser & Literal Author Search Remediation
 
-- Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI PENDING** 2026-08-24.
+- Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** 2026-08-24; GitHub Actions run `32769320392` passed.
 - Root cause: AudioBookBay's current DOM places the English language text immediately before a nested metadata label. Upstream's flattened `.Text()` produced `EnglishKeywords:`, so all nine otherwise valid `pirateaba` rows failed the English-only gate.
 - Implementerat: pinned `bigbrain-librarr:1208254-bb6`, sanitized DOM-boundary parser fixture and stage counters, literal author-query reservation, and correct Swedish/English/All ranking without destructive filtering of `und`.
 - Runtime: AudioBookBay exposed 9 rows, parsed 9, Librarr retained 9 and BigBrain displayed 9 sanitized candidates for literal `pirateaba`; title-only variants remained zero. Acquisition-job count stayed 10 and no acquisition was created.

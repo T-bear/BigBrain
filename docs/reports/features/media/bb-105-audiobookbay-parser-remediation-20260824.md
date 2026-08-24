@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version; lokal runtime-evidens med privata värden p
 
 ## Status
 
-**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI PENDING.**
+**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED.**
 
 ## Scope and root cause
 
@@ -43,6 +43,7 @@ BigBrain reserves an author-only literal input before metadata-derived work iden
 - Librarr image gate: organizer, search and download packages plus focused API passed; the search package includes the fixture regression.
 - Release build: succeeded with zero warnings/errors.
 - Vite production build: succeeded.
+- GitHub Actions run `32769320392`: backend, frontend, documentation and secrets succeeded for implementation commit `b359a7f69998d3a5249d9233843909309a1c7468`.
 
 ## Sanitized runtime evidence
 
@@ -64,7 +65,6 @@ At 390×844, Obsidian Gold, Forest Night and Arctic Wind each rendered nine cand
 - AudioBookBay's site-side title search still returns no useful result for the tested title variants; author search is currently the effective identity.
 - Current releases lack authoritative structured language and narrator metadata, so candidates remain unknown rather than being guessed English.
 - Current Prowlarr coverage still returns zero for this series.
-- CI evidence is recorded after publication.
 
 ## Resumption
 

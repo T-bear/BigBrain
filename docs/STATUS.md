@@ -2,7 +2,7 @@
 
 ## BB-105 AudioBookBay Parser & Literal Author Search Remediation (2026-08-24)
 
-BB-105 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI PENDING**. Den pinnade Librarr-revisionen är oförändrad; image `bigbrain-librarr:1208254-bb6` lägger endast till en sanerad fixture-testad DOM-textgräns för AudioBookBay. Den verkliga sidan innehöll 9 poster och 9 titellänkar men sammanfogade `English` med nästa nästlade etikett till `EnglishKeywords:`. Den tidigare språkgrinden avvisade därför samtliga. bb6 separerar DOM-textnoder och loggar endast sanerade parser-räkningar (`posts`, `rows_with_titles`, `rejected_language`, `retained`) på debugnivå.
+BB-105 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**. GitHub Actions run `32769320392` passerade backend, frontend, documentation och secrets. Den pinnade Librarr-revisionen är oförändrad; image `bigbrain-librarr:1208254-bb6` lägger endast till en sanerad fixture-testad DOM-textgräns för AudioBookBay. Den verkliga sidan innehöll 9 poster och 9 titellänkar men sammanfogade `English` med nästa nästlade etikett till `EnglishKeywords:`. Den tidigare språkgrinden avvisade därför samtliga. bb6 separerar DOM-textnoder och loggar endast sanerade parser-räkningar (`posts`, `rows_with_titles`, `rejected_language`, `retained`) på debugnivå.
 
 BigBrains sökplan reserverar nu ägarens literalinput för author-only-sökningar innan högst en metadatahärledd work-seed läggs till. `pirateaba` når därför den verkliga discovery-gränsen. Vald språkpreferens används vid slutrankning: svenska respektive engelska prioriteras, `und` behålls och Alla språk lägger ingen språkpreferens.
 
