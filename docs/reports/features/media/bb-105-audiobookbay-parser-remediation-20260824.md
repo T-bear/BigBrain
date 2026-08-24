@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version; lokal runtime-evidens med privata värden p
 
 ## Status
 
-**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / FOLLOW-UP CI PENDING.**
+**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / FOLLOW-UP CI VERIFIED.**
 
 ## Scope and root cause
 
@@ -83,6 +83,8 @@ Sanitized deployed GET-only evidence:
 | `the wandering inn` | 9 | AudioBookBay | `und` |
 
 Only Librarr was recreated. Acquisition jobs remained 12 and the existing Ghostsong job remained `indexing`; no POST acquisition request was made. Source policy, qBittorrent, Audiobookshelf, Finance, Sentinel and no-overwrite behavior were untouched. The remaining limitation is unchanged: source releases lack authoritative structured language and narrator metadata.
+
+Implementation commit `0acad253af22fdc40b33911dd78f91314b083217` passed GitHub Actions run `32777190573` (backend, frontend, documentation and secrets).
 
 ## Resumption
 

@@ -7,7 +7,7 @@
 - Implementerat: pinned `bigbrain-librarr:1208254-bb6`, sanitized DOM-boundary parser fixture and stage counters, literal author-query reservation, and correct Swedish/English/All ranking without destructive filtering of `und`.
 - Runtime: AudioBookBay exposed 9 rows, parsed 9, Librarr retained 9 and BigBrain displayed 9 sanitized candidates for literal `pirateaba`; title-only variants remained zero. Acquisition-job count stayed 10 and no acquisition was created.
 - Bevarade gränser: no indexer/Prowlarr/source-policy/acquisition/qBittorrent/import/Finance change; explicit owner confirmation, opaque candidate IDs and no-overwrite remain authoritative.
-- Uppföljning 2026-08-24: **IMPLEMENTED / DEPLOYED / RUNTIME VERIFIED / CI PENDING**. Proven case-sensitive AudioBookBay discovery is fixed in `bigbrain-librarr:1208254-bb7` by lowercasing only that source's request parameter. Five casing regressions pass; deployed read-only QA returned 9 candidates for all five approved variants, with 12 jobs before/after and Ghostsong unchanged.
+- Uppföljning 2026-08-24: **IMPLEMENTED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** through GitHub Actions run `32777190573`. Proven case-sensitive AudioBookBay discovery is fixed in `bigbrain-librarr:1208254-bb7` by lowercasing only that source's request parameter. Five casing regressions pass; deployed read-only QA returned 9 candidates for all five approved variants, with 12 jobs before/after and Ghostsong unchanged.
 
 ## BB-104 — Universal Metadata-Aware Audiobook Search
 
