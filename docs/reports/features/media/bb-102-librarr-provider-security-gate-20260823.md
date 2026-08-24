@@ -9,7 +9,7 @@
 
 ## Status
 
-**IMPORT GATE REMEDIATED; SOURCE-BOUNDARY GATE OPEN.** The owner approved option 2, a minimal BigBrain-controlled import patch/image. The no-overwrite invariant is automatically verified. Commissioning later stopped on a separately discovered Prowlarr-only source-registration violation.
+**IMPORT AND SOURCE-POLICY GATES REMEDIATED; FIRST ACQUISITION OWNER-GATED.** The owner approved the minimal BigBrain-controlled import patch and later superseded Prowlarr-only with Prowlarr preferred plus explicitly allowlisted native sources. Both invariants are automatically and runtime verified.
 
 ## Scope and decision
 
@@ -87,12 +87,45 @@ The controlled-degradation fix passed 22 focused audiobook/provider tests and th
 
 ## Remaining work
 
-Install the dedicated Librarr API key and the existing qBittorrent Web API username/password in the ignored appliance `.env`, then follow `docs/operations/runbooks/librarr-provider.md`. Commission only Librarr/API/Web, verify downstream health and perform a sanitized real search. The first live download still requires explicit owner selection in BigBrain.
+The acquisition pipeline is ready for its first owner-gated release. The owner must search in BigBrain, inspect language/source/edition evidence and explicitly choose **Lägg till**. Current result metadata does not verify Swedish or narrator, so the first choice requires human inspection. No automatic first acquisition is authorized.
+
+## Owner source-policy decision and resumed commissioning — 2026-08-24
+
+The owner revoked Prowlarr-only after reviewing the prior stop. The approved architecture is now Prowlarr preferred plus explicitly allowlisted Librarr-native audiobook sources. Native sources are not implicitly trusted: current and future upstream registrations are denied unless their exact identifier is configured.
+
+Pinned source inventory found Anna's Archive, AudioBookBay, Gutenberg, Open Library, Standard Ebooks, Librivox, MangaDex, Nyaa Manga, Anna's Manga, Web Novels, Flibusta, Z-Library, ThePirateBay ebook/audiobook and BookTracker ebook/audiobook implementations. Only AudioBookBay was approved: it is audiobook-specific, unauthenticated, torrent-based, needs no privilege/public bind and remains behind owner-gated Add. Librivox was disabled because it is a direct-download path outside the commissioned qBittorrent flow. ThePirateBay and BookTracker audiobook modes were disabled pending separate source/security approval. Every non-audiobook implementation was disabled as out of scope.
+
+| Identifier / display | Mechanism and auth | Metadata in pinned adapter | Policy / security result |
+| --- | --- | --- | --- |
+| `audiobookbay` / AudioBookBay | HTTPS scrape, torrent/magnet resolution; no credential | release title and source; no authoritative narrator/edition/language; distinguishable detail path | **ENABLED**; audiobook-specific, server-side public egress, no new privilege or bind |
+| `librivox` / Librivox | public JSON feed, direct ZIP; no credential | title, author, duration-like text and cover; no mapped narrator/language/edition | **DISABLED**; safe-looking public source but bypasses the reviewed qBittorrent/import flow |
+| `tpb_audiobook` / ThePirateBay | public API, torrent/magnet; no credential in adapter | release name, size, peers and hash; no narrator/language/edition | **DISABLED**; separate source/reliability review required |
+| `booktracker_audiobook` / BookTracker | authenticated forum scrape, torrent; username/password and cookie session | release name, author, format, size and peers; no authoritative language/narrator/edition | **REJECTED for this slice**; would add unapproved source credentials and session handling |
+| `annas` / Anna's Archive | HTML/metadata scrape plus direct download; no configured account | author, language, publisher and year for ebooks | **DISABLED**; main/ebook scope, not audiobook acquisition |
+| `gutenberg` / Project Gutenberg | public JSON/direct download; no credential | title, author, language and format | **DISABLED**; ebook scope |
+| `openlibrary` / Open Library | public JSON/direct link; no credential | title/author/cover; limited edition data | **DISABLED**; ebook scope |
+| `standardebooks` / Standard Ebooks | public HTML/direct download; no credential | title/author/format | **DISABLED**; ebook scope |
+| `mangadex` / MangaDex | public API/direct download; no credential | manga title/author/language-like feed metadata | **DISABLED**; manga scope |
+| `nyaa_manga` / Nyaa | public feed, torrent/magnet; no credential | release/size/peers/source; no audiobook metadata | **DISABLED**; manga scope |
+| `annas_manga` / Anna's Archive (Manga) | scrape/direct download; no configured account | manga release metadata | **DISABLED**; manga scope |
+| `webnovel` / Web Novels | multi-site HTML scrape/direct download; no credential | title/author/site, no audiobook metadata | **DISABLED**; web-novel scope and broad outbound surface |
+| `flibusta` / Flibusta | configured endpoint/direct download; no adapter credential | title/author/format | **DISABLED**; ebook scope and unapproved endpoint |
+| `zlibrary` / Z-Library | authenticated RPC/direct download; email/password/session | title/author/file metadata | **REJECTED for this slice**; unrelated ebook scope plus new credentials |
+| `tpb` / ThePirateBay | public API, torrent/magnet | ebook release/size/peers/hash | **DISABLED**; ebook scope |
+| `booktracker` / BookTracker | authenticated forum scrape, torrent | ebook release/author/format/size/peers | **REJECTED for this slice**; unrelated scope plus new credentials |
+
+Image `bigbrain-librarr:1208254-bb2` retains the unchanged import-safety patch and adds an exact source-policy patch. Empty, duplicate or unavailable identifiers fail startup; selection preserves Prowlarr-first construction order; future sources are excluded. The local registry contains only the pinned upstream AudioBookBay public mirror/tracker metadata. BigBrain accepts only Prowlarr and AudioBookBay results, stores raw release references only in its bounded server-side cache, exposes sanitized provenance, deduplicates safely by exact info hash where available and never merges merely similar titles/narrators/editions.
+
+The previous approximately 10-second HTTP timeout was below the observed Librarr multi-source latency. A Librarr-specific bounded 30-second timeout is deployed; caller cancellation propagates. Librarr itself runs sources concurrently and returns partial useful results when another source returns no results or fails without exhausting the parent context.
+
+Runtime commissioning loaded exactly `prowlarr_audiobooks` and `audiobookbay`. Authenticated health reported Librarr plus Prowlarr, qBittorrent and Audiobookshelf `ok`; BigBrain reported provider `configuredHealthy`, search/request enabled and cancel disabled. Read-only searches for `Harry Potter` and `The Martian` completed in roughly 17–20 seconds. The representative result set contained 11 Prowlarr candidates and zero AudioBookBay candidates; a second query returned 10 Prowlarr and zero AudioBookBay. AudioBookBay recorded successful searches but no matching parsed rows, proving partial-source behavior while providing no measured coverage improvement for these samples. Prowlarr results had release/size edition text but no authoritative narrator or language metadata: all remained `und/unknown`, and Swedish preference therefore did not falsely relabel them. No acquisition job, Add request or qBittorrent download was created.
+
+The final local regression passed 533 API, 127 Web and 32 Sentinel tests, a zero-warning Release solution build, Vite production build, Compose validation, documentation verification (183 Markdown files / 89 unique backlog IDs), staged-diff secret scan and whitespace check. Browser QA rendered real candidate results at 390×844 and 430×932 in Obsidian Gold, Forest Night and Arctic Wind: Swedish remained selected, Prowlarr provenance and edition text were visible, Add was enabled but untouched, activity remained absent, and every state had no horizontal overflow or dock occlusion. Obsidian Gold was restored. One repeated external search temporarily exceeded the browser-QA wait window; a subsequent isolated run passed with ten real candidates while provider/source health remained green. This is a bounded upstream-latency limitation, not fabricated success.
 
 ## Preserved state
 
 - BB-100 Audiobookshelf commissioning: unchanged.
-- BB-101 provider: `None / NotConfigured`.
+- BB-101 provider-neutral contracts and job store: unchanged; Librarr is active behind the same boundary.
 - Existing Prowlarr, qBittorrent and Audiobookshelf services: unchanged.
 - Finance: no code or runtime change.
 - Sentinel: no code or runtime change.
@@ -100,4 +133,4 @@ Install the dedicated Librarr API key and the existing qBittorrent Web API usern
 
 ## Resumption
 
-Resume BB-102 commissioning after the required secret values are installed locally outside Git/chat. Preserve the provider-neutral BB-101 boundary and do not initiate the first acquisition without the owner's explicit release selection.
+Owner review may now initiate the first acquisition from the deployed BigBrain candidate list. Preserve the provider-neutral BB-101 boundary and do not initiate a release without explicit owner selection.

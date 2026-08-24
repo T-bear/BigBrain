@@ -91,6 +91,7 @@ services:
       Media__Librarr__BaseUrl: ${MEDIA__LIBRARR__BASEURL:-http://librarr:5050}
       Media__Librarr__ApiKey: ${LIBRARR_API_KEY:-}
       Media__Librarr__CandidateLifetimeMinutes: ${MEDIA__LIBRARR__CANDIDATELIFETIMEMINUTES:-15}
+      Media__Librarr__SearchTimeoutSeconds: ${MEDIA__LIBRARR__SEARCHTIMEOUTSECONDS:-30}
       Media__QBittorrent__BaseUrl: ${MEDIA__QBITTORRENT__BASEURL:-http://qbittorrent:8080}
       Media__QBittorrent__ApiKey: ${MEDIA__QBITTORRENT__APIKEY:-}
       Media__ServiceLinks__Jellyfin__Url: ${MEDIA__SERVICELINKS__JELLYFIN__URL:-}
@@ -167,14 +168,15 @@ services:
     stop_grace_period: 30s
 
   librarr:
-    image: bigbrain-librarr:1208254-bb1
+    image: bigbrain-librarr:1208254-bb2
     build:
       context: .
       dockerfile: infrastructure/librarr/Dockerfile
     environment:
       TZ: ${TZ:-Europe/Stockholm}
       LIBRARR_DB_PATH: /config/librarr.db
-      LIBRARR_SOURCES_PATH: /etc/librarr/prowlarr-only-sources.json
+      LIBRARR_SOURCES_PATH: /etc/librarr/approved-audiobook-sources.json
+      LIBRARR_ALLOWED_SOURCES: ${LIBRARR_ALLOWED_SOURCES:-prowlarr_audiobooks,audiobookbay}
       API_KEY: ${LIBRARR_API_KEY:-}
       PROWLARR_URL: ${MEDIA__PROWLARR__BASEURL:-http://prowlarr:9696}
       PROWLARR_API_KEY: ${MEDIA__PROWLARR__APIKEY:-}
@@ -192,7 +194,7 @@ services:
       ABS_LIBRARY_ID: ${MEDIA__AUDIOBOOKSHELF__LIBRARYID:-}
     volumes:
       - librarr-config:/config
-      - ./infrastructure/librarr/prowlarr-only-sources.json:/etc/librarr/prowlarr-only-sources.json:ro
+      - ./infrastructure/librarr/approved-audiobook-sources.json:/etc/librarr/approved-audiobook-sources.json:ro
       - ${AUDIOBOOKS_INCOMING_PATH:-/srv/media/audiobooks-incoming}:/data/audiobooks-incoming
       - ${AUDIOBOOKS_LIBRARY_PATH:-/srv/media/audiobooks}:/audiobooks
     networks:

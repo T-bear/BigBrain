@@ -59,9 +59,69 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
         Assert.Equal(2, values.Count);
         Assert.Equal(2, values.Select(x => x.EditionId).Distinct().Count());
         Assert.All(values, value => { Assert.Equal("librarr", value.Source); Assert.Null(value.Narrator); });
+        Assert.All(values, value => Assert.Equal("Prowlarr", value.Provenance));
         Assert.Equal("sv", values.Single(x => x.Title.Contains("Svenska")).Language);
         Assert.Equal("probable", values.Single(x => x.Title.Contains("Svenska")).LanguageConfidence);
         Assert.Equal("en", values.Single(x => x.Title.Contains("English")).Language);
+    }
+
+    [Fact]
+    public async Task SearchMapsApprovedAudioBookBayCandidateWithoutExposingItsPath()
+    {
+        var calls = 0;
+        var provider = Provider(request =>
+        {
+            calls++;
+            if (request.Method == HttpMethod.Get)
+                return Json(HttpStatusCode.OK, """{"results":[{"source":"audiobookbay","title":"Boken English","abb_url":"/abss/boken/","indexer":"AudioBookBay"}]}""");
+            var body = request.Content!.ReadAsStringAsync().GetAwaiter().GetResult();
+            Assert.Contains("/abss/boken/", body);
+            return Json(HttpStatusCode.OK, """{"success":true,"title":"Boken","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}""");
+        });
+
+        var candidate = Assert.Single(await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken));
+        Assert.Equal("AudioBookBay", candidate.Provenance);
+        Assert.DoesNotContain("abss", candidate.EditionId);
+        Assert.Equal("probable", candidate.LanguageConfidence);
+        var job = await provider.RequestAsync(new(candidate.EditionId, candidate.Source, candidate.Language), TestContext.Current.CancellationToken);
+        Assert.Equal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", job.ProviderJobId);
+        Assert.Equal(2, calls);
+    }
+
+    [Fact]
+    public async Task SearchRejectsUnapprovedOrUnsafeNativeCandidates()
+    {
+        var provider = Provider(_ => Json(HttpStatusCode.OK, """
+            {"results":[
+              {"source":"librivox","title":"Direct","download_url":"https://example.invalid/book.zip"},
+              {"source":"audiobookbay","title":"Unsafe","abb_url":"https://example.invalid/private"}
+            ]}
+            """));
+        Assert.Empty(await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SearchDeduplicatesOnlyTheSameExactInfoHash()
+    {
+        var provider = Provider(_ => Json(HttpStatusCode.OK, """
+            {"results":[
+              {"source":"prowlarr_audiobooks","title":"Boken Release A","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","indexer":"one"},
+              {"source":"prowlarr_audiobooks","title":"Boken Release B","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","indexer":"two"},
+              {"source":"prowlarr_audiobooks","title":"Boken annan upplaga","info_hash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","indexer":"one"}
+            ]}
+            """));
+        var candidates = await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken);
+        Assert.Equal(2, candidates.Count);
+        Assert.Equal(2, candidates.Select(candidate => candidate.EditionId).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task SearchPropagatesCallerCancellation()
+    {
+        var client = new HttpClient(new DelayedHandler()) { BaseAddress = new("http://librarr:5050/"), Timeout = TimeSpan.FromSeconds(30) };
+        var provider = new LibrarrAudiobookAcquisitionProvider(client, new MediaOptions { Librarr = new() { ApiKey = "test-key", SearchTimeoutSeconds = 30 } }, TimeProvider.System);
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(25));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => provider.SearchAsync("Boken", null, "sv", cancellation.Token));
     }
 
     [Fact]
@@ -136,5 +196,14 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
     private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> response) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) => Task.FromResult(response(request));
+    }
+
+    private sealed class DelayedHandler : HttpMessageHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            throw new InvalidOperationException("unreachable");
+        }
     }
 }

@@ -94,7 +94,7 @@ public partial class Program
         builder.Services.AddHttpClient<IAudiobookAcquisitionProvider, LibrarrAudiobookAcquisitionProvider>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();
-            ConfigureMediaClient(httpClient, options.Librarr.BaseUrl, Math.Max(options.TimeoutSeconds, 10));
+            ConfigureMediaClient(httpClient, options.Librarr.BaseUrl, options.Librarr.SearchTimeoutSeconds);
             if (!string.IsNullOrWhiteSpace(options.Librarr.ApiKey))
                 httpClient.DefaultRequestHeaders.Add("X-Api-Key", options.Librarr.ApiKey);
         }).AddHttpMessageHandler(serviceProvider =>

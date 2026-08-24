@@ -17,6 +17,7 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     private readonly ConcurrentDictionary<string, CachedCandidate> candidates = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, string> observedStates = new(StringComparer.OrdinalIgnoreCase);
     private bool Configured => !string.IsNullOrWhiteSpace(options.Librarr.ApiKey);
+    private static readonly HashSet<string> ApprovedSources = new(StringComparer.Ordinal) { "prowlarr_audiobooks", "audiobookbay" };
 
     public async Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token)
     {
@@ -24,7 +25,9 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
             return new(AudiobookIntegrationStates.NotConfigured, "librarr", false, false, false, "Librarr är inte konfigurerat.");
         try
         {
-            using var response = await http.GetAsync("api/admin/health", token);
+            using var statusTimeout = CancellationTokenSource.CreateLinkedTokenSource(token);
+            statusTimeout.CancelAfter(TimeSpan.FromSeconds(10));
+            using var response = await http.GetAsync("api/admin/health", statusTimeout.Token);
             if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
                 return Unavailable("Librarr avvisade autentiseringen.");
             if (!response.IsSuccessStatusCode) return Unavailable("Librarr kunde inte nås.");
@@ -55,24 +58,32 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         using var document = await ParseBoundedAsync(response, token);
         if (!document.RootElement.TryGetProperty("results", out var results) || results.ValueKind != JsonValueKind.Array) return [];
         var mapped = new List<AudiobookAcquisitionCandidate>();
+        var byRelease = new Dictionary<string, AudiobookAcquisitionCandidate>(StringComparer.OrdinalIgnoreCase);
         foreach (var item in results.EnumerateArray().Take(50))
         {
             var source = Text(item, "source");
             var title = Text(item, "title");
             var infoHash = Text(item, "info_hash")?.ToLowerInvariant();
-            if (source != "prowlarr_audiobooks" || string.IsNullOrWhiteSpace(title) || !SafeInfoHash(infoHash)) continue;
+            var abbUrl = Text(item, "abb_url");
+            if (source is null || !ApprovedSources.Contains(source) || string.IsNullOrWhiteSpace(title)) continue;
+            if (source == "prowlarr_audiobooks" && !SafeInfoHash(infoHash)) continue;
+            if (source == "audiobookbay" && !SafeAbbPath(abbUrl)) continue;
             var raw = new LibrarrCandidate(
                 title, Text(item, "author"), source, Text(item, "source_id"),
-                Text(item, "download_url"), Text(item, "magnet_url"), infoHash!, Text(item, "guid"),
+                Text(item, "download_url"), Text(item, "magnet_url"), infoHash, Text(item, "guid"), abbUrl,
                 Text(item, "download_protocol"), Text(item, "format"), Text(item, "indexer"), Number(item, "size"));
-            var editionId = Id("edition", raw.Source, raw.InfoHash, raw.Guid, raw.DownloadUrl);
+            var releaseKey = SafeInfoHash(infoHash) ? $"hash:{infoHash}" : $"source:{source}:{abbUrl}";
+            var editionId = Id("edition", raw.Source, raw.InfoHash, raw.Guid, raw.DownloadUrl, raw.AbbUrl);
             candidates[editionId] = new(raw, clock.GetUtcNow().AddMinutes(options.Librarr.CandidateLifetimeMinutes));
             var (candidateLanguage, confidence) = Language(item, title);
-            mapped.Add(new(
+            var candidate = new AudiobookAcquisitionCandidate(
                 Id("work", title, raw.Author ?? author ?? string.Empty), editionId, title,
                 raw.Author ?? author, null, candidateLanguage, AudiobookLanguages.DisplayName(candidateLanguage),
-                Edition(raw), null, Year(item), null, "librarr", "available", confidence));
+                Edition(raw), null, Year(item), null, "librarr", "available", confidence, Provenance(source));
+            if (!byRelease.TryGetValue(releaseKey, out var existing) || Prefer(candidate, existing))
+                byRelease[releaseKey] = candidate;
         }
+        mapped.AddRange(byRelease.Values);
         return mapped;
     }
 
@@ -92,6 +103,7 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
             magnet_url = value.MagnetUrl,
             info_hash = value.InfoHash,
             guid = value.Guid,
+            abb_url = value.AbbUrl,
             download_protocol = value.DownloadProtocol,
             media_type = "audiobook",
             force = false
@@ -102,8 +114,12 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         using var document = await ParseBoundedAsync(response, token);
         if (!document.RootElement.TryGetProperty("success", out var success) || success.ValueKind != JsonValueKind.True)
             throw new AudiobookAcquisitionException("providerRejected", "Librarr avvisade hämtningen.", StatusCodes.Status502BadGateway);
-        observedStates[value.InfoHash] = AudiobookAcquisitionStatuses.Queued;
-        return new(value.InfoHash, AudiobookAcquisitionStatuses.Queued, null);
+        var providerJobId = Text(document.RootElement, "info_hash")?.ToLowerInvariant() ?? value.InfoHash;
+        if (!SafeInfoHash(providerJobId))
+            throw new AudiobookAcquisitionException("providerRejected", "Librarr returnerade ingen spårbar hämtning.", StatusCodes.Status502BadGateway);
+        var trackedJobId = providerJobId!;
+        observedStates[trackedJobId] = AudiobookAcquisitionStatuses.Queued;
+        return new(trackedJobId, AudiobookAcquisitionStatuses.Queued, null);
     }
 
     public async Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId, CancellationToken token)
@@ -164,6 +180,11 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     private static long? Number(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.TryGetInt64(out var number) ? number : null;
     private static string? Text(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     private static bool SafeInfoHash(string? value) => value is { Length: 40 or 64 } && value.All(Uri.IsHexDigit);
+    private static bool SafeAbbPath(string? value) => value is { Length: > 1 and <= 500 }
+        && value[0] == '/' && !value.StartsWith("//", StringComparison.Ordinal) && !value.Contains("..", StringComparison.Ordinal);
+    private static string Provenance(string source) => source == "prowlarr_audiobooks" ? "Prowlarr" : "AudioBookBay";
+    private static bool Prefer(AudiobookAcquisitionCandidate candidate, AudiobookAcquisitionCandidate existing) =>
+        candidate.Provenance == "Prowlarr" && existing.Provenance != "Prowlarr";
     private static string Id(string prefix, params string?[] values) => $"{prefix}:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\u001f', values.Select(value => value ?? string.Empty))))).ToLowerInvariant()}";
     private void PruneCandidates()
     {
@@ -196,7 +217,7 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         : null;
 
     private sealed record CachedCandidate(LibrarrCandidate Value, DateTimeOffset ExpiresAtUtc);
-    private sealed record LibrarrCandidate(string Title, string? Author, string Source, string? SourceId, string? DownloadUrl, string? MagnetUrl, string InfoHash, string? Guid, string? DownloadProtocol, string? Format, string? Indexer, long? Size);
+    private sealed record LibrarrCandidate(string Title, string? Author, string Source, string? SourceId, string? DownloadUrl, string? MagnetUrl, string? InfoHash, string? Guid, string? AbbUrl, string? DownloadProtocol, string? Format, string? Indexer, long? Size);
 }
 
 internal sealed class LimitedReadStream(Stream inner, long maximumBytes) : Stream

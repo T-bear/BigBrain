@@ -2,10 +2,10 @@
 
 ## BB-102 patched Librarr provider
 
-- `docker build -t bigbrain-librarr:1208254-bb1 -f infrastructure/librarr/Dockerfile .` applies the pinned patch and runs all upstream organizer tests plus 11 no-overwrite regressions inside the build.
+- `docker build -t bigbrain-librarr:1208254-bb2 -f infrastructure/librarr/Dockerfile .` applies both pinned patches, runs the complete upstream organizer/search packages and the focused native-source tracking regression. Source-policy tests prove exact allowlisting, Prowlarr-first order and fail-closed empty/duplicate/unknown configuration.
 - `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --filter 'FullyQualifiedName~LibrarrAudiobookAcquisitionProviderTests|FullyQualifiedName~AudiobookAcquisitionTests' --no-restore` covers authenticated health, dependency degradation, bounded/opaque candidates, request cache, language hints, state mapping and safe cancellation semantics without a network.
 - `npm test -- --run src/audiobooks/Audiobooks.test.tsx` covers the real registry-composed Media view and bounded polling of real job states without fabricated percentage progress.
-- Runtime search and downstream health are commissioning checks. They must not initiate the first download; secrets remain outside Git, test output and chat.
+- Runtime search and downstream health are commissioning checks. Aggregate candidate counts/provenance may be recorded, but raw URLs and releases stay private. These checks must not initiate the first download; secrets remain outside Git, test output and chat.
 
 ## BB-101 audiobook acquisition foundation
 

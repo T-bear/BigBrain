@@ -9,11 +9,15 @@ RUN git clone --filter=blob:none https://github.com/JeremiahM37/librarr.git sour
     && test "$(git rev-parse HEAD)" = "${LIBRARR_UPSTREAM_COMMIT}"
 
 COPY infrastructure/librarr/patches/0001-audiobook-import-no-overwrite.patch /tmp/no-overwrite.patch
+COPY infrastructure/librarr/patches/0002-explicit-source-policy.patch /tmp/source-policy.patch
 RUN cd source \
     && git apply --check /tmp/no-overwrite.patch \
     && git apply /tmp/no-overwrite.patch \
-    && test -z "$(gofmt -l internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go)" \
-    && go test ./internal/organize \
+    && git apply --check /tmp/source-policy.patch \
+    && git apply /tmp/source-policy.patch \
+    && test -z "$(gofmt -l internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/api/download.go internal/api/audiobook_provider_test.go cmd/librarr/main.go)" \
+    && go test ./internal/organize ./internal/search \
+    && go test ./internal/api -run '^TestInfoHashFromMagnetIsBoundedAndNormalized$' \
     && CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /librarr ./cmd/librarr/
 
 FROM alpine:3.21@sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d

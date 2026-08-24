@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "audiobookbay": {
+    "mirrors": [
+      "audiobookbay.lu",
+      "audiobookbay.li",
+      "audiobookbay.se"
+    ],
+    "trackers": [
+      "udp://tracker.opentrackr.org:1337/announce",
+      "udp://open.stealth.si:80/announce",
+      "udp://exodus.desync.com:6969/announce",
+      "udp://tracker.torrent.eu.org:451/announce",
+      "udp://tracker.tiny-vps.com:6969/announce",
+      "udp://tracker.dler.org:6969/announce",
+      "http://tracker.files.fm:6969/announce"
+    ]
+  }
+}

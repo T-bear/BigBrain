@@ -1,10 +1,10 @@
 # BigBrain Status
 
-## BB-102 Librarr provider continuation (2026-08-23)
+## BB-102 Librarr provider continuation (2026-08-24)
 
-Den tidigare import-säkerhetsgaten accepterades av ägaren med alternativ 2: en minimal BigBrain-underhållen patch/image. Upstream är pinnad till commit `1208254c20b31fbf217558c0fb987f779fed1cf8`; image `bigbrain-librarr:1208254-bb1` byggs reproducerbart och kör 59 organizer-tester, varav 11 nya regressionsfall för no-overwrite, katalogkonflikt, partiell destination, path escape samt source-preservation i move/copy/hardlink.
+Den tidigare Prowlarr-only-regeln är uttryckligen ersatt av ägarbeslutet **Prowlarr preferred + explicit allowlist för Librarr-native sources**. Upstream är fortsatt pinnad till commit `1208254c20b31fbf217558c0fb987f779fed1cf8`; `bigbrain-librarr:1208254-bb2` behåller den isolerade no-overwrite-patchen och lägger till en fail-closed source-policy. Endast `prowlarr_audiobooks` och den granskade native-källan `audiobookbay` laddas. Saknad/tom/duplicerad/okänd allowlist stoppar processen, och framtida upstream-källor kan inte aktiveras implicit.
 
-Provider-adaptern och intern-only Compose-konfigurationen är implementerade och automatiskt verifierade. Commissioning 2026-08-24 bekräftade alla tre runtime-hemligheter, healthy Librarr samt fungerande Prowlarr-, qBittorrent- och Audiobookshelf-anslutningar. En verklig sökning avslöjade dock att upstream alltid registrerar built-in audiobook sources även med tom lokal registry; detta bryter den beslutade Prowlarr-only-gränsen. Librarr stoppades utan acquisition och API degraderar nu kontrollerat medan Audiobookshelf förblir `configuredHealthy`. Fortsättning kräver ett nytt, uttryckligt ägarbeslut eftersom den godkända patchen endast omfattar importkonflikter. BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+Commissioning 2026-08-24 verifierade intern-only Librarr, autentiserad downstream-health för Prowlarr/qBittorrent/Audiobookshelf och BigBrain-provider `configuredHealthy`. Ett verkligt read-only-sökprov gav 11 Prowlarr-kandidater; AudioBookBay deltog utan fel men gav noll träffar för de två provfrågorna. Resultaten hade utgåveinformation men saknade auktoritativ språk- och uppläsarmetadata, så språk förblev sanningsenligt `und/unknown`. Sök-timeout är nu provider-specifikt 30 sekunder efter tidigare observerad >10-sekunders latens; caller cancellation propagerar. Ingen acquisition eller qBittorrent-hämtning har startats. BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
 
 ## BB-101 audiobook acquisition foundation (2026-08-23)
 

@@ -25,6 +25,7 @@ public sealed class MediaOptions
         && IsHttpUrl(options.Audiobookshelf.BaseUrl)
         && IsHttpUrl(options.Librarr.BaseUrl)
         && options.Librarr.CandidateLifetimeMinutes is >= 5 and <= 60
+        && options.Librarr.SearchTimeoutSeconds is >= 10 and <= 45
         && (string.IsNullOrWhiteSpace(options.Audiobookshelf.PublicUrl) || IsHttpUrl(options.Audiobookshelf.PublicUrl))
         && options.Audiobookshelf.PageSize is >= 1 and <= 50
         && IsHttpUrl(options.QBittorrent.BaseUrl)
@@ -57,6 +58,7 @@ public sealed class LibrarrOptions
     public string BaseUrl { get; init; } = "http://librarr:5050";
     public string? ApiKey { get; init; }
     public int CandidateLifetimeMinutes { get; init; } = 15;
+    public int SearchTimeoutSeconds { get; init; } = 30;
 }
 
 public sealed class AudiobookshelfOptions

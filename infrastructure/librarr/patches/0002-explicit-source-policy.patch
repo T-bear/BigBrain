@@ -1,0 +1,224 @@
+diff --git a/cmd/librarr/main.go b/cmd/librarr/main.go
+index f2365d0..4bb8ceb 100644
+--- a/cmd/librarr/main.go
++++ b/cmd/librarr/main.go
+@@ -73,6 +73,12 @@ func main() {
+ 	registeredSources := search.CreateRegisteredSources(cfg, httpClient)
+ 	sources = append(sources, registeredSources...)
+ 
++	sources, err = search.ApplySourceAllowlist(sources, os.Getenv("LIBRARR_ALLOWED_SOURCES"))
++	if err != nil {
++		slog.Error("source allowlist rejected", "error", err)
++		os.Exit(1)
++	}
++
+ 	searchMgr := search.NewManager(cfg, sources, health)
+ 
+ 	// Graceful shutdown context (used by background workers).
+diff --git a/internal/api/audiobook_provider_test.go b/internal/api/audiobook_provider_test.go
+new file mode 100644
+index 0000000..afc5b18
+--- /dev/null
++++ b/internal/api/audiobook_provider_test.go
+@@ -0,0 +1,20 @@
++package api
++
++import "testing"
++
++func TestInfoHashFromMagnetIsBoundedAndNormalized(t *testing.T) {
++	want := "0123456789abcdef0123456789abcdef01234567"
++	got := infoHashFromMagnet("magnet:?xt=urn:btih:0123456789ABCDEF0123456789ABCDEF01234567&dn=Book")
++	if got != want {
++		t.Fatalf("infoHashFromMagnet = %q, want %q", got, want)
++	}
++	for _, invalid := range []string{
++		"https://example.invalid/file",
++		"magnet:?xt=urn:btih:short",
++		"magnet:?xt=urn:btih:zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
++	} {
++		if got := infoHashFromMagnet(invalid); got != "" {
++			t.Fatalf("infoHashFromMagnet(%q) = %q, want empty", invalid, got)
++		}
++	}
++}
+diff --git a/internal/api/download.go b/internal/api/download.go
+index 5abaec0..c9f47e5 100644
+--- a/internal/api/download.go
++++ b/internal/api/download.go
+@@ -130,6 +130,10 @@ func (s *Server) handleTorrentDownload(w http.ResponseWriter, r *http.Request, r
+ 		})
+ 		return
+ 	}
++	resolvedInfoHash := req.InfoHash
++	if resolvedInfoHash == "" {
++		resolvedInfoHash = infoHashFromMagnet(url)
++	}
+ 
+ 	// Check for duplicates.
+ 	sourceID := extractSourceID(req)
+@@ -153,7 +157,7 @@ func (s *Server) handleTorrentDownload(w http.ResponseWriter, r *http.Request, r
+ 		category = s.cfg.QBMangaCategory
+ 	}
+ 
+-	err = s.downloadMgr.StartTorrentDownload(url, req.Title, savePath, category, req.InfoHash)
++	err = s.downloadMgr.StartTorrentDownload(url, req.Title, savePath, category, resolvedInfoHash)
+ 	var verificationWarning *download.TorrentVerificationWarning
+ 	if errors.As(err, &verificationWarning) {
+ 		writeJSON(w, http.StatusOK, map[string]interface{}{
+@@ -165,12 +169,37 @@ func (s *Server) handleTorrentDownload(w http.ResponseWriter, r *http.Request, r
+ 		return
+ 	}
+ 	writeJSON(w, http.StatusOK, map[string]interface{}{
+-		"success": err == nil,
+-		"title":   req.Title,
+-		"error":   errString(err),
++		"success":   err == nil,
++		"title":     req.Title,
++		"error":     errString(err),
++		"info_hash": resolvedInfoHash,
+ 	})
+ }
+ 
++func infoHashFromMagnet(raw string) string {
++	u, err := neturl.Parse(raw)
++	if err != nil || !strings.EqualFold(u.Scheme, "magnet") {
++		return ""
++	}
++	for _, exactTopic := range u.Query()["xt"] {
++		const prefix = "urn:btih:"
++		if !strings.HasPrefix(strings.ToLower(exactTopic), prefix) {
++			continue
++		}
++		value := exactTopic[len(prefix):]
++		if len(value) != 40 {
++			return ""
++		}
++		for _, character := range value {
++			if !strings.ContainsRune("0123456789abcdefABCDEF", character) {
++				return ""
++			}
++		}
++		return strings.ToLower(value)
++	}
++	return ""
++}
++
+ func (s *Server) handleDirectDownloadReq(w http.ResponseWriter, req models.DownloadRequest) {
+ 	if s.rejectIfInLibrary(w, req) {
+ 		return
+diff --git a/internal/search/audiobookbay.go b/internal/search/audiobookbay.go
+index 92588a0..c7c3e93 100644
+--- a/internal/search/audiobookbay.go
++++ b/internal/search/audiobookbay.go
+@@ -114,7 +114,7 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 		}
+ 
+ 		results = append(results, models.SearchResult{
+-			Source:    "audiobook",
++			Source:    "audiobookbay",
+ 			Title:     title,
+ 			SizeHuman: "?",
+ 			Seeders:   0,
+diff --git a/internal/search/source_policy.go b/internal/search/source_policy.go
+new file mode 100644
+index 0000000..62b38b2
+--- /dev/null
++++ b/internal/search/source_policy.go
+@@ -0,0 +1,46 @@
++package search
++
++import (
++	"fmt"
++	"strings"
++)
++
++// ApplySourceAllowlist retains only explicitly approved source identifiers.
++// It preserves constructor order so an owner-managed Prowlarr source can stay
++// preferred, and rejects configuration drift rather than silently activating
++// or ignoring a source.
++func ApplySourceAllowlist(sources []Searcher, configured string) ([]Searcher, error) {
++	configured = strings.TrimSpace(configured)
++	if configured == "" {
++		return nil, fmt.Errorf("source allowlist is required")
++	}
++
++	allowed := make(map[string]struct{})
++	for _, raw := range strings.Split(configured, ",") {
++		name := strings.TrimSpace(raw)
++		if name == "" {
++			return nil, fmt.Errorf("source allowlist contains an empty identifier")
++		}
++		if _, duplicate := allowed[name]; duplicate {
++			return nil, fmt.Errorf("source allowlist contains duplicate identifier %q", name)
++		}
++		allowed[name] = struct{}{}
++	}
++
++	available := make(map[string]struct{}, len(sources))
++	selected := make([]Searcher, 0, len(allowed))
++	for _, source := range sources {
++		name := source.Name()
++		available[name] = struct{}{}
++		if _, approved := allowed[name]; approved {
++			selected = append(selected, source)
++		}
++	}
++
++	for name := range allowed {
++		if _, exists := available[name]; !exists {
++			return nil, fmt.Errorf("source allowlist references unavailable identifier %q", name)
++		}
++	}
++	return selected, nil
++}
+diff --git a/internal/search/source_policy_test.go b/internal/search/source_policy_test.go
+new file mode 100644
+index 0000000..50327be
+--- /dev/null
++++ b/internal/search/source_policy_test.go
+@@ -0,0 +1,45 @@
++package search
++
++import (
++	"context"
++	"testing"
++
++	"github.com/JeremiahM37/librarr/internal/models"
++)
++
++type policySource struct{ name string }
++
++func (s policySource) Name() string                                                  { return s.name }
++func (s policySource) Label() string                                                 { return s.name }
++func (s policySource) Enabled() bool                                                 { return true }
++func (s policySource) Search(context.Context, string) ([]models.SearchResult, error) { return nil, nil }
++func (s policySource) SearchTab() string                                             { return "audiobook" }
++func (s policySource) DownloadType() string                                          { return "torrent" }
++
++func TestApplySourceAllowlistIsExplicitAndPreservesPreference(t *testing.T) {
++	sources := []Searcher{
++		policySource{"prowlarr_audiobooks"},
++		policySource{"audiobookbay"},
++		policySource{"future_upstream_source"},
++	}
++
++	selected, err := ApplySourceAllowlist(sources, "prowlarr_audiobooks,audiobookbay")
++	if err != nil {
++		t.Fatalf("ApplySourceAllowlist returned error: %v", err)
++	}
++	if len(selected) != 2 || selected[0].Name() != "prowlarr_audiobooks" || selected[1].Name() != "audiobookbay" {
++		t.Fatalf("unexpected selected sources: %#v", selected)
++	}
++}
++
++func TestApplySourceAllowlistFailsClosed(t *testing.T) {
++	sources := []Searcher{policySource{"prowlarr_audiobooks"}}
++	tests := []string{"", "prowlarr_audiobooks,", "prowlarr_audiobooks,prowlarr_audiobooks", "unknown"}
++	for _, configured := range tests {
++		t.Run(configured, func(t *testing.T) {
++			if _, err := ApplySourceAllowlist(sources, configured); err == nil {
++				t.Fatal("expected fail-closed allowlist error")
++			}
++		})
++	}
++}
