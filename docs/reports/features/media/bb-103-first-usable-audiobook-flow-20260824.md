@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-24
-- Status: technically ready and deployed; first real acquisition owner-gated and not started
+- Status: technically complete, deployed and first real acquisition verified
 - Scope: close the existing BB-100/101/102 acquisition lifecycle without changing provider boundaries
 - Sanitization notice: no keys, private addresses, raw provider URLs, magnet links, tracker details, private library data or credentials are published.
 
@@ -11,7 +11,7 @@ Detta är en sanerad GitHub-version; lokal runtime-evidens med privata värden p
 
 ## Status
 
-**TECHNICALLY READY / FIRST REAL ACQUISITION OWNER-GATED.** Search, explicit release confirmation, truthful lifecycle reconciliation and deployed mobile UI are verified. No request/download was started, so the first real acquisition remains unverified.
+**TECHNICALLY COMPLETE / FIRST REAL ACQUISITION VERIFIED.** The owner-selected Narnia release completed request, download, safe import, Audiobookshelf indexing, BigBrain library visibility and owner playback/deep-link verification.
 
 ## Verified baseline
 
@@ -25,7 +25,7 @@ BB-100 provides the commissioned Audiobookshelf library, metadata, progress and 
 4. Add focused provider, API/service, UI and registry regression coverage, then run repository validation.
 5. Deploy only the changed Librarr/API/Web services, execute real read-only search and mobile/theme QA, and stop before the owner-gated first Add action.
 
-The first real acquisition lifecycle remains **NOT VERIFIED** until the owner selects a specific candidate and explicitly starts it in BigBrain.
+The first real acquisition lifecycle is **VERIFIED** for the owner-selected Narnia release.
 
 ## Changes
 
@@ -53,7 +53,11 @@ Deployed Firefox QA at 390 × 844 and 430 × 932 passed in Obsidian Gold, Forest
 
 Finance remained `RESEARCH / 0 SEK / NONE`. The scheduler is enabled, but the 2026-08-24 02:00 UTC opportunity was skipped as a non-research day with no research run; the next due time is 2026-08-25 02:00 UTC. BB-099 remains **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**. Sentinel remains in its known `sentinel.sock` address-in-use restart loop and was not modified.
 
-**TECHNICALLY READY: YES. FIRST REAL ACQUISITION VERIFIED: NO.** The owner must select one specific release in BigBrain and explicitly confirm Add before request, download, import and final indexing can be verified against real media.
+An observed post-acquisition inconsistency had two causes. Audiobookshelf was initially still indexing, while a transient provider-status request was incorrectly mapped by Web to an invalid `unavailable` value and therefore displayed as not configured. Separately, the completed job remained `indexing` because Librarr stored the tagged release title and author `Unknown`, while Audiobookshelf exposed canonical title/author metadata. Runtime configuration was present and bound throughout the investigation.
+
+The minimal fix maps transient provider failure to `configuredUnavailable` and withholds provider copy while status is pending. Completion still requires the exact provider hash, exact import event and exact local `source_id`; it then permits exactly one deterministic normalized canonical-title match and treats `Unknown` as absent metadata. Ambiguous matches remain `indexing`. The existing Narnia job reconciled naturally to `completed` without persisted-state manipulation. BigBrain returned one unique library item, the cover proxy and owner deep link returned HTTP 200, and 390 × 844 QA verified `Klar`, the second existing job truthfully `Hämtas`, no overflow and full dock clearance.
+
+**TECHNICALLY COMPLETE: YES. FIRST REAL ACQUISITION VERIFIED: YES.**
 
 ## Security
 
@@ -61,8 +65,8 @@ BB-102's no-overwrite, path-containment, exact source allowlist, internal-only L
 
 ## Remaining work
 
-The real request → qBittorrent → safe import → Audiobookshelf indexing → BigBrain library lifecycle cannot be marked verified until the owner chooses a specific candidate and explicitly confirms it. If that real run conflicts or fails, preserve both source and destination and investigate through the runbook.
+No BB-103 lifecycle blocker remains. The separate Revolvermannen acquisition was observed read-only as downloading and was not modified.
 
 ## Resumption
 
-Open BigBrain → Media → Ljudböcker, search for the desired title, select **Välj utgåva**, verify the release details and choose **Lägg till vald utgåva**. Resume validation from the resulting BigBrain job ID without exposing provider identifiers or credentials.
+No further BB-103 action is required for the verified Narnia lifecycle. The separate existing Revolvermannen job may be observed through its BigBrain-owned job ID without cancelling, restarting or exposing provider identifiers or credentials.

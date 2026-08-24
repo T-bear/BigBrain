@@ -248,6 +248,36 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
         Assert.Equal(expected, status!.Status);
     }
 
+    [Fact]
+    public async Task CompletedImportAcceptsOneCanonicalAudiobookshelfTitleForTheExactImportedHash()
+    {
+        var provider = Provider(request => request.RequestUri!.AbsolutePath switch
+        {
+            "/api/downloads" => Json(HttpStatusCode.OK, """{"downloads":[]}"""),
+            "/api/activity" => Json(HttpStatusCode.OK, """{"events":[{"event_type":"torrent_import","job_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library" => Json(HttpStatusCode.OK, """{"items":[{"title":"Narnia.1. Min morbror trollkarlen.swe.sagablanc-reseeded","author":"Unknown","source_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library/audiobooks" => Json(HttpStatusCode.OK, """{"items":[{"title":"Min Morbror Trollkarlen","author":"C.S. Lewis"}]}"""),
+            _ => throw new InvalidOperationException(request.RequestUri.AbsolutePath)
+        });
+        var status = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        Assert.Equal("completed", status!.Status);
+    }
+
+    [Fact]
+    public async Task AmbiguousCanonicalAudiobookshelfTitlesRemainIndexing()
+    {
+        var provider = Provider(request => request.RequestUri!.AbsolutePath switch
+        {
+            "/api/downloads" => Json(HttpStatusCode.OK, """{"downloads":[]}"""),
+            "/api/activity" => Json(HttpStatusCode.OK, """{"events":[{"event_type":"torrent_import","job_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library" => Json(HttpStatusCode.OK, """{"items":[{"title":"Narnia.1. Min morbror trollkarlen.swe.sagablanc-reseeded","author":"Unknown","source_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library/audiobooks" => Json(HttpStatusCode.OK, """{"items":[{"title":"Min Morbror Trollkarlen","author":"C.S. Lewis"},{"title":"Min Morbror Trollkarlen","author":"Annan"}]}"""),
+            _ => throw new InvalidOperationException(request.RequestUri.AbsolutePath)
+        });
+        var status = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        Assert.Equal("indexing", status!.Status);
+    }
+
     private static LibrarrAudiobookAcquisitionProvider Provider(Func<HttpRequestMessage, HttpResponseMessage> response, bool configured = true)
     {
         var client = new HttpClient(new StubHandler(response)) { BaseAddress = new("http://librarr:5050/") };

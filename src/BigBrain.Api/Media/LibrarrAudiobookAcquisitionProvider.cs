@@ -14,6 +14,7 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
 {
     private static readonly Regex Swedish = new(@"(?:^|[\s.\-_\[(])(swedish|svenska|swe)(?:$|[\s.\-_\])])", RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromMilliseconds(50));
     private static readonly Regex English = new(@"(?:^|[\s.\-_\[(])(english|eng)(?:$|[\s.\-_\])])", RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromMilliseconds(50));
+    private static readonly Regex MetadataSeparators = new(@"[^\p{L}\p{N}]+", RegexOptions.Compiled, TimeSpan.FromMilliseconds(50));
     private readonly ConcurrentDictionary<string, CachedCandidate> candidates = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, string> observedStates = new(StringComparer.OrdinalIgnoreCase);
     private bool Configured => !string.IsNullOrWhiteSpace(options.Librarr.ApiKey);
@@ -190,9 +191,10 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         using var abs = await ParseBoundedAsync(absResponse, token);
         var indexedItems = abs.RootElement.TryGetProperty("items", out var absItems) && absItems.ValueKind == JsonValueKind.Array
             ? absItems.EnumerateArray() : [];
-        var author = Text(imported, "author");
-        var indexed = indexedItems.Any(item => string.Equals(Text(item, "title")?.Trim(), title.Trim(), StringComparison.OrdinalIgnoreCase)
-            && (string.IsNullOrWhiteSpace(author) || string.Equals(Text(item, "author")?.Trim(), author.Trim(), StringComparison.OrdinalIgnoreCase)));
+        var author = NullIfUnknown(Text(imported, "author"));
+        var indexedMatches = indexedItems.Count(item => TitlesIdentifySameImportedWork(title, Text(item, "title"))
+            && (author is null || string.Equals(Text(item, "author")?.Trim(), author, StringComparison.OrdinalIgnoreCase)));
+        var indexed = indexedMatches == 1;
         return indexed
             ? (AudiobookAcquisitionStatuses.Completed, null)
             : (AudiobookAcquisitionStatuses.Indexing, "Importerad; väntar på Audiobookshelf-indexering.");
@@ -219,6 +221,14 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     private static long? Number(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.TryGetInt64(out var number) ? number : null;
     private static string? Text(JsonElement item, string name) => item.ValueKind == JsonValueKind.Object && item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     private static string? NullIfWhiteSpace(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+    private static string? NullIfUnknown(string? value) => string.IsNullOrWhiteSpace(value) || value.Equals("unknown", StringComparison.OrdinalIgnoreCase) ? null : value.Trim();
+    private static bool TitlesIdentifySameImportedWork(string importedTitle, string? indexedTitle)
+    {
+        var imported = NormalizeMetadata(importedTitle);
+        var indexed = NormalizeMetadata(indexedTitle);
+        return imported == indexed || indexed.Length >= 8 && imported.Contains(indexed, StringComparison.Ordinal);
+    }
+    private static string NormalizeMetadata(string? value) => MetadataSeparators.Replace(value?.Normalize(NormalizationForm.FormKC).ToLowerInvariant() ?? string.Empty, " ").Trim();
     private static bool SafeInfoHash(string? value) => value is { Length: 40 or 64 } && value.All(Uri.IsHexDigit);
     private static bool SafeAbbPath(string? value) => value is { Length: > 1 and <= 500 }
         && value[0] == '/' && !value.StartsWith("//", StringComparison.Ordinal) && !value.Contains("..", StringComparison.Ordinal);

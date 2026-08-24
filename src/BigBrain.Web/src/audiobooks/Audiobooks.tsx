@@ -49,8 +49,8 @@ export function Audiobooks(){
   const[busy,setBusy]=useState(false)
 
   useEffect(()=>{const c=new AbortController()
-    void getAudiobookOverview(c.signal).then(setData).catch(()=>setData({state:'configuredUnavailable',message:'Ljudböcker kunde inte laddas.',continueListening:null,library:[],recent:[],acquisition:{state:'unavailable',canSearch:false,canRequest:false,message:null}}))
-    void getAudiobookAcquisitionStatus(c.signal).then(setProvider).catch(()=>setProvider({state:'unavailable',provider:'unknown',canSearch:false,canRequest:false,canCancel:false,message:'Anskaffningsleverantören kunde inte nås.'}))
+    void getAudiobookOverview(c.signal).then(setData).catch(()=>setData({state:'configuredUnavailable',message:'Ljudböcker kunde inte laddas.',continueListening:null,library:[],recent:[],acquisition:{state:'configuredUnavailable',canSearch:false,canRequest:false,message:null}}))
+    void getAudiobookAcquisitionStatus(c.signal).then(setProvider).catch(()=>setProvider({state:'configuredUnavailable',provider:'unknown',canSearch:false,canRequest:false,canCancel:false,message:'Anskaffningsleverantören kunde inte nås.'}))
     void getAudiobookAcquisitionJobs(c.signal).then(activity=>setJobs(activity.items)).catch(()=>setJobs([]))
     return()=>c.abort()},[])
 
@@ -81,7 +81,7 @@ export function Audiobooks(){
       {notice&&<p aria-live="polite" className="audiobook-notice">{notice}</p>}
       {localResults&&(localResults.length?<><h3>I biblioteket</h3><div className="audiobook-grid">{localResults.map(i=><Book item={i} key={i.id} onOpen={setSelected}/>)}</div></>:<BBEmptyState title="Ingen ljudbok hittades i biblioteket"/>)}
       {discovery&&discovery.length>0&&<><div className="audiobook-section-title"><h3>Kan läggas till</h3><span>{discovery.length} utgåvor</span></div><div className="audiobook-candidates">{discovery.map(i=><Candidate candidate={i} key={`${i.source}:${i.editionId}`} onView={setSelectedCandidate}/>)}</div></>}
-      {!provider?.canRequest&&<BBSurface className="audiobook-provider-note"><strong>{provider?.state==='configuredUnavailable'?'Automatisk hämtning är tillfälligt otillgänglig.':'Automatisk hämtning är inte konfigurerad ännu.'}</strong><span>{provider?.state==='configuredUnavailable'?'Ditt Audiobookshelf-bibliotek fungerar fortfarande. Försök igen när anskaffningsleverantören är tillgänglig.':'Du kan söka i ditt bibliotek. En granskad anskaffningsleverantör krävs för att lägga till nya utgåvor.'}</span></BBSurface>}
+      {provider&&!provider.canRequest&&<BBSurface className="audiobook-provider-note"><strong>{provider.state==='configuredUnavailable'?'Automatisk hämtning är tillfälligt otillgänglig.':'Automatisk hämtning är inte konfigurerad ännu.'}</strong><span>{provider.state==='configuredUnavailable'?'Ditt Audiobookshelf-bibliotek fungerar fortfarande. Försök igen när anskaffningsleverantören är tillgänglig.':'Du kan söka i ditt bibliotek. En granskad anskaffningsleverantör krävs för att lägga till nya utgåvor.'}</span></BBSurface>}
       <Activity jobs={jobs}/>
     </>}
     {selected&&<div aria-modal="true" className="bb-dialog-backdrop" onClick={()=>setSelected(null)} role="dialog"><BBSurface aria-labelledby="audiobook-detail-title" className="audiobook-detail" onClick={e=>e.stopPropagation()}><BBButton aria-label="Stäng" className="audiobook-detail__close" onClick={()=>setSelected(null)} variant="icon">×</BBButton><h2 id="audiobook-detail-title">{selected.title}</h2>{selected.author&&<p>{selected.author}</p>}{selected.narrator&&<p>Uppläsare: {selected.narrator}</p>}<p>{selected.languageLabel}{selected.publishedYear?` · ${selected.publishedYear}`:''}</p>{selected.description&&<p>{selected.description}</p>}{selected.playbackUrl&&<a className="bb-button bb-button--primary" href={selected.playbackUrl} rel="noreferrer">Öppna i Audiobookshelf</a>}</BBSurface></div>}

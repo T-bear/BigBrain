@@ -54,6 +54,14 @@ test('keeps library usable while acquisition provider is unavailable',async()=>{
   expect(screen.queryByText('Audiobookshelf väntar på konfigurering')).not.toBeInTheDocument()
 })
 
+test('does not mislabel a pending or failed provider-status request as not configured',async()=>{
+  const fetch=vi.spyOn(globalThis,'fetch')
+  fetch.mockResolvedValueOnce(json(overview)).mockRejectedValueOnce(new TypeError('network')).mockResolvedValueOnce(json(jobs))
+  render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
+  expect(screen.getByText('Automatisk hämtning är tillfälligt otillgänglig.')).toBeInTheDocument()
+  expect(screen.queryByText('Automatisk hämtning är inte konfigurerad ännu.')).not.toBeInTheDocument()
+})
+
 test('polls real provider state for active jobs without inventing progress',async()=>{
   vi.spyOn(window,'setInterval').mockImplementation(handler=>{if(typeof handler==='function')void handler();return 1})
   const fetch=vi.spyOn(globalThis,'fetch')

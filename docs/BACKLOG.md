@@ -2,10 +2,10 @@
 
 ## BB-103 — First Usable Audiobook Flow
 
-- Status: **TECHNICALLY READY / FIRST REAL ACQUISITION OWNER-GATED** 2026-08-24. Kod, tester och runtime-UI är deployade; ingen acquisition har startats.
+- Status: **TECHNICALLY COMPLETE / FIRST REAL ACQUISITION VERIFIED** 2026-08-24. Den ägarvalda Narnia-releasen är nedladdad, säkert importerad, indexerad, synlig och öppningsbar via BigBrain.
 - Implementerat: explicit utgåvebekräftelse, beständigt sanerat importfel, fail-closed jobbavstämning mot Librarrs exakta import-ID och Audiobookshelf-indexering, lokaliserade jobbstatusar samt library refresh efter bekräftad completion.
 - Runtime: Librarr/Audiobookshelf/provider är healthy och verklig sökning visar valbara Prowlarr-kandidater. Svenska är fortsatt preferens; samtliga observerade kandidater saknade auktoritativ språkmetadata och förblev därför `und/unknown`.
-- Owner gate: välj en specifik utgåva i BigBrain och bekräfta **Lägg till vald utgåva**. Först därefter kan den verkliga kedjan qBittorrent → säker import → Audiobookshelf-indexering → BigBrain-bibliotek verifieras. **FIRST REAL ACQUISITION VERIFIED: NO.**
+- Runtime-verifiering: exakt import-hash, unik normaliserad Audiobookshelf-match och fungerande owner-deeplink verifierades. Provider/Audiobookshelf är `configuredHealthy`; **FIRST REAL ACQUISITION VERIFIED: YES.**
 
 ## BB-100 — Audiobooks Platform Foundation
 

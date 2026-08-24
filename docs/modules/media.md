@@ -22,6 +22,8 @@ BB-103 retains the provider-neutral job contract and upgrades the patched image 
 
 The registry-composed Media view shows sanitized source provenance, decoded display metadata and Swedish labels for job states. Candidate cards open a release-confirmation surface; only that surface can submit the opaque candidate ID. Completion refreshes the existing Audiobookshelf overview, and an indexed item's detail surface keeps playback delegated to the configured Audiobookshelf owner URL. No percentage is shown because the current bounded job contract does not expose authoritative progress.
 
+The first real import proved that provider release metadata can differ from Audiobookshelf's canonical metadata. Completion still starts from an exact provider job hash and exact local `source_id`; after that, reconciliation accepts either an exact title or exactly one normalized canonical Audiobookshelf title contained in the imported release title. `Unknown` is treated as absent author metadata. Multiple matching library items fail closed in `indexing`. A transient provider-status request is represented as `configuredUnavailable`, never `notConfigured`.
+
 Endpoints:
 
 - `GET /api/v1/modules/media/audiobooks/acquisition/provider-status`

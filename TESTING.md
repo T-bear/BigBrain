@@ -6,6 +6,7 @@
 - `LibrarrAudiobookAcquisitionProviderTests` cover single-use opaque candidates, bounded real-state mapping, disappearance without completion, durable import failure, exact local import identity, Audiobookshelf indexing and final completion. Missing evidence remains importing/indexing rather than becoming complete.
 - `Audiobooks.test.tsx` proves the actual registered Media view requires explicit release confirmation, submits exactly once only after that confirmation, localizes truthful job states, refreshes the library on completion and never fabricates percentage progress.
 - Runtime QA performs read-only real search, confirms zero jobs before the owner gate, and checks 390 × 844 plus 430 × 932 in all themes. Never click **Lägg till vald utgåva** without explicit owner selection and approval.
+- First-acquisition regression coverage proves that an exact imported provider hash may reconcile with exactly one canonical Audiobookshelf title even when release tags differ and Librarr reports author `Unknown`; two possible canonical matches remain `indexing`. Web proves transient provider-status failure renders `configuredUnavailable`, not a false not-configured state. Final totals: 540 API and 130 Web tests.
 
 ## BB-102 patched Librarr provider
 
