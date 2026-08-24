@@ -11,6 +11,7 @@ RUN git clone --filter=blob:none https://github.com/JeremiahM37/librarr.git sour
 COPY infrastructure/librarr/patches/0001-audiobook-import-no-overwrite.patch /tmp/no-overwrite.patch
 COPY infrastructure/librarr/patches/0002-explicit-source-policy.patch /tmp/source-policy.patch
 COPY infrastructure/librarr/patches/0003-durable-import-outcome.patch /tmp/import-outcome.patch
+COPY infrastructure/librarr/patches/0004-author-aware-discovery.patch /tmp/author-aware-discovery.patch
 RUN cd source \
     && git apply --check /tmp/no-overwrite.patch \
     && git apply /tmp/no-overwrite.patch \
@@ -18,7 +19,9 @@ RUN cd source \
     && git apply /tmp/source-policy.patch \
     && git apply --check /tmp/import-outcome.patch \
     && git apply /tmp/import-outcome.patch \
-    && test -z "$(gofmt -l internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/api/download.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)" \
+    && git apply --check /tmp/author-aware-discovery.patch \
+    && git apply /tmp/author-aware-discovery.patch \
+    && test -z "$(gofmt -l internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/search/searcher.go internal/search/prowlarr.go internal/search/discovery_query_test.go internal/api/download.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)" \
     && go test ./internal/organize ./internal/search ./internal/download \
     && go test ./internal/api -run '^TestInfoHashFromMagnetIsBoundedAndNormalized$' \
     && CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /librarr ./cmd/librarr/

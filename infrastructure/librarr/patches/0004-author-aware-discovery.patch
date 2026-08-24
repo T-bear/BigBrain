@@ -1,0 +1,291 @@
+diff --git a/internal/search/prowlarr.go b/internal/search/prowlarr.go
+index 446c17e..b68812c 100644
+--- a/internal/search/prowlarr.go
++++ b/internal/search/prowlarr.go
+@@ -96,9 +96,13 @@ type prowlarrSearchParams struct {
+ func (p *Prowlarr) searchVariants(query string, categories []string) []prowlarrSearchParams {
+ 	switch p.tab {
+ 	case "audiobook":
++		genericQuery := query
++		if !containsAudiobookTerm(query) {
++			genericQuery += " audiobook"
++		}
+ 		return []prowlarrSearchParams{
+ 			{query: query, categories: categories, limit: 50},
+-			{query: query + " audiobook", categories: nil, limit: 30},
++			{query: genericQuery, categories: nil, limit: 30},
+ 		}
+ 	case "manga":
+ 		return []prowlarrSearchParams{
+@@ -112,6 +116,16 @@ func (p *Prowlarr) searchVariants(query string, categories []string) []prowlarrS
+ 	}
+ }
+ 
++func containsAudiobookTerm(query string) bool {
++	normalized := strings.ToLower(strings.Join(strings.Fields(query), " "))
++	for _, term := range []string{"audiobook", "audio book", "ljudbok"} {
++		if strings.Contains(normalized, term) {
++			return true
++		}
++	}
++	return false
++}
++
+ func (p *Prowlarr) doSearch(ctx context.Context, params prowlarrSearchParams) ([]models.SearchResult, error) {
+ 	url := fmt.Sprintf("%s/api/v1/search", p.cfg.ProwlarrURL)
+ 
+diff --git a/internal/search/searcher.go b/internal/search/searcher.go
+index 0843599..9e72186 100644
+--- a/internal/search/searcher.go
++++ b/internal/search/searcher.go
+@@ -81,6 +81,7 @@ func (m *Manager) Search(ctx context.Context, tab, query string) ([]models.Searc
+ // SearchWithAuthor runs a query and scores results using the provided author hint.
+ func (m *Manager) SearchWithAuthor(ctx context.Context, tab, query, author string) ([]models.SearchResult, int64) {
+ 	start := time.Now()
++	queries := discoveryQueries(tab, query, author)
+ 	var (
+ 		mu      sync.Mutex
+ 		results []models.SearchResult
+@@ -99,42 +100,124 @@ func (m *Manager) SearchWithAuthor(ctx context.Context, tab, query, author strin
+ 		wg.Add(1)
+ 		go func(src Searcher) {
+ 			defer wg.Done()
++			res, err := m.searchSourceVariants(ctx, src, queries)
++			if err != nil {
++				return
++			}
++			mu.Lock()
++			results = append(results, res...)
++			mu.Unlock()
++		}(s)
++	}
++
++	wg.Wait()
+ 
++	results = m.processResults(results, query, author)
++
++	elapsed := time.Since(start).Milliseconds()
++	return results, elapsed
++}
++
++func (m *Manager) searchSourceVariants(ctx context.Context, src Searcher, queries []string) ([]models.SearchResult, error) {
++	var (
++		mu        sync.Mutex
++		results   []models.SearchResult
++		firstErr  error
++		successes int
++		wg        sync.WaitGroup
++	)
++	for _, query := range queries {
++		wg.Add(1)
++		go func(sourceQuery string) {
++			defer wg.Done()
+ 			searchCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+ 			defer cancel()
+-
+-			res, err := src.Search(searchCtx, query)
++			res, err := src.Search(searchCtx, sourceQuery)
++			mu.Lock()
++			defer mu.Unlock()
+ 			if err != nil {
+-				if ctx.Err() != nil {
+-					slog.Debug("search canceled by client", "source", src.Name())
+-					return
++				if firstErr == nil {
++					firstErr = err
+ 				}
+-				slog.Error("search failed", "source", src.Name(), "error", err)
+-				m.health.RecordFailure(src.Name(), err.Error(), "search")
+ 				return
+ 			}
+-
+-			m.health.RecordSuccess(src.Name(), "search")
+-
+-			// Set source field on all results.
++			successes++
+ 			for i := range res {
+ 				if res[i].Source == "" {
+ 					res[i].Source = src.Name()
+ 				}
+ 			}
+-
+-			mu.Lock()
+ 			results = append(results, res...)
+-			mu.Unlock()
+-		}(s)
++		}(query)
+ 	}
+-
+ 	wg.Wait()
++	if ctx.Err() != nil {
++		slog.Debug("search canceled by client", "source", src.Name())
++		return nil, ctx.Err()
++	}
++	if successes == 0 {
++		m.health.RecordFailure(src.Name(), firstErr.Error(), "search")
++		slog.Warn("all search variants failed", "source", src.Name(), "error", firstErr)
++		return nil, firstErr
++	}
++	m.health.RecordSuccess(src.Name(), "search")
++	if firstErr != nil {
++		slog.Warn("search variant failed; retaining partial results", "source", src.Name(), "error", firstErr)
++	}
++	return results, nil
++}
+ 
+-	results = m.processResults(results, query, author)
++// discoveryQueries keeps ordinary searches unchanged and adds at most two
++// author-aware audiobook variants. Normalized duplicates are removed before
++// any source is called.
++func discoveryQueries(tab, query, author string) []string {
++	query = strings.Join(strings.Fields(query), " ")
++	author = strings.Join(strings.Fields(author), " ")
++	variants := []string{query}
++	if tab == "audiobook" && author != "" {
++		if !containsNormalizedPhrase(query, author) {
++			variants = append(variants, query+" "+author)
++		}
++		words := strings.Fields(query)
++		if len(words) > 1 {
++			switch strings.ToLower(words[0]) {
++			case "a", "an", "the":
++				variants = append(variants, strings.Join(words[1:], " ")+" "+author)
++			}
++		}
++	}
+ 
+-	elapsed := time.Since(start).Milliseconds()
+-	return results, elapsed
++	seen := make(map[string]struct{}, len(variants))
++	bounded := make([]string, 0, len(variants))
++	for _, variant := range variants {
++		normalized := strings.ToLower(strings.Join(strings.Fields(variant), " "))
++		if normalized == "" {
++			continue
++		}
++		if _, duplicate := seen[normalized]; duplicate {
++			continue
++		}
++		seen[normalized] = struct{}{}
++		bounded = append(bounded, variant)
++		if len(bounded) == 3 {
++			break
++		}
++	}
++	return bounded
++}
++
++func containsNormalizedPhrase(value, phrase string) bool {
++	valueWords := strings.Fields(strings.ToLower(value))
++	phraseWords := strings.Fields(strings.ToLower(phrase))
++	if len(phraseWords) == 0 || len(phraseWords) > len(valueWords) {
++		return false
++	}
++	for i := 0; i <= len(valueWords)-len(phraseWords); i++ {
++		if strings.Join(valueWords[i:i+len(phraseWords)], " ") == strings.Join(phraseWords, " ") {
++			return true
++		}
++	}
++	return false
+ }
+ 
+ // SearchStream runs a query and emits an update when each source finishes.
+diff --git a/internal/search/discovery_query_test.go b/internal/search/discovery_query_test.go
+new file mode 100644
+index 0000000..a4ca91a
+--- /dev/null
++++ b/internal/search/discovery_query_test.go
+@@ -0,0 +1,93 @@
++package search
++
++import (
++	"context"
++	"errors"
++	"reflect"
++	"sync"
++	"testing"
++
++	"github.com/JeremiahM37/librarr/internal/config"
++	"github.com/JeremiahM37/librarr/internal/models"
++)
++
++func TestDiscoveryQueriesAreBoundedAndAuthorAware(t *testing.T) {
++	tests := []struct {
++		name, tab, query, author string
++		want                     []string
++	}{
++		{"title only", "audiobook", "The Wandering Inn", "", []string{"The Wandering Inn"}},
++		{"title and author", "audiobook", "The Wandering Inn", "pirateaba", []string{"The Wandering Inn", "The Wandering Inn pirateaba", "Wandering Inn pirateaba"}},
++		{"normalized duplicates", "audiobook", "  Book   pirateaba  ", "PIRATEABA", []string{"Book pirateaba"}},
++		{"other tabs unchanged", "main", "The Wandering Inn", "pirateaba", []string{"The Wandering Inn"}},
++	}
++	for _, tc := range tests {
++		t.Run(tc.name, func(t *testing.T) {
++			if got := discoveryQueries(tc.tab, tc.query, tc.author); !reflect.DeepEqual(got, tc.want) {
++				t.Fatalf("discoveryQueries() = %#v, want %#v", got, tc.want)
++			}
++		})
++	}
++}
++
++type recordingSearcher struct {
++	name    string
++	mu      sync.Mutex
++	queries []string
++}
++
++func (s *recordingSearcher) Name() string         { return s.name }
++func (s *recordingSearcher) Label() string        { return s.name }
++func (s *recordingSearcher) Enabled() bool        { return true }
++func (s *recordingSearcher) SearchTab() string    { return "audiobook" }
++func (s *recordingSearcher) DownloadType() string { return "torrent" }
++func (s *recordingSearcher) Search(_ context.Context, query string) ([]models.SearchResult, error) {
++	s.mu.Lock()
++	s.queries = append(s.queries, query)
++	s.mu.Unlock()
++	if query == "The Wandering Inn" {
++		return nil, errors.New("one variant failed")
++	}
++	return []models.SearchResult{{Source: "prowlarr_audiobooks", Title: "The Wandering Inn English", InfoHash: query}}, nil
++}
++
++func TestSearchWithAuthorReachesSourcesAndKeepsPartialSuccess(t *testing.T) {
++	source := &recordingSearcher{name: "prowlarr_audiobooks"}
++	mgr := NewManager(&config.Config{}, []Searcher{source}, NewHealthTracker(3, 300))
++	results, _ := mgr.SearchWithAuthor(context.Background(), "audiobook", "The Wandering Inn", "pirateaba")
++
++	source.mu.Lock()
++	gotQueries := append([]string(nil), source.queries...)
++	source.mu.Unlock()
++	wantQueries := []string{"The Wandering Inn", "The Wandering Inn pirateaba", "Wandering Inn pirateaba"}
++	for _, want := range wantQueries {
++		if !containsString(gotQueries, want) {
++			t.Fatalf("source queries = %#v, missing %q", gotQueries, want)
++		}
++	}
++	if len(results) == 0 {
++		t.Fatal("successful variants must survive a partial variant failure")
++	}
++}
++
++func TestProwlarrAudiobookSuffixIsNotDuplicated(t *testing.T) {
++	p := &Prowlarr{tab: "audiobook"}
++	for _, query := range []string{"Book audiobook", "Book audio book", "Book ljudbok"} {
++		variants := p.searchVariants(query, []string{"3030"})
++		if variants[1].query != query {
++			t.Fatalf("generic query = %q, want %q", variants[1].query, query)
++		}
++	}
++	if got := p.searchVariants("Book", []string{"3030"})[1].query; got != "Book audiobook" {
++		t.Fatalf("generic query = %q, want audiobook suffix", got)
++	}
++}
++
++func containsString(values []string, target string) bool {
++	for _, value := range values {
++		if value == target {
++			return true
++		}
++	}
++	return false
++}

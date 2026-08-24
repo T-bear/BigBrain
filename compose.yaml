@@ -168,7 +168,7 @@ services:
     stop_grace_period: 30s
 
   librarr:
-    image: bigbrain-librarr:1208254-bb3
+    image: bigbrain-librarr:1208254-bb4
     build:
       context: .
       dockerfile: infrastructure/librarr/Dockerfile

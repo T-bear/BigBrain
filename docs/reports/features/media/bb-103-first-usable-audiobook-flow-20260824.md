@@ -70,3 +70,11 @@ No BB-103 lifecycle blocker remains. The separate Revolvermannen acquisition was
 ## Resumption
 
 No further BB-103 action is required for the verified Narnia lifecycle. The separate existing Revolvermannen job may be observed through its BigBrain-owned job ID without cancelling, restarting or exposing provider identifiers or credentials.
+
+## Bounded author-aware discovery follow-up
+
+Owner-requested discovery quality work on 2026-08-24 produced `bigbrain-librarr:1208254-bb4` without changing provider, source, indexer or acquisition architecture. The isolated fourth patch keeps title-only searches unchanged and generates at most three normalized unique audiobook source queries when an author is supplied. For the diagnostic title these are `The Wandering Inn`, `The Wandering Inn pirateaba` and `Wandering Inn pirateaba`. Each Prowlarr query retains its category `3030` variant and one generic audiobook variant; an existing equivalent audiobook term is never appended twice. Variants share the existing 30-second cancellation boundary, successful variants survive another variant failing, and original title/author scoring remains authoritative after aggregation.
+
+The deployed read-only comparison used English preference and made no acquisition request. Before the patch the title-plus-author call completed with zero candidates while author affected only scoring. After deployment, all three author-aware variants reached sources; the six sanitized Prowlarr category/generic calls each returned zero raw rows. Librarr retained zero and BigBrain returned zero candidates in 24.26 seconds. AudioBookBay completed without yielding a retained result. The evidence therefore leaves audiobook-capable English indexer coverage—not application filtering or ranking—as the primary remaining limitation for this title.
+
+The bb4 build passed complete upstream organizer, search and download packages plus focused API regression. BigBrain provider tests passed 33/33, the registry-composed audiobook Web suite passed 9/9, Vite production build and documentation/Compose checks passed. Deployed 390 × 844 browser smoke passed Obsidian Gold, Forest Night and Arctic Wind with provider configured, English selection and author retained, no horizontal overflow, dock clearance and no acquisition dialog or Add action.

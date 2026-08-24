@@ -2,7 +2,7 @@
 
 ## Supported build
 
-BB-103 uses the internal-only image `bigbrain-librarr:1208254-bb3`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, explicit-source-policy and durable-import-outcome patches documented in `infrastructure/librarr/README.md`.
+BB-103 uses the internal-only image `bigbrain-librarr:1208254-bb4`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, explicit-source-policy, durable-import-outcome and bounded author-aware discovery patches documented in `infrastructure/librarr/README.md`.
 
 Do not replace the tag with `latest`. Re-run the patch security review for every upstream change.
 
@@ -39,7 +39,7 @@ The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are 
 2. Create `/srv/media/audiobooks-incoming` owned by appliance UID/GID 1000 without changing the final library.
 3. Initialize the newly created `librarr-config` named volume for UID/GID 1000 before first start; Docker creates it root-owned and Librarr intentionally runs non-root.
 4. Render Compose with `docker compose config --quiet`.
-5. Build `bigbrain-librarr:1208254-bb3`; the build runs complete organizer/search/download tests plus the focused API patch regression.
+5. Build `bigbrain-librarr:1208254-bb4`; the build runs complete organizer/search/download tests plus focused API and discovery-query regressions.
 6. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
 7. Before enabling BigBrain search, verify runtime logs show exactly `prowlarr_audiobooks` then `audiobookbay`. Stop Librarr if any additional source is loaded.
 8. Recreate only API and Web after provider health and source-boundary checks succeed.

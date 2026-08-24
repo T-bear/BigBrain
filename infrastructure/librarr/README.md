@@ -1,6 +1,6 @@
 # BigBrain-maintained Librarr image
 
-BB-102/103 builds Librarr from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` and applies three independently reviewable patches: `patches/0001-audiobook-import-no-overwrite.patch`, `patches/0002-explicit-source-policy.patch` and `patches/0003-durable-import-outcome.patch`.
+BB-102/103 builds Librarr from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` and applies four independently reviewable patches: `patches/0001-audiobook-import-no-overwrite.patch`, `patches/0002-explicit-source-policy.patch`, `patches/0003-durable-import-outcome.patch` and `patches/0004-author-aware-discovery.patch`.
 
 ## Why the patch exists
 
@@ -13,10 +13,12 @@ The second patch requires `LIBRARR_ALLOWED_SOURCES`, preserves constructor order
 ## Build and verification
 
 ```bash
-docker build -f infrastructure/librarr/Dockerfile -t bigbrain-librarr:1208254-bb2 .
+docker build -f infrastructure/librarr/Dockerfile -t bigbrain-librarr:1208254-bb4 .
 ```
 
 The third BB-103 patch records a sanitized `torrent_import_failed` activity event keyed by the torrent hash whenever final import fails. It does not alter placement: the no-overwrite patch remains authoritative, the source is retained and the existing destination stays untouched. This durable evidence lets BigBrain distinguish a real conflict/failure from asynchronous import/indexing without reading provider logs.
+
+The fourth discovery-quality patch keeps title-only search unchanged. For an audiobook title plus author it issues at most three normalized, unique source queries: title, title plus author and—only for leading English articles—the article-free title plus author. Variants run within the existing bounded/cancellable source search, partial source success is retained, and author remains a post-result scoring signal. Prowlarr no longer appends a second audiobook term when the query already contains `audiobook`, `audio book` or `ljudbok`. Provider/source architecture and acquisition/import behavior are unchanged.
 
 The Docker build applies all patches with `git apply --check`, verifies formatting, runs the complete upstream `internal/organize`, `internal/search` and `internal/download` packages plus the focused API regression and then builds the binary. The runtime stage remains non-root and contains neither Git nor the Go toolchain. Its entrypoint fails closed before Librarr starts if any required server-side credential, Audiobookshelf library ID or source allowlist is absent; it never prints values.
 
