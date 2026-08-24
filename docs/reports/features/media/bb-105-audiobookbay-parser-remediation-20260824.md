@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version; lokal runtime-evidens med privata värden p
 
 ## Status
 
-**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED.**
+**TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / FOLLOW-UP CI PENDING.**
 
 ## Scope and root cause
 
@@ -66,6 +66,24 @@ At 390×844, Obsidian Gold, Forest Night and Arctic Wind each rendered nine cand
 - Current releases lack authoritative structured language and narrator metadata, so candidates remain unknown rather than being guessed English.
 - Current Prowlarr coverage still returns zero for this series.
 
+## Case-normalization follow-up
+
+A later owner regression showed `Pirateaba` returning zero while lowercase `pirateaba` still returned the catalogue candidates. Read-only tracing proved the capitalized request produced nine AudioBookBay parser rows that Librarr rejected, while lowercase source HTML exposed nine matching posts and Librarr/BigBrain retained all nine. Language, deduplication, acquisition-state filtering, cache and deployment mismatch were excluded.
+
+Image `bigbrain-librarr:1208254-bb7` adds only `0007-audiobookbay-query-case-normalization.patch`. The AudioBookBay adapter lowercases its outgoing search parameter; BigBrain's literal owner input and Librarr relevance/scoring remain unchanged, as do Prowlarr, other sources and the complete acquisition/import boundary. A network-free table test covers three Pirateaba casings and two Wandering Inn casings.
+
+Sanitized deployed GET-only evidence:
+
+| Query | BigBrain candidates | Provenance | Language |
+| --- | ---: | --- | --- |
+| `Pirateaba` | 9 | AudioBookBay | `und` |
+| `pirateaba` | 9 | AudioBookBay | `und` |
+| `PIRATEABA` | 9 | AudioBookBay | `und` |
+| `The Wandering Inn` | 9 | AudioBookBay | `und` |
+| `the wandering inn` | 9 | AudioBookBay | `und` |
+
+Only Librarr was recreated. Acquisition jobs remained 12 and the existing Ghostsong job remained `indexing`; no POST acquisition request was made. Source policy, qBittorrent, Audiobookshelf, Finance, Sentinel and no-overwrite behavior were untouched. The remaining limitation is unchanged: source releases lack authoritative structured language and narrator metadata.
+
 ## Resumption
 
-No operational continuation is required for BB-105. A future discovery-quality slice should begin from `bigbrain-librarr:1208254-bb6`, retain all six patches and re-run the fixture plus complete import/no-overwrite regressions. Do not add sources or modify acquisition behavior without a separate owner decision.
+No operational continuation is required for BB-105. A future discovery-quality slice should begin from `bigbrain-librarr:1208254-bb7`, retain all seven patches and re-run the fixture plus complete import/no-overwrite regressions. Do not add sources or modify acquisition behavior without a separate owner decision.

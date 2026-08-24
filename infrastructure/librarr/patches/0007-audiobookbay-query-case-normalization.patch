@@ -1,0 +1,61 @@
+diff --git a/internal/search/audiobookbay.go b/internal/search/audiobookbay.go
+index 54fd126..fe7c6d2 100644
+--- a/internal/search/audiobookbay.go
++++ b/internal/search/audiobookbay.go
+@@ -57,7 +57,10 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 	}
+ 
+ 	q := req.URL.Query()
+-	q.Set("s", query)
++	// AudioBookBay's search endpoint treats otherwise equivalent mixed-case
++	// queries inconsistently. Normalize only this source request; Librarr keeps
++	// the owner's original query for relevance filtering and scoring.
++	q.Set("s", strings.ToLower(query))
+ 	q.Set("tt", "1")
+ 	req.URL.RawQuery = q.Encode()
+ 	setABBRequestHeaders(req)
+diff --git a/internal/search/audiobookbay_test.go b/internal/search/audiobookbay_test.go
+index 012138a..25b97c8 100644
+--- a/internal/search/audiobookbay_test.go
++++ b/internal/search/audiobookbay_test.go
+@@ -93,6 +93,40 @@ func TestAudioBookBaySearchSetsBrowserHeaders(t *testing.T) {
+ 	}
+ }
+ 
++func TestAudioBookBaySearchQueryIsSourceSpecificallyLowercased(t *testing.T) {
++	tests := []struct {
++		name  string
++		query string
++		want  string
++	}{
++		{name: "author title case", query: "Pirateaba", want: "pirateaba"},
++		{name: "author lower case", query: "pirateaba", want: "pirateaba"},
++		{name: "author upper case", query: "PIRATEABA", want: "pirateaba"},
++		{name: "book title case", query: "The Wandering Inn", want: "the wandering inn"},
++		{name: "book lower case", query: "the wandering inn", want: "the wandering inn"},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			rt := &abbRoundTripper{body: "<html><body></body></html>"}
++			reg, err := sourcestest.Registry()
++			if err != nil {
++				t.Fatalf("load registry: %v", err)
++			}
++			cfg := &config.Config{UserAgent: "test", Sources: reg}
++			cfg.Sources.AudioBookBay.Mirrors = []string{"fixture.invalid"}
++			a := &AudioBookBay{cfg: cfg, client: &http.Client{Transport: rt}}
++
++			if _, err := a.searchDomain(context.Background(), "fixture.invalid", tt.query); err != nil {
++				t.Fatalf("searchDomain returned error: %v", err)
++			}
++			if got := rt.req.URL.Query().Get("s"); got != tt.want {
++				t.Fatalf("source query = %q, want %q", got, tt.want)
++			}
++		})
++	}
++}
++
+ func TestResolveABBMagnetUsesBrowserHeaders(t *testing.T) {
+ 	rt := &abbRoundTripper{
+ 		body: `<html><body>

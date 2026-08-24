@@ -2,7 +2,7 @@
 
 ## Supported build
 
-BB-105 uses the internal-only image `bigbrain-librarr:1208254-bb6`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, revision-bound source-policy, durable-import-outcome, bounded author-aware discovery and AudioBookBay DOM-boundary patches documented in `infrastructure/librarr/README.md`.
+BB-105 uses the internal-only image `bigbrain-librarr:1208254-bb7`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, revision-bound source-policy, durable-import-outcome, bounded author-aware discovery, AudioBookBay DOM-boundary and AudioBookBay-only query-case patches documented in `infrastructure/librarr/README.md`.
 
 Do not replace the tag with `latest`. Re-run the patch security review for every upstream change.
 
@@ -39,11 +39,13 @@ The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are 
 2. Create `/srv/media/audiobooks-incoming` owned by appliance UID/GID 1000 without changing the final library.
 3. Initialize the newly created `librarr-config` named volume for UID/GID 1000 before first start; Docker creates it root-owned and Librarr intentionally runs non-root.
 4. Render Compose with `docker compose config --quiet`.
-5. Build `bigbrain-librarr:1208254-bb6`; the build runs complete organizer/search/download tests plus focused API, revision-policy, discovery-query and sanitized AudioBookBay fixture regressions.
+5. Build `bigbrain-librarr:1208254-bb7`; the build runs complete organizer/search/download tests plus focused API, revision-policy, discovery-query, sanitized AudioBookBay parser and query-case regressions.
 6. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
 7. Before enabling BigBrain search, verify source metadata matches the exact pinned set: Prowlarr first, AudioBookBay, LibriVox and The Pirate Bay active, and BookTracker present but disabled unless separately configured. Stop Librarr on any unknown or duplicate audiobook source.
 8. Recreate only API and Web after provider health and source-boundary checks succeed.
 9. Search through BigBrain. The provider-specific timeout is bounded at 45 seconds for the reviewed multi-source latency; cancellation still propagates and one source may return zero results without invalidating useful results from another. Acquisition still requires the owner's explicit edition review and confirmation.
+
+AudioBookBay alone receives a lowercase source query because runtime evidence proved its catalogue lookup case-dependent. Do not lowercase the BigBrain owner input or queries for Prowlarr/other sources; original text remains authoritative for metadata, relevance and ranking.
 
 ## Acquisition lifecycle evidence
 

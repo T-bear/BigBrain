@@ -5,6 +5,7 @@
 - Build `bigbrain-librarr:1208254-bb6`. The image applies the sanitized current-markup fixture, proves English rows survive adjacent nested metadata labels, rejects a non-English row, and reruns complete organizer/search/download plus the focused API regression.
 - `AudiobookMetadataTests` prove literal author-only input is the first bounded provider seed and only one resolved work supplements it. `AudiobookAcquisitionTests` prove English preference, Swedish preference, All Languages and retained unknown candidates without creating requests.
 - Runtime verification is read-only: record source HTML post count, AudioBookBay parsed count, Librarr retained count and BigBrain candidate count; compare acquisition-job totals before/after and never open the final confirmation.
+- BB-105 follow-up image `bigbrain-librarr:1208254-bb7` adds a network-free table regression proving AudioBookBay alone sends lowercase queries for `Pirateaba`, `pirateaba`, `PIRATEABA`, `The Wandering Inn` and `the wandering inn`. Runtime QA repeats those five GET-only searches and verifies acquisition-job totals and Ghostsong state are unchanged.
 
 ## BB-104 universal metadata-aware audiobook search
 
