@@ -22,19 +22,27 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     {
         if (!Configured)
             return new(AudiobookIntegrationStates.NotConfigured, "librarr", false, false, false, "Librarr är inte konfigurerat.");
-        using var response = await http.GetAsync("api/admin/health", token);
-        if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
-            return Unavailable("Librarr avvisade autentiseringen.");
-        if (!response.IsSuccessStatusCode) return Unavailable("Librarr kunde inte nås.");
-        using var document = await ParseBoundedAsync(response, token);
-        if (!document.RootElement.TryGetProperty("healthy", out var healthy) || healthy.ValueKind != JsonValueKind.True)
-            return Unavailable(DependencyMessage(document.RootElement));
-        var checks = document.RootElement.TryGetProperty("checks", out var value) && value.ValueKind == JsonValueKind.Array
-            ? value.EnumerateArray().ToArray() : [];
-        foreach (var required in new[] { "prowlarr", "qbittorrent", "audiobookshelf" })
-            if (!checks.Any(check => Text(check, "service") == required && Text(check, "status") == "ok"))
-                return Unavailable($"Librarrs beroende {required} är inte tillgängligt.");
-        return new(AudiobookIntegrationStates.ConfiguredHealthy, "librarr", true, true, false, null);
+        try
+        {
+            using var response = await http.GetAsync("api/admin/health", token);
+            if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+                return Unavailable("Librarr avvisade autentiseringen.");
+            if (!response.IsSuccessStatusCode) return Unavailable("Librarr kunde inte nås.");
+            using var document = await ParseBoundedAsync(response, token);
+            if (!document.RootElement.TryGetProperty("healthy", out var healthy) || healthy.ValueKind != JsonValueKind.True)
+                return Unavailable(DependencyMessage(document.RootElement));
+            var checks = document.RootElement.TryGetProperty("checks", out var value) && value.ValueKind == JsonValueKind.Array
+                ? value.EnumerateArray().ToArray() : [];
+            foreach (var required in new[] { "prowlarr", "qbittorrent", "audiobookshelf" })
+                if (!checks.Any(check => Text(check, "service") == required && Text(check, "status") == "ok"))
+                    return Unavailable($"Librarrs beroende {required} är inte tillgängligt.");
+            return new(AudiobookIntegrationStates.ConfiguredHealthy, "librarr", true, true, false, null);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or JsonException or IOException)
+        {
+            return Unavailable("Librarr kunde inte nås.");
+        }
     }
 
     public async Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token)

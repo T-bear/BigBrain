@@ -14,7 +14,7 @@ BigBrain owns `AudiobookAcquisitionCandidate`, `AudiobookAcquisitionJob` and sta
 
 ## Librarr provider continuation (BB-102)
 
-The owner approved a minimal BigBrain-maintained patch/image after upstream overwrite-on-destination behavior blocked deployment. Commit `1208254c20b31fbf217558c0fb987f779fed1cf8` is pinned; the isolated patch reserves a new book directory, uses exclusive file creation and fails closed on existing/partial destinations and path escapes. Librarr remains internal-only, Prowlarr is the sole discovery source, Web receives opaque candidate IDs, `CanCancel=false`, and weak release-name language hints remain `Probable` while missing language remains `und`. The provider code is implemented but runtime still reports the BB-101 safe fallback until required local secrets are installed and commissioning succeeds.
+The owner approved a minimal BigBrain-maintained patch/image after upstream overwrite-on-destination behavior blocked deployment. Commit `1208254c20b31fbf217558c0fb987f779fed1cf8` is pinned; the isolated patch reserves a new book directory, uses exclusive file creation and fails closed on existing/partial destinations and path escapes. Web receives opaque candidate IDs, `CanCancel=false`, and weak release-name language hints remain `Probable` while missing language remains `und`. Runtime commissioning proved downstream connectivity but also proved that upstream registers built-in audiobook sources unconditionally despite an empty local registry. Librarr is stopped pending separate owner approval for a narrowly scoped Prowlarr-only source-registration correction. Provider transport failure degrades acquisition without breaking the commissioned Audiobookshelf library.
 
 Endpoints:
 

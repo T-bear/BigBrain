@@ -4,7 +4,7 @@
 
 Den tidigare import-säkerhetsgaten accepterades av ägaren med alternativ 2: en minimal BigBrain-underhållen patch/image. Upstream är pinnad till commit `1208254c20b31fbf217558c0fb987f779fed1cf8`; image `bigbrain-librarr:1208254-bb1` byggs reproducerbart och kör 59 organizer-tester, varav 11 nya regressionsfall för no-overwrite, katalogkonflikt, partiell destination, path escape samt source-preservation i move/copy/hardlink.
 
-Provider-adaptern och intern-only Compose-konfigurationen är implementerade och automatiskt verifierade, men deployment är ännu blockerad: appliance `.env` saknar `LIBRARR_API_KEY`, `LIBRARR_QBITTORRENT_USERNAME` och `LIBRARR_QBITTORRENT_PASSWORD`. Inga värden ska lämnas i chat eller Git. Ingen Librarr-container har startats och ingen acquisition har gjorts. BB-100:s Audiobookshelf-baslinje påverkas inte; BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+Provider-adaptern och intern-only Compose-konfigurationen är implementerade och automatiskt verifierade. Commissioning 2026-08-24 bekräftade alla tre runtime-hemligheter, healthy Librarr samt fungerande Prowlarr-, qBittorrent- och Audiobookshelf-anslutningar. En verklig sökning avslöjade dock att upstream alltid registrerar built-in audiobook sources även med tom lokal registry; detta bryter den beslutade Prowlarr-only-gränsen. Librarr stoppades utan acquisition och API degraderar nu kontrollerat medan Audiobookshelf förblir `configuredHealthy`. Fortsättning kräver ett nytt, uttryckligt ägarbeslut eftersom den godkända patchen endast omfattar importkonflikter. BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
 
 ## BB-101 audiobook acquisition foundation (2026-08-23)
 

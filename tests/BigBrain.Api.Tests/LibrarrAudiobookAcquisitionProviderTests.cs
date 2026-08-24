@@ -35,6 +35,16 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
     }
 
     [Fact]
+    public async Task StatusFailsClosedForTransportFailure()
+    {
+        var provider = Provider(_ => throw new HttpRequestException("unreachable"));
+        var status = await provider.GetStatusAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("configuredUnavailable", status.State);
+        Assert.False(status.CanSearch);
+        Assert.False(status.CanRequest);
+    }
+
+    [Fact]
     public async Task SearchMapsOnlyTrackableProwlarrReleasesAndKeepsEditionsDistinct()
     {
         var provider = Provider(_ => Json(HttpStatusCode.OK, """

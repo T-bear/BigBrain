@@ -37,11 +37,13 @@ The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are 
 
 1. Verify all three secret variable names are present without printing values.
 2. Create `/srv/media/audiobooks-incoming` owned by appliance UID/GID 1000 without changing the final library.
-3. Render Compose with `docker compose config --quiet`.
-4. Build `bigbrain-librarr:1208254-bb1`; the build runs upstream organizer tests plus the patch regressions.
-5. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
-6. Recreate only API and Web after provider health succeeds.
-7. Search through BigBrain. Do not submit the first release until the owner explicitly selects it.
+3. Initialize the newly created `librarr-config` named volume for UID/GID 1000 before first start; Docker creates it root-owned and Librarr intentionally runs non-root.
+4. Render Compose with `docker compose config --quiet`.
+5. Build `bigbrain-librarr:1208254-bb1`; the build runs upstream organizer tests plus the patch regressions.
+6. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
+7. Before enabling BigBrain search, verify runtime logs show only the approved discovery sources. Upstream commit `1208254` currently registers built-in audiobook sources unconditionally; an empty registry does not disable them. Stop Librarr if this remains true.
+8. Recreate only API and Web after provider health and source-boundary checks succeed.
+9. Search through BigBrain. Do not submit the first release until the owner explicitly selects it.
 
 ## Failure and rollback
 

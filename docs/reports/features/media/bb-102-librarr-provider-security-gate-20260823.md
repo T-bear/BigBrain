@@ -9,7 +9,7 @@
 
 ## Status
 
-**SECURITY GATE REMEDIATED; RUNTIME COMMISSIONING BLOCKED.** The owner approved option 2, a minimal BigBrain-controlled patch/image. The no-overwrite invariant is automatically verified; deployment has not started because required local credentials are absent.
+**IMPORT GATE REMEDIATED; SOURCE-BOUNDARY GATE OPEN.** The owner approved option 2, a minimal BigBrain-controlled import patch/image. The no-overwrite invariant is automatically verified. Commissioning later stopped on a separately discovered Prowlarr-only source-registration violation.
 
 ## Scope and decision
 
@@ -53,9 +53,9 @@ On 2026-08-23 the owner explicitly approved a narrowly scoped BigBrain-maintaine
 
 The patched organizer atomically reserves a new final book directory, uses exclusive destination-file creation, refuses existing or partially populated book destinations, rejects unsafe author/title components and source symlinks, and preserves source data when placement fails. Move deletes the source only after all destination writes and syncs succeed; copy and hardlink never replace. The image build executes all 59 organizer tests, including 11 new patch regression tests.
 
-The focused security re-review found no Docker socket, privileged mode, host port or arbitrary Web-controlled path. Prowlarr-only discovery is enforced with a local empty registry. BigBrain retains opaque candidate identifiers and server-only provider payloads. Cancellation remains disabled because upstream deletion semantics are not proven safe.
+The focused security re-review found no Docker socket, privileged mode, host port or arbitrary Web-controlled path. At this stage the local empty registry was believed to enforce Prowlarr-only discovery; runtime commissioning later disproved that assumption. BigBrain retains opaque candidate identifiers and server-only provider payloads. Cancellation remains disabled because upstream deletion semantics are not proven safe.
 
-BigBrain's provider adapter and Compose service are implemented and locally tested. Runtime deployment remains blocked until the appliance owner installs the three required secret values named in the runbook; as of this report all three are absent. No secret value was read or published, no Librarr container was started, and no download was requested.
+BigBrain's provider adapter and Compose service were implemented and locally tested. At the original 2026-08-23 stop, runtime deployment was blocked until the appliance owner installed the three required secret values. The 2026-08-24 commissioning section below supersedes that historical credential state. No secret value was read or published and no download was requested.
 
 ## Automated verification
 
@@ -70,6 +70,20 @@ BigBrain's provider adapter and Compose service are implemented and locally test
 - Missing-credential entrypoint test: image refused startup with exit code 78 and did not print variable values.
 
 CI, deployment, downstream health, real provider search and browser QA are not claimed: they require publication and then the three local runtime credentials. The first real download remains explicitly prohibited until the owner selects a candidate.
+
+## Commissioning evidence — 2026-08-24
+
+The three required environment variables were present without their values being read or printed. `/srv/media/audiobooks-incoming` was created with appliance ownership, the pinned image rebuilt, and only Librarr started. The new Docker named volume required a one-time UID/GID 1000 ownership initialization; afterward container health and authenticated admin health were green. Librarr independently reported Prowlarr, qBittorrent and Audiobookshelf as `ok`.
+
+BigBrain API/Web were recreated only after that health evidence. Provider status and audiobook overview both reported `configuredHealthy`, and Audiobookshelf remained healthy with an empty library. A real Swedish-preference search was then attempted. No acquisition job was created.
+
+The search exposed a second upstream boundary issue: commit `1208254` always constructs AudioBookBay and other built-in source drivers in `cmd/librarr/main.go`. The empty local registry prevents external registry loading but does not disable those drivers; runtime logs proved attempted non-Prowlarr access. BigBrain filters returned candidates to `prowlarr_audiobooks`, but outbound requests still violate the approved Prowlarr-only architecture. The search also completed just after BigBrain's ten-second provider timeout, so no candidates were accepted or displayed.
+
+The owner approval for the maintained patch was explicitly limited to import conflict safety. Librarr was therefore stopped rather than broadening the patch. Its volume and both media paths were preserved. A small BigBrain resilience fix was added and tested so stopped/unreachable Librarr yields `configuredUnavailable` without breaking Audiobookshelf; the deployed overview again reports Audiobookshelf `configuredHealthy`. Acquisition jobs remain zero.
+
+Continuation now requires explicit owner approval for a second independently reviewable patch limited to making source registration configurable/Prowlarr-only, plus a bounded search-timeout adjustment. This is not authorization for other Librarr behavior changes, and the first download remains owner-gated.
+
+The controlled-degradation fix passed 22 focused audiobook/provider tests and the complete 529-test API suite plus a zero-warning Release build. The unavailable-state Web refinement passed 6 focused tests and its production build. Deployed browser QA at both 390×844 and 430×932 passed for Obsidian Gold, Forest Night and Arctic Wind: Audiobookshelf remained connected, Swedish remained selected, local empty search worked, no fake progress or horizontal overflow appeared, and the last action cleared the dock. Obsidian Gold was restored afterward. This evidence validates the safe blocked state, not a commissioned acquisition provider or real candidate list.
 
 ## Remaining work
 
