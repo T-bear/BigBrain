@@ -70,6 +70,25 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     }
 
     [Fact]
+    public async Task EnglishPreferenceRanksEnglishFirstAndAllLanguagesAddsNoPreference()
+    {
+        using var store = Store();
+        var provider = new FakeProvider
+        {
+            Results = [Candidate("sv", "Röst", "sv"), Candidate("und", "Okänd", "und"), Candidate("en", "Voice", "en")]
+        };
+        var service = new AudiobookAcquisitionService(provider, store, TimeProvider.System);
+
+        var english = await service.SearchAsync("Book", null, "en", CancellationToken.None);
+        Assert.Equal("en", english[0].EditionId);
+        Assert.Contains(english, value => value.Language == "und");
+
+        var all = await service.SearchAsync("Book", null, "und", CancellationToken.None);
+        Assert.Equal(["en", "sv", "und"], all.Select(value => value.EditionId));
+        Assert.Equal(0, provider.RequestCount);
+    }
+
+    [Fact]
     public async Task MetadataVariantPartialFailureKeepsSuccessfulCandidates()
     {
         using var store = Store();

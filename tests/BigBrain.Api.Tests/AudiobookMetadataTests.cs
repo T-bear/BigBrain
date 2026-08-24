@@ -66,13 +66,17 @@ public sealed class AudiobookMetadataTests
     }
 
     [Fact]
-    public void AuthorOnlySearchReturnsAtMostTwoResolvedWorks()
+    public void AuthorOnlySearchPreservesLiteralQueryAndAddsOneResolvedWork()
     {
         var plan = AudiobookDiscoveryPlanner.Plan(AudiobookMetadataInput.Classify("pirateaba"),
             [Work(), Work("The Wandering Inn: Fae and Fare")], null);
         Assert.Equal(2, plan.Count);
-        Assert.All(plan, seed => Assert.Equal("pirateaba", seed.Author));
-        Assert.All(plan, seed => Assert.Equal("authorWork", seed.MatchEvidence));
+        Assert.Equal("pirateaba", plan[0].Query);
+        Assert.Null(plan[0].Author);
+        Assert.Equal("literal", plan[0].MatchEvidence);
+        Assert.Equal("The Wandering Inn", plan[1].Query);
+        Assert.Equal("pirateaba", plan[1].Author);
+        Assert.Equal("authorWork", plan[1].MatchEvidence);
     }
 
     [Fact]

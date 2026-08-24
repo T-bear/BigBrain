@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-105 AudioBookBay Parser & Literal Author Search Remediation (2026-08-24)
+
+BB-105 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI PENDING**. Den pinnade Librarr-revisionen är oförändrad; image `bigbrain-librarr:1208254-bb6` lägger endast till en sanerad fixture-testad DOM-textgräns för AudioBookBay. Den verkliga sidan innehöll 9 poster och 9 titellänkar men sammanfogade `English` med nästa nästlade etikett till `EnglishKeywords:`. Den tidigare språkgrinden avvisade därför samtliga. bb6 separerar DOM-textnoder och loggar endast sanerade parser-räkningar (`posts`, `rows_with_titles`, `rejected_language`, `retained`) på debugnivå.
+
+BigBrains sökplan reserverar nu ägarens literalinput för author-only-sökningar innan högst en metadatahärledd work-seed läggs till. `pirateaba` når därför den verkliga discovery-gränsen. Vald språkpreferens används vid slutrankning: svenska respektive engelska prioriteras, `und` behålls och Alla språk lägger ingen språkpreferens.
+
+Read-only runtime: direkt source-HTML gav 9 poster; AudioBookBay-parsern returnerade 9, Librarr behöll 9 och BigBrain visade 9 kandidater för `pirateaba`, samtliga med sanerad AudioBookBay-proveniens och sanningsenligt `und/unknown`. `The Wandering Inn`, `Wandering Inn`, titel+författare och den naturligt upptäckta volymtiteln `Fae and Fare` gav fortsatt 0. 390×844 passerade Obsidian Gold, Forest Night och Arctic Wind med nio verkliga resultat, ingen overflow, fri dockyta och stängd confirmation. Jobbantalet var 10 före/efter; ingen acquisition skapades. Librarr, provider och Audiobookshelf är `configuredHealthy`, och ett befintligt biblioteksobjekt är intakt. BB-099 kvarstår **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+
 ## BB-104 Universal Metadata-Aware Audiobook Search (2026-08-24)
 
 BB-104 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED**. Ägaren godkände Open Library som en lågvolyms, server-side metadata-provider. BigBrain äger nu metadata- och sökplankontrakten; Open Library används endast för kanonisk bokmetadata och omslag, medan all release-discovery och acquisition fortsatt går genom den pinnade Librarr-gränsen.

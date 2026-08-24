@@ -1,0 +1,136 @@
+diff --git a/internal/search/audiobookbay.go b/internal/search/audiobookbay.go
+index c7c3e93..54fd126 100644
+--- a/internal/search/audiobookbay.go
++++ b/internal/search/audiobookbay.go
+@@ -78,11 +78,15 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 	}
+ 
+ 	var results []models.SearchResult
++	postsSeen := 0
++	rowsWithTitles := 0
++	rejectedLanguage := 0
+ 
+ 	// Parse search results: look for h2 > a links with /abss/ paths.
+ 	titleRe := regexp.MustCompile(`<[^>]+>`)
+ 
+ 	doc.Find("div.post").Each(func(_ int, post *goquery.Selection) {
++		postsSeen++
+ 		// Find the title link.
+ 		link := post.Find("h2 a, .postTitle a")
+ 		if link.Length() == 0 {
+@@ -98,9 +102,10 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 		if title == "" {
+ 			return
+ 		}
++		rowsWithTitles++
+ 
+ 		// Check language if present.
+-		infoText := post.Find(".postInfo").Text()
++		infoText := selectionTextWithBoundaries(post.Find(".postInfo"))
+ 		if langIdx := strings.Index(strings.ToLower(infoText), "language:"); langIdx >= 0 {
+ 			langStr := strings.TrimSpace(infoText[langIdx+9:])
+ 			// Take first word as language.
+@@ -109,6 +114,7 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 			}
+ 			langStr = strings.ToLower(strings.TrimSpace(langStr))
+ 			if langStr != "" && langStr != "english" {
++				rejectedLanguage++
+ 				return
+ 			}
+ 		}
+@@ -123,10 +129,29 @@ func (a *AudioBookBay) searchDomain(ctx context.Context, domain, query string) (
+ 			AbbURL:    href,
+ 		})
+ 	})
++	slog.Debug("audiobookbay parser stages",
++		"posts", postsSeen,
++		"rows_with_titles", rowsWithTitles,
++		"rejected_language", rejectedLanguage,
++		"retained", len(results))
+ 
+ 	return results, nil
+ }
+ 
++// selectionTextWithBoundaries preserves a separator between adjacent DOM
++// nodes. ABB's live search markup places "English" directly before a nested
++// "Keywords:" element; goquery.Text concatenates those as
++// "EnglishKeywords:", which made the language gate reject valid rows.
++func selectionTextWithBoundaries(selection *goquery.Selection) string {
++	parts := make([]string, 0, selection.Contents().Length())
++	selection.Contents().Each(func(_ int, node *goquery.Selection) {
++		if value := strings.TrimSpace(node.Text()); value != "" {
++			parts = append(parts, value)
++		}
++	})
++	return strings.Join(parts, " ")
++}
++
+ // ResolveABBMagnet fetches the detail page for an AudioBookBay result and extracts
+ // the magnet URI. mirrors and fallbackTrackers come from the runtime sources
+ // registry; if either is empty, the function returns an error rather than
+diff --git a/internal/search/audiobookbay_test.go b/internal/search/audiobookbay_test.go
+index e9d105b..b946fcc 100644
+--- a/internal/search/audiobookbay_test.go
++++ b/internal/search/audiobookbay_test.go
+@@ -4,6 +4,7 @@ import (
+ 	"context"
+ 	"io"
+ 	"net/http"
++	"os"
+ 	"regexp"
+ 	"strings"
+ 	"testing"
+@@ -13,6 +14,32 @@ import (
+ 	"github.com/PuerkitoBio/goquery"
+ )
+ 
++func TestAudioBookBayCurrentSearchMarkupRetainsEnglishRows(t *testing.T) {
++	body, err := os.ReadFile("testdata/audiobookbay-current-search.html")
++	if err != nil {
++		t.Fatalf("read fixture: %v", err)
++	}
++	rt := &abbRoundTripper{body: string(body)}
++	reg, err := sourcestest.Registry()
++	if err != nil {
++		t.Fatalf("load registry: %v", err)
++	}
++	cfg := &config.Config{UserAgent: "test", Sources: reg}
++	cfg.Sources.AudioBookBay.Mirrors = []string{"fixture.invalid"}
++	a := &AudioBookBay{cfg: cfg, client: &http.Client{Transport: rt}}
++
++	results, err := a.searchDomain(context.Background(), "fixture.invalid", "fixture author")
++	if err != nil {
++		t.Fatalf("searchDomain returned error: %v", err)
++	}
++	if len(results) != 2 {
++		t.Fatalf("expected 2 English results and one rejected non-English result, got %d", len(results))
++	}
++	if results[0].Title != "A Long Journey - Example Author" || results[1].Title != "A Long Journey: Volume Two - Example Author" {
++		t.Fatalf("unexpected sanitized fixture titles: %#v", results)
++	}
++}
++
+ type abbRoundTripper struct {
+ 	body string
+ 	req  *http.Request
+diff --git a/internal/search/testdata/audiobookbay-current-search.html b/internal/search/testdata/audiobookbay-current-search.html
+new file mode 100644
+index 0000000..ab732d3
+--- /dev/null
++++ b/internal/search/testdata/audiobookbay-current-search.html
+@@ -0,0 +1,15 @@
++<!doctype html>
++<html><body>
++  <div class="post">
++    <div class="postTitle"><h2><a href="/abss/example-one/">A Long Journey - Example Author</a></h2></div>
++    <div class="postInfo">Language: English<span>Keywords:</span><a href="/genre/fantasy/">Fantasy</a></div>
++  </div>
++  <div class="post">
++    <div class="postTitle"><h2><a href="/abss/example-two/">A Long Journey: Volume Two - Example Author</a></h2></div>
++    <div class="postInfo">Language: English<span>Keywords:</span><a href="/genre/fantasy/">Fantasy</a></div>
++  </div>
++  <div class="post">
++    <div class="postTitle"><h2><a href="/abss/example-three/">En annan resa - Exempelforfattare</a></h2></div>
++    <div class="postInfo">Language: Swedish<span>Keywords:</span><a href="/genre/fantasy/">Fantasy</a></div>
++  </div>
++</body></html>

@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-105` — [AudioBookBay Parser & Literal Author Search Remediation](features/media/bb-105-audiobookbay-parser-remediation-20260824.md)
 - `BB-104` — [Universal Metadata-Aware Audiobook Search](features/media/bb-104-universal-metadata-search-gate-20260824.md)
 - `BB-103` — [First Usable Audiobook Flow](features/media/bb-103-first-usable-audiobook-flow-20260824.md)
 - `BB-102` — [Librarr Provider Security Gate](features/media/bb-102-librarr-provider-security-gate-20260823.md)

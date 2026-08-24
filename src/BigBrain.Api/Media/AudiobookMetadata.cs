@@ -186,6 +186,11 @@ public static class AudiobookDiscoveryPlanner
     {
         var seeds = new List<AudiobookDiscoverySeed>();
         var inputLooksLikeAuthor = works.Count > 0 && works.Any(work => work.Authors.Any(author => Same(author, input.Original)));
+        // A literal owner query is an immutable discovery identity. Author
+        // metadata may add a representative work, but must never consume both
+        // bounded slots and replace the text the owner actually entered.
+        if (inputLooksLikeAuthor)
+            Add(seeds, new(input.Original, null, null, "literal"));
         foreach (var work in works.Take(inputLooksLikeAuthor ? MaximumProviderSearches : 1))
         {
             var author = (work.Authors.Count > 0 ? work.Authors[0] : null) ?? NullIfWhiteSpace(authorHint);

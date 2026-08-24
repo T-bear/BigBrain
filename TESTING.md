@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-105 AudioBookBay parser and literal author search
+
+- Build `bigbrain-librarr:1208254-bb6`. The image applies the sanitized current-markup fixture, proves English rows survive adjacent nested metadata labels, rejects a non-English row, and reruns complete organizer/search/download plus the focused API regression.
+- `AudiobookMetadataTests` prove literal author-only input is the first bounded provider seed and only one resolved work supplements it. `AudiobookAcquisitionTests` prove English preference, Swedish preference, All Languages and retained unknown candidates without creating requests.
+- Runtime verification is read-only: record source HTML post count, AudioBookBay parsed count, Librarr retained count and BigBrain candidate count; compare acquisition-job totals before/after and never open the final confirmation.
+
 ## BB-104 universal metadata-aware audiobook search
 
 - `AudiobookMetadataTests` use network-free Open Library fixtures for ISBN-10/13 classification, malformed identifiers, deterministic metadata parsing, missing metadata, timeout, series/alternate/author planning, narrator capability and the bounded The Wandering Inn fixture.

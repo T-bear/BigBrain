@@ -200,9 +200,10 @@ public sealed class AudiobookAcquisitionService(
                     deduplicated[normalized.EditionId] = normalized;
             }
         }
+        var preferredLanguage = AudiobookLanguages.Normalize(language);
         return deduplicated.Values.Take(50)
             .OrderBy(x => MatchScore(x.MatchEvidence))
-            .ThenBy(x => AudiobookRanking.Score(x.Language, x.LanguageConfidence))
+            .ThenBy(x => LanguagePreferenceScore(x, preferredLanguage))
             .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(x => x.EditionId, StringComparer.Ordinal).ToArray();
     }
@@ -294,6 +295,12 @@ public sealed class AudiobookAcquisitionService(
         "series" => 4,
         "authorWork" => 5,
         _ => 6
+    };
+    private static int LanguagePreferenceScore(AudiobookAcquisitionCandidate candidate, string preferred) => preferred switch
+    {
+        "sv" => AudiobookRanking.Score(candidate.Language, candidate.LanguageConfidence, "sv", "en"),
+        "en" => AudiobookRanking.Score(candidate.Language, candidate.LanguageConfidence, "en", "sv"),
+        _ => 0
     };
     private static bool KnownMatchEvidence(string value) =>
         value is "identifier" or "canonicalTitleAuthor" or "canonicalTitle" or "alternateTitle" or "series" or "authorWork" or "literal";
