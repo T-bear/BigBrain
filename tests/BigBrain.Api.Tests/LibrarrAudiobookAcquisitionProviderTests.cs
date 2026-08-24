@@ -90,15 +90,37 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
     }
 
     [Fact]
-    public async Task SearchRejectsUnapprovedOrUnsafeNativeCandidates()
+    public async Task SearchMapsPinnedNativeCandidatesAndRejectsInjectedOrUnsafeCandidates()
     {
         var provider = Provider(_ => Json(HttpStatusCode.OK, """
             {"results":[
-              {"source":"librivox","title":"Direct","download_url":"https://example.invalid/book.zip"},
+              {"source":"librivox","title":"Direct","author":"Author","source_id":"librivox-1","download_url":"https://example.invalid/book.zip"},
+              {"source":"tpb_audiobook","title":"Torrent English","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+              {"source":"future_upstream_source","title":"Injected","download_url":"https://example.invalid/injected"},
               {"source":"audiobookbay","title":"Unsafe","abb_url":"https://example.invalid/private"}
             ]}
             """));
-        Assert.Empty(await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken));
+        var candidates = await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken);
+        Assert.Equal(2, candidates.Count);
+        Assert.Contains(candidates, value => value.Provenance == "LibriVox");
+        Assert.Contains(candidates, value => value.Provenance == "The Pirate Bay");
+        Assert.DoesNotContain(candidates, value => value.Title is "Injected" or "Unsafe");
+    }
+
+    [Fact]
+    public async Task DirectNativeCandidateCannotBypassTrackedAcquisitionContract()
+    {
+        var calls = 0;
+        var provider = Provider(request =>
+        {
+            calls++;
+            return Json(HttpStatusCode.OK, """{"results":[{"source":"librivox","title":"Direct","source_id":"librivox-1","download_url":"https://example.invalid/book.zip"}]}""");
+        });
+        var candidate = Assert.Single(await provider.SearchAsync("Direct", null, "en", TestContext.Current.CancellationToken));
+        var exception = await Assert.ThrowsAsync<AudiobookAcquisitionException>(() =>
+            provider.RequestAsync(new(candidate.EditionId, candidate.Source, candidate.Language), TestContext.Current.CancellationToken));
+        Assert.Equal("candidateUnsupported", exception.Code);
+        Assert.Equal(1, calls);
     }
 
     [Fact]

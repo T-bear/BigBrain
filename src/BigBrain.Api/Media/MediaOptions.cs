@@ -58,7 +58,7 @@ public sealed class LibrarrOptions
     public string BaseUrl { get; init; } = "http://librarr:5050";
     public string? ApiKey { get; init; }
     public int CandidateLifetimeMinutes { get; init; } = 15;
-    public int SearchTimeoutSeconds { get; init; } = 30;
+    public int SearchTimeoutSeconds { get; init; } = 45;
 }
 
 public sealed class AudiobookshelfOptions

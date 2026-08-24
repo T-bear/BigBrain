@@ -1,0 +1,196 @@
+--- a/cmd/librarr/main.go
++++ b/cmd/librarr/main.go
+@@ -73,9 +73,9 @@
+ 	registeredSources := search.CreateRegisteredSources(cfg, httpClient)
+ 	sources = append(sources, registeredSources...)
+ 
+-	sources, err = search.ApplySourceAllowlist(sources, os.Getenv("LIBRARR_ALLOWED_SOURCES"))
++	sources, err = search.ApplyPinnedAudiobookSourcePolicy(sources, os.Getenv("LIBRARR_TRUSTED_SOURCE_REVISION"))
+ 	if err != nil {
+-		slog.Error("source allowlist rejected", "error", err)
++		slog.Error("pinned audiobook source policy rejected", "error", err)
+ 		os.Exit(1)
+ 	}
+ 
+--- a/internal/api/search.go
++++ b/internal/api/search.go
+@@ -128,12 +128,13 @@
+ 		}
+ 		results = annotateOwnership(ownership, results, tab)
+ 		payload := map[string]interface{}{
+-			"source":         update.Source,
+-			"source_done":    update.Done,
+-			"circuit_open":   update.CircuitOpen,
+-			"results":        results,
+-			"search_time_ms": update.ElapsedMilli,
+-			"sources":        s.searchMgr.SourceMeta(),
++			"source":              update.Source,
++			"source_done":         update.Done,
++			"source_result_count": len(update.Results),
++			"circuit_open":        update.CircuitOpen,
++			"results":             results,
++			"search_time_ms":      update.ElapsedMilli,
++			"sources":             s.searchMgr.SourceMeta(),
+ 		}
+ 		if update.Err != nil {
+ 			payload["error"] = update.Err.Error()
+--- a/internal/search/source_policy.go
++++ b/internal/search/source_policy.go
+@@ -5,41 +5,47 @@
+ 	"strings"
+ )
+ 
+-// ApplySourceAllowlist retains only explicitly approved source identifiers.
+-// It preserves constructor order so an owner-managed Prowlarr source can stay
+-// preferred, and rejects configuration drift rather than silently activating
+-// or ignoring a source.
+-func ApplySourceAllowlist(sources []Searcher, configured string) ([]Searcher, error) {
+-	configured = strings.TrimSpace(configured)
+-	if configured == "" {
+-		return nil, fmt.Errorf("source allowlist is required")
+-	}
++const TrustedAudiobookSourceRevision = "1208254c20b31fbf217558c0fb987f779fed1cf8"
+ 
+-	allowed := make(map[string]struct{})
+-	for _, raw := range strings.Split(configured, ",") {
+-		name := strings.TrimSpace(raw)
+-		if name == "" {
+-			return nil, fmt.Errorf("source allowlist contains an empty identifier")
+-		}
+-		if _, duplicate := allowed[name]; duplicate {
+-			return nil, fmt.Errorf("source allowlist contains duplicate identifier %q", name)
+-		}
+-		allowed[name] = struct{}{}
++var pinnedAudiobookSources = map[string]struct{}{
++	"prowlarr_audiobooks":   {},
++	"audiobookbay":          {},
++	"librivox":              {},
++	"tpb_audiobook":         {},
++	"booktracker_audiobook": {},
++}
++
++// ApplyPinnedAudiobookSourcePolicy trusts only the audiobook drivers compiled
++// into BigBrain's reviewed upstream revision. A future/injected audiobook
++// driver fails startup until both the immutable revision and this manifest are
++// reviewed together.
++func ApplyPinnedAudiobookSourcePolicy(sources []Searcher, revision string) ([]Searcher, error) {
++	if strings.TrimSpace(revision) != TrustedAudiobookSourceRevision {
++		return nil, fmt.Errorf("trusted source revision does not match the compiled policy")
+ 	}
+ 
+-	available := make(map[string]struct{}, len(sources))
+-	selected := make([]Searcher, 0, len(allowed))
++	seen := make(map[string]struct{}, len(pinnedAudiobookSources))
++	selected := make([]Searcher, 0, len(pinnedAudiobookSources))
+ 	for _, source := range sources {
++		if source.SearchTab() != "audiobook" {
++			continue
++		}
+ 		name := source.Name()
+-		available[name] = struct{}{}
+-		if _, approved := allowed[name]; approved {
+-			selected = append(selected, source)
++		if name == "" {
++			return nil, fmt.Errorf("audiobook source has an empty identifier")
++		}
++		if _, trusted := pinnedAudiobookSources[name]; !trusted {
++			return nil, fmt.Errorf("audiobook source %q is not trusted by pinned revision", name)
+ 		}
++		if _, duplicate := seen[name]; duplicate {
++			return nil, fmt.Errorf("duplicate audiobook source identifier %q", name)
++		}
++		seen[name] = struct{}{}
++		selected = append(selected, source)
+ 	}
+-
+-	for name := range allowed {
+-		if _, exists := available[name]; !exists {
+-			return nil, fmt.Errorf("source allowlist references unavailable identifier %q", name)
++	for name := range pinnedAudiobookSources {
++		if _, exists := seen[name]; !exists {
++			return nil, fmt.Errorf("pinned audiobook source %q is missing", name)
+ 		}
+ 	}
+ 	return selected, nil
+--- a/internal/search/source_policy_test.go
++++ b/internal/search/source_policy_test.go
+@@ -16,29 +16,45 @@
+ func (s policySource) SearchTab() string                                             { return "audiobook" }
+ func (s policySource) DownloadType() string                                          { return "torrent" }
+ 
+-func TestApplySourceAllowlistIsExplicitAndPreservesPreference(t *testing.T) {
++func TestPinnedPolicyAcceptsExactRevisionSourcesAndPreservesPreference(t *testing.T) {
+ 	sources := []Searcher{
+ 		policySource{"prowlarr_audiobooks"},
+ 		policySource{"audiobookbay"},
+-		policySource{"future_upstream_source"},
++		policySource{"librivox"},
++		policySource{"tpb_audiobook"},
++		policySource{"booktracker_audiobook"},
+ 	}
+ 
+-	selected, err := ApplySourceAllowlist(sources, "prowlarr_audiobooks,audiobookbay")
++	selected, err := ApplyPinnedAudiobookSourcePolicy(sources, TrustedAudiobookSourceRevision)
+ 	if err != nil {
+-		t.Fatalf("ApplySourceAllowlist returned error: %v", err)
++		t.Fatalf("ApplyPinnedAudiobookSourcePolicy returned error: %v", err)
+ 	}
+-	if len(selected) != 2 || selected[0].Name() != "prowlarr_audiobooks" || selected[1].Name() != "audiobookbay" {
++	if len(selected) != 5 || selected[0].Name() != "prowlarr_audiobooks" || selected[1].Name() != "audiobookbay" {
+ 		t.Fatalf("unexpected selected sources: %#v", selected)
+ 	}
+ }
+ 
+-func TestApplySourceAllowlistFailsClosed(t *testing.T) {
+-	sources := []Searcher{policySource{"prowlarr_audiobooks"}}
+-	tests := []string{"", "prowlarr_audiobooks,", "prowlarr_audiobooks,prowlarr_audiobooks", "unknown"}
+-	for _, configured := range tests {
+-		t.Run(configured, func(t *testing.T) {
+-			if _, err := ApplySourceAllowlist(sources, configured); err == nil {
+-				t.Fatal("expected fail-closed allowlist error")
++func TestPinnedPolicyFailsClosedForRevisionDriftMissingDuplicateAndInjectedSources(t *testing.T) {
++	valid := []Searcher{
++		policySource{"prowlarr_audiobooks"}, policySource{"audiobookbay"}, policySource{"librivox"},
++		policySource{"tpb_audiobook"}, policySource{"booktracker_audiobook"},
++	}
++	tests := []struct {
++		name     string
++		revision string
++		sources  []Searcher
++	}{
++		{"missing revision", "", valid},
++		{"future revision", "future", valid},
++		{"missing expected", TrustedAudiobookSourceRevision, valid[:4]},
++		{"duplicate", TrustedAudiobookSourceRevision, append(valid, policySource{"librivox"})},
++		{"injected", TrustedAudiobookSourceRevision, append(valid, policySource{"future_upstream_source"})},
++		{"malformed", TrustedAudiobookSourceRevision, append(valid, policySource{""})},
++	}
++	for _, tc := range tests {
++		t.Run(tc.name, func(t *testing.T) {
++			if _, err := ApplyPinnedAudiobookSourcePolicy(tc.sources, tc.revision); err == nil {
++				t.Fatal("expected fail-closed pinned source policy error")
+ 			}
+ 		})
+ 	}
+--- a/internal/search/searcher.go
++++ b/internal/search/searcher.go
+@@ -223,6 +223,7 @@
+ // SearchStream runs a query and emits an update when each source finishes.
+ func (m *Manager) SearchStream(ctx context.Context, tab, query, author string) <-chan SourceSearchUpdate {
+ 	start := time.Now()
++	queries := discoveryQueries(tab, query, author)
+ 	updates := make(chan SourceSearchUpdate, len(m.sources))
+ 
+ 	go func() {
+@@ -258,10 +259,7 @@
+ 			go func(src Searcher) {
+ 				defer wg.Done()
+ 
+-				searchCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+-				defer cancel()
+-
+-				res, err := src.Search(searchCtx, query)
++				res, err := m.searchSourceVariants(ctx, src, queries)
+ 				if err != nil {
+ 					if ctx.Err() != nil {
+ 						slog.Debug("search canceled by client", "source", src.Name())

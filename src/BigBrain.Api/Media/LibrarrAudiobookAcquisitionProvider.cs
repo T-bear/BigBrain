@@ -18,7 +18,8 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     private readonly ConcurrentDictionary<string, CachedCandidate> candidates = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, string> observedStates = new(StringComparer.OrdinalIgnoreCase);
     private bool Configured => !string.IsNullOrWhiteSpace(options.Librarr.ApiKey);
-    private static readonly HashSet<string> ApprovedSources = new(StringComparer.Ordinal) { "prowlarr_audiobooks", "audiobookbay" };
+    private static readonly HashSet<string> ApprovedSources = new(StringComparer.Ordinal)
+        { "prowlarr_audiobooks", "audiobookbay", "librivox", "tpb_audiobook", "booktracker_audiobook" };
 
     public async Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token)
     {
@@ -67,13 +68,15 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
             var infoHash = Text(item, "info_hash")?.ToLowerInvariant();
             var abbUrl = Text(item, "abb_url");
             if (source is null || !ApprovedSources.Contains(source) || string.IsNullOrWhiteSpace(title)) continue;
-            if (source == "prowlarr_audiobooks" && !SafeInfoHash(infoHash)) continue;
+            if (source is "prowlarr_audiobooks" or "tpb_audiobook" && !SafeInfoHash(infoHash)) continue;
             if (source == "audiobookbay" && !SafeAbbPath(abbUrl)) continue;
+            if (source is "librivox" or "booktracker_audiobook" && !SafeProviderUrl(Text(item, "download_url"))) continue;
             var raw = new LibrarrCandidate(
                 title, NullIfWhiteSpace(WebUtility.HtmlDecode(Text(item, "author"))?.Trim()), source, Text(item, "source_id"),
                 Text(item, "download_url"), Text(item, "magnet_url"), infoHash, Text(item, "guid"), abbUrl,
                 Text(item, "download_protocol"), Text(item, "format"), Text(item, "indexer"), Number(item, "size"));
-            var releaseKey = SafeInfoHash(infoHash) ? $"hash:{infoHash}" : $"source:{source}:{abbUrl}";
+            var releaseIdentity = raw.SourceId ?? raw.AbbUrl ?? raw.Guid ?? raw.DownloadUrl;
+            var releaseKey = SafeInfoHash(infoHash) ? $"hash:{infoHash}" : $"source:{source}:{releaseIdentity}";
             var editionId = Id("edition", raw.Source, raw.InfoHash, raw.Guid, raw.DownloadUrl, raw.AbbUrl);
             candidates[editionId] = new(raw, clock.GetUtcNow().AddMinutes(options.Librarr.CandidateLifetimeMinutes));
             var (candidateLanguage, confidence) = Language(item, title);
@@ -93,6 +96,8 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         if (request.Source != "librarr" || !candidates.TryRemove(request.EditionId, out var cached) || cached.ExpiresAtUtc <= clock.GetUtcNow())
             throw new AudiobookAcquisitionException("candidateExpired", "Sökresultatet har gått ut. Sök igen före Lägg till.", StatusCodes.Status409Conflict);
         var value = cached.Value;
+        if (value.Source is "librivox" or "booktracker_audiobook")
+            throw new AudiobookAcquisitionException("candidateUnsupported", "Källan stöder ännu inte säkert spårbar hämtning i BigBrain.", StatusCodes.Status409Conflict);
         using var response = await http.PostAsJsonAsync("api/download/audiobook", new
         {
             source = value.Source,
@@ -232,7 +237,18 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     private static bool SafeInfoHash(string? value) => value is { Length: 40 or 64 } && value.All(Uri.IsHexDigit);
     private static bool SafeAbbPath(string? value) => value is { Length: > 1 and <= 500 }
         && value[0] == '/' && !value.StartsWith("//", StringComparison.Ordinal) && !value.Contains("..", StringComparison.Ordinal);
-    private static string Provenance(string source) => source == "prowlarr_audiobooks" ? "Prowlarr" : "AudioBookBay";
+    private static bool SafeProviderUrl(string? value) => value is { Length: > 0 and <= 1000 }
+        && Uri.TryCreate(value, UriKind.Absolute, out var parsed) && parsed.Scheme == Uri.UriSchemeHttps
+        && string.IsNullOrEmpty(parsed.UserInfo) && string.IsNullOrEmpty(parsed.Fragment);
+    private static string Provenance(string source) => source switch
+    {
+        "prowlarr_audiobooks" => "Prowlarr",
+        "audiobookbay" => "AudioBookBay",
+        "librivox" => "LibriVox",
+        "tpb_audiobook" => "The Pirate Bay",
+        "booktracker_audiobook" => "BookTracker",
+        _ => "Librarr"
+    };
     private static bool Prefer(AudiobookAcquisitionCandidate candidate, AudiobookAcquisitionCandidate existing) =>
         candidate.Provenance == "Prowlarr" && existing.Provenance != "Prowlarr";
     private static string Id(string prefix, params string?[] values) => $"{prefix}:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\u001f', values.Select(value => value ?? string.Empty))))).ToLowerInvariant()}";

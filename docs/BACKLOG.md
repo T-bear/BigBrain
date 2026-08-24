@@ -6,6 +6,7 @@
 - Implementerat: explicit utgåvebekräftelse, beständigt sanerat importfel, fail-closed jobbavstämning mot Librarrs exakta import-ID och Audiobookshelf-indexering, lokaliserade jobbstatusar samt library refresh efter bekräftad completion.
 - Runtime: Librarr/Audiobookshelf/provider är healthy och verklig sökning visar valbara Prowlarr-kandidater. Svenska är fortsatt preferens; samtliga observerade kandidater saknade auktoritativ språkmetadata och förblev därför `und/unknown`.
 - Runtime-verifiering: exakt import-hash, unik normaliserad Audiobookshelf-match och fungerande owner-deeplink verifierades. Provider/Audiobookshelf är `configuredHealthy`; **FIRST REAL ACQUISITION VERIFIED: YES.**
+- Discovery-policy 2026-08-24: `bigbrain-librarr:1208254-bb5` litar på audiobook-källmängden i exakt pinnad upstream-revision, med fail-closed revision/source-set-kontroll. Prowlarr, AudioBookBay, LibriVox och The Pirate Bay audiobook är aktiva; BookTracker audiobook saknar separat runtime-konfiguration. Ett read-only `The Wandering Inn`-prov gav noll träffar från samtliga aktiva källor och startade ingen acquisition.
 
 ## BB-100 — Audiobooks Platform Foundation
 
@@ -23,10 +24,9 @@
 
 ## BB-102 — Librarr acquisition provider
 
-- Status: **TECHNICALLY IMPLEMENTED / FIRST ACQUISITION OWNER-GATED** 2026-08-24. Ägaren har valt `JeremiahM37/librarr` och ersatt Prowlarr-only med Prowlarr preferred plus uttryckligt allowlistade native-källor.
+- Status: **TECHNICALLY COMPLETE / FIRST ACQUISITION VERIFIED VIA BB-103** 2026-08-24. Ägaren har valt `JeremiahM37/librarr`; discovery använder Prowlarr preferred plus den revision-bundna native audiobook-källmängden.
 - Ägaren godkände 2026-08-23 en minimal BigBrain-patch/image. Upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` är pinnad och patchen stoppar overwrite, katalog-/filkollisioner, partiella bokdestinationer och path escape; 59 organizer-tester passerar (11 patchregressioner).
-- Implementerat och verifierat: intern-only Compose-service, dedikerad qBittorrent-kategori/path, provider-neutral adapter, opaque kandidater, sanerad proveniens, statusmappning, säker `CanCancel=false` och image `1208254-bb2`. Allowlisten innehåller endast `prowlarr_audiobooks,audiobookbay`; okända framtida upstream-källor är avstängda. Real search gav valbara Prowlarr-resultat medan AudioBookBay gav noll resultat, utan att hela sökningen föll.
-- Nästa ägaråtgärd: välj uttryckligen den första önskade releasen i BigBrain och tryck **Lägg till**. Ingen första acquisition har startats av commissioning.
+- Implementerat och verifierat: intern-only Compose-service, dedikerad qBittorrent-kategori/path, provider-neutral adapter, opaque kandidater, sanerad proveniens, statusmappning, säker `CanCancel=false` och aktuell image `1208254-bb5`. Exakt upstream-revision och audiobook-source-set verifieras fail-closed; framtida revisioner/källor aktiveras inte implicit. Första verkliga acquisitionen verifierades senare i BB-103.
 
 ### BB-089 – M5 Hard Risk Engine foundation
 

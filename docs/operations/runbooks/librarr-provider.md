@@ -2,7 +2,7 @@
 
 ## Supported build
 
-BB-103 uses the internal-only image `bigbrain-librarr:1208254-bb4`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, explicit-source-policy, durable-import-outcome and bounded author-aware discovery patches documented in `infrastructure/librarr/README.md`.
+BB-103 uses the internal-only image `bigbrain-librarr:1208254-bb5`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, revision-bound source-policy, durable-import-outcome and bounded author-aware discovery patches documented in `infrastructure/librarr/README.md`.
 
 Do not replace the tag with `latest`. Re-run the patch security review for every upstream change.
 
@@ -31,7 +31,7 @@ awk -F= '{print $1}' .env | grep -E '^LIBRARR_(API_KEY|QBITTORRENT_USERNAME|QBIT
 | Incomplete/completed acquisition | `/srv/media/audiobooks-incoming` | `/data/audiobooks-incoming` | `/data/audiobooks-incoming` | not mounted |
 | Final library | `/srv/media/audiobooks` | available beneath existing `/data` mount | `/audiobooks` | `/audiobooks` |
 
-The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are unchanged. Librarr has no host port and is reachable only on the existing internal media network. `LIBRARR_ALLOWED_SOURCES` defaults to `prowlarr_audiobooks,audiobookbay`; the local registry contains only reviewed public AudioBookBay endpoint metadata. Prowlarr remains first/preferred, and unknown future sources are denied by default.
+The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are unchanged. Librarr has no host port and is reachable only on the existing internal media network. `LIBRARR_TRUSTED_SOURCE_REVISION` must exactly match the image's immutable upstream commit. The local pinned registry enables public configuration for AudioBookBay, LibriVox and The Pirate Bay audiobook. BookTracker audiobook belongs to the reviewed revision set but stays disabled without its separate server-side configuration. Prowlarr remains first/preferred; unknown, injected or future-revision sources stop startup.
 
 ## Commissioning
 
@@ -39,11 +39,11 @@ The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are 
 2. Create `/srv/media/audiobooks-incoming` owned by appliance UID/GID 1000 without changing the final library.
 3. Initialize the newly created `librarr-config` named volume for UID/GID 1000 before first start; Docker creates it root-owned and Librarr intentionally runs non-root.
 4. Render Compose with `docker compose config --quiet`.
-5. Build `bigbrain-librarr:1208254-bb4`; the build runs complete organizer/search/download tests plus focused API and discovery-query regressions.
+5. Build `bigbrain-librarr:1208254-bb5`; the build runs complete organizer/search/download tests plus focused API, revision-policy and discovery-query regressions.
 6. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
-7. Before enabling BigBrain search, verify runtime logs show exactly `prowlarr_audiobooks` then `audiobookbay`. Stop Librarr if any additional source is loaded.
+7. Before enabling BigBrain search, verify source metadata matches the exact pinned set: Prowlarr first, AudioBookBay, LibriVox and The Pirate Bay active, and BookTracker present but disabled unless separately configured. Stop Librarr on any unknown or duplicate audiobook source.
 8. Recreate only API and Web after provider health and source-boundary checks succeed.
-9. Search through BigBrain. The provider-specific timeout is 30 seconds; one source may return zero results without invalidating useful results from the other. Do not submit the first release until the owner explicitly selects it.
+9. Search through BigBrain. The provider-specific timeout is bounded at 45 seconds for the reviewed multi-source latency; cancellation still propagates and one source may return zero results without invalidating useful results from another. Acquisition still requires the owner's explicit edition review and confirmation.
 
 ## Acquisition lifecycle evidence
 

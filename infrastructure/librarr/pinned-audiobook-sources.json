@@ -1,5 +1,12 @@
 {
   "version": 1,
+  "upstream_revision": "1208254c20b31fbf217558c0fb987f779fed1cf8",
+  "trusted_audiobook_sources": [
+    "audiobookbay",
+    "librivox",
+    "tpb_audiobook",
+    "booktracker_audiobook"
+  ],
   "audiobookbay": {
     "mirrors": [
       "audiobookbay.lu",
@@ -15,5 +22,11 @@
       "udp://tracker.dler.org:6969/announce",
       "http://tracker.files.fm:6969/announce"
     ]
+  },
+  "librivox": {
+    "url": "https://librivox.org/api/feed/audiobooks"
+  },
+  "thepiratebay": {
+    "url": "https://apibay.org"
   }
 }
