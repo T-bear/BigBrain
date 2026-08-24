@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-104 universal metadata-aware audiobook search
+
+- `AudiobookMetadataTests` use network-free Open Library fixtures for ISBN-10/13 classification, malformed identifiers, deterministic metadata parsing, missing metadata, timeout, series/alternate/author planning, narrator capability and the bounded The Wandering Inn fixture.
+- `AudiobookAcquisitionTests` prove that at most two metadata seeds are merged, duplicate provider editions collapse, English/unknown remain visible under Swedish preference, partial source failure retains successful results and search creates no acquisition request.
+- `Audiobooks.test.tsx` proves the single universal input, canonical book context and unchanged explicit edition-confirmation gate. Runtime acceptance is read-only: compare job count before/after title, author and ISBN searches and never press **Lägg till vald utgåva**.
+
 ## BB-103 usable audiobook lifecycle
 
 - Build `bigbrain-librarr:1208254-bb5`; its revision-policy regressions prove the exact pinned native audiobook source set is accepted in Prowlarr-first order while a revision mismatch, missing source, duplicate registration, malformed ID or injected/future source fails closed. The same image reruns the complete organizer/search/download packages, preserving every no-overwrite and lifecycle regression.

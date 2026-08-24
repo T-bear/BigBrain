@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-104` — [Universal Metadata-Aware Audiobook Search](features/media/bb-104-universal-metadata-search-gate-20260824.md)
 - `BB-103` — [First Usable Audiobook Flow](features/media/bb-103-first-usable-audiobook-flow-20260824.md)
 - `BB-102` — [Librarr Provider Security Gate](features/media/bb-102-librarr-provider-security-gate-20260823.md)
 - `BB-101` — [Audiobook Acquisition Foundation](features/media/bb-101-audiobook-acquisition-foundation-20260823.md)

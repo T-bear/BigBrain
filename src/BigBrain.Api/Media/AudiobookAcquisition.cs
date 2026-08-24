@@ -28,7 +28,7 @@ public sealed record AudiobookAcquisitionCandidate(
     string WorkId, string EditionId, string Title, string? Author, string? Narrator,
     string Language, string LanguageLabel, string? Edition, double? DurationSeconds,
     int? PublicationYear, string? CoverUrl, string Source, string Availability, string LanguageConfidence,
-    string? Provenance = null);
+    string? Provenance = null, string? MetadataWorkId = null, string? MatchEvidence = null);
 public sealed record AudiobookAcquisitionRequest(string EditionId, string Source, string Language);
 public sealed record AudiobookProviderJob(string ProviderJobId, string Status, string? Message);
 public sealed record AudiobookAcquisitionJob(
@@ -163,17 +163,46 @@ public sealed class AudiobookAcquisitionService(
         catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
         catch { throw ProviderUnavailable(); }
     }
-    public async Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token)
+    public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token) =>
+        SearchVariantsAsync([new(query, author, null, "literal")], language, token);
+
+    public async Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchVariantsAsync(
+        IReadOnlyList<AudiobookDiscoverySeed> seeds, string language, CancellationToken token)
     {
-        ValidateSearch(query, author);
+        if (seeds.Count is < 1 or > AudiobookDiscoveryPlanner.MaximumProviderSearches)
+            throw new AudiobookAcquisitionException("invalidQueryPlan", "Sökplanen är ogiltig.", StatusCodes.Status400BadRequest);
+        foreach (var seed in seeds) ValidateSearch(seed.Query, seed.Author);
         var status = await StatusAsync(token);
         if (!status.CanSearch) return [];
-        IReadOnlyList<AudiobookAcquisitionCandidate> values;
-        try { values = await provider.SearchAsync(query.Trim(), author?.Trim(), AudiobookLanguages.Normalize(language), token); }
-        catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
-        catch { throw ProviderUnavailable(); }
-        return values.Take(50).Select(NormalizeProviderCandidate)
-            .OrderBy(x => AudiobookRanking.Score(x.Language, x.LanguageConfidence))
+        var searches = seeds.Select(async seed =>
+        {
+            try
+            {
+                var values = await provider.SearchAsync(seed.Query.Trim(), seed.Author?.Trim(), AudiobookLanguages.Normalize(language), token);
+                return (Seed: seed, Values: values, Failed: false);
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+            catch { return (Seed: seed, Values: (IReadOnlyList<AudiobookAcquisitionCandidate>)[], Failed: true); }
+        }).ToArray();
+        var completed = await Task.WhenAll(searches);
+        if (completed.All(result => result.Failed)) throw ProviderUnavailable();
+        var deduplicated = new Dictionary<string, AudiobookAcquisitionCandidate>(StringComparer.Ordinal);
+        foreach (var result in completed.Where(result => !result.Failed))
+        {
+            foreach (var value in result.Values.Take(50))
+            {
+                var normalized = NormalizeProviderCandidate(value) with
+                {
+                    MetadataWorkId = result.Seed.MetadataWorkId,
+                    MatchEvidence = result.Seed.MatchEvidence
+                };
+                if (!deduplicated.TryGetValue(normalized.EditionId, out var existing) || MatchScore(normalized.MatchEvidence) < MatchScore(existing.MatchEvidence))
+                    deduplicated[normalized.EditionId] = normalized;
+            }
+        }
+        return deduplicated.Values.Take(50)
+            .OrderBy(x => MatchScore(x.MatchEvidence))
+            .ThenBy(x => AudiobookRanking.Score(x.Language, x.LanguageConfidence))
             .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(x => x.EditionId, StringComparer.Ordinal).ToArray();
     }
@@ -231,6 +260,8 @@ public sealed class AudiobookAcquisitionService(
         static bool Opaque(string text) => text.Length is > 0 and <= 160 && text.All(c => char.IsLetterOrDigit(c) || c is '-' or '_' or '.' or ':');
         if (!Opaque(value.WorkId) || !Opaque(value.EditionId) || !Opaque(value.Source) || value.Title.Trim().Length is < 1 or > 300
             || value.Author?.Length > 300 || value.Narrator?.Length > 300 || value.Edition?.Length > 160
+            || value.MetadataWorkId is not null && !Opaque(value.MetadataWorkId)
+            || value.MatchEvidence is not null && !KnownMatchEvidence(value.MatchEvidence)
             || value.CoverUrl is not null && !SafeCoverUrl(value.CoverUrl))
             throw new AudiobookAcquisitionException("invalidCandidate", "Utgåvan är ogiltig.", StatusCodes.Status400BadRequest);
         if (AudiobookLanguages.Normalize(value.Language) == AudiobookLanguages.Unknown && value.Language != AudiobookLanguages.Unknown)
@@ -253,6 +284,19 @@ public sealed class AudiobookAcquisitionService(
         ValidateCandidate(normalized);
         return normalized;
     }
+
+    private static int MatchScore(string? evidence) => evidence switch
+    {
+        "identifier" => 0,
+        "canonicalTitleAuthor" => 1,
+        "canonicalTitle" => 2,
+        "alternateTitle" => 3,
+        "series" => 4,
+        "authorWork" => 5,
+        _ => 6
+    };
+    private static bool KnownMatchEvidence(string value) =>
+        value is "identifier" or "canonicalTitleAuthor" or "canonicalTitle" or "alternateTitle" or "series" or "authorWork" or "literal";
 
     private static bool SafeCoverUrl(string value) =>
         value.StartsWith("/api/v1/modules/media/audiobooks/", StringComparison.Ordinal) && !value.Contains("..", StringComparison.Ordinal);

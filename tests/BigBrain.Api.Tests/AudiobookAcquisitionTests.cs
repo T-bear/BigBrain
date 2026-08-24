@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using BigBrain.Api.Media;
 
 namespace BigBrain.Api.Tests;
@@ -43,6 +44,44 @@ public sealed class AudiobookAcquisitionTests : IDisposable
         Assert.DoesNotContain(values, x => x.CoverUrl?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true);
         var unknown = Assert.Single(values, x => x.EditionId == "e0");
         Assert.Equal("und", unknown.Language); Assert.Equal("unknown", unknown.LanguageConfidence);
+    }
+
+    [Fact]
+    public async Task MetadataVariantsAreBoundedDeduplicatedAndKeepEnglishAndUnknownWithSwedishPreference()
+    {
+        using var store = Store();
+        var provider = new FakeProvider
+        {
+            Results = [Candidate("en", "Voice", "same"), Candidate("und", "Okänd", "unknown")]
+        };
+        var seeds = new[]
+        {
+            new AudiobookDiscoverySeed("The Wandering Inn", "pirateaba", "OL1W", "canonicalTitleAuthor"),
+            new AudiobookDiscoverySeed("Wandering Inn", null, "OL1W", "alternateTitle")
+        };
+        var values = await new AudiobookAcquisitionService(provider, store, TimeProvider.System)
+            .SearchVariantsAsync(seeds, "sv", CancellationToken.None);
+        Assert.Equal(2, values.Count);
+        Assert.Contains(values, value => value.Language == "en");
+        Assert.Contains(values, value => value.Language == "und");
+        Assert.All(values, value => Assert.Equal("OL1W", value.MetadataWorkId));
+        Assert.Equal(2, provider.Searches.Count);
+        Assert.Equal(0, provider.RequestCount);
+    }
+
+    [Fact]
+    public async Task MetadataVariantPartialFailureKeepsSuccessfulCandidates()
+    {
+        using var store = Store();
+        var provider = new FakeProvider
+        {
+            Results = [Candidate("en", "Voice", "edition")],
+            FailingQuery = "broken"
+        };
+        var values = await new AudiobookAcquisitionService(provider, store, TimeProvider.System).SearchVariantsAsync(
+            [new("broken", null, null, "literal"), new("working", null, null, "literal")], "en", CancellationToken.None);
+        Assert.Single(values);
+        Assert.Equal("edition", values[0].EditionId);
     }
 
     [Theory]
@@ -96,10 +135,13 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     {
         public IReadOnlyList<AudiobookAcquisitionCandidate> Results { get; init; } = [];
         public bool Fail { get; init; }
+        public string? FailingQuery { get; init; }
+        public ConcurrentBag<string> Searches { get; } = [];
+        public int RequestCount { get; private set; }
         public AudiobookProviderJob? JobStatus { get; set; }
         public Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token) => Fail?throw new HttpRequestException():Task.FromResult(new AudiobookAcquisitionProviderStatus("configuredHealthy","fixture",true,true,true,null));
-        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query,string? author,string language,CancellationToken token)=>Task.FromResult(Results);
-        public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request,CancellationToken token)=>Task.FromResult(new AudiobookProviderJob("provider-job",AudiobookAcquisitionStatuses.Queued,null));
+        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query,string? author,string language,CancellationToken token){Searches.Add(query);return query==FailingQuery?throw new HttpRequestException():Task.FromResult(Results);}
+        public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request,CancellationToken token){RequestCount++;return Task.FromResult(new AudiobookProviderJob("provider-job",AudiobookAcquisitionStatuses.Queued,null));}
         public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId,CancellationToken token)=>Task.FromResult(JobStatus);
         public Task<AudiobookProviderJob> CancelAsync(string providerJobId,CancellationToken token)=>Task.FromResult(new AudiobookProviderJob(providerJobId,AudiobookAcquisitionStatuses.Cancelled,null));
     }

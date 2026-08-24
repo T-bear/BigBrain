@@ -9,6 +9,7 @@ public sealed class MediaOptions
     public MediaApiKeyOptions Radarr { get; init; } = new("http://radarr:7878");
     public MediaApiKeyOptions Prowlarr { get; init; } = new("http://prowlarr:9696");
     public AudiobookshelfOptions Audiobookshelf { get; init; } = new();
+    public OpenLibraryOptions OpenLibrary { get; init; } = new();
     public LibrarrOptions Librarr { get; init; } = new();
     public QBittorrentOptions QBittorrent { get; init; } = new();
     public MediaRequestOptions Requests { get; init; } = new();
@@ -23,6 +24,9 @@ public sealed class MediaOptions
         && IsHttpUrl(options.Radarr.BaseUrl)
         && IsHttpUrl(options.Prowlarr.BaseUrl)
         && IsHttpUrl(options.Audiobookshelf.BaseUrl)
+        && IsOpenLibraryUrl(options.OpenLibrary.BaseUrl)
+        && options.OpenLibrary.TimeoutSeconds is >= 2 and <= 10
+        && options.OpenLibrary.ResultLimit is >= 1 and <= 3
         && IsHttpUrl(options.Librarr.BaseUrl)
         && options.Librarr.CandidateLifetimeMinutes is >= 5 and <= 60
         && options.Librarr.SearchTimeoutSeconds is >= 10 and <= 45
@@ -49,6 +53,13 @@ public sealed class MediaOptions
         && string.IsNullOrEmpty(uri.Query)
         && string.IsNullOrEmpty(uri.Fragment);
 
+    private static bool IsOpenLibraryUrl(string value) =>
+        Uri.TryCreate(value, UriKind.Absolute, out var uri)
+        && uri.Scheme == Uri.UriSchemeHttps
+        && uri.Host.Equals("openlibrary.org", StringComparison.OrdinalIgnoreCase)
+        && string.IsNullOrEmpty(uri.Query)
+        && string.IsNullOrEmpty(uri.Fragment);
+
     private static bool IsValidServiceLink(MediaServiceLinkOptions link) =>
         !link.Enabled || IsHttpUrl(link.Url);
 }
@@ -69,6 +80,13 @@ public sealed class AudiobookshelfOptions
     public string? PublicUrl { get; init; }
     public int PageSize { get; init; } = 24;
     public string AcquisitionDatabasePath { get; init; } = "/data/audiobook-acquisition.db";
+}
+
+public sealed class OpenLibraryOptions
+{
+    public string BaseUrl { get; init; } = "https://openlibrary.org";
+    public int TimeoutSeconds { get; init; } = 5;
+    public int ResultLimit { get; init; } = 3;
 }
 
 public sealed class MediaRequestOptions

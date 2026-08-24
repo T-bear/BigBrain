@@ -22,10 +22,21 @@ test('renders provider-neutral search with Swedish preference and no fake progre
   expect(screen.getByText('Automatisk hämtning är inte konfigurerad ännu.')).toBeInTheDocument()
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
   fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'bok'}})
-  fireEvent.change(screen.getByLabelText('Författare'),{target:{value:'Författare'}})
+  expect(screen.getByPlaceholderText('Titel, författare, serie eller ISBN')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   await waitFor(()=>expect(String(fetch.mock.calls[3][0])).toContain('language=sv'))
-  expect(String(fetch.mock.calls[3][0])).toContain('author=F%C3%B6rfattare')
+  expect(String(fetch.mock.calls[3][0])).not.toContain('author=')
+})
+
+test('shows resolved canonical metadata separately from audiobook releases',async()=>{
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch)
+  const metadata={query:{original:'The Wandering Inn',normalized:'The Wandering Inn',kind:'freeText'},state:'resolved',narratorSearchSupported:false,message:null,works:[{workId:'OL1W',editionIds:['OL1M'],canonicalTitle:'The Wandering Inn',alternateTitles:['Wandering Inn'],authors:['pirateaba'],series:'The Wandering Inn',seriesNumber:null,narrators:[],isbn10:null,isbn13:'9780306406157',asin:null,language:'en',publicationYear:2017,coverUrl:null,provider:'openLibrary'}]}
+  fetch.mockResolvedValueOnce(json({library:[],metadata,discovery:[],acquisition:provider}))
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'The Wandering Inn'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}))
+  expect(await screen.findByText('Bokträff')).toBeInTheDocument()
+  expect(screen.getByText('pirateaba')).toBeInTheDocument()
+  expect(screen.getByText(/Serie: The Wandering Inn/)).toBeInTheDocument()
+  expect(screen.getByText(/nuvarande metadata-provider saknar/)).toBeInTheDocument()
 })
 
 test('keeps materially different discovery editions visible',async()=>{

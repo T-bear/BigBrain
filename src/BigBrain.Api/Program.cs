@@ -91,6 +91,15 @@ public partial class Program
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, "Radarr", options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
         AddMediaClient<IAudiobookshelfClient, AudiobookshelfClient>(builder.Services, "Audiobookshelf", options => options.Audiobookshelf.BaseUrl);
+        builder.Services.AddHttpClient<IAudiobookMetadataProvider, OpenLibraryAudiobookMetadataProvider>((serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<MediaOptions>();
+            ConfigureMediaClient(httpClient, options.OpenLibrary.BaseUrl, options.OpenLibrary.TimeoutSeconds);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("BigBrain/1.0");
+        }).AddHttpMessageHandler(serviceProvider =>
+            new ProviderHttpLoggingHandler(
+                "OpenLibrary",
+                serviceProvider.GetRequiredService<ILogger<ProviderHttpLoggingHandler>>()));
         builder.Services.AddHttpClient<IAudiobookAcquisitionProvider, LibrarrAudiobookAcquisitionProvider>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();
@@ -104,6 +113,7 @@ public partial class Program
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<AudiobookAcquisitionStore>();
         builder.Services.AddSingleton<AudiobookAcquisitionService>();
+        builder.Services.AddSingleton<AudiobookUniversalSearchService>();
         builder.Services.AddHttpClient<IQBittorrentClient, QBittorrentClient>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();

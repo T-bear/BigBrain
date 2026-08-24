@@ -14,25 +14,19 @@ public static class AudiobookEndpoints
             if (query?.Length > 120) return Problem("queryTooLong", "Sökningen får vara högst 120 tecken.");
             return Results.Ok(await client.GetLibraryAsync(normalizedPage, normalizedLimit, query, language, token));
         });
-        group.MapGet("/search", async (string? query, string? author, string? language, IAudiobookshelfClient client, AudiobookAcquisitionService acquisition, CancellationToken token) =>
+        group.MapGet("/search", async (string? query, string? author, string? language, AudiobookUniversalSearchService search, CancellationToken token) =>
         {
             var value = query?.Trim() ?? string.Empty;
             if (value.Length is < 2 or > 120) return Problem("invalidQuery", "Sökningen måste vara 2–120 tecken.");
-            var normalizedLanguage = string.IsNullOrWhiteSpace(language) || language.Equals("all", StringComparison.OrdinalIgnoreCase) ? null : AudiobookLanguages.Normalize(language);
-            var local = await client.GetLibraryAsync(0, 25, value, normalizedLanguage, token);
-            AudiobookAcquisitionProviderStatus status;
-            IReadOnlyList<AudiobookAcquisitionCandidate> discovery;
-            try
-            {
-                status = await acquisition.StatusAsync(token);
-                discovery = await acquisition.SearchAsync(value, author, normalizedLanguage ?? AudiobookLanguages.Unknown, token);
-            }
-            catch (AudiobookAcquisitionException exception)
-            {
-                status = new("unavailable", "unknown", false, false, false, exception.SafeMessage);
-                discovery = [];
-            }
-            return Results.Ok(new { library = local.Items, discovery, acquisition = status });
+            if (author?.Trim().Length > 120) return Problem("invalidAuthor", "Författaren får vara högst 120 tecken.");
+            return Results.Ok(await search.SearchAsync(value, author, language, token));
+        });
+        group.MapGet("/metadata/covers/{id}", async (string id, IAudiobookMetadataProvider metadata, HttpContext context, CancellationToken token) =>
+        {
+            var cover = await metadata.GetCoverAsync(id, token);
+            if (cover is null) return Results.NotFound();
+            context.Response.Headers.CacheControl = "public,max-age=86400";
+            return Results.File(cover.Value.Bytes, cover.Value.ContentType);
         });
         group.MapGet("/acquisition/provider-status", async (AudiobookAcquisitionService acquisition, CancellationToken token) =>
             Results.Ok(await acquisition.StatusAsync(token)));

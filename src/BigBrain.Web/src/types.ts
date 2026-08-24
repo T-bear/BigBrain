@@ -389,10 +389,12 @@ export interface AudiobookItem { id:string; title:string; author:string|null; se
 export interface AudiobookAcquisitionCapabilities { state:string; canSearch:boolean; canRequest:boolean; message:string|null }
 export interface AudiobookOverview { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'; message:string|null; continueListening:AudiobookItem|null; library:AudiobookItem[]; recent:AudiobookItem[]; acquisition:AudiobookAcquisitionCapabilities }
 export interface AudiobookAcquisitionProviderStatus extends AudiobookAcquisitionCapabilities { provider:string; canCancel:boolean }
-export interface AudiobookAcquisitionCandidate { workId:string; editionId:string; title:string; author:string|null; narrator:string|null; language:string; languageLabel:string; edition:string|null; durationSeconds:number|null; publicationYear:number|null; coverUrl:string|null; source:string; availability:string; languageConfidence:string; provenance?:string|null }
+export interface AudiobookAcquisitionCandidate { workId:string; editionId:string; title:string; author:string|null; narrator:string|null; language:string; languageLabel:string; edition:string|null; durationSeconds:number|null; publicationYear:number|null; coverUrl:string|null; source:string; availability:string; languageConfidence:string; provenance?:string|null; metadataWorkId?:string|null; matchEvidence?:string|null }
 export interface AudiobookAcquisitionJob { id:string; providerJobId:string|null; candidate:AudiobookAcquisitionCandidate; status:string; createdAtUtc:string; updatedAtUtc:string; message:string|null }
 export interface AudiobookAcquisitionJobPage { items:AudiobookAcquisitionJob[]; offset:number; limit:number; total:number }
-export interface AudiobookSearchResponse { library:AudiobookItem[]; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
+export interface AudiobookMetadataWork { workId:string; editionIds:string[]; canonicalTitle:string; alternateTitles:string[]; authors:string[]; series:string|null; seriesNumber:string|null; narrators:string[]; isbn10:string|null; isbn13:string|null; asin:string|null; language:string; publicationYear:number|null; coverUrl:string|null; provider:string }
+export interface AudiobookMetadataResolution { query:{original:string;normalized:string;kind:'isbn10'|'isbn13'|'probableAsin'|'freeText'}; state:'resolved'|'notFound'|'unavailable'; works:AudiobookMetadataWork[]; narratorSearchSupported:boolean; message:string|null }
+export interface AudiobookSearchResponse { library:AudiobookItem[]; metadata:AudiobookMetadataResolution; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
 
 export interface MediaAddOption {
   id: string

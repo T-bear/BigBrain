@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-104 — Universal Metadata-Aware Audiobook Search
+
+- Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED** 2026-08-24.
+- Implementerat: provider-neutralt metadataresolver-kontrakt, server-side Open Library-adapter, lokal ISBN-10/13-validering, fri-text/sannolik-ASIN-klassificering, högst två deduplicerade discovery seeds, metadataassociation och konservativ release-deduplicering bakom befintlig Librarr-provider.
+- Känd begränsning: Open Library ger inte tillförlitlig uppläsarmetadata eller en komplett ASIN-crosswalk. Narrator-sökning är därför ärligt deklarerad som unsupported tills en separat metadataförmåga har godkänts; ingen ny provider läggs till i BB-104.
+- Bevarade gränser: ingen indexer/source-policy/qBittorrent/Finance/Sentinel-ändring, ingen acquisition och inga ändringar i BB-102/103:s explicita bekräftelse, opaque kandidater, no-overwrite eller completion-reconciliation.
+
 ## BB-103 — First Usable Audiobook Flow
 
 - Status: **TECHNICALLY COMPLETE / FIRST REAL ACQUISITION VERIFIED** 2026-08-24. Den ägarvalda Narnia-releasen är nedladdad, säkert importerad, indexerad, synlig och öppningsbar via BigBrain.

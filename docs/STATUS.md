@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-104 Universal Metadata-Aware Audiobook Search (2026-08-24)
+
+BB-104 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED**. Ägaren godkände Open Library som en lågvolyms, server-side metadata-provider. BigBrain äger nu metadata- och sökplankontrakten; Open Library används endast för kanonisk bokmetadata och omslag, medan all release-discovery och acquisition fortsatt går genom den pinnade Librarr-gränsen.
+
+En universell sökruta klassificerar validerad ISBN-10/13, sannolik ASIN och fri text. Metadata kan ge kanonisk titel, alternativa titlar, författare, serie, år, språk, ISBN och omslag. Högst två deduplicerade provider-sökningar planeras (högst sex befintliga Librarr-källfrågor). Svenska är en rankningspreferens, inte ett destruktivt filter. Open Library saknar tillförlitlig uppläsardata och ASIN-crosswalk; dessa visas aldrig som verifierade. BB-102/103:s explicita utgåveval, confirmation, opaque candidate-ID, no-overwrite, import och completion-reconciliation är oförändrade.
+
+Runtime 2026-08-24: `The Wandering Inn` och `pirateaba` gav användbar kanonisk Open Library-metadata men noll releasekandidater från nuvarande discovery-täckning. ISBN `9780261103573` klassificerades som ISBN-13, löstes till *The Fellowship of the Ring* och gav fyra separata Prowlarr-kandidater. Jobbantalet var oförändrat 9 före/efter all QA. Mobil 390×844 och 430×932 samt desktop 1440×900 passerade i alla tre teman utan overflow; sista releaseknappen kunde scrollas helt ovanför dockan.
+
 ## BB-103 First Usable Audiobook Flow (2026-08-24)
 
 BB-103 är **TECHNICALLY COMPLETE / FIRST REAL ACQUISITION VERIFIED**. Den ägarvalda Narnia-releasen passerade verklig request, qBittorrent-download, fail-closed Librarr-import, Audiobookshelf-indexering, BigBrain-bibliotek och fungerande owner-deeplink. BigBrain visar exakt en biblioteksrad och jobbet som `completed/Klar`.

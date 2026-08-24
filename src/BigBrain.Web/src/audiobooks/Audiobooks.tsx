@@ -1,7 +1,7 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { getAudiobookAcquisitionJob,getAudiobookAcquisitionJobs,getAudiobookAcquisitionStatus,getAudiobookOverview,requestAudiobookAcquisition,searchAudiobooks } from '../api'
 import { BBButton,BBEmptyState,BBInput,BBSelect,BBSurface } from '../components'
-import type { AudiobookAcquisitionCandidate,AudiobookAcquisitionJob,AudiobookAcquisitionProviderStatus,AudiobookItem,AudiobookOverview } from '../types'
+import type { AudiobookAcquisitionCandidate,AudiobookAcquisitionJob,AudiobookAcquisitionProviderStatus,AudiobookItem,AudiobookMetadataResolution,AudiobookOverview } from '../types'
 
 function Book({item,prominent=false,onOpen}:{item:AudiobookItem;prominent?:boolean;onOpen:(item:AudiobookItem)=>void}) {
   return <article className={`audiobook ${prominent?'audiobook--continue':''}`}>
@@ -41,9 +41,9 @@ export function Audiobooks(){
   const[selected,setSelected]=useState<AudiobookItem|null>(null)
   const[selectedCandidate,setSelectedCandidate]=useState<AudiobookAcquisitionCandidate|null>(null)
   const[query,setQuery]=useState('')
-  const[author,setAuthor]=useState('')
   const[language,setLanguage]=useState('sv')
   const[localResults,setLocalResults]=useState<AudiobookItem[]|null>(null)
+  const[metadata,setMetadata]=useState<AudiobookMetadataResolution|null>(null)
   const[discovery,setDiscovery]=useState<AudiobookAcquisitionCandidate[]|null>(null)
   const[notice,setNotice]=useState<string|null>(null)
   const[busy,setBusy]=useState(false)
@@ -65,7 +65,7 @@ export function Audiobooks(){
     return()=>window.clearInterval(timer)
   },[jobs])
 
-  async function search(e:FormEvent){e.preventDefault();if(query.trim().length<2)return;setBusy(true);setNotice(null);try{const result=await searchAudiobooks(query,language,author);setLocalResults(result.library);setDiscovery(result.discovery);setProvider(result.acquisition)}catch{setNotice('Sökningen kunde inte genomföras. Försök igen.')}finally{setBusy(false)}}
+  async function search(e:FormEvent){e.preventDefault();if(query.trim().length<2)return;setBusy(true);setNotice(null);try{const result=await searchAudiobooks(query,language);setLocalResults(result.library);setMetadata(result.metadata);setDiscovery(result.discovery);setProvider(result.acquisition)}catch{setNotice('Sökningen kunde inte genomföras. Försök igen.')}finally{setBusy(false)}}
   async function add(candidate:AudiobookAcquisitionCandidate){if(!provider?.canRequest){setNotice(provider?.message??'Automatisk hämtning är inte konfigurerad ännu.');return}setBusy(true);try{const job=await requestAudiobookAcquisition(candidate);setJobs(current=>[job,...current]);setSelectedCandidate(null);setNotice('Hämtningen har begärts.')}catch{setNotice('Hämtningen kunde inte begäras.')}finally{setBusy(false)}}
 
   return <section aria-labelledby="audiobooks-heading" className="audiobooks-section"><div className="section-heading"><div><p className="eyebrow">Lyssna</p><h2 id="audiobooks-heading">Ljudböcker</h2></div></div>
@@ -76,9 +76,12 @@ export function Audiobooks(){
     {data?.state==='configuredHealthy'&&<><div className="audiobook-section-title"><h3>Ditt bibliotek</h3><span>{data.library.length} visas</span></div>
       {data.library.length?<div className="audiobook-grid">{data.library.map(i=><Book item={i} key={i.id} onOpen={setSelected}/>)}</div>:<BBEmptyState title="Biblioteket är tomt" detail="Lägg till en ljudbok i Audiobookshelf så visas den här."/>}
       <form className="audiobook-search" onSubmit={search}><div className="audiobook-section-title"><label htmlFor="audiobook-query">Hitta ljudbok</label><span>{provider?.provider&&provider.provider!=='none'?provider.provider:'Bibliotekssökning'}</span></div>
-        <div><BBInput id="audiobook-query" minLength={2} maxLength={120} onChange={e=>setQuery(e.target.value)} placeholder="Titel" value={query}/><BBInput aria-label="Författare" maxLength={120} onChange={e=>setAuthor(e.target.value)} placeholder="Författare (valfritt)" value={author}/><BBSelect aria-label="Föredraget språk" onChange={e=>setLanguage(e.target.value)} value={language}><option value="sv">Svenska</option><option value="en">Engelska</option><option value="all">Alla språk</option></BBSelect><BBButton busy={busy} type="submit" variant="secondary">Sök</BBButton></div>
+        <div><BBInput id="audiobook-query" minLength={2} maxLength={120} onChange={e=>setQuery(e.target.value)} placeholder="Titel, författare, serie eller ISBN" value={query}/><BBSelect aria-label="Föredraget språk" onChange={e=>setLanguage(e.target.value)} value={language}><option value="sv">Svenska</option><option value="en">Engelska</option><option value="all">Alla språk</option></BBSelect><BBButton busy={busy} type="submit" variant="secondary">Sök</BBButton></div>
+        <small>Uppläsare används när en källa ger verifierad metadata; nuvarande metadata-provider saknar den uppgiften.</small>
       </form>
       {notice&&<p aria-live="polite" className="audiobook-notice">{notice}</p>}
+      {metadata&&metadata.works.length>0&&<section aria-labelledby="audiobook-metadata-heading"><div className="audiobook-section-title"><h3 id="audiobook-metadata-heading">Bokträff</h3><span>Open Library</span></div><BBSurface className="audiobook-metadata">{metadata.works.slice(0,3).map(work=><article key={work.workId}>{work.coverUrl&&<img alt="" loading="lazy" src={work.coverUrl}/>}<div><strong>{work.canonicalTitle}</strong>{work.authors.length>0&&<p>{work.authors.join(', ')}</p>}<small>{[work.series?'Serie: '+work.series:null,work.publicationYear,work.isbn13?'ISBN '+work.isbn13:work.isbn10?'ISBN '+work.isbn10:null].filter(Boolean).join(' · ')}</small></div></article>)}</BBSurface></section>}
+      {metadata?.state==='unavailable'&&<p className="audiobook-notice">{metadata.message}</p>}
       {localResults&&(localResults.length?<><h3>I biblioteket</h3><div className="audiobook-grid">{localResults.map(i=><Book item={i} key={i.id} onOpen={setSelected}/>)}</div></>:<BBEmptyState title="Ingen ljudbok hittades i biblioteket"/>)}
       {discovery&&discovery.length>0&&<><div className="audiobook-section-title"><h3>Kan läggas till</h3><span>{discovery.length} utgåvor</span></div><div className="audiobook-candidates">{discovery.map(i=><Candidate candidate={i} key={`${i.source}:${i.editionId}`} onView={setSelectedCandidate}/>)}</div></>}
       {provider&&!provider.canRequest&&<BBSurface className="audiobook-provider-note"><strong>{provider.state==='configuredUnavailable'?'Automatisk hämtning är tillfälligt otillgänglig.':'Automatisk hämtning är inte konfigurerad ännu.'}</strong><span>{provider.state==='configuredUnavailable'?'Ditt Audiobookshelf-bibliotek fungerar fortfarande. Försök igen när anskaffningsleverantören är tillgänglig.':'Du kan söka i ditt bibliotek. En granskad anskaffningsleverantör krävs för att lägga till nya utgåvor.'}</span></BBSurface>}
