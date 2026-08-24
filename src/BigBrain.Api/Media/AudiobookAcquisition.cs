@@ -13,12 +13,13 @@ public static class AudiobookAcquisitionStatuses
     public const string Queued = "queued";
     public const string Downloading = "downloading";
     public const string Importing = "importing";
+    public const string Indexing = "indexing";
     public const string Completed = "completed";
     public const string Failed = "failed";
     public const string Cancelled = "cancelled";
 
     public static bool IsKnown(string value) => value is Requested or Searching or CandidateFound or AwaitingSelection
-        or Queued or Downloading or Importing or Completed or Failed or Cancelled;
+        or Queued or Downloading or Importing or Indexing or Completed or Failed or Cancelled;
 }
 
 public sealed record AudiobookAcquisitionProviderStatus(

@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-103 First Usable Audiobook Flow (2026-08-24)
+
+BB-103 är **TECHNICALLY READY / FIRST REAL ACQUISITION OWNER-GATED**. Den befintliga BB-100/101/102-arkitekturen är bevarad. Kandidatvalet kräver nu att ägaren öppnar en specifik utgåva och bekräftar **Lägg till vald utgåva**; ingen acquisition har startats under implementation eller QA. Jobbstatus visas med sanningsenliga svenska tillstånd, och Web uppdaterar Audiobookshelf-biblioteket först efter bekräftad indexering.
+
+`bigbrain-librarr:1208254-bb3` lägger till en tredje minimal patch som beständigt registrerar sanerat importfel. BigBrain markerar inte längre en försvunnen torrent som klar: exakt Librarr-importbevis krävs, därefter visas `indexing` tills samma titel/författare faktiskt syns genom Librarrs Audiobookshelf-adapter. Konflikter förblir fail-closed och bevarar både befintligt bibliotek och källpayload. En verklig read-only-sökning gav 11–12 Prowlarr-kandidater beroende på körning; AudioBookBay gav inga kandidater. Alla förblev korrekt `und/unknown`, och tom författare/narrator fabricerades inte. Rå indexernamn och provider-URL:er exponeras inte.
+
+Automatisk validering passerade 538 API-, 129 Web- och 32 Sentinel-tester, upstreams organizer/search/download-paket inklusive det nya konfliktbeviset, Release- och Vite-build. Deployad QA passerade 390 × 844 och 430 × 932 i alla tre teman med verkliga kandidater, explicit bekräftelse, noll acquisition-jobb, ingen overflow och fri dockyta. Audiobookshelf och Librarr-provider rapporterar `configuredHealthy`; befintliga fem Media-integrationer är online. Finance är oförändrat `RESEARCH / 0 SEK / NONE`. Scheduler är enabled; dagens 02:00 UTC-opportunity skippades som non-research day, inget research/training-run startade och nästa due är 2026-08-25 02:00 UTC. Den kända separata Sentinel socket-restart-loopen kvarstår. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+
 ## BB-102 Librarr provider continuation (2026-08-24)
 
 Den tidigare Prowlarr-only-regeln är uttryckligen ersatt av ägarbeslutet **Prowlarr preferred + explicit allowlist för Librarr-native sources**. Upstream är fortsatt pinnad till commit `1208254c20b31fbf217558c0fb987f779fed1cf8`; `bigbrain-librarr:1208254-bb2` behåller den isolerade no-overwrite-patchen och lägger till en fail-closed source-policy. Endast `prowlarr_audiobooks` och den granskade native-källan `audiobookbay` laddas. Saknad/tom/duplicerad/okänd allowlist stoppar processen, och framtida upstream-källor kan inte aktiveras implicit.

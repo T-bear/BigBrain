@@ -34,9 +34,10 @@ test('keeps materially different discovery editions visible',async()=>{
   fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate('sv-a','Röst A','sv','Svenska'),candidate('en-b','Voice B','en','Engelska')],acquisition:provider}))
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'bok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   expect(await screen.findByText('2 utgåvor')).toBeInTheDocument();expect(screen.getByText(/Röst A/)).toBeInTheDocument();expect(screen.getByText(/Voice B/)).toBeInTheDocument()
-  expect(screen.getAllByRole('button',{name:'Lägg till'}).every(button=>(button as HTMLButtonElement).disabled)).toBe(true)
-  fireEvent.click(screen.getAllByRole('button',{name:'Visa detaljer'})[0])
+  expect(screen.queryByRole('button',{name:'Lägg till vald utgåva'})).not.toBeInTheDocument()
+  fireEvent.click(screen.getAllByRole('button',{name:'Välj utgåva'})[0])
   expect(screen.getByRole('dialog')).toHaveTextContent('Röst A')
+  expect(screen.getByRole('button',{name:'Lägg till vald utgåva'})).toBeDisabled()
 })
 
 test('shows truthful Audiobookshelf not-configured state',async()=>{
@@ -59,6 +60,28 @@ test('polls real provider state for active jobs without inventing progress',asyn
   const active={id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate:{workId:'work',editionId:'edition',title:'Boken',author:'Författaren',narrator:null,language:'sv',languageLabel:'Svenska',edition:'Release',durationSeconds:null,publicationYear:null,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'unknown'},status:'queued',createdAtUtc:'2026-08-23T10:00:00Z',updatedAtUtc:'2026-08-23T10:00:00Z',message:null}
   fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({...active,status:'downloading'}))
   render(<Audiobooks/>)
-  await waitFor(()=>expect(screen.getByText('downloading')).toBeInTheDocument())
+  await waitFor(()=>expect(screen.getByText('Hämtas')).toBeInTheDocument())
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+})
+
+test('requires explicit edition confirmation before creating one acquisition job',async()=>{
+  const healthy={...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true}
+  const candidate={workId:'work',editionId:'edition',title:'En mycket lång ljudboksutgåva',author:'Författaren',narrator:'Röst',language:'sv',languageLabel:'Svenska',edition:'Oavkortad · 1.2 GB',durationSeconds:null,publicationYear:2025,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'verified',provenance:'Prowlarr'}
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json({...overview,acquisition:healthy})).mockResolvedValueOnce(json(healthy)).mockResolvedValueOnce(json(jobs))
+  fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate],acquisition:healthy}))
+  fetch.mockResolvedValueOnce(new Response(JSON.stringify({id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate,status:'queued',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:null}),{status:201,headers:{'Content-Type':'application/json'}}))
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'ljudbok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}));await screen.findByText('1 utgåvor')
+  expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(0)
+  fireEvent.click(screen.getByRole('button',{name:'Välj utgåva'}));expect(screen.getByRole('dialog')).toHaveTextContent('Kontrollera utgåvan')
+  fireEvent.click(screen.getByRole('button',{name:'Lägg till vald utgåva'}));await waitFor(()=>expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(1))
+  expect(await screen.findByText('Köad')).toBeInTheDocument()
+})
+
+test('refreshes Audiobookshelf library after indexing is confirmed complete',async()=>{
+  vi.spyOn(window,'setInterval').mockImplementation(handler=>{if(typeof handler==='function')void handler();return 1})
+  const active={id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate:{workId:'work',editionId:'edition',title:'Hämtad release',author:'Författaren',narrator:null,language:'und',languageLabel:'Språk okänt',edition:'Release',durationSeconds:null,publicationYear:null,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'unknown'},status:'indexing',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:'Väntar på indexering.'}
+  const imported={id:'abs-item',title:'Importerad bok',author:'Författaren',series:null,narrator:null,language:'und',languageLabel:'Språk okänt',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:'http://owner/item/abs-item'}
+  const fetch=vi.spyOn(globalThis,'fetch')
+  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({...active,status:'completed',message:null})).mockResolvedValueOnce(json({...overview,library:[imported],recent:[imported]}))
+  render(<Audiobooks/>);expect(await screen.findByText('Importerad bok')).toBeInTheDocument();expect(screen.getByText('Klar')).toBeInTheDocument()
 })

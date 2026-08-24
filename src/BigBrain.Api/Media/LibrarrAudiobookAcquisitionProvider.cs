@@ -62,14 +62,14 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         foreach (var item in results.EnumerateArray().Take(50))
         {
             var source = Text(item, "source");
-            var title = Text(item, "title");
+            var title = WebUtility.HtmlDecode(Text(item, "title"))?.Trim();
             var infoHash = Text(item, "info_hash")?.ToLowerInvariant();
             var abbUrl = Text(item, "abb_url");
             if (source is null || !ApprovedSources.Contains(source) || string.IsNullOrWhiteSpace(title)) continue;
             if (source == "prowlarr_audiobooks" && !SafeInfoHash(infoHash)) continue;
             if (source == "audiobookbay" && !SafeAbbPath(abbUrl)) continue;
             var raw = new LibrarrCandidate(
-                title, Text(item, "author"), source, Text(item, "source_id"),
+                title, NullIfWhiteSpace(WebUtility.HtmlDecode(Text(item, "author"))?.Trim()), source, Text(item, "source_id"),
                 Text(item, "download_url"), Text(item, "magnet_url"), infoHash, Text(item, "guid"), abbUrl,
                 Text(item, "download_protocol"), Text(item, "format"), Text(item, "indexer"), Number(item, "size"));
             var releaseKey = SafeInfoHash(infoHash) ? $"hash:{infoHash}" : $"source:{source}:{abbUrl}";
@@ -89,9 +89,8 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
 
     public async Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request, CancellationToken token)
     {
-        if (request.Source != "librarr" || !candidates.TryGetValue(request.EditionId, out var cached) || cached.ExpiresAtUtc <= clock.GetUtcNow())
+        if (request.Source != "librarr" || !candidates.TryRemove(request.EditionId, out var cached) || cached.ExpiresAtUtc <= clock.GetUtcNow())
             throw new AudiobookAcquisitionException("candidateExpired", "Sökresultatet har gått ut. Sök igen före Lägg till.", StatusCodes.Status409Conflict);
-        candidates.TryRemove(request.EditionId, out _);
         var value = cached.Value;
         using var response = await http.PostAsJsonAsync("api/download/audiobook", new
         {
@@ -137,11 +136,14 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
             observedStates[providerJobId] = mapped;
             return new(providerJobId, mapped, SafeProviderMessage(mapped, Text(item, "error"), Text(item, "detail")));
         }
-        if (observedStates.TryGetValue(providerJobId, out var prior) && prior == AudiobookAcquisitionStatuses.Importing)
+        var outcome = await GetImportOutcomeAsync(providerJobId, token);
+        if (outcome.Status is not null)
         {
-            observedStates[providerJobId] = AudiobookAcquisitionStatuses.Completed;
-            return new(providerJobId, AudiobookAcquisitionStatuses.Completed, null);
+            observedStates[providerJobId] = outcome.Status;
+            return new(providerJobId, outcome.Status, outcome.Message);
         }
+        if (observedStates.TryGetValue(providerJobId, out var prior) && prior is AudiobookAcquisitionStatuses.Importing or AudiobookAcquisitionStatuses.Indexing)
+            return new(providerJobId, prior, "Importen bearbetas fortfarande.");
         return null;
     }
 
@@ -159,6 +161,43 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
         _ => AudiobookAcquisitionStatuses.Failed
     };
 
+    private async Task<(string? Status, string? Message)> GetImportOutcomeAsync(string providerJobId, CancellationToken token)
+    {
+        using var activityResponse = await http.GetAsync("api/activity?limit=100&offset=0", token);
+        EnsureProviderSuccess(activityResponse);
+        using var activity = await ParseBoundedAsync(activityResponse, token);
+        var events = activity.RootElement.TryGetProperty("events", out var eventValues) && eventValues.ValueKind == JsonValueKind.Array
+            ? eventValues.EnumerateArray() : [];
+        var latest = events.FirstOrDefault(item => string.Equals(Text(item, "job_id"), providerJobId, StringComparison.OrdinalIgnoreCase)
+            && Text(item, "event_type") is "torrent_import" or "torrent_import_failed");
+        var eventType = Text(latest, "event_type");
+        if (eventType == "torrent_import_failed")
+            return (AudiobookAcquisitionStatuses.Failed, "Importen stoppades och kräver åtgärd. Befintliga filer har bevarats.");
+        if (eventType != "torrent_import") return (null, null);
+
+        using var localResponse = await http.GetAsync("api/library?type=audiobook&limit=100&offset=0", token);
+        EnsureProviderSuccess(localResponse);
+        using var local = await ParseBoundedAsync(localResponse, token);
+        var items = local.RootElement.TryGetProperty("items", out var localItems) && localItems.ValueKind == JsonValueKind.Array
+            ? localItems.EnumerateArray() : [];
+        var imported = items.FirstOrDefault(item => string.Equals(Text(item, "source_id"), providerJobId, StringComparison.OrdinalIgnoreCase));
+        var title = Text(imported, "title");
+        if (string.IsNullOrWhiteSpace(title))
+            return (AudiobookAcquisitionStatuses.Importing, "Importen är registrerad men biblioteksposten kunde ännu inte bekräftas.");
+
+        using var absResponse = await http.GetAsync($"api/library/audiobooks?q={Uri.EscapeDataString(title)}", token);
+        EnsureProviderSuccess(absResponse);
+        using var abs = await ParseBoundedAsync(absResponse, token);
+        var indexedItems = abs.RootElement.TryGetProperty("items", out var absItems) && absItems.ValueKind == JsonValueKind.Array
+            ? absItems.EnumerateArray() : [];
+        var author = Text(imported, "author");
+        var indexed = indexedItems.Any(item => string.Equals(Text(item, "title")?.Trim(), title.Trim(), StringComparison.OrdinalIgnoreCase)
+            && (string.IsNullOrWhiteSpace(author) || string.Equals(Text(item, "author")?.Trim(), author.Trim(), StringComparison.OrdinalIgnoreCase)));
+        return indexed
+            ? (AudiobookAcquisitionStatuses.Completed, null)
+            : (AudiobookAcquisitionStatuses.Indexing, "Importerad; väntar på Audiobookshelf-indexering.");
+    }
+
     private static (string Language, string Confidence) Language(JsonElement item, string title)
     {
         var explicitLanguage = Text(item, "language");
@@ -171,14 +210,15 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
 
     private static string Edition(LibrarrCandidate value)
     {
-        var parts = new[] { value.Format, value.Indexer, value.Size is > 0 ? FormatSize(value.Size.Value) : null }.Where(x => !string.IsNullOrWhiteSpace(x));
+        var parts = new[] { value.Format, value.Size is > 0 ? FormatSize(value.Size.Value) : null }.Where(x => !string.IsNullOrWhiteSpace(x));
         var text = string.Join(" · ", parts);
         return text.Length == 0 ? "Release" : text.Length <= 160 ? text : text[..160];
     }
     private static string FormatSize(long bytes) => bytes >= 1_073_741_824 ? $"{bytes / 1_073_741_824d:0.0} GB" : $"{bytes / 1_048_576d:0} MB";
     private static int? Year(JsonElement item) => int.TryParse(Text(item, "year"), NumberStyles.None, CultureInfo.InvariantCulture, out var year) && year is >= 1000 and <= 9999 ? year : null;
     private static long? Number(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.TryGetInt64(out var number) ? number : null;
-    private static string? Text(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
+    private static string? Text(JsonElement item, string name) => item.ValueKind == JsonValueKind.Object && item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
+    private static string? NullIfWhiteSpace(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
     private static bool SafeInfoHash(string? value) => value is { Length: 40 or 64 } && value.All(Uri.IsHexDigit);
     private static bool SafeAbbPath(string? value) => value is { Length: > 1 and <= 500 }
         && value[0] == '/' && !value.StartsWith("//", StringComparison.Ordinal) && !value.Contains("..", StringComparison.Ordinal);

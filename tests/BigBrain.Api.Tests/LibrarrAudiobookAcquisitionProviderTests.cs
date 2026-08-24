@@ -60,6 +60,7 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
         Assert.Equal(2, values.Select(x => x.EditionId).Distinct().Count());
         Assert.All(values, value => { Assert.Equal("librarr", value.Source); Assert.Null(value.Narrator); });
         Assert.All(values, value => Assert.Equal("Prowlarr", value.Provenance));
+        Assert.DoesNotContain(values, value => value.Edition?.Contains("one", StringComparison.OrdinalIgnoreCase) == true || value.Edition?.Contains("two", StringComparison.OrdinalIgnoreCase) == true);
         Assert.Equal("sv", values.Single(x => x.Title.Contains("Svenska")).Language);
         Assert.Equal("probable", values.Single(x => x.Title.Contains("Svenska")).LanguageConfidence);
         Assert.Equal("en", values.Single(x => x.Title.Contains("English")).Language);
@@ -134,6 +135,15 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
     }
 
     [Fact]
+    public async Task SearchDecodesDisplayMetadataWithoutInventingMissingAuthor()
+    {
+        var provider = Provider(_ => Json(HttpStatusCode.OK, """{"results":[{"source":"prowlarr_audiobooks","title":"Boken &amp; Berättelsen","author":"","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""));
+        var candidate = Assert.Single(await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken));
+        Assert.Equal("Boken & Berättelsen", candidate.Title);
+        Assert.Null(candidate.Author);
+    }
+
+    [Fact]
     public async Task RequestUsesServerCachedCandidateAndNeverNeedsRawUrlFromWeb()
     {
         var calls = 0;
@@ -152,6 +162,8 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
         Assert.Equal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", job.ProviderJobId);
         Assert.Equal("queued", job.Status);
         Assert.Equal(2, calls);
+        var replay = await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => provider.RequestAsync(new(candidate.EditionId, candidate.Source, candidate.Language), TestContext.Current.CancellationToken));
+        Assert.Equal("candidateExpired", replay.Code);
     }
 
     [Fact]
@@ -180,6 +192,60 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
         Assert.Equal("downloading", status!.Status);
         var exception = await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => provider.CancelAsync(status.ProviderJobId, TestContext.Current.CancellationToken));
         Assert.Equal("cancelUnsupported", exception.Code);
+    }
+
+    [Fact]
+    public async Task MissingDownloadNeverBecomesCompletedWithoutDurableImportEvidence()
+    {
+        var calls = 0;
+        var provider = Provider(request =>
+        {
+            calls++;
+            return request.RequestUri!.AbsolutePath switch
+            {
+                "/api/downloads" when calls == 1 => Json(HttpStatusCode.OK, """{"downloads":[{"status":"completed","hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+                "/api/downloads" => Json(HttpStatusCode.OK, """{"downloads":[]}"""),
+                "/api/activity" => Json(HttpStatusCode.OK, """{"events":[]}"""),
+                _ => throw new InvalidOperationException(request.RequestUri.AbsolutePath)
+            };
+        });
+        var first = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        var second = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        Assert.Equal("importing", first!.Status);
+        Assert.Equal("importing", second!.Status);
+        Assert.NotEqual("completed", second.Status);
+    }
+
+    [Fact]
+    public async Task DurableImportFailureMapsToSafeTerminalState()
+    {
+        var provider = Provider(request => request.RequestUri!.AbsolutePath switch
+        {
+            "/api/downloads" => Json(HttpStatusCode.OK, """{"downloads":[]}"""),
+            "/api/activity" => Json(HttpStatusCode.OK, """{"events":[{"event_type":"torrent_import_failed","job_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            _ => throw new InvalidOperationException(request.RequestUri.AbsolutePath)
+        });
+        var status = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        Assert.Equal("failed", status!.Status);
+        Assert.Contains("bevarats", status.Message);
+    }
+
+    [Theory]
+    [InlineData(false, "indexing")]
+    [InlineData(true, "completed")]
+    public async Task CompletedImportWaitsForExactAudiobookshelfIndexEvidence(bool indexed, string expected)
+    {
+        var provider = Provider(request => request.RequestUri!.AbsolutePath switch
+        {
+            "/api/downloads" => Json(HttpStatusCode.OK, """{"downloads":[]}"""),
+            "/api/activity" => Json(HttpStatusCode.OK, """{"events":[{"event_type":"torrent_import","job_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library" => Json(HttpStatusCode.OK, """{"items":[{"title":"Boken","author":"Författaren","source_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]}"""),
+            "/api/library/audiobooks" when indexed => Json(HttpStatusCode.OK, """{"items":[{"title":"Boken","author":"Författaren"}]}"""),
+            "/api/library/audiobooks" => Json(HttpStatusCode.OK, """{"items":[]}"""),
+            _ => throw new InvalidOperationException(request.RequestUri.AbsolutePath)
+        });
+        var status = await provider.GetJobStatusAsync("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", TestContext.Current.CancellationToken);
+        Assert.Equal(expected, status!.Status);
     }
 
     private static LibrarrAudiobookAcquisitionProvider Provider(Func<HttpRequestMessage, HttpResponseMessage> response, bool configured = true)

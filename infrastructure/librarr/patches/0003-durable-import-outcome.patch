@@ -1,0 +1,76 @@
+diff --git a/internal/download/watcher.go b/internal/download/watcher.go
+--- a/internal/download/watcher.go
++++ b/internal/download/watcher.go
+@@ -158,6 +158,9 @@ func (w *Watcher) importTorrent(t TorrentInfo, mediaType string) {
+ 			slog.Info("torrent import pending", "name", t.Name, "hash", t.Hash, "type", mediaType, "path", savePath, "error", importErr)
+ 		} else {
+ 			slog.Error("torrent import failed", "name", t.Name, "type", mediaType, "error", importErr)
++			if logErr := w.db.LogEvent("torrent_import_failed", t.Name, "Import failed and requires attention", nil, t.Hash); logErr != nil {
++				slog.Warn("failed to record torrent import failure", "name", t.Name, "hash", t.Hash, "error", logErr)
++			}
+ 		}
+ 		return
+ 	}
+diff --git a/internal/download/watcher_test.go b/internal/download/watcher_test.go
+--- a/internal/download/watcher_test.go
++++ b/internal/download/watcher_test.go
+@@ -613,6 +613,59 @@ func TestImportTorrentDoesNotDeleteFilesWhenOrganizeFails(t *testing.T) {
+ 	}
+ }
+ 
++func TestAudiobookImportConflictIsDurableAndPreservesDownload(t *testing.T) {
++	root := t.TempDir()
++	incoming := filepath.Join(root, "incoming", "Author - Book")
++	if err := os.MkdirAll(incoming, 0755); err != nil {
++		t.Fatal(err)
++	}
++	payload := filepath.Join(incoming, "book.m4b")
++	if err := os.WriteFile(payload, []byte("new payload"), 0644); err != nil {
++		t.Fatal(err)
++	}
++	libraryBook := filepath.Join(root, "audiobooks", "Author", "Book")
++	if err := os.MkdirAll(libraryBook, 0755); err != nil {
++		t.Fatal(err)
++	}
++	existing := filepath.Join(libraryBook, "existing.m4b")
++	if err := os.WriteFile(existing, []byte("existing payload"), 0644); err != nil {
++		t.Fatal(err)
++	}
++
++	database, err := db.New(filepath.Join(root, "library.db"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer database.Close()
++	cfg := &config.Config{
++		FileOrgEnabled: true, AudiobookDir: filepath.Join(root, "audiobooks"),
++		QBAudiobookSavePath: filepath.Join(root, "incoming"), ImportMode: config.ImportModeCopy,
++		RemoveTorrentAfterImport: true,
++	}
++	client := &fakeTorrentClient{}
++	w := NewWatcher(cfg, database, client, nil, organize.NewOrganizer(cfg), nil, nil)
++	info := TorrentInfo{Name: "Author - Book", Hash: "hash-conflict", Progress: 1, ContentPath: incoming, SavePath: filepath.Join(root, "incoming")}
++
++	w.importTorrent(info, "audiobook")
++
++	if len(client.deletes) != 0 {
++		t.Fatalf("conflicted torrent deletion calls = %d, want 0", len(client.deletes))
++	}
++	if got, err := os.ReadFile(payload); err != nil || string(got) != "new payload" {
++		t.Fatalf("source payload changed: %q, %v", got, err)
++	}
++	if got, err := os.ReadFile(existing); err != nil || string(got) != "existing payload" {
++		t.Fatalf("existing library payload changed: %q, %v", got, err)
++	}
++	events, err := database.GetActivity(10, 0)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(events) != 1 || events[0].EventType != "torrent_import_failed" || events[0].JobID != info.Hash {
++		t.Fatalf("failure events = %+v, want durable event for %s", events, info.Hash)
++	}
++}
++
+ // The single-knob contract, end to end through the watcher: the operator turns
+ // off "remove torrents" and nothing else, and the payload survives the import.
+ func TestImportTorrentKeepingTorrentsAloneKeepsThePayload(t *testing.T) {

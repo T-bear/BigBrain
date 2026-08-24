@@ -16,6 +16,12 @@ BigBrain owns `AudiobookAcquisitionCandidate`, `AudiobookAcquisitionJob` and sta
 
 The owner approved a minimal BigBrain-maintained patch/image after upstream overwrite-on-destination behavior blocked deployment. Commit `1208254c20b31fbf217558c0fb987f779fed1cf8` is pinned; the isolated import patch reserves a new book directory, uses exclusive file creation and fails closed on existing/partial destinations and path escapes. The later owner decision supersedes Prowlarr-only: Prowlarr remains preferred and `AudioBookBay` is the sole approved Librarr-native source. Image `1208254-bb2` applies an exact fail-closed source allowlist; unknown future sources remain disabled. Web receives opaque candidate IDs plus sanitized provenance, `CanCancel=false`, and weak release-name language hints remain `Probable` while missing language remains `und`. Provider search has a bounded 30-second Librarr-specific timeout and propagates cancellation.
 
+## Usable acquisition lifecycle (BB-103)
+
+BB-103 retains the provider-neutral job contract and upgrades the patched image to `bigbrain-librarr:1208254-bb3`. A failed torrent import now leaves a durable, sanitized `torrent_import_failed` event keyed by the provider job hash. BigBrain never treats disappearance from qBittorrent as completion. It requires an exact successful Librarr import event and an exact local library `source_id`, reports `indexing` while Audiobookshelf is still scanning, and marks `completed` only when the imported title/author is visible through Librarr's authenticated Audiobookshelf library adapter. Missing or ambiguous evidence remains nonterminal; an explicit failure becomes a safe failed state.
+
+The registry-composed Media view shows sanitized source provenance, decoded display metadata and Swedish labels for job states. Candidate cards open a release-confirmation surface; only that surface can submit the opaque candidate ID. Completion refreshes the existing Audiobookshelf overview, and an indexed item's detail surface keeps playback delegated to the configured Audiobookshelf owner URL. No percentage is shown because the current bounded job contract does not expose authoritative progress.
+
 Endpoints:
 
 - `GET /api/v1/modules/media/audiobooks/acquisition/provider-status`

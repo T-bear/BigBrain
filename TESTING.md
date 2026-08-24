@@ -1,8 +1,15 @@
 # Testa BigBrain
 
+## BB-103 usable audiobook lifecycle
+
+- Build `bigbrain-librarr:1208254-bb3`; the image gate runs complete upstream organizer/search/download tests. The added regression proves an existing audiobook destination creates durable failure evidence, never deletes the qBittorrent job/source and never changes existing content.
+- `LibrarrAudiobookAcquisitionProviderTests` cover single-use opaque candidates, bounded real-state mapping, disappearance without completion, durable import failure, exact local import identity, Audiobookshelf indexing and final completion. Missing evidence remains importing/indexing rather than becoming complete.
+- `Audiobooks.test.tsx` proves the actual registered Media view requires explicit release confirmation, submits exactly once only after that confirmation, localizes truthful job states, refreshes the library on completion and never fabricates percentage progress.
+- Runtime QA performs read-only real search, confirms zero jobs before the owner gate, and checks 390 × 844 plus 430 × 932 in all themes. Never click **Lägg till vald utgåva** without explicit owner selection and approval.
+
 ## BB-102 patched Librarr provider
 
-- `docker build -t bigbrain-librarr:1208254-bb2 -f infrastructure/librarr/Dockerfile .` applies both pinned patches, runs the complete upstream organizer/search packages and the focused native-source tracking regression. Source-policy tests prove exact allowlisting, Prowlarr-first order and fail-closed empty/duplicate/unknown configuration.
+- `docker build -t bigbrain-librarr:1208254-bb3 -f infrastructure/librarr/Dockerfile .` applies all pinned patches, runs the complete upstream organizer/search/download packages and the focused native-source tracking regression. Source-policy tests prove exact allowlisting, Prowlarr-first order and fail-closed empty/duplicate/unknown configuration.
 - `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --filter 'FullyQualifiedName~LibrarrAudiobookAcquisitionProviderTests|FullyQualifiedName~AudiobookAcquisitionTests' --no-restore` covers authenticated health, dependency degradation, bounded/opaque candidates, request cache, language hints, state mapping and safe cancellation semantics without a network.
 - `npm test -- --run src/audiobooks/Audiobooks.test.tsx` covers the real registry-composed Media view and bounded polling of real job states without fabricated percentage progress.
 - Runtime search and downstream health are commissioning checks. Aggregate candidate counts/provenance may be recorded, but raw URLs and releases stay private. These checks must not initiate the first download; secrets remain outside Git, test output and chat.

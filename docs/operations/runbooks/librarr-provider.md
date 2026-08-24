@@ -2,7 +2,7 @@
 
 ## Supported build
 
-BB-102 uses the internal-only image `bigbrain-librarr:1208254-bb2`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite and explicit-source-policy patches documented in `infrastructure/librarr/README.md`.
+BB-103 uses the internal-only image `bigbrain-librarr:1208254-bb3`. It is built from immutable upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` with isolated no-overwrite, explicit-source-policy and durable-import-outcome patches documented in `infrastructure/librarr/README.md`.
 
 Do not replace the tag with `latest`. Re-run the patch security review for every upstream change.
 
@@ -39,11 +39,17 @@ The qBittorrent category is `audiobooks`. Existing Sonarr/Radarr categories are 
 2. Create `/srv/media/audiobooks-incoming` owned by appliance UID/GID 1000 without changing the final library.
 3. Initialize the newly created `librarr-config` named volume for UID/GID 1000 before first start; Docker creates it root-owned and Librarr intentionally runs non-root.
 4. Render Compose with `docker compose config --quiet`.
-5. Build `bigbrain-librarr:1208254-bb2`; the build runs complete organizer/search tests plus the focused API patch regression.
+5. Build `bigbrain-librarr:1208254-bb3`; the build runs complete organizer/search/download tests plus the focused API patch regression.
 6. Start only Librarr, verify `/health`, authenticated `/api/admin/health`, Prowlarr, qBittorrent and Audiobookshelf checks.
 7. Before enabling BigBrain search, verify runtime logs show exactly `prowlarr_audiobooks` then `audiobookbay`. Stop Librarr if any additional source is loaded.
 8. Recreate only API and Web after provider health and source-boundary checks succeed.
 9. Search through BigBrain. The provider-specific timeout is 30 seconds; one source may return zero results without invalidating useful results from the other. Do not submit the first release until the owner explicitly selects it.
+
+## Acquisition lifecycle evidence
+
+After the owner confirms a release, BigBrain follows the opaque provider job. qBittorrent states map to queued/downloading/importing. A missing qBittorrent row is never completion evidence. Librarr must record an exact successful import and local audiobook `source_id`; a durable `torrent_import_failed` event yields a safe failed state. After import, BigBrain reports indexing until the same title and author appear through Librarr's Audiobookshelf-backed library endpoint, then reports completed and refreshes its own Audiobookshelf overview.
+
+On conflict, do not clear the torrent or destination. Inspect the sanitized activity state and filesystem ownership/path mapping without deleting either side. An asynchronous or failed Audiobookshelf scan leaves the job in indexing; use Audiobookshelf's supported library scan control and never edit its database directly.
 
 ## Failure and rollback
 
