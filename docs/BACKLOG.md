@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-106 — Consolidated UX / Quality Fix Sprint
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-27.
+- Levererat: gemensam overflow/dock-safe-area-cascade, standardiserade loading-/fält-/media-placeholder-/radprimitiver, kompakt paginerad audiobook acquisition-historik, sök-/sorteringsbar paginerad ljudbokshylla, kort normal confirmation, lokala kalenderlägen för passerat/i dag/framtid och tydligare Home-hierarki.
+- **PARTIAL:** full inbyggd Audiobookshelf pause/resume/seek/chapter-navigation kräver ett separat granskat playback-session/streamingkontrakt; befintlig BigBrain-adapter äger fortsatt bibliotek, cover, metadata, progress, continue/detail och säker uppspelningsstart via owner-länk. Modulrespons har standardiserad väntan/säkra fel och befintlig bounded cancellation/SSE-reconnect; bred latencyinstrumentering är kvarstående verifieringsarbete och globala timeouter höjdes inte.
+- Säkerhet: inga acquisitionjobb/mediafiler raderades, avbröts eller startades. Finance, scheduler, governor, Sentinel och backendintegrationer ändrades inte. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+
 ## BB-105 — AudioBookBay Parser & Literal Author Search Remediation
 
 - Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** 2026-08-24; GitHub Actions run `32769320392` passed.

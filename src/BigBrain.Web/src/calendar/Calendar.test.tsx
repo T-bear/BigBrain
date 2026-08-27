@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CalendarWidget } from './Calendar'
+import { CalendarWidget,calendarDayState } from './Calendar'
 
 const event = { id:'event-1',date:'2026-08-03',startTime:'07:00:00',endTime:'15:00:00',eventType:'Work',visualClassification:'Day',title:'Dagpass',sourceLabel:'Arbete',isAllDay:false,endsNextDay:false }
 const ok=(body:unknown)=>Promise.resolve(new Response(JSON.stringify(body),{status:200,headers:{'Content-Type':'application/json'}}))
@@ -8,6 +8,13 @@ const ok=(body:unknown)=>Promise.resolve(new Response(JSON.stringify(body),{stat
 describe('CalendarWidget',()=>{
   beforeEach(()=>{vi.stubGlobal('fetch',vi.fn((input:RequestInfo|URL)=>{const url=String(input);if(url.includes('/week'))return ok({from:'2026-08-03',to:'2026-08-09',events:[event]});if(url.includes('/month'))return ok({year:2026,month:8,events:[event]});if(url.endsWith('/imports'))return ok([]);return ok({files:[]})}))})
   afterEach(()=>{cleanup();vi.unstubAllGlobals();document.body.className=''})
+
+  it('classifies past, today and future using local calendar dates',()=>{
+    const localToday=new Date(2026,7,27,23,55)
+    expect(calendarDayState('2026-08-26',localToday)).toBe('past')
+    expect(calendarDayState('2026-08-27',localToday)).toBe('today')
+    expect(calendarDayState('2026-08-28',localToday)).toBe('future')
+  })
 
   it('shows the current week with accessible symbol and time',async()=>{
     render(<CalendarWidget/>)

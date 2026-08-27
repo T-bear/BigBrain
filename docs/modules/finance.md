@@ -414,3 +414,13 @@ Adjusted-price research requires an explicit revision capability. Production aud
 # BB-091 European macro/FX boundary (2026-08-17)
 
 Macro Memory migration 93 adds provider-neutral provider/region/unit/frequency and explicit FX base/quote metadata. The bounded packs are Riksbank `SECBREPOEFF`, `SEKEURPMI`, `SEKUSDPMI` and ECB `EXR.D.USD.EUR.SP00.A`, `EXR.D.SEK.EUR.SP00.A`, `FM.D.U2.EUR.4F.KR.MRR_FR.LEV`. `EUR/SEK` means SEK per EUR. Current-history bootstrap is `REVISED_HISTORY_EXPLORATORY`; only exact evidence-class as-of queries are allowed and causal requests never fall back. Acquisition remains an unscheduled maintenance capability.
+
+## Future account/strategy isolation safeguard (BB-106)
+
+Any future brokerage portfolio must bind an explicit account identity to its strategy objective, risk
+budget, portfolio state, decisions, evaluation metrics and execution authority. Conservative active,
+speculative and long-horizon child-savings mandates must never share mutable strategy/risk/performance
+state merely because Finance presents them in one module. Reusable market observations may be shared
+only with compatible provenance and time semantics; research/training evidence must retain account and
+mandate identity. This is an architecture/backlog safeguard only: no account, broker, order, PAPER,
+LIVE/AUTO or execution capability is introduced, and current `RESEARCH / 0 SEK / NONE` remains binding.

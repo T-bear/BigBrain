@@ -8,7 +8,8 @@
 
 /* Module and page layouts. Palette values are supplied by the v1 token layer. */
 * { box-sizing: border-box; }
-html, body, #root { max-width: 100%; overflow-x: hidden; }
+html, body, #root { max-width: 100%; overflow-x: hidden; overflow-x:clip; }
+img,svg,video,canvas{max-width:100%}button,input,select,textarea{max-width:100%}h1,h2,h3,h4,p,small,strong,dd{overflow-wrap:anywhere}
 body { margin: 0; min-width: 0; min-height: 100vh; }
 button, summary, input, select, textarea { font: inherit; }
 button:focus-visible, summary:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:0; box-shadow:var(--bb-focus-ring); }
@@ -165,10 +166,11 @@ progress::-moz-progress-bar { background: var(--bb-color-primary); }
 .calendar-widget h3,.calendar-widget p,.calendar-dialog h2,.calendar-dialog h3,.calendar-dialog p { margin:0; }
 .calendar-week,.calendar-import-history ul,.calendar-previews { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
 .calendar-week li { display:grid; grid-template-columns:minmax(110px,.6fr) minmax(0,1.4fr); gap:10px; padding:10px; border:1px solid var(--bb-color-border); border-radius:var(--bb-radius-md); background:var(--bb-color-bg-subtle); }
+.calendar-date--past{opacity:.58}.calendar-date--past .calendar-event>span:last-child{text-decoration:line-through;text-decoration-thickness:1px}.calendar-date--today{border-color:color-mix(in srgb,var(--bb-color-accent) 60%,var(--bb-color-border))!important;background:var(--bb-accent-soft)!important}.calendar-today{display:inline-flex;margin-left:.45rem;padding:.12rem .4rem;border-radius:var(--bb-radius-pill);background:var(--bb-color-accent);color:var(--bb-canvas);font-size:.65rem;font-weight:700;text-decoration:none!important}
 .calendar-event { display:flex; min-width:0; gap:5px; align-items:flex-start; font-size:.78rem; overflow-wrap:anywhere; }
 .calendar-event--compact { font-size:.92rem; }
 body.calendar-open { overflow:hidden; }
-.calendar-dialog { position:fixed; z-index:160; inset:12px; display:flex; max-width:1200px; margin:auto; padding:20px; overflow:auto; flex-direction:column; gap:12px; border:1px solid var(--bb-color-border-strong); border-radius:var(--bb-radius-lg); background:var(--bb-color-bg); box-shadow:0 0 0 100vmax rgb(0 0 0 / 60%); }
+.calendar-dialog { position:fixed; z-index:160; inset:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); display:flex; max-width:1200px; margin:auto; padding:20px; padding-bottom:max(20px,env(safe-area-inset-bottom)); overflow:auto; flex-direction:column; gap:12px; border:1px solid var(--bb-color-border-strong); border-radius:var(--bb-radius-lg); background:var(--bb-color-bg); box-shadow:0 0 0 100vmax rgb(0 0 0 / 60%); }
 .calendar-close { width:44px; height:44px; border:0; background:transparent; color:var(--bb-color-text); font-size:2rem; cursor:pointer; }
 .calendar-dialog__content { display:flex; min-width:0; flex:none; flex-direction:column; gap:20px; }
 .calendar-grid { min-width:0; margin-top:16px; }
@@ -189,7 +191,7 @@ body.calendar-open { overflow:hidden; }
 @media(prefers-reduced-motion:reduce){.calendar-dialog,.calendar-import-dialog{scroll-behavior:auto}}
 .shopping-compact { display:grid; gap:10px; }
 .shopping-quick-add { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
-.shopping-quick-add input,.shopping-add input,.shopping-item__edit input { min-width:0; min-height:46px; padding:10px 12px; border:1px solid var(--bb-color-border); border-radius:9px; background:var(--bb-color-bg); color:var(--bb-color-text-inverse); font-size:16px; }
+.shopping-quick-add input,.shopping-add input,.shopping-item__edit input { min-width:0; min-height:46px; padding:10px 12px; border:1px solid var(--bb-color-border-strong); border-radius:var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-3) 86%,var(--bb-canvas)); color:var(--bb-color-text); font-size:16px; }
 .shopping-quick-add button,.shopping-add button,.shopping-dialog button,.primary-button { min-height:44px; padding:9px 13px; border:0; border-radius:9px; background:var(--bb-color-primary); color:var(--bb-color-text-inverse); cursor:pointer; font-weight:700; }
 body.shopping-mode-open { overflow:hidden; }
 body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search-fab { display:none!important; }
@@ -242,7 +244,7 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
 .meal-planner__week-heading { display: grid; grid-template-columns: 38px minmax(0, 1fr) 38px; align-items: center; gap: 8px; text-align: center; }
 .meal-planner__week-heading p { margin-bottom: 2px; }
 .meal-planner .meal-planner__week-button { width: 38px; min-height: 38px; padding: 0; border-radius: 50%; font-size: 1.45rem; }
-.meal-planner select, .meal-planner input { min-width: 0; min-height: 42px; padding: 8px 9px; border: 1px solid var(--bb-color-border); border-radius: 9px; background: var(--bb-color-bg-subtle); color: var(--bb-color-text); }
+.meal-planner select, .meal-planner input { min-width: 0; min-height: 44px; padding: 9px 11px; border: 1px solid var(--bb-color-border-strong); border-radius: var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-3) 86%,var(--bb-canvas)); color: var(--bb-color-text); }
 .meal-planner button:not(.secondary-button) { min-height: 42px; padding: 8px 12px; border: 0; border-radius: 9px; background: var(--bb-color-primary); color: var(--bb-color-text-inverse); font-weight: 700; cursor: pointer; }
 .meal-planner button:disabled { opacity: .45; cursor: not-allowed; }
 .meal-planner__days, .meal-planner__meals, .meal-planner__tags, .meal-planner__saved-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
@@ -661,7 +663,8 @@ body.shopping-mode-open .mobile-navigation,body.shopping-mode-open .media-search
   .sidebar nav { display: none; }
   .nav-label { display: none; }
   .nav-link { min-width: 0; min-height: 52px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; padding: 5px 8px; font-size: .8rem; }
-  .main { padding-bottom:var(--bb-mobile-dock-clearance); }
+  .main { padding-bottom:var(--bb-mobile-dock-clearance); scroll-padding-bottom:var(--bb-mobile-dock-clearance); }
+  .bb-dialog-backdrop{padding-bottom:max(14px,env(safe-area-inset-bottom))}
 }
 
 @media (max-width: 420px) {

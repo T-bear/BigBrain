@@ -36,7 +36,7 @@ test('shows resolved canonical metadata separately from audiobook releases',asyn
   expect(await screen.findByText('Bokträff')).toBeInTheDocument()
   expect(screen.getByText('pirateaba')).toBeInTheDocument()
   expect(screen.getByText(/Serie: The Wandering Inn/)).toBeInTheDocument()
-  expect(screen.getByText(/nuvarande metadata-provider saknar/)).toBeInTheDocument()
+  expect(screen.queryByText(/metadata-provider|Librarr/)).not.toBeInTheDocument()
 })
 
 test('keeps materially different discovery editions visible',async()=>{
@@ -45,10 +45,10 @@ test('keeps materially different discovery editions visible',async()=>{
   fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate('sv-a','Röst A','sv','Svenska'),candidate('en-b','Voice B','en','Engelska')],acquisition:provider}))
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'bok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   expect(await screen.findByText('2 utgåvor')).toBeInTheDocument();expect(screen.getByText(/Röst A/)).toBeInTheDocument();expect(screen.getByText(/Voice B/)).toBeInTheDocument()
-  expect(screen.queryByRole('button',{name:'Lägg till vald utgåva'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'Lägg till'})).not.toBeInTheDocument()
   fireEvent.click(screen.getAllByRole('button',{name:'Välj utgåva'})[0])
   expect(screen.getByRole('dialog')).toHaveTextContent('Röst A')
-  expect(screen.getByRole('button',{name:'Lägg till vald utgåva'})).toBeDisabled()
+  expect(screen.getByRole('button',{name:'Lägg till'})).toBeDisabled()
 })
 
 test('shows truthful Audiobookshelf not-configured state',async()=>{
@@ -61,7 +61,7 @@ test('keeps library usable while acquisition provider is unavailable',async()=>{
   const fetch=vi.spyOn(globalThis,'fetch')
   fetch.mockResolvedValueOnce(json({...overview,acquisition:unavailable})).mockResolvedValueOnce(json(unavailable)).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
-  expect(screen.getByText('Automatisk hämtning är tillfälligt otillgänglig.')).toBeInTheDocument()
+  expect(screen.getByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Audiobookshelf väntar på konfigurering')).not.toBeInTheDocument()
 })
 
@@ -69,7 +69,7 @@ test('does not mislabel a pending or failed provider-status request as not confi
   const fetch=vi.spyOn(globalThis,'fetch')
   fetch.mockResolvedValueOnce(json(overview)).mockRejectedValueOnce(new TypeError('network')).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
-  expect(screen.getByText('Automatisk hämtning är tillfälligt otillgänglig.')).toBeInTheDocument()
+  expect(screen.getByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Automatisk hämtning är inte konfigurerad ännu.')).not.toBeInTheDocument()
 })
 
@@ -91,8 +91,8 @@ test('requires explicit edition confirmation before creating one acquisition job
   fetch.mockResolvedValueOnce(new Response(JSON.stringify({id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate,status:'queued',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:null}),{status:201,headers:{'Content-Type':'application/json'}}))
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Hitta ljudbok'),{target:{value:'ljudbok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}));await screen.findByText('1 utgåvor')
   expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(0)
-  fireEvent.click(screen.getByRole('button',{name:'Välj utgåva'}));expect(screen.getByRole('dialog')).toHaveTextContent('Kontrollera utgåvan')
-  fireEvent.click(screen.getByRole('button',{name:'Lägg till vald utgåva'}));await waitFor(()=>expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(1))
+  fireEvent.click(screen.getByRole('button',{name:'Välj utgåva'}));expect(screen.getByRole('dialog')).toHaveTextContent('Lägg till den här utgåvan?')
+  fireEvent.click(screen.getByRole('button',{name:'Lägg till'}));await waitFor(()=>expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(1))
   expect(await screen.findByText('Köad')).toBeInTheDocument()
 })
 
@@ -103,4 +103,12 @@ test('refreshes Audiobookshelf library after indexing is confirmed complete',asy
   const fetch=vi.spyOn(globalThis,'fetch')
   fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({...active,status:'completed',message:null})).mockResolvedValueOnce(json({...overview,library:[imported],recent:[imported]}))
   render(<Audiobooks/>);expect(await screen.findByText('Importerad bok')).toBeInTheDocument();expect(screen.getByText('Klar')).toBeInTheDocument()
+})
+
+test('keeps completed acquisition history collapsed while active work stays visible',async()=>{
+  const active={id:'a'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Pågående bok',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'downloading',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:null}
+  const done={...active,id:'b'.repeat(32),candidate:{...active.candidate,editionId:'done',title:'Gammal bok'},status:'completed'}
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active,done],total:42}))
+  render(<Audiobooks/>);expect(await screen.findByText('Pågående bok')).toBeVisible()
+  expect(screen.getByText('Historik (41)')).toBeInTheDocument();expect(screen.getByText('Gammal bok').closest('details')).not.toHaveAttribute('open')
 })

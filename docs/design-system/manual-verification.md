@@ -10,6 +10,8 @@
 6. Navigate by keyboard on desktop and confirm every interactive element has visible focus.
 7. Enlarge text to 200% and confirm content/actions remain usable.
 8. In `Obsidian Gold`, confirm layered graphite backgrounds, restrained gold actions/selection, warm readable text, distinct semantic status colors and visible hover/focus/active/disabled states.
+9. At 390×844 and 430×932, wait for asynchronous content, scroll each view to its spatially last action and confirm it rests above the fixed dock. The combined `.bb-page.dashboard-workspace` rule owns dock clearance; pages must not add magic bottom margins.
+10. Empty text/search/textarea controls must retain a strong material boundary. Busy actions keep their original dimensions and use the single three-dot indicator with screen-reader status; reduced motion removes its movement. Missing artwork must render `BBMediaArtwork`, never a browser broken-image glyph.
 
 ## Jellyfin (installed; manual visual approval pending)
 

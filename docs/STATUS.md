@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-106 Consolidated UX / Quality Fix Sprint (2026-08-27)
+
+BB-106 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW PENDING**. Den gemensamma shell-cascaden reserverar nu den faktiska mobildockans höjd plus safe-area efter `.bb-page`-shorthanden; formulärfält, loading, media-placeholder, status och radpadding har gemensamma kontrakt. Home, Family Calendar och Media har komponerats om inom befintliga API-gränser. Lokal verifiering passerade 135 Web-, 555 API- och 32 Sentinel-tester, Release/Vite-build, Compose och diffkontroll. Deployad Web är healthy; API recreatades inte. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+
+Ljudboksbiblioteket är paginerat och sök-/sorterbart, Continue Listening är fortsatt främst och hämtningar delas i pågående, kräver åtgärd och infälld historik. BigBrain äger bibliotek, omslag, metadata, progress, detalj och uppspelningsstart; pause/resume, seek och chapters är **PARTIAL** eftersom nuvarande granskade adapter endast har server-side read/cover och owner-deep-link, inte ett verifierat Audiobookshelf playback-session/streamingkontrakt. Inga mediajobb eller filer raderades.
+
 ## BB-105 AudioBookBay Parser & Literal Author Search Remediation (2026-08-24)
 
 BB-105 är **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**. GitHub Actions run `32769320392` passerade backend, frontend, documentation och secrets. Den pinnade Librarr-revisionen är oförändrad; image `bigbrain-librarr:1208254-bb6` lägger endast till en sanerad fixture-testad DOM-textgräns för AudioBookBay. Den verkliga sidan innehöll 9 poster och 9 titellänkar men sammanfogade `English` med nästa nästlade etikett till `EnglishKeywords:`. Den tidigare språkgrinden avvisade därför samtliga. bb6 separerar DOM-textnoder och loggar endast sanerade parser-räkningar (`posts`, `rows_with_titles`, `rejected_language`, `retained`) på debugnivå.

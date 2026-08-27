@@ -1,4 +1,5 @@
 import type { FormEvent, KeyboardEvent } from 'react'
+import { BBButton } from '../components'
 
 export function MediaSearchForm({
   loading,
@@ -42,7 +43,7 @@ export function MediaSearchForm({
         autoComplete="off"
       />
       {showClear && <button aria-label="Rensa sökning" className="media-search-clear-control" onClick={onClear} type="button">×</button>}
-      <button type="submit" disabled={!canSubmit}>{loading ? 'Söker…' : 'Sök'}</button>
+      <BBButton busy={loading} type="submit" disabled={!query.trim()||query.trim().length<2} variant="primary">Sök</BBButton>
     </div>
   </form>
 }

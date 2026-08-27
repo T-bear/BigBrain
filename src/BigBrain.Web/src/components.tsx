@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type InputHTMLAttributes, type PropsWithChildren, type SelectHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useState, type ButtonHTMLAttributes, type HTMLAttributes, type ImgHTMLAttributes, type InputHTMLAttributes, type PropsWithChildren, type SelectHTMLAttributes } from 'react'
 import type { DockerContainer } from './types'
 
 export function StatusBadge({ status, compact = false }: { status: string; compact?: boolean }) {
@@ -9,8 +9,20 @@ export function StatusBadge({ status, compact = false }: { status: string; compa
 export type BBButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'icon' | 'contextual'
 
 export const BBButton = forwardRef<HTMLButtonElement, PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { variant?: BBButtonVariant; busy?: boolean }>>(function BBButton({ variant = 'secondary', className = '', busy = false, children, disabled, ...props }, ref) {
-  return <button aria-busy={busy || undefined} className={`bb-button bb-button--${variant} ${className}`.trim()} disabled={disabled || busy} ref={ref} {...props}>{busy ? <><span aria-hidden="true" className="bb-spinner" />Vänta…</> : children}</button>
+  const busyLabel=typeof children==='string'?`${children} pågår`:'Åtgärden pågår'
+  return <button {...props} aria-busy={busy || undefined} aria-label={busy?busyLabel:props['aria-label']} className={`bb-button bb-button--${variant} ${className}`.trim()} disabled={disabled || busy} ref={ref}><span className={busy?'bb-button__content bb-button__content--busy':'bb-button__content'}>{children}</span>{busy&&<BBLoadingIndicator label={busyLabel} compact/>}</button>
 })
+
+export function BBLoadingIndicator({ label = 'Laddar', compact = false }: { label?: string; compact?: boolean }) {
+  return <span aria-live="polite" className={`bb-loading-indicator ${compact?'bb-loading-indicator--compact':''}`} role="status"><span aria-hidden="true" className="bb-loading-indicator__dots"><i/><i/><i/></span><span className="bb-sr-only">{label}</span></span>
+}
+
+export function BBMediaArtwork({ src, alt, className = '', ...props }: ImgHTMLAttributes<HTMLImageElement>) {
+  const [failed,setFailed]=useState(!src)
+  useEffect(()=>setFailed(!src),[src])
+  if(failed)return <div aria-label={alt||'Omslag saknas'} className={`bb-media-placeholder ${className}`.trim()} role="img"><span aria-hidden="true" className="bb-media-placeholder__mark">B</span></div>
+  return <img {...props} alt={alt??''} className={className} onError={()=>setFailed(true)} src={src}/>
+}
 
 export function BBInput({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`bb-input ${className}`.trim()} {...props} />

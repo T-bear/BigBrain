@@ -379,6 +379,26 @@ Tizen TV. Jellyfin accepted each command and the expected episode became `NowPla
 Natural completion transition remains tracked as BB-014; no terminal or automated test run
 starts real playback.
 
+## BB-106 audiobook browsing and interaction quality
+
+The normal audiobook surface no longer exposes Librarr or metadata-pipeline explanations. It keeps
+Continue Listening prominent, pages/searches/sorts the Audiobookshelf library in bounded groups and
+separates active work, attention and collapsed historical acquisition evidence. History cleanup is
+presentation-only: durable lifecycle evidence, provider jobs and media files are never deleted to make
+the list shorter. Missing covers use the shared BigBrain media placeholder and all remote images retain
+their existing same-origin proxy boundaries.
+
+BigBrain currently owns library browsing, cover, metadata, detail, progress, continue-listening and the
+play/open action. Full embedded pause/resume, seeking and chapter navigation remain **PARTIAL**: the
+reviewed adapter does not yet expose an authenticated Audiobookshelf playback-session/streaming contract.
+Audiobookshelf 2.36.0 has internal start/sync/close and track routes, but these are not included in its
+official OpenAPI specification. Native BigBrain pause/seek/chapter playback therefore remains partial
+until a dedicated slice defines a same-origin Range proxy and a tested session/progress lifecycle rather
+than binding the product to undocumented routes.
+The supported action therefore opens the configured owner-reachable player; no ABS key enters Web.
+Adding such a contract requires a bounded server-side adapter, stream/range and progress-sync review,
+not a frontend call to Audiobookshelf.
+
 ## ADR impact
 
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart

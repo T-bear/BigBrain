@@ -38,6 +38,8 @@ The expanded dialog is one scroll container. Its header, toolbar and content use
 
 The MVP supports the verified single-month Swedish calendar-grid `.xlsx` format. It does not support PDF/OCR, encrypted workbooks, ICS/Google/Apple sync, manual events, per-user calendars, reminders or deletion of prior imports. See BB-029.
 
-Calendar remains a module presented within Home, not a standalone BigBrain view. Accessible visual
-recession of past days and mobile swipe navigation are future UX investigations; neither behavior is
-implemented or approved as a final interaction specification. See the [planning record](../reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md).
+Calendar remains a module presented within Home, not a standalone BigBrain view. BB-106 classifies
+calendar dates against a locally constructed `YYYY-MM-DD` key: passed rows recede and use a restrained
+strike-through, today receives the shared accent marker and future days remain normal. This avoids UTC
+midnight drift. Mobile swipe navigation remains a future UX investigation. See the
+[planning record](../reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md).

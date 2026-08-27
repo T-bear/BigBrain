@@ -1,6 +1,6 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { BBButton, BBEmptyState, BBInput, BBSelect, BBSurface } from './components'
+import { BBButton, BBEmptyState, BBInput, BBMediaArtwork, BBSelect, BBSurface } from './components'
 
 describe('BigBrain semantic controls', () => {
   afterEach(cleanup)
@@ -14,9 +14,10 @@ describe('BigBrain semantic controls', () => {
 
   it('exposes loading state and prevents duplicate activation', () => {
     render(<BBButton busy>Skicka</BBButton>)
-    const button = screen.getByRole('button', { name: /Vänta/ })
+    const button = screen.getByRole('button', { name: 'Skicka pågår' })
     expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByRole('status')).toHaveTextContent('Skicka pågår')
   })
 
   it('keeps native labels and values for material inputs and selects', () => {
@@ -24,6 +25,14 @@ describe('BigBrain semantic controls', () => {
     expect(screen.getByLabelText('Sök')).toHaveClass('bb-input')
     expect(screen.getByLabelText('Tema')).toHaveClass('bb-select')
     expect(screen.getByLabelText('Tema')).toHaveValue('forest')
+  })
+
+  it('replaces missing or broken artwork with the shared branded placeholder', () => {
+    const {rerender}=render(<BBMediaArtwork alt="Omslag till Test" />)
+    expect(screen.getByRole('img',{name:'Omslag till Test'})).toHaveClass('bb-media-placeholder')
+    rerender(<BBMediaArtwork alt="Omslag till Test" src="/broken.jpg" />)
+    fireEvent.error(screen.getByRole('img',{name:'Omslag till Test'}))
+    expect(screen.getByRole('img',{name:'Omslag till Test'})).toHaveClass('bb-media-placeholder')
   })
 
   it('provides restrained surface and empty-state anatomy', () => {

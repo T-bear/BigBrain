@@ -17,6 +17,8 @@ type HomeSnapshot = {
 
 const localDate = () => new Date().toLocaleDateString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit' })
 const eventTime = (event: CalendarEvent) => event.isAllDay ? 'Hela dagen' : [event.startTime, event.endTime].filter(Boolean).join('–')
+const eventDate = (event: CalendarEvent) => new Intl.DateTimeFormat('sv-SE',{weekday:'short',day:'numeric',month:'short'}).format(new Date(`${event.date}T12:00:00`))
+export const nextEventLabel=(event:CalendarEvent)=>`${eventDate(event)} · ${event.title} · ${eventTime(event)}`
 
 export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | null }) {
   const { setActiveView } = useWidgets()
@@ -40,10 +42,10 @@ export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | 
 
   return <div className="home-overview">
     <section aria-labelledby="home-today-title" className="home-today">
-      <header><p className="eyebrow">I dag</p><h2 id="home-today-title">Just nu</h2></header>
+      <header><p className="eyebrow">Översikt</p><h2 id="home-today-title">Det viktigaste i dag</h2></header>
       <div className="home-today__grid">
         <div><span>Måltid</span><strong>{snapshot.todayMeals.length ? snapshot.todayMeals.map(meal => meal.mealName).join(' · ') : 'Ingen måltid planerad'}</strong></div>
-        <div><span>Nästa i kalendern</span><strong>{snapshot.nextEvent ? `${snapshot.nextEvent.title} · ${eventTime(snapshot.nextEvent)}` : 'Inget kommande i veckan'}</strong></div>
+        <div><span>Nästa kalenderhändelse</span><strong>{snapshot.nextEvent ? nextEventLabel(snapshot.nextEvent) : 'Inget kommande i veckan'}</strong></div>
       </div>
     </section>
     <div className="home-glances">

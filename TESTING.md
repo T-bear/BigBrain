@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-106 consolidated UX quality
+
+- `components.test.tsx` verifierar dimensionsstabil busy-knapp, tillgänglig status och gemensam media-placeholder. Audiobook-regressionen verifierar explicit utgåvebekräftelse, kompakt historik och pagineringskontrakt; Calendar provar lokal past/today/future-klassificering och Home provar datum+titel+tid.
+- Full verifiering: 135 Web-, 555 API- och 32 Sentinel-tester, Vite- och Release-build, Compose, dokumentationsverifierare och diffkontroll.
+- Deployad browserkontroll ska vänta tills modulernas read-only data har stabiliserats, scrolla den rumsligt sista kontrollen och prova 390×844 samt 430×932 i alla tre teman. Kräv ingen horisontell overflow, synliga textfält och full dock-clearance. Kontrollera även 1440×900 och reduced-motion-kontraktet.
+
 ## BB-105 AudioBookBay parser and literal author search
 
 - Build `bigbrain-librarr:1208254-bb6`. The image applies the sanitized current-markup fixture, proves English rows survive adjacent nested metadata labels, rejects a non-English row, and reruns complete organizer/search/download plus the focused API regression.

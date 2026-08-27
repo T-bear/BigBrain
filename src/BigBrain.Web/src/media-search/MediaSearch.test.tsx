@@ -62,7 +62,7 @@ test('Enter starts search and shows loading state', async () => {
   fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Enter', code: 'Enter' })
 
   expect(screen.getByText('Searching media services…')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Söker…' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Sök pågår' })).toBeDisabled()
   resolveRequest?.(response(result))
   expect(await screen.findByText('Results for “Family Guy”')).toBeInTheDocument()
 })

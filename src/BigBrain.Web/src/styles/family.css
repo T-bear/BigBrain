@@ -74,7 +74,7 @@
 .family-section .shopping-list { display:grid; gap:11px; }
 .family-section .shopping-list>.shopping-quick-add { margin:0; }
 .family-section .shopping-quick-add { gap:7px; padding:3px; border-radius:calc(var(--bb-radius-control) + 3px); background:color-mix(in srgb,var(--bb-surface-1) 60%,transparent); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
-.family-section .shopping-quick-add input { min-height:44px; padding:9px 11px; border:1px solid transparent; border-radius:var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-2) 78%,transparent) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
+.family-section .shopping-quick-add input { min-height:44px; padding:9px 11px; border:1px solid var(--bb-color-border-strong); border-radius:var(--bb-radius-control); background:color-mix(in srgb,var(--bb-surface-3) 86%,var(--bb-canvas)) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text); box-shadow:inset 0 1px 2px var(--bb-surface-shadow); }
 .family-section .shopping-quick-add input::placeholder { color:var(--bb-color-text-tertiary); opacity:.82; }
 .family-section .shopping-quick-add input:focus-visible { background:var(--bb-material-control) padding-box,var(--bb-metallic-accent) border-box; }
 .family-section .shopping-quick-add button { border:1px solid transparent; background:var(--bb-material-primary-action) padding-box,var(--bb-material-panel-edge) border-box; color:var(--bb-color-text); box-shadow:var(--bb-shadow-sm); font-weight:600; }
