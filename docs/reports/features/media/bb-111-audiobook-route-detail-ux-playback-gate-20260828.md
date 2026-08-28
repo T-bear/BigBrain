@@ -11,7 +11,7 @@ Detta är en sanerad GitHub-version. Lokal rå runtime- och browser-evidens publ
 
 ## Status
 
-- UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING**
+- UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**
 - Native BigBrain audiobook playback: **BLOCKED**
 - Mini-player: **NO**
 - Owner UX approved: **NO**
@@ -37,7 +37,9 @@ Credentials remain server-side and absent from browser DTO/config/logs/documenta
 
 ## Evidence
 
-Focused Web regression is 28/28; complete Web is 151/151; API is 558/558 and Sentinel is 32/32. Vite production build passes. Compose, documentation, secret/diff gates, viewport/theme QA, publication, CI, deploy/runtime and physical owner checks are recorded in canonical status/testing as they complete.
+Focused Web regression is 28/28; complete Web is 151/151; API is 558/558 and Sentinel is 32/32. Vite and full Release builds, Compose, 192-file documentation verification, staged gitleaks and diff checks pass. Implementation `686f621937ae0e376bcc55003077769fff8b4351` is published and GitHub Actions run `33187236677` passed.
+
+Only BigBrain Web was rebuilt/recreated and became healthy; API remained healthy. Nine Firefox cases across 390×844, 430×932 and 1440×900 plus all three themes proved link semantics, no pointer focus ring while DOM focus remains on route headings, detail at top, exact Library scroll restoration, no overflow, 2:3 artwork at 88 px mobile/180 px desktop with `object-fit:cover`, and no unknown-language copy.
 
 ## Remaining work
 

@@ -7,7 +7,8 @@
 - `npm run build`: TypeScript + Vite production build passerar.
 - `dotnet test BigBrain.slnx -c Release --no-restore`: 558 API + 32 Sentinel passerar. Det första felskrivna försöket mot `BigBrain.sln` kunde inte starta eftersom repositoryt använder `BigBrain.slnx`; det körde inga tester och följdes av korrekt kommando.
 - Runtime credential discovery är read-only och sanerad: endast identity/privilege-klass, aktiveringsstatus och aggregerade progress/session-counts får lämna proben. Token, användarnamn, user ID, privata URL:er och råa payloads får aldrig skrivas ut. Resultatet 2026-08-28 är restricted/non-root, 0 progress och 0 sessions; inga playback-write-/sessionanrop kördes mot fel identitet.
-- Återstående publiceringsgates: Compose, dokumentationsverifiering, `git diff --check`, secret scan, browsermatris 390×844/430×932/1440×900 i tre teman, CI och deployad runtime.
+- `docker compose config --quiet`, 192-filers documentation verifier, `git diff --check` och scoped staged gitleaks (0 fynd) passerar.
+- Deployad Firefox-matris 390×844/430×932/1440×900 × Obsidian Gold/Forest Night/Arctic Wind passerar. Samtliga nio fall har link-semantik, 0 overview-katalograder, pointerfokuserad heading med DOM-fokus men ingen ring, detail på `scrollY=0`, exakt collection-scrollrestoration, 1.5 höjd/bredd (2:3), `object-fit:cover`, inget `Språk okänt` och ingen overflow. Web/API health är HTTP 200; GitHub Actions run `33187236677` passerade implementation `686f621937ae0e376bcc55003077769fff8b4351`.
 
 ## BB-110 audiobook owner UX consolidation
 

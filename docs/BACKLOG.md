@@ -2,11 +2,11 @@
 
 ## BB-111 — Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice
 
-- Status UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING** 2026-08-28.
+- Status UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `686f621937ae0e376bcc55003077769fff8b4351`; GitHub Actions run `33187236677` passerade.
 - Levererat lokalt: modality-aware route-heading focus utan falsk pointer/touch-ring; forward detail till `scrollY=0` och back-restoration till collection; audiobook-lokal **Bibliotek**-länk/navigation row; kompakt 2:3-säker detail hero; okänt valfritt språk utelämnas. Bounded overview, 24-posters collection, whole-row detail, discovery → library → downloads, scroll-top och presentation-only failed history bevaras.
 - Artworkbeslut: detail använder 88 px cover på mobil och collection 68 px genom lokala canonical storlekar. Den gemensamma 2:3-placeholder-/cover-principen bevaras; ingen global artwork-token ändras utan bredare modulförevidens.
 - **BLOCKED native playback:** befintlig nyckel är sanerat verifierad som aktiv begränsad service/user-identitet utan ägarprogress/sessioner. Den är inte root men är fel playbackidentitet. En separat server-side per-user playbacknyckel för rätt Audiobookshelf-användare krävs; skapa/borrowa/exponera ingen token. Först efter verifiering får same-origin session/Range/progress-sync, Continue Listening, native player och mini-player implementeras.
-- DoD kvar: Compose/docs/security/diff gates, viewport/theme-QA, publish/CI, Web deploy/runtime och fysisk owner UX review. Audiobook-navigationen är inte globalt antagen.
+- Automatisk DoD: Compose/docs/security/diff, 28 focused/151 full Web, 558 API, 32 Sentinel, Release/Vite, nio viewport/theme-fall, Web-only deploy och health passerar. Fysisk owner UX review återstår. Audiobook-navigationen är inte globalt antagen.
 
 ## BB-110 — Audiobook Owner UX Consolidation & Native Playback Foundation
 
