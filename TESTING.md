@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-110 audiobook owner UX consolidation
+
+- `Audiobooks.test.tsx` verifierar kanonisk secondary-variant för **Bibliotek**, reducerad synlig copy med bevarade accessible names, discovery → library → downloads, semantic whole-row detail navigation, bounded collection och lokal persistent attention-dismiss utan POST eller audit/provider-mutation.
+- Full Web-regression, API/Sentinel-regression och Release/Vite-build körs trots att BB-110 endast ändrar Web. Browsermatrisen är 390×844, 430×932 och 1440×900 i Obsidian Gold, Forest Night och Arctic Wind; kontrollera långa titlar, vertikala jobb, dock/safe-area och overflow.
+- Native playback får inte testas eller markeras implementerad innan BigBrain-user→Audiobookshelf-playback-identitet och same-origin Range/session/progress-sync har ett godkänt arkitekturkontrakt. Ingen ägartoken får förekomma i Web eller browserlagring.
+
 ## BB-109 audiobook owner UX remediation
 
 - `Audiobooks.test.tsx` verifierar standardiserad **Bibliotek**-affordance utan dominant count, progressbaserad Continue Listening utan falsk tomstatus, separata inputs för ny discovery/lokal filtrering, bounded collection, reducerad-motion scroll-till-top, aktiva/attention/history-sektioner och presentation-only historikrensning. Befintlig edition-confirmation/idempotens körs fortsatt.

@@ -14,3 +14,20 @@
 .audiobook-history{padding:var(--bb-space-3);border:1px solid var(--bb-color-border);border-radius:var(--bb-radius-lg)}
 .audiobook-scroll-top{position:fixed;right:max(var(--bb-space-4),env(safe-area-inset-right));bottom:calc(var(--bb-mobile-nav-height,72px) + env(safe-area-inset-bottom) + var(--bb-space-4));z-index:20;width:44px;height:44px;padding:0;border-radius:50%}
 @media(min-width:769px){.audiobook-scroll-top{bottom:var(--bb-space-6)}}
+
+/* BB-110: canonical actions, semantic collection rows and mobile-first job hierarchy. */
+.audiobook-collection-link{display:inline-flex;gap:var(--bb-space-2);color:var(--bb-color-text-secondary)}
+.audiobook-collection-link span:last-child{font-size:inherit;line-height:inherit}
+.audiobook-book-row{grid-template-columns:82px minmax(0,1fr) 44px;width:100%;padding:var(--bb-space-3);border-color:transparent;background:transparent;color:inherit;text-align:left;box-shadow:none}
+.audiobook-book-row:hover{background:color-mix(in srgb,var(--bb-surface-2) 68%,transparent);transform:none}
+.audiobook-book-row:focus-visible{box-shadow:var(--bb-focus-ring)}
+.audiobook-book-row__chevron{display:grid;width:44px;height:44px;place-items:center;color:var(--bb-color-text-tertiary);font-size:1.35rem}
+.audiobook-discovery>h2,.audiobook-owned-library h2,.audiobook-activity h2{margin:0}
+.audiobook-search{padding-top:0;border-top:0}
+.audiobook-job-group{display:grid;gap:0;min-width:0;padding:var(--bb-space-3)}
+.audiobook-job-group>h3{margin-block:0 var(--bb-space-2)}
+.audiobook-job{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:var(--bb-space-1) var(--bb-space-3);min-width:0;padding:var(--bb-space-3) 0}
+.audiobook-job strong,.audiobook-job small{min-width:0;overflow-wrap:anywhere}
+.audiobook-job small{grid-column:1/-1}
+.audiobook-job .bb-button{grid-column:2;grid-row:2;justify-self:end;min-height:44px}
+@media(max-width:600px){.audiobook-book-row{grid-template-columns:68px minmax(0,1fr) 44px;padding-inline:var(--bb-space-2)}.audiobook-book-row>img,.audiobook-book-row>.bb-media-placeholder{width:68px}.audiobook-job{grid-template-columns:minmax(0,1fr)}.audiobook-job>span,.audiobook-job .bb-button{grid-column:1;grid-row:auto;justify-self:start}.audiobook-job-group{padding-inline:var(--bb-space-3)}}

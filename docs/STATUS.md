@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-110 Audiobook Owner UX Consolidation & Native Playback Foundation (2026-08-28)
+
+BB-110 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING**. Den audiobook-lokala positiva owner-evidensen består: Media förblir bounded, samlingen öppnas separat och scroll-till-top behålls. Media använder nu den kanoniska sekundära **Bibliotek**-knappen utan lokala accent-/typografiöverstyrningar. Samlingen är avskalad och ordnad **Hitta ljudbok → Bibliotek → Hämtningar**; hela den semantiska bokraden öppnar detaljen. Hämtningar använder en mobil vertikal hierarki och terminala fel kan döljas lokalt utan att audit-, jobb- eller providerdata raderas.
+
+Native playback är **BLOCKED** vid en uttrycklig arkitekturgräns. Den nuvarande BigBrain-identitetsmodellen har ingen godkänd mappning från autentiserad BigBrain-användare till personlig Audiobookshelf-playbackidentitet. Serviceidentiteten får därför fortsatt inte användas för ägarens progress/session och ingen token exponeras i Web. Owner/systemarkitekt måste besluta identitetsmappning, credential lifecycle, authorization och same-origin Range/session/progress-sync innan player, mini-player eller Continue Listening kan bli korrekt.
+
 ## BB-109 Audiobook Owner UX Remediation & Native Playback Investigation (2026-08-28)
 
 BB-109 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. BB-108:s positiva owner-evidens bevaras: Media-overview är bounded och hela katalogen öppnas först via den separata samlingen. Den dominerande räknarlänken ersätts av standardknappen **Bibliotek**; samlingsrouten skiljer tydligt ny discovery från lokal filtrering, har lugnare rubrikhierarki, bounded 24-poster, dock-safe scroll-till-top och uppdelade aktiva jobb, åtgärdsbehov och presentation-only historikrensning.

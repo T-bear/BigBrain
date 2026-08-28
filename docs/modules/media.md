@@ -427,6 +427,14 @@ BB-108's bounded `overview → collection → detail` remains audiobook-local an
 
 Audiobookshelf progress is user-specific. Runtime evidence on 2.36.0 shows no progress/session rows for the restricted BigBrain service identity and three active rows for another library identity, so the adapter cannot truthfully show the owner's Continue Listening state with its current credential. The installed start, ephemeral session-track, sync and close routes establish that native playback is technically possible, but do not decide which identity owns playback/progress. BigBrain therefore keeps the owner link as an explicitly temporary fallback and must not expose an Audiobookshelf token or start a zero-progress session under the wrong identity. A future approved slice must choose the canonical playback identity and define a same-origin Range/session/progress-sync adapter boundary.
 
+## BB-110 audiobook UX consolidation and playback identity gate
+
+Audiobook-samlingen använder lokalt experimentkontraktet overview → collection → detail. Collection ordnas discovery → owned library → downloads; synlig copy är reducerad men ny discovery och lokal filterinput behåller skilda accessible names. En bokrad är en semantisk navigation target över hela raden och katalogen förblir bounded 24 poster. Terminala failed-rader kan döljas via ett max 200-ID device-local presentationstillstånd; BigBrain-jobb, audit, provider och media ändras inte.
+
+`BBButton` secondary äger **Bibliotek**-affordancens geometri/tillstånd; den tidigare lokala guldtexten/förstorade chevronen var inte ett nytt variantkontrakt och är borttagen. Detta whole-row- och informationsdensitetsbeteende är fortsatt audiobook-lokalt och inväntar owner UX review.
+
+Owner direction är service identity för katalog/integration och per-authenticated-user playback identity för progress/session. Någon sådan godkänd identitetsmappning eller credential lifecycle finns ännu inte i BigBrains authkontrakt. Native same-origin stream/Range/session/progress-sync, mini-player och korrekt Continue Listening är därför blockerade tills owner/systemarkitekt beslutar denna varaktiga säkerhetsgräns; servicekontot ersätts inte och token lämnar aldrig API-sidan.
+
 Acquisition reconciliation treats provider absence as a bounded ambiguity: a missing provider job retains its active state for five minutes to allow registration, then fails closed into attention rather than remaining `downloading` forever. This does not cancel, delete or restart provider work.
 
 ## ADR impact

@@ -1,5 +1,7 @@
 # Reports Index
 
+- [BB-110 Audiobook UX consolidation and native playback foundation](../reports/features/media/bb-110-audiobook-ux-consolidation-20260828.md)
+
 - [BB-088 Finance prospective daily cadence and UI v1.0](../reports/features/finance/finance-bb-088-daily-cadence-ui-v1-20260815.md)
 - [BB-087 Finance prospective shadow foundation](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md)
 - [BB-084 Finance dataset research](../reports/features/finance/finance-bb-084-dataset-research-20260815.md)

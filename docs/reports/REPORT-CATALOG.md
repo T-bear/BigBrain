@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-110` — [Audiobook Owner UX Consolidation & Native Playback Foundation](features/media/bb-110-audiobook-ux-consolidation-20260828.md)
 - `BB-109` — [Audiobook Owner UX Remediation & Native Playback Investigation](features/media/bb-109-audiobook-owner-ux-remediation-20260828.md)
 
 - `BB-108` — [Audiobook Navigation UX Experiment](features/media/bb-108-audiobook-navigation-ux-experiment-20260828.md)

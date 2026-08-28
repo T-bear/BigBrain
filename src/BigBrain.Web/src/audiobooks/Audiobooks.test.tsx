@@ -27,9 +27,9 @@ test('renders provider-neutral search with Swedish preference and no fake progre
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
   expect(screen.getByText('Automatisk hämtning är inte konfigurerad ännu.')).toBeInTheDocument()
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-  fireEvent.change(screen.getByLabelText('Sök utanför ditt bibliotek'),{target:{value:'bok'}})
+  fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'bok'}})
   expect(screen.getByPlaceholderText('Titel, författare, serie eller ISBN')).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button',{name:'Sök nya ljudböcker'}))
+  fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   await waitFor(()=>expect(String(fetch.mock.calls[4][0])).toContain('language=sv'))
   expect(String(fetch.mock.calls[4][0])).not.toContain('author=')
 })
@@ -39,7 +39,7 @@ test('shows resolved canonical metadata separately from audiobook releases',asyn
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch)
   const metadata={query:{original:'The Wandering Inn',normalized:'The Wandering Inn',kind:'freeText'},state:'resolved',narratorSearchSupported:false,message:null,works:[{workId:'OL1W',editionIds:['OL1M'],canonicalTitle:'The Wandering Inn',alternateTitles:['Wandering Inn'],authors:['pirateaba'],series:'The Wandering Inn',seriesNumber:null,narrators:[],isbn10:null,isbn13:'9780306406157',asin:null,language:'en',publicationYear:2017,coverUrl:null,provider:'openLibrary'}]}
   fetch.mockResolvedValueOnce(json({library:[],metadata,discovery:[],acquisition:provider}))
-  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök utanför ditt bibliotek'),{target:{value:'The Wandering Inn'}});fireEvent.click(screen.getByRole('button',{name:'Sök nya ljudböcker'}))
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'The Wandering Inn'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   expect(await screen.findByText('Bokträff')).toBeInTheDocument()
   expect(screen.getByText('pirateaba')).toBeInTheDocument()
   expect(screen.getByText(/Serie: The Wandering Inn/)).toBeInTheDocument()
@@ -51,7 +51,7 @@ test('keeps materially different discovery editions visible',async()=>{
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch)
   const candidate=(editionId:string,narrator:string,language:string,languageLabel:string)=>({workId:'work',editionId,title:'Boken',author:'Författaren',narrator,language,languageLabel,edition:'Oavkortad',durationSeconds:100,publicationYear:2025,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'verified',provenance:'AudioBookBay'})
   fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate('sv-a','Röst A','sv','Svenska'),candidate('en-b','Voice B','en','Engelska')],acquisition:provider}))
-  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök utanför ditt bibliotek'),{target:{value:'bok'}});fireEvent.click(screen.getByRole('button',{name:'Sök nya ljudböcker'}))
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'bok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}))
   expect(await screen.findByText('2 utgåvor')).toBeInTheDocument();expect(screen.getByText(/Röst A/)).toBeInTheDocument();expect(screen.getByText(/Voice B/)).toBeInTheDocument()
   expect(screen.queryByRole('button',{name:'Lägg till'})).not.toBeInTheDocument()
   fireEvent.click(screen.getAllByRole('button',{name:'Välj utgåva'})[0])
@@ -101,7 +101,7 @@ test('requires explicit edition confirmation before creating one acquisition job
   const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json({...overview,acquisition:healthy})).mockResolvedValueOnce(json(healthy)).mockResolvedValueOnce(json(jobs)).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
   fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate],acquisition:healthy}))
   fetch.mockResolvedValueOnce(new Response(JSON.stringify({id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate,status:'queued',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:null}),{status:201,headers:{'Content-Type':'application/json'}}))
-  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök utanför ditt bibliotek'),{target:{value:'ljudbok'}});fireEvent.click(screen.getByRole('button',{name:'Sök nya ljudböcker'}));await screen.findByText('1 utgåvor')
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'ljudbok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}));await screen.findByText('1 utgåvor')
   expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(0)
   fireEvent.click(screen.getByRole('button',{name:'Välj utgåva'}));expect(screen.getByRole('dialog')).toHaveTextContent('Lägg till den här utgåvan?')
   fireEvent.click(screen.getByRole('button',{name:'Lägg till'}));await waitFor(()=>expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method==='POST')).toHaveLength(1))
@@ -127,11 +127,22 @@ test('keeps completed acquisition history collapsed while active work stays visi
   expect(screen.getByText('Historik (41)')).toBeInTheDocument();expect(screen.getByText('Gammal bok').closest('details')).not.toHaveAttribute('open')
 })
 
+test('dismisses failed attention locally without mutating audit or provider state',async()=>{
+  collection()
+  const failed={id:'f'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Gammalt misslyckat jobb',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'failed',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:'Jobbet finns inte längre hos leverantören.'}
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[failed],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
+  render(<Audiobooks/>);await screen.findByText('Gammalt misslyckat jobb')
+  fireEvent.click(screen.getByRole('button',{name:'Dölj Gammalt misslyckat jobb från åtgärdslistan'}))
+  expect(screen.queryByText('Gammalt misslyckat jobb')).not.toBeInTheDocument()
+  expect(JSON.parse(window.localStorage.getItem('bigbrain.audiobooks.hidden-attention.v1')??'[]')).toEqual([failed.id])
+  expect(fetch.mock.calls.filter(([,init])=>(init as RequestInit|undefined)?.method&&((init as RequestInit).method!=='GET'))).toHaveLength(0)
+})
+
 test('keeps the Media overview compact and opens the bounded full collection on demand',async()=>{
   const item=(index:number)=>({id:`book-${index}`,title:`Ljudbok ${index}`,author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null})
   const books=Array.from({length:12},(_,index)=>item(index+1))
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,library:books,recent:books.slice(0,6)})
-  render(<Audiobooks/>);expect(await screen.findByRole('button',{name:'Öppna ljudboksbiblioteket'})).toBeInTheDocument()
+  render(<Audiobooks/>);expect(await screen.findByRole('button',{name:'Öppna ljudboksbiblioteket'})).toHaveClass('bb-button--secondary')
   expect(screen.queryByText('Senast tillagda')).not.toBeInTheDocument()
   expect(screen.queryByText('Ljudbok 1')).not.toBeInTheDocument()
   expect(screen.queryByLabelText('Sök i biblioteket')).not.toBeInTheDocument()
@@ -173,19 +184,42 @@ test('restores collection query and sort after returning from detail',async()=>{
   render(<Audiobooks/>);await screen.findByText('En bok')
   fireEvent.change(screen.getByLabelText('Sök i ditt bibliotek'),{target:{value:'min sökning'}})
   fireEvent.change(screen.getByLabelText('Sortera bibliotek'),{target:{value:'author'}})
-  fireEvent.click(screen.getByRole('button',{name:'Visa ljudbok'}))
+  fireEvent.click(screen.getByRole('button',{name:'Öppna En bok'}))
   window.history.replaceState({bbAudiobookOrigin:true},'','/media/audiobooks')
   window.dispatchEvent(new PopStateEvent('popstate'))
   await waitFor(()=>expect(screen.getByLabelText('Sök i ditt bibliotek')).toHaveValue('min sökning'))
   expect(screen.getByLabelText('Sortera bibliotek')).toHaveValue('author')
 })
 
+test('uses the whole semantic book row for detail navigation',async()=>{
+  collection()
+  const item={id:'whole-row',title:'Tryckbar bok',author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null}
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,library:[item],recent:[item]})
+  render(<Audiobooks/>);const row=await screen.findByRole('button',{name:'Öppna Tryckbar bok'})
+  expect(row).toHaveClass('audiobook-book-row');expect(screen.queryByText('Visa ljudbok')).not.toBeInTheDocument()
+  fireEvent.click(row);expect(window.location.pathname).toBe('/media/audiobooks/whole-row')
+})
+
 test('keeps new-book discovery distinct from local-library filtering',async()=>{
   collection()
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch)
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt')
-  expect(screen.getByLabelText('Sök utanför ditt bibliotek')).toBeInTheDocument()
+  expect(screen.getByLabelText('Sök efter en ny ljudbok')).toBeInTheDocument()
   expect(screen.getByLabelText('Sök i ditt bibliotek')).toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'Sök'})).toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'Filtrera'})).toBeInTheDocument()
+  expect(screen.queryByText('Lägg till')).not.toBeInTheDocument()
+  expect(screen.queryByText('Din samling')).not.toBeInTheDocument()
+})
+
+test('orders discovery before library before downloads',async()=>{
+  collection()
+  const active={id:'a'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Pågående',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'downloading',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:null}
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
+  render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt')
+  const discovery=screen.getByRole('heading',{name:'Hitta ljudbok'});const library=screen.getByRole('heading',{name:'Bibliotek'});const downloads=screen.getByRole('heading',{name:'Hämtningar'})
+  expect(discovery.compareDocumentPosition(library)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(library.compareDocumentPosition(downloads)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 })
 
 test('shows a dock-safe scroll-to-top utility and respects reduced motion',async()=>{
