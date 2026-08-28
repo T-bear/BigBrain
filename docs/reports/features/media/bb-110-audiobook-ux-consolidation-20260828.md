@@ -11,7 +11,7 @@ Detta är en sanerad GitHub-version. Lokal rå runtime- och browser-evidens publ
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING**
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**
 
 ## Changes
 
@@ -38,7 +38,9 @@ Inget media, providerjobb, acquisitionjobb eller auditrecord raderas, avbryts el
 
 ## Evidence
 
-Fokuserade tester täcker canonical Bibliotek-variant, accessible compact copy, sektionsordning, semantic row navigation och persistent presentation-only dismiss. Fulla test-, build-, dokumentations-, browser-, CI- och deployresultat kompletteras i source of truth efter faktisk verifiering.
+Fokuserade tester täcker canonical Bibliotek-variant, accessible compact copy, sektionsordning, semantic row navigation och persistent presentation-only dismiss: 25/25 passerade. Full regression passerade 147 Web, 558 API och 32 Sentinel. Release build hade 0 warnings/errors; Vite, Compose och 191-filers dokumentationsverifiering passerade.
+
+Endast Web byggdes/återskapades och blev healthy. Deployad browsermatris 390×844, 430×932 och 1440×900 i Obsidian Gold, Forest Night och Arctic Wind passerade: overview hade 0 katalograder, collection 20 bounded rows, korrekt discovery → library → downloads, whole-row semantic targets, robust jobbwrapping, ingen overflow, 112 px mobil dock-clearance och scroll-top efter lång scroll. En första transient tom 430px-read stabiliserades vid identisk sekventiell omkörning; ingen mutation gjordes. GitHub Actions run `33179994941` passerade backend, frontend, documentation och secrets för `76b3c9eda56230e6cf570353ea5f1ca4e579a07c`.
 
 ## Remaining work
 

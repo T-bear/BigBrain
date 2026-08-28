@@ -5,6 +5,7 @@
 - `Audiobooks.test.tsx` verifierar kanonisk secondary-variant för **Bibliotek**, reducerad synlig copy med bevarade accessible names, discovery → library → downloads, semantic whole-row detail navigation, bounded collection och lokal persistent attention-dismiss utan POST eller audit/provider-mutation.
 - Full Web-regression, API/Sentinel-regression och Release/Vite-build körs trots att BB-110 endast ändrar Web. Browsermatrisen är 390×844, 430×932 och 1440×900 i Obsidian Gold, Forest Night och Arctic Wind; kontrollera långa titlar, vertikala jobb, dock/safe-area och overflow.
 - Native playback får inte testas eller markeras implementerad innan BigBrain-user→Audiobookshelf-playback-identitet och same-origin Range/session/progress-sync har ett godkänt arkitekturkontrakt. Ingen ägartoken får förekomma i Web eller browserlagring.
+- Resultat 2026-08-28: 25 fokuserade Web, 147 fulla Web, 558 API och 32 Sentinel; Release build 0 warnings/errors, Vite, Compose och 191 Markdown passerade. Deployad 3×3 browsermatris passerade utan overflow med 20 bounded rows, semantic whole-row, korrekt sektionsordning, jobbwrapping och 112 px mobil dock-clearance. GitHub Actions run `33179994941` var green.
 
 ## BB-109 audiobook owner UX remediation
 

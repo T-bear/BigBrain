@@ -2,7 +2,7 @@
 
 ## BB-110 — Audiobook Owner UX Consolidation & Native Playback Foundation
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING** 2026-08-28.
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `76b3c9eda56230e6cf570353ea5f1ca4e579a07c`; GitHub Actions run `33179994941` passerade.
 - UX: kanonisk sekundär **Bibliotek**-kontroll; reducerad discovery/library-copy; sektioner i ordningen discovery → library → downloads; hela semantiska bokraden navigerar; mobil hämtning använder titel → status → orsak; gamla terminala attention-rader kan döljas lokalt utan dataradering.
 - Button-inventering: `BBButton` har den kompletta aktuella varianten primary/secondary/tertiary/icon/danger/contextual och gemensamma busy/disabled/focus/press-kontrakt. Media-avvikelsen kom från lokal accentfärg och förstorad chevron ovanpå tertiary-varianten. Orelaterade legacy `<button>`-användningar kvarstår som dokumenterad design-systemskuld; BB-110 gör ingen global visuell omskrivning.
 - **BLOCKED playback architecture:** definiera autentiserad BigBrain user → Audiobookshelf playback identity, säker server-side credential lifecycle/authorization och same-origin session/Range/progress-sync. Serviceidentiteten och ägarens playbackidentitet får inte sammanblandas. Ingen native player byggs före beslutet.
