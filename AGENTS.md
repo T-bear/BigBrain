@@ -43,6 +43,10 @@
 - Redovisa exakt vilka filer och beteenden som ändrats samt vilka build- och testkommandon som körts.
 - Om build eller test inte kan köras ska orsaken redovisas tydligt.
 
+### Systemarkitektens review-trigger
+
+När ägaren säger **"Codex är klar"** ska ChatGPT behandla det som en review-trigger, inte som tillräcklig färdigevidens. ChatGPT ska läsa senaste publicerade GitHub source of truth, granska relevanta commits samt status-, backlog-, test- och rapportunderlag och därefter ge ägaren en förenklad systemarkitektgranskning: vad som gjorts, vad som är partiellt eller återstår, problem/risker, vad ägaren bör verifiera manuellt och rekommenderat nästa steg. Owner UX approval får endast registreras efter ägarens uttryckliga godkännande.
+
 ## Git
 
 - Gör aldrig commit, push, reset, rebase, force push eller annan force-operation utan uttryckligt godkännande.

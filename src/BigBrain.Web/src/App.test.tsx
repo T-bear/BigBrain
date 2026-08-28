@@ -30,6 +30,9 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/modules/shopping-list/items')) return Promise.resolve(response({ sessionId: 'active', items: [{ id: 'item', name: 'Mjölk', normalizedName: 'mjölk', quantity: 1, purchased: false, createdAtUtc: '', updatedAtUtc: '', sortOrdinal: 1 }] }))
     if (url.endsWith('/api/v1/modules/media')) return Promise.resolve(response({ healthSummary: 'Allt lugnt', insights: [], qBittorrent: { activeCount: 0 } }))
     if (url.endsWith('/api/v1/modules/finance/overview')) return Promise.resolve(response({ marketSummary: 'Marknaden är blandad', signals: [], prospective: { curve: [] } }))
+    if (url.endsWith('/api/v1/modules/media/audiobooks/overview')) return Promise.resolve(response({ state:'configuredHealthy',message:null,continueListening:null,library:[],recent:[],acquisition:{state:'notConfigured',canSearch:false,canRequest:false,message:null} }))
+    if (url.endsWith('/api/v1/modules/media/audiobooks/acquisition/provider-status')) return Promise.resolve(response({ state:'notConfigured',provider:'none',canSearch:false,canRequest:false,canCancel:false,message:null }))
+    if (url.includes('/api/v1/modules/media/audiobooks/acquisition/jobs')) return Promise.resolve(response({items:[],offset:0,limit:25,total:0}))
     return Promise.reject(new Error('Unexpected URL'))
   })
 }
@@ -44,7 +47,7 @@ function switchView(name: string) {
 }
 
 beforeEach(() => { window.localStorage.clear(); vi.stubGlobal('fetch', successfulFetch()) })
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); window.history.replaceState({}, '', '/') })
 
 test('starts on the calm Home launcher and keeps family tools in Family', async () => {
   const { container } = render(<App />)
@@ -78,6 +81,14 @@ test('switches dashboard without reload and remembers the active view', () => {
   expect(screen.getByRole('heading', { level: 1, name: 'Media' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Mediesökning' })).toBeInTheDocument()
   expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({ activeView: 'media', version: 2 })
+})
+
+test('opens the audiobook collection as a real deep-linked Media route', async () => {
+  window.history.replaceState({}, '', '/media/audiobooks')
+  render(<App />)
+  expect(await screen.findByRole('heading',{name:'Ljudböcker',level:1})).toBeInTheDocument()
+  expect(screen.queryByRole('heading',{name:'Mediesökning'})).not.toBeInTheDocument()
+  expect(screen.getAllByRole('button',{name:/Media/}).some(button=>button.getAttribute('aria-current')==='page')).toBe(true)
 })
 
 test('Media keeps technical integrations progressively disclosed', () => {

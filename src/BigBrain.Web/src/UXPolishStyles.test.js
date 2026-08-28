@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const css = readFileSync(resolve(process.cwd(), 'src/styles/modules.css'), 'utf8')
+const audiobookRoutes = readFileSync(resolve(process.cwd(), 'src/styles/audiobook-routes.css'), 'utf8')
 
 describe('Sprint 1 UX layout contracts', () => {
   it('constrains download information to the widget at mobile and wider sizes', () => {
@@ -27,5 +28,10 @@ describe('Sprint 1 UX layout contracts', () => {
     expect(css).toMatch(/\.shopping-frequent button:focus-visible \{[^}]*outline:var\(--bb-focus-ring\);/)
     expect(css).toMatch(/\.shopping-frequent button:active,\.shopping-frequent button\[aria-pressed=true\] \{[^}]*color:var\(--bb-color-primary-contrast\);/)
     expect(css).toMatch(/\.shopping-frequent button:disabled \{[^}]*color:var\(--bb-color-text-muted\);[^}]*opacity:1;/)
+  })
+
+  it('removes decorative audiobook route motion when reduced motion is requested', () => {
+    expect(audiobookRoutes).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(audiobookRoutes).toMatch(/\.audiobook-route-view--forward,[\s\S]*\.audiobook-route-view--back[\s\S]*animation: none;/)
   })
 })

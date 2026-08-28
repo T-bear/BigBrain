@@ -75,6 +75,7 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
   const [editMode, setEditMode] = useState(false)
   const [libraryOpen, setLibraryOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [pathname,setPathname]=useState(()=>window.location.pathname)
   const settingsButtonRef = useRef<HTMLButtonElement>(null)
   const settingsRef = useRef<HTMLDivElement>(null)
   const dashboard = dashboards.get(activeView)
@@ -84,6 +85,8 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     ...viewPreferences.order.map(id => registry.get(id)).filter((widget): widget is WidgetDefinition => Boolean(widget) && widget!.supportedViews.includes(activeView)),
     ...available.filter(widget => widget.defaultView === activeView && !viewPreferences.order.includes(widget.id)),
   ].filter(widget => !viewPreferences.hidden.includes(widget.id))
+
+  useEffect(()=>{const changed=()=>setPathname(window.location.pathname);window.addEventListener('popstate',changed);window.addEventListener('bb:navigation',changed);return()=>{window.removeEventListener('popstate',changed);window.removeEventListener('bb:navigation',changed)}},[])
 
   useEffect(() => {
     if (!settingsOpen) return
@@ -98,6 +101,11 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     document.addEventListener('mousedown', close)
     return () => { document.removeEventListener('keydown', close); document.removeEventListener('mousedown', close) }
   }, [settingsOpen])
+
+  if(activeView==='media'&&pathname.startsWith('/media/audiobooks')){
+    const audiobooks=registry.get('audiobooks')
+    return <main className="main bb-page dashboard-workspace dashboard-workspace--media audiobook-route-shell" id="media">{audiobooks?.render({expanded:true})}</main>
+  }
 
   const settings = settingsOpen && <div aria-label="Familjeinställningar" className="dashboard-settings family-settings" ref={settingsRef} role="dialog">
     <ThemeControl />

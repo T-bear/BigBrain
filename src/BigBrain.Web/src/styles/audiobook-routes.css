@@ -1,0 +1,14 @@
+.audiobook-route-view--forward {
+  animation-duration: var(--bb-motion-component);
+}
+
+.audiobook-route-view--back {
+  animation-duration: var(--bb-motion-press);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audiobook-route-view--forward,
+  .audiobook-route-view--back {
+    animation: none;
+  }
+}

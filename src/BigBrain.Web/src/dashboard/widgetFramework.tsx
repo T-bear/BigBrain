@@ -152,7 +152,10 @@ interface WidgetContextValue {
 const WidgetContext = createContext<WidgetContextValue | null>(null)
 
 export function WidgetProvider({ children, registry }: { children: ReactNode; registry: ApplicationWidgetRegistry }) {
-  const [preferences, setPreferences] = useState(() => readDashboardPreferences(registry))
+  const [preferences, setPreferences] = useState(() => {
+    const stored=readDashboardPreferences(registry)
+    return window.location.pathname.startsWith('/media/audiobooks') ? {...stored,activeView:'media' as const} : stored
+  })
 
   const update = (mutate: (current: DashboardPreferences) => DashboardPreferences) => {
     setPreferences(current => {

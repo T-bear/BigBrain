@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-108 audiobook navigation experiment
+
+- `Audiobooks.test.tsx` verifierar att Media-overview inte renderar katalog/nyligen tillagt, att Continue Listening kräver verklig progress, collection-routen är bounded, detail har egen deep-link, browser/in-app-back använder History API och query/sort överlever detail-retur. Befintlig sök-, edition-confirmation-, jobb- och completion-regression körs oförändrad.
+- `App.test.tsx` verifierar att en direkt `/media/audiobooks`-länk aktiverar Media och renderar endast den dedikerade audiobook-routen, inte hela Media-dashboarden.
+- `components.test.tsx` förblir kontraktstest för BigBrain-B vid saknad/misslyckad bild. Runtime artwork-verifiering ska separat skilja HTTP-success från 404: en verklig Audiobookshelf-cover får inte ersättas baserat på motivet.
+- Browser-QA: 390×844, 430×932 och 1440×900 i Obsidian Gold, Forest Night och Arctic Wind. Kontrollera overview-density, progress, collection-affordance, bounded catalogue, detail/deep-link/back, state restoration, dock/safe-area, overflow, lång text och `prefers-reduced-motion`. QA får inte skapa acquisition eller ändra media.
+
 ## BB-107 owner UX remediation
 
 - `MediaLookupRequestTests` simulerar den verkliga first-click-klassen: Arr registrerar posten men POST-svaret timeoutar. API:t avstämmer exakt registrerad foreign ID, returnerar `created` och gör totalt en POST. Web-testet bevisar att retry av samma dialog använder samma idempotensnyckel och att busy-knappen blockerar dubbeltryck.

@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-108 — Audiobook Navigation UX Experiment
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28.
+- Audiobook-localt experiment: Media visar endast progressbaserad lyssningskontinuitet och en tydlig collection-affordance. `/media/audiobooks` är en separat, bounded samlingsroute och `/media/audiobooks/{id}` en separat detaljroute med History API, deep-link, fokus och reducerad rörelse.
+- Experimentet är inte en global navigationsstandard. FAB utelämnas eftersom collection-navigation inte är en create/add-åtgärd. Det globala dockbeteendet ändras inte.
+- Känd begränsning: Audiobookshelf-responsen ger säker progress men nuvarande BigBrain-kontrakt exponerar inte lyssningsrecency. Översikten visar därför endast faktisk påbörjad bok och ersätter den inte med nyligen tillagt.
+- Automatisk DoD är verifierad med full regression/build, route-/mobile-QA och Web-only deploy. GitHub CI verifieras på publicerad SHA; fysisk owner UX review återstår och endast ägaren får godkänna experimentet.
+
 ## BB-107 — Owner UX Remediation after BB-106
 
 - Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-27.

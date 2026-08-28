@@ -124,6 +124,7 @@ export const getMediaServiceLinks = (signal?: AbortSignal) =>
 
 export const getAudiobookOverview = (signal?: AbortSignal) => getJson<AudiobookOverview>('/api/v1/modules/media/audiobooks/overview',signal)
 export const getAudiobookLibrary = (page=0,limit=24,query='',language='',signal?:AbortSignal) => getJson<import('./types').AudiobookLibraryPage>(`/api/v1/modules/media/audiobooks/library?page=${page}&limit=${limit}&query=${encodeURIComponent(query.trim())}&language=${encodeURIComponent(language)}`,signal)
+export const getAudiobook = (id:string,signal?:AbortSignal) => getJson<import('./types').AudiobookItem>(`/api/v1/modules/media/audiobooks/${encodeURIComponent(id)}`,signal)
 export const searchAudiobooks = (query:string,language:string,signal?:AbortSignal) => getJson<AudiobookSearchResponse>(`/api/v1/modules/media/audiobooks/search?query=${encodeURIComponent(query.trim())}&language=${encodeURIComponent(language)}`,signal)
 export const getAudiobookAcquisitionStatus = (signal?:AbortSignal) => getJson<import('./types').AudiobookAcquisitionProviderStatus>('/api/v1/modules/media/audiobooks/acquisition/provider-status',signal)
 export const getAudiobookAcquisitionJobs = (signal?:AbortSignal,offset=0,limit=25) => getJson<import('./types').AudiobookAcquisitionJobPage>(`/api/v1/modules/media/audiobooks/acquisition/jobs?offset=${offset}&limit=${limit}`,signal)

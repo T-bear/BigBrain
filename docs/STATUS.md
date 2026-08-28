@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-108 Audiobook Navigation UX Experiment (2026-08-28)
+
+BB-108 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Det avgränsade experimentet använder riktiga Web/PWA-routes för `Media → Ljudböcker → detalj` utan ny router eller global navigation. Media-overview renderar inte katalogen eller nyligen tillagt; den visar endast en kompakt, progressbaserad Continue Listening-rad när Audiobookshelf ger faktisk progress samt en tydlig räknare/chevron till den separata samlingen. Collection behåller bounded 24-posters API-laddning, sökning, sortering och paginering. Detail kan deep-länkas, laddar genom BigBrains adapter och behåller säker uppspelningslänk.
+
+Owner-bilden med film/musiknoten är verifierad som en faktisk coverfil som Audiobookshelf returnerar för biblioteksobjektet, inte BigBrains fallback eller en browserglyph. Flera berörda objekt returnerar samma upstream-bild; BigBrain ersätter inte legitimt bibliotek-artwork. Saknad eller misslyckad cover använder fortsatt den gemensamma BigBrain-B-fallbacken. Navigationsexperimentet och dockens lämplighet inväntar fysisk owner review och är inte globalt accepterade.
+
+Automatisk verifiering 2026-08-28 passerade 142 Web-, 556 API- och 32 Sentinel-tester, Release/Vite-build, dokumentationsverifiering och Compose. Deployen återskapade endast Web. Browsermatrisen 390×844, 430×932 och 1440×900 i samtliga tre teman verifierade separata collection/detail-routes, browser-back, återställd query/sort, 0 overview-katalogkort, ingen overflow och 112 px dock-clearance på mobil. Runtime hade ingen påbörjad progresspost och visade därför sanningsenligt ingen Continue Listening-bok.
+
 ## BB-107 Owner UX Remediation after BB-106 (2026-08-27)
 
 BB-107 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Home-radernas faktiska grid-root cause är korrigerad i den gemensamma BBButton-kompositionen. Media-add behåller en stabil idempotensnyckel och API:t avstämmer timeout/5xx efter en påbörjad Arr-skrivning mot registrerad foreign ID; en lyckad mutation visas därför som lyckad utan en andra POST. Audiobook-starten visar nu en kompakt overview med Continue Listening och högst fyra nyligen tillagda böcker, medan hela sök-/sorterings-/pagineringsytan öppnas som **Alla ljudböcker**.
