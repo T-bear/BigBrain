@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-109 audiobook owner UX remediation
+
+- `Audiobooks.test.tsx` verifierar standardiserad **Bibliotek**-affordance utan dominant count, progressbaserad Continue Listening utan falsk tomstatus, separata inputs för ny discovery/lokal filtrering, bounded collection, reducerad-motion scroll-till-top, aktiva/attention/history-sektioner och presentation-only historikrensning. Befintlig edition-confirmation/idempotens körs fortsatt.
+- `AudiobookAcquisitionTests` verifierar att provider-absence efter fem minuters grace fail-closed blir `failed`, medan ett nyregistrerat jobb behåller aktiv state under gracen.
+- Runtimekontroll ska sanerat verifiera serviceprofilens respektive övrig profils progressantal, provider/download/import-evidens och att inga acquisitioner cancel/start/delete görs. Native playback får inte markeras complete utan beslutad identitet och säker same-origin session/stream-gräns.
+- Browser-QA: 390×844, 430×932 och 1440×900 i alla tre teman. Kontrollera overview, Bibliotek, separat discovery/library-search, rubrikhierarki, scroll-till-top/dock/safe-area, aktivitet/history, overflow och lång svensk text.
+
 ## BB-108 audiobook navigation experiment
 
 - `Audiobooks.test.tsx` verifierar att Media-overview inte renderar katalog/nyligen tillagt, att Continue Listening kräver verklig progress, collection-routen är bounded, detail har egen deep-link, browser/in-app-back använder History API och query/sort överlever detail-retur. Befintlig sök-, edition-confirmation-, jobb- och completion-regression körs oförändrad.

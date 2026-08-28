@@ -1,8 +1,16 @@
 # BigBrain Backlog
 
-## BB-108 — Audiobook Navigation UX Experiment
+## BB-109 — Audiobook Owner UX Remediation & Native Playback Investigation
 
 - Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28.
+- Levererat: standardiserad **Bibliotek**-affordance utan dominant count; tydligt separerad ny-book discovery och lokal library-filter; lugnare collection-rubrik; dock-safe reducerad-motion scroll-till-top; aktiva jobb, åtgärdsbehov och bounded presentation-only historik.
+- Datafix: ett providerjobb som saknas efter fem minuters registreringsgrace övergår från stale aktiv status till `failed/Kräver åtgärd`. Ingen provider/audit/media-data rensas.
+- **BLOCKED owner/systemarkitektbeslut:** Audiobookshelf-progress och playback-sessioner tillhör användaridentiteten. Commissioning-servicekontot har 0 progress medan owner-identiteten har faktisk progress. Native player får inte implementeras med fel identitet eller browserexponerad token. Välj canonical playback identity och same-origin session/Range-proxygräns i en separat godkänd arkitekturslice.
+- BB-108:s bounded overview → collection är positiv owner-evidens men inte global standard. BB-109 inväntar fysisk owner UX review.
+
+## BB-108 — Audiobook Navigation UX Experiment
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER REVIEW: POSITIVE EVIDENCE + NEEDS ITERATION** 2026-08-28.
 - Audiobook-localt experiment: Media visar endast progressbaserad lyssningskontinuitet och en tydlig collection-affordance. `/media/audiobooks` är en separat, bounded samlingsroute och `/media/audiobooks/{id}` en separat detaljroute med History API, deep-link, fokus och reducerad rörelse.
 - Experimentet är inte en global navigationsstandard. FAB utelämnas eftersom collection-navigation inte är en create/add-åtgärd. Det globala dockbeteendet ändras inte.
 - Känd begränsning: Audiobookshelf-responsen ger säker progress men nuvarande BigBrain-kontrakt exponerar inte lyssningsrecency. Översikten visar därför endast faktisk påbörjad bok och ersätter den inte med nyligen tillagt.

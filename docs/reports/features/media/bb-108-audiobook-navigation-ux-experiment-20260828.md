@@ -11,7 +11,7 @@ Detta är en sanerad GitHub-version. Lokal rå runtime- och browser-evidens publ
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER REVIEW: POSITIVE EVIDENCE + NEEDS ITERATION**
 
 The experiment is not accepted, is not a global BigBrain navigation standard and has no navigation ADR. Only physical-device owner feedback may change that verdict.
 
@@ -31,7 +31,9 @@ No FAB was added: opening a collection is navigation, not a create action, and a
 | Bounded catalogue directly in overview with search/sort/pagination/load-more/collapse | BB-106/107 | Still turns overview into a catalogue and encourages long scrolling. | **REJECTED** | Audiobook-local evidence. |
 | Recently added as primary overview information | BB-107 | Listening continuity is more relevant. | **REJECTED** | Audiobook-local evidence. |
 | FAB as compensation for long pages | Historical BigBrain prototypes | No current evidence that FAB solves this hierarchy. | **UNDECIDED** | Not included in BB-108. |
-| Overview → collection → detail real-route stack | BB-108 Web/PWA experiment | Automatic/browser evidence is green after Web-only deployment; physical verdict is absent. | **PENDING OWNER REVIEW** | Candidate for later review, not a standard. |
+| Overview → collection → detail real-route stack | BB-108 physical iPhone/PWA | Owner likes that Media remains bounded and long scrolling starts only after entering Library. Affordance, progress correctness, collection hierarchy and utilities need iteration. | **NEEDS ITERATION (positive evidence)** | Bounded overview/collection is retained locally by BB-109; not a global standard. |
+| Large count-led Library affordance | BB-108 physical iPhone/PWA | Too visually dominant and inconsistent with standard controls. | **REJECTED** | BB-109 replaces it with the standard **Bibliotek** navigation treatment. |
+| Continue Listening with commissioned service identity | BB-108/109 runtime | Owner has listened, but progress is user-specific and absent for the restricted service identity. | **NEEDS ITERATION** | Identity/security decision is required before native playback/progress can be truthful. |
 
 ## Evidence
 

@@ -126,6 +126,41 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     }
 
     [Fact]
+    public async Task MissingProviderJobFailsClosedAfterGraceInsteadOfRemainingDownloadingForever()
+    {
+        using var store = Store();
+        var clock = new TestTimeProvider(new DateTimeOffset(2026, 8, 28, 8, 0, 0, TimeSpan.Zero));
+        var old = new AudiobookAcquisitionJob(
+            new string('b', 32), "provider-job", Candidate("en", "Narrator"),
+            AudiobookAcquisitionStatuses.Downloading, clock.GetUtcNow().AddHours(-1),
+            clock.GetUtcNow().AddMinutes(-6), null);
+        await store.AddAsync(old, CancellationToken.None);
+
+        var result = await new AudiobookAcquisitionService(new FakeProvider(), store, clock)
+            .GetAsync(old.Id, CancellationToken.None);
+
+        Assert.Equal(AudiobookAcquisitionStatuses.Failed, result.Status);
+        Assert.Contains("inte längre", result.Message);
+        Assert.Equal(AudiobookAcquisitionStatuses.Failed, (await store.GetAsync(old.Id, CancellationToken.None))!.Status);
+    }
+
+    [Fact]
+    public async Task MissingNewProviderJobRetainsActiveStateDuringRegistrationGrace()
+    {
+        using var store = Store();
+        var clock = new TestTimeProvider(new DateTimeOffset(2026, 8, 28, 8, 0, 0, TimeSpan.Zero));
+        var recent = new AudiobookAcquisitionJob(
+            new string('c', 32), "provider-job", Candidate("en", "Narrator"),
+            AudiobookAcquisitionStatuses.Queued, clock.GetUtcNow(), clock.GetUtcNow(), null);
+        await store.AddAsync(recent, CancellationToken.None);
+
+        var result = await new AudiobookAcquisitionService(new FakeProvider(), store, clock)
+            .GetAsync(recent.Id, CancellationToken.None);
+
+        Assert.Equal(AudiobookAcquisitionStatuses.Queued, result.Status);
+    }
+
+    [Fact]
     public async Task MissingJobAndProviderFailureAreControlled()
     {
         using var store = Store(); var service = new AudiobookAcquisitionService(new FakeProvider { Fail = true }, store, TimeProvider.System);
@@ -163,5 +198,10 @@ public sealed class AudiobookAcquisitionTests : IDisposable
         public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request,CancellationToken token){RequestCount++;return Task.FromResult(new AudiobookProviderJob("provider-job",AudiobookAcquisitionStatuses.Queued,null));}
         public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId,CancellationToken token)=>Task.FromResult(JobStatus);
         public Task<AudiobookProviderJob> CancelAsync(string providerJobId,CancellationToken token)=>Task.FromResult(new AudiobookProviderJob(providerJobId,AudiobookAcquisitionStatuses.Cancelled,null));
+    }
+
+    private sealed class TestTimeProvider(DateTimeOffset now) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => now;
     }
 }

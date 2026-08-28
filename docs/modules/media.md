@@ -421,6 +421,14 @@ artwork uses the shared theme-aware BigBrain B cover in overview, collection, se
 listening. Audiobookshelf remains the library/playback engine and the existing owner-reachable play link
 is unchanged.
 
+## BB-109 owner UX remediation and playback boundary
+
+BB-108's bounded `overview → collection → detail` remains audiobook-local and has positive owner evidence, but is not a global navigation standard. Media uses the standard tertiary **Bibliotek** affordance without a dominant inventory count. The collection separates new provider discovery from local library filtering, keeps its 24-item bounded page, uses a dock-safe reduced-motion scroll-to-top utility and separates active jobs, attention and terminal history. Hiding visible terminal history is device-local presentation state only; durable job/audit data and media remain intact.
+
+Audiobookshelf progress is user-specific. Runtime evidence on 2.36.0 shows no progress/session rows for the restricted BigBrain service identity and three active rows for another library identity, so the adapter cannot truthfully show the owner's Continue Listening state with its current credential. The installed start, ephemeral session-track, sync and close routes establish that native playback is technically possible, but do not decide which identity owns playback/progress. BigBrain therefore keeps the owner link as an explicitly temporary fallback and must not expose an Audiobookshelf token or start a zero-progress session under the wrong identity. A future approved slice must choose the canonical playback identity and define a same-origin Range/session/progress-sync adapter boundary.
+
+Acquisition reconciliation treats provider absence as a bounded ambiguity: a missing provider job retains its active state for five minutes to allow registration, then fails closed into attention rather than remaining `downloading` forever. This does not cancel, delete or restart provider work.
+
 ## ADR impact
 
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart

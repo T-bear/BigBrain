@@ -230,7 +230,20 @@ public sealed class AudiobookAcquisitionService(
         try { status = await provider.GetJobStatusAsync(job.ProviderJobId, token); }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
         catch { throw ProviderUnavailable(); }
-        if (status is null || !AudiobookAcquisitionStatuses.IsKnown(status.Status)) return job;
+        if (status is null)
+        {
+            // Provider reads may briefly race a new registration. After that bounded grace,
+            // absence from both download and durable import evidence must fail closed instead
+            // of preserving a stale active label forever.
+            if (clock.GetUtcNow() - job.UpdatedAtUtc < TimeSpan.FromMinutes(5)) return job;
+            return await store.UpdateAsync(job with
+            {
+                Status = AudiobookAcquisitionStatuses.Failed,
+                UpdatedAtUtc = clock.GetUtcNow(),
+                Message = "Hämtningen finns inte längre hos leverantören och kräver kontroll."
+            }, token);
+        }
+        if (!AudiobookAcquisitionStatuses.IsKnown(status.Status)) return job;
         return await store.UpdateAsync(job with { Status = status.Status, UpdatedAtUtc = clock.GetUtcNow(), Message = status.Message }, token);
     }
     public async Task<AudiobookAcquisitionJob> CancelAsync(string id, CancellationToken token)
