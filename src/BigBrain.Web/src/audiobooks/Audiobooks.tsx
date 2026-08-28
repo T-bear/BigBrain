@@ -14,6 +14,10 @@ function Book({item,prominent=false,onOpen}:{item:AudiobookItem;prominent?:boole
   </article>
 }
 
+function ShelfBook({item,onOpen}:{item:AudiobookItem;onOpen:(item:AudiobookItem)=>void}) {
+  return <button className="audiobook-shelf-book" onClick={()=>onOpen(item)} type="button"><BBMediaArtwork alt={`Omslag till ${item.title}`} loading="lazy" src={item.coverUrl??undefined}/><span><strong>{item.title}</strong>{item.author&&<small>{item.author}</small>}</span></button>
+}
+
 function Candidate({candidate,onView}:{candidate:AudiobookAcquisitionCandidate;onView:(candidate:AudiobookAcquisitionCandidate)=>void}) {
   const metadata=[candidate.narrator?`Uppläsare ${candidate.narrator}`:null,candidate.languageLabel,candidate.edition,candidate.publicationYear,candidate.provenance??candidate.source].filter(Boolean).join(' · ')
   return <BBSurface className="audiobook-candidate">
@@ -48,6 +52,7 @@ export function Audiobooks(){
   const[libraryQuery,setLibraryQuery]=useState('')
   const[librarySort,setLibrarySort]=useState('recent')
   const[libraryBusy,setLibraryBusy]=useState(false)
+  const[collectionOpen,setCollectionOpen]=useState(false)
   const[selected,setSelected]=useState<AudiobookItem|null>(null)
   const[selectedCandidate,setSelectedCandidate]=useState<AudiobookAcquisitionCandidate|null>(null)
   const[query,setQuery]=useState('')
@@ -88,8 +93,9 @@ export function Audiobooks(){
     {data?.state==='configuredUnavailable'&&<BBEmptyState title="Ljudböcker är tillfälligt otillgängliga" detail={data.message??undefined}/>}
     {data?.continueListening&&<BBSurface className="audiobook-feature"><p className="eyebrow">Fortsätt lyssna</p><Book item={data.continueListening} onOpen={setSelected} prominent/></BBSurface>}
     {data?.state==='configuredHealthy'&&<><div className="audiobook-section-title"><h3>Ditt bibliotek</h3><span>{libraryTotal} ljudböcker</span></div>
-      <form className="audiobook-library-tools" onSubmit={findLibrary}><BBInput aria-label="Sök i biblioteket" onChange={e=>setLibraryQuery(e.target.value)} placeholder="Sök titel, författare eller serie" value={libraryQuery}/><BBSelect aria-label="Sortera bibliotek" onChange={e=>setLibrarySort(e.target.value)} value={librarySort}><option value="recent">Senast tillagda</option><option value="title">Titel</option><option value="author">Författare</option></BBSelect><BBButton busy={libraryBusy} type="submit">Filtrera</BBButton></form>
-      {visibleLibrary.length?<><div className="audiobook-grid">{visibleLibrary.map(i=><Book item={i} key={i.id} onOpen={setSelected}/>)}</div>{library.length<libraryTotal&&<BBButton busy={libraryBusy} onClick={moreLibrary} variant="tertiary">Visa fler ljudböcker</BBButton>}</>:<BBEmptyState title="Biblioteket är tomt" detail="Dina ljudböcker visas här när de har lagts till."/>}
+      {!collectionOpen&&(data.recent.length||library.length)?<BBSurface className="audiobook-library-overview"><div className="audiobook-section-title"><h4>Senast tillagda</h4><BBButton onClick={()=>setCollectionOpen(true)} variant="tertiary">Visa alla</BBButton></div><div className="audiobook-shelf">{(data.recent.length?data.recent:library).slice(0,4).map(i=><ShelfBook item={i} key={i.id} onOpen={setSelected}/>)}</div></BBSurface>:null}
+      {collectionOpen&&<section aria-labelledby="all-audiobooks-heading" className="audiobook-collection"><div className="audiobook-section-title"><h3 id="all-audiobooks-heading">Alla ljudböcker</h3><BBButton onClick={()=>setCollectionOpen(false)} variant="tertiary">Till översikten</BBButton></div><form className="audiobook-library-tools" onSubmit={findLibrary}><BBInput aria-label="Sök i biblioteket" onChange={e=>setLibraryQuery(e.target.value)} placeholder="Sök titel, författare eller serie" value={libraryQuery}/><BBSelect aria-label="Sortera bibliotek" onChange={e=>setLibrarySort(e.target.value)} value={librarySort}><option value="recent">Senast tillagda</option><option value="title">Titel</option><option value="author">Författare</option></BBSelect><BBButton busy={libraryBusy} type="submit">Filtrera</BBButton></form>{visibleLibrary.length?<><div className="audiobook-grid">{visibleLibrary.map(i=><Book item={i} key={i.id} onOpen={setSelected}/>)}</div>{library.length<libraryTotal&&<BBButton busy={libraryBusy} onClick={moreLibrary} variant="tertiary">Visa fler ljudböcker</BBButton>}</>:<BBEmptyState title="Inga ljudböcker matchar" detail="Ändra sökningen eller gå tillbaka till översikten."/>}</section>}
+      {!collectionOpen&&!library.length&&<BBEmptyState title="Biblioteket är tomt" detail="Dina ljudböcker visas här när de har lagts till."/>}
       <form className="audiobook-search" onSubmit={search}><div className="audiobook-section-title"><label htmlFor="audiobook-query">Hitta ljudbok</label></div>
         <div><BBInput id="audiobook-query" minLength={2} maxLength={120} onChange={e=>setQuery(e.target.value)} placeholder="Titel, författare, serie eller ISBN" value={query}/><BBSelect aria-label="Föredraget språk" onChange={e=>setLanguage(e.target.value)} value={language}><option value="sv">Svenska</option><option value="en">Engelska</option><option value="all">Alla språk</option></BBSelect><BBButton busy={busy} type="submit" variant="secondary">Sök</BBButton></div>
       </form>

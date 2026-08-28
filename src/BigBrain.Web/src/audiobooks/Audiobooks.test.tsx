@@ -112,3 +112,15 @@ test('keeps completed acquisition history collapsed while active work stays visi
   render(<Audiobooks/>);expect(await screen.findByText('Pågående bok')).toBeVisible()
   expect(screen.getByText('Historik (41)')).toBeInTheDocument();expect(screen.getByText('Gammal bok').closest('details')).not.toHaveAttribute('open')
 })
+
+test('keeps the Media overview compact and opens the bounded full collection on demand',async()=>{
+  const item=(index:number)=>({id:`book-${index}`,title:`Ljudbok ${index}`,author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null})
+  const books=Array.from({length:12},(_,index)=>item(index+1))
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,library:books,recent:books.slice(0,6)})
+  render(<Audiobooks/>);expect(await screen.findByText('Senast tillagda')).toBeInTheDocument()
+  expect(screen.getAllByRole('button',{name:/Ljudbok/})).toHaveLength(4)
+  expect(screen.queryByLabelText('Sök i biblioteket')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'Visa alla'}))
+  expect(screen.getByRole('heading',{name:'Alla ljudböcker'})).toBeInTheDocument()
+  expect(screen.getByLabelText('Sök i biblioteket')).toBeInTheDocument()
+})

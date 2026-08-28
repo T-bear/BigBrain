@@ -49,3 +49,13 @@ Malformed versions and unknown IDs are ignored safely. New default widgets are a
 Add a future first-party widget by registering one complete `WidgetDefinition`; do not import it into `App` or `DashboardWorkspace`. A real permissions service, server synchronization, templates, shared/per-user ownership and custom sizing require later decisions and are tracked in BB-027.
 
 See [Proposed ADR 0014](../adr/0014-dashboard-views-and-widget-framework.md).
+
+## Responsive contextual-row contract
+
+Dashboard launch rows use the shared `BBButton` content wrapper. A row that composes leading icon,
+copy and trailing affordance must account for that wrapper rather than styling component children as if
+they were direct button grid items. The standard pattern keeps the button and copy at `min-width: 0`,
+lets the wrapper participate through `display: contents`, and assigns remaining width with
+`minmax(0, 1fr)`. Long localized text may wrap naturally; it must not create a narrow vertical text
+column or horizontal page overflow. Navigation icon paths share the same 1.7 stroke, round caps,
+24×24 geometry and theme-token color behavior.

@@ -72,7 +72,7 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
         return item.ValueKind == JsonValueKind.Object ? MapLookup(item, []) : null;
     }
 
-    async Task<bool> IMediaRequestProvider.IsRegisteredAsync(
+    async Task<ProviderAddResult?> IMediaRequestProvider.GetRegisteredAsync(
         string foreignId,
         string title,
         int? year,
@@ -80,11 +80,14 @@ public sealed class SonarrClient(HttpClient httpClient, MediaOptions options)
     {
         EnsureSonarrConfigured();
         using var registered = await GetJsonAsync("api/v3/series", options.Sonarr.ApiKey, cancellationToken);
-        if (registered.RootElement.ValueKind != JsonValueKind.Array) return false;
-        return registered.RootElement.EnumerateArray().Any(item =>
+        if (registered.RootElement.ValueKind != JsonValueKind.Array) return null;
+        var item = registered.RootElement.EnumerateArray().FirstOrDefault(item =>
             int.TryParse(foreignId, out var tvdbId) && tvdbId > 0
                 ? GetInt32(item, "tvdbId") == tvdbId
                 : SameTitleAndYear(item, title, year));
+        return item.ValueKind == JsonValueKind.Object
+            ? new(GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture), GetString(item, "title") ?? title)
+            : null;
     }
 
     async Task<ProviderAddResult> IMediaAddProvider.AddAsync(
@@ -396,7 +399,7 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
         return item.ValueKind == JsonValueKind.Object ? MapLookup(item, []) : null;
     }
 
-    async Task<bool> IMediaRequestProvider.IsRegisteredAsync(
+    async Task<ProviderAddResult?> IMediaRequestProvider.GetRegisteredAsync(
         string foreignId,
         string title,
         int? year,
@@ -404,11 +407,14 @@ public sealed class RadarrClient(HttpClient httpClient, MediaOptions options)
     {
         EnsureRadarrConfigured();
         using var registered = await GetJsonAsync("api/v3/movie", options.Radarr.ApiKey, cancellationToken);
-        if (registered.RootElement.ValueKind != JsonValueKind.Array) return false;
-        return registered.RootElement.EnumerateArray().Any(item =>
+        if (registered.RootElement.ValueKind != JsonValueKind.Array) return null;
+        var item = registered.RootElement.EnumerateArray().FirstOrDefault(item =>
             int.TryParse(foreignId, out var tmdbId) && tmdbId > 0
                 ? GetInt32(item, "tmdbId") == tmdbId
                 : SameTitleAndYear(item, title, year));
+        return item.ValueKind == JsonValueKind.Object
+            ? new(GetInt32(item, "id").ToString(System.Globalization.CultureInfo.InvariantCulture), GetString(item, "title") ?? title)
+            : null;
     }
 
     async Task<ProviderAddResult> IMediaAddProvider.AddAsync(

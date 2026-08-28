@@ -224,6 +224,30 @@ public sealed class MediaLookupRequestTests
     }
 
     [Fact]
+    public async Task ConfirmReconcilesProviderWriteThatCompletedBeforeTimeout()
+    {
+        var provider = new RequestProviderStub { RegisterBeforeThrow = true, AddException = new TaskCanceledException() };
+        var protector = new MediaOpaqueIdProtector();
+        var options = Options();
+        var available = await new MediaAddOptionsService([provider], protector, options)
+            .GetAsync(MediaLookupTypes.Series, TestContext.Current.CancellationToken);
+        var service = new MediaRequestService(
+            [provider], [provider], protector, new MediaRequestStore(), options, NullLogger<MediaRequestService>.Instance);
+        var preview = await service.PreviewAsync(new(
+            "Sonarr", MediaLookupTypes.Series, "123", available.RootFolders[0].Id,
+            available.QualityProfiles[0].Id, "all", "standard", true), TestContext.Current.CancellationToken);
+
+        var result = await service.ConfirmAsync(
+            new(preview.RequestToken, "stable-owner-action"), TestContext.Current.CancellationToken);
+        var retry = await service.ConfirmAsync(
+            new(preview.RequestToken, "stable-owner-action"), TestContext.Current.CancellationToken);
+
+        Assert.Equal(MediaRequestStatuses.Created, result.Status);
+        Assert.Equal(result, retry);
+        Assert.Equal(1, provider.AddCalls);
+    }
+
+    [Fact]
     public async Task MoviePreviewIsValidAndDoesNotWrite()
     {
         var provider = new RequestProviderStub("Radarr", MediaLookupTypes.Movie);
@@ -424,6 +448,7 @@ public sealed class MediaLookupRequestTests
         public int AddCalls { get; private set; }
         public int DuplicateChecks { get; private set; }
         public bool Registered { get; set; }
+        public bool RegisterBeforeThrow { get; set; }
         public Exception? AddException { get; set; }
 
         public Task<ProviderAddOptions> GetAddOptionsAsync(CancellationToken cancellationToken) =>
@@ -440,19 +465,20 @@ public sealed class MediaLookupRequestTests
                 ProviderName, foreignId, "The Expanse", null, 2015, "Overview", "Syfy", 45, "ended",
                 SupportedMediaType, MediaLookupStates.External, false, false, null));
 
-        public Task<bool> IsRegisteredAsync(
+        public Task<ProviderAddResult?> GetRegisteredAsync(
             string foreignId,
             string title,
             int? year,
             CancellationToken cancellationToken)
         {
             DuplicateChecks++;
-            return Task.FromResult(Registered);
+            return Task.FromResult(Registered ? new ProviderAddResult("99", title) : null);
         }
 
         public Task<ProviderAddResult> AddAsync(ProviderAddCommand command, CancellationToken cancellationToken)
         {
             AddCalls++;
+            if (RegisterBeforeThrow) Registered = true;
             if (AddException is not null) throw AddException;
             return Task.FromResult(new ProviderAddResult("99", command.Title));
         }

@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-107` — [Owner UX Remediation after BB-106](features/design-system/bb-107-owner-ux-remediation-20260827.md)
 - `BB-106` — [Consolidated UX / Quality Fix Sprint](features/design-system/bb-106-consolidated-ux-quality-sprint-20260827.md)
 
 - `BB-105` — [AudioBookBay Parser & Literal Author Search Remediation](features/media/bb-105-audiobookbay-parser-remediation-20260824.md)

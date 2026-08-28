@@ -32,7 +32,7 @@ export function MediaSearchForm({
   return <form className="media-search-form" role="search" onSubmit={submit}>
     <label htmlFor="media-search-query">Titel</label>
     <div className="media-search-controls">
-      <input
+      <input className="bb-input"
         id="media-search-query"
         name="query"
         type="search"

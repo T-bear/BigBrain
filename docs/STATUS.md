@@ -1,8 +1,14 @@
 # BigBrain Status
 
+## BB-107 Owner UX Remediation after BB-106 (2026-08-27)
+
+BB-107 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Home-radernas faktiska grid-root cause är korrigerad i den gemensamma BBButton-kompositionen. Media-add behåller en stabil idempotensnyckel och API:t avstämmer timeout/5xx efter en påbörjad Arr-skrivning mot registrerad foreign ID; en lyckad mutation visas därför som lyckad utan en andra POST. Audiobook-starten visar nu en kompakt overview med Continue Listening och högst fyra nyligen tillagda böcker, medan hela sök-/sorterings-/pagineringsytan öppnas som **Alla ljudböcker**.
+
+Automatisk validering passerade 137 Web-, 556 API- och 32 Sentinel-tester samt Vite/Release-build, Compose och diffkontroll. Deployen återskapade endast API och Web. Browsermatrisen 390×844, 430×932 och 1440×900 i Obsidian Gold, Forest Night och Arctic Wind visade ingen horisontell overflow; Home-texten hade 259/299 px användbar bredd på mobil, textfält var synliga och sista verkliga Media-kontroll nåddes ovanför dockan. BB-106:s owner review dokumenteras som remediation required; varken BB-106 eller BB-107 är owner UX approved. Finance, scheduler, governor och Sentinel ändrades inte.
+
 ## BB-106 Consolidated UX / Quality Fix Sprint (2026-08-27)
 
-BB-106 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW PENDING**. Den gemensamma shell-cascaden reserverar nu den faktiska mobildockans höjd plus safe-area efter `.bb-page`-shorthanden; formulärfält, loading, media-placeholder, status och radpadding har gemensamma kontrakt. Home, Family Calendar och Media har komponerats om inom befintliga API-gränser. Lokal verifiering passerade 135 Web-, 555 API- och 32 Sentinel-tester, Release/Vite-build, Compose och diffkontroll. Deployad Web är healthy; API recreatades inte. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
+BB-106 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW FOUND REMEDIATION REQUIRED**. Ägargranskningen fann Home-layout, Media first-click, sökknapp och audiobook-informationsarkitektur som kräver BB-107. Den gemensamma shell-cascaden reserverar nu den faktiska mobildockans höjd plus safe-area efter `.bb-page`-shorthanden; formulärfält, loading, media-placeholder, status och radpadding har gemensamma kontrakt. Lokal verifiering passerade 135 Web-, 555 API- och 32 Sentinel-tester, Release/Vite-build, Compose och diffkontroll. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
 
 Ljudboksbiblioteket är paginerat och sök-/sorterbart, Continue Listening är fortsatt främst och hämtningar delas i pågående, kräver åtgärd och infälld historik. BigBrain äger bibliotek, omslag, metadata, progress, detalj och uppspelningsstart; pause/resume, seek och chapters är **PARTIAL** eftersom nuvarande granskade adapter endast har server-side read/cover och owner-deep-link, inte ett verifierat Audiobookshelf playback-session/streamingkontrakt. Inga mediajobb eller filer raderades.
 

@@ -61,7 +61,7 @@ test('Enter starts search and shows loading state', async () => {
   fireEvent.change(screen.getByRole('searchbox', { name: 'Titel' }), { target: { value: 'Family Guy' } })
   fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Enter', code: 'Enter' })
 
-  expect(screen.getByText('Searching media services…')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Sök pågår' })).toHaveAttribute('aria-busy', 'true')
   expect(screen.getByRole('button', { name: 'Sök pågår' })).toBeDisabled()
   resolveRequest?.(response(result))
   expect(await screen.findByText('Results for “Family Guy”')).toBeInTheDocument()

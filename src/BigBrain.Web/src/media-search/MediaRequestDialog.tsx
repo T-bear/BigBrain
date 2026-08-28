@@ -38,6 +38,7 @@ export function MediaRequestDialog({
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const confirming = useRef(false)
+  const idempotencyKey = useRef(createIdempotencyKey())
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -99,7 +100,7 @@ export function MediaRequestDialog({
     setBusy(true)
     setError(null)
     try {
-      const response = await confirmMediaRequest(preview.requestToken, createIdempotencyKey())
+      const response = await confirmMediaRequest(preview.requestToken, idempotencyKey.current)
       setCreated(response)
       setPhase('success')
     } catch (requestError) {

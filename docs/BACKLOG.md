@@ -1,8 +1,16 @@
 # BigBrain Backlog
 
+## BB-107 — Owner UX Remediation after BB-106
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-27.
+- Home: BBButton-innehållets wrapper deltog felaktigt som en enda gridcell och pressade texten till en smal kolumn. Den gemensamma contextual-row-kompositionen låter nu ikon, text och affordance använda de avsedda responsiva gridkolumnerna.
+- Media request: en Arr-skrivning kunde lyckas före ett timeout-/responsefel medan API:t frigav requesten och Web skapade en ny idempotensnyckel vid retry. Web behåller nu samma actionnyckel och API:t avstämmer en tvetydig skrivning mot exakt foreign ID innan den svarar eller tillåter säker retry.
+- Media UX: den gemensamma dimensionsstabila busy-knappen används utan separat engelsk statusrad. Audiobook-starten är en kompakt översikt med Continue Listening och högst fyra nyligen tillagda omslag; sök/sortering/paginering finns först i **Alla ljudböcker**. BigBrain-B-placeholder och gemensam strokeikonografi används konsekvent.
+- BB-106 owner review krävde denna remediation och är inte owner-godkänd. BB-107 inväntar separat owner UX review. Finance, scheduler, governor och Sentinel är oförändrade.
+
 ## BB-106 — Consolidated UX / Quality Fix Sprint
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-27.
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW FOUND REMEDIATION REQUIRED** 2026-08-27; uppföljning sker i BB-107.
 - Levererat: gemensam overflow/dock-safe-area-cascade, standardiserade loading-/fält-/media-placeholder-/radprimitiver, kompakt paginerad audiobook acquisition-historik, sök-/sorteringsbar paginerad ljudbokshylla, kort normal confirmation, lokala kalenderlägen för passerat/i dag/framtid och tydligare Home-hierarki.
 - **PARTIAL:** full inbyggd Audiobookshelf pause/resume/seek/chapter-navigation kräver ett separat granskat playback-session/streamingkontrakt; befintlig BigBrain-adapter äger fortsatt bibliotek, cover, metadata, progress, continue/detail och säker uppspelningsstart via owner-länk. Modulrespons har standardiserad väntan/säkra fel och befintlig bounded cancellation/SSE-reconnect; bred latencyinstrumentering är kvarstående verifieringsarbete och globala timeouter höjdes inte.
 - Säkerhet: inga acquisitionjobb/mediafiler raderades, avbröts eller startades. Finance, scheduler, governor, Sentinel och backendintegrationer ändrades inte. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.

@@ -147,6 +147,37 @@ test('requires options and preview review before one explicit confirm', async ()
   expect(await within(dialog).findByText('The Expanse har lagts till.')).toBeInTheDocument()
 })
 
+test('retries the same owner action with the same idempotency key', async () => {
+  const confirmBodies: Array<{ idempotencyKey: string }> = []
+  let confirmAttempts = 0
+  const fetch = vi.fn((url: string, init?: RequestInit) => {
+    if (url.includes('/lookup')) return ok(lookup)
+    if (url.includes('/add-options/')) return ok(options)
+    if (url.includes('/preview')) return ok({
+      requestToken: 'opaque-token', expiresAtUtc: '2026-07-25T10:05:00Z', status: 'previewReady',
+      summary: { title: 'The Expanse', year: 2015, provider: 'Sonarr', mediaType: 'series', rootFolder: 'TV Library', qualityProfile: 'HD 1080p', monitoring: 'All', seriesType: 'Standard', searchAfterAdd: true },
+    })
+    if (url.includes('/confirm')) {
+      confirmBodies.push(JSON.parse(String(init?.body)))
+      confirmAttempts++
+      if (confirmAttempts === 1) return Promise.reject(new Error('response lost after write'))
+      return ok({ status: 'created', provider: 'Sonarr', mediaType: 'series', sourceId: '9', title: 'The Expanse' })
+    }
+    throw new Error(`Unexpected request: ${url}`)
+  })
+  fireEvent.click(await openExternalResult(fetch))
+  const dialog = await screen.findByRole('dialog')
+  await screen.findByText('Avancerade inställningar')
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Fortsätt' }))
+  const confirm = await within(dialog).findByRole('button', { name: 'Bekräfta och börja söka' })
+  fireEvent.click(confirm)
+  await within(dialog).findByRole('alert')
+  fireEvent.click(confirm)
+  await within(dialog).findByText('The Expanse har lagts till.')
+  expect(confirmBodies).toHaveLength(2)
+  expect(confirmBodies[0].idempotencyKey).toBe(confirmBodies[1].idempotencyKey)
+})
+
 test('Escape closes before review and returns focus while raw errors stay hidden', async () => {
   const fetch = vi.fn((url: string) => {
     if (url.includes('/lookup')) return ok(lookup)

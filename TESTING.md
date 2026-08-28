@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-107 owner UX remediation
+
+- `MediaLookupRequestTests` simulerar den verkliga first-click-klassen: Arr registrerar posten men POST-svaret timeoutar. API:t avstämmer exakt registrerad foreign ID, returnerar `created` och gör totalt en POST. Web-testet bevisar att retry av samma dialog använder samma idempotensnyckel och att busy-knappen blockerar dubbeltryck.
+- `Audiobooks.test.tsx` bevisar overview → collection: Media-starten visar högst fyra senaste böcker och döljer full katalog/sökfält tills **Visa alla** väljs. Befintliga explicit-utgåve-, aktivitet-, completion- och placeholdertester består.
+- Browser-QA kör 390×844, 430×932 och 1440×900 i alla teman. Kontrollera Home-textcellens användbara bredd, horizontal overflow, verklig sista kontroll över dockan, kompakt audiobook overview, gemensam B-placeholder och dimensionsstabil sök-busy state. Den muterande first-click-regressionen körs med säker providerfixture, inte mot användarens bibliotek.
+
 ## BB-106 consolidated UX quality
 
 - `components.test.tsx` verifierar dimensionsstabil busy-knapp, tillgänglig status och gemensam media-placeholder. Audiobook-regressionen verifierar explicit utgåvebekräftelse, kompakt historik och pagineringskontrakt; Calendar provar lokal past/today/future-klassificering och Home provar datum+titel+tid.

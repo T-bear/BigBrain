@@ -399,6 +399,22 @@ The supported action therefore opens the configured owner-reachable player; no A
 Adding such a contract requires a bounded server-side adapter, stream/range and progress-sync review,
 not a frontend call to Audiobookshelf.
 
+## BB-107 owner UX remediation
+
+Media request confirmation uses one stable Web idempotency key for the complete owner action. Immediately
+before the single Arr POST, API records that the write was attempted. A timeout or server-side response
+failure triggers a bounded read-after-write lookup using the exact TVDB/TMDB identity; if the item exists,
+the original action completes as `created`. A retry of that preview returns the same result and never
+mislabels BigBrain's own successful write as a pre-existing title. Provider 4xx/auth failures remain
+controlled failures and are not treated as ambiguous success.
+
+The registry-composed Media page now follows **overview → collection → detail** for Audiobookshelf.
+Continue Listening remains prominent; the default library overview renders at most four recent covers
+and a count. **Alla ljudböcker** opens the existing bounded search, sort and pagination controls. Missing
+artwork uses the shared theme-aware BigBrain B cover in overview, collection, search, detail and continue
+listening. Audiobookshelf remains the library/playback engine and the existing owner-reachable play link
+is unchanged.
+
 ## ADR impact
 
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart

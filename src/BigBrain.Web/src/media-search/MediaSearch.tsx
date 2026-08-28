@@ -7,6 +7,7 @@ import { MediaSearchModeSelector, type MediaSearchMode } from './MediaSearchMode
 import { MediaLookupResults } from './MediaLookupResults'
 import { MediaRequestDialog } from './MediaRequestDialog'
 import { MediaTypeSelector, type MediaTypeSelection } from './MediaTypeSelector'
+import { AppIcon } from '../AppIcon'
 
 export function MediaSearch() {
   const [query, setQuery] = useState('')
@@ -98,7 +99,6 @@ export function MediaSearch() {
     /></div>
     <MediaSearchModeSelector mode={mode} onChange={next => { setMode(next); setErrorCode(null) }} />
     {mode === 'external' && <MediaTypeSelector value={mediaType} onChange={setMediaType} />}
-    {loading && <p className="media-search-loading" aria-live="polite">Searching media services…</p>}
     {errorCode && <p className="notice notice--error" role="alert">{mediaErrorMessage(errorCode)}</p>}
     {!loading && mode === 'libraries' && result && <MediaSearchResults response={result} />}
     {!loading && mode === 'external' && lookupResult && <MediaLookupResults
@@ -114,7 +114,7 @@ export function MediaSearch() {
         {lookupResult && hasExpandedResults && <button onClick={() => { setExpandedProviders([]); setFabOpen(false) }} role="menuitem" type="button">Visa färre</button>}
         {lookupResult && !hasExpandedResults && hiddenLookupCount > 0 && <button onClick={() => { setExpandedProviders(lookupResult.providers.filter(provider => provider.results.length > 1).map(provider => provider.provider)); setFabOpen(false) }} role="menuitem" type="button">Visa {hiddenLookupCount} fler träffar</button>}
       </div>
-      <button aria-controls="media-search-fab-menu" aria-expanded={fabOpen} aria-label="Sökåtgärder" className="media-search-fab__button" onClick={() => setFabOpen(open => !open)} ref={fabButtonRef} type="button"><span aria-hidden="true">⌕</span><span>Åtgärder</span></button>
+      <button aria-controls="media-search-fab-menu" aria-expanded={fabOpen} aria-label="Sökåtgärder" className="media-search-fab__button" onClick={() => setFabOpen(open => !open)} ref={fabButtonRef} type="button"><AppIcon name="search"/><span>Åtgärder</span></button>
     </div>}
     {requestTarget && <MediaRequestDialog
       result={requestTarget}

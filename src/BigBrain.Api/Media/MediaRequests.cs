@@ -107,7 +107,7 @@ internal interface IMediaRequestProvider
     string SupportedMediaType { get; }
     Task<ProviderAddOptions> GetAddOptionsAsync(CancellationToken cancellationToken);
     Task<MediaLookupResult?> GetLookupItemAsync(string foreignId, CancellationToken cancellationToken);
-    Task<bool> IsRegisteredAsync(string foreignId, string title, int? year, CancellationToken cancellationToken);
+    Task<ProviderAddResult?> GetRegisteredAsync(string foreignId, string title, int? year, CancellationToken cancellationToken);
 }
 
 internal interface IMediaAddProvider
@@ -232,6 +232,7 @@ internal sealed record PendingMediaRequest(
     bool SearchAfterAdd,
     MediaRequestSummary Summary,
     bool InProgress = false,
+    bool AddAttempted = false,
     string? IdempotencyKey = null,
     MediaRequestConfirmResponse? Result = null);
 
@@ -283,12 +284,21 @@ internal sealed class MediaRequestStore
         }
     }
 
+    public void MarkAddAttempted(string tokenHash)
+    {
+        lock (gate)
+        {
+            if (requests.TryGetValue(tokenHash, out var request))
+                requests[tokenHash] = request with { AddAttempted = true };
+        }
+    }
+
     public void Release(string tokenHash)
     {
         lock (gate)
         {
             if (requests.TryGetValue(tokenHash, out var request) && request.Result is null)
-                requests[tokenHash] = request with { InProgress = false, IdempotencyKey = null };
+                requests[tokenHash] = request with { InProgress = false };
         }
     }
 }
@@ -363,7 +373,7 @@ internal sealed class MediaRequestService(
         var provider = FindRequestProvider(input.Provider, input.MediaType);
         var lookup = await provider.GetLookupItemAsync(input.ForeignId, cancellationToken)
             ?? throw MediaAddOptionsService.Invalid(MediaRequestErrors.LookupNotFound, "The lookup item was not found.");
-        if (await provider.IsRegisteredAsync(input.ForeignId, lookup.Title, lookup.Year, cancellationToken))
+        if (await provider.GetRegisteredAsync(input.ForeignId, lookup.Title, lookup.Year, cancellationToken) is not null)
             throw new MediaRequestException(
                 MediaRequestErrors.AlreadyRegistered,
                 "The title is already registered.",
@@ -432,8 +442,11 @@ internal sealed class MediaRequestService(
             var provider = FindRequestProvider(request.Provider, request.MediaType);
             var lookup = await provider.GetLookupItemAsync(request.ForeignId, cancellationToken)
                 ?? throw MediaAddOptionsService.Invalid(MediaRequestErrors.LookupNotFound, "The lookup item was not found.");
-            if (await provider.IsRegisteredAsync(request.ForeignId, lookup.Title, lookup.Year, cancellationToken))
+            var registered = await provider.GetRegisteredAsync(request.ForeignId, lookup.Title, lookup.Year, cancellationToken);
+            if (registered is not null)
             {
+                if (request.AddAttempted)
+                    return Complete(tokenHash, input.IdempotencyKey, request, registered);
                 AlreadyExisted(logger, request.Provider, request.MediaType, request.ForeignId, null);
                 throw new MediaRequestException(
                     MediaRequestErrors.AlreadyRegistered,
@@ -450,6 +463,7 @@ internal sealed class MediaRequestService(
             if (!currentOptions.MonitoringOptions.Contains(request.Monitor, StringComparer.Ordinal))
                 throw MediaAddOptionsService.Invalid(MediaRequestErrors.InvalidMonitoringOption, "The monitoring selection is no longer valid.");
             var addProvider = addProviders.Single(item => item.ProviderName == request.Provider);
+            store.MarkAddAttempted(tokenHash);
             var created = await addProvider.AddAsync(new(
                 request.ForeignId,
                 lookup.Title,
@@ -459,21 +473,7 @@ internal sealed class MediaRequestService(
                 request.Monitor,
                 request.SeriesType,
                 request.SearchAfterAdd), cancellationToken);
-            var response = new MediaRequestConfirmResponse(
-                MediaRequestStatuses.Created,
-                request.Provider,
-                request.MediaType,
-                created.SourceId,
-                created.Title);
-            store.Complete(tokenHash, input.IdempotencyKey, response);
-            RequestConfirmed(
-                logger,
-                request.Provider,
-                request.MediaType,
-                request.ForeignId,
-                response.Status,
-                null);
-            return response;
+            return Complete(tokenHash, input.IdempotencyKey, request, created);
         }
         catch (MediaRequestException)
         {
@@ -487,6 +487,8 @@ internal sealed class MediaRequestService(
         }
         catch (TaskCanceledException)
         {
+            var reconciled = await ReconcileAsync(request, tokenHash, input.IdempotencyKey);
+            if (reconciled is not null) return reconciled;
             store.Release(tokenHash);
             ProviderUnavailable(logger, request.Provider, request.MediaType, request.ForeignId, null);
             throw new MediaRequestException(
@@ -512,6 +514,8 @@ internal sealed class MediaRequestService(
         catch (HttpRequestException exception) when (exception.StatusCode is null
             || (int)exception.StatusCode >= StatusCodes.Status500InternalServerError)
         {
+            var reconciled = await ReconcileAsync(request, tokenHash, input.IdempotencyKey);
+            if (reconciled is not null) return reconciled;
             store.Release(tokenHash);
             ProviderUnavailable(logger, request.Provider, request.MediaType, request.ForeignId, null);
             throw new MediaRequestException(
@@ -538,6 +542,42 @@ internal sealed class MediaRequestService(
         {
             if (enteredConcurrencyGate) concurrency.Release();
         }
+    }
+
+    private async Task<MediaRequestConfirmResponse?> ReconcileAsync(
+        PendingMediaRequest request,
+        string tokenHash,
+        string idempotencyKey)
+    {
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 2, 15)));
+            var provider = FindRequestProvider(request.Provider, request.MediaType);
+            var registered = await provider.GetRegisteredAsync(
+                request.ForeignId, request.Summary.Title, request.Summary.Year, timeout.Token);
+            return registered is null ? null : Complete(tokenHash, idempotencyKey, request, registered);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private MediaRequestConfirmResponse Complete(
+        string tokenHash,
+        string idempotencyKey,
+        PendingMediaRequest request,
+        ProviderAddResult created)
+    {
+        var response = new MediaRequestConfirmResponse(
+            MediaRequestStatuses.Created,
+            request.Provider,
+            request.MediaType,
+            created.SourceId,
+            created.Title);
+        store.Complete(tokenHash, idempotencyKey, response);
+        RequestConfirmed(logger, request.Provider, request.MediaType, request.ForeignId, response.Status, null);
+        return response;
     }
 
     private IMediaRequestProvider FindRequestProvider(string provider, string mediaType) =>
