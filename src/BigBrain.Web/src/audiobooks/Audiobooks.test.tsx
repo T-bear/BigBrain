@@ -70,7 +70,7 @@ test('keeps library usable while acquisition provider is unavailable',async()=>{
   const fetch=vi.spyOn(globalThis,'fetch')
   fetch.mockResolvedValueOnce(json({...overview,acquisition:unavailable})).mockResolvedValueOnce(json(unavailable)).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
-  expect(screen.getByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
+  expect(await screen.findByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Audiobookshelf väntar på konfigurering')).not.toBeInTheDocument()
 })
 
@@ -79,7 +79,7 @@ test('does not mislabel a pending or failed provider-status request as not confi
   const fetch=vi.spyOn(globalThis,'fetch')
   fetch.mockResolvedValueOnce(json(overview)).mockRejectedValueOnce(new TypeError('network')).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
-  expect(screen.getByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
+  expect(await screen.findByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Automatisk hämtning är inte konfigurerad ännu.')).not.toBeInTheDocument()
 })
 
