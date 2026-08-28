@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-111 — Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice
+
+- Status UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING** 2026-08-28.
+- Levererat lokalt: modality-aware route-heading focus utan falsk pointer/touch-ring; forward detail till `scrollY=0` och back-restoration till collection; audiobook-lokal **Bibliotek**-länk/navigation row; kompakt 2:3-säker detail hero; okänt valfritt språk utelämnas. Bounded overview, 24-posters collection, whole-row detail, discovery → library → downloads, scroll-top och presentation-only failed history bevaras.
+- Artworkbeslut: detail använder 88 px cover på mobil och collection 68 px genom lokala canonical storlekar. Den gemensamma 2:3-placeholder-/cover-principen bevaras; ingen global artwork-token ändras utan bredare modulförevidens.
+- **BLOCKED native playback:** befintlig nyckel är sanerat verifierad som aktiv begränsad service/user-identitet utan ägarprogress/sessioner. Den är inte root men är fel playbackidentitet. En separat server-side per-user playbacknyckel för rätt Audiobookshelf-användare krävs; skapa/borrowa/exponera ingen token. Först efter verifiering får same-origin session/Range/progress-sync, Continue Listening, native player och mini-player implementeras.
+- DoD kvar: Compose/docs/security/diff gates, viewport/theme-QA, publish/CI, Web deploy/runtime och fysisk owner UX review. Audiobook-navigationen är inte globalt antagen.
+
 ## BB-110 — Audiobook Owner UX Consolidation & Native Playback Foundation
 
 - Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `76b3c9eda56230e6cf570353ea5f1ca4e579a07c`; slutlig testfix `87d8528791a32a0e4d0e66de400d5ca4d5c392c9`; GitHub Actions run `33180923644` passerade.

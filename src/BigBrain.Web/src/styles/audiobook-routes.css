@@ -6,6 +6,11 @@
   animation-duration: var(--bb-motion-press);
 }
 
+[data-bb-route-focus="pointer"]:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .audiobook-route-view--forward,
   .audiobook-route-view--back {

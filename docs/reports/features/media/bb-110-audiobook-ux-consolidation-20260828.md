@@ -46,6 +46,10 @@ Endast Web byggdes/återskapades och blev healthy. Deployad browsermatris 390×8
 
 På fysisk iPhone/PWA: bedöm Bibliotek-kontrollen, informationsdensiteten, discovery → library → downloads, whole-row tap/focus, långa jobbtitlar, Dölj-semantiken och dock/safe-area i tre teman. Native playback ska inte förväntas förrän identitetsbeslutet fattats.
 
+### Owner follow-up captured by BB-111
+
+Den fysiska BB-110-granskningen registrerade **NEEDS ITERATION** för fem punkter: falsk gul programmatisk route-focus på touch, forward detail som ärvde collection-scroll, **Bibliotek** som actionlik CTA i stället för navigation, lös/misaligned detail hero med deformerat/stort cover samt onödig `Språk okänt`-copy. Positiv evidens för bounded overview, separat collection, whole-row detail, sektionsordning, scroll-top och icke-destruktiv historypresentation kvarstår. BB-111 hanterar iterationen; navigationen är fortsatt inte globalt antagen och owner approval är fortsatt NO.
+
 ## Resumption
 
 Utgå från publicerad BB-110-SHA och aktuell status. Implementera inte playback innan identitets- och same-origin-kontraktet har ett uttryckligt arkitekturbeslut. Registrera endast owner UX approval efter fysisk owner-feedback.

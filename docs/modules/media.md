@@ -437,6 +437,14 @@ Owner direction är service identity för katalog/integration och per-authentica
 
 Acquisition reconciliation treats provider absence as a bounded ambiguity: a missing provider job retains its active state for five minutes to allow registration, then fails closed into attention rather than remaining `downloading` forever. This does not cancel, delete or restart provider work.
 
+## BB-111 route/detail remediation and credential result
+
+Audiobook route focus is still programmatic for assistive continuity, but its visual treatment now follows input modality: pointer/touch route entry suppresses only the programmatic heading ring, while keyboard route focus remains visible through the shared focus contract. Focus uses `preventScroll`. A forward History entry owns `scrollY=0`; popstate restores the saved scroll on the prior collection entry. This preserves collection return without making every route globally scroll to top.
+
+The overview's **Bibliotek** affordance is an audiobook-local semantic link/navigation row, not a button variant. Detail uses a token-based two-column summary with a 2:3, `height:auto`, `object-fit:cover` artwork contract; mobile collection/detail sizes are locally compact and no global artwork primitive was resized. Optional `und`/unknown language is omitted from normal book/detail presentation.
+
+The existing server-side Audiobookshelf key was rechecked without publishing identity or credential material. It acts for an active restricted non-root integration user with zero progress and zero listening sessions, so it is not the owner's authoritative playback identity. Audiobookshelf's per-user session/progress semantics mean a separate server-side playback key for the correct user is required. Until configured and sanitized permission/identity verification succeeds, BigBrain must not start a session, proxy Range bytes, expose a token, borrow progress, or implement a player/mini-player. No new ADR is created for a boundary that has not yet been safely implemented.
+
 ## ADR impact
 
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart

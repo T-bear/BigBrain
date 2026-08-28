@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-111 Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice (2026-08-28)
+
+BB-111 UX är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER UX REVIEW PENDING**. Route-entry använder nu modality-aware programmatisk fokus: pointer/touch behåller DOM-/screen-reader-fokus utan falsk gul headingmarkering, medan keyboardklassificerad fokus fortsatt använder den globala synliga focusringen. Ny collection/detail-navigation börjar vid toppen med `preventScroll`-fokus och en egen `scrollY: 0`-post; browser-back återställer den föregående collection-postens sparade scroll. **Bibliotek** är en audiobook-lokal semantisk navigationsrad/länk, inte en upphöjd CTA eller ny knappvariant.
+
+Detaljheron använder ett kompakt tokenbaserat tvåkolumnsgitter där 2:3-omslag och titel/author/primär metadata bildar en sammanhållen komponent. `height:auto`, `aspect-ratio:2/3` och `object-fit:cover` stoppar deformation; mobil detail använder 88 px cover medan collection behåller den redan etablerade kompakta 68 px-storleken. Ingen global artwork-token ändrades. Okänt valfritt språk (`und`/`Språk okänt`) utelämnas i collection/detail utan att meningsfulla provider-/statuslägen döljs.
+
+Native playback är separat **BLOCKED**. Sanerad read-only runtimeverifiering mot den redan konfigurerade server-side nyckeln visar en aktiv begränsad user/service-identitet, inte root/admin, med 0 media-progress och 0 listening sessions. Det är inte ägarens progressbärande playbackidentitet. Nyckeln får därför inte återanvändas för ägarplayback och ingen session, stream-/Range-proxy, player, mini-player eller falsk Continue Listening byggdes. Audiobookshelf stödjer user-owned playbackkontrakt enligt BB-109, så en separat server-side API-nyckel för rätt playbackanvändare krävs innan dess identitet/behörighet kan verifieras och den auktoriserade same-origin-gränsen implementeras. Ingen credential har skapats eller exponerats.
+
+Verifiering hittills 2026-08-28: 28 fokuserade Web-tester, 151 fulla Web-tester, 558 API-tester och 32 Sentinel-tester passerar; Vite production build passerar. Compose, dokumentationsverifiering, browsermatris, publicering, CI, deploy och runtimekontroll återstår som publiceringsgates.
+
 ## BB-110 Audiobook Owner UX Consolidation & Native Playback Foundation (2026-08-28)
 
 BB-110 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Den audiobook-lokala positiva owner-evidensen består: Media förblir bounded, samlingen öppnas separat och scroll-till-top behålls. Media använder nu den kanoniska sekundära **Bibliotek**-knappen utan lokala accent-/typografiöverstyrningar. Samlingen är avskalad och ordnad **Hitta ljudbok → Bibliotek → Hämtningar**; hela den semantiska bokraden öppnar detaljen. Hämtningar använder en mobil vertikal hierarki och terminala fel kan döljas lokalt utan att audit-, jobb- eller providerdata raderas.

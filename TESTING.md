@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-111 route/detail UX and playback credential gate
+
+- `npm test -- --run src/audiobooks/Audiobooks.test.tsx src/routeFocus.test.ts src/UXPolishStyles.test.js`: 28/28. Täcker semantic Library-link i stället för CTA, pointer-/keyboardklassificerad route focus, forward detail till top, back-restoration, okänt språk som utelämnas, detail artwork-klass/ratio-kontrakt och befintliga bounded audiobookflöden.
+- `npm test -- --run`: 151/151 Web.
+- `npm run build`: TypeScript + Vite production build passerar.
+- `dotnet test BigBrain.slnx -c Release --no-restore`: 558 API + 32 Sentinel passerar. Det första felskrivna försöket mot `BigBrain.sln` kunde inte starta eftersom repositoryt använder `BigBrain.slnx`; det körde inga tester och följdes av korrekt kommando.
+- Runtime credential discovery är read-only och sanerad: endast identity/privilege-klass, aktiveringsstatus och aggregerade progress/session-counts får lämna proben. Token, användarnamn, user ID, privata URL:er och råa payloads får aldrig skrivas ut. Resultatet 2026-08-28 är restricted/non-root, 0 progress och 0 sessions; inga playback-write-/sessionanrop kördes mot fel identitet.
+- Återstående publiceringsgates: Compose, dokumentationsverifiering, `git diff --check`, secret scan, browsermatris 390×844/430×932/1440×900 i tre teman, CI och deployad runtime.
+
 ## BB-110 audiobook owner UX consolidation
 
 - `Audiobooks.test.tsx` verifierar kanonisk secondary-variant för **Bibliotek**, reducerad synlig copy med bevarade accessible names, discovery → library → downloads, semantic whole-row detail navigation, bounded collection och lokal persistent attention-dismiss utan POST eller audit/provider-mutation.

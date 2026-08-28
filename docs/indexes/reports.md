@@ -1,5 +1,6 @@
 # Reports Index
 
+- [BB-111 Audiobook route/detail UX fixes and playback credential gate](../reports/features/media/bb-111-audiobook-route-detail-ux-playback-gate-20260828.md)
 - [BB-110 Audiobook UX consolidation and native playback foundation](../reports/features/media/bb-110-audiobook-ux-consolidation-20260828.md)
 
 - [BB-088 Finance prospective daily cadence and UI v1.0](../reports/features/finance/finance-bb-088-daily-cadence-ui-v1-20260815.md)

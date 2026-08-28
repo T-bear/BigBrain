@@ -142,12 +142,13 @@ test('keeps the Media overview compact and opens the bounded full collection on 
   const item=(index:number)=>({id:`book-${index}`,title:`Ljudbok ${index}`,author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null})
   const books=Array.from({length:12},(_,index)=>item(index+1))
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,library:books,recent:books.slice(0,6)})
-  render(<Audiobooks/>);expect(await screen.findByRole('button',{name:'Öppna ljudboksbiblioteket'})).toHaveClass('bb-button--secondary')
+  render(<Audiobooks/>);const libraryLink=await screen.findByRole('link',{name:'Öppna ljudboksbiblioteket'})
+  expect(libraryLink).toHaveAttribute('href','/media/audiobooks');expect(libraryLink).not.toHaveClass('bb-button')
   expect(screen.queryByText('Senast tillagda')).not.toBeInTheDocument()
   expect(screen.queryByText('Ljudbok 1')).not.toBeInTheDocument()
   expect(screen.queryByLabelText('Sök i biblioteket')).not.toBeInTheDocument()
   fetch.mockResolvedValueOnce(json({items:books,page:0,pageSize:24,total:books.length,hasMore:false}))
-  fireEvent.click(screen.getByRole('button',{name:'Öppna ljudboksbiblioteket'}))
+  fireEvent.click(screen.getByRole('link',{name:'Öppna ljudboksbiblioteket'}))
   await waitFor(()=>expect(screen.getByRole('heading',{name:'Ljudböcker',level:1})).toBeInTheDocument())
   expect(screen.getByLabelText('Sök i ditt bibliotek')).toBeInTheDocument()
 })
@@ -175,6 +176,22 @@ test('loads a deep-linked audiobook detail through the bounded BigBrain API',asy
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch);fetch.mockResolvedValueOnce(json(item))
   render(<Audiobooks/>);expect(await screen.findByRole('heading',{name:'Direktlänkad bok'})).toBeInTheDocument()
   expect(String(fetch.mock.calls[3][0])).toContain('/api/v1/modules/media/audiobooks/deep-link')
+  expect(screen.queryByText('Språk okänt')).not.toBeInTheDocument()
+  expect(screen.getByRole('img',{name:'Omslag till Direktlänkad bok'})).toHaveClass('audiobook-detail-page__artwork')
+})
+
+test('starts a forward detail route at top and restores collection scroll on back',async()=>{
+  collection()
+  const item={id:'scroll-book',title:'Scrollbok',author:null,series:null,narrator:null,language:'und',languageLabel:'Språk okänt',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null}
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,library:[item],recent:[item]})
+  Object.defineProperty(window,'scrollY',{configurable:true,value:720})
+  vi.spyOn(window,'requestAnimationFrame').mockImplementation(callback=>{callback(0);return 1})
+  const scrollTo=vi.spyOn(window,'scrollTo').mockImplementation(()=>undefined)
+  render(<Audiobooks/>);fireEvent.click(await screen.findByRole('button',{name:'Öppna Scrollbok'}))
+  expect(scrollTo).toHaveBeenCalledWith({top:0,behavior:'auto'})
+  window.history.replaceState({bbAudiobookOrigin:true,scrollY:720},'','/media/audiobooks')
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  expect(scrollTo).toHaveBeenLastCalledWith({top:720})
 })
 
 test('restores collection query and sort after returning from detail',async()=>{

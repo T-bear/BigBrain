@@ -34,4 +34,9 @@ describe('Sprint 1 UX layout contracts', () => {
     expect(audiobookRoutes).toContain('@media (prefers-reduced-motion: reduce)')
     expect(audiobookRoutes).toMatch(/\.audiobook-route-view--forward,[\s\S]*\.audiobook-route-view--back[\s\S]*animation: none;/)
   })
+
+  it('suppresses only pointer-origin route focus without disabling keyboard focus globally', () => {
+    expect(audiobookRoutes).toMatch(/\[data-bb-route-focus="pointer"\]:focus\s*\{[^}]*box-shadow: none;/)
+    expect(audiobookRoutes).not.toMatch(/:focus-visible\s*\{[^}]*box-shadow:\s*none/)
+  })
 })

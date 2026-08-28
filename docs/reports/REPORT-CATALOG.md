@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-111` — [Audiobook Route/Detail UX Fixes & Playback Credential Gate](features/media/bb-111-audiobook-route-detail-ux-playback-gate-20260828.md)
 - `BB-110` — [Audiobook Owner UX Consolidation & Native Playback Foundation](features/media/bb-110-audiobook-ux-consolidation-20260828.md)
 - `BB-109` — [Audiobook Owner UX Remediation & Native Playback Investigation](features/media/bb-109-audiobook-owner-ux-remediation-20260828.md)
 

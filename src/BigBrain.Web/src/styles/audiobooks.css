@@ -31,3 +31,20 @@
 .audiobook-job small{grid-column:1/-1}
 .audiobook-job .bb-button{grid-column:2;grid-row:2;justify-self:end;min-height:44px}
 @media(max-width:600px){.audiobook-book-row{grid-template-columns:68px minmax(0,1fr) 44px;padding-inline:var(--bb-space-2)}.audiobook-book-row>img,.audiobook-book-row>.bb-media-placeholder{width:68px}.audiobook-job{grid-template-columns:minmax(0,1fr)}.audiobook-job>span,.audiobook-job .bb-button{grid-column:1;grid-row:auto;justify-self:start}.audiobook-job-group{padding-inline:var(--bb-space-3)}}
+
+/* BB-111: audiobook-local navigation row and compact, ratio-safe detail composition. */
+.audiobook-overview__heading.audiobook-collection-link{min-height:58px;padding-block:var(--bb-space-2);border-bottom:1px solid var(--bb-color-border);color:inherit;text-decoration:none}
+.audiobook-overview__heading>a,.audiobook-overview__heading>span{min-width:0}
+.audiobook-overview__heading>span:first-child{display:grid}
+.audiobook-overview__title{font-family:var(--bb-font-family-heading);font-size:var(--bb-font-size-xl);font-weight:var(--bb-font-weight-bold);line-height:var(--bb-line-height-tight)}
+.audiobook-collection-link>span:last-child{display:flex;align-items:center;gap:var(--bb-space-2);color:var(--bb-color-text-secondary)}
+.audiobook-detail-page{grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:var(--bb-space-5)}
+.audiobook-detail-page__artwork,.audiobook-detail-page>.bb-media-placeholder{grid-row:1;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover}
+.audiobook-detail-page__summary{display:grid;align-content:start;gap:var(--bb-space-2);min-width:0}
+.audiobook-detail-page__summary>*{margin:0}
+.audiobook-detail-page__author{color:var(--bb-color-text-secondary);font-size:var(--bb-font-size-lg)}
+.audiobook-detail-page__metadata{display:flex;flex-wrap:wrap;gap:var(--bb-space-1) var(--bb-space-3);color:var(--bb-color-text-tertiary);font-size:var(--bb-font-size-sm)}
+.audiobook-detail-page__body{grid-column:1/-1;display:grid;justify-items:start;gap:var(--bb-space-3)}
+.audiobook-detail-page__body>p{margin:0}
+.audiobook-detail-page__body progress{margin:0}
+@media(max-width:600px){.audiobook-detail-page{grid-template-columns:88px minmax(0,1fr);gap:var(--bb-space-3)}.audiobook-detail-page h1{grid-column:auto;font-size:1.38rem}.audiobook-detail-page__summary{display:grid;gap:var(--bb-space-1)}.audiobook-detail-page__summary>*{grid-column:auto}.audiobook-detail-page__metadata{gap:2px var(--bb-space-2)}}
