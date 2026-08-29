@@ -4,7 +4,8 @@
 
 - Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-29.
 - Delivered: compact direct Continue Listening play/pause plus authoritative derived time; explicit playback-availability hierarchy; intrinsic-safe detail hero; exact verified Audiobookshelf legacy-placeholder recognition with canonical BigBrain fallback; no-cache Web shell/manifest; API/Web-only healthy deployment and 3×3 viewport/theme QA.
-- Definition of Done remaining: publish and verify CI, then physical iPhone/PWA owner review. Chapters, speed, mini-player redesign and Library redesign remain out of scope.
+- Publication: implementation `5d829fdcf64541e49b8cf355004bea90d2a372d3`; GitHub Actions run `33269194506` passed all four jobs.
+- Remaining: physical iPhone/PWA owner review only. Chapters, speed, mini-player redesign and Library redesign remain out of scope.
 
 ## BB-112 — Native Audiobook Playback + Owner Search/Result UX Remediation
 

@@ -12,7 +12,7 @@ Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresse
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Publication and CI verification are pending until the authorized commit is pushed.
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / CI VERIFIED / OWNER UX REVIEW PENDING**. Implementation `5d829fdcf64541e49b8cf355004bea90d2a372d3` is published.
 
 ## Owner evidence and causes
 
@@ -32,7 +32,7 @@ Focused verification passed 18 API and 23 Web tests. Full verification passed 56
 
 ## Evidence
 
-Firefox at 390×844 verified compact direct play, authoritative `current / total`, playing/Pausa state, mini-player appearance and survival after navigation. The 390×844, 430×932 and 1440×900 matrix in Obsidian Gold, Forest Night and Arctic Wind verified direct affordance, full-width nonzero mobile hero boxes, natural Golden Compass wrapping, synthetic long Swedish wrapping with `word-break:normal`, canonical B fallback at 2:3, visible native action, tertiary external reserve path and zero horizontal overflow. The Web shell returns `no-cache, no-store, must-revalidate`. Publication SHA and CI result are appended after they occur. No owner UX approval is inferred.
+Firefox at 390×844 verified compact direct play, authoritative `current / total`, playing/Pausa state, mini-player appearance and survival after navigation. The 390×844, 430×932 and 1440×900 matrix in Obsidian Gold, Forest Night and Arctic Wind verified direct affordance, full-width nonzero mobile hero boxes, natural Golden Compass wrapping, synthetic long Swedish wrapping with `word-break:normal`, canonical B fallback at 2:3, visible native action, tertiary external reserve path and zero horizontal overflow. The Web shell returns `no-cache, no-store, must-revalidate`. GitHub Actions run `33269194506` passed frontend, backend, documentation and secrets. No owner UX approval is inferred.
 
 ## Security and boundaries
 

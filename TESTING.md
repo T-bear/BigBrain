@@ -5,6 +5,7 @@
 - `Audiobooks.test.tsx` covers separate direct play versus detail navigation, accessible play/pause state, native start/session path, authoritative duration/progress time, healthy native-primary/fallback-secondary hierarchy and truthful unavailable fallback.
 - `AudiobookTests` preserves arbitrary valid owner artwork and matches only the exact runtime-verified Audiobookshelf generic media-note placeholder hash. `UXPolishStyles.test.js` locks the hero's `minmax(0,1fr)`, natural word wrapping, 2:3 artwork and narrow stacked fallback.
 - Gates: focused audiobook Web/API, full Web/API/Sentinel, Vite/Release build, Compose, documentation, diff and scoped secret scan. Deployed QA: 390×844, 430×932 and 1440×900; overview/direct playback/time/detail/Golden Compass plus a long Swedish title/native player/fallback/mini-player route survival/overflow/dock-safe-area. Theme expansion is required only where the existing automation is cheap.
+- Result 2026-08-29: 18 focused API, 23 focused Web, 564 full API, 32 Sentinel and 154 full Web passed; Vite, Compose, 195-document verification, diff and staged gitleaks passed. Deployed Firefox direct-play/mini-player/route-survival passed, as did the 3×3 viewport/theme matrix. GitHub Actions run `33269194506` passed frontend, backend, documentation and secrets for `5d829fdcf64541e49b8cf355004bea90d2a372d3`.
 
 ## BB-112 native audiobook playback and owner search remediation
 
