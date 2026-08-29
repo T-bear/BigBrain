@@ -253,7 +253,7 @@ test('keeps new-book discovery distinct from local-library filtering',async()=>{
   expect(screen.getByLabelText('Sök efter en ny ljudbok')).toBeInTheDocument()
   expect(screen.getByLabelText('Sök i ditt bibliotek')).toBeInTheDocument()
   expect(screen.getByRole('button',{name:'Sök'})).toBeInTheDocument()
-  expect(screen.getByRole('button',{name:'Filtrera'})).toBeInTheDocument()
+  expect(await screen.findByRole('button',{name:'Filtrera'})).toBeInTheDocument()
   expect(screen.queryByText('Lägg till')).not.toBeInTheDocument()
   expect(screen.queryByText('Din samling')).not.toBeInTheDocument()
 })
