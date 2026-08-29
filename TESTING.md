@@ -6,6 +6,7 @@
 - `AudiobookTests` preserves arbitrary valid owner artwork and matches only the exact runtime-verified Audiobookshelf generic media-note placeholder hash. `UXPolishStyles.test.js` locks the hero's `minmax(0,1fr)`, natural word wrapping, 2:3 artwork and narrow stacked fallback.
 - Gates: focused audiobook Web/API, full Web/API/Sentinel, Vite/Release build, Compose, documentation, diff and scoped secret scan. Deployed QA: 390×844, 430×932 and 1440×900; overview/direct playback/time/detail/Golden Compass plus a long Swedish title/native player/fallback/mini-player route survival/overflow/dock-safe-area. Theme expansion is required only where the existing automation is cheap.
 - Result 2026-08-29: 18 focused API, 23 focused Web, 564 full API, 32 Sentinel and 154 full Web passed; Vite, Compose, 195-document verification, diff and staged gitleaks passed. Deployed Firefox direct-play/mini-player/route-survival passed, as did the 3×3 viewport/theme matrix. GitHub Actions run `33269194506` passed frontend, backend, documentation and secrets for `5d829fdcf64541e49b8cf355004bea90d2a372d3`.
+- Publication follow-up: docs-run `33269347381` exposed one asynchronous test race where the collection button still had busy-name `Filtrera pågår`; the assertion now awaits `Filtrera`. Three focused repetitions, full Web and Vite passed locally; GitHub Actions run `33269619672` passed all jobs for testfix `09976f0ab43c825f22434177ca7952f5207b746b`.
 
 ## BB-112 native audiobook playback and owner search remediation
 

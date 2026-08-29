@@ -34,6 +34,8 @@ Focused verification passed 18 API and 23 Web tests. Full verification passed 56
 
 Firefox at 390×844 verified compact direct play, authoritative `current / total`, playing/Pausa state, mini-player appearance and survival after navigation. The 390×844, 430×932 and 1440×900 matrix in Obsidian Gold, Forest Night and Arctic Wind verified direct affordance, full-width nonzero mobile hero boxes, natural Golden Compass wrapping, synthetic long Swedish wrapping with `word-break:normal`, canonical B fallback at 2:3, visible native action, tertiary external reserve path and zero horizontal overflow. The Web shell returns `no-cache, no-store, must-revalidate`. GitHub Actions run `33269194506` passed frontend, backend, documentation and secrets. No owner UX approval is inferred.
 
+A subsequent documentation run exposed an existing async test race: the assertion queried `Filtrera` while collection loading could still expose the busy-name `Filtrera pågår`. Testfix `09976f0ab43c825f22434177ca7952f5207b746b` waits for readiness; three focused repetitions, full Web and Vite passed locally, and GitHub Actions run `33269619672` passed all jobs. Product behavior did not change.
+
 ## Security and boundaries
 
 ADR 0037 is unchanged. Credentials remain server-side, sessions remain opaque/bounded, Audiobookshelf remains durable progress truth and AppShell retains playback lifetime. No media, progress, acquisition, Finance, Sentinel, Library navigation or search/language behavior was modified.
