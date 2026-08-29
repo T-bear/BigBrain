@@ -34,6 +34,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0027](../adr/0027-finance-external-dataset-quarantine-and-promotion.md) | Accepted | Finance external dataset quarantine and deterministic promotion |
 | [0028](../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md) | Accepted | Finance provider-tagged backup, restore and quarantine cleanup |
 | [0030](../adr/0030-finance-hard-risk-authority-and-immutable-policy-evidence.md) | Accepted | Finance Hard Risk authority and immutable policy evidence |
+| [0037](../adr/0037-native-audiobook-playback-boundary.md) | Accepted | Native Audiobook playback identity, Range and session boundary |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

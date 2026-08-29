@@ -161,7 +161,7 @@ test('uses progress-backed listening continuity and real collection/detail route
   fireEvent.click(screen.getByRole('button',{name:'Öppna Påbörjad bok'}))
   expect(window.location.pathname).toBe('/media/audiobooks/book-1')
   expect(screen.getByRole('heading',{name:'Påbörjad bok',level:1})).toBeInTheDocument()
-  expect(screen.getByRole('link',{name:'Öppna tillfälligt i Audiobookshelf'})).toHaveAttribute('href','https://owner.example/item/book-1')
+  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf'})).toHaveAttribute('href','https://owner.example/item/book-1')
   const back=vi.spyOn(window.history,'back').mockImplementation(()=>undefined)
   fireEvent.click(screen.getByRole('button',{name:'‹ Ljudböcker'}))
   expect(back).toHaveBeenCalledOnce()

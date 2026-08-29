@@ -447,5 +447,11 @@ The existing server-side Audiobookshelf key was rechecked without publishing ide
 
 ## ADR impact
 
+## BB-112 native audiobook playback
+
+The separate `Media:Audiobookshelf:PlaybackApiKey` acts only for owner playback/session/progress; `ApiKey` remains catalogue/integration identity. Purpose-built availability, item start, session-bound Range, sync and close endpoints use opaque process-local sessions, expire after 120 minutes by default, bind one item/track allowlist, cap one byte range to 8 MiB and cannot accept an upstream URL. Audiobookshelf remains durable progress truth; Web receives no credential and BigBrain adds no progress database.
+
+AppShell owns audio/session lifetime. Continue Listening uses authoritative items-in-progress; player/detail provide play/pause, seek, ±30 seconds, actual time/duration and close. Chapters/speed are deferred. Discovery language is preference, not strict exclusion: explicit language is verified, strong release tokens probable and unknown visible. Stable provider release identity/infohash/guid drives deduplication. ADR 0037 records the boundary and current single-owner auth limitation.
+
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
 Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.

@@ -85,9 +85,11 @@ services:
       Media__Prowlarr__ApiKey: ${MEDIA__PROWLARR__APIKEY:-}
       Media__Audiobookshelf__BaseUrl: ${MEDIA__AUDIOBOOKSHELF__BASEURL:-http://audiobookshelf:80}
       Media__Audiobookshelf__ApiKey: ${MEDIA__AUDIOBOOKSHELF__APIKEY:-}
+      Media__Audiobookshelf__PlaybackApiKey: ${MEDIA__AUDIOBOOKSHELF__PLAYBACKAPIKEY:-}
       Media__Audiobookshelf__LibraryId: ${MEDIA__AUDIOBOOKSHELF__LIBRARYID:-}
       Media__Audiobookshelf__PublicUrl: ${MEDIA__AUDIOBOOKSHELF__PUBLICURL:-}
       Media__Audiobookshelf__PageSize: ${MEDIA__AUDIOBOOKSHELF__PAGESIZE:-24}
+      Media__Audiobookshelf__PlaybackSessionLifetimeMinutes: ${MEDIA__AUDIOBOOKSHELF__PLAYBACKSESSIONLIFETIMEMINUTES:-120}
       Media__Librarr__BaseUrl: ${MEDIA__LIBRARR__BASEURL:-http://librarr:5050}
       Media__Librarr__ApiKey: ${LIBRARR_API_KEY:-}
       Media__Librarr__CandidateLifetimeMinutes: ${MEDIA__LIBRARR__CANDIDATELIFETIMEMINUTES:-15}

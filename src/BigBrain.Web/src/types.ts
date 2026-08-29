@@ -396,6 +396,8 @@ export interface AudiobookAcquisitionJobPage { items:AudiobookAcquisitionJob[]; 
 export interface AudiobookMetadataWork { workId:string; editionIds:string[]; canonicalTitle:string; alternateTitles:string[]; authors:string[]; series:string|null; seriesNumber:string|null; narrators:string[]; isbn10:string|null; isbn13:string|null; asin:string|null; language:string; publicationYear:number|null; coverUrl:string|null; provider:string }
 export interface AudiobookMetadataResolution { query:{original:string;normalized:string;kind:'isbn10'|'isbn13'|'probableAsin'|'freeText'}; state:'resolved'|'notFound'|'unavailable'; works:AudiobookMetadataWork[]; narratorSearchSupported:boolean; message:string|null }
 export interface AudiobookSearchResponse { library:AudiobookItem[]; metadata:AudiobookMetadataResolution; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
+export interface AudiobookPlaybackTrack { index:number; startOffset:number; duration:number; title:string|null; mimeType:string; streamUrl:string }
+export interface AudiobookPlaybackSession { id:string; itemId:string; currentTime:number; duration:number; tracks:AudiobookPlaybackTrack[]; expiresAtUtc:string }
 
 export interface MediaAddOption {
   id: string

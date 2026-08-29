@@ -21,6 +21,10 @@ The internal BigBrain adapter continues to use `http://audiobookshelf:80` on the
 5. Inject the key as `MEDIA__AUDIOBOOKSHELF__APIKEY` and library ID as `MEDIA__AUDIOBOOKSHELF__LIBRARYID` through the appliance environment. Never place either value in Git or Web.
 6. Recreate only API and verify the audiobook overview reports `configuredHealthy`.
 
+## Separate playback identity
+
+Create a revocable API key for the active restricted user that owns the owner's real progress. It needs audiobook-library and own playback/progress access, but no admin, user-management, upload or delete authority. Store it only as `MEDIA__AUDIOBOOKSHELF__PLAYBACKAPIKEY` in ignored `.env` (`0600`). Never replace `MEDIA__AUDIOBOOKSHELF__APIKEY`, print either value, or place them in Web/Git/docs. Recreate only API; sanitized availability must report `configuredHealthy`, `separateIdentity:true` and `hasProgress:true`.
+
 Until steps 2–5 are performed, `notConfigured` is expected. Do not use an admin key for routine reads. ABS configuration/metadata may be backed up separately; audiobook media follows the media-library retention policy.
 
 ## Commissioned state

@@ -1,5 +1,11 @@
 # BigBrain Backlog
 
+## BB-112 — Native Audiobook Playback + Owner Search/Result UX Remediation
+
+- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-29.
+- Delivered: separate server-side playback identity, authoritative Continue Listening, same-origin bounded session/Range/progress API, native player, route-surviving mini-player, long-title remediation, compact language confidence and documented live provider variability.
+- Remaining: physical iPhone/PWA owner review of player, mini-player, Library hierarchy and long-title cards. Chapters/speed are future enhancements. A future multi-user auth model must bind authenticated users to playback identities.
+
 ## BB-111 — Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice
 
 - Status UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `686f621937ae0e376bcc55003077769fff8b4351`; GitHub Actions run `33187236677` passerade.

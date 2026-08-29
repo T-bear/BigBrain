@@ -5,6 +5,7 @@ import { WidgetProvider } from './dashboard/widgetFramework'
 import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from './types'
 import { ThemeProvider } from './ThemeProvider'
 import { AppShell } from './AppShell'
+import { AudiobookPlaybackProvider } from './audiobooks/AudiobookPlayback'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -43,7 +44,7 @@ function AppContent() {
   }, [])
 
   const registry = useMemo(() => createAppWidgetRegistry({ docker, dockerError, moduleError, modules, recovery, recoveryError, system, systemError }), [docker, dockerError, moduleError, modules, recovery, recoveryError, system, systemError])
-  return <WidgetProvider registry={registry}><AppShell /></WidgetProvider>
+  return <WidgetProvider registry={registry}><AudiobookPlaybackProvider><AppShell /></AudiobookPlaybackProvider></WidgetProvider>
 }
 
 export default function App() {

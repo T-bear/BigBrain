@@ -91,6 +91,12 @@ public partial class Program
         AddMediaClient<IRadarrClient, RadarrClient>(builder.Services, "Radarr", options => options.Radarr.BaseUrl);
         AddMediaClient<IProwlarrClient, ProwlarrClient>(builder.Services, "Prowlarr", options => options.Prowlarr.BaseUrl);
         AddMediaClient<IAudiobookshelfClient, AudiobookshelfClient>(builder.Services, "Audiobookshelf", options => options.Audiobookshelf.BaseUrl);
+        builder.Services.AddHttpClient("AudiobookPlayback", (serviceProvider, httpClient) =>
+        {
+            var options = serviceProvider.GetRequiredService<MediaOptions>();
+            ConfigureMediaClient(httpClient, options.Audiobookshelf.BaseUrl, Math.Max(options.TimeoutSeconds, 15));
+        }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
+        builder.Services.AddSingleton<AudiobookPlaybackService>();
         builder.Services.AddHttpClient<IAudiobookMetadataProvider, OpenLibraryAudiobookMetadataProvider>((serviceProvider, httpClient) =>
         {
             var options = serviceProvider.GetRequiredService<MediaOptions>();

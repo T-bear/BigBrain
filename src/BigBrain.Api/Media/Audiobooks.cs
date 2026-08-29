@@ -72,7 +72,7 @@ public interface IAudiobookshelfClient
     Task<(byte[] Bytes, string ContentType)?> GetCoverAsync(string id, CancellationToken token);
 }
 
-public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, IAudiobookAcquisitionProvider acquisition)
+public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, IAudiobookAcquisitionProvider acquisition, AudiobookPlaybackService? playback = null)
     : IAudiobookshelfClient
 {
     private static readonly Regex Html = new("<[^>]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(50));
@@ -90,7 +90,16 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
         try
         {
             var page = await GetLibraryCoreAsync(0, options.Audiobookshelf.PageSize, null, token);
-            var listening = page.Items.Where(x => x.ProgressPercent is > 0 and < 100).OrderByDescending(x => x.ProgressPercent).FirstOrDefault();
+            AudiobookItem? listening = null;
+            if (playback?.Configured == true)
+            {
+                try { listening = await playback.GetContinueListeningAsync(token); }
+                catch (AudiobookPlaybackException) { }
+            }
+            else if (playback is null)
+            {
+                listening = page.Items.Where(x => x.ProgressPercent is > 0 and < 100).OrderByDescending(x => x.ProgressPercent).FirstOrDefault();
+            }
             return new(AudiobookIntegrationStates.ConfiguredHealthy, null, listening, page.Items, page.Items.Take(8).ToArray(), capabilities);
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or JsonException or MediaAuthenticationException)

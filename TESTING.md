@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-112 native audiobook playback and owner search remediation
+
+- `AudiobookPlaybackTests` covers separate identity/progress verification, credential-free opaque DTOs, item/track binding, invalid progress, single bounded Range and absence of arbitrary upstream URLs.
+- Audiobook acquisition/provider tests retain deterministic ranking, unknown-language retention, stable release dedup and partial-provider behavior. `Audiobooks.test.tsx` retains overview/collection/detail, result and confidence presentation.
+- Runtime mutation is bounded: move an existing in-progress item one second, sync, restore the original position on close, then require the closed stream to return 404. Firefox verifies `206` audio, playing state, real slider position, route survival and no overflow.
+
 ## BB-111 route/detail UX and playback credential gate
 
 - `npm test -- --run src/audiobooks/Audiobooks.test.tsx src/routeFocus.test.ts src/UXPolishStyles.test.js`: 28/28. Täcker semantic Library-link i stället för CTA, pointer-/keyboardklassificerad route focus, forward detail till top, back-restoration, okänt språk som utelämnas, detail artwork-klass/ratio-kontrakt och befintliga bounded audiobookflöden.

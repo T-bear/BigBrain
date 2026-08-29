@@ -7,6 +7,24 @@ public static class AudiobookEndpoints
         var group = app.MapGroup("/api/v1/modules/media/audiobooks");
         group.MapGet("/overview", async (IAudiobookshelfClient client, CancellationToken token) =>
             Results.Ok(await client.GetOverviewAsync(token)));
+        group.MapGet("/playback/availability", (AudiobookPlaybackService playback, CancellationToken token) =>
+            Playback(async () => Results.Ok(await playback.VerifyAsync(token))));
+        group.MapPost("/{id}/playback", (string id, AudiobookPlaybackService playback, CancellationToken token) =>
+            Playback(async () => Results.Ok(await playback.StartAsync(id, token))));
+        group.MapPost("/playback/sessions/{id}/sync", (string id, AudiobookPlaybackProgress input, AudiobookPlaybackService playback, CancellationToken token) =>
+            Playback(async () => { await playback.SyncAsync(id, input, false, token); return Results.NoContent(); }));
+        group.MapPost("/playback/sessions/{id}/close", (string id, AudiobookPlaybackProgress input, AudiobookPlaybackService playback, CancellationToken token) =>
+            Playback(async () => { await playback.SyncAsync(id, input, true, token); return Results.NoContent(); }));
+        group.MapGet("/playback/sessions/{id}/tracks/{trackIndex:int}", async (string id, int trackIndex, AudiobookPlaybackService playback, HttpContext context, CancellationToken token) =>
+        {
+            try { await playback.StreamAsync(id, trackIndex, context, token); }
+            catch (AudiobookPlaybackException exception) when (!context.Response.HasStarted)
+            {
+                context.Response.StatusCode = exception.StatusCode;
+                await Results.Problem(statusCode: exception.StatusCode, title: "Audiobook playback could not be completed", detail: exception.SafeMessage,
+                    extensions: new Dictionary<string, object?> { ["code"] = exception.Code }).ExecuteAsync(context);
+            }
+        });
         group.MapGet("/library", async (int? page, int? limit, string? query, string? language, IAudiobookshelfClient client, CancellationToken token) =>
         {
             var normalizedPage = Math.Max(0, page ?? 0);
@@ -68,6 +86,15 @@ public static class AudiobookEndpoints
         catch (AudiobookAcquisitionException exception)
         {
             return Results.Problem(statusCode: exception.StatusCode, title: "Audiobook acquisition could not be completed",
+                detail: exception.SafeMessage, extensions: new Dictionary<string, object?> { ["code"] = exception.Code });
+        }
+    }
+    private static async Task<IResult> Playback(Func<Task<IResult>> action)
+    {
+        try { return await action(); }
+        catch (AudiobookPlaybackException exception)
+        {
+            return Results.Problem(statusCode: exception.StatusCode, title: "Audiobook playback could not be completed",
                 detail: exception.SafeMessage, extensions: new Dictionary<string, object?> { ["code"] = exception.Code });
         }
     }

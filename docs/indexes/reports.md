@@ -1,5 +1,7 @@
 # Reports Index
 
+- [BB-112 Native audiobook playback and owner search remediation](../reports/features/media/bb-112-native-audiobook-playback-owner-search-remediation-20260829.md)
+
 - [BB-111 Audiobook route/detail UX fixes and playback credential gate](../reports/features/media/bb-111-audiobook-route-detail-ux-playback-gate-20260828.md)
 - [BB-110 Audiobook UX consolidation and native playback foundation](../reports/features/media/bb-110-audiobook-ux-consolidation-20260828.md)
 

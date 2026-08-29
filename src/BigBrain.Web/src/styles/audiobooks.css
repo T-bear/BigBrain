@@ -48,3 +48,4 @@
 .audiobook-detail-page__body>p{margin:0}
 .audiobook-detail-page__body progress{margin:0}
 @media(max-width:600px){.audiobook-detail-page{grid-template-columns:88px minmax(0,1fr);gap:var(--bb-space-3)}.audiobook-detail-page h1{grid-column:auto;font-size:1.38rem}.audiobook-detail-page__summary{display:grid;gap:var(--bb-space-1)}.audiobook-detail-page__summary>*{grid-column:auto}.audiobook-detail-page__metadata{gap:2px var(--bb-space-2)}}
+.audiobook-candidate{width:100%;min-width:0;overflow:hidden}.audiobook-candidate .audiobook__copy,.audiobook-candidate h3{width:100%;min-width:0}.audiobook-candidate h3{margin:0;word-break:normal;overflow-wrap:break-word}

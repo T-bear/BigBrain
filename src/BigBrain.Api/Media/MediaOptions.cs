@@ -32,6 +32,7 @@ public sealed class MediaOptions
         && options.Librarr.SearchTimeoutSeconds is >= 10 and <= 45
         && (string.IsNullOrWhiteSpace(options.Audiobookshelf.PublicUrl) || IsHttpUrl(options.Audiobookshelf.PublicUrl))
         && options.Audiobookshelf.PageSize is >= 1 and <= 50
+        && options.Audiobookshelf.PlaybackSessionLifetimeMinutes is >= 15 and <= 240
         && IsHttpUrl(options.QBittorrent.BaseUrl)
         && options.ServiceLinks.All.All(IsValidServiceLink)
         && options.Requests.PreviewTokenLifetimeMinutes is >= 1 and <= 15
@@ -76,9 +77,11 @@ public sealed class AudiobookshelfOptions
 {
     public string BaseUrl { get; init; } = "http://audiobookshelf:80";
     public string? ApiKey { get; init; }
+    public string? PlaybackApiKey { get; init; }
     public string? LibraryId { get; init; }
     public string? PublicUrl { get; init; }
     public int PageSize { get; init; } = 24;
+    public int PlaybackSessionLifetimeMinutes { get; init; } = 120;
     public string AcquisitionDatabasePath { get; init; } = "/data/audiobook-acquisition.db";
 }
 

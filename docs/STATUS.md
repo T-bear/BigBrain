@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-112 Native Audiobook Playback + Owner Search/Result UX Remediation (2026-08-29)
+
+BB-112 är **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. En separat aktiv begränsad Audiobookshelf playback-identitet är server-side konfigurerad, skild från den oförändrade integrationsidentiteten och har verklig progress. BigBrains versionerade same-origin API startar/resumerar item-bundna opaque sessioner, levererar allowlistade tracks med bounded Range/`206`, synkar/stänger sessionen och lämnar durable progress i Audiobookshelf. Ett kontrollerat prov flyttade positionen en sekund och återställde den vid close.
+
+AppShell äger audio/session state. Playern har play/pause, faktisk position/duration, slider seek och ±30; navigation ger en dock-/safe-area-säker mini-player utan att stoppa ljudet. Continue Listening läser playbackidentitetens `items-in-progress`, inte `addedAt`. Overview är **Lyssna/Ljudböcker → Continue Listening → Bibliotek navigation row**; tre användares feedback är hanterad men composition är fortsatt owner review pending och inte globalt antagen.
+
+Sökkortets providerberoende min-content-kollaps är korrigerad med fullbredd, `min-width:0`, normal word-break och compact cover. Svenska/English är rankingpreferenser: explicit språk är verified, starka release-token probable och unknown förblir synligt. Redundant unknown-confidence är borttagen och dedup behåller stabil releaseidentitet. Sex runtimeprov visade provider-variation: Svenska växlade mellan 2 unknown/0 Prowlarr och 4 resultat med 1 svenska/3 unknown/2 Prowlarr; Alla språk gav den senare formen. Hypotesen “Svenska-filter trasigt” är inte etablerad.
+
+Verifiering: 16 fokuserade API-, 21 fokuserade Web-, 562 fulla API-, 32 Sentinel- och 151 fulla Web-tester passerar. Release/Vite-build, Compose och 194-filers dokumentationsgrind passerar. Nio viewport/theme-fall behåller BB-111-regressionerna utan overflow; Firefox-playerprovet gav `206`, playing state, verklig sliderposition och route-survival.
+
 ## BB-111 Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice (2026-08-28)
 
 BB-111 UX är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING**. Route-entry använder nu modality-aware programmatisk fokus: pointer/touch behåller DOM-/screen-reader-fokus utan falsk gul headingmarkering, medan keyboardklassificerad fokus fortsatt använder den globala synliga focusringen. Ny collection/detail-navigation börjar vid toppen med `preventScroll`-fokus och en egen `scrollY: 0`-post; browser-back återställer den föregående collection-postens sparade scroll. **Bibliotek** är en audiobook-lokal semantisk navigationsrad/länk, inte en upphöjd CTA eller ny knappvariant.

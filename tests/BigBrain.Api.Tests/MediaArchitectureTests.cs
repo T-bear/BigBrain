@@ -58,7 +58,7 @@ public sealed class MediaArchitectureTests
             .Where(file => File.ReadAllText(file).Contains("HttpMethod.Post", StringComparison.Ordinal))
             .Select(file => Path.GetFileName(file)!)
             .ToArray();
-        Assert.Equal(["ArrClients.cs", "JellyfinClient.cs", "QBittorrentClient.cs"], filesWithPost.Order(StringComparer.Ordinal));
+        Assert.Equal(["ArrClients.cs", "AudiobookPlayback.cs", "JellyfinClient.cs", "QBittorrentClient.cs"], filesWithPost.Order(StringComparer.Ordinal));
         var arrSource = File.ReadAllText(Path.Combine(mediaDirectory, "ArrClients.cs"));
         Assert.Equal(2, Count(arrSource, "HttpMethod.Post"));
         Assert.Contains("\"api/v3/series\"", arrSource, StringComparison.Ordinal);
