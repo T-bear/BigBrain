@@ -74,6 +74,25 @@ public sealed class AudiobookTests
         Assert.Null(item);
     }
 
+    [Fact]
+    public async Task ValidOwnerArtworkRemainsAvailable()
+    {
+        var bytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xD9 };
+        var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(bytes) };
+        response.Content.Headers.ContentType = new("image/jpeg");
+        var cover = await Client(response).GetCoverAsync("book-1", CancellationToken.None);
+        Assert.NotNull(cover);
+        Assert.Equal(bytes, cover.Value.Bytes);
+    }
+
+    [Fact]
+    public void RecognizesOnlyTheVerifiedLegacyGenericArtworkHash()
+    {
+        Assert.True(AudiobookshelfClient.IsKnownGenericArtworkHash(Convert.FromHexString("4F0501EA0E79901895E6860E60F32DE273F6F18700636BAE86611BA5E149EFF0")));
+        Assert.False(AudiobookshelfClient.IsKnownGenericArtworkHash(new byte[32]));
+        Assert.False(AudiobookshelfClient.IsKnownGenericArtworkHash(new byte[31]));
+    }
+
     private static AudiobookDiscoveryResult Result(string edition, string language, string confidence, string? narrator = null) =>
         new("work", edition, "Title", "Author", narrator, language, AudiobookLanguages.DisplayName(language), null, null, null, "test", "available", confidence);
     private static AudiobookshelfClient Client(HttpResponseMessage response)

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -76,6 +77,7 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
     : IAudiobookshelfClient
 {
     private static readonly Regex Html = new("<[^>]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(50));
+    private static readonly byte[] KnownGenericMediaArtworkSha256 = Convert.FromHexString("4F0501EA0E79901895E6860E60F32DE273F6F18700636BAE86611BA5E149EFF0");
 
     public async Task<AudiobookOverview> GetOverviewAsync(CancellationToken token)
     {
@@ -143,8 +145,12 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
         if (length is > 5_000_000) return null;
         var bytes = await response.Content.ReadAsByteArrayAsync(token);
         if (bytes.Length > 5_000_000) return null;
+        if (IsKnownGenericArtworkHash(SHA256.HashData(bytes))) return null;
         return (bytes, response.Content.Headers.ContentType?.MediaType ?? "image/jpeg");
     }
+
+    internal static bool IsKnownGenericArtworkHash(ReadOnlySpan<byte> hash) =>
+        hash.Length == KnownGenericMediaArtworkSha256.Length && CryptographicOperations.FixedTimeEquals(hash, KnownGenericMediaArtworkSha256);
 
     private bool Configured => !string.IsNullOrWhiteSpace(options.Audiobookshelf.ApiKey) && !string.IsNullOrWhiteSpace(options.Audiobookshelf.LibraryId);
     private async Task<AudiobookLibraryPage> GetLibraryCoreAsync(int page, int limit, string? query, CancellationToken token)

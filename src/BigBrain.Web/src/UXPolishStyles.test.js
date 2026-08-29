@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 const css = readFileSync(resolve(process.cwd(), 'src/styles/modules.css'), 'utf8')
 const audiobookRoutes = readFileSync(resolve(process.cwd(), 'src/styles/audiobook-routes.css'), 'utf8')
+const audiobooks = readFileSync(resolve(process.cwd(), 'src/styles/audiobooks.css'), 'utf8')
 
 describe('Sprint 1 UX layout contracts', () => {
   it('constrains download information to the widget at mobile and wider sizes', () => {
@@ -38,5 +39,12 @@ describe('Sprint 1 UX layout contracts', () => {
   it('suppresses only pointer-origin route focus without disabling keyboard focus globally', () => {
     expect(audiobookRoutes).toMatch(/\[data-bb-route-focus="pointer"\]:focus\s*\{[^}]*box-shadow: none;/)
     expect(audiobookRoutes).not.toMatch(/:focus-visible\s*\{[^}]*box-shadow:\s*none/)
+  })
+
+  it('keeps the audiobook detail hero ratio-safe without an intrinsic title-width collapse', () => {
+    expect(audiobooks).toMatch(/\.audiobook-detail-page>\.audiobook-detail-page__hero\{[^}]*display:grid;[^}]*grid-template-columns:minmax\(120px,180px\) minmax\(0,1fr\);[^}]*min-width:0/)
+    expect(audiobooks).toMatch(/\.audiobook-detail-page__summary h1\{[^}]*word-break:normal;[^}]*overflow-wrap:break-word/)
+    expect(audiobooks).toMatch(/\.audiobook-detail-page__hero>\.audiobook-detail-page__artwork,[^}]*aspect-ratio:2\/3;[^}]*object-fit:cover/)
+    expect(audiobooks).toContain('@media(max-width:350px){.audiobook-detail-page>.audiobook-detail-page__hero{grid-template-columns:minmax(0,1fr)}')
   })
 })

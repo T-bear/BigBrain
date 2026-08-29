@@ -398,6 +398,7 @@ export interface AudiobookMetadataResolution { query:{original:string;normalized
 export interface AudiobookSearchResponse { library:AudiobookItem[]; metadata:AudiobookMetadataResolution; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
 export interface AudiobookPlaybackTrack { index:number; startOffset:number; duration:number; title:string|null; mimeType:string; streamUrl:string }
 export interface AudiobookPlaybackSession { id:string; itemId:string; currentTime:number; duration:number; tracks:AudiobookPlaybackTrack[]; expiresAtUtc:string }
+export interface AudiobookPlaybackAvailability { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'|'rejected'; message:string|null; separateIdentity:boolean; hasProgress:boolean }
 
 export interface MediaAddOption {
   id: string

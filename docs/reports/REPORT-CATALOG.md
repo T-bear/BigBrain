@@ -1,5 +1,8 @@
 # Project Report Catalog
 
+- `BB-113` — [Audiobook Player Affordance, Detail Layout & Artwork Remediation](features/media/bb-113-audiobook-player-affordance-layout-artwork-20260829.md)
+- `BB-112` — [Native Audiobook Playback and Owner Search Remediation](features/media/bb-112-native-audiobook-playback-owner-search-remediation-20260829.md)
+
 - `BB-111` — [Audiobook Route/Detail UX Fixes & Playback Credential Gate](features/media/bb-111-audiobook-route-detail-ux-playback-gate-20260828.md)
 - `BB-110` — [Audiobook Owner UX Consolidation & Native Playback Foundation](features/media/bb-110-audiobook-ux-consolidation-20260828.md)
 - `BB-109` — [Audiobook Owner UX Remediation & Native Playback Investigation](features/media/bb-109-audiobook-owner-ux-remediation-20260828.md)

@@ -453,5 +453,11 @@ The separate `Media:Audiobookshelf:PlaybackApiKey` acts only for owner playback/
 
 AppShell owns audio/session lifetime. Continue Listening uses authoritative items-in-progress; player/detail provide play/pause, seek, ±30 seconds, actual time/duration and close. Chapters/speed are deferred. Discovery language is preference, not strict exclusion: explicit language is verified, strong release tokens probable and unknown visible. Stable provider release identity/infohash/guid drives deduplication. ADR 0037 records the boundary and current single-owner auth limitation.
 
+## BB-113 owner-review remediation
+
+Continue Listening exposes compact direct play/pause without changing the AppShell playback lifetime; its separate identity area retains detail navigation. Current/total time is shown only when the existing authoritative Audiobookshelf duration and progress are both present. Detail explicitly verifies the playback availability endpoint: healthy native playback is primary, while the external Audiobookshelf link is labelled as a secondary reserve path; an unavailable identity produces a bounded explanation and promotes only the fallback.
+
+The detail hero owns one explicit artwork/summary grid with `minmax(0,1fr)` and natural title wrapping. At very narrow width it stacks and gives metadata the full page width. Successful Audiobookshelf covers remain owner artwork by default. The one physical-owner-observed generic filmstrip/music-note JPEG was traced to Audiobookshelf and is recognized only by its exact verified SHA-256; that response becomes missing artwork so the established BigBrain-B placeholder renders. No external artwork source or metadata/media mutation is introduced.
+
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
 Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.

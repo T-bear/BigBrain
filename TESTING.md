@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-113 audiobook owner-review remediation
+
+- `Audiobooks.test.tsx` covers separate direct play versus detail navigation, accessible play/pause state, native start/session path, authoritative duration/progress time, healthy native-primary/fallback-secondary hierarchy and truthful unavailable fallback.
+- `AudiobookTests` preserves arbitrary valid owner artwork and matches only the exact runtime-verified Audiobookshelf generic media-note placeholder hash. `UXPolishStyles.test.js` locks the hero's `minmax(0,1fr)`, natural word wrapping, 2:3 artwork and narrow stacked fallback.
+- Gates: focused audiobook Web/API, full Web/API/Sentinel, Vite/Release build, Compose, documentation, diff and scoped secret scan. Deployed QA: 390×844, 430×932 and 1440×900; overview/direct playback/time/detail/Golden Compass plus a long Swedish title/native player/fallback/mini-player route survival/overflow/dock-safe-area. Theme expansion is required only where the existing automation is cheap.
+
 ## BB-112 native audiobook playback and owner search remediation
 
 - `AudiobookPlaybackTests` covers separate identity/progress verification, credential-free opaque DTOs, item/track binding, invalid progress, single bounded Range and absence of arbitrary upstream URLs.

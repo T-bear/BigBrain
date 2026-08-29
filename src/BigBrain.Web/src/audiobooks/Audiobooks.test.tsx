@@ -1,17 +1,19 @@
 import { cleanup,fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { afterEach,expect,test,vi } from 'vitest'
 import { Audiobooks } from './Audiobooks'
+import { AudiobookPlaybackProvider, AudiobookPlayer } from './AudiobookPlayback'
 import { createAppWidgetRegistry } from '../dashboard/appWidgets'
 
 const json=(value:unknown)=>new Response(JSON.stringify(value),{status:200,headers:{'Content-Type':'application/json'}})
 const provider={state:'notConfigured',provider:'none',canSearch:false,canRequest:false,canCancel:false,message:'Ingen granskad anskaffningsleverantör är konfigurerad.'}
 const jobs={items:[],offset:0,limit:25,total:0}
 const overview={state:'configuredHealthy',message:null,continueListening:null,library:[],recent:[],acquisition:provider}
+const playbackHealthy={state:'configuredHealthy',message:null,separateIdentity:true,hasProgress:true}
 afterEach(()=>{cleanup();vi.restoreAllMocks();window.history.replaceState({},'','/');window.localStorage.clear();Object.defineProperty(window,'scrollY',{configurable:true,value:0})})
 function collection(){window.history.replaceState({},'','/media/audiobooks')}
 
-function initial(fetch:ReturnType<typeof vi.spyOn>,value:unknown=overview){
-  fetch.mockResolvedValueOnce(json(value)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json(jobs))
+function initial(fetch:ReturnType<typeof vi.spyOn>,value:unknown=overview,availability:unknown=playbackHealthy){
+  fetch.mockResolvedValueOnce(json(value)).mockResolvedValueOnce(json(availability)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json(jobs))
   if(window.location.pathname==='/media/audiobooks'){
     const items=(value as typeof overview).library??[]
     fetch.mockResolvedValueOnce(json({items,page:0,pageSize:24,total:items.length,hasMore:false}))
@@ -30,8 +32,8 @@ test('renders provider-neutral search with Swedish preference and no fake progre
   fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'bok'}})
   expect(screen.getByPlaceholderText('Titel, författare, serie eller ISBN')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'Sök'}))
-  await waitFor(()=>expect(String(fetch.mock.calls[4][0])).toContain('language=sv'))
-  expect(String(fetch.mock.calls[4][0])).not.toContain('author=')
+  await waitFor(()=>expect(String(fetch.mock.calls[5][0])).toContain('language=sv'))
+  expect(String(fetch.mock.calls[5][0])).not.toContain('author=')
 })
 
 test('shows resolved canonical metadata separately from audiobook releases',async()=>{
@@ -68,7 +70,7 @@ test('keeps library usable while acquisition provider is unavailable',async()=>{
   collection()
   const unavailable={...provider,state:'configuredUnavailable',provider:'librarr',message:'Librarr kunde inte nås.'}
   const fetch=vi.spyOn(globalThis,'fetch')
-  fetch.mockResolvedValueOnce(json({...overview,acquisition:unavailable})).mockResolvedValueOnce(json(unavailable)).mockResolvedValueOnce(json(jobs))
+  fetch.mockResolvedValueOnce(json({...overview,acquisition:unavailable})).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json(unavailable)).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
   expect(await screen.findByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Audiobookshelf väntar på konfigurering')).not.toBeInTheDocument()
@@ -77,7 +79,7 @@ test('keeps library usable while acquisition provider is unavailable',async()=>{
 test('does not mislabel a pending or failed provider-status request as not configured',async()=>{
   collection()
   const fetch=vi.spyOn(globalThis,'fetch')
-  fetch.mockResolvedValueOnce(json(overview)).mockRejectedValueOnce(new TypeError('network')).mockResolvedValueOnce(json(jobs))
+  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockRejectedValueOnce(new TypeError('network')).mockResolvedValueOnce(json(jobs))
   render(<Audiobooks/>);expect(await screen.findByText('Biblioteket är tomt')).toBeInTheDocument()
   expect(await screen.findByText('Det går inte att lägga till just nu.')).toBeInTheDocument()
   expect(screen.queryByText('Automatisk hämtning är inte konfigurerad ännu.')).not.toBeInTheDocument()
@@ -88,7 +90,7 @@ test('polls real provider state for active jobs without inventing progress',asyn
   vi.spyOn(window,'setInterval').mockImplementation(handler=>{if(typeof handler==='function')void handler();return 1})
   const fetch=vi.spyOn(globalThis,'fetch')
   const active={id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate:{workId:'work',editionId:'edition',title:'Boken',author:'Författaren',narrator:null,language:'sv',languageLabel:'Svenska',edition:'Release',durationSeconds:null,publicationYear:null,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'unknown'},status:'queued',createdAtUtc:'2026-08-23T10:00:00Z',updatedAtUtc:'2026-08-23T10:00:00Z',message:null}
-  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false})).mockResolvedValueOnce(json({...active,status:'downloading'}))
+  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false})).mockResolvedValueOnce(json({...active,status:'downloading'}))
   render(<Audiobooks/>)
   await waitFor(()=>expect(screen.getByText('Hämtas')).toBeInTheDocument())
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
@@ -98,7 +100,7 @@ test('requires explicit edition confirmation before creating one acquisition job
   collection()
   const healthy={...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true}
   const candidate={workId:'work',editionId:'edition',title:'En mycket lång ljudboksutgåva',author:'Författaren',narrator:'Röst',language:'sv',languageLabel:'Svenska',edition:'Oavkortad · 1.2 GB',durationSeconds:null,publicationYear:2025,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'verified',provenance:'Prowlarr'}
-  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json({...overview,acquisition:healthy})).mockResolvedValueOnce(json(healthy)).mockResolvedValueOnce(json(jobs)).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json({...overview,acquisition:healthy})).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json(healthy)).mockResolvedValueOnce(json(jobs)).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
   fetch.mockResolvedValueOnce(json({library:[],discovery:[candidate],acquisition:healthy}))
   fetch.mockResolvedValueOnce(new Response(JSON.stringify({id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate,status:'queued',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:null}),{status:201,headers:{'Content-Type':'application/json'}}))
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt');fireEvent.change(screen.getByLabelText('Sök efter en ny ljudbok'),{target:{value:'ljudbok'}});fireEvent.click(screen.getByRole('button',{name:'Sök'}));await screen.findByText('1 utgåvor')
@@ -114,7 +116,7 @@ test('refreshes Audiobookshelf library after indexing is confirmed complete',asy
   const active={id:'a'.repeat(32),providerJobId:'b'.repeat(40),candidate:{workId:'work',editionId:'edition',title:'Hämtad release',author:'Författaren',narrator:null,language:'und',languageLabel:'Språk okänt',edition:'Release',durationSeconds:null,publicationYear:null,coverUrl:null,source:'librarr',availability:'available',languageConfidence:'unknown'},status:'indexing',createdAtUtc:'2026-08-24T10:00:00Z',updatedAtUtc:'2026-08-24T10:00:00Z',message:'Väntar på indexering.'}
   const imported={id:'abs-item',title:'Importerad bok',author:'Författaren',series:null,narrator:null,language:'und',languageLabel:'Språk okänt',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:'http://owner/item/abs-item'}
   const fetch=vi.spyOn(globalThis,'fetch')
-  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false})).mockResolvedValueOnce(json({...active,status:'completed',message:null})).mockResolvedValueOnce(json({...overview,library:[imported],recent:[imported]}))
+  fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json({...provider,state:'configuredHealthy',provider:'librarr',canSearch:true,canRequest:true})).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false})).mockResolvedValueOnce(json({...active,status:'completed',message:null})).mockResolvedValueOnce(json({...overview,library:[imported],recent:[imported]}))
   render(<Audiobooks/>);expect(await screen.findByText('Importerad bok')).toBeInTheDocument();expect(screen.getByText('Klar')).toBeInTheDocument()
 })
 
@@ -122,7 +124,7 @@ test('keeps completed acquisition history collapsed while active work stays visi
   collection()
   const active={id:'a'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Pågående bok',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'downloading',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:null}
   const done={...active,id:'b'.repeat(32),candidate:{...active.candidate,editionId:'done',title:'Gammal bok'},status:'completed'}
-  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active,done],total:42}))
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active,done],total:42}))
   render(<Audiobooks/>);expect(await screen.findByText('Pågående bok')).toBeVisible()
   expect(screen.getByText('Historik (41)')).toBeInTheDocument();expect(screen.getByText('Gammal bok').closest('details')).not.toHaveAttribute('open')
 })
@@ -130,7 +132,7 @@ test('keeps completed acquisition history collapsed while active work stays visi
 test('dismisses failed attention locally without mutating audit or provider state',async()=>{
   collection()
   const failed={id:'f'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Gammalt misslyckat jobb',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'failed',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:'Jobbet finns inte längre hos leverantören.'}
-  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[failed],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[failed],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
   render(<Audiobooks/>);await screen.findByText('Gammalt misslyckat jobb')
   fireEvent.click(screen.getByRole('button',{name:'Dölj Gammalt misslyckat jobb från åtgärdslistan'}))
   expect(screen.queryByText('Gammalt misslyckat jobb')).not.toBeInTheDocument()
@@ -158,10 +160,12 @@ test('uses progress-backed listening continuity and real collection/detail route
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,continueListening:listening,library:[listening],recent:[listening]})
   render(<Audiobooks/>);expect(await screen.findByText('Fortsätt lyssna')).toBeInTheDocument()
   expect(screen.getByRole('progressbar',{name:'Lyssnat 42 procent'})).toBeInTheDocument()
+  expect(screen.getByText('7:00 / 16:40')).toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'Spela Påbörjad bok'})).toHaveAttribute('aria-pressed','false')
   fireEvent.click(screen.getByRole('button',{name:'Öppna Påbörjad bok'}))
   expect(window.location.pathname).toBe('/media/audiobooks/book-1')
   expect(screen.getByRole('heading',{name:'Påbörjad bok',level:1})).toBeInTheDocument()
-  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf'})).toHaveAttribute('href','https://owner.example/item/book-1')
+  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf (reservväg)'})).toHaveAttribute('href','https://owner.example/item/book-1')
   const back=vi.spyOn(window.history,'back').mockImplementation(()=>undefined)
   fireEvent.click(screen.getByRole('button',{name:'‹ Ljudböcker'}))
   expect(back).toHaveBeenCalledOnce()
@@ -170,12 +174,37 @@ test('uses progress-backed listening continuity and real collection/detail route
   await waitFor(()=>expect(screen.getByRole('heading',{name:'Ljudböcker',level:1})).toBeInTheDocument())
 })
 
+test('starts native playback directly while the non-control area retains detail navigation',async()=>{
+  const listening={id:'book-1',title:'Påbörjad bok',author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:1000,progressPercent:42,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:'https://owner.example/item/book-1'}
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,continueListening:listening,library:[listening],recent:[listening]})
+  fetch.mockResolvedValueOnce(json({id:'session',itemId:'book-1',currentTime:420,duration:1000,tracks:[{index:0,startOffset:0,duration:1000,title:null,mimeType:'audio/mpeg',streamUrl:'/api/v1/modules/media/audiobooks/playback/sessions/session/tracks/0'}],expiresAtUtc:'2026-08-29T20:00:00Z'}))
+  vi.spyOn(HTMLMediaElement.prototype,'play').mockImplementation(async function(this:HTMLMediaElement){this.dispatchEvent(new Event('play'))})
+  vi.spyOn(HTMLMediaElement.prototype,'load').mockImplementation(()=>undefined)
+  render(<AudiobookPlaybackProvider><Audiobooks/><AudiobookPlayer/></AudiobookPlaybackProvider>)
+  const navigation=await screen.findByRole('button',{name:'Öppna Påbörjad bok'});const play=screen.getByRole('button',{name:'Spela Påbörjad bok'})
+  fireEvent.click(play)
+  expect(await screen.findByRole('region',{name:'Spelar Påbörjad bok'})).toBeInTheDocument()
+  expect(fetch.mock.calls.some(([url,init])=>String(url).endsWith('/book-1/playback')&&(init as RequestInit).method==='POST')).toBe(true)
+  expect(window.location.pathname).toBe('/')
+  fireEvent.click(navigation);expect(window.location.pathname).toBe('/media/audiobooks/book-1')
+})
+
+test('shows a truthful fallback instead of a native primary action when playback is unavailable',async()=>{
+  window.history.replaceState({},'','/media/audiobooks/unplayable')
+  const item={id:'unplayable',title:'Otillgänglig bok',author:null,series:null,narrator:null,language:'und',languageLabel:'Språk okänt',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:'https://owner.example/item/unplayable'}
+  const unavailable={state:'configuredUnavailable',message:'Playback-identiteten kunde inte verifieras.',separateIdentity:false,hasProgress:false}
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,overview,unavailable);fetch.mockResolvedValueOnce(json(item))
+  render(<Audiobooks/>);expect(await screen.findByText('BigBrains spelare är inte tillgänglig för den här ljudboken.')).toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'Spela ljudboken'})).not.toBeInTheDocument()
+  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf (reservväg)'})).toHaveClass('bb-button--primary')
+})
+
 test('loads a deep-linked audiobook detail through the bounded BigBrain API',async()=>{
   window.history.replaceState({},'','/media/audiobooks/deep-link')
   const item={id:'deep-link',title:'Direktlänkad bok',author:null,series:null,narrator:null,language:'und',languageLabel:'Språk okänt',durationSeconds:null,progressPercent:null,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:null}
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch);fetch.mockResolvedValueOnce(json(item))
   render(<Audiobooks/>);expect(await screen.findByRole('heading',{name:'Direktlänkad bok'})).toBeInTheDocument()
-  expect(String(fetch.mock.calls[3][0])).toContain('/api/v1/modules/media/audiobooks/deep-link')
+  expect(String(fetch.mock.calls[4][0])).toContain('/api/v1/modules/media/audiobooks/deep-link')
   expect(screen.queryByText('Språk okänt')).not.toBeInTheDocument()
   expect(screen.getByRole('img',{name:'Omslag till Direktlänkad bok'})).toHaveClass('audiobook-detail-page__artwork')
 })
@@ -232,7 +261,7 @@ test('keeps new-book discovery distinct from local-library filtering',async()=>{
 test('orders discovery before library before downloads',async()=>{
   collection()
   const active={id:'a'.repeat(32),providerJobId:null,candidate:{workId:'w',editionId:'e',title:'Pågående',author:null,narrator:null,language:'und',languageLabel:'Språk okänt',edition:null,durationSeconds:null,publicationYear:null,coverUrl:null,source:'opaque',availability:'available',languageConfidence:'unknown'},status:'downloading',createdAtUtc:'2026-08-27T10:00:00Z',updatedAtUtc:'2026-08-27T10:00:00Z',message:null}
-  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
+  const fetch=vi.spyOn(globalThis,'fetch');fetch.mockResolvedValueOnce(json(overview)).mockResolvedValueOnce(json(playbackHealthy)).mockResolvedValueOnce(json(provider)).mockResolvedValueOnce(json({...jobs,items:[active],total:1})).mockResolvedValueOnce(json({items:[],page:0,pageSize:24,total:0,hasMore:false}))
   render(<Audiobooks/>);await screen.findByText('Biblioteket är tomt')
   const discovery=screen.getByRole('heading',{name:'Hitta ljudbok'});const library=screen.getByRole('heading',{name:'Bibliotek'});const downloads=screen.getByRole('heading',{name:'Hämtningar'})
   expect(discovery.compareDocumentPosition(library)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

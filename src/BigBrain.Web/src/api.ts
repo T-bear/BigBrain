@@ -125,6 +125,7 @@ export const getMediaServiceLinks = (signal?: AbortSignal) =>
 export const getAudiobookOverview = (signal?: AbortSignal) => getJson<AudiobookOverview>('/api/v1/modules/media/audiobooks/overview',signal)
 export const getAudiobookLibrary = (page=0,limit=24,query='',language='',signal?:AbortSignal) => getJson<import('./types').AudiobookLibraryPage>(`/api/v1/modules/media/audiobooks/library?page=${page}&limit=${limit}&query=${encodeURIComponent(query.trim())}&language=${encodeURIComponent(language)}`,signal)
 export const getAudiobook = (id:string,signal?:AbortSignal) => getJson<import('./types').AudiobookItem>(`/api/v1/modules/media/audiobooks/${encodeURIComponent(id)}`,signal)
+export const getAudiobookPlaybackAvailability = (signal?:AbortSignal) => getJson<import('./types').AudiobookPlaybackAvailability>('/api/v1/modules/media/audiobooks/playback/availability',signal)
 export const startAudiobookPlayback = (id:string,signal?:AbortSignal) => postJson<import('./types').AudiobookPlaybackSession>(`/api/v1/modules/media/audiobooks/${encodeURIComponent(id)}/playback`,{},signal)
 export const syncAudiobookPlayback = async (id:string,currentTime:number,duration:number,timeListened:number,close=false,signal?:AbortSignal) => {
   const response=await fetch(`/api/v1/modules/media/audiobooks/playback/sessions/${encodeURIComponent(id)}/${close?'close':'sync'}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({currentTime,duration,timeListened}),signal,keepalive:close})
