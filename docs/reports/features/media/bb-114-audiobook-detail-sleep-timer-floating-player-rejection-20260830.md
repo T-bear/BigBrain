@@ -5,14 +5,14 @@
 - Date: 2026-08-30
 - Baseline: `587c5d0b41c02440d852d65c494918a72e175bfb`
 - Scope: small post-BB-113 physical owner-review remediation
-- Status: implemented, automatically/runtime verified and deployed; CI and owner UX review pending
+- Status: implemented, automatically/runtime verified, deployed and CI verified; owner UX review pending
 - Sanitization: no credentials, identities, private addresses, item/session IDs, raw payloads or private paths are published.
 
 Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresses, credentials, logs and screenshots are not published.
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI AND OWNER UX REVIEW PENDING.**
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / OWNER UX REVIEW PENDING.** Implementation `2607d6f804efd6bbc49bdc2c2f9e721655692a68` is published.
 
 ## Changes
 
@@ -30,7 +30,7 @@ Verification passed 19 focused API, 31 focused Web, 565 full API, 156 full Web a
 
 Only API and Web were rebuilt/recreated and became healthy. Deployed Firefox verified Narnia, Ghostsong and Golden Compass Disc 3 at 390×844, 430×932 and 1440×900: artwork widths were 156/172/180 px at 2:3, fallback used identical geometry, useful metadata/description remained, LJUDBOK/X3M/reservväg/healthy external link were absent and horizontal overflow was false. The matrix caught and drove correction of a legacy mobile `grid-column:1/-1` cascade before final evidence.
 
-An active Induction session reported Pausa, navigated to Home with no player overlay or overflow, and returned to the same detail as Pausa with static in-flow controls. The sleep timer started at exactly 15 min and cancelled cleanly. API/Web health and sanitized playback availability were green after deployment. GitHub CI awaits the published commit.
+An active Induction session reported Pausa, navigated to Home with no player overlay or overflow, and returned to the same detail as Pausa with static in-flow controls. The sleep timer started at exactly 15 min and cancelled cleanly. API/Web health and sanitized playback availability were green after deployment. GitHub Actions run `33326376331` passed backend, frontend, documentation and secrets for the implementation commit.
 
 ## Security
 
@@ -38,7 +38,7 @@ No external metadata/artwork provider, credential change, server scheduler, work
 
 ## Remaining work
 
-Publish the scoped commit and verify GitHub CI. Physical iPhone/PWA owner approval remains separate; Web timers cannot promise exact expiry while iOS suspends the PWA.
+Physical iPhone/PWA owner approval remains separate; Web timers cannot promise exact expiry while iOS suspends the PWA.
 
 ## Resumption
 

@@ -10,10 +10,11 @@
 
 ## BB-114 — Audiobook Detail Polish, Sleep Timer & Floating Player Rejection
 
-- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI AND OWNER UX REVIEW PENDING** 2026-08-30.
+- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / OWNER UX REVIEW PENDING** 2026-08-30.
 - Delivered locally: responsive detail-only artwork, redundant LJUDBOK removal, healthy-state Audiobookshelf-link removal, mapped metadata presentation, client-lifetime 15/30/45/60/custom-clock sleep timer, and removal of the global floating player UI while AppShell playback lifetime remains.
 - Owner decision: persistent floating audiobook mini-player UI is **REJECTED** after physical mobile testing; navigation-surviving playback is **RETAINED**. No replacement global player is introduced.
 - Evidence: 565 API, 156 Web and 32 Sentinel tests passed; Release/Vite, documentation and Compose gates passed. Deployed 390×844/430×932/1440×900 detail matrix and playback/navigation/timer smoke passed; only API/Web were recreated.
+- Publication: implementation `2607d6f804efd6bbc49bdc2c2f9e721655692a68`; GitHub Actions run `33326376331` passed backend, frontend, documentation and secrets.
 - BB-155 is registered as backlog only. External metadata/artwork providers, UX/UI Lab, Library/search/language redesign, chapters and speed remain outside BB-114.
 
 ## BB-113 — Audiobook Player Affordance, Detail Layout & Artwork Remediation
