@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-115R physical iPhone sleep-timer remediation
+
+- `Audiobooks.test.tsx` verifies that the pre-session timer is not a dead disabled icon: tapping opens visible guidance and an explicit playback action; the still-open panel becomes configurable from Continue Listening after session creation. It retains presets, custom local clock, replace/cancel, shared detail status, ordinary expiration pause/sync and unchanged Play/Pause.
+- `UXPolishStyles.test.js` requires active timer status to occupy its own in-flow `grid-column:1/-1` row and forbids the former absolute status positioning. The compact panel is viewport-bounded.
+- Local result 2026-08-30: 32 focused Web tests and Vite production build passed. Deployed 390×844, 430×932 and 1440×900 QA must cover no-session guidance, start→15 min, hour-boundary/long-duration status, shared detail state, change/cancel, containment and no overflow. Physical iPhone/PWA verification remains authoritative and pending.
+
 ## BB-115 physical iPhone artwork and Continue Listening timer
 
 - `UXPolishStyles.test.js` protects the root cascade correction: the obsolete mobile `display:contents` and broad detail-child grid override are absent, one canonical detail container remains, and both fetched artwork and BigBrain-B receive explicit 2:3, first-column, intrinsic-safe, 40 vw / 180 px constraints.

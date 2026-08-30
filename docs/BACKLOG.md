@@ -1,5 +1,17 @@
 # BigBrain Backlog
 
+## BB-157 — Media Release Availability Search
+
+- Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115R.
+- When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
+- Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
+
+## BB-115R — Physical iPhone Sleep-Timer Remediation
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
+- BB-115 physical owner review failed: the pre-session timer icon was disabled and silent, while absolute active status overlaid progress/time. BB-115R provides a visible start-playback path and an in-flow status row while retaining one shared AppShell timer.
+- Full player and audiobook library remain unchanged. Future UX/UI Lab may study Storytel's current public high-level hierarchy, cover density, wrapping, spacing, touch targets and filtering placement only; never copy/scrape its CSS, DOM, source, class names, tokens, assets, icons or implementation.
+
 ## BB-156 — Module Runtime Latency & Reliability
 
 - Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115.

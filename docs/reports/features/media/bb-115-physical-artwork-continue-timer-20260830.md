@@ -12,7 +12,7 @@ Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresse
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING.** Implementation `6917ed16b1fedbebaf26b06e36352d4627959d33` is published.
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW FAILED — BB-115R REMEDIATION AND RE-VERIFICATION PENDING.** Implementation `6917ed16b1fedbebaf26b06e36352d4627959d33` is published.
 
 ## Changes
 
@@ -27,6 +27,8 @@ Focused Web regression passed 31/31, full Web passed 156/156 and the Vite produc
 Only Web was rebuilt/recreated and became healthy; `/` and the proxied `/health` returned HTTP 200. Deployed Firefox measured Induction at 156×234 px (390×844), 172×258 px (430×932) and 180×270 px (1440×900), each exactly 2:3 without horizontal overflow. Golden Compass BigBrain-B matched 156/172/180 px and the same ratio. At 390×844, Continue Listening exposed `Sovtimer för Induction`, enabled it after direct playback, started 15 minutes, showed the identical deadline on detail, replaced it with 30 minutes and cancelled it without overflow. GitHub Actions run `33328144299` passed backend, frontend, documentation and secrets.
 
 Physical iPhone/PWA owner verification remains pending. Browser QA cannot replace it because BB-114's browser evidence failed to expose the owner-reported regression.
+
+Subsequent physical owner review found two timer failures that automated BB-115 QA did not represent: the compact icon was disabled and silent without a current in-memory session, and absolute active-status positioning collided with progress/time. BB-115R owns that remediation; BB-115 is not owner-approved.
 
 ## Security
 

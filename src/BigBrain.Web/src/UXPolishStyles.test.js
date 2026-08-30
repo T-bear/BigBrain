@@ -59,4 +59,11 @@ describe('Sprint 1 UX layout contracts', () => {
     expect(audiobookRoutes).not.toMatch(/\.audiobook-player\{[^}]*position:fixed/)
     expect(appShell).not.toContain('<AudiobookPlayer')
   })
+
+  it('gives the compact timer status its own non-overlapping grid row', () => {
+    expect(audiobooks).toMatch(/\.audiobook-compact-book__timer-status\{[^}]*grid-column:1\/-1;[^}]*min-width:0;[^}]*overflow-wrap:anywhere/)
+    expect(audiobooks).not.toMatch(/\.audiobook-compact-book__timer-status\{[^}]*position:absolute/)
+    expect(audiobooks).not.toMatch(/\.audiobook-sleep-timer--compact \.audiobook-sleep-timer__status\{[^}]*position:absolute/)
+    expect(audiobooks).toMatch(/\.audiobook-sleep-timer--compact \.audiobook-sleep-timer__panel\{[^}]*width:min\(280px,calc\(100vw - 48px\)\);[^}]*max-width:calc\(100vw - 48px\)/)
+  })
 })

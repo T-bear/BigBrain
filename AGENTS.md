@@ -52,6 +52,12 @@ När ägaren säger **"Codex är klar"** ska ChatGPT behandla det som en review-
 - Gör aldrig commit, push, reset, rebase, force push eller annan force-operation utan uttryckligt godkännande.
 - Skriv inte över eller återställ användarens befintliga ändringar.
 
+## Interrupted-run recovery
+
+Om en körning avbryts innan avgränsat arbete är klart ska giltiga working-tree-ändringar bevaras och inte göras om eller kastas. Ofullständigt arbete får inte committas utan uttryckligt godkännande. Skriv när möjligt en sanerad återhämtningsnot enligt `docs/operations/codex-recovery.md` med baseline/source-of-truth-SHA, git status, ändrade filer, exakt klart/återstående arbete, körda test/build-resultat, blockerare/antaganden och nästa exakta åtgärd. Använd endast denna enda plats och statusen `INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
+
+En senare Codex-session ska läsa `AGENTS.md`, synka/verifiera GitHub, inspektera working tree och återhämtningsnoten, säkerställa att orelaterade ändringar bevaras och fortsätta giltigt verifierat arbete utan onödig omkörning. Slutför ursprunglig scope före nytt arbete. Om repositoryt och noten motsäger varandra: stoppa och rapportera konflikten i stället för att gissa. Återhämtningsnoten får aldrig innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. GitHub är source of truth mellan färdiga sessioner; working tree och återhämtningsnoten beskriver uttryckligen ofärdigt lokalt arbete.
+
 ## Documentation and publication completion rule
 
 Dokumentation är en del av Definition of Done. Efter varje implementation, buggfix, ändring, deployment, arkitekturbeslut eller verifiering ska Codex bedöma om följande behöver uppdateras: `README.md`, `docs/STATUS.md`, `docs/BACKLOG.md`, `ARCHITECTURE.md`, `docs/modules/*.md`, `docs/architecture/*.md`, `docs/adr/*.md`, `docs/knowledge/*.md`, `docs/operations/**/*.md`, `docs/indexes/*.md`, `TESTING.md`, `docs/reports/**` samt relevanta runbooks, säkerhets- och rollbackinstruktioner. Endast relevanta dokument ändras, men kontrollen ska alltid göras.

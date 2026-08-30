@@ -1,8 +1,16 @@
 # BigBrain Status
 
+## BB-115R Physical iPhone Sleep-Timer Remediation (2026-08-30)
+
+BB-115R is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** from baseline `f8136eccb7feed7bd2f9d23f449aa9f327c51a82`. Physical owner review failed BB-115's timer acceptance: before a live AppShell session, the compact timer was a disabled icon and therefore produced no response on iPhone/PWA; after a detail-configured timer, its absolute-positioned status overlapped the progress/time area.
+
+The compact disclosure is now always operable. Without a session it opens a visible explanation and explicit **Starta uppspelningen** action; after session creation the same open panel exposes the existing shared choices. Paused existing sessions remain directly configurable. Active status moved out of the action cluster into its own in-flow full-width grid row, preserving long duration text without overlay or horizontal expansion. Detail and Continue Listening retain one AppShell provider deadline and ordinary expiration pause/sync.
+
+Focused Web tests pass 32/32 and Vite production build passes. Deployment, browser QA, GitHub CI and physical iPhone/PWA verification remain pending. Full player design is still owner-review pending; UX/UI Lab remains next and is not implemented. The permanent interrupted-run rule and canonical sanitized template are present in `AGENTS.md` and `docs/operations/codex-recovery.md`.
+
 ## BB-115 Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer (2026-08-30)
 
-BB-115 is **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** from baseline `ad3e39d76139d664c403ea28068d586eaddbada3`. BB-114 browser QA did not reproduce the later physical iPhone/PWA artwork regression. The root cause was an accumulated cascade containing three generations of audiobook-detail layout rules, including obsolete mobile `display: contents` and broad direct-child grid-column overrides. BB-115 removes those legacy detail rules and retains one explicit hero: fetched artwork and BigBrain-B share 2:3 geometry, `min-inline-size: 0`, an explicit first column, 40 vw mobile sizing and a 180 px ceiling.
+BB-115 is **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW FAILED — REMEDIATED BY BB-115R, RE-VERIFICATION PENDING** from baseline `ad3e39d76139d664c403ea28068d586eaddbada3`. BB-114 browser QA did not reproduce the later physical iPhone/PWA artwork regression. The root cause was an accumulated cascade containing three generations of audiobook-detail layout rules, including obsolete mobile `display: contents` and broad direct-child grid-column overrides. BB-115 removes those legacy detail rules and retains one explicit hero: fetched artwork and BigBrain-B share 2:3 geometry, `min-inline-size: 0`, an explicit first column, 40 vw mobile sizing and a 180 px ceiling.
 
 Continue Listening now exposes the existing sleep timer as a secondary 44 px icon action after playback starts. The disclosure has an accessible name/state, presets, local-clock selection, cancellation and visible stop/remaining status. It reads and writes the same AppShell-scoped provider deadline as detail; expiration, pause and progress synchronization are unchanged. Full player visual design remains **OWNER REVIEW PENDING / NOT DESIGN-SYSTEM APPROVED**. UX/UI Lab remains the next planned design sprint.
 

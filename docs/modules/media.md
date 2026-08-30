@@ -475,5 +475,11 @@ BB-114's desktop-browser matrix did not reproduce the later physical iPhone/PWA 
 
 Continue Listening now renders a compact accessible sleep-timer disclosure beside Play/Pause. It calls the existing AppShell provider's 15/30/45/60-minute, local-clock and cancel operations; active stop/remaining state is therefore identical when returning to detail. No second timer, server state or playback-lifetime change exists. The full player remains **OWNER REVIEW PENDING / NOT DESIGN-SYSTEM APPROVED**. Admin UX/UI Lab remains the next planned design sprint and is not part of BB-115.
 
+## BB-115R physical timer interaction and containment
+
+Physical iPhone/PWA review superseded BB-115 browser acceptance for the timer. The compact timer was intentionally disabled until an AppShell session existed, which made it a silent dead icon after PWA entry/reload. It is now always a working disclosure: no-session state explains the prerequisite and offers explicit playback start; an existing playing or paused session exposes the shared timer options immediately. The same open disclosure updates when the session arrives.
+
+The second failure was CSS, not provider state: compact status used `position:absolute` below the action icon and painted over progress/time. Status now renders as a sibling semantic element in its own full-width in-flow grid row, while the panel remains viewport-bounded. Detail and Continue Listening still share one provider deadline. Full player/library redesign and UX/UI Lab remain out of scope. Storytel may later inform only high-level public hierarchy; no proprietary CSS/source/assets may be copied.
+
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
 Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.
