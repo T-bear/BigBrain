@@ -16,7 +16,7 @@ Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresse
 
 ## Changes
 
-Physical iPhone/PWA review established that the compact timer button was disabled whenever the AppShell provider had no live in-memory session. A disabled native button dispatches no activation, so the owner saw a small icon with no response. BB-115R keeps the disclosure operable: it shows a clear session prerequisite and an explicit playback-start action, then exposes the existing shared options in the same open panel once the session exists. Playing and paused existing sessions remain directly configurable.
+Physical iPhone/PWA review established that the compact timer button was disabled whenever the AppShell provider had no live in-memory session. A disabled native button dispatches no activation, so the owner saw a small icon with no response. Pre-correction deployed Firefox hit-testing additionally reached the enabled JavaScript-only toggle without opening it, exposing the weakness that component tests missed. BB-115R uses native `<details>/<summary>` disclosure semantics and keeps it operable: it shows a clear session prerequisite and an explicit playback-start action, then exposes the existing shared options in the same open panel once the session exists. Playing and paused existing sessions remain directly configurable.
 
 The active status collision came from absolute positioning inside the narrow action cluster. Status is now a separate semantic sibling in its own in-flow full-width grid row. The timer panel is bounded to the viewport. No player, library or backend architecture changed.
 
