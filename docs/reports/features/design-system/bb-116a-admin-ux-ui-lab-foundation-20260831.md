@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version. Inga hemligheter, privata adresser, rålogg
 
 ## Status
 
-Implemented, automatically verified and local-browser verified; deployment, CI and physical owner review pending.
+Implemented, automatically and runtime verified, Web-deployed and CI-verified; physical owner review pending.
 
 ## Changes
 
@@ -37,14 +37,17 @@ BB-157 and a discovery-card candidate were deferred. BB-155 and BB-156 were not 
 ## Verification
 
 - Focused Web: 35 passed.
-- Full Web: 159 passed.
+- Full Web: 160 passed.
 - Vite production build: passed.
 - Local Firefox: 390×844, 430×932, 768×1024 and 1440×900 rendered with responsive category navigation, single-column mobile specimens, desktop two-column specimens and mobile dock clearance.
+- Deployment: implementation `a50c1ffa9b238bc5238b537dcbb7ecc36e476f78`; only Web rebuilt/recreated without volume removal; image `sha256:e2360112a7f11e892937f0556a67d134aa14c1b40ff866c9a458ff357db9a3aa`; container healthy.
+- Runtime: `/`, `/health` and `/admin/ux-ui-lab` returned HTTP 200. The deployed route passed Firefox rendering at 390×844, 430×932, 768×1024 and 1440×900.
+- CI: GitHub Actions run `33339440666` completed successfully for the implementation commit.
 - Physical iPhone/PWA owner review: pending and authoritative for approval.
 
 ## Remaining work
 
-Deploy Web, verify the published route/runtime and GitHub CI, then request physical owner review. Production audiobook grid migration, search/discovery candidate, BB-157 and broad local-pattern consolidation remain deferred.
+Request physical owner review. Production audiobook grid migration, search/discovery candidate, BB-157 and broad local-pattern consolidation remain deferred.
 
 ## Resumption
 
