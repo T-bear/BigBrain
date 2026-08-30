@@ -8,10 +8,11 @@
 
 ## BB-115 — Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
+- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
 - The obsolete audiobook-detail mobile cascade is removed; the one canonical detail hero constrains fetched artwork and BigBrain-B to the same 2:3, 40 vw / 180 px geometry. Browser QA cannot replace physical iPhone/PWA verification for this regression.
 - Continue Listening exposes the existing AppShell-scoped sleep timer through a compact accessible quick action. Presets, local clock, active state, change and cancellation use the same provider deadline as detail.
 - Full player visual design remains owner-review pending. UX/UI Lab remains the next planned design sprint; neither was implemented here.
+- Publication: implementation `6917ed16b1fedbebaf26b06e36352d4627959d33`; GitHub Actions run `33328144299` passed. Web-only deployment is healthy; browser widths are 156/172/180 px at 390×844/430×932/1440×900.
 
 ## BB-155 — Canonical Book Metadata Resolver
 

@@ -5,14 +5,14 @@
 - Date: 2026-08-30
 - Baseline: `ad3e39d76139d664c403ea28068d586eaddbada3`
 - Scope: exactly two Web product fixes after BB-114 physical owner review
-- Status: implemented and automatically verified; deployment, CI and physical owner verification pending
+- Status: implemented, automatically/runtime verified, deployed and CI verified; physical owner verification pending
 - Sanitization: no credentials, identities, private addresses, item/session IDs, raw payloads or private paths are published.
 
 Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresses, credentials, logs and screenshots are not published.
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT, CI AND PHYSICAL OWNER VERIFICATION PENDING.**
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING.** Implementation `6917ed16b1fedbebaf26b06e36352d4627959d33` is published.
 
 ## Changes
 
@@ -24,7 +24,9 @@ Continue Listening now exposes an icon-based, 44 px sleep-timer disclosure after
 
 Focused Web regression passed 31/31, full Web passed 156/156 and the Vite production build passed. The CSS regression asserts removal of the actual legacy cascade in addition to the geometry contract. Component tests cover visible/disabled quick access, activation after playback start, accessible disclosure state, preset/custom/cancel/replace, shared detail state and ordinary expiration pause. API code did not change.
 
-Deployed measurements, runtime timer/navigation QA, GitHub CI and physical iPhone/PWA owner verification are pending at this implementation stage. Browser QA cannot replace physical verification because BB-114's browser evidence failed to expose the owner-reported regression.
+Only Web was rebuilt/recreated and became healthy; `/` and the proxied `/health` returned HTTP 200. Deployed Firefox measured Induction at 156×234 px (390×844), 172×258 px (430×932) and 180×270 px (1440×900), each exactly 2:3 without horizontal overflow. Golden Compass BigBrain-B matched 156/172/180 px and the same ratio. At 390×844, Continue Listening exposed `Sovtimer för Induction`, enabled it after direct playback, started 15 minutes, showed the identical deadline on detail, replaced it with 30 minutes and cancelled it without overflow. GitHub Actions run `33328144299` passed backend, frontend, documentation and secrets.
+
+Physical iPhone/PWA owner verification remains pending. Browser QA cannot replace it because BB-114's browser evidence failed to expose the owner-reported regression.
 
 ## Security
 
@@ -32,7 +34,7 @@ Full player visual design remains owner-review pending and not Design System v1 
 
 ## Remaining work
 
-Deploy Web only, complete the three-viewport deployed QA, verify GitHub CI and ask the owner to repeat the Induction detail check in the physical iPhone/PWA. Browser evidence does not close that physical verification.
+Ask the owner to repeat the Induction detail and Continue Listening timer checks in the physical iPhone/PWA. Browser evidence does not close that physical verification.
 
 ## Resumption
 

@@ -6,6 +6,7 @@
 - `Audiobooks.test.tsx` verifies that the timer affordance is present on Continue Listening, disabled before an active session, enabled after direct playback, keyboard/button semantics through `aria-expanded`/`aria-controls`, presets, custom local clock, cancellation, replacement, ordinary expiration pause and the same deadline/status after navigating to detail. Existing direct Play/Pause behavior remains covered.
 - Local result 2026-08-30: 31 focused Web and 156 full Web passed; Vite production build passed. API was not touched and BB-115 does not require an API rerun.
 - Browser QA must measure Induction and BigBrain-B at 390×844, 430×932 and 1440×900, verify no overflow, and exercise Continue Listening timer start/change/cancel plus shared detail/navigation state. Browser QA cannot replace physical iPhone/PWA owner verification because BB-114's browser matrix failed to expose the reported regression.
+- Deployed result 2026-08-30: Induction measured 156×234, 172×258 and 180×270 px at the three viewports, all 2:3 without overflow; Golden Compass BigBrain-B matched the widths/ratio. Continue Listening exposed the accessible timer, started 15 minutes, retained the same status on detail, changed to 30 minutes and cancelled. Web-only deployment and `/health` returned HTTP 200. GitHub Actions run `33328144299` passed.
 
 ## BB-114 audiobook detail polish, sleep timer and floating-player rejection
 
