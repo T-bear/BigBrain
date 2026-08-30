@@ -5,6 +5,7 @@ import { useWidgets } from './widgetFramework'
 import { FamilyExperience } from '../family/FamilyExperience'
 import { AppIcon } from '../AppIcon'
 import { BBButton, BBEmptyState } from '../components'
+import { UXLab } from '../ux-lab/UXLab'
 
 function WidgetLibrary({ onClose, view }: { onClose: () => void; view: DashboardViewId }) {
   const { preferences, registry, setVisible } = useWidgets()
@@ -106,6 +107,7 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     const audiobooks=registry.get('audiobooks')
     return <main className="main bb-page dashboard-workspace dashboard-workspace--media audiobook-route-shell" id="media">{audiobooks?.render({expanded:true})}</main>
   }
+  if(activeView==='admin'&&pathname==='/admin/ux-ui-lab') return <UXLab />
 
   const settings = settingsOpen && <div aria-label="Familjeinställningar" className="dashboard-settings family-settings" ref={settingsRef} role="dialog">
     <ThemeControl />

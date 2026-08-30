@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { DASHBOARD_PREFERENCES_STORAGE_KEY } from './dashboard/widgetFramework'
@@ -89,6 +89,17 @@ test('opens the audiobook collection as a real deep-linked Media route', async (
   expect(await screen.findByRole('heading',{name:'Ljudböcker',level:1})).toBeInTheDocument()
   expect(screen.queryByRole('heading',{name:'Mediesökning'})).not.toBeInTheDocument()
   expect(screen.getAllByRole('button',{name:/Media/}).some(button=>button.getAttribute('aria-current')==='page')).toBe(true)
+})
+
+test('opens the UX/UI Lab from Admin and supports browser history', async () => {
+  render(<App />)
+  switchView('Admin')
+  fireEvent.click(screen.getByRole('button', { name: /Öppna UX\/UI-labb/ }))
+  expect(window.location.pathname).toBe('/admin/ux-ui-lab')
+  expect(screen.getByRole('heading', { level: 1, name: 'UX/UI-labb' })).toBeInTheDocument()
+  window.history.replaceState({}, '', '/')
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument())
 })
 
 test('Media keeps technical integrations progressively disclosed', () => {

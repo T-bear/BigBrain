@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+# BB-116A — Admin UX/UI Lab Foundation & Production Component Inventory
+
+- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY VERIFIED / LOCAL BROWSER QA VERIFIED / DEPLOYMENT AND OWNER REVIEW PENDING**.
+- Definition of Done: permanent Admin route, stable real-component inventory, safe specimens, review vocabulary, shared sleep-timer candidate, focused/full Web tests, production build, viewport QA, canonical report, deployment and CI evidence.
+- BigBrain Design System v1 remains **OWNER REVIEW IN PROGRESS**. No component may become `OWNER GODKÄND` without explicit owner feedback.
+- Deferred: production audiobook grid migration; search/discovery candidate; BB-157; broad consolidation of local checkbox, navigation, dialog and domain-card markup.
+
 ## BB-157 — Media Release Availability Search
 
 - Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115R.

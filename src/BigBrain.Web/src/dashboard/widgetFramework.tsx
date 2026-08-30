@@ -154,7 +154,9 @@ const WidgetContext = createContext<WidgetContextValue | null>(null)
 export function WidgetProvider({ children, registry }: { children: ReactNode; registry: ApplicationWidgetRegistry }) {
   const [preferences, setPreferences] = useState(() => {
     const stored=readDashboardPreferences(registry)
-    return window.location.pathname.startsWith('/media/audiobooks') ? {...stored,activeView:'media' as const} : stored
+    if (window.location.pathname.startsWith('/media/audiobooks')) return {...stored,activeView:'media' as const}
+    if (window.location.pathname.startsWith('/admin/')) return {...stored,activeView:'admin' as const}
+    return stored
   })
 
   const update = (mutate: (current: DashboardPreferences) => DashboardPreferences) => {

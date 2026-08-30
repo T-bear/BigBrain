@@ -88,6 +88,11 @@ function DockerWidget({ data }: { data: AppWidgetData }) {
   </div>
 }
 
+function UXLabNavigation() {
+  const open = () => { window.history.pushState({}, '', '/admin/ux-ui-lab'); window.dispatchEvent(new Event('bb:navigation')) }
+  return <BBSurface className="ux-lab-launcher"><div><p className="eyebrow">Permanent granskningsyta</p><h3>UX/UI-labb</h3><p>Inspektera verkliga produktionskomponenter, kandidater och ägarstatus.</p></div><BBButton onClick={open} variant="contextual"><span>Öppna UX/UI-labb</span><AppIcon name="chevron" /></BBButton></BBSurface>
+}
+
 export const dashboardRegistry = new DashboardRegistry([
   { id: 'home', title: 'Hem', description: 'Det viktigaste just nu', icon: 'home' },
   { id: 'family', title: 'Familj', description: 'Mat, inköp och kalender', icon: 'family' },
@@ -120,6 +125,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     { id: 'ai-overview', title: 'AI i BigBrain', description: 'Nuvarande och planerade capability-gränser.', icon: '✦', category: 'AI', defaultView: 'ai', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['ai'], permissions: [], render: () => <AIOverview /> },
     { id: 'settings', title: 'Inställningar', description: 'Tema och sekundära destinationer.', icon: '⚙', category: 'Inställningar', defaultView: 'more', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['more'], permissions: [], render: () => <MoreNavigation /> },
     { id: 'server-status', title: 'Serverstatus', description: 'CPU, minne, lagring och uptime.', icon: '▤', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemWidget data={data} /> },
+    { id: 'ux-ui-lab', title: 'UX/UI-labb', description: 'Permanent intern komponentinventering och ägargranskning.', icon: '◇', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'medium', supportedViews: ['admin'], permissions: [], render: () => <UXLabNavigation /> },
     { id: 'system-recovery', title: 'Start och återställning', description: 'Boot, clean shutdown, storage och recovery.', icon: '↻', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <SystemRecovery recovery={data.recovery} error={data.recoveryError} /> },
     { id: 'containers', title: 'Containers', description: 'Read-only Docker-inventering.', icon: '⬡', category: 'Administration', defaultView: 'admin', defaultSize: 'large', minimumSize: 'medium', supportedViews: ['admin'], permissions: [], render: () => <DockerWidget data={data} /> },
     { id: 'integrations', title: 'Mediaintegrationer', description: 'Teknisk status för mediatjänster.', icon: '⌁', category: 'Administration', defaultView: 'admin', defaultSize: 'full', minimumSize: 'large', supportedViews: ['admin'], permissions: [], render: () => <MediaDashboard administrationOnly /> },

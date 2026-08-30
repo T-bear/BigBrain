@@ -1,4 +1,4 @@
-export type AppIconName = 'home' | 'family' | 'media' | 'finance' | 'more' | 'ai' | 'admin' | 'settings' | 'chevron' | 'search'
+export type AppIconName = 'home' | 'family' | 'media' | 'finance' | 'more' | 'ai' | 'admin' | 'settings' | 'chevron' | 'search' | 'moon'
 
 const paths: Record<AppIconName, string> = {
   home: 'M3 11.5 12 4l9 7.5M5.5 10v10h13V10M9.5 20v-6h5v6',
@@ -11,6 +11,7 @@ const paths: Record<AppIconName, string> = {
   settings: 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7.4-3.5a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.3 2.6h4l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z',
   chevron: 'm9 18 6-6-6-6',
   search: 'm21 21-4.3-4.3M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z',
+  moon: 'M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z',
 }
 
 export function AppIcon({ name, size = 22 }: { name: AppIconName; size?: number }) {
