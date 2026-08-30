@@ -5,6 +5,7 @@
 - `Audiobooks.test.tsx` verifies that the pre-session timer is not a dead disabled icon: native details/summary activation opens visible guidance and an explicit playback action; the still-open panel becomes configurable from Continue Listening after session creation. It retains presets, custom local clock, replace/cancel, shared detail status, ordinary expiration pause/sync and unchanged Play/Pause.
 - `UXPolishStyles.test.js` requires active timer status to occupy its own in-flow `grid-column:1/-1` row and forbids the former absolute status positioning. The compact panel is viewport-bounded.
 - Local result 2026-08-30: 32 focused Web tests and Vite production build passed. Deployed 390×844, 430×932 and 1440×900 QA must cover no-session guidance, start→15 min, hour-boundary/long-duration status, shared detail state, change/cancel, containment and no overflow. Physical iPhone/PWA verification remains authoritative and pending.
+- Final result 2026-08-31: 32 focused and 157 full Web tests plus Vite build passed. Deployed Firefox at all three viewports opened the native summary by pointer, showed no-session guidance/start in a 280 px panel, then rendered `60 min kvar` with a 4:33:57 audiobook in a static `1 / -1` row with zero geometric intersection or overflow. Exact status survived detail navigation and cancelled there. Web `/` and `/health` returned HTTP 200; GitHub Actions runs `33337614697` and `33337917824` passed. Physical iPhone/PWA remains pending.
 
 ## BB-115 physical iPhone artwork and Continue Listening timer
 

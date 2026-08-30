@@ -8,9 +8,10 @@
 
 ## BB-115R — Physical iPhone Sleep-Timer Remediation
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
+- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** 2026-08-31.
 - BB-115 physical owner review failed: the pre-session timer icon was disabled and silent, while absolute active status overlaid progress/time. BB-115R provides a visible start-playback path and an in-flow status row while retaining one shared AppShell timer.
 - Full player and audiobook library remain unchanged. Future UX/UI Lab may study Storytel's current public high-level hierarchy, cover density, wrapping, spacing, touch targets and filtering placement only; never copy/scrape its CSS, DOM, source, class names, tokens, assets, icons or implementation.
+- Publication: implementation `c6519e059fc87faec92243271e26d0d9bf06d37e`, native-disclosure correction `a4139e46820a46b78c628d1db976a150d26adf98`; GitHub Actions runs `33337614697` and `33337917824` passed. Web-only deployment and three-viewport runtime QA passed; physical owner re-verification remains open.
 
 ## BB-156 — Module Runtime Latency & Reliability
 

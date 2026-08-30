@@ -5,14 +5,14 @@
 - Date: 2026-08-30
 - Baseline: `f8136eccb7feed7bd2f9d23f449aa9f327c51a82`
 - Scope: two physical-iPhone timer fixes plus permanent interrupted-run recovery rules
-- Status: implemented and automatically verified; deployment, CI and physical owner verification pending
+- Status: implemented, automatically/runtime verified, deployed and CI verified; physical owner verification pending
 - Sanitization: no credentials, private addresses, runtime identifiers, raw payloads or sensitive logs are published.
 
 Detta är en sanerad GitHub-version. Raw runtime payloads, identifiers, addresses, credentials, logs and screenshots are not published.
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT, CI AND PHYSICAL OWNER VERIFICATION PENDING.** BB-115 owner UX approval remains NO.
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING.** BB-115R owner UX approval remains NO. Implementation `c6519e059fc87faec92243271e26d0d9bf06d37e` and native-disclosure correction `a4139e46820a46b78c628d1db976a150d26adf98` are published.
 
 ## Changes
 
@@ -22,7 +22,9 @@ The active status collision came from absolute positioning inside the narrow act
 
 ## Evidence
 
-Focused Web tests pass 32/32 and Vite production build passes. Tests exercise the visible pre-session response/start path, session transition, shared detail state, preset/custom/cancel/expiration behavior and the non-absolute status-row contract. Deployment, deployed browser QA, CI and physical owner re-verification remain pending.
+Focused Web tests pass 32/32, full Web passes 157/157 and Vite production build passes. Tests exercise the visible pre-session response/start path, session transition, shared detail state, preset/custom/cancel/expiration behavior and the non-absolute status-row contract.
+
+Only Web was rebuilt/recreated and became healthy; `/` and `/health` returned HTTP 200. Deployed Firefox at 390×844, 430×932 and 1440×900 pointer-opened the native summary, showed visible guidance/start before a session and bounded the panel to 280 px. After start, a 60-minute timer beside a 4:33:57 audiobook rendered with static positioning in grid column `1 / -1`; rectangle comparison showed no progress/time intersection and no horizontal overflow. Detail showed the exact same deadline/status and cancellation removed it. GitHub Actions runs `33337614697` and `33337917824` passed backend, frontend, documentation and secrets.
 
 ## Security
 
@@ -30,7 +32,7 @@ The timer remains client/AppShell scoped with no server scheduler, database or d
 
 ## Remaining work
 
-Deploy Web only, verify timer interaction/containment at 390×844, 430×932 and 1440×900, obtain green GitHub CI and ask the owner to repeat the checks on the physical iPhone/PWA. UX/UI Lab remains the next sprint only after owner acceptance.
+Ask the owner to repeat the timer-open, configure, shared-state and no-overlap checks on the physical iPhone/PWA. UX/UI Lab remains the next sprint only after owner acceptance.
 
 ## Resumption
 
