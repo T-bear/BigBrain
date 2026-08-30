@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-114` — [Audiobook Detail Polish, Sleep Timer & Floating Player Rejection](features/media/bb-114-audiobook-detail-sleep-timer-floating-player-rejection-20260830.md)
 - `BB-113` — [Audiobook Player Affordance, Detail Layout & Artwork Remediation](features/media/bb-113-audiobook-player-affordance-layout-artwork-20260829.md)
 - `BB-112` — [Native Audiobook Playback and Owner Search Remediation](features/media/bb-112-native-audiobook-playback-owner-search-remediation-20260829.md)
 

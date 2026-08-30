@@ -459,5 +459,15 @@ Continue Listening exposes compact direct play/pause without changing the AppShe
 
 The detail hero owns one explicit artwork/summary grid with `minmax(0,1fr)` and natural title wrapping. At very narrow width it stacks and gives metadata the full page width. Successful Audiobookshelf covers remain owner artwork by default. The one physical-owner-observed generic filmstrip/music-note JPEG was traced to Audiobookshelf and is recognized only by its exact verified SHA-256; that response becomes missing artwork so the established BigBrain-B placeholder renders. No external artwork source or metadata/media mutation is introduced.
 
+## BB-114 detail, metadata and playback presentation
+
+Audiobook detail now bounds the 2:3 cover locally to 180 px desktop and a 40 vw mobile column; the same rule owns fetched artwork and canonical BigBrain-B. The redundant type eyebrow is absent. Healthy native playback does not expose or compete with an Audiobookshelf link. Only verified playback unavailability exposes **Öppna i Audiobookshelf** as recovery, without implementation terminology.
+
+The mapping audit traced detail values directly to Audiobookshelf `media.metadata`: `Pirateaba` is `authorName` and is presented as **Av Pirateaba**; `X3M 4ever!!!` is the Narnia item's `description`, not an author/series field, and the exact verified non-synopsis value is omitted from BigBrain presentation without modifying Audiobookshelf. Useful `seriesName`, `narratorName`, language, `publishedYear` and synopsis text remain.
+
+The accepted ADR 0037 lifetime is retained: the AppShell-scoped provider owns audio/session/sync across navigation. The persistent floating mini-player UI is **REJECTED after physical owner testing** because even its minimized form obstructed unrelated mobile content above the bottom dock. AppShell no longer renders player chrome; the active detail renders controls when revisited. Do not generalize a floating overlay to future BigBrain Media UI.
+
+Sleep timer state is client-local in that same provider lifetime. Presets are 15/30/45/60 minutes plus a local clock deadline and off. Expiration calls the ordinary audio pause path, which performs normal progress sync; it does not close as completed or create server state. Browser/PWA suspension can delay JavaScript timer execution. End-of-chapter is deferred.
+
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
 Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.

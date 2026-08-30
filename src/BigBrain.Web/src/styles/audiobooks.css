@@ -64,10 +64,10 @@
 .audiobook-compact-book__chevron{display:grid;width:44px;height:44px;place-items:center;color:var(--bb-color-text-tertiary)}
 .audiobook-detail-page{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--bb-space-5);min-width:0}
 .audiobook-detail-page>.audiobook-detail-page__hero{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);align-items:start;gap:var(--bb-space-5);min-width:0}
-.audiobook-detail-page__hero>.audiobook-detail-page__artwork,.audiobook-detail-page__hero>.bb-media-placeholder{grid-row:auto;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover}
+.audiobook-detail-page>.audiobook-detail-page__hero>.audiobook-detail-page__artwork,.audiobook-detail-page>.audiobook-detail-page__hero>.bb-media-placeholder{grid-row:auto;grid-column:auto;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover}
 .audiobook-detail-page__summary h1{max-width:100%;word-break:normal;overflow-wrap:break-word}
 .audiobook-detail-page>.audiobook-detail-page__body{display:grid;grid-column:auto;min-width:0}
 .audiobook-playback-unavailable{display:grid;gap:var(--bb-space-1);padding:var(--bb-space-3)}
 .audiobook-playback-unavailable span{color:var(--bb-color-text-secondary)}
-@media(max-width:600px){.audiobook-detail-page>.audiobook-detail-page__hero{grid-template-columns:88px minmax(0,1fr);gap:var(--bb-space-3)}.audiobook-detail-page__hero>div{display:grid}.audiobook-detail-page__summary h1{grid-column:auto;font-size:1.38rem}.audiobook-detail-page__summary>*{grid-column:auto}}
-@media(max-width:350px){.audiobook-detail-page>.audiobook-detail-page__hero{grid-template-columns:minmax(0,1fr)}.audiobook-detail-page__hero>.audiobook-detail-page__artwork,.audiobook-detail-page__hero>.bb-media-placeholder{width:min(132px,100%)}}
+@media(max-width:600px){.audiobook-detail-page>.audiobook-detail-page__hero{grid-template-columns:clamp(120px,40vw,180px) minmax(0,1fr);gap:var(--bb-space-3)}.audiobook-detail-page__hero>div{display:grid}.audiobook-detail-page__summary h1{grid-column:auto;font-size:1.38rem}.audiobook-detail-page__summary>*{grid-column:auto}}
+@media(max-width:350px){.audiobook-detail-page>.audiobook-detail-page__hero{grid-template-columns:minmax(0,1fr)}.audiobook-detail-page__hero>.audiobook-detail-page__artwork,.audiobook-detail-page__hero>.bb-media-placeholder{width:min(140px,42vw)}}

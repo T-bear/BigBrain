@@ -4,7 +4,6 @@ import { DashboardWorkspace } from './dashboard/DashboardWorkspace'
 import { useWidgets } from './dashboard/widgetFramework'
 import { MobileNavigation } from './MobileNavigation'
 import { BBButton } from './components'
-import { AudiobookPlayer } from './audiobooks/AudiobookPlayback'
 
 const primaryDestinations = new Set(['home', 'family', 'media', 'finance', 'more'])
 
@@ -24,7 +23,6 @@ export function AppShell() {
       </nav>
     </aside>
     <DashboardWorkspace dashboards={dashboardRegistry} />
-    <AudiobookPlayer />
     <MobileNavigation dashboards={dashboardRegistry} />
   </div>
 }

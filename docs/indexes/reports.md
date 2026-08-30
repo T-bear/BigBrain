@@ -1,5 +1,6 @@
 # Reports Index
 
+- [BB-114 Audiobook detail polish, sleep timer and floating-player rejection](../reports/features/media/bb-114-audiobook-detail-sleep-timer-floating-player-rejection-20260830.md)
 - [BB-112 Native audiobook playback and owner search remediation](../reports/features/media/bb-112-native-audiobook-playback-owner-search-remediation-20260829.md)
 
 - [BB-111 Audiobook route/detail UX fixes and playback credential gate](../reports/features/media/bb-111-audiobook-route-detail-ux-playback-gate-20260828.md)

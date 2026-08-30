@@ -1,7 +1,7 @@
-import { cleanup,fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { act,cleanup,fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { afterEach,expect,test,vi } from 'vitest'
 import { Audiobooks } from './Audiobooks'
-import { AudiobookPlaybackProvider, AudiobookPlayer } from './AudiobookPlayback'
+import { AudiobookPlaybackProvider } from './AudiobookPlayback'
 import { createAppWidgetRegistry } from '../dashboard/appWidgets'
 
 const json=(value:unknown)=>new Response(JSON.stringify(value),{status:200,headers:{'Content-Type':'application/json'}})
@@ -165,7 +165,10 @@ test('uses progress-backed listening continuity and real collection/detail route
   fireEvent.click(screen.getByRole('button',{name:'Öppna Påbörjad bok'}))
   expect(window.location.pathname).toBe('/media/audiobooks/book-1')
   expect(screen.getByRole('heading',{name:'Påbörjad bok',level:1})).toBeInTheDocument()
-  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf (reservväg)'})).toHaveAttribute('href','https://owner.example/item/book-1')
+  expect(screen.getByText('Av Författare')).toBeInTheDocument()
+  expect(screen.queryByText('Ljudbok')).not.toBeInTheDocument()
+  expect(screen.queryByText(/reservväg/i)).not.toBeInTheDocument()
+  expect(screen.queryByRole('link',{name:'Öppna i Audiobookshelf'})).not.toBeInTheDocument()
   const back=vi.spyOn(window.history,'back').mockImplementation(()=>undefined)
   fireEvent.click(screen.getByRole('button',{name:'‹ Ljudböcker'}))
   expect(back).toHaveBeenCalledOnce()
@@ -175,18 +178,31 @@ test('uses progress-backed listening continuity and real collection/detail route
 })
 
 test('starts native playback directly while the non-control area retains detail navigation',async()=>{
+  const now=Date.now();vi.spyOn(Date,'now').mockReturnValue(now);const intervals=vi.spyOn(window,'setInterval')
   const listening={id:'book-1',title:'Påbörjad bok',author:'Författare',series:null,narrator:null,language:'sv',languageLabel:'Svenska',durationSeconds:1000,progressPercent:42,description:null,coverUrl:null,publishedYear:null,isAbridged:null,playbackUrl:'https://owner.example/item/book-1'}
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,{...overview,continueListening:listening,library:[listening],recent:[listening]})
   fetch.mockResolvedValueOnce(json({id:'session',itemId:'book-1',currentTime:420,duration:1000,tracks:[{index:0,startOffset:0,duration:1000,title:null,mimeType:'audio/mpeg',streamUrl:'/api/v1/modules/media/audiobooks/playback/sessions/session/tracks/0'}],expiresAtUtc:'2026-08-29T20:00:00Z'}))
-  vi.spyOn(HTMLMediaElement.prototype,'play').mockImplementation(async function(this:HTMLMediaElement){this.dispatchEvent(new Event('play'))})
+  const mediaPlay=vi.spyOn(HTMLMediaElement.prototype,'play').mockImplementation(async function(this:HTMLMediaElement){this.dispatchEvent(new Event('play'))})
   vi.spyOn(HTMLMediaElement.prototype,'load').mockImplementation(()=>undefined)
-  render(<AudiobookPlaybackProvider><Audiobooks/><AudiobookPlayer/></AudiobookPlaybackProvider>)
+  render(<AudiobookPlaybackProvider><Audiobooks/></AudiobookPlaybackProvider>)
   const navigation=await screen.findByRole('button',{name:'Öppna Påbörjad bok'});const play=screen.getByRole('button',{name:'Spela Påbörjad bok'})
   fireEvent.click(play)
-  expect(await screen.findByRole('region',{name:'Spelar Påbörjad bok'})).toBeInTheDocument()
+  await waitFor(()=>expect(mediaPlay).toHaveBeenCalled())
+  expect(screen.queryByRole('region',{name:'Spelar Påbörjad bok'})).not.toBeInTheDocument()
   expect(fetch.mock.calls.some(([url,init])=>String(url).endsWith('/book-1/playback')&&(init as RequestInit).method==='POST')).toBe(true)
   expect(window.location.pathname).toBe('/')
   fireEvent.click(navigation);expect(window.location.pathname).toBe('/media/audiobooks/book-1')
+  expect(screen.getByRole('region',{name:'Spelar Påbörjad bok'})).toBeInTheDocument()
+  const sleepTimer=screen.getByLabelText('Sovtimer');expect(sleepTimer).toBeInTheDocument()
+  fireEvent.change(sleepTimer,{target:{value:'15'}});expect(screen.getByText(/15 min kvar/)).toBeInTheDocument()
+  fireEvent.change(sleepTimer,{target:{value:'custom'}});fireEvent.change(screen.getByLabelText('Välj lokal sluttid'),{target:{value:'22:30'}});expect(screen.getByText(/Stannar 22:30/)).toBeInTheDocument()
+  fireEvent.change(sleepTimer,{target:{value:'off'}});expect(screen.queryByText(/min kvar/)).not.toBeInTheDocument()
+  fireEvent.change(sleepTimer,{target:{value:'15'}})
+  const pause=vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(function(this:HTMLMediaElement){this.dispatchEvent(new Event('pause'))})
+  vi.mocked(Date.now).mockReturnValue(now+16*60_000)
+  const expiration=[...intervals.mock.calls].reverse().find(call=>call[1]===1000)?.[0]
+  expect(expiration).toBeTypeOf('function');act(()=>{if(typeof expiration==='function')expiration()})
+  expect(pause).toHaveBeenCalled();expect(screen.queryByText(/min kvar/)).not.toBeInTheDocument()
 })
 
 test('shows a truthful fallback instead of a native primary action when playback is unavailable',async()=>{
@@ -196,7 +212,19 @@ test('shows a truthful fallback instead of a native primary action when playback
   const fetch=vi.spyOn(globalThis,'fetch');initial(fetch,overview,unavailable);fetch.mockResolvedValueOnce(json(item))
   render(<Audiobooks/>);expect(await screen.findByText('BigBrains spelare är inte tillgänglig för den här ljudboken.')).toBeInTheDocument()
   expect(screen.queryByRole('button',{name:'Spela ljudboken'})).not.toBeInTheDocument()
-  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf (reservväg)'})).toHaveClass('bb-button--primary')
+  expect(screen.getByRole('link',{name:'Öppna i Audiobookshelf'})).toHaveClass('bb-button--primary')
+  expect(screen.queryByText(/reservväg/i)).not.toBeInTheDocument()
+})
+
+test('presents semantic detail metadata without raw filler',async()=>{
+  window.history.replaceState({},'','/media/audiobooks/ghostsong')
+  const item={id:'ghostsong',title:'Ghostsong (Unabridged)',author:'Pirateaba',series:'Singer of Terandria Series #3',narrator:'Andrea Parsneau',language:'en',languageLabel:'Engelska',durationSeconds:1000,progressPercent:null,description:'Användbar beskrivning.',coverUrl:null,publishedYear:'2025',isAbridged:false,playbackUrl:'https://owner.example/item/ghostsong'}
+  const fetch=vi.spyOn(globalThis,'fetch');initial(fetch);fetch.mockResolvedValueOnce(json(item))
+  render(<Audiobooks/>);expect(await screen.findByText('Av Pirateaba')).toBeInTheDocument()
+  expect(screen.getByText('Serie: Singer of Terandria Series #3')).toBeInTheDocument()
+  expect(screen.getByText('Uppläsare: Andrea Parsneau')).toBeInTheDocument()
+  expect(screen.getByRole('heading',{name:'Beskrivning'})).toBeInTheDocument()
+  expect(screen.queryByText('Ljudbok')).not.toBeInTheDocument()
 })
 
 test('loads a deep-linked audiobook detail through the bounded BigBrain API',async()=>{

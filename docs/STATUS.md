@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-114 Audiobook Detail Polish, Sleep Timer & Floating Player Rejection (2026-08-30)
+
+BB-114 är **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI AND OWNER UX REVIEW PENDING** från baseline `587c5d0b41c02440d852d65c494918a72e175bfb`. Detail-artwork använder en audiobook-lokal responsiv 2:3-kolumn med högst 180 px och 40 vw på vanlig mobil; canonical BigBrain-B följer samma geometri. Den redundanta LJUDBOK-raden är borttagen. Healthy native playback visar ingen Audiobookshelf-action; verifierat unavailable-läge behåller en återhämtningslänk utan utvecklarordet “reservväg”.
+
+Runtime-/DTO-auditen verifierade att `X3M 4ever!!!` kommer från Audiobookshelf `media.metadata.description`; den exakta icke-synopsisnoten utelämnas utan källdatamutation. `Pirateaba` kommer från `media.metadata.authorName` och presenteras tydligt som **Av Pirateaba**. Serie, uppläsare, språk, år och användbara beskrivningar bevaras.
+
+En klientlokal sovtimer erbjuder 15/30/45/60 minuter, lokal sluttid och Av. Deadline syns med sluttid/återstående minuter; expiration pausar via det normala audio-pause/sync-flödet och skapar ingen server scheduler eller progressdatabas. Persistent floating player UI är **REJECTED** och borttagen från AppShell. Audioelement, session och sync lever fortsatt i AppShell-scope providern, så playback överlever navigation; kontroller återkommer på aktiv audiobook-detail. Webplattformen kan inte garantera exakt väckning när iOS suspenderar PWA:n.
+
+Verifiering passerar 19 fokuserade API, 31 fokuserade Web, 565 fulla API, 156 fulla Web och 32 Sentinel samt Vite/Release, dokumentation, Compose och diff. Endast API/Web återskapades och är healthy. Deployad Firefox-matris gav artwork 156 px vid 390×844, 172 px vid 430×932 och 180 px vid 1440×900, 2:3-ratio, BigBrain-B med samma mått och noll overflow. Induction fortsatte spela på Home utan overlay och återkom i Pausa-state på detail; sovtimer visade exakt 15 min och kunde avbrytas. GitHub CI inväntar publicerad commit. BB-155 är **PLANNED / BACKLOG ONLY**. Media UX och BigBrain Design System v1 är inte owner-godkända.
+
 ## BB-113 Audiobook Player Affordance, Detail Layout & Artwork Remediation (2026-08-29)
 
 BB-113 är **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** från baseline `a50a52e33d95e317b0391647a2378a5e347210e5`. Physical iPhone-evidens visade verklig progress utan direkt play/pause, detailtitel i en katastrofalt smal restkolumn, frånvarande native kontroller, dominant tillfällig Audiobookshelf-action och en generisk media-note-bild.

@@ -41,6 +41,21 @@ public sealed class AudiobookTests
         Assert.False(overview.Acquisition.CanRequest);
     }
 
+    [Fact]
+    public async Task MappingKeepsSemanticAuthorButOmitsVerifiedNonSynopsisDescription()
+    {
+        const string payload = """{"results":[{"id":"narnia","media":{"metadata":{"title":"Min Morbror Trollkarlen","authorName":"C.S. Lewis","description":"X3M 4ever!!!"}}},{"id":"ghostsong","media":{"metadata":{"title":"Ghostsong (Unabridged)","authorName":"Pirateaba","seriesName":"Singer of Terandria Series #3","narratorName":"Andrea Parsneau","language":"en","publishedYear":"2025","description":"A useful listener-facing synopsis."}}}],"total":2}""";
+        var overview = await Client(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(payload, Encoding.UTF8, "application/json") }).GetOverviewAsync(CancellationToken.None);
+
+        var narnia = Assert.Single(overview.Library, item => item.Id == "narnia");
+        Assert.Equal("C.S. Lewis", narnia.Author);
+        Assert.Null(narnia.Description);
+        var ghostsong = Assert.Single(overview.Library, item => item.Id == "ghostsong");
+        Assert.Equal("Pirateaba", ghostsong.Author);
+        Assert.Equal("Singer of Terandria Series #3", ghostsong.Series);
+        Assert.Equal("A useful listener-facing synopsis.", ghostsong.Description);
+    }
+
     [Theory]
     [InlineData(HttpStatusCode.Unauthorized, AudiobookIntegrationStates.ConfiguredUnavailable)]
     [InlineData(HttpStatusCode.Forbidden, AudiobookIntegrationStates.ConfiguredUnavailable)]

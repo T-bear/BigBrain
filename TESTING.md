@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-114 audiobook detail polish, sleep timer and floating-player rejection
+
+- `Audiobooks.test.tsx` covers semantic detail metadata, absent redundant label/raw fallback copy, healthy-native suppression of the Audiobookshelf link, truthful unavailable recovery, route-surviving session state, in-detail controls, sleep presets/custom local clock/cancel/replace/expiration and ordinary pause sync.
+- `AudiobookTests` traces Audiobookshelf `authorName`, `seriesName`, `narratorName`, `language`, `publishedYear` and `description`; it locks the verified `X3M 4ever!!!` non-synopsis omission while preserving useful Ghostsong metadata. `UXPolishStyles.test.js` locks 2:3 compact responsive detail artwork, shared fallback geometry, no fixed player styling and no AppShell player render.
+- Browser QA: 390×844, 430×932 and 1440×900. Verify Narnia, Ghostsong and Golden Compass fallback; no LJUDBOK/raw X3M/reservväg; timer presets/custom/cancel; Home/Family/Finance navigation with continuing audio and no overlay; return-state, dock clearance and zero horizontal overflow. Exact sleep expiry is best-effort while iOS suspends a PWA.
+- Result 2026-08-30: 19 focused API, 31 focused Web, 565 full API, 156 full Web and 32 Sentinel passed; Vite/Release, 196-document/89-unique-BB-ID, Compose and diff gates passed. Only API/Web were recreated. Deployed Firefox verified Narnia/Ghostsong/Golden Compass at 390×844, 430×932 and 1440×900 with 156/172/180 px 2:3 artwork, same-size BigBrain-B, no raw/fallback copy and no overflow. Induction playback survived Home without overlay, returned as Pausa, and timer activated at 15 min then cancelled. CI remains pending publication.
+
 ## BB-113 audiobook owner-review remediation
 
 - `Audiobooks.test.tsx` covers separate direct play versus detail navigation, accessible play/pause state, native start/session path, authoritative duration/progress time, healthy native-primary/fallback-secondary hierarchy and truthful unavailable fallback.

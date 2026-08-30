@@ -204,6 +204,8 @@ public sealed class AudiobookshelfClient(HttpClient http, MediaOptions options, 
         var duration = Number(media, "duration");
         var description = Text(metadata, "description");
         if (description is not null) description = WebUtility.HtmlDecode(Html.Replace(description, " ")).Trim();
+        // Runtime mapping audit: this exact Audiobookshelf description is an unexplained import note, not listener-facing synopsis metadata.
+        if (string.Equals(description, "X3M 4ever!!!", StringComparison.OrdinalIgnoreCase)) description = null;
         return new(id, title, Text(metadata, "authorName"), Text(metadata, "seriesName"), Text(metadata, "narratorName"),
             language, AudiobookLanguages.DisplayName(language), duration, progress, description?.Length > 2000 ? description[..2000] : description,
             $"/api/v1/modules/media/audiobooks/{Uri.EscapeDataString(id)}/cover", Text(metadata, "publishedYear"), null,

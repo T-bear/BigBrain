@@ -1,5 +1,21 @@
 # BigBrain Backlog
 
+## BB-155 — Canonical Book Metadata Resolver
+
+- Status: **PLANNED / BACKLOG**. Not implemented by BB-114.
+- Start with Audiobooks only. Audiobookshelf remains authoritative for local media, playback, sessions, duration and progress. BigBrain may later build a cached canonical normalized audiobook metadata record, with ISBN/ISBN-13 as the strongest external identity when available.
+- Candidate enrichment fields: title, subtitle, author, series/number, language, publication year, publisher, description, ISBN, subjects/genres and high-quality cover artwork. Books without ISBN may use cautious title + author + series + language matching with explicit confidence thresholds.
+- Uncertain matches must never silently overwrite trustworthy data. Retain field-level provenance where appropriate and cache resolved data rather than fetching on every page view.
+- Before implementation, investigate provider/API terms, rate limits, artwork/image rights, licensing and cache conditions. Do not prematurely create a generic all-Media metadata platform.
+
+## BB-114 — Audiobook Detail Polish, Sleep Timer & Floating Player Rejection
+
+- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI AND OWNER UX REVIEW PENDING** 2026-08-30.
+- Delivered locally: responsive detail-only artwork, redundant LJUDBOK removal, healthy-state Audiobookshelf-link removal, mapped metadata presentation, client-lifetime 15/30/45/60/custom-clock sleep timer, and removal of the global floating player UI while AppShell playback lifetime remains.
+- Owner decision: persistent floating audiobook mini-player UI is **REJECTED** after physical mobile testing; navigation-surviving playback is **RETAINED**. No replacement global player is introduced.
+- Evidence: 565 API, 156 Web and 32 Sentinel tests passed; Release/Vite, documentation and Compose gates passed. Deployed 390×844/430×932/1440×900 detail matrix and playback/navigation/timer smoke passed; only API/Web were recreated.
+- BB-155 is registered as backlog only. External metadata/artwork providers, UX/UI Lab, Library/search/language redesign, chapters and speed remain outside BB-114.
+
 ## BB-113 — Audiobook Player Affordance, Detail Layout & Artwork Remediation
 
 - Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-29.
