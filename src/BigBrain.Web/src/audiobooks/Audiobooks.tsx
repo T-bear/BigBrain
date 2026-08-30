@@ -3,7 +3,7 @@ import { getAudiobook, getAudiobookAcquisitionJob, getAudiobookAcquisitionJobs, 
 import { BBButton, BBEmptyState, BBInput, BBLoadingIndicator, BBMediaArtwork, BBSelect, BBSurface } from '../components'
 import type { AudiobookAcquisitionCandidate, AudiobookAcquisitionJob, AudiobookAcquisitionProviderStatus, AudiobookItem, AudiobookMetadataResolution, AudiobookOverview, AudiobookPlaybackAvailability } from '../types'
 import { focusRouteHeading } from '../routeFocus'
-import { AudiobookPlayer, useAudiobookPlayback } from './AudiobookPlayback'
+import { AudiobookPlayer, AudiobookSleepTimer, useAudiobookPlayback } from './AudiobookPlayback'
 
 type Route = { kind: 'overview' } | { kind: 'collection' } | { kind: 'detail'; id: string }
 const collectionPath = '/media/audiobooks'
@@ -28,7 +28,8 @@ function Book({ item, onOpen }: { item: AudiobookItem; onOpen: (item: AudiobookI
 
 function CompactBook({ item, onOpen, onPlayback, playing, playable }: { item: AudiobookItem; onOpen: (item: AudiobookItem) => void; onPlayback: (item:AudiobookItem)=>void; playing:boolean; playable:boolean }) {
   const current=item.durationSeconds!==null&&item.progressPercent!==null?item.durationSeconds*item.progressPercent/100:null
-  return <div className="audiobook-compact-book"><button aria-label={`Öppna ${item.title}`} className="audiobook-compact-book__identity" onClick={() => onOpen(item)} type="button"><BBMediaArtwork alt="" loading="lazy" src={item.coverUrl ?? undefined} /><span><strong>{item.title}</strong>{item.author && <small>{item.author}</small>}{item.progressPercent !== null && <progress aria-label={`Lyssnat ${Math.round(item.progressPercent)} procent`} max="100" value={item.progressPercent} />}{current!==null&&item.durationSeconds!==null&&<small className="audiobook-compact-book__time">{formatTime(current)} / {formatTime(item.durationSeconds)}</small>}</span></button>{playable?<BBButton aria-label={playing?`Pausa ${item.title}`:`Spela ${item.title}`} aria-pressed={playing} className="audiobook-compact-book__play" onClick={()=>onPlayback(item)} variant="primary">{playing?'❚❚':'▶'}</BBButton>:<span aria-hidden="true" className="audiobook-compact-book__chevron">›</span>}</div>
+  const player=useAudiobookPlayback();const timerAvailable=player.item?.id===item.id&&player.session!==null
+  return <div className="audiobook-compact-book"><button aria-label={`Öppna ${item.title}`} className="audiobook-compact-book__identity" onClick={() => onOpen(item)} type="button"><BBMediaArtwork alt="" loading="lazy" src={item.coverUrl ?? undefined} /><span><strong>{item.title}</strong>{item.author && <small>{item.author}</small>}{item.progressPercent !== null && <progress aria-label={`Lyssnat ${Math.round(item.progressPercent)} procent`} max="100" value={item.progressPercent} />}{current!==null&&item.durationSeconds!==null&&<small className="audiobook-compact-book__time">{formatTime(current)} / {formatTime(item.durationSeconds)}</small>}</span></button><span className="audiobook-compact-book__actions">{playable?<BBButton aria-label={playing?`Pausa ${item.title}`:`Spela ${item.title}`} aria-pressed={playing} className="audiobook-compact-book__play" onClick={()=>onPlayback(item)} variant="primary">{playing?'❚❚':'▶'}</BBButton>:<span aria-hidden="true" className="audiobook-compact-book__chevron">›</span>}<AudiobookSleepTimer compact disabled={!timerAvailable} label={`Sovtimer för ${item.title}`}/></span></div>
 }
 
 function Candidate({ candidate, onView }: { candidate: AudiobookAcquisitionCandidate; onView: (candidate: AudiobookAcquisitionCandidate) => void }) {

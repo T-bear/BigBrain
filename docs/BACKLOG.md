@@ -1,5 +1,18 @@
 # BigBrain Backlog
 
+## BB-156 — Module Runtime Latency & Reliability
+
+- Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115.
+- Instrument and diagnose end-to-end module load latency and reliability, separating Web, API, module, database and external-service delays. Measure before optimization instead of blindly increasing timeouts.
+- Investigate partial/widget-level loading so one slow dependency does not unnecessarily block an entire module.
+
+## BB-115 — Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer
+
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
+- The obsolete audiobook-detail mobile cascade is removed; the one canonical detail hero constrains fetched artwork and BigBrain-B to the same 2:3, 40 vw / 180 px geometry. Browser QA cannot replace physical iPhone/PWA verification for this regression.
+- Continue Listening exposes the existing AppShell-scoped sleep timer through a compact accessible quick action. Presets, local clock, active state, change and cancellation use the same provider deadline as detail.
+- Full player visual design remains owner-review pending. UX/UI Lab remains the next planned design sprint; neither was implemented here.
+
 ## BB-155 — Canonical Book Metadata Resolver
 
 - Status: **PLANNED / BACKLOG**. Not implemented by BB-114.

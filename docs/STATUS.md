@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-115 Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer (2026-08-30)
+
+BB-115 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT AND PHYSICAL OWNER VERIFICATION PENDING** from baseline `ad3e39d76139d664c403ea28068d586eaddbada3`. BB-114 browser QA did not reproduce the later physical iPhone/PWA artwork regression. The root cause was an accumulated cascade containing three generations of audiobook-detail layout rules, including obsolete mobile `display: contents` and broad direct-child grid-column overrides. BB-115 removes those legacy detail rules and retains one explicit hero: fetched artwork and BigBrain-B share 2:3 geometry, `min-inline-size: 0`, an explicit first column, 40 vw mobile sizing and a 180 px ceiling.
+
+Continue Listening now exposes the existing sleep timer as a secondary 44 px icon action after playback starts. The disclosure has an accessible name/state, presets, local-clock selection, cancellation and visible stop/remaining status. It reads and writes the same AppShell-scoped provider deadline as detail; expiration, pause and progress synchronization are unchanged. Full player visual design remains **OWNER REVIEW PENDING / NOT DESIGN-SYSTEM APPROVED**. UX/UI Lab remains the next planned design sprint.
+
+Focused Web tests pass 31/31, full Web passes 156/156 and Vite production build passes. Deployment, deployed browser measurements, CI and physical iPhone/PWA owner verification remain pending. BB-156 is **PLANNED / BACKLOG ONLY**. BB-115 owner UX and BigBrain Design System v1 are not approved.
+
 ## BB-114 Audiobook Detail Polish, Sleep Timer & Floating Player Rejection (2026-08-30)
 
 BB-114 är **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / OWNER UX REVIEW PENDING** från baseline `587c5d0b41c02440d852d65c494918a72e175bfb`. Detail-artwork använder en audiobook-lokal responsiv 2:3-kolumn med högst 180 px och 40 vw på vanlig mobil; canonical BigBrain-B följer samma geometri. Den redundanta LJUDBOK-raden är borttagen. Healthy native playback visar ingen Audiobookshelf-action; verifierat unavailable-läge behåller en återhämtningslänk utan utvecklarordet “reservväg”.

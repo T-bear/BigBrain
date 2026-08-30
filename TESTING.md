@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-115 physical iPhone artwork and Continue Listening timer
+
+- `UXPolishStyles.test.js` protects the root cascade correction: the obsolete mobile `display:contents` and broad detail-child grid override are absent, one canonical detail container remains, and both fetched artwork and BigBrain-B receive explicit 2:3, first-column, intrinsic-safe, 40 vw / 180 px constraints.
+- `Audiobooks.test.tsx` verifies that the timer affordance is present on Continue Listening, disabled before an active session, enabled after direct playback, keyboard/button semantics through `aria-expanded`/`aria-controls`, presets, custom local clock, cancellation, replacement, ordinary expiration pause and the same deadline/status after navigating to detail. Existing direct Play/Pause behavior remains covered.
+- Local result 2026-08-30: 31 focused Web and 156 full Web passed; Vite production build passed. API was not touched and BB-115 does not require an API rerun.
+- Browser QA must measure Induction and BigBrain-B at 390×844, 430×932 and 1440×900, verify no overflow, and exercise Continue Listening timer start/change/cancel plus shared detail/navigation state. Browser QA cannot replace physical iPhone/PWA owner verification because BB-114's browser matrix failed to expose the reported regression.
+
 ## BB-114 audiobook detail polish, sleep timer and floating-player rejection
 
 - `Audiobooks.test.tsx` covers semantic detail metadata, absent redundant label/raw fallback copy, healthy-native suppression of the Audiobookshelf link, truthful unavailable recovery, route-surviving session state, in-detail controls, sleep presets/custom local clock/cancel/replace/expiration and ordinary pause sync.

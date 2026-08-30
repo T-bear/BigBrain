@@ -45,9 +45,13 @@ describe('Sprint 1 UX layout contracts', () => {
   it('keeps the audiobook detail hero ratio-safe without an intrinsic title-width collapse', () => {
     expect(audiobooks).toMatch(/\.audiobook-detail-page>\.audiobook-detail-page__hero\{[^}]*display:grid;[^}]*grid-template-columns:minmax\(120px,180px\) minmax\(0,1fr\);[^}]*min-width:0/)
     expect(audiobooks).toMatch(/\.audiobook-detail-page__summary h1\{[^}]*word-break:normal;[^}]*overflow-wrap:break-word/)
-    expect(audiobooks).toMatch(/\.audiobook-detail-page>\.audiobook-detail-page__hero>\.audiobook-detail-page__artwork,[^}]*grid-column:auto;[^}]*aspect-ratio:2\/3;[^}]*object-fit:cover/)
+    expect(audiobooks).toMatch(/\.audiobook-detail-page>\.audiobook-detail-page__hero>\.audiobook-detail-page__artwork,[^}]*grid-column:1;[^}]*max-inline-size:180px;[^}]*min-inline-size:0;[^}]*aspect-ratio:2\/3;[^}]*object-fit:cover/)
     expect(audiobooks).toContain('grid-template-columns:clamp(120px,40vw,180px) minmax(0,1fr)')
+    expect(audiobooks).toContain('inline-size:clamp(120px,40vw,180px)')
     expect(audiobooks).toContain('width:min(140px,42vw)')
+    expect(audiobooks).not.toContain('.audiobook-detail-page>div{display:contents}')
+    expect(audiobooks).not.toContain('.audiobook-detail-page>div>*:not(.eyebrow):not(h1)')
+    expect(audiobooks.match(/\.audiobook-detail-page\{/g) ?? []).toHaveLength(1)
   })
 
   it('keeps audiobook controls in-flow instead of as a global floating overlay', () => {

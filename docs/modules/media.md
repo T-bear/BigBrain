@@ -469,5 +469,11 @@ The accepted ADR 0037 lifetime is retained: the AppShell-scoped provider owns au
 
 Sleep timer state is client-local in that same provider lifetime. Presets are 15/30/45/60 minutes plus a local clock deadline and off. Expiration calls the ordinary audio pause path, which performs normal progress sync; it does not close as completed or create server state. Browser/PWA suspension can delay JavaScript timer execution. End-of-chapter is deferred.
 
+## BB-115 physical artwork cascade and timer quick access
+
+BB-114's desktop-browser matrix did not reproduce the later physical iPhone/PWA result where detail artwork reached roughly 280 px. The actual stylesheet retained three historical detail compositions at once: an obsolete mobile `display: contents` rule and broad direct-child grid assignments could compete with the newer hero. BB-115 removes those obsolete detail declarations instead of adding another `!important`. One audiobook-detail hero now owns both fetched cover and BigBrain-B geometry with a 2:3 ratio, explicit first column, intrinsic-size safeguards, 40 vw mobile width and 180 px maximum. Physical iPhone/PWA verification remains required.
+
+Continue Listening now renders a compact accessible sleep-timer disclosure beside Play/Pause. It calls the existing AppShell provider's 15/30/45/60-minute, local-clock and cancel operations; active stop/remaining state is therefore identical when returning to detail. No second timer, server state or playback-lifetime change exists. The full player remains **OWNER REVIEW PENDING / NOT DESIGN-SYSTEM APPROVED**. Admin UX/UI Lab remains the next planned design sprint and is not part of BB-115.
+
 The read-only dashboard and controlled Arr request decisions remain unchanged. Smart
 Shuffle's new Jellyfin write boundary is documented separately in Proposed ADR 0011.
