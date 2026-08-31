@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-117 audiobook final polish and Media handoff
+
+- Focused Web coverage locks the 48 px gold crescent target, 23 px vector glyph, lower-right Continue Listening alignment, inactive/active `aria-pressed`, focus entry/return, dialog open/dismiss, 15/30/45/60, local stop time, off, shared detail deadline, expiry pause/sync, independent status row and unchanged mobile two-column Detail Hero.
+- Browser QA targets 390×844, 430×932, tablet and 1440×900. Verify compact mobile bottom sheet/desktop popover, no collision or horizontal overflow, active status separated from progress/time and unchanged cover-left/detail-metadata-right hero. Automated QA never grants physical owner approval.
+- BB-117 changes Web presentation only. Run focused Web tests, full Web only if required by a regression signal or publication policy, Vite production build, documentation verification, diff/secret gates, Web-only deployment/runtime smoke and GitHub CI. API, Finance, Family and Sentinel suites are outside the affected scope.
+
 ## BB-115R physical iPhone sleep-timer remediation
 
 - `Audiobooks.test.tsx` verifies that the pre-session timer is not a dead disabled icon: native details/summary activation opens visible guidance and an explicit playback action; the still-open panel becomes configurable from Continue Listening after session creation. It retains presets, custom local clock, replace/cancel, shared detail status, ordinary expiration pause/sync and unchanged Play/Pause.

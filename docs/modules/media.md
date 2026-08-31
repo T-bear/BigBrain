@@ -1,5 +1,22 @@
 # Media Module
 
+## BB-117 Media pause decision snapshot
+
+Media's audiobook playback path is functionally stable and is planned to pause after BB-117's physical owner verification. Implemented behavior includes Audiobookshelf-authoritative local media/progress, BigBrain's bounded playback/session API, one AppShell-scoped client timer deadline shared by Continue Listening and detail, 15/30/45/60-minute presets, local-clock deadline, cancellation, ordinary pause/progress sync on best-effort iOS/PWA expiry and no automatic completion. The production timer is a gold 23 px crescent in a 48 px target at the Continue Listening card's lower right, with a compact anchored desktop popover and compact mobile bottom sheet. The active text row—not the icon—is authoritative for the deadline.
+
+Owner decision classifications:
+
+- **OWNER DESIGN APPROVED:** mobile Audiobook Detail Hero only—back navigation above; cover left; title, author and series/secondary metadata right; compact two-column first viewport; artwork important but not dominant. Do not move the title above the cover or restore oversized full-width artwork.
+- **EXPERIMENTAL / OWNER REVIEW PENDING:** primary playback action and full player. Detail Hero approval does not approve the whole detail page or player.
+- **FUNCTIONAL / FINAL DESIGN DEFERRED:** production audiobook library. Future direction is cover-forward and likely a two-column iPhone grid with whole-card navigation and progressive secondary metadata for scanning large collections.
+- **REJECTED:** tiny white clock timer, broad/form-like timer disclosure and persistent floating audiobook mini-player.
+
+Public Storytel surfaces may later be studied only for high-level hierarchy, cover prominence/proportions, mobile density, columns, spacing, wrapping, progressive disclosure, touch behavior and filter/sort placement. Never copy or scrape Storytel CSS, HTML/DOM, JavaScript, source, class names, tokens, assets, artwork, proprietary icons, implementation details or branding. BigBrain remains its own product.
+
+Deferred canonical work remains open: BB-155 audiobook-first cached normalized metadata with Audiobookshelf authoritative for local media/playback/session/progress, ISBN-13/ISBN preferred identity, cautious confidence-bearing fallback matching, no silent trustworthy-data overwrite, provenance and provider terms/rate-limit/artwork-rights research; BB-156 measurement across iPhone/PWA → Web → API → module → database/external dependency before optimization; and BB-157 truthful indexer-supplied seeder counts/sorting plus future language/category filters, kept distinct from canonical content metadata. No provider is chosen and none is implemented by BB-117.
+
+UX/UI Lab remains implemented and deployed with owner review in progress; Design System v1 is not owner approved. After the Media pause, the intended next product step is a Finance source-of-truth assessment of current architecture, code, status/backlog, tests and reports before any later approved remediation. Finance stays research-only; BB-117 changes no Finance code and introduces no live broker, order execution or real-money automation.
+
 ## Ljudböcker (BB-100)
 
 Audiobookshelf owns audiobook files, metadata and listening progress. BigBrain Web calls only the versioned BigBrain API; the API key remains server-side. The adapter implements bounded overview, paged library, detail, local search and a same-origin cover proxy. Missing credentials return `notConfigured`, and upstream failure returns a controlled unavailable state without affecting the existing Media stack.

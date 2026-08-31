@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-117` — [Audiobook Final Polish, Media Decision Freeze & Finance Handoff](features/media/bb-117-audiobook-final-polish-media-handoff-20260831.md)
 - `BB-115R` — [Physical iPhone Sleep-Timer Remediation](features/media/bb-115r-physical-sleep-timer-remediation-20260830.md)
 - `BB-115` — [Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer](features/media/bb-115-physical-artwork-continue-timer-20260830.md)
 - `BB-114` — [Audiobook Detail Polish, Sleep Timer & Floating Player Rejection](features/media/bb-114-audiobook-detail-sleep-timer-floating-player-rejection-20260830.md)

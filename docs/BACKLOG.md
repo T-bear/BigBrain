@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-117 — Audiobook Final Polish, Media Decision Freeze & Finance Handoff
+
+- Status 2026-08-31: **IMPLEMENTED / FOCUSED AUTOMATED VERIFICATION PASSED / DEPLOYMENT AND CI PENDING / PHYSICAL OWNER REVIEW PENDING**.
+- Definition of Done: production gold-crescent timer with practical 48 px target and compact responsive interaction; shared deadline, status row, expiry and progress behavior preserved; approved Detail Hero protected; focused tests/build/browser QA; deployment/runtime/CI; canonical Media reconciliation and publication. Owner UX approval remains NO until explicit physical iPhone/PWA acceptance.
+- Owner-approved principle: **Media / Audiobook / Detail Hero** uses back navigation above and a compact two-column mobile hero with cover left and title/author/series hierarchy right. This approval does not extend to the primary playback action, full player or whole detail page.
+- Rejected: tiny white clock trigger, broad/form-like timer disclosure and persistent floating mini-player. New production direction: gold crescent plus compact polished timer interaction.
+- After physical acceptance, Media enters **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. Next product focus is a read-only Finance source-of-truth assessment; no Finance implementation is part of BB-117.
+
 # BB-116A — Admin UX/UI Lab Foundation & Production Component Inventory
 
 - Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING**.
@@ -9,7 +17,7 @@
 
 ## BB-157 — Media Release Availability Search
 
-- Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115R.
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
 - When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
 - Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
 
@@ -22,9 +30,9 @@
 
 ## BB-156 — Module Runtime Latency & Reliability
 
-- Status: **PLANNED / BACKLOG ONLY**. Not implemented by BB-115.
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
 - Instrument and diagnose end-to-end module load latency and reliability, separating Web, API, module, database and external-service delays. Measure before optimization instead of blindly increasing timeouts.
-- Investigate partial/widget-level loading so one slow dependency does not unnecessarily block an entire module.
+- Investigate slow endpoints, blocking dependencies, sequential calls, container behavior, dashboard aggregation, timeout classification and partial/widget-level loading so one slow dependency does not unnecessarily block an entire module.
 
 ## BB-115 — Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer
 
@@ -36,7 +44,7 @@
 
 ## BB-155 — Canonical Book Metadata Resolver
 
-- Status: **PLANNED / BACKLOG**. Not implemented by BB-114.
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented and no provider selected.
 - Start with Audiobooks only. Audiobookshelf remains authoritative for local media, playback, sessions, duration and progress. BigBrain may later build a cached canonical normalized audiobook metadata record, with ISBN/ISBN-13 as the strongest external identity when available.
 - Candidate enrichment fields: title, subtitle, author, series/number, language, publication year, publisher, description, ISBN, subjects/genres and high-quality cover artwork. Books without ISBN may use cautious title + author + series + language matching with explicit confidence thresholds.
 - Uncertain matches must never silently overwrite trustworthy data. Retain field-level provenance where appropriate and cache resolved data rather than fetching on every page view.
