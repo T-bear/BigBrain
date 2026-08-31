@@ -48,8 +48,8 @@ public static class DeterministicRobustnessEvaluator
     public const string RobustnessModelVersion="transparent-robustness-score-v3";
     public static readonly EvaluationThresholds DefaultThresholds=new("v1",126,40,3,0.05m,0.10m,70m);
     public static readonly BacktestCostModel[] CostLadder=
-    [BacktestCostModel.Zero,new("cost-low","v1",0.005m,0.50m,2m),BacktestCostModel.Conservative,
-     new("cost-high","v1",0.02m,1m,10m),new("cost-stress","v1",0.03m,1m,20m)];
+    [BacktestCostModel.Zero,new("cost-low","v2",0.005m,0.50m,2m,AssumedFullSpreadBasisPoints:1m),BacktestCostModel.Conservative,
+     new("cost-high","v2",0.02m,1m,10m,AssumedFullSpreadBasisPoints:4m),new("cost-stress","v2",0.03m,1m,20m,AssumedFullSpreadBasisPoints:8m)];
     private static readonly string[] Limitations=["Historical coverage and universe are source-revision specific.","Universe survivorship classification must be read from source lineage.","Raw OHLC basis and incomplete corporate actions.","Full-liquidity next-open fill assumptions.","Bounded diagnostics are not parameter optimization or strategy validation."];
     private static readonly (decimal Fast,decimal Slow)[] SmaVariants=[(5m,20m),(10m,20m),(5m,50m),(10m,50m)];
     private static readonly decimal[] MomentumVariants=[5m,10m,20m];
@@ -71,6 +71,7 @@ public static class DeterministicRobustnessEvaluator
         {
             var config=new BacktestRunConfiguration(plan.MarketRevisionIds,plan.FeatureRevisionId,selected.Identity,selected.Parameters,
                 plan.SimulationModel,cost,plan.InitialCapital,plan.Universe,from,to,plan.SizingPolicy,plan.Seed,$"{plan.Id}/{plan.Version}/{plan.RobustnessModelVersion}/{plan.Strategy.Id}/{plan.SplitRatio}/{plan.EmbargoSessions}");
+            config=config with{FillModel=BacktestFillModel.NextSessionOpen};
             var result=DeterministicBacktestEngine.Run(config,selected,bars,featureRows,benchmark);results[result.RunId]=result;return result;
         }
         var benchmarkTrain=Run(new BuyAndHoldResearchStrategy(),BacktestCostModel.Conservative,split.TrainFrom,split.TrainTo);
@@ -93,7 +94,7 @@ public static class DeterministicRobustnessEvaluator
         {
             var costBenchmark=Run(new BuyAndHoldResearchStrategy(),cost,plan.From,plan.To);
             var run=isBenchmark?costBenchmark:Run(strategy,cost,plan.From,plan.To,costBenchmark.Metrics.NetReturn);zero??=run;var grossPnl=Math.Abs(run.Metrics.GrossReturn*plan.InitialCapital);
-            var total=run.Metrics.TotalCommissions+run.Metrics.TotalEstimatedSlippage;
+            var total=run.Metrics.TotalCommissions+run.Metrics.TotalEstimatedSlippage+run.Metrics.TotalAssumedSpreadCost;
             costPoints.Add(new($"{cost.Id}-{cost.Version}",run.RunId,run.Metrics.NetReturn,zero.Metrics.NetReturn-run.Metrics.NetReturn,total,
                 grossPnl==0?0:total/grossPnl,run.Metrics.GrossReturn==0?0:run.Metrics.NetReturn/run.Metrics.GrossReturn,
                 run.Metrics.Trades,run.Metrics.Turnover,AverageHolding(run.Fills,sessions)));

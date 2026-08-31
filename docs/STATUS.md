@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-123 Transaction-Cost, Slippage & Fill Realism (2026-08-31)
+
+BB-123 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `317e882ef90e15562642105ce3f7f5a2621002ad`. The existing BB-080 engine now uses versioned `daily-next-session-open-v2` and `next-session-open-full-fill/v2`: fixed, per-share/minimum and proportional costs; assumed full-spread; separately adverse slippage; whole-share/cash constraints; and explicit filled/rejected attempts. Missing exact-next-session bars, invalid opens, zero quantity, insufficient cash, unavailable positions and end-of-data fail deterministically without future-bar substitution. Old v1 runs remain immutable and readable.
+
+BB-081's existing five-level ladder now includes explicit unobserved-spread assumptions and preserves monotonic friction. A bounded existing-evidence comparison over 265 sessions/eight instruments produced buy-and-hold net returns of 29.65858% zero, 29.59159% base and 29.41012% stress; total simulated friction was 0.00, 66.98 and 248.46. Verdict remains `INSUFFICIENT_DATA`, not strategy approval. Runtime added exactly 81 new immutable runs and three evaluations; repeated builds were idempotent. API-only image `sha256:892ed7e920e29833937c84997e44857775bee4e9bc837bf5af5220e5514e0965` is healthy. Finance remains `RESEARCH / 0 SEK / NONE`; no provider, autonomous run, broker/order, PAPER/LIVE/AUTO or real-money capability changed.
+
 ## BB-122 Historical Security Identity Evidence Pilot (2026-08-31)
 
 BB-122 is **RESEARCH VERIFIED / STATE B / NO MAPPING / NO PROMOTION** from baseline `78736af9153ef28c435ca1a70b1971ae38677540`. A deterministic 30-ticker cohort from the 3,181 unmapped WIKI strings included full-snapshot, early-ending and late-starting cases. Bounded public-authority research classified 3 `VERIFIED`, 17 `PARTIAL`, 5 `AMBIGUOUS` and 5 `UNRESOLVED` (10.0% safely resolved). SEC/issuer and exchange filings can establish selected identity/event intervals, but current exchange directories cannot prove 2014–2016 membership and WIKI price coverage cannot prove listing, delisting, ticker change or historical universe membership.

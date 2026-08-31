@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-123 deterministic execution realism — 2026-08-31
+
+Historical research backtests now use `daily-next-session-open-v2` with an immutable `next-session-open-full-fill/v2` contract. Costs separately record fixed per-fill, per-share/minimum and proportional commissions; assumed full-spread; and adverse slippage. Spread is explicitly assumed because daily OHLCV contains no quotes. Buy fills add half-spread plus slippage; sells subtract them. Cash, whole shares, turnover, gross/net equity and benchmark behavior remain in the existing engine.
+
+An intent may fill only on the exact next US session. Missing/invalid bars, zero quantity, insufficient cash, unavailable sale state and end-of-data produce durable rejection attempts rather than a later favorable fill. Daily aggregate volume is retained as input evidence but does not justify intraday participation or partial-fill claims, so fills remain explicitly full-liquidity assumptions. Old v1 runs remain readable and unchanged. BB-081's existing ladder consumes the same v2 contract; it is not a second simulator. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-122 historical security identity boundary — 2026-08-31
 
 A deterministic 30-ticker WIKI feasibility cohort produced 3 `VERIFIED`, 17 `PARTIAL`, 5 `AMBIGUOUS` and 5 `UNRESOLVED` identities. SEC/issuer and exchange filings can establish selected issuer, venue, CIK and effective-event intervals, but current exchange directories cannot back-prove 2014–2016 membership. Price appearance/disappearance remains price coverage only—not IPO, listing, delisting, universe membership or corporate-action evidence.

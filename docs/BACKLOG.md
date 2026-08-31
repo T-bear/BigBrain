@@ -930,10 +930,17 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Backtesting
 - Typ: Implementation / validation
 - Prioritet: P1
-- Status: Planerad
+- Status: **Klar för nuvarande dagliga research-scope genom BB-123 / kända databundna begränsningar explicita**
 - Beroenden: BB-047.
 - Definition of Done: applicable fees, spread, slippage, FX, delay, partial fill and
   rejection are modeled; a strategy negative after costs fails validation.
+- Resultat 2026-08-31: BB-123 återanvänder BB-080/081 och levererar versionsatt fast,
+  per-aktie/minimi- och proportionell avgift, antagen spread, adverse slippage, exakt nästa
+  sessions-open, whole shares/kassa samt explicita fill/rejection-skäl och mått. FX är inte
+  tillämpligt på nuvarande USD-scope. Partial fills/volymtak är inte vetenskapligt motiverade av
+  daglig aggregatvolym och är därför explicit kända begränsningar, inte implicit full realism.
+  Äldre v1-runs bevaras; bounded v2-jämförelse är monotont kostnadskänslig och fortsatt
+  `INSUFFICIENT_DATA`. Ingen trading- eller exekveringsauktoritet skapades.
 
 ### BB-049 – Anti-overfitting and out-of-sample validation
 

@@ -74,6 +74,15 @@ visible to an earlier replay horizon. This is feature evidence only, not a signa
 
 BB-080 implements the first bounded M3 engine. The strategy sees a completed daily bar, features with `knowledgeTime <= decisionTime`, and simulated portfolio state, then returns only `NO_ACTION`, `TARGET_LONG` or `TARGET_FLAT`. An intent after session T may fill only at the next available session open. `zero-cost-v1` is diagnostic; `conservative-cost-v1` explicitly models USD 0.01/share, USD 1 minimum and 5 bps adverse slippage. Initial sizing divides capital equally across the exact universe and floors to whole shares without borrowing. Immutable results report gross/net return, annualization where valid, drawdown, volatility, a zero-risk-free daily/252 Sharpe-like ratio, trade/exits, turnover, costs and SPY-universe benchmark comparison. This one-year raw-OHLC/current-survivor evidence is engineering validation only.
 
+BB-123 supersedes new-run execution semantics with `daily-next-session-open-v2` and
+`next-session-open-full-fill/v2`; historical v1 evidence is not rewritten. A v2 intent targets the
+exact next `us-equities-ny-v1` session, never an arbitrarily later available bar. The cost contract
+separates fixed, per-share/minimum and proportional commission, assumed full spread and adverse
+slippage. Half of the assumed full spread is applied adversely on each side. Rejected/unfilled
+attempts retain explicit reasons. Daily volume is not treated as intraday liquidity, so the model
+still assumes full fills and makes no partial-fill/executability claim. BB-081's five-level ladder
+uses this same contract.
+
 ## Prospective shadow evaluation
 
 Forward evidence complements historical replay: at time T an immutable prediction records

@@ -20,3 +20,17 @@ All artifacts are offline RESEARCH evidence, never external orders. EODHD-derive
 ## Consequences
 
 Old evidence remains readable beside later datasets. Raw/unadjusted prices, incomplete corporate actions, full-liquidity fills, current-survivor selection and the short window are prominent limitations. This decision creates no PAPER, LIVE, broker or execution authority.
+
+## BB-123 amendment — 2026-08-31
+
+New runs use `daily-next-session-open-v2` plus `next-session-open-full-fill/v2`; v1 rows remain
+immutable historical evidence. The next session is now exact under `us-equities-ny-v1`; a missing
+instrument bar is rejected rather than silently deferred to a later bar. Versioned assumptions
+separate fixed, per-share/minimum and proportional commissions, assumed full-spread and adverse
+slippage. Filled and rejected attempts, rejection reasons and commission/spread/slippage totals are
+part of immutable result lineage. Spread is an assumption, never a quote observation.
+
+Daily aggregate volume does not establish open liquidity or intraday participation. Partial fills
+and volume caps remain unsupported rather than receiving fabricated precision. FX is outside the
+current USD-only universe. Equivalent concurrent builders converge through atomic insertion and
+checksum verification; different evidence under one run ID still fails closed.

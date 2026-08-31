@@ -1,5 +1,13 @@
 # Testa BigBrain
 
+## BB-123 transaction-cost, slippage and fill realism
+
+- `FinanceDeterministicBacktestTests` uses hand-verifiable series for zero, fixed/per-share/minimum/proportional costs, adverse assumed spread and slippage on buy/sell, combined friction, cash/whole shares, invalid open, exact-next-session missing bar, end-of-data, deterministic replay and unchanged strategy intents.
+- Legacy v1 cost JSON must deserialize with zero—not invented—spread/fixed/proportional values. New fill/cost assumptions must alter run identity. Old persisted v1 runs must remain readable and unchanged.
+- `FinanceEodhdIntegrationTests.ConcurrentEquivalentBacktestBuildsConvergeWithoutImmutableIdentityConflict` protects startup/maintenance concurrency: identical writers converge and immutable checksum conflict behavior remains fail-closed.
+- A bounded maintenance comparison may use only existing exact revisions and must not call a provider or autonomous research. Verify zero ≤ low ≤ base ≤ high ≤ stress degradation, retain `INSUFFICIENT_DATA` where evidence is insufficient, and report sanitized aggregates only.
+- Required affected scope: focused backtest/robustness/concurrency tests, full API suite, Release build, documentation/Compose/diff/secrets gates, API-only deployment health, old-run read and Finance `RESEARCH / 0 SEK / NONE` safety check.
+
 ## BB-122 historical security identity evidence pilot
 
 - Documentation/research-only result. Verify the deterministic 30-ticker cohort and its 3 VERIFIED / 17 PARTIAL / 5 AMBIGUOUS / 5 UNRESOLVED classification without invoking intake, acquisition, promotion or autonomous research.

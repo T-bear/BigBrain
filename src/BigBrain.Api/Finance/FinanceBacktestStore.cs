@@ -65,7 +65,7 @@ internal sealed partial class EodhdMarketMemory
         {
             var config = new BacktestRunConfiguration(marketRevisions, featureRevision, strategy.Identity, strategy.Parameters,
                 DeterministicBacktestEngine.SimulationModel, cost, 100_000m, universe, from, to,
-                DeterministicBacktestEngine.SizingPolicy, 0);
+                DeterministicBacktestEngine.SizingPolicy, 0, FillModel: BacktestFillModel.NextSessionOpen);
             return DeterministicBacktestEngine.Run(config, strategy, market, features, benchmarkReturn);
         }
     }
@@ -102,11 +102,17 @@ internal sealed partial class EodhdMarketMemory
             return false;
         }
         using var transaction = connection.BeginTransaction();
-        Execute(connection, transaction, "INSERT INTO backtest_runs VALUES($id,$checksum,$strategy,$version,$cost,$feature,$markets,$from,$to,$json,$created)",
-            ("$id",result.RunId),("$checksum",result.Checksum),("$strategy",result.Configuration.Strategy.Id),("$version",result.Configuration.Strategy.Version),
+        using var insert=connection.CreateCommand();insert.Transaction=transaction;insert.CommandText="INSERT OR IGNORE INTO backtest_runs VALUES($id,$checksum,$strategy,$version,$cost,$feature,$markets,$from,$to,$json,$created)";
+        foreach(var value in new (string Name,object Value)[]{("$id",result.RunId),("$checksum",result.Checksum),("$strategy",result.Configuration.Strategy.Id),("$version",result.Configuration.Strategy.Version),
             ("$cost",$"{result.Configuration.CostModel.Id}-{result.Configuration.CostModel.Version}"),("$feature",result.Configuration.FeatureRevisionId),
             ("$markets",JsonSerializer.Serialize(result.Configuration.MarketRevisionIds)),("$from",result.Configuration.From.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),
-            ("$to",result.Configuration.To.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$json",JsonSerializer.Serialize(result,BacktestJson)),("$created",DateTimeOffset.UtcNow.ToString("O")));
+            ("$to",result.Configuration.To.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$json",JsonSerializer.Serialize(result,BacktestJson)),("$created",DateTimeOffset.UtcNow.ToString("O"))})insert.Parameters.AddWithValue(value.Name,value.Value);
+        if(insert.ExecuteNonQuery()==0)
+        {
+            transaction.Rollback();var winner=ScalarTextOrNull(connection,"SELECT checksum FROM backtest_runs WHERE run_id=$id",("$id",result.RunId));
+            if(winner!=result.Checksum)throw new InvalidOperationException($"Immutable backtest identity conflict for {result.RunId}: stored {winner??"missing"}, computed {result.Checksum}.");
+            return false;
+        }
         foreach (var item in result.Events) Execute(connection, transaction, "INSERT INTO backtest_events VALUES($run,$sequence,$json)",("$run",result.RunId),("$sequence",item.Sequence),("$json",JsonSerializer.Serialize(item,BacktestJson)));
         foreach (var item in result.Fills) Execute(connection, transaction, "INSERT INTO backtest_fills VALUES($run,$id,$json)",("$run",result.RunId),("$id",item.FillId),("$json",JsonSerializer.Serialize(item,BacktestJson)));
         foreach (var item in result.EquityCurve) Execute(connection, transaction, "INSERT INTO backtest_equity VALUES($run,$date,$json)",("$run",result.RunId),("$date",item.Session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$json",JsonSerializer.Serialize(item,BacktestJson)));
@@ -116,9 +122,9 @@ internal sealed partial class EodhdMarketMemory
     private static List<BacktestMarketBar> ReadBacktestMarket(SqliteConnection connection, IReadOnlyList<string> revisions)
     {
         var rows = new List<BacktestMarketBar>(); using var command = connection.CreateCommand();
-        command.CommandText = "SELECT instrument_id,revision_id,session_date,open,close,acquired_utc FROM observations ORDER BY session_date,instrument_id";
+        command.CommandText = "SELECT instrument_id,revision_id,session_date,open,close,acquired_utc,volume FROM observations ORDER BY session_date,instrument_id";
         using var reader = command.ExecuteReader(); while(reader.Read()) if(revisions.Contains(reader.GetString(1),StringComparer.Ordinal))
-            rows.Add(new(new InstrumentId(reader.GetString(0)),reader.GetString(1),DateOnly.Parse(reader.GetString(2),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(3),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(4),CultureInfo.InvariantCulture),DateTimeOffset.Parse(reader.GetString(5),CultureInfo.InvariantCulture)));
+            rows.Add(new(new InstrumentId(reader.GetString(0)),reader.GetString(1),DateOnly.Parse(reader.GetString(2),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(3),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(4),CultureInfo.InvariantCulture),DateTimeOffset.Parse(reader.GetString(5),CultureInfo.InvariantCulture),reader.GetInt64(6)));
         return rows;
     }
     private static List<BacktestFeatureValue> ReadBacktestFeatures(SqliteConnection connection,string revision)

@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-123` — [Transaction-Cost, Slippage & Fill Realism](features/finance/finance-bb-123-transaction-cost-slippage-fill-realism-20260831.md)
+
 - `BB-122` — [Historical Security Identity Evidence Pilot](features/finance/finance-bb-122-historical-security-identity-evidence-pilot-20260831.md)
 
 - `BB-121` — [Nasdaq WIKI Historical Recovery & Stooq Requalification](features/finance/finance-bb-121-wiki-recovery-stooq-requalification-20260831.md)
