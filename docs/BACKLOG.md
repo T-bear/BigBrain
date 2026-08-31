@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-120 — Historical Evidence Expansion & Source Qualification
+
+- Status 2026-08-31: **SOURCE-QUALIFIED / FAIL-CLOSED / DOCUMENTATION VERIFIED**. Baseline `940afa78932bf22019f2f45e3ef640afc2c9b5f3`; no code, schema, runtime data or deployment change.
+- Existing capability: BB-084+ already supports bounded multi-year CSV/ZIP intake, durable quarantine, OHLCV-v1, 13 mandatory promotion gates, cross-source-comparison-v1, immutable provider revisions, idempotent recovery and canonical-safe cleanup. No parallel abstraction is needed.
+- Qualification result: EODHD Free remains 0 SEK, 20 calls/day and about one year; deeper history and Bulk EOD require paid plans. Free delisted/corporate-action access is `UNKNOWN`. SEC EDGAR and Eurostat are qualified first-party zero-cost evidence candidates for separate filings/reference or macro/statistics needs, not a longer-OHLCV pilot. Prior FRED/ALFRED, Riksbank, ECB, WIKI and BB-086 decisions remain authoritative.
+- Pilot: none. No new source cleared every rights/provenance/technical gate, so acquisition and promotion remained fail-closed and canonical Finance evidence is unchanged.
+- Remaining need: locate or rights-clear a first-party/public-domain daily-OHLCV artifact with adequate historical identity, delisting, corporate-action, session and point-in-time classification. Paid candidates remain informational and require explicit future owner approval.
+
 ## BB-119 — Finance Readiness & Resource-Governor Reconciliation
 
 - Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**. Implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8`; GitHub Actions `33393820120` passed.

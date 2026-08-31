@@ -22,7 +22,7 @@ least 20 overlapping sessions, uses latest EODHD evidence per symbol/session and
 relative close differences as consistent, minor, price-basis, material or insufficient.
 Insufficient overlap is a recorded limitation, not evidence of equality.
 
-## Current source decisions (2026-08-15)
+## Current source decisions (updated 2026-08-31)
 
 - WIKI mirror `kmfranz/trading_pairs`: public-domain evidence is first-party Nasdaq Data Link;
   LFS pointer and downloaded SHA-256 agree. The 2016 snapshot passed and only AAPL, MSFT, JPM,
@@ -34,6 +34,15 @@ Insufficient overlap is a recorded limitation, not evidence of equality.
   candidates failed before acquisition: no new raw artifact entered quarantine. Host-level CC0,
   CC BY or MIT cannot replace missing underlying market-data rights; Stooq's browser verification
   remains a technical stop condition. Candidate research evidence lives in the BB-086 report.
+- BB-120 revalidated that EODHD Free exposes approximately one year at 20 calls/day; longer
+  history and Bulk EOD are paid capabilities. Delisted and separate corporate-action access on
+  the active Free product remains `UNKNOWN`. No request may infer entitlement from endpoint
+  reachability.
+- SEC EDGAR and Eurostat have first-party zero-cost/public reuse evidence but are filings/reference
+  and macro/statistical sources, not longer daily-OHLCV artifacts. They require their existing or
+  a separately approved source-specific semantic path; they are not forced through OHLCV-v1.
+- No BB-120 candidate cleared every rights, provenance and technical gate. Zero artifacts were
+  acquired, zero candidates were added and zero canonical revisions were created.
 
 ## Retention and cleanup
 

@@ -1,5 +1,13 @@
 # Finance module
 
+## BB-120 historical evidence qualification — 2026-08-31
+
+The authoritative external-file path remains `ExternalDatasetCandidate → QuarantineArtifact → ValidationEvidence → PromotionDecision → CanonicalDatasetRevision`. It already supports bounded CSV and ZIP-contained CSV, multi-year evidence, SHA-256 revisions, restart/idempotency, OHLCV-v1 and `cross-source-comparison-v1`; all 13 `dataset-promotion-v1` gates must pass. Generic gates cover integrity, license, provenance and entitlement/retention. Equity-specific gates cover field/price-basis semantics, session/date-time, OHLCV, duplicates, symbol mapping, survivorship, corporate actions and source overlap. Unknown rights or semantics remain manual review and cannot become canonical.
+
+The current EODHD product is `Free`: 0 SEK, 20 calls/day and approximately one year of EOD history. Current first-party documentation places deeper history and Bulk EOD in paid products. The existing private non-commercial research/storage grant remains active-subscription scoped; redistribution is prohibited and post-expiry deletion remains mandatory. Free access to delisted instruments or separate splits/dividends capabilities is not proven and is therefore `UNKNOWN`/disabled. No paid capability was activated.
+
+BB-120 found no missing technical capability needed for a qualified longer-OHLCV source and no newly qualified source. WIKI remains the sole promoted external-file revision; the Zenodo/Yahoo-derived artifact remains manual review. SEC EDGAR and Eurostat are credible zero-cost first-party sources for filings/reference and macro/statistical evidence respectively, but neither is a longer daily-OHLCV source compatible with this intake contract. FRED/ALFRED, Riksbank and ECB are already implemented behind source-specific macro adapters. No acquisition, pilot, canonical mutation, code change or deployment occurred.
+
 ## BB-119 authoritative readiness semantics — 2026-08-31
 
 Finance readiness is a conjunction, not one vague `READY` flag. The read model separately exposes whether durable historical market/feature evidence exists; whether the pinned scheduler date is an eligible market session; whether all eight configured instruments are exact-session complete; whether an exact compatible feature lineage exists; whether scientific, resource, recovery/operations, maintenance and single-flight gates permit a run. The scheduler may run only when every required gate passes.

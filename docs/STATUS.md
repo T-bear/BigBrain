@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-120 Historical Evidence Expansion & Source Qualification (2026-08-31)
+
+BB-120 is **SOURCE-QUALIFIED / FAIL-CLOSED / DOCUMENTATION VERIFIED** from baseline `940afa78932bf22019f2f45e3ef640afc2c9b5f3`. No production source, schema, provider configuration or Finance data changed; no deployment or new pilot was justified. Finance remains `RESEARCH / 0 SEK / NONE`.
+
+The existing BB-084+ path already admits bounded multi-year CSV and ZIP-contained CSV through quarantine, OHLCV validation, all 13 `dataset-promotion-v1` gates, cross-source comparison, immutable provider-specific revisions and protected cleanup. Runtime still contains the promoted WIKI revision (`wiki-5713d7dccfa38f56`, 3,722 canonical rows across five mapped symbols) and the Zenodo/Yahoo-derived candidate remains `MANUAL_REVIEW_REQUIRED` with zero canonical rows. No duplicate importer, registry, quarantine, provenance or entitlement model was added.
+
+Current first-party evidence confirms EODHD Free at 0 cost provides 20 calls/day and approximately the past year; older/deeper history is paid, and Bulk EOD is listed for paid plans rather than Free. Private non-commercial storage/analysis is permitted only within the active-subscription retention terms; redistribution is prohibited and copies must be deleted within one month after termination/expiry. Free-tier access to delisted securities and separate corporate-action capabilities is **UNKNOWN**, so it remains disabled. SEC EDGAR and Eurostat are legitimate zero-cost first-party evidence sources, but they provide filings/reference or statistical/macro evidence rather than a rights-cleared longer daily-OHLCV artifact for the existing intake contract. Existing FRED/ALFRED, Riksbank and ECB paths were not duplicated.
+
+Because no newly assessed source cleared cost, exact intended-use rights, provenance, format and promotion prerequisites, BB-120 performed zero acquisitions and zero promotions. Canonical data and revision counts are unchanged. The next useful step is source-rights resolution or discovery of a first-party/public-domain daily-OHLCV artifact with historical identity/delisting coverage—not a new ingestion framework.
+
 ## BB-119 Finance Readiness & Resource-Governor Reconciliation (2026-08-31)
 
 BB-119 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** from baseline `5145194ba09ace91f8078c1eba1563bcfd4dbc93`, implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8` and GitHub Actions run `33393820120`. Finance remains `RESEARCH / 0 SEK / NONE`; no methodology, cadence, readiness gate, provider/data policy or trading capability changed.

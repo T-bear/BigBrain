@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-120 historical evidence source qualification
+
+- Documentation/research-only result: no production source, schema, configuration, provider request, quarantine artifact, promotion or deployment changed. Full code/build regression is therefore outside affected scope.
+- Read-only `/api/v1/modules/finance/datasets` inspection must continue to show WIKI promoted as `wiki-5713d7dccfa38f56` with 3,722 canonical rows/five symbols and Zenodo as `ManualReviewRequired` with zero promoted rows. It must not invoke dataset intake POST operations.
+- Validate documentation links/BB-ID uniqueness, Compose syntax, whitespace and sanitized secret patterns. Current EODHD path and the 13-gate fail-closed policy remain covered by the existing BB-077/084/085 suites; no test was weakened or duplicated.
+
 ## BB-119 Finance readiness and governor reconciliation
 
 - Pinned-clock scheduler tests cover an eligible complete 8/8 universe, incomplete universe, exact/incompatible feature lineage and a 2026-08-30 non-session date. Historical evidence and current-session eligibility are asserted independently; restart/reconciliation tests remain required.
