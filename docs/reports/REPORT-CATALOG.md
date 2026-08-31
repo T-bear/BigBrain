@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-119` — [Finance Readiness & Resource-Governor Reconciliation](features/finance/finance-readiness-resource-governor-reconciliation-20260831.md)
 - `BB-118` — [Finance Source-of-Truth Reconciliation & Runtime Baseline](features/finance/finance-source-of-truth-baseline-20260831.md)
 - `BB-117` — [Audiobook Final Polish, Media Decision Freeze & Finance Handoff](features/media/bb-117-audiobook-final-polish-media-handoff-20260831.md)
 - `BB-115R` — [Physical iPhone Sleep-Timer Remediation](features/media/bb-115r-physical-sleep-timer-remediation-20260830.md)

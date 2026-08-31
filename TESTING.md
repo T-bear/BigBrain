@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-119 Finance readiness and governor reconciliation
+
+- Pinned-clock scheduler tests cover an eligible complete 8/8 universe, incomplete universe, exact/incompatible feature lineage and a 2026-08-30 non-session date. Historical evidence and current-session eligibility are asserted independently; restart/reconciliation tests remain required.
+- Operations tests assert the same live readiness projection and explicitly require `NOT_REQUIRED_NON_RESEARCH_DAY` rather than an inferred generic `READY`. Governor tests preserve missing/stale metrics → `DEFER`, healthy metrics → `ALLOW`, critical disk → `BLOCK`, and `BLOCK > DEFER > ALLOW`.
+- Sentinel integration starts over a pre-existing stale socket file and must bind successfully. Deployment verification must inspect scheduler, operations, governor and system overview without triggering research or mutating Finance data.
+
 ## BB-118 Finance source-of-truth reconciliation
 
 - Production behavior is unchanged. Runtime verification uses only GET endpoints plus repository-native `finance-evidence-counts` and `finance-schema-status`; it must not invoke autonomous-run POST, provider acquisition, backfill, prediction creation, scheduler/config mutation or deletion.

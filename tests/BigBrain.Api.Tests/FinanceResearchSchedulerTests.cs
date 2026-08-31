@@ -90,6 +90,21 @@ public sealed class FinanceResearchSchedulerTests
     }
 
     [Fact]
+    public void StatusSeparatesHistoricalEvidenceFromNonResearchDayReadiness()
+    {
+        using var fixture=Ready();var status=Orchestrator(Enabled(),fixture.Memory).Status(new DateTimeOffset(2026,8,31,12,0,0,TimeSpan.Zero));
+        Assert.True(status.HistoricalEvidenceAvailable);Assert.False(status.CurrentSessionRequired);Assert.Null(status.RequiredResearchDate);Assert.Equal("NOT_REQUIRED_NON_RESEARCH_DAY",status.CurrentSessionReadiness);Assert.Equal("NOT_REQUIRED",status.FeatureLineageReadiness);Assert.False(status.DataReady);Assert.Equal("finance.research.scheduler.nonResearchDay",status.ReadinessReason);Assert.Null(status.CurrentInstrumentCount);Assert.Equal(8,status.ExpectedInstrumentCount);
+    }
+
+    [Fact]
+    public void StatusExposesCompleteUniverseAndExactFeatureLineageForEligibleSession()
+    {
+        using var fixture=Ready();var status=Orchestrator(Enabled(),fixture.Memory).Status(Due(fixture));
+        Assert.True(status.HistoricalEvidenceAvailable);Assert.True(status.CurrentSessionRequired);Assert.Equal(fixture.LastSession,status.RequiredResearchDate);Assert.Equal("COMPLETE",status.CurrentSessionReadiness);Assert.Equal("READY",status.FeatureLineageReadiness);Assert.True(status.DataReady);Assert.Equal(8,status.CurrentInstrumentCount);
+        using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="UPDATE feature_revisions SET source_revisions_json='[]'";x.ExecuteNonQuery();}var incompatible=Orchestrator(Enabled(),fixture.Memory).Status(Due(fixture));Assert.Equal("COMPLETE",incompatible.CurrentSessionReadiness);Assert.Equal("INCOMPATIBLE",incompatible.FeatureLineageReadiness);Assert.False(incompatible.DataReady);
+    }
+
+    [Fact]
     public void PartialUniverseDefersWithoutResearchThenSameOpportunityProceedsWhenCoherent()
     {
         using var fixture=Ready();using(var c=Open(fixture)){using var x=c.CreateCommand();x.CommandText="DELETE FROM observations WHERE instrument_id='US:XNYS:XOM' AND session_date=$date";x.Parameters.AddWithValue("$date",fixture.LastSession.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture));x.ExecuteNonQuery();}

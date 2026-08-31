@@ -31,7 +31,7 @@ public sealed class FinanceResearchOperationsTests
     [Fact]
     public void PersistentDataAndResourceWaitBecomeVisibleWithoutBypass()
     {
-        using var data=new Fixture();var old=data.Memory.UpdateResearchOpportunity(data.Opportunity(0,Now.AddHours(-25)).OpportunityId,FinanceResearchOpportunityState.Deferred,Now.AddHours(-25),null,"finance.research.scheduler.featureLineageIncomplete",Now.AddHours(-24));data.Memory.RecordResearchOperationsEvaluation(Now,old);var dataStatus=data.Status(Now,new(){Enabled=true},new());Assert.Equal(FinanceResearchOperationalState.Degraded,dataStatus.State);Assert.Equal("DATA_WAIT_PERSISTENT",dataStatus.CurrentActivity);Assert.Equal("FEATURE_LINEAGE_INCOMPLETE",dataStatus.DataReadiness);Assert.Empty(data.Memory.ResearchRuns(0,10).Runs);
+        using var data=new Fixture();var old=data.Memory.UpdateResearchOpportunity(data.Opportunity(0,Now.AddHours(-25)).OpportunityId,FinanceResearchOpportunityState.Deferred,Now.AddHours(-25),null,"finance.research.scheduler.featureLineageIncomplete",Now.AddHours(-24));data.Memory.RecordResearchOperationsEvaluation(Now,old);var dataStatus=data.Status(Now,new(){Enabled=true},new());Assert.Equal(FinanceResearchOperationalState.Degraded,dataStatus.State);Assert.Equal("DATA_WAIT_PERSISTENT",dataStatus.CurrentActivity);Assert.Equal("INCOMPLETE",dataStatus.DataReadiness);Assert.Equal("NOT_EVALUATED",dataStatus.FeatureLineageReadiness);Assert.False(dataStatus.HistoricalEvidenceAvailable);Assert.Empty(data.Memory.ResearchRuns(0,10).Runs);
         using var resource=new Fixture();var pressured=resource.Memory.UpdateResearchOpportunity(resource.Opportunity(0,Now.AddHours(-25)).OpportunityId,FinanceResearchOpportunityState.Deferred,Now.AddHours(-25),null,"finance.research.scheduler.resource.memory",Now.AddHours(-24));resource.Memory.RecordResearchOperationsEvaluation(Now,pressured);var resourceStatus=resource.Status(Now,new(){Enabled=true},new());Assert.Equal("RESOURCE_WAIT_PERSISTENT",resourceStatus.CurrentActivity);Assert.Empty(resource.Memory.ResearchRuns(0,10).Runs);
     }
 
@@ -45,6 +45,13 @@ public sealed class FinanceResearchOperationsTests
     public void ConfigurationAndIncidentPagingAreBounded()
     {
         Assert.Throws<InvalidOperationException>(()=>new FinanceResearchOperationsOptions{OperationsVersion="v0"}.Validate());Assert.Throws<InvalidOperationException>(()=>new FinanceResearchOperationsOptions{AttentionFailureThreshold=1}.Validate());Assert.Throws<InvalidOperationException>(()=>new FinanceResearchOperationsOptions{StaleSchedulerMinutes=59}.Validate());Assert.Throws<InvalidOperationException>(()=>new FinanceResearchOperationsOptions{PersistentWaitHours=0}.Validate());new FinanceResearchOperationsOptions().Validate();using var fixture=new Fixture();Assert.Throws<ArgumentException>(()=>fixture.Memory.ResearchOperationalIncidents(0,101));var completedAt=Now.AddMinutes(1);fixture.Memory.UpdateResearchOpportunity(fixture.Opportunity(0).OpportunityId,FinanceResearchOpportunityState.Completed,completedAt,"legacy-run","finance.research.scheduler.completed",null);Assert.Equal(completedAt,fixture.Status(Now.AddMinutes(2),new(){Enabled=false},new()).LastSuccessfulResearchUtc);
+    }
+
+    [Fact]
+    public void OperationsUsesCurrentPinnedReadinessAndMarksNonResearchDayNotRequired()
+    {
+        using var fixture=new Fixture();var status=fixture.Status(new DateTimeOffset(2026,8,31,12,0,0,TimeSpan.Zero),new(){Enabled=true},new());
+        Assert.False(status.HistoricalEvidenceAvailable);Assert.False(status.CurrentSessionRequired);Assert.Null(status.RequiredResearchDate);Assert.Equal("NOT_REQUIRED_NON_RESEARCH_DAY",status.DataReadiness);Assert.Equal("NOT_REQUIRED",status.FeatureLineageReadiness);
     }
 
     private sealed class Fixture:IDisposable

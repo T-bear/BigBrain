@@ -29,7 +29,8 @@ public sealed record FinanceResearchOperationsStatus(string OperationsVersion,Da
     FinanceResearchOperationalState State,bool RequiresAttention,string CurrentActivity,bool SchedulerEnabled,bool MaintenancePaused,
     DateTimeOffset? LastSchedulerEvaluationUtc,DateTimeOffset? LastSuccessfulResearchUtc,DateTimeOffset? LastOperationalFailureUtc,
     int ConsecutiveOperationalFailures,string? LastFailureReason,DateTimeOffset? LastSuccessfulEvidenceRefreshUtc,
-    string DataReadiness,string? ResourceDecision,string? ActiveResearchRunId,string OperatingMode,decimal BudgetSek,string ExecutionAuthority);
+    bool HistoricalEvidenceAvailable,bool CurrentSessionRequired,DateOnly? RequiredResearchDate,string DataReadiness,
+    string FeatureLineageReadiness,string? ResourceDecision,string? ActiveResearchRunId,string OperatingMode,decimal BudgetSek,string ExecutionAuthority);
 public sealed record FinanceResearchOperationalIncidentCatalog(DateTimeOffset GeneratedAtUtc,int Offset,int Limit,int Total,IReadOnlyList<FinanceResearchOperationalIncident> Incidents);
 
 internal sealed partial class EodhdMarketMemory
@@ -66,7 +67,7 @@ internal sealed partial class EodhdMarketMemory
         FinanceResearchSchedulerOptions scheduler,SystemRecoverySnapshot recovery,FinanceCadenceSnapshot cadence)
     {
         using var c=new SqliteConnection(ConnectionString);c.Open();using var x=c.CreateCommand();x.CommandText="SELECT last_scheduler_evaluation_utc,last_success_utc,last_failure_utc,consecutive_operational_failures,last_failure_reason FROM research_operations WHERE singleton=1";using var r=x.ExecuteReader();r.Read();DateTimeOffset? ReadTime(int i)=>r.IsDBNull(i)?null:DateTimeOffset.Parse(r.GetString(i),CultureInfo.InvariantCulture);var lastEvaluation=ReadTime(0);var lastSuccess=ReadTime(1);var lastFailure=ReadTime(2);var streak=r.GetInt32(3);var lastReason=r.IsDBNull(4)?null:r.GetString(4);r.Close();
-        lastSuccess??=ReadNullableOperationsTime(c,"SELECT MAX(completed_utc) FROM research_schedule_opportunities WHERE state='Completed'");var latest=LatestResearchOpportunity();var active=ResearchScalar(c,"SELECT run_id FROM research_runs WHERE state='Running' ORDER BY created_utc,run_id LIMIT 1");var readiness=latest?.Reason is{} lineageReason&&lineageReason.Contains("featureLineageIncomplete",StringComparison.Ordinal)?"FEATURE_LINEAGE_INCOMPLETE":latest?.Reason is{} reason&&reason.Contains("featuresNotReady",StringComparison.Ordinal)?"FEATURES_NOT_READY":latest?.Reason is{} dataReason&&dataReason.Contains("universeIncomplete",StringComparison.Ordinal)?"DATA_NOT_READY":"READY";var resource=latest?.ResourceDecision?.Decision.ToString().ToUpperInvariant();
+        lastSuccess??=ReadNullableOperationsTime(c,"SELECT MAX(completed_utc) FROM research_schedule_opportunities WHERE state='Completed'");var latest=LatestResearchOpportunity();var active=ResearchScalar(c,"SELECT run_id FROM research_runs WHERE state='Running' ORDER BY created_utc,run_id LIMIT 1");var readiness=ResearchReadinessStatus(now,scheduler);var resource=latest?.ResourceDecision?.Decision.ToString().ToUpperInvariant();
         var state=FinanceResearchOperationalState.Waiting;var attention=false;var activity="WAITING";
         if(!scheduler.Enabled){state=FinanceResearchOperationalState.Disabled;activity="SCHEDULER_DISABLED";}
         else if(options.MaintenancePaused){state=FinanceResearchOperationalState.Maintenance;activity="MAINTENANCE_PAUSED";}
@@ -77,7 +78,7 @@ internal sealed partial class EodhdMarketMemory
         else if(cadence.Health=="Degraded"){state=FinanceResearchOperationalState.Degraded;activity="ACQUISITION_DEGRADED";}
         else if(latest?.State==FinanceResearchOpportunityState.Deferred){state=FinanceResearchOperationalState.Deferred;activity="TEMPORARILY_DEFERRED";}
         else if(latest?.State==FinanceResearchOpportunityState.Completed){state=FinanceResearchOperationalState.Ready;activity="LAST_CYCLE_COMPLETED";}
-        return new(options.OperationsVersion,now,state,attention,activity,scheduler.Enabled,options.MaintenancePaused,lastEvaluation,lastSuccess,lastFailure,streak,lastReason,cadence.LastSuccessfulAcquisitionUtc,readiness,resource,active,"RESEARCH",0m,"NONE");
+        return new(options.OperationsVersion,now,state,attention,activity,scheduler.Enabled,options.MaintenancePaused,lastEvaluation,lastSuccess,lastFailure,streak,lastReason,cadence.LastSuccessfulAcquisitionUtc,readiness.HistoricalEvidenceAvailable,readiness.CurrentSessionRequired,readiness.RequiredResearchDate,readiness.CurrentSessionReadiness,readiness.FeatureLineageReadiness,resource,active,"RESEARCH",0m,"NONE");
     }
 
     internal FinanceResearchOperationalIncidentCatalog ResearchOperationalIncidents(int offset,int limit)

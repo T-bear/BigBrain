@@ -108,6 +108,7 @@ public sealed class SentinelProtocolIntegrationTests
             {
                 var nodeId = "node:integration-test";
                 var socketPath = Path.Combine(directory, "sentinel.sock");
+                await File.WriteAllTextAsync(socketPath, "stale-socket", TestContext.Current.CancellationToken);
                 var serverCertificatePath = Path.Combine(directory, "server.pfx");
                 var clientCertificatePath = Path.Combine(directory, "client.pfx");
                 var untrustedClientCertificatePath = Path.Combine(directory, "untrusted-client.pfx");

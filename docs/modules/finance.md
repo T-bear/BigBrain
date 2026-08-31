@@ -1,5 +1,13 @@
 # Finance module
 
+## BB-119 authoritative readiness semantics — 2026-08-31
+
+Finance readiness is a conjunction, not one vague `READY` flag. The read model separately exposes whether durable historical market/feature evidence exists; whether the pinned scheduler date is an eligible market session; whether all eight configured instruments are exact-session complete; whether an exact compatible feature lineage exists; whether scientific, resource, recovery/operations, maintenance and single-flight gates permit a run. The scheduler may run only when every required gate passes.
+
+On a non-research day, historical evidence remains valid while `currentSessionRequired=false`, `requiredResearchDate=null`, current-session readiness is `NOT_REQUIRED_NON_RESEARCH_DAY`, feature lineage is `NOT_REQUIRED` and current instrument count is not applicable. On an eligible session, `universeIncomplete`, `featuresNotReady` and `featureLineageIncomplete` retain their existing fail-closed meanings. Operations consumes this same live projection rather than reverse-engineering data readiness from the latest opportunity reason.
+
+BB-119 also makes Sentinel restart-safe for its configured Unix socket. Sentinel remains the only source for CPU, memory and configured-disk evidence; Finance invents no metrics and the governor still applies `BLOCK > DEFER > ALLOW`. No research run is triggered by status inspection.
+
 ## BB-118 current deployed baseline — 2026-08-31
 
 Finance is deployed in `RESEARCH` with budget `0 SEK` and execution authority `NONE`. Real trading is impossible: there is no broker, order contract, paper executor, LIVE mode or AUTO trading. Autonomous research is not autonomous trading; signals, candidate evidence, backtests, shadow predictions and BB-089 risk verdicts are research evidence only.

@@ -49,6 +49,7 @@ public static class SentinelHost
 
         if (protocolOptions.Enabled)
         {
+            PrepareProtocolSocket(protocolOptions.SocketPath);
             ConfigureProtocolTransport(builder, protocolOptions);
             builder.Services.AddSingleton<ICapabilityRegistry, SystemMetricsCapabilityRegistry>();
             builder.Services.AddSingleton<ISentinelRequestAuthorizer, SentinelRequestAuthorizer>();
@@ -61,6 +62,14 @@ public static class SentinelHost
         }
 
         return builder;
+    }
+
+    internal static void PrepareProtocolSocket(string socketPath)
+    {
+        if (File.Exists(socketPath))
+        {
+            File.Delete(socketPath);
+        }
     }
 
     public static WebApplication Build(WebApplicationBuilder builder)

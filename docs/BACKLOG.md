@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-119 — Finance Readiness & Resource-Governor Reconciliation
+
+- Status 2026-08-31: **IMPLEMENTED / FOCUSED TESTS PASSED / DEPLOYMENT AND RUNTIME VERIFICATION PENDING**.
+- Root causes: non-session date was incorrectly evaluated as an exact-session 0/8 requirement; operations reduced unknown/latest journal reasons to vague `READY`; Sentinel could not restart over its own stale persistent Unix socket, leaving resource evidence unavailable.
+- Remediation: explicit historical/current-session/feature-lineage semantics shared by scheduler and operations; non-research day is `NOT_REQUIRED`, not 0/8; Sentinel removes its stale configured socket before bind. Existing scheduler and governor fail-closed gates remain unchanged.
+- Definition of Done: pinned 8/8, incomplete universe, feature-lineage, non-research-day, restart/socket and governor allow/defer/block tests; affected-service deployment; coherent sanitized runtime evidence; CI and documentation publication.
+
 ## BB-118 — Finance Source-of-Truth Reconciliation & Runtime Baseline
 
 - Status 2026-08-31: **RECONCILED READ-ONLY / DOCUMENTATION VALIDATED**. No Finance source, configuration or data mutation.
