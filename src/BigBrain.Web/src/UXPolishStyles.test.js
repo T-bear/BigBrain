@@ -68,6 +68,6 @@ describe('Sprint 1 UX layout contracts', () => {
     expect(audiobooks).toMatch(/\.audiobook-compact-book__actions\{[^}]*display:grid;[^}]*align-content:space-between;[^}]*justify-items:end/)
     expect(audiobooks).toMatch(/\.audiobook-sleep-timer--compact \.audiobook-sleep-timer__toggle\{[^}]*width:48px;[^}]*height:48px;[^}]*border-radius:50%;[^}]*color:var\(--bb-color-accent\)/)
     expect(audiobooks).toMatch(/\.audiobook-sleep-timer--compact\.audiobook-sleep-timer--active \.audiobook-sleep-timer__toggle\{[^}]*background:color-mix/)
-    expect(audiobookRoutes).toMatch(/@media\(max-width:600px\)\{[^}]*[\s\S]*\.audiobook-sleep-timer__panel\{[^}]*position:fixed;[^}]*max-width:360px;[^}]*margin-inline:auto/)
+    expect(audiobookRoutes).toMatch(/@media\(max-width:600px\)\{[^}]*[\s\S]*\.audiobook-sleep-timer__panel\{[^}]*position:fixed;[^}]*max-width:320px;[^}]*margin-inline:auto/)
   })
 })
