@@ -10,15 +10,19 @@ Detta är en sanerad GitHub-version. No credentials, private addresses, owner me
 
 ## Status
 
-**IMPLEMENTED / FOCUSED AUTOMATED VERIFICATION PASSED / DEPLOYMENT AND CI PENDING / PHYSICAL OWNER REVIEW PENDING.** Baseline/source of truth: `de1f256ecb1424556f05825f4d6525fd5e5675c9`. Physical owner acceptance cannot be inferred from component tests, browser QA, deployment health or CI.
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING.** Baseline/source of truth: `de1f256ecb1424556f05825f4d6525fd5e5675c9`. Implementation `601896619b29b2b487be8e840a48d3ea132891ad`; final compact-sheet fix `29cb505804c07b6413c057f134ec0175f08a7d99`. Physical owner acceptance cannot be inferred from component tests, browser QA, deployment health or CI.
 
 ## Changes
 
-BB-116A's shared production/lab `SleepTimerControl` is refined rather than duplicated. Continue Listening renders a BigBrain vector crescent at 23 px inside a circular gold 48 px target at the card's lower right. Active state uses `aria-pressed` and a subtle selected gold surface while the independent `Stannar HH:MM · N min kvar` row remains authoritative. Desktop/tablet keep the compact anchored interaction; mobile uses a compact centered bottom sheet above the dock. Dialog focus enters its close action and returns to the trigger on explicit/Escape dismissal. Presets, custom local time, off, shared AppShell deadline, expiry pause and ordinary progress sync are unchanged.
+BB-116A's shared production/lab `SleepTimerControl` is refined rather than duplicated. Continue Listening renders a BigBrain vector crescent at 23 px inside a circular gold 48 px target at the card's lower right. Active state uses `aria-pressed` and a subtle selected gold surface while the independent `Stannar HH:MM · N min kvar` row remains authoritative. Desktop/tablet keep the 280 px anchored interaction; mobile uses a compact centered 320 px bottom sheet above the dock. Dialog focus enters its close action and returns to the trigger on explicit/Escape dismissal. Presets, custom local time, off, shared AppShell deadline, expiry pause and ordinary progress sync are unchanged.
 
 ## Evidence
 
-The owner physically accepted shared state, timer configuration, active-state propagation and the independent deadline row before BB-117, while rejecting the former visual trigger/menu. BB-117's focused component/style/lab tests pass 34/34 and full Web passes 160/160. The Vite production build passes. Browser, deployment/runtime and CI evidence remains pending at this checkpoint and cannot grant owner UX approval.
+The owner physically accepted shared state, timer configuration, active-state propagation and the independent deadline row before BB-117, while rejecting the former visual trigger/menu. BB-117's focused component/style/lab tests pass 34/34 and full Web passes 160/160. Vite production build and documentation validation pass.
+
+Deployed Firefox at 390×844, 430×932, 768×1024 and 1440×900 measured the crescent at 23×23 inside a 48×48 top hit-test button, gold `rgb(214, 163, 65)`, mobile sheet 320 px, desktop/tablet popover 280 px, correct focus entry/return, active `aria-pressed`, shared exact detail deadline, off, `grid-column: 1 / -1`, no status/time intersection, cover left of metadata and no horizontal overflow. Firefox BiDi pointer dispatch was inconsistent on three narrow runs even though `elementsFromPoint` resolved glyph → button with no overlay; DOM activation completed state transitions. This automation limitation is not treated as physical touch approval.
+
+Only Web was rebuilt/recreated. Image `sha256:215921b72acbcf27c5f1fcc2bdc9f0e7c512c70e7fb5892e664b18629bed3749` is running healthy; `/` and `/health` returned HTTP 200. GitHub Actions runs `33385591024` and `33386467803` passed backend, frontend, documentation and secrets.
 
 ## Security
 
@@ -26,7 +30,7 @@ Timer authority remains local to the existing AppShell provider. No server timer
 
 ## Remaining work
 
-Complete four-viewport browser QA, publish the scoped implementation, deploy Web only, verify runtime and GitHub CI, then publish the resulting evidence. Physical owner iPhone/PWA review remains required. BB-155, BB-156 and BB-157 remain open.
+Physical owner iPhone/PWA review remains required for crescent appearance/placement/touch, menu appearance/placement/width, presets/custom/off/active state and unchanged Detail Hero. BB-155, BB-156 and BB-157 remain open. After acceptance, begin no Media or Finance implementation automatically; the next separately approved activity is the Finance source-of-truth assessment.
 
 ## Frozen owner decisions and deferred work
 
@@ -36,10 +40,10 @@ BB-155 canonical metadata, BB-156 runtime latency/reliability diagnostics and BB
 
 After successful physical iPhone verification, Media enters **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. The next intended development activity is a read-only Finance source-of-truth assessment. No Finance code, live broker, order execution or real-money automation is introduced.
 
-## Verification and publication checkpoint
+## Verification and publication
 
 - Focused Web: 34 tests passed across audiobook behavior, style contracts and UX/UI Lab reuse.
-- Production build, browser QA, deployment/runtime and CI: pending at this checkpoint.
+- Production build, four-viewport browser QA, Web-only deployment/runtime and both GitHub CI runs: passed as detailed above.
 - Physical iPhone/PWA: pending and authoritative for crescent appearance/placement/target, menu appearance/placement/width, presets/custom/off/active state and unchanged Detail Hero.
 
 ## Resumption

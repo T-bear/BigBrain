@@ -2,7 +2,7 @@
 
 ## BB-117 — Audiobook Final Polish, Media Decision Freeze & Finance Handoff
 
-- Status 2026-08-31: **IMPLEMENTED / FOCUSED AUTOMATED VERIFICATION PASSED / DEPLOYMENT AND CI PENDING / PHYSICAL OWNER REVIEW PENDING**.
+- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING**. Published implementation `601896619b29b2b487be8e840a48d3ea132891ad` and final interaction-width fix `29cb505804c07b6413c057f134ec0175f08a7d99`; GitHub Actions `33385591024` and `33386467803` passed.
 - Definition of Done: production gold-crescent timer with practical 48 px target and compact responsive interaction; shared deadline, status row, expiry and progress behavior preserved; approved Detail Hero protected; focused tests/build/browser QA; deployment/runtime/CI; canonical Media reconciliation and publication. Owner UX approval remains NO until explicit physical iPhone/PWA acceptance.
 - Owner-approved principle: **Media / Audiobook / Detail Hero** uses back navigation above and a compact two-column mobile hero with cover left and title/author/series hierarchy right. This approval does not extend to the primary playback action, full player or whole detail page.
 - Rejected: tiny white clock trigger, broad/form-like timer disclosure and persistent floating mini-player. New production direction: gold crescent plus compact polished timer interaction.
