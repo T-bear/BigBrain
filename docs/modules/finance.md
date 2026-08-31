@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-122 historical security identity boundary — 2026-08-31
+
+A deterministic 30-ticker WIKI feasibility cohort produced 3 `VERIFIED`, 17 `PARTIAL`, 5 `AMBIGUOUS` and 5 `UNRESOLVED` identities. SEC/issuer and exchange filings can establish selected issuer, venue, CIK and effective-event intervals, but current exchange directories cannot back-prove 2014–2016 membership. Price appearance/disappearance remains price coverage only—not IPO, listing, delisting, universe membership or corporate-action evidence.
+
+The existing `CanonicalInstrument` and effective-dated `ProviderInstrumentMapping` model can represent a bounded mapping and already fails closed on missing/overlapping resolution. It has no durable structured CIK/source-document/event evidence chain, and WIKI intake remains deliberately bound to approved watchlist identities. BB-122 therefore assigns `STATE B`, adds no second security-master/provenance system and performs no promotion. `wiki-5713d7dccfa38f56` remains immutable at 3,722 rows/five instruments. Any future expansion requires a separately approved evidence-persistence design; Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-121 WIKI recovery boundary — 2026-08-31
 
 The retained WIKI artifact is `STATE A`: large and useful locally, so it must not be downloaded again. It is nevertheless only a 2014-01-02–2016-12-19 snapshot. Its 3,186 ticker strings and 2,155,310 accepted rows are price-history evidence; they do not themselves establish canonical security identity, venue history, listing/delisting, historical universe membership or point-in-time knowledge.

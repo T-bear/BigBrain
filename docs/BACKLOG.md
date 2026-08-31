@@ -1,5 +1,11 @@
 # BigBrain Backlog
 
+## BB-122 — Historical Security Identity Evidence Pilot
+
+- Status 2026-08-31: **RESEARCH VERIFIED / STATE B / NO MAPPING / NO PROMOTION**. Baseline `78736af9153ef28c435ca1a70b1971ae38677540`; no production code, schema, WIKI acquisition, canonical data or deployment change.
+- Deterministic 30-ticker result: 3 VERIFIED, 17 PARTIAL, 5 AMBIGUOUS, 5 UNRESOLVED. Public SEC/issuer/exchange evidence can prove selected intervals, but complete venue/identity validity and ticker-reuse adjudication remain manual; current symbol directories are not historical evidence.
+- Future decision: approve or reject a narrow source-document-backed historical identity evidence design before any additional WIKI mapping. Do not build a generic security master or promote from ticker text. Stooq remains `HUMAN CONFIRMATION REQUIRED / NO ACQUISITION`.
+
 ## BB-121 — Nasdaq WIKI Historical Recovery & Stooq Requalification
 
 - Status 2026-08-31: **FORENSICALLY VERIFIED / STATE A / NO ACQUISITION / NO PROMOTION**. Baseline `98c9bdb040ef5f1f7f22e40dac759dfcd62f42b7`; no code, schema, runtime data or deployment change.

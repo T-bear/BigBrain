@@ -52,6 +52,12 @@ Insufficient overlap is a recorded limitation, not evidence of equality.
   `wiki-5713d7dccfa38f56`, and no provider may be stitched into another revision.
 - Stooq remains `HUMAN CONFIRMATION REQUIRED`; browser-visible history and technical URLs are not
   entitlement evidence. No access-control challenge may be automated or bypassed.
+- BB-122 confirms that WIKI ticker text and price-date coverage are not historical security
+  identity. Existing effective-dated mappings can express a proven interval, but promotion also
+  needs durable authority/source-document, stable-identifier, event, venue and limitation lineage.
+  Current exchange directories cannot back-prove 2014–2016 membership. The bounded pilot is
+  `STATE B`: selected filings work, but reconstruction is substantially manual. No cohort mapping
+  or promotion occurred and no identity/provenance system was duplicated.
 
 ## Retention and cleanup
 

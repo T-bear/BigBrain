@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-122 Historical Security Identity Evidence Pilot (2026-08-31)
+
+BB-122 is **RESEARCH VERIFIED / STATE B / NO MAPPING / NO PROMOTION** from baseline `78736af9153ef28c435ca1a70b1971ae38677540`. A deterministic 30-ticker cohort from the 3,181 unmapped WIKI strings included full-snapshot, early-ending and late-starting cases. Bounded public-authority research classified 3 `VERIFIED`, 17 `PARTIAL`, 5 `AMBIGUOUS` and 5 `UNRESOLVED` (10.0% safely resolved). SEC/issuer and exchange filings can establish selected identity/event intervals, but current exchange directories cannot prove 2014–2016 membership and WIKI price coverage cannot prove listing, delisting, ticker change or historical universe membership.
+
+The existing effective-dated instrument/mapping model can express a verified ticker interval, so no parallel security-master architecture was added. It cannot yet durably preserve the complete CIK/source-document/event evidence chain required for a defensible promotion. **STATE B** applies: public evidence works for selected cases but requires substantial/manual reconstruction. No WIKI download, source/schema/runtime change, canonical mutation or deployment occurred; `wiki-5713d7dccfa38f56` remains 3,722 rows/five instruments. Finance remains `RESEARCH / 0 SEK / NONE`; Stooq remains `HUMAN CONFIRMATION REQUIRED / NO ACQUISITION`.
+
 ## BB-121 Nasdaq WIKI Historical Recovery & Stooq Requalification (2026-08-31)
 
 BB-121 is **FORENSICALLY VERIFIED / STATE A / NO ACQUISITION / NO PROMOTION** from baseline `98c9bdb040ef5f1f7f22e40dac759dfcd62f42b7`. Finance remains `RESEARCH / 0 SEK / NONE`; no production source, schema, configuration, canonical data or deployment changed.

@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-122 historical security identity evidence pilot
+
+- Documentation/research-only result. Verify the deterministic 30-ticker cohort and its 3 VERIFIED / 17 PARTIAL / 5 AMBIGUOUS / 5 UNRESOLVED classification without invoking intake, acquisition, promotion or autonomous research.
+- Confirm `wiki-5713d7dccfa38f56` remains immutable at 3,722 canonical rows/five instruments, no WIKI redownload or Stooq request occurred, and current exchange directories are never treated as historical membership evidence.
+- Existing mapping and BB-084 suites remain authoritative for effective dates/MIC ambiguity, all 13 gates, fail-closed `UNKNOWN`, provenance, checksums, immutable revisions, restart/idempotency, OHLCV/conflicts and cleanup safety. No production test changed because behavior did not change.
+- Validate documentation structure/links, BB-ID uniqueness, Compose syntax, diff whitespace and secret patterns. No deployment is required.
+
 ## BB-121 WIKI forensics and Stooq requalification
 
 - Documentation/research-only result. Read-only runtime/API and aggregate artifact inspection must not invoke intake, acquisition, promotion, feature generation, backtests or autonomous research. No production build/deployment is required without behavior change.
