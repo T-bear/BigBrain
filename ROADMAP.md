@@ -75,11 +75,14 @@ Family implementation.
 
 ## Finance epic
 
+**Current BB-118 baseline (2026-08-31):** Finance is deployed `RESEARCH / 0 SEK / NONE` with real EODHD memory, immutable features, deterministic backtests/robustness, macro context, prospective shadow/research-risk evidence and commissioned scheduler/governor/operations foundations. It has no broker, orders, PAPER, LIVE or AUTO. Scheduler is enabled but currently not running; a readiness contradiction (`universeIncomplete` 0/8 versus operations `READY`) and unavailable governor metrics must be reconciled before the next implementation decision. Scientific evidence strengthening is the recommended candidate; continuing execution-grade BB-053 risk foundation is the alternative. Neither is started here.
+
 The canonical Finance delivery sequence is the
-[Finance master roadmap](docs/architecture/finance/master-roadmap.md). Finance is in
-RESEARCH with M0 and M1 complete. BB-046 provider research and ADR 0021 owner review are
-complete. BB-077/078 passed the EODHD Free authorization and activation gates for M2 daily
-EOD ingestion; persistent real provider data, replay and read-only API/UI are deployed.
+[Finance master roadmap](docs/architecture/finance/master-roadmap.md). Finance remains
+RESEARCH; M0/M1 and the bounded BB-077–095 research chain are delivered. BB-046 provider
+research and ADR 0021 owner review are complete. BB-077/078 passed the EODHD Free
+authorization and activation gates for M2 daily EOD ingestion; persistent real provider
+data, replay and read-only API/UI are deployed.
 PAPER execution, live connectivity and real-money authority are not implemented.
 Provider-neutral policy/provenance, canonical identity, normalization, market-session/gap
 semantics and deterministic synthetic replay may be built before BB-071. Those BB-045

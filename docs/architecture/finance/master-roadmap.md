@@ -44,10 +44,9 @@ BB-083 temporarily supersedes the next Finance research slice. Future LIVE requi
 host recovery, persistent order idempotency, duplicate prevention and broker reconciliation
 after every unclean restart. This baseline covers host/data only.
 
-Status: M0 and M1 complete; Finance remains an undeployed RESEARCH foundation.
+Status: M0/M1 and multiple bounded market-data, deterministic-research, macro, prospective and unattended-research operations slices are deployed; Finance remains RESEARCH.
 Owner approval required: before every transition toward live or greater autonomy.
-Live trading enabled: **NO**. Current trading mode: **RESEARCH** domain/module status only;
-Finance is not deployed and no mode transition operation exists.
+Live trading enabled: **NO**. Current trading mode: **RESEARCH**; deployed execution authority is **NONE** and no mode-transition operation exists.
 
 ## What and why
 
@@ -63,9 +62,13 @@ enabled before all M13 gates are evidenced and explicitly approved.
 
 ## Current state and next gate
 
-- Current phase/milestone: RESEARCH / early M2, BB-045 in progress.
+- Current phase/milestone (BB-118, 2026-08-31): deployed RESEARCH spanning real EOD market memory, deterministic features/backtests/robustness, macro context, prospective shadow/risk evidence and bounded autonomous-research operations. This is not “early M2 only”; M4/M5 execution-grade and M7+ trading gates remain incomplete.
 - Hard current budget: external Finance market data = **0 SEK** until explicitly changed.
-- Completed: M0 specification and M1 domain/evidence foundation with read-only module status.
+- Current appliance: EODHD enabled/healthy, 105 market revisions and 29,890 observations; scheduler enabled/not running; 0 autonomous runs/experiments. Scheduler says `universeIncomplete` 0/8 while operations says `READY`, and the governor defers for unavailable metrics. Reconcile this contradiction before relying on unattended eligibility.
+- Implemented chain: M0/M1 foundations; BB-077/078 real EOD memory; BB-079 features; BB-080 backtests; BB-081 robustness; BB-084/085 dataset/data-protection; BB-087–091 shadow/cadence/research-risk/macro; BB-092–095 autonomous research, scheduler, governor and operations/recovery.
+- BB-089 is a research-only risk foundation. BB-053's execution-grade Hard Risk Engine DoD, paper executor, broker/execution/reconciliation and every LIVE/AUTO mode remain incomplete.
+- Next owner/system-architect decision: A) strengthen longer/diversified scientific evidence, anti-overfitting and multiple-hypothesis governance (recommended from current insufficiency/readiness evidence), or B) continue BB-053 while remaining RESEARCH-only. Neither is authorized by BB-118.
+- The dated bullets below are a historical delivery ledger. Earlier “no provider/data” or blocked-ingestion statements remain valid only for their original slice and are superseded as current state by BB-078 and later runtime evidence.
 - BB-071: positive human evidence clears the submitted Twelve Data use on a qualifying paid
   Personal plan; Basic/free is insufficient. This is entitlement, not activation.
 - Next safe task: resolve Alpaca Basic/free IEX entitlement for the same private scope, then

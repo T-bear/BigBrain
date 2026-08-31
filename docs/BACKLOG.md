@@ -1,12 +1,20 @@
 # BigBrain Backlog
 
+## BB-118 — Finance Source-of-Truth Reconciliation & Runtime Baseline
+
+- Status 2026-08-31: **RECONCILED READ-ONLY / DOCUMENTATION VALIDATED**. No Finance source, configuration or data mutation.
+- Current authority: `RESEARCH / 0 SEK / NONE`; no broker, orders, PAPER, LIVE or AUTO trading.
+- Runtime: scheduler enabled/not running; latest opportunity skipped as non-research day; 10 opportunities, 0 autonomous runs and 0 experiments. Current scheduler readiness says `universeIncomplete` 0/8 while operations says `READY`; governor says `DEFER / metricsUnavailable`. Reconcile these read models before trusting unattended-run eligibility.
+- Evidence counts: 105 market revisions; 29,890 observations; 16 feature revisions; latest feature revision 44,520 values (aggregate values not exposed); 797 backtest runs; 25 robustness evaluations; 288 shadow predictions; 240 outcomes; 240 research-risk evaluations; schema v93.
+- Next owner decision, not implementation: A) strengthen scientific evidence/anti-overfitting first (recommended), or B) continue execution-grade Hard Risk Engine foundation while remaining RESEARCH-only.
+
 ## BB-117 — Audiobook Final Polish, Media Decision Freeze & Finance Handoff
 
-- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING**. Published implementation `601896619b29b2b487be8e840a48d3ea132891ad` and final interaction-width fix `29cb505804c07b6413c057f134ec0175f08a7d99`; GitHub Actions `33385591024` and `33386467803` passed.
-- Definition of Done: production gold-crescent timer with practical 48 px target and compact responsive interaction; shared deadline, status row, expiry and progress behavior preserved; approved Detail Hero protected; focused tests/build/browser QA; deployment/runtime/CI; canonical Media reconciliation and publication. Owner UX approval remains NO until explicit physical iPhone/PWA acceptance.
+- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW APPROVED**. The owner physically reviewed iPhone/PWA and explicitly stated “I am satisfied.” Published implementation `601896619b29b2b487be8e840a48d3ea132891ad` and final interaction-width fix `29cb505804c07b6413c057f134ec0175f08a7d99`; GitHub Actions `33385591024` and `33386467803` passed.
+- Definition of Done: met, including explicit physical owner acceptance. Production gold-crescent timer, shared deadline/status/expiry behavior and approved Detail Hero remain the accepted BB-117 baseline.
 - Owner-approved principle: **Media / Audiobook / Detail Hero** uses back navigation above and a compact two-column mobile hero with cover left and title/author/series hierarchy right. This approval does not extend to the primary playback action, full player or whole detail page.
 - Rejected: tiny white clock trigger, broad/form-like timer disclosure and persistent floating mini-player. New production direction: gold crescent plus compact polished timer interaction.
-- After physical acceptance, Media enters **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. Next product focus is a read-only Finance source-of-truth assessment; no Finance implementation is part of BB-117.
+- Media status: **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. BB-155/156/157 remain open; UX/UI Lab review continues and Design System v1 is not globally owner-approved.
 
 # BB-116A — Admin UX/UI Lab Foundation & Production Component Inventory
 
@@ -948,7 +956,7 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Risk
 - Typ: Critical safety implementation
 - Prioritet: P1
-- Status: Planerad
+- Status: **PARTIAL / RESEARCH-ONLY FOUNDATION DELIVERED BY BB-089; EXECUTION-GRADE DoD INCOMPLETE**
 - Beroenden: BB-044, BB-047; ADR 0018 review.
 - Definition of Done: all documented capital, exposure, loss, liquidity, spread, hours,
   data/volatility and health limits are server-enforced and bypass/invariant tested.

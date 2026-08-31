@@ -1,5 +1,17 @@
 # Finance module
 
+## BB-118 current deployed baseline — 2026-08-31
+
+Finance is deployed in `RESEARCH` with budget `0 SEK` and execution authority `NONE`. Real trading is impossible: there is no broker, order contract, paper executor, LIVE mode or AUTO trading. Autonomous research is not autonomous trading; signals, candidate evidence, backtests, shadow predictions and BB-089 risk verdicts are research evidence only.
+
+The current implemented chain is provider/entitlement-aware EODHD Free SQLite/WAL memory and immutable replay; `core-daily-v1` features; deterministic buy-and-hold/SMA10-20/momentum20 backtests; chronological OOS/embargo/walk-forward/parameter and cost sensitivity; WIKI plus FRED/Riksbank/ECB macro/vintage evidence; prospective shadow outcomes and research-only risk evaluations; bounded autonomous-research, scheduler, resource-governor and operations/recovery foundations. BB-089 delivers a research-only risk foundation, not the complete execution-grade BB-053 Hard Risk Engine. Paper execution, portfolio/trading controller, broker security adapter, execution verification/reconciliation, manual/live/limited-auto/AUTO and Brain trading integration remain unimplemented.
+
+Read-only appliance inspection at 2026-08-31 12:04 UTC found: recovery healthy/clean; EODHD cadence enabled/healthy with last success and latest canonical session 2026-08-28; maintenance pause false; operations waiting/no attention/no active run; scheduler enabled/not running with 10 opportunities and latest `Skipped / nonResearchDay`; 0 autonomous runs and 0 experiments; governor `Defer / metricsUnavailable`. Persistent evidence counts are 105 market revisions, 29,890 observations, 16 feature revisions, 797 backtests, 25 robustness evaluations, 288 shadow predictions, 240 outcomes and 240 risk evaluations. Latest feature revision has 44,520 values; aggregate feature-value count is not exposed. Schema version is 93 (1/90/91/92/93). Exact current entitlement-end/deletion deadline is not exposed by the responsive status endpoints; the canonical active-account/subscription-only EODHD policy and one-month post-termination deletion duty remain authoritative.
+
+Known current inconsistency: scheduler readiness reports `dataReady=false`, `universeIncomplete` and 0/8 instruments while operations reports `dataReadiness=READY`; governor separately lacks metrics and defers. Resolve this read-model contradiction before relying on unattended eligibility. Do not trigger research to diagnose it. The next owner decision is either A) strengthen scientific evidence/anti-overfitting first (recommended because evidence remains insufficient), or B) continue BB-053 execution-grade Hard Risk foundation while remaining RESEARCH-only.
+
+The sections below preserve the chronological implementation history. Earlier statements such as provider absent, synthetic-only, startup-only cadence or scheduler default-off are historical slice truth and not the current appliance state.
+
 BB-088 replaces the startup-only acquisition/shadow passes with one lightweight prospective cadence.
 After BB-083 recovery, it checks local state every 30 minutes; EODHD requests are allowed only on
 weekdays after 22:00 UTC and at most one successful provider cycle per UTC day. The existing adapter

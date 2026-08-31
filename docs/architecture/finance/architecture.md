@@ -1,5 +1,12 @@
 # Finance target architecture and capability boundary
 
+Current deployed state is recorded in the [Finance module baseline](../../modules/finance.md)
+and [Finance master roadmap](master-roadmap.md): `RESEARCH / 0 SEK / NONE`, with real EOD
+memory and the bounded deterministic/autonomous-research chain implemented. The M1/M2 sections
+below preserve the historical delivery boundaries that led to that state; they are not current
+claims that the provider, persistence or Web projection remains absent. Trading Controller,
+broker execution, PAPER, LIVE and AUTO remain target architecture only.
+
 BB-087 adds a prospective evidence boundary inside RESEARCH: current source-specific canonical observation → causal feature snapshot → immutable shadow prediction → separate later outcome. It does not cross the existing execution boundary and introduces no broker/order adapter.
 
 ## Conceptual components
@@ -79,7 +86,7 @@ M1 implements domain contracts and a deterministic in-memory evidence slice in
 The module registry exposes only `finance.research.read`; there is no Finance-specific
 HTTP mutation, broker port, network client, executor, persistence or Web component.
 
-## Planned M2 market-data boundary
+## Historical M2 market-data delivery boundary
 
 Provider adapters normalize into immutable canonical datasets before strategy access.
 Canonical identity uses an internal ID plus MIC/currency and time-bounded provider symbol
@@ -90,10 +97,10 @@ boundary. BB-071 now contains positive human Twelve Data Personal-plan evidence,
 is insufficient and no provider has been selected or activated; architecture or entitlement
 evidence alone is not activation approval. No adapter is implemented yet.
 
-BB-075 adds a hard current product constraint of 0 SEK for external market data. Its fresh
-source sweep cleared no exact free product, so the planned adapter/persistence boundary
-remains inactive. The fail-closed read projection names the zero-cost entitlement gate and
-never substitutes synthetic observations in production.
+BB-075 added the 0 SEK product constraint and, in that historical slice, cleared no exact
+free product, so the planned adapter/persistence boundary remained inactive. BB-077/078 later
+superseded that activation state for EODHD Free; the fail-closed read projection still never
+substitutes synthetic observations in production.
 
 BB-076 adds ADR 0022's capability-scoped owner-accepted personal-research evidence class.
 It applies only to legitimate 0-SEK private read-only research and cannot override explicit

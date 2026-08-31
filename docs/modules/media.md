@@ -2,7 +2,7 @@
 
 ## BB-117 Media pause decision snapshot
 
-Media's audiobook playback path is functionally stable and is planned to pause after BB-117's physical owner verification. Implemented behavior includes Audiobookshelf-authoritative local media/progress, BigBrain's bounded playback/session API, one AppShell-scoped client timer deadline shared by Continue Listening and detail, 15/30/45/60-minute presets, local-clock deadline, cancellation, ordinary pause/progress sync on best-effort iOS/PWA expiry and no automatic completion. The production timer is a gold 23 px crescent in a 48 px target at the Continue Listening card's lower right, with a compact anchored desktop popover and compact mobile bottom sheet. The active text row—not the icon—is authoritative for the deadline.
+Media's audiobook playback path is functionally stable. The product owner physically approved BB-117 on iPhone/PWA on 2026-08-31 (“I am satisfied”), so Media is in **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. Implemented behavior includes Audiobookshelf-authoritative local media/progress, BigBrain's bounded playback/session API, one AppShell-scoped client timer deadline shared by Continue Listening and detail, 15/30/45/60-minute presets, local-clock deadline, cancellation, ordinary pause/progress sync on best-effort iOS/PWA expiry and no automatic completion. The production timer is a gold 23 px crescent in a 48 px target at the Continue Listening card's lower right, with a compact anchored desktop popover and compact mobile bottom sheet. The active text row—not the icon—is authoritative for the deadline.
 
 Owner decision classifications:
 

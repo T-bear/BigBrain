@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-118 Finance source-of-truth reconciliation
+
+- Production behavior is unchanged. Runtime verification uses only GET endpoints plus repository-native `finance-evidence-counts` and `finance-schema-status`; it must not invoke autonomous-run POST, provider acquisition, backfill, prediction creation, scheduler/config mutation or deletion.
+- Validate canonical current-state consistency, report schema/links, unique BB IDs, Compose syntax, diff whitespace and publication secrets. Historical reports remain immutable evidence; stale phrases are acceptable only when explicitly scoped to their original date/slice.
+- Current read-only baseline: `RESEARCH / 0 SEK / NONE`; scheduler enabled/not running; 10 opportunities; 0 autonomous runs/experiments; 105 market revisions; 29,890 observations; 16 feature revisions; 797 backtests; 25 robustness evaluations; 288 shadow predictions; 240 outcomes; 240 research-risk evaluations; schema 93. Latest feature revision has 44,520 values; aggregate values are not exposed.
+
 ## BB-117 audiobook final polish and Media handoff
 
 - Focused Web coverage locks the 48 px gold crescent target, 23 px vector glyph, lower-right Continue Listening alignment, inactive/active `aria-pressed`, focus entry/return, dialog open/dismiss, 15/30/45/60, local stop time, off, shared detail deadline, expiry pause/sync, independent status row and unchanged mobile two-column Detail Hero.

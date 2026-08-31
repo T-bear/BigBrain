@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version. No credentials, private addresses, owner me
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING.** Baseline/source of truth: `de1f256ecb1424556f05825f4d6525fd5e5675c9`. Implementation `601896619b29b2b487be8e840a48d3ea132891ad`; final compact-sheet fix `29cb505804c07b6413c057f134ec0175f08a7d99`. Physical owner acceptance cannot be inferred from component tests, browser QA, deployment health or CI.
+**IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW APPROVED.** Baseline/source of truth: `de1f256ecb1424556f05825f4d6525fd5e5675c9`. Implementation `601896619b29b2b487be8e840a48d3ea132891ad`; final compact-sheet fix `29cb505804c07b6413c057f134ec0175f08a7d99`. On 2026-08-31 the product owner physically reviewed iPhone/PWA and explicitly stated “I am satisfied.”
 
 ## Changes
 
@@ -30,7 +30,7 @@ Timer authority remains local to the existing AppShell provider. No server timer
 
 ## Remaining work
 
-Physical owner iPhone/PWA review remains required for crescent appearance/placement/touch, menu appearance/placement/width, presets/custom/off/active state and unchanged Detail Hero. BB-155, BB-156 and BB-157 remain open. After acceptance, begin no Media or Finance implementation automatically; the next separately approved activity is the Finance source-of-truth assessment.
+Physical owner review is complete and approved. BB-155, BB-156 and BB-157 remain open. Media is in its planned pause; no further Media implementation starts automatically.
 
 ## Frozen owner decisions and deferred work
 
