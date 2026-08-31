@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-121 — Nasdaq WIKI Historical Recovery & Stooq Requalification
+
+- Status 2026-08-31: **FORENSICALLY VERIFIED / STATE A / NO ACQUISITION / NO PROMOTION**. Baseline `98c9bdb040ef5f1f7f22e40dac759dfcd62f42b7`; no code, schema, runtime data or deployment change.
+- WIKI: the retained 235,562,224-byte/3,186-ticker artifact is a partial 2014–2016 snapshot, not decades/final 2018 history. Its five canonical symbols already contain every available snapshot session; SPY/QQQ/IWM are absent. The other 3,181 ticker strings are price evidence without approved canonical/historical identity, venue, listing/delisting or point-in-time-universe evidence.
+- Promotion scope: the implementation intentionally selects `EodhdCatalog.Watchlist`; all 13 gates passed for the candidate, while canonical insertion was bounded to safely mapped rows. Additional immutable revisions from the same artifact are technically possible only after a new candidate identity plus explicit mapping evidence, but are not justified by current security-master evidence.
+- Nasdaq: public-domain rights remain supported; current docs require a free account/API key and state that full-database bulk export is unavailable for free datasets. Preserve the local artifact; do not redownload.
+- Stooq: **HUMAN CONFIRMATION REQUIRED**. Current first-party material does not establish automation, persistent storage, private backtesting/derived rights, retention, rate limits or adjustment/delisting semantics. No protected route was probed or bypassed. Use the BB-121 inquiry draft before any future acquisition.
+
 ## BB-120 — Historical Evidence Expansion & Source Qualification
 
 - Status 2026-08-31: **SOURCE-QUALIFIED / FAIL-CLOSED / DOCUMENTATION VERIFIED**. Baseline `940afa78932bf22019f2f45e3ef640afc2c9b5f3`; no code, schema, runtime data or deployment change.

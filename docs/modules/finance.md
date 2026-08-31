@@ -1,5 +1,15 @@
 # Finance module
 
+## BB-121 WIKI recovery boundary — 2026-08-31
+
+The retained WIKI artifact is `STATE A`: large and useful locally, so it must not be downloaded again. It is nevertheless only a 2014-01-02–2016-12-19 snapshot. Its 3,186 ticker strings and 2,155,310 accepted rows are price-history evidence; they do not themselves establish canonical security identity, venue history, listing/delisting, historical universe membership or point-in-time knowledge.
+
+The five-symbol result is intentional. `FinanceDatasetIntakeStore` evaluates the whole candidate but promotes only rows whose ticker has an exact `EodhdCatalog.Watchlist` mapping. AAPL, JNJ, JPM and MSFT each contribute 748 raw snapshot rows and XOM 732; SPY/QQQ/IWM have zero. The resulting 3,722-row revision already covers all locally available WIKI sessions for every safely mapped symbol. Expanding to the other 3,181 tickers would require explicit historical instrument/venue mappings and a new immutable candidate/promotion decision; ticker text is not sufficient identity evidence.
+
+All mandatory candidate gates remain authoritative. WIKI's public-domain/provenance, schema, OHLCV, duplicate-conflict, explicit survivorship limitation, corporate-action columns, retention and insufficient-overlap classification passed. The full artifact's `SurvivorshipUnknown` limitation remains; disappearing/appearing ticker strings are coverage observations only. Adjusted history remains unusable under BB-090's `ADJUSTED_SEMANTICS_INVALID` audit, while raw research remains reproducible.
+
+Stooq remains `HUMAN CONFIRMATION REQUIRED`. Public historical pages do not constitute permission for automated acquisition, persistent private storage, backtesting, derived evidence or retention, and upstream supplier notices do not resolve those rights. No Stooq artifact or adapter is active.
+
 ## BB-120 historical evidence qualification — 2026-08-31
 
 The authoritative external-file path remains `ExternalDatasetCandidate → QuarantineArtifact → ValidationEvidence → PromotionDecision → CanonicalDatasetRevision`. It already supports bounded CSV and ZIP-contained CSV, multi-year evidence, SHA-256 revisions, restart/idempotency, OHLCV-v1 and `cross-source-comparison-v1`; all 13 `dataset-promotion-v1` gates must pass. Generic gates cover integrity, license, provenance and entitlement/retention. Equity-specific gates cover field/price-basis semantics, session/date-time, OHLCV, duplicates, symbol mapping, survivorship, corporate actions and source overlap. Unknown rights or semantics remain manual review and cannot become canonical.

@@ -43,6 +43,15 @@ Insufficient overlap is a recorded limitation, not evidence of equality.
   a separately approved source-specific semantic path; they are not forced through OHLCV-v1.
 - No BB-120 candidate cleared every rights, provenance and technical gate. Zero artifacts were
   acquired, zero candidates were added and zero canonical revisions were created.
+- BB-121 classifies the persisted WIKI snapshot as `STATE A`: retain and reuse; do not redownload.
+  The candidate was validated as one immutable artifact, while canonical insertion deliberately
+  selected exact `EodhdCatalog.Watchlist` mappings. Five mapped equities already contain all of
+  their available 2014–2016 rows; the other ticker strings are not canonical identities.
+- Reusing the same bytes for a wider cohort would require a distinct candidate/revision decision
+  and explicit historical instrument, venue and validity mappings. It must not overwrite or widen
+  `wiki-5713d7dccfa38f56`, and no provider may be stitched into another revision.
+- Stooq remains `HUMAN CONFIRMATION REQUIRED`; browser-visible history and technical URLs are not
+  entitlement evidence. No access-control challenge may be automated or bypassed.
 
 ## Retention and cleanup
 

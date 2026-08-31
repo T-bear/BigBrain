@@ -1,5 +1,6 @@
 # Project Report Catalog
 
+- `BB-121` — [Nasdaq WIKI Historical Recovery & Stooq Requalification](features/finance/finance-bb-121-wiki-recovery-stooq-requalification-20260831.md)
 - `BB-120` — [Historical Evidence Expansion & Source Qualification](features/finance/finance-bb-120-historical-evidence-source-qualification-20260831.md)
 - `BB-119` — [Finance Readiness & Resource-Governor Reconciliation](features/finance/finance-readiness-resource-governor-reconciliation-20260831.md)
 - `BB-118` — [Finance Source-of-Truth Reconciliation & Runtime Baseline](features/finance/finance-source-of-truth-baseline-20260831.md)

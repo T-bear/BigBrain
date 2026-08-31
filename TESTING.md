@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-121 WIKI forensics and Stooq requalification
+
+- Documentation/research-only result. Read-only runtime/API and aggregate artifact inspection must not invoke intake, acquisition, promotion, feature generation, backtests or autonomous research. No production build/deployment is required without behavior change.
+- Verify the retained WIKI SHA-256/size, 2014-01-02–2016-12-19 range, 3,186 ticker strings, 2,155,310 accepted/11,295 rejected rows, and exact five-symbol canonical lineage. AAPL/JNJ/JPM/MSFT each have 748 snapshot rows, XOM 732; SPY/QQQ/IWM have zero.
+- Existing BB-084 tests remain authoritative for all 13 gates, `UNKNOWN` fail-closed behavior, checksum revisioning, immutable promotion, restart/idempotency, OHLCV, conflicts, overlap and cleanup safety. No test or gate changed.
+- Validate documentation links/BB-ID uniqueness, Compose syntax, diff whitespace and sanitized secret patterns. No Stooq protected data route or external communication is part of verification.
+
 ## BB-120 historical evidence source qualification
 
 - Documentation/research-only result: no production source, schema, configuration, provider request, quarantine artifact, promotion or deployment changed. Full code/build regression is therefore outside affected scope.

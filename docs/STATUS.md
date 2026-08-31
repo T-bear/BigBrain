@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-121 Nasdaq WIKI Historical Recovery & Stooq Requalification (2026-08-31)
+
+BB-121 is **FORENSICALLY VERIFIED / STATE A / NO ACQUISITION / NO PROMOTION** from baseline `98c9bdb040ef5f1f7f22e40dac759dfcd62f42b7`. Finance remains `RESEARCH / 0 SEK / NONE`; no production source, schema, configuration, canonical data or deployment changed.
+
+Read-only inspection verified the persisted 235,562,224-byte WIKI CSV and its published SHA-256. It is a large but partial 2016 snapshot: 2,166,605 raw rows, 2,155,310 accepted rows, 11,295 rejected rows, 3,186 tickers and 2014-01-02–2016-12-19 coverage—not decades and not the final 2018 WIKI release. The existing promotion deliberately filters to the eight canonical EODHD watchlist identities. Only AAPL/JNJ/JPM/MSFT/XOM exist in the artifact, and their full available snapshot coverage is already present in `wiki-5713d7dccfa38f56` (3,722 rows); SPY/QQQ/IWM are absent. The remaining 3,181 tickers lack approved canonical/historical identity and venue mappings. No promotion gate was weakened.
+
+Current Nasdaq first-party documentation still identifies WIKI as free/public-domain and requiring a free API-key account for API access, while its time-series documentation says entire-database bulk download is unavailable for free datasets. The local snapshot therefore remains valuable independent historical evidence but is not evidence of a currently obtainable complete export. **STATE A** applies: reuse the persisted large artifact; do not redownload it. No bounded expansion was scientifically justified because all currently mapped WIKI rows are already canonical and unmapped symbols require separate historical-identity evidence.
+
+Stooq was requalified from current first-party surfaces without probing its protected CSV route. Historical pages remain publicly visible and cite multiple upstream quote suppliers, but no first-party terms/API documentation establishes an official key, automated bounded download, local retention, backtesting, derived-data or post-termination rights. Status remains **HUMAN CONFIRMATION REQUIRED / NO ACQUISITION**. A sanitized inquiry draft is published in the BB-121 report; no communication was sent.
+
 ## BB-120 Historical Evidence Expansion & Source Qualification (2026-08-31)
 
 BB-120 is **SOURCE-QUALIFIED / FAIL-CLOSED / DOCUMENTATION VERIFIED** from baseline `940afa78932bf22019f2f45e3ef640afc2c9b5f3`. No production source, schema, provider configuration or Finance data changed; no deployment or new pilot was justified. Finance remains `RESEARCH / 0 SEK / NONE`.
