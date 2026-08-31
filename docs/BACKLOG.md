@@ -2,10 +2,11 @@
 
 ## BB-119 — Finance Readiness & Resource-Governor Reconciliation
 
-- Status 2026-08-31: **IMPLEMENTED / FOCUSED TESTS PASSED / DEPLOYMENT AND RUNTIME VERIFICATION PENDING**.
+- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**. Implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8`; GitHub Actions `33393820120` passed.
 - Root causes: non-session date was incorrectly evaluated as an exact-session 0/8 requirement; operations reduced unknown/latest journal reasons to vague `READY`; Sentinel could not restart over its own stale persistent Unix socket, leaving resource evidence unavailable.
 - Remediation: explicit historical/current-session/feature-lineage semantics shared by scheduler and operations; non-research day is `NOT_REQUIRED`, not 0/8; Sentinel removes its stale configured socket before bind. Existing scheduler and governor fail-closed gates remain unchanged.
 - Definition of Done: pinned 8/8, incomplete universe, feature-lineage, non-research-day, restart/socket and governor allow/defer/block tests; affected-service deployment; coherent sanitized runtime evidence; CI and documentation publication.
+- Runtime: historical evidence available; current session and feature lineage explicitly not required on the inspected non-research day; no 0/8 claim; operations agrees; governor `ALLOW/resource.ready`; Sentinel/API/Web healthy; 0 research runs and experiments.
 
 ## BB-118 — Finance Source-of-Truth Reconciliation & Runtime Baseline
 

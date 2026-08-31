@@ -2,11 +2,13 @@
 
 ## BB-119 Finance Readiness & Resource-Governor Reconciliation (2026-08-31)
 
-BB-119 is **IMPLEMENTED / FOCUSED TESTS PASSED / DEPLOYMENT AND RUNTIME VERIFICATION PENDING** from baseline `5145194ba09ace91f8078c1eba1563bcfd4dbc93`. Finance remains `RESEARCH / 0 SEK / NONE`; no methodology, cadence, readiness gate, provider/data policy or trading capability changed.
+BB-119 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** from baseline `5145194ba09ace91f8078c1eba1563bcfd4dbc93`, implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8` and GitHub Actions run `33393820120`. Finance remains `RESEARCH / 0 SEK / NONE`; no methodology, cadence, readiness gate, provider/data policy or trading capability changed.
 
 Three independent causes were proven. Scheduler status reused the latest opportunity's Sunday `2026-08-30` as though it were a required market session and consequently queried exact-session evidence as 0/8. Operations inferred readiness from the latest journal reason and treated every unrecognized reason—including `nonResearchDay`—as `READY`. Sentinel restarted against a socket file left in its persistent runtime volume and failed with `address already in use`, so the governor correctly failed closed as `DEFER / metricsUnavailable`.
 
 Scheduler and operations now consume one deterministic current readiness projection with separate `historicalEvidenceAvailable`, `currentSessionRequired`, `requiredResearchDate`, current-session readiness and feature-lineage readiness. On a non-research day historical evidence can remain available while current session and lineage are explicitly `NOT_REQUIRED`; universe count is `null`, not misleading `0/8`. On an eligible session the existing exact 8/8 market and feature-lineage gates remain unchanged. Sentinel removes its own stale configured socket before binding; unavailable or stale CPU/memory/configured-disk evidence still produces `DEFER`, and critical disk still wins as `BLOCK`.
+
+Post-deployment read-only evidence at 2026-08-31 13:00 UTC: scheduler enabled/not running, last outcome `Skipped/nonResearchDay`, historical evidence true, current session `NOT_REQUIRED_NON_RESEARCH_DAY`, lineage `NOT_REQUIRED`, instrument count not applicable and 10 unchanged opportunities; operations reports the same readiness with no active run or attention; governor is `ALLOW/resource.ready` from healthy current CPU, memory and one configured disk snapshot. Sentinel, API and Web are healthy, HTTP health is 200 and autonomous research remains 0 runs/0 experiments. No verification run was triggered.
 
 ## BB-118 Finance Source-of-Truth & Runtime Baseline (2026-08-31)
 

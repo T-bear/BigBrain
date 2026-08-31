@@ -10,7 +10,7 @@ Detta är en sanerad GitHub-version. It contains no credential, private address,
 
 ## Status
 
-Implementation and focused tests are complete; deployment/runtime/CI evidence is pending. Finance remains `RESEARCH / 0 SEK / NONE`. No research methodology, scheduler cadence, provider/data policy, strategy, experiment, broker, order, PAPER, LIVE or AUTO capability changed.
+Implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8` is deployed, runtime verified and CI verified by GitHub Actions `33393820120`. Finance remains `RESEARCH / 0 SEK / NONE`. No research methodology, scheduler cadence, provider/data policy, strategy, experiment, broker, order, PAPER, LIVE or AUTO capability changed.
 
 ## Evidence
 
@@ -27,7 +27,11 @@ Scheduler and operations share a deterministic current projection that separates
 - Focused API suite: 82 passed.
 - Sentinel protocol integration: 3 passed, including startup over a pre-existing stale socket.
 - Web: 160 passed; production build passed.
-- Runtime and GitHub CI: pending publication/deployment.
+- Release solution build, documentation verification, Compose validation and diff check passed.
+- Only Sentinel, API and Web were rebuilt/recreated; all three are healthy and API/Web return HTTP 200.
+- Read-only runtime at 2026-08-31 13:00 UTC: scheduler enabled/not running; historical evidence true; current session `NOT_REQUIRED_NON_RESEARCH_DAY`; feature lineage `NOT_REQUIRED`; instrument count not applicable; operations agrees and has no active run/attention; governor `ALLOW / resource.ready` with healthy current CPU, memory and one configured disk evidence source.
+- Scheduler opportunities remain 10; autonomous runs/experiments remain 0/0. No run was manually triggered.
+- GitHub Actions run `33393820120`: passed.
 
 ## Security
 
@@ -35,8 +39,8 @@ The remediation adds no host mount, Docker socket, permissive fallback or new ca
 
 ## Remaining work
 
-Deploy only Sentinel, API and Web, inspect the same read-only status surfaces, verify health and publish CI/runtime evidence. Do not manually trigger a research run.
+No BB-119 remediation remains. Runtime evidence is dated and must be refreshed before a future implementation decision; governor may truthfully return `DEFER` or `BLOCK` when later resource evidence warrants it.
 
 ## Resumption
 
-Start from the published BB-119 implementation SHA and recheck Sentinel/API health before interpreting governor state. If deployment has not occurred, build and recreate only Sentinel, API and Web; never remove Finance or runtime volumes. Then query scheduler, operations, governor and system overview read-only.
+Start from the published BB-119 evidence SHA and recheck Sentinel/API health before interpreting governor state. Query scheduler, operations, governor and system overview read-only; never infer current eligibility from this dated snapshot or manually trigger research for verification.

@@ -8,6 +8,8 @@ On a non-research day, historical evidence remains valid while `currentSessionRe
 
 BB-119 also makes Sentinel restart-safe for its configured Unix socket. Sentinel remains the only source for CPU, memory and configured-disk evidence; Finance invents no metrics and the governor still applies `BLOCK > DEFER > ALLOW`. No research run is triggered by status inspection.
 
+Runtime verification at 2026-08-31 13:00 UTC confirmed historical evidence available, a non-research day with no required current session/lineage/universe count, matching operations semantics, no active run and governor `ALLOW` from a healthy fresh CPU/memory/configured-disk snapshot. Sentinel, API and Web were healthy; opportunities remained 10 and autonomous runs/experiments remained 0.
+
 ## BB-118 current deployed baseline — 2026-08-31
 
 Finance is deployed in `RESEARCH` with budget `0 SEK` and execution authority `NONE`. Real trading is impossible: there is no broker, order contract, paper executor, LIVE mode or AUTO trading. Autonomous research is not autonomous trading; signals, candidate evidence, backtests, shadow predictions and BB-089 risk verdicts are research evidence only.
