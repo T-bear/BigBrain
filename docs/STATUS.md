@@ -14,6 +14,8 @@ Initial CI run `33468854249` passed backend, documentation and secrets but expos
 
 The follow-up full-history secrets scan identified one historical false positive in commit `04c9271…`: prose containing “credentials, authorization” in the Finance threat model. A fingerprint-specific `.gitleaksignore` suppresses only that reviewed historical finding; a redacted local scan of 200 commits found no other candidate. Secret detection rules remain otherwise unchanged.
 
+Publication chain: implementation `17192451deac709a3cb2d25ee1aa0ad97919769d`; Calendar test-only rollover remediation `a0a4c9d2ca62ed43587b070f6c06db57a0217708`; fingerprint-specific secrets remediation `91247b81be5b55b1200e7c39233106ef3f2ecd3e`. GitHub Actions run `33469847365` passed backend, frontend, documentation and secrets.
+
 ## BB-123 Transaction-Cost, Slippage & Fill Realism (2026-08-31)
 
 BB-123 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `317e882ef90e15562642105ce3f7f5a2621002ad`. The existing BB-080 engine now uses versioned `daily-next-session-open-v2` and `next-session-open-full-fill/v2`: fixed, per-share/minimum and proportional costs; assumed full-spread; separately adverse slippage; whole-share/cash constraints; and explicit filled/rejected attempts. Missing exact-next-session bars, invalid opens, zero quantity, insufficient cash, unavailable positions and end-of-data fail deterministically without future-bar substitution. Old v1 runs remain immutable and readable.
