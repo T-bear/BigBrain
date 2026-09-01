@@ -22,6 +22,21 @@ least 20 overlapping sessions, uses latest EODHD evidence per symbol/session and
 relative close differences as consistent, minor, price-basis, material or insufficient.
 Insufficient overlap is a recorded limitation, not evidence of equality.
 
+## Owner-controlled drop boundary (BB-126)
+
+The owner drop is an untrusted, read-only ingress mount, not Finance storage. Only a top-level
+`.csv` or `.zip` accompanied by an explicit `.ready` marker is considered. The scanner rejects
+symlinks/reparse points, unsafe names, unsupported or nested archive content, ZIP traversal,
+configured size/file-count expansion limits and unstable bytes. It copies verified bytes through
+a `.partial` file into the existing content-addressed quarantine and then invokes the same parser,
+OHLCV rules, mappings, comparison and 13 gates.
+
+An optional JSON sidecar is bounded and retained as an owner claim. It cannot assert entitlement,
+price basis or historical identity. Owner-drop candidates therefore start with unknown license,
+provenance, retention, price-basis and survivorship evidence. `UNKNOWN` produces manual review,
+never canonical data. The inspection-only path also stops all-pass evidence at `APPROVED /
+READY_FOR_EXPLICIT_PROMOTION_REVIEW`; a separate explicit promotion decision is required.
+
 ## Current source decisions (updated 2026-08-31)
 
 - WIKI mirror `kmfranz/trading_pairs`: public-domain evidence is first-party Nasdaq Data Link;

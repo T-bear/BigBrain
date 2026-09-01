@@ -12,5 +12,6 @@
 - [Finance mode promotion](finance-mode-promotion.md) — design-only gated transition model
 - [Finance read-only observation verification](finance-read-only-observation-verification.md)
 - [Finance EODHD retention and deletion](finance-eodhd-retention-deletion.md)
+- [Finance owner market-data drop](finance-owner-market-data-drop.md)
 
 Kontrollera alltid status, versioner, liveidentitet och stoppvillkor. Draft kräver review.

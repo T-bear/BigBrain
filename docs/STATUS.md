@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-126 Owner Market-Data Drop Folder & Quarantine Inspection (2026-09-01)
+
+BB-126 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI PENDING** from baseline `2e6999f86f6863dabb5b7f0225248ea7b5603dfa`. The API now watches the owner-controlled, read-only container mount `/finance-data/market-data-drop` for explicit `<file>.ready` markers and copies stable CSV or ZIP-contained CSV evidence into the existing BB-084 quarantine before inspection.
+
+The existing 13-gate policy, OHLCV checks, effective instrument mappings and cross-source comparison remain authoritative. Owner sidecars are retained as unverified claims; possession never establishes entitlement. Unknown provenance/rights remain fail-closed, and even an all-pass inspection stops at `READY_FOR_EXPLICIT_PROMOTION_REVIEW` without canonical insertion. The existing dataset catalog reports schema, coverage, row/identity/conflict/overlap evidence plus separate technical-quality, rights and promotion states. Focused 16/16 and full API 586/586 tests, warning-free Release build, documentation/Compose/diff gates and API-only runtime verification passed. Image `sha256:e8b7cf7c03baf560740408bc01917162ba928480489490736a94547e94a37311` is healthy; Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-125 Zero-Cost Historical Market Data Qualification (2026-09-01)
 
 BB-125 is **QUALIFIED FAIL-CLOSED / NO STATE A / NO ACQUISITION / NO CODE / NO DEPLOYMENT** from baseline `95490168e113a506bfda200cb2b8603b5ee050d2`. Current first-party material was reviewed for SimFin Free, Alpaca Basic/free, Yahoo Finance/yfinance and Tiingo Starter/free against the existing capability-scoped entitlement policy and BB-084 intake gates.

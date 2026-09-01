@@ -46,6 +46,7 @@ services:
       Finance__Eodhd__DatabasePath: /finance-data/eodhd-market-memory.db
       Finance__Eodhd__PayloadDirectory: /finance-data/eodhd-payloads
       Finance__Datasets__QuarantineDirectory: /finance-data/dataset-quarantine
+      Finance__Datasets__OwnerDropDirectory: /finance-data/market-data-drop
       Finance__DataProtection__BackupDirectory: /finance-data/backups
       Finance__DataProtection__RestoreStagingDirectory: /finance-data/restore-staging
       Finance__Eodhd__EntitlementEndsAtUtc: ${FINANCE__EODHD__ENTITLEMENTENDSATUTC:-}
@@ -114,6 +115,7 @@ services:
       - calendar-data:/calendar-data
       - settings-data:/settings-data
       - finance-market-data:/finance-data
+      - ${FINANCE_MARKET_DATA_DROP_PATH:-./data/finance/market-data-drop}:/finance-data/market-data-drop:ro
       - lifecycle-data:/lifecycle-data
       - /run/systemd/timesync:/host-timesync:ro
     networks:

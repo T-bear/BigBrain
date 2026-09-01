@@ -1,5 +1,22 @@
 # Testa BigBrain
 
+## BB-126 owner market-data drop
+
+- `FinanceDatasetIntakeTests` covers explicit ready-marker detection, missing/unstable boundaries,
+  checksum idempotency, changed evidence, CSV/ZIP inspection, ZIP traversal/expansion rejection,
+  suspicious sidecars, unknown schema/provenance/identity, restart and the no-auto-promotion gate.
+- Catalog assertions verify explicit technical-quality, rights and promotion states. Existing
+  BB-084 tests remain authoritative for all 13 gates, OHLCV/conflicts, cross-source evidence,
+  immutable revisions and cleanup safety.
+- Required closure: focused and full API tests, Release build, Compose config, documentation/link/
+  BB-ID checks, diff/secrets gates and API-only deployment/runtime health. No provider request,
+  autonomous research or canonical promotion is a BB-126 verification action.
+- Result 2026-09-01: 16 focused and 586 full API tests passed; `BigBrain.slnx` Release build
+  succeeded with zero warnings/errors; 211-document/89-unique-BB-ID, Compose and diff gates passed.
+  API-only image `sha256:e8b7cf7c03baf560740408bc01917162ba928480489490736a94547e94a37311`
+  is healthy. Runtime confirmed a read-only owner-drop bind, unchanged two-candidate catalog and
+  `RESEARCH / 0 SEK / NONE`; no inspection candidate or canonical revision was created.
+
 ## BB-125 zero-cost historical market-data qualification
 
 - Documentation/research-only result: no production source, schema, configuration, provider

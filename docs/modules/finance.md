@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-126 owner-controlled dataset drop — 2026-09-01
+
+The host path configured by `FINANCE_MARKET_DATA_DROP_PATH` is mounted read-only at `/finance-data/market-data-drop` in the API. An explicit `<dataset>.ready` marker claims a stable top-level CSV or ZIP-contained CSV; bytes are content-addressed and copied into the existing Finance quarantine before parsing. Same bytes and sidecar are idempotent, while changed evidence produces a distinct candidate.
+
+The existing dataset catalog is the owner-readable result surface. It separates technical quality, historical identity mapping, overlap, provenance, rights and promotion eligibility. Sidecar statements remain unverified claims, `UNKNOWN` remains fail-closed, and all-pass owner evidence stops at `READY_FOR_EXPLICIT_PROMOTION_REVIEW`; no automatic canonical promotion was added. See the [owner runbook](../operations/runbooks/finance-owner-market-data-drop.md).
+
 ## BB-125 zero-cost historical-source qualification — 2026-09-01
 
 Current first-party evidence leaves no candidate qualified for a bounded pilot. SimFin Free and

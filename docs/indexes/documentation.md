@@ -1,6 +1,7 @@
 # Documentation Index
 
 - [Finance dataset intake and quarantine](../architecture/finance/dataset-intake-quarantine.md)
+- [Finance owner market-data drop runbook](../operations/runbooks/finance-owner-market-data-drop.md)
 
 ## Authority order
 

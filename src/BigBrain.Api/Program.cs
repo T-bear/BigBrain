@@ -217,6 +217,8 @@ public partial class Program
         builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions,riskOptions));
         builder.Services.AddSingleton(_ => new FinanceMacroMemory(eodhdOptions,fredOptions));
         builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
+        builder.Services.AddSingleton<FinanceOwnerDatasetDropScanner>();
+        builder.Services.AddHostedService<FinanceOwnerDatasetDropWorker>();
         builder.Services.AddSingleton<FinanceDataProtectionStore>();
         builder.Services.AddHostedService<FinanceProspectiveCadenceWorker>();
         builder.Services.AddHostedService<FinanceFeatureBuildWorker>();
