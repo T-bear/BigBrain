@@ -12,9 +12,10 @@ Detta är en sanerad GitHub-version. Den innehåller inga hemligheter, privata a
 
 ## Status
 
-**QUARANTINED / INSPECTED / REJECTED FAIL-CLOSED / ZERO CANONICAL ROWS.** The original ZIP remains
+**QUARANTINED / INSPECTED / REJECTED FAIL-CLOSED / ZERO CANONICAL ROWS / CI VERIFIED.** The original ZIP remains
 unchanged in the owner drop. Codex created only its required external empty ready marker. No market
 data was downloaded, no external provider was contacted and no raw payload was committed.
+Implementation `057c2f07bd10f2ff21d35d981028b262e0d07cd8` is published.
 
 ## Evidence
 
@@ -81,6 +82,7 @@ secret, provider account, raw payload, private path or market row is published.
   deployed healthy.
 - Runtime: three dataset candidates total; GOOGLEFINANCE canonical rows zero; Finance
   `RESEARCH / 0 SEK / NONE`.
+- Staged gitleaks: no findings. GitHub Actions run `33528970337` passed all four jobs.
 
 ## Remaining work
 

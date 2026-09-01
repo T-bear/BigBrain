@@ -11,6 +11,8 @@
   external rights, RAW semantics and corporate actions remain unresolved.
 - Result 2026-09-01: focused 17/17 and full API 587/587 passed; Release build passed with zero
   warnings/errors. API-only deployment is healthy and Finance remained `RESEARCH / 0 SEK / NONE`.
+  Staged gitleaks found no secret/raw-payload issue. GitHub Actions run `33528970337` passed backend,
+  frontend, documentation and secrets for `057c2f07bd10f2ff21d35d981028b262e0d07cd8`.
 
 ## BB-126 owner market-data drop
 

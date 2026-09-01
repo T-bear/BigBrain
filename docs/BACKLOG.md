@@ -5,6 +5,7 @@
 - Status 2026-09-01: **QUARANTINED / INSPECTED / PROMOTION BLOCKED**; 3,126 accepted rows and zero canonical rows.
 - Owner policy decision is durably `APPROVED_BY_OWNER`; external provider/storage/reuse rights remain `UNKNOWN`. RAW basis and NASDAQ venue are owner declarations only.
 - Exact blocker: establish authoritative historical GOOG identity/venue validity and independently resolve external rights/price-basis/corporate-action semantics before any new explicit promotion review. Do not weaken `dataset-promotion-v1` or infer identity from ticker text.
+- Publication: implementation `057c2f07bd10f2ff21d35d981028b262e0d07cd8`; GitHub Actions run `33528970337` passed all four jobs.
 
 ## BB-126 — Owner Market-Data Drop Folder & Quarantine Inspection
 
