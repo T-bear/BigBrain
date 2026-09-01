@@ -14,7 +14,8 @@ Detta är en sanerad GitHub-version. Den innehåller inga hemligheter, privata a
 
 Research and source-of-truth reconciliation are complete. No candidate reached `STATE A`, so no
 production code, data, runtime or deployment changed. Documentation verification and publication
-evidence are recorded during finalization.
+evidence are complete. Qualification commit `16deff048f68da199087de1cccceb8a0111c9a97` is published;
+GitHub Actions run `33471245304` passed all four jobs.
 
 ## Evidence
 
@@ -232,7 +233,8 @@ tuning or deployment occurred. Documentation links/structure, unique BB IDs, Com
 whitespace and secret-pattern gates are the applicable publication checks. The documentation
 validator passed for 209 Markdown files and 89 unique BB IDs; Compose validation and
 `git diff --check` passed. No production build/test is applicable. The local gitleaks binary is not
-installed, so the full-history secrets result is recorded from GitHub CI after publication.
+installed; GitHub Actions run `33471245304` passed backend, frontend, documentation and the
+full-history secrets gate for the published qualification commit.
 
 ## Changes
 

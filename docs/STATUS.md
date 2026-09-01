@@ -8,6 +8,8 @@ SimFin Free is `STATE B — HUMAN CONFIRMATION REQUIRED`: it advertises $0/no ca
 
 No candidate qualified for a pilot, so no account, key, provider request, data, adapter, candidate, promotion, runtime change or deployment occurred. EODHD Free and immutable WIKI evidence remain authoritative and independent; Stooq remains human-confirmation-required. Finance remains `RESEARCH / 0 SEK / NONE`. Sanitized SimFin, Alpaca, Yahoo and Tiingo inquiry drafts are published but were not sent.
 
+Qualification/documentation commit `16deff048f68da199087de1cccceb8a0111c9a97` is published. GitHub Actions run `33471245304` passed backend, frontend, documentation and full-history secrets jobs.
+
 ## BB-124 Anti-Overfitting & Out-of-Sample Governance (2026-09-01)
 
 BB-124 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `386c8766baa0306589e8d5b1fc88c0f81c201c95`. The existing BB-081 robustness engine now produces immutable v2 evidence with chronological `TRAIN / VALIDATION / HOLDOUT`, two 50-session embargoes, a declared parameter trial population, validation-only selection and a single-use holdout lifecycle (`UNTOUCHED / EVALUATED / CONTAMINATED`). A conservative family-breadth gate exposes repeated selection without inventing p-values; DSR and PBO/CSCV remain honestly not evaluable.

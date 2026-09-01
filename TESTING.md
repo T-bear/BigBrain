@@ -12,7 +12,8 @@
 - Result 2026-09-01: documentation verification passed for 209 Markdown files and 89 unique BB
   IDs; Compose validation and `git diff --check` passed. No production build/test or deployment is
   applicable because production behavior did not change. The local gitleaks binary is unavailable;
-  the required full-history secrets gate remains GitHub CI evidence after push.
+  GitHub Actions run `33471245304` passed backend, frontend, documentation and full-history secrets
+  jobs for qualification commit `16deff048f68da199087de1cccceb8a0111c9a97`.
 
 ## BB-124 anti-overfitting and OOS governance
 
