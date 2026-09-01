@@ -1,5 +1,6 @@
 # Finance reports
 
+- [BB-125 Zero-Cost Historical Market Data Qualification](finance-bb-125-zero-cost-market-data-qualification-20260901.md)
 - [BB-124 Anti-Overfitting & Out-of-Sample Governance](finance-bb-124-anti-overfitting-oos-governance-20260901.md)
 - [BB-092 Autonomous Research v1 foundation](finance-bb-092-autonomous-research-foundation-20260822.md)
 - [BB-093 Research Scheduler / Orchestrator v1](finance-bb-093-research-scheduler-20260822.md)

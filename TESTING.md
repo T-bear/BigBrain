@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-125 zero-cost historical market-data qualification
+
+- Documentation/research-only result: no production source, schema, configuration, provider
+  request, account/key, quarantine artifact, canonical revision or deployment changed.
+- Validate the four-provider matrix and first-party links, unique BB IDs, Compose syntax, diff
+  whitespace and secret patterns. Existing entitlement and BB-084 suites remain authoritative;
+  no adapter or test is manufactured when no source reaches `STATE A`.
+- No provider endpoint, autonomous research run or strategy optimization is part of verification.
+  Finance must remain `RESEARCH / 0 SEK / NONE`.
+- Result 2026-09-01: documentation verification passed for 209 Markdown files and 89 unique BB
+  IDs; Compose validation and `git diff --check` passed. No production build/test or deployment is
+  applicable because production behavior did not change. The local gitleaks binary is unavailable;
+  the required full-history secrets gate remains GitHub CI evidence after push.
+
 ## BB-124 anti-overfitting and OOS governance
 
 - `FinanceRobustnessEvaluationTests` verifies deterministic 60/20/20 chronology, two embargoes, validation-only selection, complete trial preservation, single-use holdout state, contamination, insufficient-history fail-closed behavior, family-breadth rejection, negative/regime/leakage controls and the positive engineering-only control.

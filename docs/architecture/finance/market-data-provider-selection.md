@@ -1,5 +1,18 @@
 # Finance market-data provider selection
 
+## BB-125 current zero-cost historical qualification (2026-09-01)
+
+No assessed candidate reached the current `STATE A — QUALIFIED FOR BOUNDED PILOT` gate. SimFin
+Free and Alpaca Basic/free are `STATE B — HUMAN CONFIRMATION REQUIRED`; Yahoo Finance is `STATE D`
+for automated canonical intake, yfinance is separately an unsupported unofficial acquisition
+mechanism, and Tiingo Starter is `STATE D` for persistent intake because current Terms explicitly
+prohibit durable Starter storage. Attractive technical depth cannot override entitlement.
+
+No account, key, request, download, adapter, candidate or promotion was created. EODHD Free remains
+the sole active bounded provider, WIKI remains independent immutable archive evidence and Stooq
+remains human-confirmation-required/no-acquisition. The shared matrix, dated first-party links and
+unsent inquiries are in the [BB-125 report](../../reports/features/finance/finance-bb-125-zero-cost-market-data-qualification-20260901.md).
+
 BB-088 keeps EODHD Free as the sole approved current provider and adds no entitlement. A normal
 running appliance performs internal checks every 30 minutes but only attempts the bounded daily
 EOD request cycle on weekdays after 22:00 UTC. Holidays may cause a healthy no-new-session result;

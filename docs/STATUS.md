@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-125 Zero-Cost Historical Market Data Qualification (2026-09-01)
+
+BB-125 is **QUALIFIED FAIL-CLOSED / NO STATE A / NO ACQUISITION / NO CODE / NO DEPLOYMENT** from baseline `95490168e113a506bfda200cb2b8603b5ee050d2`. Current first-party material was reviewed for SimFin Free, Alpaca Basic/free, Yahoo Finance/yfinance and Tiingo Starter/free against the existing capability-scoped entitlement policy and BB-084 intake gates.
+
+SimFin Free is `STATE B — HUMAN CONFIRMATION REQUIRED`: it advertises $0/no card, five years, US prices, API/bulk and backtesting, but requires an owner-created account and does not sufficiently resolve exact price provenance/semantics or the raw/normalized/derived lifecycle after cancellation. Alpaca Basic remains `STATE B`: $0 IEX, US stocks/ETFs and historical data since 2016 are technically documented, while persistent storage, backups, accumulation, derived/audit and post-account rights remain unknown. Yahoo Finance is `STATE D` for automated canonical intake because current Yahoo terms prohibit automated collection without prior permission; human interactive reference is a narrower non-canonical case. `yfinance` is separately `STATE D` as an unsupported acquisition mechanism because its Apache license covers code, not Yahoo data. Tiingo Starter is `STATE D` for persistent intake because its 2026 Terms explicitly prohibit any durable Starter storage despite the attractive $0/30+ year EOD scope.
+
+No candidate qualified for a pilot, so no account, key, provider request, data, adapter, candidate, promotion, runtime change or deployment occurred. EODHD Free and immutable WIKI evidence remain authoritative and independent; Stooq remains human-confirmation-required. Finance remains `RESEARCH / 0 SEK / NONE`. Sanitized SimFin, Alpaca, Yahoo and Tiingo inquiry drafts are published but were not sent.
+
 ## BB-124 Anti-Overfitting & Out-of-Sample Governance (2026-09-01)
 
 BB-124 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `386c8766baa0306589e8d5b1fc88c0f81c201c95`. The existing BB-081 robustness engine now produces immutable v2 evidence with chronological `TRAIN / VALIDATION / HOLDOUT`, two 50-session embargoes, a declared parameter trial population, validation-only selection and a single-use holdout lifecycle (`UNTOUCHED / EVALUATED / CONTAMINATED`). A conservative family-breadth gate exposes repeated selection without inventing p-values; DSR and PBO/CSCV remain honestly not evaluable.

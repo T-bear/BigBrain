@@ -1,5 +1,6 @@
 # Reports Index
 
+- [BB-125 Finance Zero-Cost Historical Market Data Qualification](../reports/features/finance/finance-bb-125-zero-cost-market-data-qualification-20260901.md)
 - [BB-124 Finance Anti-Overfitting & Out-of-Sample Governance](../reports/features/finance/finance-bb-124-anti-overfitting-oos-governance-20260901.md)
 - [BB-114 Audiobook detail polish, sleep timer and floating-player rejection](../reports/features/media/bb-114-audiobook-detail-sleep-timer-floating-player-rejection-20260830.md)
 - [BB-112 Native audiobook playback and owner search remediation](../reports/features/media/bb-112-native-audiobook-playback-owner-search-remediation-20260829.md)

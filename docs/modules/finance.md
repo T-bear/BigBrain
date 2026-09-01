@@ -1,5 +1,19 @@
 # Finance module
 
+## BB-125 zero-cost historical-source qualification — 2026-09-01
+
+Current first-party evidence leaves no candidate qualified for a bounded pilot. SimFin Free and
+Alpaca Basic/free are `HUMAN CONFIRMATION REQUIRED`; Yahoo Finance/yfinance and Tiingo Starter are
+not eligible for BigBrain's automated persistent canonical archive. Tiingo Starter explicitly
+forbids durable storage, Yahoo requires prior permission for automated collection, and the
+open-source yfinance client grants no Yahoo data rights. No provider request, account, credential,
+adapter, candidate, canonical revision, runtime change or deployment occurred.
+
+The existing entitlement/provenance boundary and BB-084 13-gate quarantine/promotion chain remain
+authoritative. EODHD Free and WIKI stay independent; no provider histories are stitched. Finance
+remains `RESEARCH / 0 SEK / NONE`. See the
+[BB-125 report](../reports/features/finance/finance-bb-125-zero-cost-market-data-qualification-20260901.md).
+
 ## BB-124 anti-overfitting governance — 2026-09-01
 
 `chronological-oos-walk-forward/v2` reuses BB-081 and reserves immutable chronological train, validation and holdout partitions with a 50-session embargo at both boundaries. Candidate parameters are all retained; selection uses validation evidence only; holdout is evaluated once after the rule is frozen. Existing persisted evaluations make repeated use explicit as `CONTAMINATED` rather than fresh OOS evidence. Insufficient partitions remain `INSUFFICIENT_DATA` with holdout `UNTOUCHED`.

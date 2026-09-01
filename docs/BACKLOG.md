@@ -1,5 +1,17 @@
 # BigBrain Backlog
 
+## BB-125 — Zero-Cost Historical Market Data Qualification
+
+- Status 2026-09-01: **QUALIFIED FAIL-CLOSED / NO STATE A / NO ACQUISITION**.
+- SimFin Free and Alpaca Basic/free are `HUMAN CONFIRMATION REQUIRED`; no account or inquiry was
+  created/sent. Yahoo Finance and yfinance are rejected for automated canonical intake under the
+  current permission/client evidence. Tiingo Starter is rejected for persistent intake because its
+  Terms expressly prohibit durable storage.
+- Current limitation: no new zero-cost source improves the short/biased canonical evidence. EODHD
+  Free and WIKI remain independent; provider stitching remains prohibited.
+- Next owner decision: optionally send the published SimFin inquiry first, then Alpaca. A complete
+  written lifecycle grant and separately approved account action are prerequisites to any pilot.
+
 ## BB-122 — Historical Security Identity Evidence Pilot
 
 - Status 2026-08-31: **RESEARCH VERIFIED / STATE B / NO MAPPING / NO PROMOTION**. Baseline `78736af9153ef28c435ca1a70b1971ae38677540`; no production code, schema, WIKI acquisition, canonical data or deployment change.
@@ -972,6 +984,10 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
   leakage-, noise-selection- och regime-fragile-kontroller avvisas/nedgraderas; positiv syntetisk
   kontroll är uttryckligen endast engineering evidence. DSR/PBO förblir `NOT_EVALUABLE`.
   Längre och mindre biased data är fortfarande framtida evidensarbete, inte en ofärdig kodgate.
+  BB-125 requalified four zero-cost candidates without acquisition: SimFin Free and Alpaca Basic
+  remain `HUMAN CONFIRMATION REQUIRED`; Yahoo/yfinance and persistent Tiingo Starter intake are
+  rejected for the intended automated archive. No new historical source is activated, so the
+  current short/biased-evidence limitation remains open.
 
 ### BB-050 – M4 versioned deterministic strategy contract and candidates
 
