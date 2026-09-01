@@ -1,5 +1,13 @@
 # Finance market-data provider selection
 
+## GOOGLEFINANCE manual owner evidence (2026-09-01)
+
+A manually exported GOOG package is retained only as quarantined owner evidence. This is not an
+active Google Finance provider adapter or a qualification of automated acquisition. The owner has
+approved private BigBrain research use, while external Google/upstream storage and reuse rights
+remain `UNKNOWN`. The candidate is promotion-blocked on historical identity, external rights,
+price-basis and corporate-action semantics; no provider selection changed.
+
 ## BB-125 current zero-cost historical qualification (2026-09-01)
 
 No assessed candidate reached the current `STATE A — QUALIFIED FOR BOUNDED PILOT` gate. SimFin

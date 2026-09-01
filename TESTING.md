@@ -1,5 +1,17 @@
 # Testa BigBrain
 
+## GOOGLEFINANCE GOOG first owner intake
+
+- Focused intake coverage now includes a matching embedded ZIP sidecar, structured
+  `ApprovedByOwner` versus external `Unknown`, owner-declared RAW versus canonical `Unclear`,
+  unmapped identity, zero volume, session gaps, discontinuity heuristics and no promotion.
+- Actual runtime candidate: 3,126 accepted rows, 2014-03-27–2026-08-31, zero invalid/duplicate/
+  conflicting/out-of-order/zero-volume rows, one missing session and zero detected suspicious or
+  split-like close jumps. Result is `Rejected / BLOCKED / 0 canonical rows` because identity fails;
+  external rights, RAW semantics and corporate actions remain unresolved.
+- Result 2026-09-01: focused 17/17 and full API 587/587 passed; Release build passed with zero
+  warnings/errors. API-only deployment is healthy and Finance remained `RESEARCH / 0 SEK / NONE`.
+
 ## BB-126 owner market-data drop
 
 - `FinanceDatasetIntakeTests` covers explicit ready-marker detection, missing/unstable boundaries,

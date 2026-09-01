@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.IO.Compression;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -20,6 +21,7 @@ public sealed record OwnerDatasetDropMetadata
     public string? PriceBasis { get; init; }
     public bool? DownloadedManually { get; init; }
     public string? PermissionReference { get; init; }
+    public string? OwnerRightsDecision { get; init; }
 }
 
 public sealed record OwnerDatasetDropScanResult(string Filename, string Status, string Reason,
@@ -70,16 +72,16 @@ internal sealed class FinanceOwnerDatasetDropScanner
         string? sidecarHash = null;
         var sidecarName = Path.GetFileNameWithoutExtension(filename) + ".metadata.json";
         var sidecarPath = Path.Combine(_options.OwnerDropDirectory, sidecarName);
-        if (File.Exists(sidecarPath))
+        byte[]? sidecarBytes;
+        try { sidecarBytes = ReadSidecarBytes(sourcePath, filename, sidecarPath); }
+        catch (Exception exception) when (exception is InvalidDataException or IOException)
+        { return Result(filename, "Rejected", "invalidOrUnsafeSidecar"); }
+        if (sidecarBytes is not null)
         {
-            var sidecar = new FileInfo(sidecarPath);
-            if (!IsDirectRegularFile(sidecar) || sidecar.Length > _options.MaximumSidecarBytes)
-                return Result(filename, "Rejected", "sidecarNotRegularOrTooLarge");
             try
             {
-                var bytes = File.ReadAllBytes(sidecarPath);
-                sidecarHash = Hex(SHA256.HashData(bytes));
-                metadata = JsonSerializer.Deserialize<OwnerDatasetDropMetadata>(bytes, SidecarJson)
+                sidecarHash = Hex(SHA256.HashData(sidecarBytes));
+                metadata = JsonSerializer.Deserialize<OwnerDatasetDropMetadata>(sidecarBytes, SidecarJson)
                            ?? throw new InvalidDataException("Sidecar is empty.");
                 ValidateMetadata(metadata);
             }
@@ -189,14 +191,56 @@ internal sealed class FinanceOwnerDatasetDropScanner
                 "Owner-supplied metadata is retained as a claim and requires independent review.", DatasetEvidenceResult.Unknown,
                 false, Clean(metadata?.PermissionReference, 500) ?? ""),
             string.Join("; ", notes.Where(x => x is not null)), DatasetPriceBasis.Unclear,
-            DatasetSurvivorshipBias.SurvivorshipUnknown, bytes);
+            DatasetSurvivorshipBias.SurvivorshipUnknown, bytes, OwnerDecision(metadata),
+            Clean(metadata?.PermissionReference, 500) ?? "", Clean(metadata?.PriceBasis, 40)?.ToUpperInvariant() ?? "UNKNOWN");
+    }
+
+    private byte[]? ReadSidecarBytes(string sourcePath, string filename, string externalSidecarPath)
+    {
+        if (File.Exists(externalSidecarPath))
+        {
+            var sidecar = new FileInfo(externalSidecarPath);
+            if (!IsDirectRegularFile(sidecar) || sidecar.Length > _options.MaximumSidecarBytes)
+                throw new InvalidDataException("External sidecar is not a bounded regular file.");
+            return File.ReadAllBytes(externalSidecarPath);
+        }
+        if (!Path.GetExtension(filename).Equals(".zip", StringComparison.OrdinalIgnoreCase)) return null;
+        using var archive = ZipFile.OpenRead(sourcePath);
+        if (archive.Entries.Count > _options.MaximumArchiveFiles) throw new InvalidDataException("Archive contains too many files.");
+        long expanded = 0;
+        foreach (var entry in archive.Entries)
+        {
+            if (entry.FullName.StartsWith('/') || entry.FullName.StartsWith('\\') || Path.IsPathRooted(entry.FullName) ||
+                entry.FullName.Split('/', '\\').Any(part => part == "..")) throw new InvalidDataException("Unsafe archive path.");
+            expanded += entry.Length;
+            if (expanded > _options.MaximumExtractedBytes) throw new InvalidDataException("Archive exceeds extraction limit.");
+        }
+        var csv = archive.Entries.Where(entry => Path.GetExtension(entry.Name).Equals(".csv", StringComparison.OrdinalIgnoreCase) &&
+            !entry.Name.Equals("manifest.csv", StringComparison.OrdinalIgnoreCase)).ToArray();
+        if (csv.Length != 1) return null;
+        var expected = Path.GetFileNameWithoutExtension(csv[0].Name) + ".metadata.json";
+        var metadata = archive.Entries.SingleOrDefault(entry => entry.FullName == entry.Name && entry.Name.Equals(expected, StringComparison.Ordinal));
+        if (metadata is null) return null;
+        if (metadata.Length > _options.MaximumSidecarBytes) throw new InvalidDataException("Embedded sidecar exceeds configured limit.");
+        using var input = metadata.Open();
+        using var output = new MemoryStream((int)metadata.Length);
+        input.CopyTo(output);
+        return output.ToArray();
+    }
+
+    private static DatasetOwnerRightsDecision OwnerDecision(OwnerDatasetDropMetadata? metadata)
+    {
+        var declared = metadata?.OwnerRightsDecision ?? metadata?.DeclaredLicense;
+        return declared is not null && (declared.Equals("APPROVED_BY_OWNER", StringComparison.OrdinalIgnoreCase) ||
+            declared.Equals("OWNER_APPROVED", StringComparison.OrdinalIgnoreCase)) && !string.IsNullOrWhiteSpace(metadata?.PermissionReference)
+            ? DatasetOwnerRightsDecision.ApprovedByOwner : DatasetOwnerRightsDecision.NotProvided;
     }
 
     private static void ValidateMetadata(OwnerDatasetDropMetadata metadata)
     {
         var values = new[] { metadata.SourceProvider, metadata.OriginalUrl, metadata.LicenseOrTermsUrl,
             metadata.DeclaredLicense, metadata.OwnerNotes, metadata.ExpectedMarket, metadata.PriceBasis,
-            metadata.PermissionReference }.Concat(metadata.ExpectedSymbols ?? []);
+            metadata.PermissionReference, metadata.OwnerRightsDecision }.Concat(metadata.ExpectedSymbols ?? []);
         if ((metadata.ExpectedSymbols?.Count ?? 0) > 100 || values.Any(x => x is { Length: > 2_000 }))
             throw new InvalidDataException("Sidecar exceeds field limits.");
         _ = Clean(metadata.SourceProvider, 120);
@@ -204,6 +248,7 @@ internal sealed class FinanceOwnerDatasetDropScanner
         _ = Clean(metadata.ExpectedMarket, 80);
         _ = Clean(metadata.PriceBasis, 40);
         _ = Clean(metadata.PermissionReference, 500);
+        _ = Clean(metadata.OwnerRightsDecision, 80);
         _ = Clean(metadata.OwnerNotes, 2_000);
         foreach (var symbol in metadata.ExpectedSymbols ?? []) _ = Clean(symbol, 32);
         var forbidden = new[] { "api_key", "apikey", "access_token", "password", "bearer ", "cookie=" };

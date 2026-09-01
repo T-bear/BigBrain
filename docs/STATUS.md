@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## First owner intake — GOOGLEFINANCE GOOG (2026-09-01)
+
+The first real BB-126 package is **QUARANTINED / INSPECTED / REJECTED FAIL-CLOSED / ZERO CANONICAL ROWS** from baseline `72d895dbe67e17fa6d9ac93116fc83acd4c54bd5`. BigBrain preserved the original owner ZIP, read its single matching embedded sidecar safely and recorded the `ApprovedByOwner` system value (policy meaning `APPROVED_BY_OWNER`) separately from external rights `Unknown`.
+
+The immutable candidate contains 3,126 accepted GOOG daily OHLCV rows for 2014-03-27–2026-08-31. There are zero invalid OHLCV rows, missing values, invalid dates, non-positive prices, invalid volumes, duplicate/conflicting keys, out-of-order rows or detected 20%/split-like close jumps; one expected US calendar session is absent. Technical quality is `LIMITED`. The package's RAW basis and NASDAQ venue are owner claims, not independently verified semantics/identity. GOOG has no approved historical `CanonicalInstrument / ProviderInstrumentMapping`, cross-source evidence is `InsufficientOverlap`, and corporate-action evidence is absent. Candidate state is `Rejected`, promotion is `BLOCKED`, and no canonical data was added. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-126 Owner Market-Data Drop Folder & Quarantine Inspection (2026-09-01)
 
 BB-126 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** from baseline `2e6999f86f6863dabb5b7f0225248ea7b5603dfa` and implementation `48755ee0ec27fed8f38132ddca050c2d2654e6ca`. The API now watches the owner-controlled, read-only container mount `/finance-data/market-data-drop` for explicit `<file>.ready` markers and copies stable CSV or ZIP-contained CSV evidence into the existing BB-084 quarantine before inspection.

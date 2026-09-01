@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- Owner intake — [GOOGLEFINANCE GOOG](features/finance/finance-googlefinance-goog-owner-intake-20260901.md)
+
 - `BB-126` — [Owner Market-Data Drop & Quarantine Inspection](features/finance/finance-bb-126-owner-market-data-drop-20260901.md)
 
 - `BB-123` — [Transaction-Cost, Slippage & Fill Realism](features/finance/finance-bb-123-transaction-cost-slippage-fill-realism-20260831.md)

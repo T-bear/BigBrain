@@ -1,5 +1,11 @@
 # Finance module
 
+## GOOGLEFINANCE GOOG owner intake — 2026-09-01
+
+The first real owner package produced candidate `owner-drop-4891dca5274b57ca303e8d0d` from an immutable manually exported GOOGLEFINANCE ZIP. Its single matching embedded metadata sidecar was bounded and parsed as an owner claim. The catalog records `ApprovedByOwner` (policy meaning `APPROVED_BY_OWNER`), external rights `Unknown`, owner-declared `RAW`, canonical price basis `Unclear`, 3,126 accepted rows, one missing calendar session and zero canonical rows.
+
+GOOG is not in the approved effective-dated mapping set, so ticker and owner-declared NASDAQ venue cannot establish historical identity. The candidate therefore remains `Rejected / BLOCKED`, independently of its otherwise valid OHLCV. Cross-source result is `InsufficientOverlap`; no EODHD/WIKI stitching occurred. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-126 owner-controlled dataset drop — 2026-09-01
 
 The host path configured by `FINANCE_MARKET_DATA_DROP_PATH` is mounted read-only at `/finance-data/market-data-drop` in the API. An explicit `<dataset>.ready` marker claims a stable top-level CSV or ZIP-contained CSV; bytes are content-addressed and copied into the existing Finance quarantine before parsing. Same bytes and sidecar are idempotent, while changed evidence produces a distinct candidate.

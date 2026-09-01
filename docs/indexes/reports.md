@@ -1,5 +1,6 @@
 # Reports Index
 
+- [GOOGLEFINANCE GOOG First Owner Intake](../reports/features/finance/finance-googlefinance-goog-owner-intake-20260901.md)
 - [BB-126 Finance Owner Market-Data Drop & Quarantine Inspection](../reports/features/finance/finance-bb-126-owner-market-data-drop-20260901.md)
 - [BB-125 Finance Zero-Cost Historical Market Data Qualification](../reports/features/finance/finance-bb-125-zero-cost-market-data-qualification-20260901.md)
 - [BB-124 Finance Anti-Overfitting & Out-of-Sample Governance](../reports/features/finance/finance-bb-124-anti-overfitting-oos-governance-20260901.md)

@@ -147,6 +147,14 @@ input dataset revisions, creation time and output checksum.
 retaining, reverse-engineerable or post-subscription derived artifacts. The entitlement
 evaluator checks derived creation and each later use independently.
 
+### Owner approval versus external rights
+
+Owner-controlled intake may record `APPROVED_BY_OWNER` as an auditable private-research policy
+decision with its own evidence reference. It never means that Google or another upstream provider
+verified storage, reuse or backtesting rights. External license/provenance remains independently
+`Pass / Fail / Unknown`, and `Unknown` remains fail-closed. The same separation applies to an
+owner-declared raw/adjusted basis, venue and symbol identity.
+
 ## Decision and outcome evidence graph
 
 The append-oriented evidence chain is:

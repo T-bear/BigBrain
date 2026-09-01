@@ -37,6 +37,11 @@ independently proven.
 Optional sidecar fields are `sourceProvider`, `originalUrl`, `downloadedOn`,
 `licenseOrTermsUrl`, `declaredLicense`, `ownerNotes`, `expectedSymbols`, `expectedMarket`,
 `priceBasis`, `downloadedManually` and `permissionReference`. URLs must be absolute HTTP(S).
+For a ZIP containing exactly one market CSV, the same top-level basename sidecar may be embedded
+as `<csv-basename>.metadata.json`; it is read with the archive safety limits. An embedded `.ready`
+file does not trigger intake—the ZIP itself still requires an external `<zip-filename>.ready`.
+`ownerRightsDecision: APPROVED_BY_OWNER` (or the legacy exact `OWNER_APPROVED` declaration plus an
+evidence reference) records owner policy only and never verifies external rights.
 
 ## Outcomes, restart and retry
 

@@ -121,8 +121,27 @@ public sealed class FinanceDatasetIntakeTests
         using var bounded=new IntakeFixture(maximumExtractedBytes:20);bounded.ReadyZip("large.zip",archive=>
         {var entry=archive.CreateEntry("prices.csv");using var writer=new StreamWriter(entry.Open());writer.Write(CsvRows());});
         var rejected=Assert.Single(bounded.Scanner.ScanOnce());
-        Assert.Equal("Rejected",rejected.Status);Assert.Equal("inspectionRejected",rejected.Reason);
-        Assert.Null(rejected.Inspection!.CanonicalRevisionId);
+        Assert.Equal("Rejected",rejected.Status);Assert.Equal("invalidOrUnsafeSidecar",rejected.Reason);
+        Assert.Null(rejected.Inspection);
+    }
+
+    [Fact]
+    public void OwnerZipReadsMatchingEmbeddedSidecarAndSeparatesOwnerApprovalFromExternalRights()
+    {
+        using var fixture=new IntakeFixture();fixture.ReadyZip("owner-package.zip",archive=>
+        {
+            var csv=archive.CreateEntry("goog.csv");using(var writer=new StreamWriter(csv.Open()))
+                writer.Write("ticker,date,open,high,low,close,volume\nGOOG,2024-01-02,100,101,99,100,0\nGOOG,2024-01-05,20,21,19,20,100\n");
+            var metadata=archive.CreateEntry("goog.metadata.json");using var metadataWriter=new StreamWriter(metadata.Open());
+            metadataWriter.Write("{\"sourceProvider\":\"Google Finance / GOOGLEFINANCE\",\"declaredLicense\":\"OWNER_APPROVED\",\"permissionReference\":\"OWNER_APPROVED_BY_OWNER_TEST\",\"priceBasis\":\"RAW\",\"expectedSymbols\":[\"GOOG\"],\"expectedMarket\":\"NASDAQ\"}");
+        });
+        var result=Assert.Single(fixture.Scanner.ScanOnce()).Inspection!;
+        Assert.Equal("ApprovedByOwner",result.OwnerRightsDecision);Assert.Equal("Unknown",result.ExternalRightsVerification);
+        Assert.Equal("RAW",result.OwnerDeclaredPriceBasis);Assert.Equal("Unclear",result.PriceBasis);
+        Assert.Equal("HUMAN_CONFIRMATION_REQUIRED",result.RightsStatus);Assert.Equal("BLOCKED",result.PromotionEligibility);
+        Assert.Equal(1,result.UnmappedInstruments);Assert.Equal(0,result.SafelyMappedInstruments);
+        Assert.Equal(1,result.ZeroVolume);Assert.True(result.MissingSessions>0);Assert.Equal(1,result.SplitLikeJumps);
+        Assert.Equal("LIMITED",result.TechnicalQuality);Assert.Null(result.CanonicalRevisionId);
     }
 
     [Fact]

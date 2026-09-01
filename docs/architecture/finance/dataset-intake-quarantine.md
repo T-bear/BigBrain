@@ -37,6 +37,17 @@ provenance, retention, price-basis and survivorship evidence. `UNKNOWN` produces
 never canonical data. The inspection-only path also stops all-pass evidence at `APPROVED /
 READY_FOR_EXPLICIT_PROMOTION_REVIEW`; a separate explicit promotion decision is required.
 
+A ZIP with exactly one market CSV may carry one top-level `<csv-basename>.metadata.json`. BB-126
+applies the same entry-count, expanded-size and traversal checks before reading it; embedded ready
+markers and manifests never trigger processing. The sidecar may durably record
+`APPROVED_BY_OWNER`, but this owner policy decision is orthogonal to external license/provenance
+verification and does not satisfy those gates. Owner-declared price basis and venue likewise remain
+claims until independently evidenced.
+
+The first real package, manually exported GOOGLEFINANCE GOOG, validated 3,126 OHLCV rows but was
+rejected because GOOG lacks approved historical identity/venue mapping. External rights, RAW
+semantics and corporate actions also remain unresolved. Zero rows were promoted.
+
 ## Current source decisions (updated 2026-08-31)
 
 - WIKI mirror `kmfranz/trading_pairs`: public-domain evidence is first-party Nasdaq Data Link;

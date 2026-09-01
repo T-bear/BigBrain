@@ -7,6 +7,7 @@ namespace BigBrain.Modules.Finance;
 public enum DatasetCandidateState { Discovered, Downloading, Downloaded, Inspecting, Validating, Rejected, ManualReviewRequired, Approved, Promoted, Superseded }
 public enum DatasetLicenseClass { Unknown, PublicDomain, Cc0, CcBy, CompatibleOther, Incompatible }
 public enum DatasetEvidenceResult { Pass, Fail, Unknown }
+public enum DatasetOwnerRightsDecision { NotProvided, ApprovedByOwner }
 public enum DatasetPriceBasis { Unclear, Raw, SplitAdjusted, DividendAdjusted, TotalReturnAdjusted, RawAndAdjusted }
 public enum DatasetSurvivorshipBias { SurvivorshipUnknown, CurrentConstituentsOnly, PointInTimeUniverse, Mixed, NotApplicable }
 public enum DatasetComparisonClass { Consistent, MinorNumericDifference, PriceBasisDifference, CorporateActionDifference, SessionDifference, MaterialConflict, InsufficientOverlap }
@@ -18,13 +19,18 @@ public sealed record DatasetRightsEvidence(DatasetLicenseClass LicenseClass, str
 
 public sealed record ExternalDatasetCandidate(string CandidateId, string SourceName, string SourceUrl,
     string HostingPlatform, string OriginalFilename, DatasetRightsEvidence Rights, string Provenance,
-    DatasetPriceBasis PriceBasis, DatasetSurvivorshipBias SurvivorshipBias, long? ExpectedBytes = null);
+    DatasetPriceBasis PriceBasis, DatasetSurvivorshipBias SurvivorshipBias, long? ExpectedBytes = null,
+    DatasetOwnerRightsDecision OwnerRightsDecision = DatasetOwnerRightsDecision.NotProvided,
+    string OwnerRightsEvidence = "", string OwnerDeclaredPriceBasis = "UNKNOWN");
 
 public sealed record DatasetGateResult(DatasetGate Gate, DatasetEvidenceResult Result, string Code, string Detail);
 
 public sealed record DatasetValidationSummary(ImmutableArray<DatasetGateResult> Gates, string SchemaFingerprint,
     long ObservationCount, int InstrumentCount, DateOnly? CoverageFrom, DateOnly? CoverageTo, long DuplicateKeys,
-    long ConflictingKeys, long InvalidOhlcv, DatasetComparisonClass Comparison, ImmutableArray<string> Limitations)
+    long ConflictingKeys, long InvalidOhlcv, DatasetComparisonClass Comparison, ImmutableArray<string> Limitations,
+    long ZeroVolume = 0, long OutOfOrderRows = 0, long MissingSessions = 0,
+    long SuspiciousDiscontinuities = 0, long SplitLikeJumps = 0, long MissingValues = 0,
+    long InvalidDates = 0, long NonPositivePrices = 0, long InconsistentOhlc = 0, long InvalidVolume = 0)
 {
     public DatasetEvidenceResult Overall => Gates.Any(x => x.Result == DatasetEvidenceResult.Fail)
         ? DatasetEvidenceResult.Fail
