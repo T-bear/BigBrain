@@ -1,5 +1,6 @@
 # Finance reports
 
+- [BB-124 Anti-Overfitting & Out-of-Sample Governance](finance-bb-124-anti-overfitting-oos-governance-20260901.md)
 - [BB-092 Autonomous Research v1 foundation](finance-bb-092-autonomous-research-foundation-20260822.md)
 - [BB-093 Research Scheduler / Orchestrator v1](finance-bb-093-research-scheduler-20260822.md)
 - [BB-091 Sweden / Europe macro and FX](finance-bb-091-european-macro-fx-20260817.md)

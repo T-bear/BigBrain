@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-124 Anti-Overfitting & Out-of-Sample Governance (2026-09-01)
+
+BB-124 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `386c8766baa0306589e8d5b1fc88c0f81c201c95`. The existing BB-081 robustness engine now produces immutable v2 evidence with chronological `TRAIN / VALIDATION / HOLDOUT`, two 50-session embargoes, a declared parameter trial population, validation-only selection and a single-use holdout lifecycle (`UNTOUCHED / EVALUATED / CONTAMINATED`). A conservative family-breadth gate exposes repeated selection without inventing p-values; DSR and PBO/CSCV remain honestly not evaluable.
+
+Seeded no-signal, future-knowledge leakage, many-noise selection, regime-fragile and positive causal engineering controls are deterministic and explicitly non-market evidence. BB-123's `daily-next-session-open-v2` conservative friction contract is reused. Current short/biased market history remains a separate limitation and may correctly yield `INSUFFICIENT_DATA`; no statistical process repairs survivorship, historical-identity, corporate-action or intraday-liquidity gaps. Autonomous Research integrity v2 now fails closed unless selection governance passes and the holdout was fresh at selection. Finance remains `RESEARCH / 0 SEK / NONE`.
+
+API-only image `sha256:bea523d60e541598e656347ef6663524c20e7420c5fa5f24183fdb55dc281bd0` is healthy. The bounded non-autonomous build was idempotent and returned three v2 evaluations, 45 unique runs, seven candidates, 15 cost variants and zero walk-forward windows. Every strategy reports 99 train / 33 validation / 34 holdout sessions, `INSUFFICIENT_DATA` and holdout `UNTOUCHED`; no autonomous run/experiment was created. Post-deployment aggregate evidence is 113 market revisions, 31,898 observations, 17 feature revisions, 929 backtests and 31 robustness evaluations. Existing enabled cadence continued independently; BB-124 made no provider, entitlement or cadence change and issued no acquisition command.
+
+Media item **BB-158 — Media URL Import & Audio Extraction** is registered as **PLANNED / BACKLOG ONLY**. No Media source, runtime or deployment changed.
+
 ## BB-123 Transaction-Cost, Slippage & Fill Realism (2026-08-31)
 
 BB-123 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `317e882ef90e15562642105ce3f7f5a2621002ad`. The existing BB-080 engine now uses versioned `daily-next-session-open-v2` and `next-session-open-full-fill/v2`: fixed, per-share/minimum and proportional costs; assumed full-spread; separately adverse slippage; whole-share/cash constraints; and explicit filled/rejected attempts. Missing exact-next-session bars, invalid opens, zero quantity, insufficient cash, unavailable positions and end-of-data fail deterministically without future-bar substitution. Old v1 runs remain immutable and readable.

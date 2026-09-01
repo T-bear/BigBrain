@@ -128,3 +128,9 @@ approval. See [market-data memory and provenance](market-data-memory-and-provena
 ## BB-081 chronological evaluation governance
 
 `chronological-oos-walk-forward/v1` keeps train earlier than embargo and test, never shuffles time and evaluates fixed parameters in each expanding walk-forward window. The 50-session default embargo matches `core-daily-v1` maximum lookback. SMA and momentum neighborhoods plus the five-point cost ladder are bounded diagnostics, not selection. `transparent-robustness-score-v2` publishes weighted components, while minimum train/test/window requirements have absolute precedence. Evaluation identity, all run references and checksum are immutable; changing test rows cannot change train or an earlier completed window.
+
+## BB-124 train/validation/holdout amendment
+
+New v2 evidence reserves 60/20/20 usable sessions after two explicit 50-session embargoes. Development diagnostics stop at validation; parameter selection is deterministic and validation-only, with every candidate retained. The selected hypothesis may inspect holdout once. Its state is immutable evidence: `UNTOUCHED`, `EVALUATED`, or `CONTAMINATED` when prior evidence already consumed the same source/feature/strategy/date scope. Current v2 evidence is reused idempotently; a materially changed future plan cannot silently call an old holdout fresh.
+
+The bounded family-breadth rule is a conservative selection gate, not a significance test. It exposes candidate count, criterion, positive-validation fraction, median behavior, BB-123 execution model and final verdict. Missing evidence fails closed. Short history, survivorship, corporate-action and liquidity limitations remain attached and cannot be statistically corrected.

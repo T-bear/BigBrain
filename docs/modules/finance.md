@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-124 anti-overfitting governance — 2026-09-01
+
+`chronological-oos-walk-forward/v2` reuses BB-081 and reserves immutable chronological train, validation and holdout partitions with a 50-session embargo at both boundaries. Candidate parameters are all retained; selection uses validation evidence only; holdout is evaluated once after the rule is frozen. Existing persisted evaluations make repeated use explicit as `CONTAMINATED` rather than fresh OOS evidence. Insufficient partitions remain `INSUFFICIENT_DATA` with holdout `UNTOUCHED`.
+
+The bounded `family-breadth-fail-closed-v1` rule requires broad positive validation behavior and a positive median before the selected candidate may reach holdout. It emits no p-value and is not DSR/PBO. Deterministic engineering controls cover no-signal noise, future-knowledge leakage, winner selection among noise, regime fragility and a deliberately causal positive series. All use BB-123's versioned conservative execution assumptions. `research-integrity-v2` requires both selection PASS and a fresh-at-selection/evaluated holdout. None of these states authorizes PAPER, LIVE, AUTO or execution.
+
 ## BB-123 deterministic execution realism — 2026-08-31
 
 Historical research backtests now use `daily-next-session-open-v2` with an immutable `next-session-open-full-fill/v2` contract. Costs separately record fixed per-fill, per-share/minimum and proportional commissions; assumed full-spread; and adverse slippage. Spread is explicitly assumed because daily OHLCV contains no quotes. Buy fills add half-spread plus slippage; sells subtract them. Cash, whole shares, turnover, gross/net equity and benchmark behavior remain in the existing engine.

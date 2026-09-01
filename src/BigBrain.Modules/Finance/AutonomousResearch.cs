@@ -58,7 +58,7 @@ public static class FinanceResearchContracts
 {
     private static readonly JsonSerializerOptions CanonicalJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     public const string EngineVersion = "autonomous-research-v1";
-    public const string IntegrityVersion = "research-integrity-v1";
+    public const string IntegrityVersion = "research-integrity-v2";
     public const string ComplexityVersion = "research-complexity-v1";
     public const int MaximumHypothesesPerRun = 3;
     public const int MaximumChallengersPerHypothesis = 1;
@@ -91,6 +91,10 @@ public static class FinanceResearchContracts
             new("costs", costAssumptionPresent && evidence.CostSensitivity.Points.Count > 1 ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail, costAssumptionPresent ? "versioned hypothetical cost ladder evaluated" : "cost assumption missing"),
             new("lineage", lineageComplete && evidence.Plan.MarketRevisionIds.Count > 0 && !string.IsNullOrWhiteSpace(evidence.Plan.FeatureRevisionId) ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail, lineageComplete ? "market and feature revisions pinned" : "lineage incomplete"),
             new("multiple-testing", familyAttempts > 0 ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail, $"familyAttempts={familyAttempts}; no independent-significance claim"),
+            new("selection-governance", evidence.SelectionGovernance?.Outcome == SelectionGovernanceOutcome.Pass ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail,
+                evidence.SelectionGovernance is null ? "anti-overfitting governance evidence missing" : $"outcome={evidence.SelectionGovernance.Outcome};candidates={evidence.SelectionGovernance.CandidateCount}"),
+            new("holdout-freshness", evidence.SelectionGovernance?.HoldoutStateAtSelection == HoldoutEvidenceState.Untouched && evidence.SelectionGovernance.FinalHoldoutState == HoldoutEvidenceState.Evaluated ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail,
+                evidence.SelectionGovernance is null ? "holdout lifecycle evidence missing" : $"atSelection={evidence.SelectionGovernance.HoldoutStateAtSelection};final={evidence.SelectionGovernance.FinalHoldoutState};prior={evidence.SelectionGovernance.PriorHoldoutEvaluations}"),
             new("complexity", complexity.Score <= 12 ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail, $"{complexity.Version};score={complexity.Score}"),
             new("robustness", evidence.Verdict == RobustnessVerdict.MoreRobust ? ResearchIntegrityState.Pass : ResearchIntegrityState.Fail, evidence.Verdict.ToString()),
             new("dsr", ResearchIntegrityState.NotEvaluable, "Return-series moments and selection-population assumptions are not retained by v1 evidence."),

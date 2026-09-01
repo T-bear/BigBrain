@@ -21,6 +21,8 @@ Final remediation pins a research cycle to the exact evidence generation returne
 
 DSR is `NOT_EVALUABLE` because v1 does not retain the required return-series moments and selection-population assumptions. PBO/CSCV is `NOT_EVALUABLE` because combinatorial partitions are absent. A negative control is deferred until a seeded label/permutation contract can be added without contaminating canonical observations. No substitute statistic or qualitative PBO label is emitted.
 
+BB-124 upgrades new integrity decisions to `research-integrity-v2`. Autonomous evidence now also fails closed unless BB-124 selection governance is `PASS` and its holdout was `UNTOUCHED` at selection and exactly `EVALUATED` afterward. Seeded controls are evaluated in isolated deterministic engineering evidence; canonical market observations are never relabeled or mutated. DSR and PBO/CSCV remain `NOT_EVALUABLE` because BB-124 deliberately does not fabricate their missing statistical inputs.
+
 Research hypotheses currently reuse momentum20 and allowlisted fast/slow SMA relation evidence. Volatility20 and volume-ratio20 are registered research inputs but not autonomous variants. Macro evidence is not used: available Riksbank/ECB/current-history data is `REVISED_HISTORY_EXPLORATORY`, and causal FRED coverage is too narrow for this loop.
 
 ## Consequences

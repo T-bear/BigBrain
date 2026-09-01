@@ -59,6 +59,13 @@
 - When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
 - Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
 
+## BB-158 — Media URL Import & Audio Extraction
+
+- Status: **PLANNED / BACKLOG ONLY**. Registered by BB-124; no implementation or deployment.
+- Future intent: accept an untrusted media URL, analyze only an explicitly supported source, verify that retrieval/import is permitted, present available metadata, lawfully extract/transcode audio where appropriate, normalize filename/metadata/artwork and import through existing Media/job/import architecture without silent overwrite.
+- Rights boundary: the user must own or otherwise have permission to retrieve the content. Provider terms and lawful access require separate investigation. Never bypass DRM, authentication, paywalls or other access controls; public playback does not approve YouTube or any other provider automatically. External access belongs behind adapters and no separate downloader service is justified without evidence.
+- Security boundary: future design must fail closed on SSRF, redirects, DNS rebinding, private-network/file targets, MIME/type and size limits, timeouts, resource exhaustion and malicious media. Never construct arbitrary shell commands from input or expose cookies/tokens/secrets to the frontend. Evaluate FFmpeg only for lawful bounded transcoding; preserve source/transformation provenance and collision-safe imports.
+
 ## BB-115R — Physical iPhone Sleep-Timer Remediation
 
 - Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** 2026-08-31.
@@ -947,7 +954,7 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Modul: Finance / Strategy Lab
 - Typ: Statistical validation
 - Prioritet: P1
-- Status: Grund levererad genom BB-081; längre historik, train/validation/test-selection governance och multiple-hypothesis correction återstår
+- Status: **Klar för nuvarande dagliga research-scope genom BB-124 / kända databundna begränsningar explicita**
 - Beroenden: BB-047, BB-048.
 - Syfte/scope: prevent research selection from being mistaken for durable expectancy by
   governing split design, repeated testing, parameter/regime sensitivity and sequence risk.
@@ -957,6 +964,14 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
   sensitivity, regime/cost stress and useful walk-forward/sequence-risk tests are evidenced.
 - Verification: seeded negative controls and synthetic biased datasets must be rejected;
   reports disclose trial population, dataset/version, costs and untouched holdout scope.
+- Resultat 2026-09-01: BB-124 utökar samma BB-081-motor med versionsatt 60/20/20
+  train/validation/holdout, dubbla 50-sessioners embargo, validation-only parameterurval,
+  komplett trial-population och en beständig holdout-livscykel. Tidigare använd holdout blir
+  `CONTAMINATED`; otillräcklig historik blir `INSUFFICIENT_DATA`. En konservativ family-breadth-
+  regel synliggör upprepade hypoteser utan fabricerade p-värden. Seedade negativa kontroller,
+  leakage-, noise-selection- och regime-fragile-kontroller avvisas/nedgraderas; positiv syntetisk
+  kontroll är uttryckligen endast engineering evidence. DSR/PBO förblir `NOT_EVALUABLE`.
+  Längre och mindre biased data är fortfarande framtida evidensarbete, inte en ofärdig kodgate.
 
 ### BB-050 – M4 versioned deterministic strategy contract and candidates
 

@@ -12,7 +12,8 @@ public sealed record FinanceRobustnessBuildEvidence(string FeatureRevisionId,IRe
 public sealed record FinanceRobustnessSummary(string EvaluationId,string Checksum,string PlanId,string PlanVersion,
     string StrategyId,string StrategyVersion,RobustnessVerdict Verdict,decimal Score,RobustnessEvidenceLabel EvidenceLabel,
     int TrainSessions,int TestSessions,int EmbargoSessions,int WalkForwardWindows,int ParameterVariants,int CostVariants,
-    string FeatureRevisionId,IReadOnlyList<string> MarketRevisionIds,IReadOnlyList<string> Limitations);
+    string FeatureRevisionId,IReadOnlyList<string> MarketRevisionIds,IReadOnlyList<string> Limitations,
+    SelectionGovernanceOutcome? SelectionOutcome,HoldoutEvidenceState? HoldoutState,int SelectionCandidates);
 public sealed record FinanceRobustnessCatalog(DateTimeOffset GeneratedAtUtc,string OperatingMode,
     IReadOnlyList<EvaluationPlan> Plans,IReadOnlyList<FinanceRobustnessSummary> Evaluations);
 
@@ -46,7 +47,15 @@ internal sealed partial class EodhdMarketMemory
         var builds=new List<RobustnessEvaluationBuild>();var anyNew=false;
         foreach(var strategy in new IResearchBacktestStrategy[]{new BuyAndHoldResearchStrategy(),new SmaCrossoverResearchStrategy(),new MomentumResearchStrategy()})
         {
-            var plan=DeterministicRobustnessEvaluator.CreatePlan(marketRevisions,featureRevision,strategy,universe,from,to);
+            var existing=ReadEvaluations(connection).FirstOrDefault(x=>x.Plan.Version==DeterministicRobustnessEvaluator.PlanVersion&&
+                x.Plan.Strategy==strategy.Identity&&x.Plan.FeatureRevisionId==featureRevision&&
+                x.Plan.MarketRevisionIds.Order(StringComparer.Ordinal).SequenceEqual(marketRevisions.Order(StringComparer.Ordinal),StringComparer.Ordinal)&&
+                x.Plan.From==from&&x.Plan.To==to);
+            if(existing is not null){builds.Add(new(existing,[]));continue;}
+            var priorHoldoutEvaluations=ReadEvaluations(connection).Any(x=>x.Plan.Strategy==strategy.Identity&&x.Plan.FeatureRevisionId==featureRevision&&
+                x.Plan.MarketRevisionIds.Order(StringComparer.Ordinal).SequenceEqual(marketRevisions.Order(StringComparer.Ordinal),StringComparer.Ordinal)&&
+                x.Plan.From==from&&x.Plan.To==to&&x.SelectionGovernance?.FinalHoldoutState==HoldoutEvidenceState.Evaluated)?1:0;
+            var plan=DeterministicRobustnessEvaluator.CreatePlan(marketRevisions,featureRevision,strategy,universe,from,to,priorHoldoutEvaluations:priorHoldoutEvaluations);
             var build=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,market,features);
             foreach(var run in build.UnderlyingRuns)PersistBacktest(connection,run);
             anyNew|=PersistEvaluation(connection,build.Evaluation);builds.Add(build);
@@ -80,7 +89,7 @@ internal sealed partial class EodhdMarketMemory
         transaction.Commit();return true;
     }
     private static List<RobustnessEvaluationResult> ReadEvaluations(SqliteConnection connection){using var command=connection.CreateCommand();command.CommandText="SELECT result_json FROM robustness_evaluations ORDER BY strategy_id,created_utc DESC,evaluation_id DESC";using var reader=command.ExecuteReader();var values=new List<RobustnessEvaluationResult>();while(reader.Read())values.Add(JsonSerializer.Deserialize<RobustnessEvaluationResult>(reader.GetString(0),EvaluationJson)!);return values;}
-    private static FinanceRobustnessSummary Summary(RobustnessEvaluationResult x)=>new(x.EvaluationId,x.Checksum,x.Plan.Id,x.Plan.Version,x.Plan.Strategy.Id,x.Plan.Strategy.Version,x.Verdict,x.Score.Total,x.Score.Label,x.TrainSessions,x.TestSessions,x.Plan.EmbargoSessions,x.WalkForwardWindows.Count,x.ParameterVariantsEvaluated,x.CostSensitivity.Points.Count,x.Plan.FeatureRevisionId,x.Plan.MarketRevisionIds,x.Limitations);
+    private static FinanceRobustnessSummary Summary(RobustnessEvaluationResult x)=>new(x.EvaluationId,x.Checksum,x.Plan.Id,x.Plan.Version,x.Plan.Strategy.Id,x.Plan.Strategy.Version,x.Verdict,x.Score.Total,x.Score.Label,x.TrainSessions,x.TestSessions,x.Plan.EmbargoSessions,x.WalkForwardWindows.Count,x.ParameterVariantsEvaluated,x.CostSensitivity.Points.Count,x.Plan.FeatureRevisionId,x.Plan.MarketRevisionIds,x.Limitations,x.SelectionGovernance?.Outcome,x.SelectionGovernance?.FinalHoldoutState,x.SelectionGovernance?.CandidateCount??0);
     private static string? LatestFeatureRevisionForEvaluation(SqliteConnection connection)=>EvaluationScalarOrNull(connection,"SELECT revision_id FROM feature_revisions ORDER BY created_utc DESC,revision_id DESC LIMIT 1");
     private static string EvaluationScalar(SqliteConnection c,string sql,params(string Name,object Value)[] args)=>EvaluationScalarOrNull(c,sql,args)??throw new InvalidOperationException("Required evaluation lineage is unavailable.");
     private static string? EvaluationScalarOrNull(SqliteConnection c,string sql,params(string Name,object Value)[] args){using var command=c.CreateCommand();command.CommandText=sql;foreach(var x in args)command.Parameters.AddWithValue(x.Name,x.Value);return command.ExecuteScalar() as string;}

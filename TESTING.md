@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-124 anti-overfitting and OOS governance
+
+- `FinanceRobustnessEvaluationTests` verifies deterministic 60/20/20 chronology, two embargoes, validation-only selection, complete trial preservation, single-use holdout state, contamination, insufficient-history fail-closed behavior, family-breadth rejection, negative/regime/leakage controls and the positive engineering-only control.
+- `FinanceAutonomousResearchTests` plus full API regression verify `research-integrity-v2`, current-evidence selection, immutable legacy readability and no autonomous fallback. DSR/PBO remain `NOT_EVALUABLE`; no p-values are synthesized.
+- Any bounded runtime validation uses only existing revisions and `finance-robustness-build`; it must not call providers or trigger autonomous research. Expected short-history output may be `INSUFFICIENT_DATA / UNTOUCHED`.
+- Required affected scope: focused robustness/autonomous tests, full API suite, Release build, documentation/Compose/diff/secrets gates and API-only deployment/runtime checks. Media BB-158 is documentation-only and must not trigger Media tests or deployment.
+
 ## BB-123 transaction-cost, slippage and fill realism
 
 - `FinanceDeterministicBacktestTests` uses hand-verifiable series for zero, fixed/per-share/minimum/proportional costs, adverse assumed spread and slippage on buy/sell, combined friction, cash/whole shares, invalid open, exact-next-session missing bar, end-of-data, deterministic replay and unchanged strategy intents.

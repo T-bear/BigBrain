@@ -21,3 +21,9 @@ Derived evaluation artifacts inherit their exact provider lineage and deletion o
 - Current approximately one-year evidence may correctly remain `INSUFFICIENT_DATA` despite a positive score or return.
 - A changed plan, model, threshold, cost assumption or input creates new evidence instead of rewriting old evidence.
 - Parameter optimization, automated selection, broker/order and PAPER/LIVE behavior remain outside this decision.
+
+## BB-124 amendment — 2026-09-01
+
+Version 2 adds an immutable 60/20/20 train/validation/holdout contract with embargo at both boundaries. Selection may use train and validation only; the complete bounded parameter family and criterion remain in evidence. Holdout is single-use after selection freezes. Existing same-version evidence is reused idempotently, while later materially changed plans must carry prior holdout use and become `CONTAMINATED` rather than claim fresh OOS evidence.
+
+Because current evidence does not support valid significance p-values, `family-breadth-fail-closed-v1` uses a transparent conservative breadth/median rule and makes no DSR/PBO claim. Deterministic synthetic controls are engineering checks only. The amended contract still creates research evidence, never execution authority.

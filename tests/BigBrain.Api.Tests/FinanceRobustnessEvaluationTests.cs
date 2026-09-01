@@ -49,7 +49,9 @@ public sealed class FinanceRobustnessEvaluationTests
         var second=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,fixture.Bars,fixture.Features);
         Assert.Equal(first.Evaluation.EvaluationId,second.Evaluation.EvaluationId);Assert.Equal(first.Evaluation.Checksum,second.Evaluation.Checksum);
         Assert.Equal(first.Evaluation.UnderlyingRunIds,second.Evaluation.UnderlyingRunIds);Assert.Equal(RobustnessVerdict.InsufficientData,first.Evaluation.Verdict);
-        Assert.Equal(3,first.Evaluation.WalkForwardWindows.Count);Assert.Equal(3,first.Evaluation.ParameterVariantsEvaluated);
+        Assert.Empty(first.Evaluation.WalkForwardWindows);Assert.Equal(3,first.Evaluation.ParameterVariantsEvaluated);
+        Assert.Equal(SelectionGovernanceOutcome.InsufficientData,first.Evaluation.SelectionGovernance!.Outcome);
+        Assert.Equal(HoldoutEvidenceState.Untouched,first.Evaluation.SelectionGovernance.FinalHoldoutState);
         Assert.True(first.Evaluation.CostSensitivity.Points.Zip(first.Evaluation.CostSensitivity.Points.Skip(1),(a,b)=>a.NetReturn>=b.NetReturn).All(x=>x));
     }
 
@@ -58,24 +60,74 @@ public sealed class FinanceRobustnessEvaluationTests
     {
         var fixture=Fixture(252);var strategy=new MomentumResearchStrategy();var plan=Plan(strategy,fixture.Bars);
         var original=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,fixture.Bars,fixture.Features).Evaluation;
-        var split=DeterministicRobustnessEvaluator.Split(fixture.Bars.Select(x=>x.SessionDate).Distinct().Order().ToArray(),plan.SplitRatio,plan.EmbargoSessions);
-        var changedBars=fixture.Bars.Select(x=>x.SessionDate>=split.TestFrom?x with{Open=x.Open*5,Close=x.Close*5}:x).ToArray();
-        var changedFeatures=fixture.Features.Select(x=>x.SessionDate>=split.TestFrom?x with{Value=x.Value is null?null:-x.Value}:x).ToArray();
+        var partition=DeterministicRobustnessEvaluator.CreatePartition(fixture.Bars.Select(x=>x.SessionDate).Distinct().Order().ToArray(),plan.AntiOverfitting!);
+        var changedBars=fixture.Bars.Select(x=>x.SessionDate>=partition.HoldoutFrom?x with{Open=x.Open*5,Close=x.Close*5}:x).ToArray();
+        var changedFeatures=fixture.Features.Select(x=>x.SessionDate>=partition.HoldoutFrom?x with{Value=x.Value is null?null:-x.Value}:x).ToArray();
         var changed=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,changedBars,changedFeatures).Evaluation;
         Assert.Equal(original.PrimarySplit.Train,changed.PrimarySplit.Train);
-        Assert.Equal(original.WalkForwardWindows[0].TrainRunId,changed.WalkForwardWindows[0].TrainRunId);
-        Assert.Equal(original.WalkForwardWindows[0].TestRunId,changed.WalkForwardWindows[0].TestRunId);
+        Assert.Equal(original.WalkForwardWindows,changed.WalkForwardWindows);
         Assert.Equal(original.ParameterSensitivity.Points.Select(x=>x.TrainNetReturn),changed.ParameterSensitivity.Points.Select(x=>x.TrainNetReturn));
     }
 
     [Fact]
     public void FutureKnowledgeFeatureRemainsInvisibleAndShortDataCannotClaimRobustness()
     {
-        var fixture=Fixture(90,futureKnowledge:true);var strategy=new MomentumResearchStrategy();var plan=Plan(strategy,fixture.Bars) with{EmbargoSessions=5,WalkForward=new(40,10,10,true)};
+        var fixture=Fixture(90,futureKnowledge:true);var strategy=new MomentumResearchStrategy();var plan=DeterministicRobustnessEvaluator.CreatePlan(["market-1"],"feature-1",strategy,["US:XNAS:TEST"],fixture.Bars.Min(x=>x.SessionDate),fixture.Bars.Max(x=>x.SessionDate),embargoSessions:5) with{WalkForward=new(40,10,10,true)};
         var build=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,fixture.Bars,fixture.Features);var result=build.Evaluation;
         Assert.Equal(RobustnessVerdict.InsufficientData,result.Verdict);Assert.Contains(result.VerdictReasons,x=>x=="data.insufficient");
         Assert.All(build.UnderlyingRuns.Where(x=>x.Configuration.Strategy.Id=="momentum"),x=>Assert.Empty(x.Fills));
     }
+
+    [Fact]
+    public void ThreeWayPartitionIsChronologicalEmbargoedAndDeterministic()
+    {
+        var sessions=Enumerable.Range(0,500).Select(i=>new DateOnly(2024,1,1).AddDays(i)).ToArray();
+        var partition=DeterministicRobustnessEvaluator.CreatePartition(sessions,AntiOverfittingPolicy.Default);
+        Assert.Equal((240,80,80),(partition.TrainSessions,partition.ValidationSessions,partition.HoldoutSessions));
+        Assert.Equal(50,partition.ValidationFrom.DayNumber-partition.TrainTo.DayNumber-1);
+        Assert.Equal(50,partition.HoldoutFrom.DayNumber-partition.ValidationTo.DayNumber-1);
+        Assert.True(partition.TrainTo<partition.ValidationFrom&&partition.ValidationTo<partition.HoldoutFrom);
+    }
+
+    [Fact]
+    public void SelectionUsesValidationPreservesTrialsAndEvaluatesHoldoutOnce()
+    {
+        var policy=AntiOverfittingPolicy.Default;var partition=Partition();
+        var trials=new[]{Trial("a",.40m,.01m),Trial("b",.10m,.04m),Trial("c",.05m,.03m),Trial("d",.02m,.02m)};
+        var result=DeterministicRobustnessEvaluator.AssessSelection(policy,partition,"momentum",trials,"holdout-b",.02m,.01m,0);
+        Assert.Equal("b",result.SelectedTrialId);Assert.Equal(4,result.Trials.Count);
+        Assert.Equal(HoldoutEvidenceState.Untouched,result.HoldoutStateAtSelection);
+        Assert.Equal(HoldoutEvidenceState.Evaluated,result.FinalHoldoutState);
+        Assert.Equal(SelectionGovernanceOutcome.Pass,result.Outcome);
+    }
+
+    [Fact]
+    public void ReusedHoldoutIsContaminatedAndNoiseFamilyFailsClosed()
+    {
+        var partition=Partition();var trials=new[]{Trial("winner",.2m,.2m),Trial("n1",-.1m,-.1m),Trial("n2",-.2m,-.2m),Trial("n3",-.3m,-.3m)};
+        var noise=DeterministicRobustnessEvaluator.AssessSelection(AntiOverfittingPolicy.Default,partition,"noise",trials,"h",.1m,.1m,0);
+        Assert.Equal(SelectionGovernanceOutcome.Fail,noise.Outcome);
+        var reused=DeterministicRobustnessEvaluator.AssessSelection(AntiOverfittingPolicy.Default,partition,"noise",trials,"h2",.1m,.1m,1);
+        Assert.Equal(SelectionGovernanceOutcome.Contaminated,reused.Outcome);Assert.Equal(HoldoutEvidenceState.Contaminated,reused.FinalHoldoutState);
+    }
+
+    [Fact]
+    public void MissingHistoryAndNegativeHoldoutFailClosedWhileControlsAreExplicit()
+    {
+        var incomplete=Partition() with{HoldoutSessions=39};var trials=new[]{Trial("a",.1m,.1m),Trial("b",.1m,.1m),Trial("c",.1m,.1m),Trial("d",.1m,.1m)};
+        var shortResult=DeterministicRobustnessEvaluator.AssessSelection(AntiOverfittingPolicy.Default,incomplete,"x",trials,null,null,null,0);
+        Assert.Equal(SelectionGovernanceOutcome.InsufficientData,shortResult.Outcome);Assert.Equal(HoldoutEvidenceState.Untouched,shortResult.FinalHoldoutState);
+        var fragile=DeterministicRobustnessEvaluator.AssessSelection(AntiOverfittingPolicy.Default,Partition(),"x",trials,"h",-.01m,-.01m,0);
+        Assert.Equal(SelectionGovernanceOutcome.Fail,fragile.Outcome);
+        Assert.Contains(fragile.Controls,x=>x.Id=="causal-positive-engineering"&&x.EngineeringOnly&&x.Status=="PASS");
+        Assert.Contains(fragile.Controls,x=>x.Id=="future-knowledge-leakage"&&x.Status=="PASS");
+        Assert.Contains(fragile.Controls,x=>x.Id=="seeded-no-signal"&&x.Status=="PASS");
+        Assert.Contains(fragile.Controls,x=>x.Id=="many-noise-selection"&&x.Status=="PASS");
+        Assert.Contains(fragile.Controls,x=>x.Id=="regime-fragile"&&x.Status=="PASS");
+    }
+
+    private static ResearchDataPartition Partition()=>new(new(2024,1,1),new(2024,6,1),new(2024,7,22),new(2024,9,1),new(2024,10,22),new(2024,12,31),126,40,40,50);
+    private static ParameterSelectionTrial Trial(string id,decimal train,decimal validation)=>new(id,new Dictionary<string,decimal>{{"period",20}},"train-"+id,"validation-"+id,train,validation,validation);
 
     private static ParameterSensitivityPoint Point(decimal period,decimal result)=>new(new Dictionary<string,decimal>{{"period",period}},"train","test",result,result,-.01m,.01m);
 
