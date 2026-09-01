@@ -10,6 +10,8 @@ API-only image `sha256:bea523d60e541598e656347ef6663524c20e7420c5fa5f24183fdb55d
 
 Media item **BB-158 — Media URL Import & Audio Extraction** is registered as **PLANNED / BACKLOG ONLY**. No Media source, runtime or deployment changed.
 
+Initial CI run `33468854249` passed backend, documentation and secrets but exposed a pre-existing date-dependent Calendar test on the 2026-09-01 month rollover. A separate test-only correction pins that fixture clock; 6/6 focused and 160/160 full Web tests plus the production Web build pass. Calendar/Web production behavior and deployment are unchanged.
+
 ## BB-123 Transaction-Cost, Slippage & Fill Realism (2026-08-31)
 
 BB-123 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `317e882ef90e15562642105ce3f7f5a2621002ad`. The existing BB-080 engine now uses versioned `daily-next-session-open-v2` and `next-session-open-full-fill/v2`: fixed, per-share/minimum and proportional costs; assumed full-spread; separately adverse slippage; whole-share/cash constraints; and explicit filled/rejected attempts. Missing exact-next-session bars, invalid opens, zero quantity, insufficient cash, unavailable positions and end-of-data fail deterministically without future-bar substitution. Old v1 runs remain immutable and readable.

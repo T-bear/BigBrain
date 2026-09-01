@@ -6,8 +6,8 @@ const event = { id:'event-1',date:'2026-08-03',startTime:'07:00:00',endTime:'15:
 const ok=(body:unknown)=>Promise.resolve(new Response(JSON.stringify(body),{status:200,headers:{'Content-Type':'application/json'}}))
 
 describe('CalendarWidget',()=>{
-  beforeEach(()=>{vi.stubGlobal('fetch',vi.fn((input:RequestInfo|URL)=>{const url=String(input);if(url.includes('/week'))return ok({from:'2026-08-03',to:'2026-08-09',events:[event]});if(url.includes('/month'))return ok({year:2026,month:8,events:[event]});if(url.endsWith('/imports'))return ok([]);return ok({files:[]})}))})
-  afterEach(()=>{cleanup();vi.unstubAllGlobals();document.body.className=''})
+  beforeEach(()=>{vi.useFakeTimers({shouldAdvanceTime:true});vi.setSystemTime(new Date(2026,7,27,12));vi.stubGlobal('fetch',vi.fn((input:RequestInfo|URL)=>{const url=String(input);if(url.includes('/week'))return ok({from:'2026-08-03',to:'2026-08-09',events:[event]});if(url.includes('/month'))return ok({year:2026,month:8,events:[event]});if(url.endsWith('/imports'))return ok([]);return ok({files:[]})}))})
+  afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals();document.body.className=''})
 
   it('classifies past, today and future using local calendar dates',()=>{
     const localToday=new Date(2026,7,27,23,55)
