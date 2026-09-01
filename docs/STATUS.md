@@ -12,6 +12,8 @@ Media item **BB-158 — Media URL Import & Audio Extraction** is registered as *
 
 Initial CI run `33468854249` passed backend, documentation and secrets but exposed a pre-existing date-dependent Calendar test on the 2026-09-01 month rollover. A separate test-only correction pins that fixture clock; 6/6 focused and 160/160 full Web tests plus the production Web build pass. Calendar/Web production behavior and deployment are unchanged.
 
+The follow-up full-history secrets scan identified one historical false positive in commit `04c9271…`: prose containing “credentials, authorization” in the Finance threat model. A fingerprint-specific `.gitleaksignore` suppresses only that reviewed historical finding; a redacted local scan of 200 commits found no other candidate. Secret detection rules remain otherwise unchanged.
+
 ## BB-123 Transaction-Cost, Slippage & Fill Realism (2026-08-31)
 
 BB-123 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / BOUNDED RESEARCH VERIFIED** from baseline `317e882ef90e15562642105ce3f7f5a2621002ad`. The existing BB-080 engine now uses versioned `daily-next-session-open-v2` and `next-session-open-full-fill/v2`: fixed, per-share/minimum and proportional costs; assumed full-spread; separately adverse slippage; whole-share/cash constraints; and explicit filled/rejected attempts. Missing exact-next-session bars, invalid opens, zero quantity, insufficient cash, unavailable positions and end-of-data fail deterministically without future-bar substitution. Old v1 runs remain immutable and readable.

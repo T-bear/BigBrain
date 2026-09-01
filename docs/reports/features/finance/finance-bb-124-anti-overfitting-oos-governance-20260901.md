@@ -61,6 +61,7 @@ No provider call, market-data acquisition, autonomous research trigger, broker, 
 - Release solution build: passed with 0 warnings and 0 errors.
 - Documentation: 208 Markdown files and 89 unique backlog IDs passed; Compose and diff checks passed.
 - Initial CI passed backend/documentation/secrets but found two pre-existing Calendar tests coupled to the wall-clock month. A separate test-only fix pins their August 2026 fixture clock; 6/6 focused and 160/160 full Web tests plus Vite production build pass. No Web production source or deployment changed.
+- The next full-history secrets job surfaced one reviewed historical prose false positive (`credentials, authorization`) from commit `04c9271…`. A fingerprint-only `.gitleaksignore` entry suppresses exactly that old finding; the redacted 200-commit local scan contains no other result and global rules are unchanged.
 
 ## Deployment and bounded validation
 
