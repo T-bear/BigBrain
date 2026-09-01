@@ -26,13 +26,19 @@ use this folder to bypass provider restrictions; possession is not entitlement.
 
 ## Supported input and limits
 
-Initial input is top-level CSV or ZIP containing one safe CSV. The existing configured defaults
+Initial input is top-level CSV, ZIP containing one safe CSV, bounded XLSX, or one bounded XLSX
+inside an owner ZIP. The existing configured defaults
 limit the source artifact to 500,000,000 bytes, ZIP entries to 100 and total expanded bytes to
 1,000,000,000. Sidecars are limited to 65,536 bytes. Nested archives, path traversal, symlinks,
 reparse points, binary/non-CSV content and unsafe names are rejected. The parser reports schema,
 UTF-8/comma interpretation, date/row/instrument coverage, invalid OHLCV, duplicate/conflicting
 keys, mappings and cross-source classification. Raw/adjusted semantics remain `UNKNOWN` unless
 independently proven.
+
+XLSX is research-only intake. BigBrain pre-screens OpenXML archive/XML dimensions and rejects
+macro/binary content, embeddings and external relationships. It reads stored cached cell values
+only and never recalculates formulas. `EXPORT_MANIFEST` is required and checked against each
+historical sheet. Support sheets and `CURRENT_METADATA` do not become historical datasets.
 
 Optional sidecar fields are `sourceProvider`, `originalUrl`, `downloadedOn`,
 `licenseOrTermsUrl`, `declaredLicense`, `ownerNotes`, `expectedSymbols`, `expectedMarket`,

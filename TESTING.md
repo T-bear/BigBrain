@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-127 owner research capabilities and XLSX
+
+- `FinanceResearchDatasetTests` covers canonical/research independence, owner approval with
+  external `Unknown`, explicit external denial, purpose/schema restrictions, current-snapshot
+  leakage prevention, bounded workbook intake, manifest mismatch, support-sheet exclusion,
+  OHLC anomaly rejection, idempotency/changed bytes, unsafe macro/external features, no canonical
+  side effect and existing-engine backtest lineage.
+- The supplied workbook is additionally processed against an isolated Finance DB before runtime:
+  expected SHA-256, 18 datasets, 154,345 accepted observations, one MSFT plus three JNJ rejected
+  OHLC rows and zero canonical rows. A GOOG buy-and-hold run proves plumbing only.
+- Required closure: focused/full API tests, warning-free Release build, documentation/Compose/
+  diff/secrets gates, API-only deployment, real owner-drop processing, health, canonical count
+  invariance, bounded non-autonomous research run and GitHub CI.
+
 ## GOOGLEFINANCE GOOG first owner intake
 
 - Focused intake coverage now includes a matching embedded ZIP sidecar, structured

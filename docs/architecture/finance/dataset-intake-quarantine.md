@@ -48,6 +48,29 @@ The first real package, manually exported GOOGLEFINANCE GOOG, validated 3,126 OH
 rejected because GOOG lacks approved historical identity/venue mapping. External rights, RAW
 semantics and corporate actions also remain unresolved. Zero rows were promoted.
 
+### Bounded workbook research intake (BB-127)
+
+The same drop/quarantine boundary additionally accepts `.xlsx` or one XLSX inside a bounded owner
+ZIP. The original artifact and extracted workbook retain independent SHA-256 identities. Before
+ClosedXML opens cached values, BigBrain scans the OpenXML ZIP: traversal, macros/binaries,
+embeddings, external links/relationships, unsafe relationship targets, excessive entries,
+expanded/XML size, sheets, rows, columns or cells fail closed. Formula text—including exported
+`__xludf.DUMMYFUNCTION(...)`—is never evaluated; only `CachedValue` is read.
+
+`EXPORT_MANIFEST` is an owner claim and is cross-checked against actual sheet schema, observation
+count and content. Each `OHLCV` or `CLOSE_ONLY` sheet becomes an independent immutable
+`research_dataset_revision` with observations and fingerprint. README/SUMMARY/DISCOVERY and
+`CURRENT_METADATA` are support/current-snapshot sheets, never historical datasets. Invalid source
+rows remain in the immutable workbook, are counted and excluded from normalized research
+observations; they are never repaired. Canonical observations are never written by this path.
+
+Research suitability is evaluated per declared purpose by `owner-research-eligibility-v1`.
+Canonical state is still decided only by `dataset-promotion-v1`; no research decision changes a
+candidate's canonical state. Owner approval is a versioned policy evidence reference, not an
+external license PASS. Explicit external denial, technical failure or schema incompatibility
+blocks the purpose; unresolved identity/basis/actions remain limitations and prohibit semantic
+claims such as accurate adjusted total return.
+
 ## Current source decisions (updated 2026-08-31)
 
 - WIKI mirror `kmfranz/trading_pairs`: public-domain evidence is first-party Nasdaq Data Link;

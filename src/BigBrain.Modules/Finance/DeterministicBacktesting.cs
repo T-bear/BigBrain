@@ -77,7 +77,8 @@ public sealed record BacktestFillModel(string Id, string Version, bool WholeShar
 public sealed record BacktestRunConfiguration(IReadOnlyList<string> MarketRevisionIds, string FeatureRevisionId,
     StrategyIdentity Strategy, IReadOnlyDictionary<string, decimal> StrategyParameters, string SimulationModel,
     BacktestCostModel CostModel, decimal InitialCapital, IReadOnlyList<string> Universe, DateOnly From, DateOnly To,
-    string SizingPolicy, int Seed,string? EvaluationContext=null, BacktestFillModel? FillModel=null);
+    string SizingPolicy, int Seed,string? EvaluationContext=null, BacktestFillModel? FillModel=null,
+    ResearchDatasetLineage? ResearchDatasetLineage=null);
 public sealed record BacktestFill(string FillId, string InstrumentId, DateOnly IntentSession, DateOnly FillSession,
     string Side, int Quantity, decimal ReferenceOpen, decimal FillPrice, decimal Commission, decimal EstimatedSlippage,
     decimal CashBefore, decimal CashAfter, int PositionBefore, int PositionAfter, decimal EstimatedSpreadCost = 0);

@@ -93,7 +93,7 @@ internal sealed partial class EodhdMarketMemory
         return json is null ? null : JsonSerializer.Deserialize<BacktestResult>(json, BacktestJson);
     }
 
-    private static bool PersistBacktest(SqliteConnection connection, BacktestResult result)
+    internal static bool PersistBacktest(SqliteConnection connection, BacktestResult result)
     {
         var existing = ScalarTextOrNull(connection, "SELECT checksum FROM backtest_runs WHERE run_id=$id", ("$id", result.RunId));
         if (existing is not null)

@@ -155,6 +155,14 @@ verified storage, reuse or backtesting rights. External license/provenance remai
 `Pass / Fail / Unknown`, and `Unknown` remains fail-closed. The same separation applies to an
 owner-declared raw/adjusted basis, venue and symbol identity.
 
+BB-127 adds a purpose-specific research capability layer for immutable owner-provided revisions.
+It does not relax the entitlement envelope or canonical promotion. An owner-accepted dataset with
+unknown external evidence may be used only for a compatible private-research purpose when artifact
+integrity and technical evidence suffice and no known rule explicitly denies that use. Every
+result carries the candidate, artifact/workbook and dataset fingerprints, owner evidence version,
+external state, purpose decision and unresolved limitations. An explicit external `Fail` remains
+blocking. Current-snapshot metadata cannot be represented as historical point-in-time evidence.
+
 ## Decision and outcome evidence graph
 
 The append-oriented evidence chain is:

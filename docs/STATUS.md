@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-127 Owner Research Dataset Capabilities & XLSX Intake (2026-09-01)
+
+BB-127 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / ISOLATED REAL-WORKBOOK VERIFIED / DEPLOYMENT PENDING** from baseline `b801712fca7eb0aa7cc3623a2198ac66c3ed8c1b`. The existing BB-084/126 quarantine now accepts a bounded, pre-screened XLSX (direct or one XLSX inside an owner package), reads cached cell values without formula evaluation and persists each manifest-declared historical sheet as an independent immutable Finance research revision. Macro/code, external relationships, embedded objects, traversal and bounded-resource violations fail closed. Support sheets and `CURRENT_METADATA` never become historical datasets.
+
+`owner-research-eligibility-v1` separates purpose-specific research capability from `dataset-promotion-v1`. Owner `APPROVED_BY_OWNER` evidence can make technically adequate noncanonical data eligible-with-limitations for compatible private research while external rights, price basis, corporate actions and historical identity remain `Unknown`. An explicit external denial or incompatible schema remains ineligible. Canonical tables and gates are unchanged; research results carry candidate/artifact/workbook/dataset/policy/limitation lineage. Isolated processing of the supplied GOOGLEFINANCE workbook found 18 historical datasets and 154,345 accepted observations after rejecting the independently reproduced one MSFT and three JNJ OHLC inconsistencies. Zero canonical rows were added. A deterministic existing buy-and-hold backtest consumed the GOOG research revision with complete lineage; its result is plumbing evidence, not profitability evidence. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## First owner intake — GOOGLEFINANCE GOOG (2026-09-01)
 
 The first real BB-126 package is **QUARANTINED / INSPECTED / REJECTED FAIL-CLOSED / ZERO CANONICAL ROWS / CI VERIFIED** from baseline `72d895dbe67e17fa6d9ac93116fc83acd4c54bd5` and implementation `057c2f07bd10f2ff21d35d981028b262e0d07cd8`. BigBrain preserved the original owner ZIP, read its single matching embedded sidecar safely and recorded the `ApprovedByOwner` system value (policy meaning `APPROVED_BY_OWNER`) separately from external rights `Unknown`.

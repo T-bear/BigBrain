@@ -1,5 +1,13 @@
 # Finance strategy, backtesting and paper methodology
 
+## Noncanonical owner research evidence
+
+BB-127 permits the existing deterministic backtest engine to receive an explicitly selected
+research dataset revision only after its `BoundedHistoricalBacktest` capability is eligible. The
+configuration retains `ResearchDatasetLineage`; canonical readers remain unchanged. Close-only
+context/FX and current-snapshot metadata cannot enter the OHLCV strategy path. A research result
+does not promote its input, repair unknown identity/actions/basis, or authorize PAPER/LIVE/AUTO.
+
 Historical backtests ask what a strategy would have done over already-known history. Prospective shadow evidence records what the same versioned strategy decided at a real knowledge cutoff before its horizon was knowable. Their metrics must never be merged. Shadow signals are research records, not orders, and outcome evaluation never mutates parameters.
 
 BB-084 reruns the unchanged BB-080 strategies only against exact WIKI revision

@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-127 owner research datasets — 2026-09-01
+
+Finance now records immutable noncanonical research dataset revisions and evaluates each declared purpose through `owner-research-eligibility-v1`. `CANONICAL ELIGIBILITY != RESEARCH ELIGIBILITY`, `OWNER APPROVAL != EXTERNAL RIGHTS VERIFICATION`, and `RESEARCH-ELIGIBLE != SUITABLE FOR EVERY EXPERIMENT`. Explicit denial and technical failure remain blocking; unresolved external evidence remains visible and owner-accepted only for compatible private research.
+
+The existing BB-126 owner drop supports bounded XLSX packages without executing formulas, macros, external links or embedded content. Each `EXPORT_MANIFEST` historical sheet becomes a distinct research revision; workbook claims are cross-checked against cached sheet values. `CURRENT_METADATA` remains current snapshot evidence and cannot enter historical backtests. The existing deterministic daily engine can consume an eligible OHLCV research revision through an explicit lineage-bearing selector. Canonical readers and 13 promotion gates are unchanged.
+
 ## GOOGLEFINANCE GOOG owner intake — 2026-09-01
 
 The first real owner package produced candidate `owner-drop-4891dca5274b57ca303e8d0d` from an immutable manually exported GOOGLEFINANCE ZIP. Its single matching embedded metadata sidecar was bounded and parsed as an owner claim. The catalog records `ApprovedByOwner` (policy meaning `APPROVED_BY_OWNER`), external rights `Unknown`, owner-declared `RAW`, canonical price basis `Unclear`, 3,126 accepted rows, one missing calendar session and zero canonical rows.

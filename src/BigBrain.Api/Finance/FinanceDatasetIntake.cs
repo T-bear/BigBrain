@@ -43,7 +43,7 @@ public sealed record FinanceDatasetCatalog(DateTimeOffset GeneratedAtUtc, string
 internal sealed record QuarantineCleanupResult(int EligibleCandidates, int PayloadsDeleted, long BytesReleased,
     int ManifestsRetained, int CanonicalRevisionsProtected, bool Idempotent);
 
-internal sealed class FinanceDatasetIntakeStore
+internal sealed partial class FinanceDatasetIntakeStore
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly EodhdFinanceOptions _market;
@@ -64,7 +64,7 @@ internal sealed class FinanceDatasetIntakeStore
         source_row INTEGER NOT NULL,PRIMARY KEY(candidate_id,symbol,session_date));
       CREATE INDEX IF NOT EXISTS ix_dataset_state ON dataset_candidates(state,updated_utc);
       UPDATE dataset_candidates SET state=CASE WHEN state='Downloading' THEN 'Rejected' ELSE 'Downloaded' END,promotion_result='interruptedBeforeValidation',updated_utc=datetime('now') WHERE state IN ('Downloading','Inspecting','Validating');
-      """;x.ExecuteNonQuery();if(!ColumnExists(c,"dataset_candidates","cleanup_state"))Exec(c,"ALTER TABLE dataset_candidates ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'Retained'");
+      """;x.ExecuteNonQuery();InitializeResearchDatasetStorage(c);if(!ColumnExists(c,"dataset_candidates","cleanup_state"))Exec(c,"ALTER TABLE dataset_candidates ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'Retained'");
       var pending=new List<(string Id,string File)>();using(var q=c.CreateCommand()){q.CommandText="SELECT candidate_id,filename FROM dataset_candidates WHERE cleanup_state='CleanupPending'";using var r=q.ExecuteReader();while(r.Read())pending.Add((r.GetString(0),r.GetString(1)));}
       foreach(var item in pending){var exists=File.Exists(Path.Combine(_options.QuarantineDirectory,item.Id,"artifact",SafeName(item.File)));Exec(c,"UPDATE dataset_candidates SET cleanup_state=$state WHERE candidate_id=$id AND cleanup_state='CleanupPending'",("$state",exists?"Retained":"PayloadDeleted"),("$id",item.Id));}}
 
@@ -206,12 +206,34 @@ internal static class FinanceDatasetMaintenanceCommand
     private static readonly JsonSerializerOptions OutputJson = new(JsonSerializerDefaults.Web){WriteIndented=true};
     internal static bool TryRun(string[] args,IConfiguration configuration)
     {
-        if(args.Length==0||args[0]!="finance-dataset-intake")return false;
-        if(args.Length!=3)throw new ArgumentException("Use finance-dataset-intake <wiki|zenodo> <local-artifact-path>.");
+        if(args.Length==0||args[0] is not ("finance-dataset-intake" or "finance-owner-drop-scan" or
+            "finance-research-dataset-catalog" or "finance-research-backtest" or "finance-candidate-research-eligibility"))return false;
         var market=configuration.GetSection(EodhdFinanceOptions.Section).Get<EodhdFinanceOptions>()??new();
         var options=configuration.GetSection(FinanceDatasetOptions.Section).Get<FinanceDatasetOptions>()??new();
         _ = new EodhdMarketMemory(market);
-        var store=new FinanceDatasetIntakeStore(market,options);var candidate=args[1] switch
+        var store=new FinanceDatasetIntakeStore(market,options);
+        if(args[0]=="finance-owner-drop-scan")
+        {
+            if(args.Length!=1)throw new ArgumentException("Use finance-owner-drop-scan.");
+            Console.WriteLine(JsonSerializer.Serialize(new FinanceOwnerDatasetDropScanner(options,store).ScanOnce(),OutputJson));return true;
+        }
+        if(args[0]=="finance-research-dataset-catalog")
+        {
+            if(args.Length!=1)throw new ArgumentException("Use finance-research-dataset-catalog.");
+            Console.WriteLine(JsonSerializer.Serialize(store.ResearchCatalog(),OutputJson));return true;
+        }
+        if(args[0]=="finance-research-backtest")
+        {
+            if(args.Length!=2)throw new ArgumentException("Use finance-research-backtest <research-revision-id>.");
+            Console.WriteLine(JsonSerializer.Serialize(store.RunBoundedResearchBacktest(args[1]),OutputJson));return true;
+        }
+        if(args[0]=="finance-candidate-research-eligibility")
+        {
+            if(args.Length!=2)throw new ArgumentException("Use finance-candidate-research-eligibility <candidate-id>.");
+            Console.WriteLine(JsonSerializer.Serialize(store.EnsureExistingCandidateResearchEligibility(args[1]),OutputJson));return true;
+        }
+        if(args.Length!=3)throw new ArgumentException("Use finance-dataset-intake <wiki|zenodo> <local-artifact-path>.");
+        var candidate=args[1] switch
         {
             "wiki"=>new ExternalDatasetCandidate("wiki-eod-mirror-kmfranz-v1","NASDAQ-WIKI","https://github.com/kmfranz/trading_pairs","GitHub Git LFS","WIKI_PRICES.csv",
                 new(DatasetLicenseClass.PublicDomain,"Public domain","https://docs.data.nasdaq.com/v1.0/docs/in-depth-usage",new DateOnly(2026,8,15),"Nasdaq Data Link describes WIKI EOD prices, dividends and splits as released into the public domain.",DatasetEvidenceResult.Pass,true,"Nasdaq Data Link WIKI EOD"),

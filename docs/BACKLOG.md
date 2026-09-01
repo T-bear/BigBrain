@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-127 — Owner Research Dataset Capabilities & XLSX Intake
+
+- Status 2026-09-01: **IMPLEMENTED / AUTOMATICALLY VERIFIED / ISOLATED REAL-WORKBOOK VERIFIED / DEPLOYMENT PENDING**.
+- Reuses BB-084/126 quarantine and the existing deterministic backtest engine. Adds purpose-specific immutable research eligibility and bounded cached-value XLSX intake; it does not add a second datastore, importer, backtester or promotion path.
+- Canonical promotion remains independently fail-closed. Owner approval does not verify provider rights, RAW/adjusted semantics, corporate actions or historical identity; explicit external denial blocks research and schema/semantic limitations constrain the permitted purpose.
+- Supplied GOOGLEFINANCE workbook: 18 historical sheets, 154,349 source observations, four rejected inconsistent OHLC rows and 154,345 accepted research observations. Support/current-metadata sheets are excluded from historical use. Zero canonical rows were added.
+- Remaining: independently resolve external rights, historical identity, price-basis and corporate-action evidence before any canonical decision or accurate adjusted/total-return claim. Existing close-only research is context/exploratory only until a separately suitable experiment consumes it.
+
 ## GOOGLEFINANCE GOOG owner-intake follow-up
 
 - Status 2026-09-01: **QUARANTINED / INSPECTED / PROMOTION BLOCKED**; 3,126 accepted rows and zero canonical rows.

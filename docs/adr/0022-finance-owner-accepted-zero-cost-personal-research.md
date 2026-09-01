@@ -26,6 +26,14 @@ compatible and no identified term prohibits the exact automation, retention, res
 other capability being enabled. The policy records provider/product, allowed and prohibited
 capabilities, evidence date, rationale and owner-acceptance version.
 
+BB-127 applies the same accepted principle to manually owner-provided immutable artifacts. A
+separate `owner-research-eligibility-v1` decision may allow a compatible research purpose with
+explicit limitations while canonical promotion and external-rights evidence remain unchanged.
+This is never a global “use anyway” flag: dataset class, technical integrity, identity,
+price-basis and corporate-action evidence constrain each purpose. Explicit negative terms still
+deny use, and accurate adjusted/total-return claims require the corresponding semantics rather
+than owner acceptance alone.
+
 Silence is not a universal grant. Owner acceptance cannot override an explicit prohibition,
 paid-license or prior-permission requirement, technical access control, redistribution
 restriction, or an unidentified source. Decisions remain fail-closed per capability.

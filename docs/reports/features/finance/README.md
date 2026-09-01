@@ -1,5 +1,7 @@
 # Finance reports
 
+- [BB-127 Owner Research Dataset Capabilities & XLSX Intake](finance-bb-127-owner-research-dataset-xlsx-20260901.md)
+
 - [GOOGLEFINANCE GOOG First Owner Intake](finance-googlefinance-goog-owner-intake-20260901.md)
 - [BB-126 Owner Market-Data Drop & Quarantine Inspection](finance-bb-126-owner-market-data-drop-20260901.md)
 - [BB-125 Zero-Cost Historical Market Data Qualification](finance-bb-125-zero-cost-market-data-qualification-20260901.md)

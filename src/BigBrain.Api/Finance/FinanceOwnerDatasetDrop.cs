@@ -25,7 +25,8 @@ public sealed record OwnerDatasetDropMetadata
 }
 
 public sealed record OwnerDatasetDropScanResult(string Filename, string Status, string Reason,
-    string? CandidateId, string? ArtifactSha256, DatasetCatalogItem? Inspection);
+    string? CandidateId, string? ArtifactSha256, DatasetCatalogItem? Inspection,
+    ResearchWorkbookInspection? WorkbookInspection = null);
 
 internal sealed class FinanceOwnerDatasetDropScanner
 {
@@ -60,7 +61,8 @@ internal sealed class FinanceOwnerDatasetDropScanner
         if (filename.Length is 0 or > 180 || filename != Path.GetFileName(filename))
             return Result(ready.Name, "Rejected", "unsafeFilename");
         var extension = Path.GetExtension(filename);
-        if (!extension.Equals(".csv", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".zip", StringComparison.OrdinalIgnoreCase))
+        if (!extension.Equals(".csv", StringComparison.OrdinalIgnoreCase) && !extension.Equals(".zip", StringComparison.OrdinalIgnoreCase) &&
+            !extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
             return Result(filename, "Rejected", "unsupportedFileType");
         var sourcePath = Path.Combine(_options.OwnerDropDirectory, filename);
         var source = new FileInfo(sourcePath);
@@ -151,6 +153,12 @@ internal sealed class FinanceOwnerDatasetDropScanner
         var candidate = Candidate(candidateId, filename, metadata, sidecarHash, beforeLength);
         try
         {
+            if (_store.IsOwnerWorkbookArtifact(targetPath))
+            {
+                var workbook = _store.InspectOwnerWorkbookForResearch(candidate, targetPath);
+                return new(filename, "ManualReviewRequired", "researchDatasetsInspectedCanonicalPromotionBlocked",
+                    candidateId, sourceHash, null, workbook);
+            }
             var inspection = _store.InspectValidateForReview(candidate, targetPath);
             return Result(filename, inspection.Status, PromotionReason(inspection), candidateId, sourceHash, inspection);
         }

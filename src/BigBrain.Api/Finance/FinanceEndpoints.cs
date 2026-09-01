@@ -29,6 +29,7 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/robustness/{evaluationId}",(string evaluationId,IFinanceRobustnessReader reader)=>
             reader.GetEvaluation(evaluationId) is { } result?Results.Json(result,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/datasets",(IFinanceDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/datasets",(IFinanceResearchDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/backups",(IFinanceBackupReader reader)=>Results.Json(reader.GetInventory(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/shadow/predictions",(string? instrument,string? strategy,string? state,
             DateOnly? from,DateOnly? to,int? limit,EodhdMarketMemory memory)=>ShadowResult(() => memory.ShadowCatalog(instrument,strategy,state,from,to,limit??50)));
