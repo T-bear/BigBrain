@@ -2,10 +2,10 @@
 
 ## BB-126 — Owner Market-Data Drop Folder & Quarantine Inspection
 
-- Status 2026-09-01: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI PENDING**.
+- Status 2026-09-01: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**.
 - Owner workflow: place one `.csv` or `.zip`, optional same-basename `.metadata.json`, then an empty `<filename>.ready` marker in the configured local drop folder. The API claims only stable regular files and copies them into BB-084 quarantine.
 - Safety: symlinks, traversal, unsafe ZIPs, excessive sizes/file counts, malformed schemas and suspicious sidecars fail closed. Unknown identity, provenance or rights cannot promote. No automatic canonical promotion exists; all-pass inspection stops for an explicit later review.
-- Remaining BB-126 closure: publish the scoped commit and verify GitHub CI.
+- Publication: implementation `48755ee0ec27fed8f38132ddca050c2d2654e6ca`; GitHub Actions run `33492668713` passed all four jobs.
 
 ## BB-125 — Zero-Cost Historical Market Data Qualification
 

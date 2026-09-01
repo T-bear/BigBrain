@@ -16,6 +16,8 @@
   API-only image `sha256:e8b7cf7c03baf560740408bc01917162ba928480489490736a94547e94a37311`
   is healthy. Runtime confirmed a read-only owner-drop bind, unchanged two-candidate catalog and
   `RESEARCH / 0 SEK / NONE`; no inspection candidate or canonical revision was created.
+  Staged gitleaks found no secrets; GitHub Actions run `33492668713` passed backend, frontend,
+  documentation and full-history secrets for implementation `48755ee0ec27fed8f38132ddca050c2d2654e6ca`.
 
 ## BB-125 zero-cost historical market-data qualification
 

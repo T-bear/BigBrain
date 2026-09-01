@@ -11,9 +11,9 @@ Detta är en sanerad GitHub-version. Den innehåller inga hemligheter, privata a
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI PENDING.** No external
-provider was contacted and no market data was downloaded or promoted. Publication evidence is
-completed only after the commit and CI gates recorded below pass.
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED.** No external
+provider was contacted and no market data was downloaded or promoted. Implementation
+`48755ee0ec27fed8f38132ddca050c2d2654e6ca` is published; GitHub Actions run `33492668713` passed.
 
 ## Evidence
 
@@ -83,13 +83,15 @@ restriction, access control or entitlement gate is bypassed.
 - The first host directory mode `0750` correctly failed closed but denied the container user.
   Changing only that empty ingress directory to owner-writable/world-traversable `0755` restored
   read access; a full subsequent scan interval emitted no errors. The mount remained `RW=false`.
-- GitHub Actions: pending.
+- Staged gitleaks: no findings.
+- GitHub Actions run `33492668713`: backend, frontend, documentation and secrets passed.
 
 ## Remaining work
 
-- Publish the scoped BB-126 commit and verify `origin/main` plus CI.
+- None within BB-126. Each future owner dataset still requires its own evidence and explicit
+  promotion decision; that is expected operation, not unfinished implementation.
 
 ## Resumption
 
-Continue with scoped diff/secret review, commit, push and CI verification. Do not include unrelated
-owner working-tree changes.
+No recovery action is required. GitHub holds the implementation and final evidence commits;
+unrelated owner working-tree changes remain outside BB-126.
