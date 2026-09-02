@@ -4,7 +4,7 @@
 
 - `financeSnapshotCache.test.ts` verifies malformed/version-incompatible rejection, explicit display-safe field projection, secret-like unexpected-field exclusion and bounded watchlist persistence.
 - `FinanceObservation.test.tsx` verifies fresh persistence, immediate cached render, failed background refresh without page blanking, repeated manual failure, in-place recovery, first-use failure/retry, one in-flight refresh, online/visibility recovery, navigation abort handling and detail-request deferral. Existing Finance panel tests verify local degradation and the absence of trading controls.
-- Result 2026-09-02: focused 23/23 and full Web 171/171 passed; `npm run build` produced the production Web bundle. No backend test was required because no backend/read-model source changed.
+- Result 2026-09-02: focused 23/23 and full Web 171/171 passed; `npm run build` produced the production Web bundle. Documentation (215 Markdown files / 89 unique BB IDs), Compose, diff and staged gitleaks gates passed. GitHub Actions run `33657212798` passed backend, frontend, documentation and secrets for implementation `6eabbafed72c5df9a7484167a98acb0249c8a39d`. No local backend test was required because no backend/read-model source changed.
 
 Manual iPhone/PWA owner test after deployment:
 

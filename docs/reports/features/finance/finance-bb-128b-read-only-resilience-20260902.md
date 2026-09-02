@@ -6,12 +6,14 @@ Detta är en sanerad GitHub-version. It contains no credential, private address,
 
 - Date: 2026-09-02
 - Baseline: `8d374e22f5927cb4afce7c0de77ee5cca9b32d49`
-- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / NOT DEPLOYED / OWNER UX REVIEW PENDING**
+- Implementation: `6eabbafed72c5df9a7484167a98acb0249c8a39d`
+- GitHub Actions: `33657212798` — backend, frontend, documentation and secrets passed
+- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / NOT DEPLOYED / OWNER UX REVIEW PENDING**
 - Finance: `RESEARCH / 0 SEK / NONE`
 
 ## Status
 
-Implementation and deterministic local verification are complete. Deployment, runtime verification, CI verification and owner iPhone/PWA UX approval are not yet complete.
+Implementation, deterministic local verification and CI verification are complete. Deployment, runtime verification and owner iPhone/PWA UX approval are not yet complete.
 
 ## Evidence
 
