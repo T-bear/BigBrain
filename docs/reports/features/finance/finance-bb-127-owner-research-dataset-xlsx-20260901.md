@@ -13,9 +13,9 @@ workbooks, marknadsrader eller känsliga runtimeuppgifter.
 
 ## Status
 
-Implementation, automated tests, isolated real-workbook inspection and bounded research plumbing
-verification are complete. Appliance deployment/runtime and GitHub CI evidence are recorded during
-publication; canonical data remains unchanged.
+Implementation, automated tests, appliance real-workbook inspection, deployment and bounded
+research plumbing verification are complete. GitHub CI is the remaining publication gate;
+canonical promotion state remains unchanged.
 
 ## Architecture and decisions
 
@@ -64,19 +64,33 @@ and are not repaired or normalized into research observations. All 18 datasets r
 rights/historical-identity limitations; OHLCV additionally retains owner-only price-basis and
 unresolved corporate-action limitations. Zero canonical datasets/rows were produced.
 
-An existing conservative `buy-and-hold/v1` run consumed GOOG revision
+An isolated conservative `buy-and-hold/v1` run first consumed GOOG revision
 `research-a7f1880044c83ede` for 2014-03-27–2026-08-31 using
 `daily-next-session-open-v2`. Run `backtest-34d7f56c997c2236` retained candidate, package/workbook,
 dataset fingerprint, source/sheet, owner evidence, external-rights state, purpose and limitations.
 The numerical return is intentionally not published or interpreted: this is deterministic plumbing
 evidence over owner-claimed RAW/unresolved corporate-action data, not profitability evidence.
 
+Appliance verification on 2026-09-02 reproduced the same 18 revisions, 154,345 accepted
+observations, one MSFT plus three JNJ exclusions and zero promoted rows. Every revision is
+eligible-with-limitations for at least one compatible purpose; none is globally eligible.
+Close-only context/FX is explicitly rejected for OHLCV backtesting. The existing engine consumed
+GOOG as run `backtest-75a9d3296e3f9228`; a second invocation returned the same run ID and checksum,
+proving deterministic replay/idempotent persistence. Its lineage names research revision
+`research-a7f1880044c83ede`, candidate `owner-drop-9ed0c61e407dabaefa708b27`, package/workbook and
+dataset fingerprints, sheet/source claim, owner-decision evidence, external-rights state and nine
+limitations. The earlier GOOG canonical candidate remains `Rejected` with zero promoted rows.
+
 ## Verification
 
 - Focused tests: 8/8 passed.
 - Full API tests: 595/595 passed.
 - Release solution build: passed with zero warnings/errors.
-- Deployment/runtime and GitHub CI: pending publication evidence.
+- Documentation (213 Markdown files / 89 unique BB IDs), Compose, diff and staged gitleaks: passed.
+- Deployment/runtime: API-only image
+  `sha256:08f2db15e83051d18a8f8848e911f4ed7ce27839b39465cc40c1c575d4eed0e0` is healthy;
+  owner-drop intake, catalog, canonical boundary and bounded non-autonomous replay passed.
+- GitHub CI: pending publication evidence.
 
 ## Security
 

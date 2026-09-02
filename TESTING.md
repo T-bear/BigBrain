@@ -7,12 +7,17 @@
   leakage prevention, bounded workbook intake, manifest mismatch, support-sheet exclusion,
   OHLC anomaly rejection, idempotency/changed bytes, unsafe macro/external features, no canonical
   side effect and existing-engine backtest lineage.
-- The supplied workbook is additionally processed against an isolated Finance DB before runtime:
+- The supplied workbook was first processed against an isolated Finance DB and then through the
+  real owner-drop appliance path:
   expected SHA-256, 18 datasets, 154,345 accepted observations, one MSFT plus three JNJ rejected
   OHLC rows and zero canonical rows. A GOOG buy-and-hold run proves plumbing only.
-- Required closure: focused/full API tests, warning-free Release build, documentation/Compose/
-  diff/secrets gates, API-only deployment, real owner-drop processing, health, canonical count
-  invariance, bounded non-autonomous research run and GitHub CI.
+- Result 2026-09-02: focused 8/8 and full API 595/595 passed; warning-free Release build,
+  documentation, Compose, diff and staged-gitleaks gates passed. API image
+  `sha256:08f2db15e83051d18a8f8848e911f4ed7ce27839b39465cc40c1c575d4eed0e0`
+  is healthy. Runtime intake produced 18 immutable research revisions / 154,345 accepted
+  observations and zero promoted rows. GOOG revision `research-a7f1880044c83ede` produced
+  deterministic run `backtest-75a9d3296e3f9228`; replay retained its run ID/checksum and did not
+  add another run. GitHub CI remains the publication gate.
 
 ## GOOGLEFINANCE GOOG first owner intake
 
