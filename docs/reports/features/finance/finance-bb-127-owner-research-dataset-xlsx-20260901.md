@@ -13,9 +13,8 @@ workbooks, marknadsrader eller känsliga runtimeuppgifter.
 
 ## Status
 
-Implementation, automated tests, appliance real-workbook inspection, deployment and bounded
-research plumbing verification are complete. GitHub CI is the remaining publication gate;
-canonical promotion state remains unchanged.
+Implementation, automated tests, appliance real-workbook inspection, deployment, bounded research
+plumbing verification and GitHub CI are complete; canonical promotion state remains unchanged.
 
 ## Architecture and decisions
 
@@ -90,7 +89,9 @@ limitations. The earlier GOOG canonical candidate remains `Rejected` with zero p
 - Deployment/runtime: API-only image
   `sha256:08f2db15e83051d18a8f8848e911f4ed7ce27839b39465cc40c1c575d4eed0e0` is healthy;
   owner-drop intake, catalog, canonical boundary and bounded non-autonomous replay passed.
-- GitHub CI: pending publication evidence.
+- Publication: implementation `bc728e93ed73dfdf59f58fe5b26e7760faf0b342`, runtime evidence
+  `ffda7c2dc3a1567708b009741e626586191a8bd5`; GitHub Actions run `33586792133` passed backend,
+  frontend, documentation and secrets.
 
 ## Security
 

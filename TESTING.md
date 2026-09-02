@@ -17,7 +17,8 @@
   is healthy. Runtime intake produced 18 immutable research revisions / 154,345 accepted
   observations and zero promoted rows. GOOG revision `research-a7f1880044c83ede` produced
   deterministic run `backtest-75a9d3296e3f9228`; replay retained its run ID/checksum and did not
-  add another run. GitHub CI remains the publication gate.
+  add another run. GitHub Actions run `33586792133` passed backend, frontend, documentation and
+  secrets for runtime-evidence commit `ffda7c2dc3a1567708b009741e626586191a8bd5`.
 
 ## GOOGLEFINANCE GOOG first owner intake
 
