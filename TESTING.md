@@ -11,7 +11,9 @@
   includes the complete live-observation/synthetic-shadow suite and existing EODHD shadow tests.
 - No test contacts Alpaca. No account, key, network client or real observation fixture exists.
 - Result 2026-09-02: focused Alpaca 4/4 and affected live/shadow 24/24 passed; full API 599/599
-  passed. Release build succeeded with zero warnings/errors.
+  passed. Release build succeeded with zero warnings/errors. GitHub Actions run `33651291772`
+  passed backend, frontend, documentation and secrets for implementation
+  `646078efe77dfb4c8876afb7c65c4cdcdd421a95`.
 
 ## BB-127 owner research capabilities and XLSX
 

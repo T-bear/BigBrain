@@ -101,7 +101,9 @@ gates.
 
 Local result: Alpaca-focused tests 4/4, combined live/synthetic-shadow/EODHD-shadow regression
 24/24 and full API 599/599 passed. Release build passed with zero warnings/errors. Documentation,
-Compose, diff and staged secret results are recorded at publication.
+Compose, diff and staged secret checks passed. Implementation
+`646078efe77dfb4c8876afb7c65c4cdcdd421a95` passed GitHub Actions run `33651291772` across backend,
+frontend, documentation and secrets.
 
 Owner action: obtain and provide Alpaca's written confirmation covering the full durable data
 lifecycle. A later separately approved sprint must translate that evidence into an entitlement
