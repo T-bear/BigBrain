@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-128A — Alpaca Live Market Data Activation Readiness
+
+- Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION**.
+- Reuses the existing live observation, entitlement and prospective shadow contracts. Read-only activation metadata identifies Basic/IEX as real-time single-exchange US stock/ETF coverage with a documented 30-symbol WebSocket limit; it cannot masquerade as SIP or consolidated US data.
+- Acquisition stays fail-closed through `MarketDataEntitlementEvaluator`: unresolved raw/normalized persistence, accumulation, backup/revision, derived-evidence and post-account retention rights prevent any provider delegate from executing. No adapter/network client, account, credential, data, deployment or trading capability exists.
+- Remaining owner action: supply Alpaca's written lifecycle clarification. Only a separately approved activation sprint may add credentials and a real adapter after policy review; the provider-processing timestamp mapping also remains `UNKNOWN`.
+
 ## BB-127 — Owner Research Dataset Capabilities & XLSX Intake
 
 - Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**.

@@ -1,5 +1,11 @@
 # BigBrain Status
 
+## BB-128A Alpaca Live Market Data Activation Readiness (2026-09-02)
+
+BB-128A is **IMPLEMENTED / AUTOMATICALLY VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION** from baseline `ed1bae8681fd18797c89f6ff140ecb92de1c8912`. It reuses `LiveMarketObservation`, `LiveObservationEntitlementGate`, `MarketDataEntitlementEvaluator`, deterministic stream identity and the existing prospective shadow boundary. Read-only `/api/v1/modules/finance/providers/alpaca/status` describes Alpaca Basic, real-time IEX single-exchange coverage, US stocks/ETFs, WebSocket as the future transport candidate, the documented 30-symbol limit, absent credentials and the unresolved durable-data lifecycle.
+
+The authoritative existing entitlement evaluator blocks acquisition before any future provider delegate can execute. IEX cannot be represented as SIP or consolidated-US coverage, and stream identity binds provider, plan, feed, instrument, observation type, granularity and policy version. Alpaca documents message field `t` as the market-event timestamp but no separate provider-processing timestamp; that mapping remains `UNKNOWN` and keeps technical status at `contractKnownWithMappingGap`. No account, key, request, observation, persistence, adapter, deployment or trading capability was created. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-127 Owner Research Dataset Capabilities & XLSX Intake (2026-09-01)
 
 BB-127 is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** from baseline `b801712fca7eb0aa7cc3623a2198ac66c3ed8c1b`. The existing BB-084/126 quarantine now accepts a bounded, pre-screened XLSX (direct or one XLSX inside an owner package), reads cached cell values without formula evaluation and persists each manifest-declared historical sheet as an independent immutable Finance research revision. Macro/code, external relationships, embedded objects, traversal and bounded-resource violations fail closed. Support sheets and `CURRENT_METADATA` never become historical datasets.

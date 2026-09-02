@@ -101,6 +101,15 @@ derived/audit, post-termination, personal-funds and IEX/exchange conditions rema
 No Alpaca inquiry is recorded as sent. Cost cannot relax licensing, provenance, security or
 live-data quality.
 
+BB-128A activation-readiness review on 2026-09-02 confirms from Alpaca's first-party documentation
+that Basic provides real-time US stocks/ETF data from IEX only, supports at most 30 WebSocket
+symbol subscriptions and uses distinct `v2/iex`, `v2/sip` and `v2/delayed_sip` feed identities.
+IEX is one exchange and is not consolidated US/SIP evidence. Trade, quote and bar messages document
+an RFC-3339 `t` market timestamp; a distinct provider-processing timestamp is not documented and
+remains `UNKNOWN`. This technical clarification does not resolve durable storage, accumulation,
+backup/revision, derived-evidence or termination-retention rights. Alpaca therefore remains
+**STATE B — HUMAN CONFIRMATION REQUIRED / NOT ACTIVATED / ACQUISITION BLOCKED**.
+
 The dated full zero-cost matrix and first-party source list are in the
 [BB-075 report](../../reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md).
 

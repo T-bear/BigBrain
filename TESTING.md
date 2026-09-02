@@ -1,5 +1,18 @@
 # Testa BigBrain
 
+## BB-128A Alpaca activation readiness
+
+- `FinanceAlpacaActivationReadinessTests` verifies that unresolved entitlement blocks before a
+  provider delegate can execute, status contains no configured credential, Basic/IEX cannot be
+  represented as consolidated coverage, and stream identity separates instrument, observation
+  type, granularity and policy version.
+- Existing `LiveMarketObservation` tests remain authoritative for event/provider/receive/knowledge
+  causal ordering and for rejecting delayed evidence labelled real-time. The affected regression
+  includes the complete live-observation/synthetic-shadow suite and existing EODHD shadow tests.
+- No test contacts Alpaca. No account, key, network client or real observation fixture exists.
+- Result 2026-09-02: focused Alpaca 4/4 and affected live/shadow 24/24 passed; full API 599/599
+  passed. Release build succeeded with zero warnings/errors.
+
 ## BB-127 owner research capabilities and XLSX
 
 - `FinanceResearchDatasetTests` covers canonical/research independence, owner approval with

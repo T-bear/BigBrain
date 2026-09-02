@@ -1,5 +1,7 @@
 # Finance reports
 
+- [BB-128A Alpaca live activation readiness](finance-bb-128a-alpaca-live-activation-readiness-20260902.md)
+
 - [BB-127 Owner Research Dataset Capabilities & XLSX Intake](finance-bb-127-owner-research-dataset-xlsx-20260901.md)
 
 - [GOOGLEFINANCE GOOG First Owner Intake](finance-googlefinance-goog-owner-intake-20260901.md)

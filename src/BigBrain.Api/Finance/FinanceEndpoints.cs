@@ -12,6 +12,9 @@ public static class FinanceEndpoints
     {
         endpoints.MapGet("/api/v1/modules/finance/observation", (IFinanceObservationReader reader) =>
             Results.Json(reader.GetSnapshot(), JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/providers/alpaca/status", () =>
+            Results.Json(AlpacaLiveActivationGate.Evaluate(AlpacaBasicIexReadiness.EntitlementPolicy(
+                new DateTimeOffset(2026, 9, 2, 0, 0, 0, TimeSpan.Zero))), JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/features", (string? instrumentId, string? featureId,
             DateOnly? from, DateOnly? to, DateTimeOffset? knowledgeAsOfUtc, int? limit, IFinanceFeatureReader reader) =>
             Results.Json(reader.GetSnapshot(instrumentId, featureId, from, to, knowledgeAsOfUtc, limit ?? 260), JsonOptions));

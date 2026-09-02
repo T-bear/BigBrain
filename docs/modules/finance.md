@@ -1,5 +1,21 @@
 # Finance module
 
+## Alpaca Basic/IEX activation readiness — 2026-09-02
+
+BB-128A adds no live provider. It projects a provider-specific candidate through the existing
+entitlement/read-model boundary at `/api/v1/modules/finance/providers/alpaca/status`. The result is
+`NOT ACTIVATED / HUMAN CONFIRMATION REQUIRED / ACQUISITION BLOCKED` while durable raw and
+normalized storage, accumulation, backups/revisions, derived research evidence and post-account
+retention remain unresolved. No secret value is a status field.
+
+Basic is explicitly Alpaca `IEX`, real-time single-exchange coverage for US stocks/ETFs, not SIP,
+NBBO or consolidated US coverage. The documented candidate transport is WebSocket and the Basic
+subscription limit is 30 symbols. Deterministic future stream identity includes provider, plan,
+feed, instrument, observation type, granularity and entitlement-policy version. Alpaca's `t` field
+maps to market event time; no separate provider-processing timestamp is documented, so that mapping
+remains `UNKNOWN`. A future adapter must assign receive and knowledge time locally while preserving
+the existing causal ordering. Existing EODHD prospective shadow behavior is unchanged.
+
 ## BB-127 owner research datasets — 2026-09-01
 
 Finance now records immutable noncanonical research dataset revisions and evaluates each declared purpose through `owner-research-eligibility-v1`. `CANONICAL ELIGIBILITY != RESEARCH ELIGIBILITY`, `OWNER APPROVAL != EXTERNAL RIGHTS VERIFICATION`, and `RESEARCH-ELIGIBLE != SUITABLE FOR EVERY EXPERIMENT`. Explicit denial and technical failure remain blocking; unresolved external evidence remains visible and owner-accepted only for compatible private research.
