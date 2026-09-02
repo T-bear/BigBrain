@@ -1,5 +1,20 @@
 # Testa BigBrain
 
+## BB-128B Finance last-known-good resilience
+
+- `financeSnapshotCache.test.ts` verifies malformed/version-incompatible rejection, explicit display-safe field projection, secret-like unexpected-field exclusion and bounded watchlist persistence.
+- `FinanceObservation.test.tsx` verifies fresh persistence, immediate cached render, failed background refresh without page blanking, repeated manual failure, in-place recovery, first-use failure/retry, one in-flight refresh, online/visibility recovery, navigation abort handling and detail-request deferral. Existing Finance panel tests verify local degradation and the absence of trading controls.
+- Result 2026-09-02: focused 23/23 and full Web 171/171 passed; `npm run build` produced the production Web bundle. No backend test was required because no backend/read-model source changed.
+
+Manual iPhone/PWA owner test after deployment:
+
+1. Open Finance with a healthy API and confirm the normal view loads.
+2. Temporarily make only the BigBrain API unreachable using the existing safe appliance procedure; do not delete data or stop unrelated services.
+3. Return to or reopen Finance and confirm the last-known-good view remains visible with `Visar senast hämtade data` and a failed-update indication.
+4. Press `Försök igen` while unavailable and confirm content remains visible.
+5. Restore the API, press `Försök igen` (or foreground/reconnect the PWA), and confirm fresh state replaces stale state without restarting the PWA.
+6. Confirm no cached state is presented as LIVE or as authorization for acquisition/trading.
+
 ## BB-128A Alpaca activation readiness
 
 - `FinanceAlpacaActivationReadinessTests` verifies that unresolved entitlement blocks before a

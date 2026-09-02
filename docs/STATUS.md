@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-128B Finance Read-Only Resilience & Last-Known-Good UX (2026-09-02)
+
+BB-128B is **IMPLEMENTED / AUTOMATICALLY VERIFIED / NOT DEPLOYED / OWNER UX REVIEW PENDING** from baseline `8d374e22f5927cb4afce7c0de77ee5cca9b32d49`. A bounded, version-1 display cache now keeps the latest successful Finance observation snapshot in browser `localStorage`, renders it immediately, identifies it as stale and revalidates in the background. Failed refreshes retain the usable page and offer `Försök igen`; first-use failure without a compatible cache retains the honest unavailable state and retry action.
+
+Only an explicit display-safe projection of the read-only observation is persisted (maximum 16 instruments, 400 chart points per instrument and 512,000 serialized characters). Fetch time remains distinct from market/source timestamps. Malformed or incompatible entries are ignored. Cache state cannot call or authorize backend actions; Finance remains `RESEARCH / 0 SEK / NONE`. Revalidation occurs on mount, return to a visible page and browser `online`, with one in-flight request and no polling loop. Detail-only features, datasets, backtests, robustness, backups, shadow and scheduler/governor/operations calls now wait until `Detaljer & forskning` opens; overview, risk and autonomous-research panels continue to degrade independently.
+
+Focused 23/23 and full Web 171/171 tests plus the production Web build passed locally. No backend, API contract, provider, acquisition, entitlement, research or trading behavior changed. Deployment/runtime and physical iPhone/PWA approval remain pending.
+
 ## BB-128A Alpaca Live Market Data Activation Readiness (2026-09-02)
 
 BB-128A is **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION** from baseline `ed1bae8681fd18797c89f6ff140ecb92de1c8912`. It reuses `LiveMarketObservation`, `LiveObservationEntitlementGate`, `MarketDataEntitlementEvaluator`, deterministic stream identity and the existing prospective shadow boundary. Read-only `/api/v1/modules/finance/providers/alpaca/status` describes Alpaca Basic, real-time IEX single-exchange coverage, US stocks/ETFs, WebSocket as the future transport candidate, the documented 30-symbol limit, absent credentials and the unresolved durable-data lifecycle.

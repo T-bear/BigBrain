@@ -1,5 +1,13 @@
 # Finance module
 
+## BB-128B read-only display resilience — 2026-09-02
+
+The Finance Web first layer uses a versioned last-known-good cache for the bounded observation read model. On entry, compatible cached data renders immediately as stale while a background read revalidates it. A temporary observation failure retains the page and exposes `Försök igen`; only a first load with no usable cache shows the full unavailable state. Visibility and browser-online events trigger one deduplicated revalidation; there is no polling loop.
+
+Cache version 1 stores only an explicit display-safe projection: fetch time, declared section, Finance safety/provider display status, latest market-data timestamp, bounded watchlist/chart history, historical-memory summary and retention summary. It is limited to 16 instruments, 400 points per instrument and 512,000 serialized characters. It does not store credentials, headers, unrestricted responses, full observation corpora, overview/risk/autonomous/detail payloads or action authority. Browser fetch time is never presented as market time.
+
+The cache describes what BigBrain last knew; it cannot decide what BigBrain may do now. All acquisition, entitlement, research eligibility, risk and any future execution authority remain backend fail-closed. Detail-only features, backtests, robustness, datasets, backups, shadow and scheduler/governor/operations reads are lazy behind `Detaljer & forskning`. First-layer overview, risk and autonomous-research failures remain local to those panels. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## Alpaca Basic/IEX activation readiness — 2026-09-02
 
 BB-128A adds no live provider. It projects a provider-specific candidate through the existing

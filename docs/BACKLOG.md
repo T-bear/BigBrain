@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-128B — Finance Read-Only Resilience & Last-Known-Good UX
+
+- Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / NOT DEPLOYED / OWNER UX REVIEW PENDING**.
+- Versioned bounded display-only Finance observation cache, stale-while-revalidate, manual in-place retry, visibility/online recovery and detail-request deferral are implemented.
+- Cache data is never backend authority and cannot enable acquisition, entitlement, PAPER/LIVE/AUTO, broker/orders or capital allocation. Finance remains `RESEARCH / 0 SEK / NONE`.
+- Remaining acceptance: deploy the Web artifact under a separately authorized deployment step, run the documented iPhone/PWA outage/recovery test and record explicit owner UX approval.
+
 ## BB-128A — Alpaca Live Market Data Activation Readiness
 
 - Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION**.

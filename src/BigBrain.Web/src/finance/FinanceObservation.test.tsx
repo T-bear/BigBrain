@@ -1,6 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, describe, expect, test, vi } from 'vitest'
+import * as api from '../api'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
+import { FINANCE_SNAPSHOT_CACHE_KEY, writeFinanceSnapshotCache } from './financeSnapshotCache'
 import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
@@ -30,7 +32,96 @@ const governorFixture:FinanceResearchResourceDecision={decision:'defer',evaluate
 const operationsFixture:FinanceResearchOperationsStatus={operationsVersion:'finance-research-operations-v1',evaluatedAtUtc:'2026-08-23T03:00:00Z',state:'attentionRequired',requiresAttention:true,currentActivity:'OPERATIONAL_FAILURE_STREAK',schedulerEnabled:true,maintenancePaused:false,lastSchedulerEvaluationUtc:'2026-08-23T03:00:00Z',lastSuccessfulResearchUtc:'2026-08-22T02:04:00Z',lastOperationalFailureUtc:'2026-08-23T03:00:00Z',consecutiveOperationalFailures:3,lastFailureReason:'finance.research.scheduler.unexpected.SqliteException',lastSuccessfulEvidenceRefreshUtc:'2026-08-22T22:10:00Z',historicalEvidenceAvailable:true,currentSessionRequired:true,requiredResearchDate:'2026-08-22',dataReadiness:'COMPLETE',featureLineageReadiness:'READY',resourceDecision:'DEFER',activeResearchRunId:null,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
 const openResearchDetails = () => fireEvent.click(screen.getAllByText('Detaljer & forskning').at(-1)!)
 
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
+
 describe('Finance read-only observation UI', () => {
+  test('persists a successful first read as bounded last-known-good display state', async () => {
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockResolvedValueOnce(empty)
+    render(<FinanceObservation />)
+    expect(await screen.findByText('Ingen handel med riktiga pengar')).toBeVisible()
+    expect(JSON.parse(localStorage.getItem(FINANCE_SNAPSHOT_CACHE_KEY)!).version).toBe(1)
+    expect(observation).toHaveBeenCalledTimes(1)
+  })
+
+  test('renders compatible cached Finance immediately and keeps it on refresh failure', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockRejectedValue(new Error('offline'))
+    render(<FinanceObservation />)
+    expect(screen.getAllByText('Ingen handel med riktiga pengar')[0]).toBeVisible()
+    expect(screen.getByText('Visar senast hämtade data')).toBeVisible()
+    await screen.findByText('Uppdatering misslyckades')
+    expect(screen.queryByText('Finance är otillgängligt')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Försök igen' }))
+    await waitFor(() => expect(observation).toHaveBeenCalledTimes(2))
+    expect(screen.getAllByText('Ingen handel med riktiga pengar')[0]).toBeVisible()
+    expect(screen.getByText('Uppdatering misslyckades')).toBeVisible()
+  })
+
+  test('manual retry recovers in place without clearing cached content', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ...empty, generatedAtUtc: '2026-09-02T18:06:00Z' })
+    render(<FinanceObservation />)
+    await screen.findByText('Uppdatering misslyckades')
+    fireEvent.click(screen.getByRole('button', { name: 'Försök igen' }))
+    expect(screen.getAllByText('Ingen handel med riktiga pengar')[0]).toBeVisible()
+    await waitFor(() => expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument())
+    expect(observation).toHaveBeenCalledTimes(2)
+  })
+
+  test('first-load failure remains honest and can be retried without navigation', async () => {
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(empty)
+    render(<FinanceObservation />)
+    expect(await screen.findByText('Finance är otillgängligt')).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: 'Försök igen' }))
+    expect(await screen.findByText('Ingen handel med riktiga pengar')).toBeVisible()
+    expect(observation).toHaveBeenCalledTimes(2)
+  })
+
+  test('does not overlap refreshes and revalidates once when connectivity returns', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    let finish: ((value: FinanceObservationSnapshot) => void) | undefined
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    render(<FinanceObservation />)
+    fireEvent(window, new Event('online'))
+    fireEvent(window, new Event('online'))
+    expect(observation).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: 'Uppdaterar…' })).toBeDisabled()
+    finish!(empty)
+    await waitFor(() => expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument())
+  })
+
+  test('revalidates once when the visible page returns to the foreground', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockResolvedValue(empty)
+    render(<FinanceObservation />)
+    await waitFor(() => expect(observation).toHaveBeenCalledTimes(1))
+    fireEvent(document, new Event('visibilitychange'))
+    await waitFor(() => expect(observation).toHaveBeenCalledTimes(2))
+  })
+
+  test('defers technical detail requests until the details section opens', async () => {
+    const features = vi.spyOn(api, 'getFinanceFeatures').mockRejectedValue(new Error('unavailable'))
+    const backtests = vi.spyOn(api, 'getFinanceBacktests').mockRejectedValue(new Error('unavailable'))
+    render(<FinanceObservation initialSnapshot={{ ...empty, watchlist: [{ ...empty.watchlist[0], price: 100 }] }} />)
+    expect(features).not.toHaveBeenCalled()
+    expect(backtests).not.toHaveBeenCalled()
+    openResearchDetails()
+    await waitFor(() => expect(features).toHaveBeenCalledTimes(1))
+    expect(backtests).toHaveBeenCalledTimes(1)
+    expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+  })
+
+  test('aborted navigation is not rendered as a backend failure', () => {
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockImplementation(signal => new Promise((_, reject) => signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))))
+    const view = render(<FinanceObservation />)
+    view.unmount()
+    expect(observation).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('Finance är otillgängligt')).not.toBeInTheDocument()
+  })
+
   test('registers Finance as a navigable dashboard view', () => {
     expect(dashboardRegistry.get('finance')).toMatchObject({ title: 'Finance' })
   })
