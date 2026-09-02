@@ -8,6 +8,8 @@ Cache version 1 stores only an explicit display-safe projection: fetch time, dec
 
 The cache describes what BigBrain last knew; it cannot decide what BigBrain may do now. All acquisition, entitlement, research eligibility, risk and any future execution authority remain backend fail-closed. Detail-only features, backtests, robustness, datasets, backups, shadow and scheduler/governor/operations reads are lazy behind `Detaljer & forskning`. First-layer overview, risk and autonomous-research failures remain local to those panels. Finance remains `RESEARCH / 0 SEK / NONE`.
 
+The Web-only BB-128B deployment was runtime verified on 2026-09-02. Web/API health and the Web-proxied Finance observation read returned HTTP 200; the deployed hashed bundle contains the versioned cache key, stale treatment and retry action. The API container and its Finance configuration were unchanged. Owner iPhone/PWA outage/recovery approval remains pending.
+
 ## Alpaca Basic/IEX activation readiness — 2026-09-02
 
 BB-128A adds no live provider. It projects a provider-specific candidate through the existing

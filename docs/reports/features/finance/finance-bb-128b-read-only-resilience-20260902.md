@@ -8,12 +8,12 @@ Detta är en sanerad GitHub-version. It contains no credential, private address,
 - Baseline: `8d374e22f5927cb4afce7c0de77ee5cca9b32d49`
 - Implementation: `6eabbafed72c5df9a7484167a98acb0249c8a39d`
 - GitHub Actions: `33657212798` — backend, frontend, documentation and secrets passed
-- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / NOT DEPLOYED / OWNER UX REVIEW PENDING**
+- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX REVIEW PENDING**
 - Finance: `RESEARCH / 0 SEK / NONE`
 
 ## Status
 
-Implementation, deterministic local verification and CI verification are complete. Deployment, runtime verification and owner iPhone/PWA UX approval are not yet complete.
+Implementation, deterministic local verification, CI verification, Web deployment and bounded runtime verification are complete. Owner iPhone/PWA UX approval is not yet complete.
 
 ## Evidence
 
@@ -52,7 +52,7 @@ The owner-facing overview, risk and autonomous-research panels retain their exis
 - Full Web: `npm test` — 171/171 passed.
 - Production Web build: `npm run build` — passed.
 - Backend tests: not required; no backend/read-model source changed.
-- Deployment/runtime: not performed; this sprint did not include separate deployment authorization.
+- Deployment/runtime: Web-only deployment and bounded runtime verification passed on 2026-09-02.
 - Owner iPhone/PWA UX: pending after deployment.
 
 The deterministic tests cover successful persistence, cached-first render, refresh success/failure, retained content, no fatal cached failure, first-use failure/retry, repeated failure, request deduplication, visibility/online recovery, abort behavior, malformed/incompatible/oversized cache, allowlisted persistence, unexpected credential-field exclusion and lazy detail reads. Existing Finance tests continue to prove research-only safety and local panel degradation.
@@ -63,12 +63,22 @@ No secret, credential, private address, raw provider payload, authorization head
 
 ## Manual owner verification
 
-After a separately authorized Web deployment: load Finance once while healthy; temporarily make the API unreachable through the safe appliance procedure; return to Finance and verify cached content plus stale status; retry while unavailable and verify content remains; restore the API; retry or foreground/reconnect the PWA and verify fresh content replaces stale state without restarting the app. Confirm no stale status appears live or authoritative.
+On the deployed PWA: load Finance once while healthy; temporarily make the API unreachable through the safe appliance procedure; return to Finance and verify cached content plus stale status; retry while unavailable and verify content remains; restore the API; retry or foreground/reconnect the PWA and verify fresh content replaces stale state without restarting the app. Confirm no stale status appears live or authoritative.
+
+## Deployment and runtime evidence
+
+The established Compose workflow rebuilt `web` and recreated only that service with `--no-deps`. The prior image was `sha256:28f348d…`; the deployed image is `sha256:25e88b6…`. The retained prior image identity is the rollback target. The first recreate command exceeded its command window after creating the new container; a scoped Compose start completed it without recreating API or another service.
+
+Post-deployment Web and API health returned HTTP 200. The Web-proxied Finance observation route returned HTTP 200, and the deployed hashed JavaScript bundle contains `bigbrain.finance.last-known-good.v1`, `Visar senast hämtade data` and `Försök igen`. Sanitized Finance observation evidence reported mode `research`, eight instruments, no broker and PAPER/LIVE disabled. Scheduler status remained `RESEARCH / 0 SEK / NONE`, enabled, not currently running. The API container identity was unchanged, so no provider, data, entitlement or safety configuration changed.
+
+A pre-deployment Finance observation probe timed out during transient appliance load while API health remained 200; after deployment the same read returned 200 in 0.27 seconds. This is runtime evidence of availability at inspection time, not proof that the underlying transient API latency cannot recur. BB-128B keeps cached display data useful when it does recur.
+
+Rollback was not required. If needed, restore the retained prior Web image tag to `sha256:28f348d…` and recreate only `web` with `--no-deps`; do not alter volumes or API.
 
 ## Remaining work
 
-Only the bounded observation snapshot is durable across browser sessions. First-layer overview, risk and autonomous-research details may show their local unavailable states during an outage rather than cached values. Cache is device/browser-profile local and disappears if site storage is cleared. No future live observation is cached. The next owner decision is to authorize Web deployment and perform the documented physical iPhone/PWA recovery test; owner UX must remain pending until explicit approval.
+Only the bounded observation snapshot is durable across browser sessions. First-layer overview, risk and autonomous-research details may show their local unavailable states during an outage rather than cached values. Cache is device/browser-profile local and disappears if site storage is cleared. No future live observation is cached. The next owner action is the documented physical iPhone/PWA recovery test; owner UX must remain pending until explicit approval.
 
 ## Resumption
 
-Resume from this report, `docs/STATUS.md`, `docs/BACKLOG.md`, `docs/modules/finance.md` and `TESTING.md`. The smallest safe next step is a separately authorized Web deployment followed by the documented iPhone/PWA outage/recovery test and explicit owner verdict.
+Resume from this report, `docs/STATUS.md`, `docs/BACKLOG.md`, `docs/modules/finance.md` and `TESTING.md`. The smallest safe next step is the documented iPhone/PWA outage/recovery test followed by an explicit owner verdict.

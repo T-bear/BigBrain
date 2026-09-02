@@ -15,6 +15,8 @@ Manual iPhone/PWA owner test after deployment:
 5. Restore the API, press `Försök igen` (or foreground/reconnect the PWA), and confirm fresh state replaces stale state without restarting the PWA.
 6. Confirm no cached state is presented as LIVE or as authorization for acquisition/trading.
 
+Deployment result 2026-09-02: only `web` was rebuilt and recreated with `--no-deps`. The Web image changed from `sha256:28f348d…` to `sha256:25e88b6…`; Web/API health and Finance via the Web proxy returned HTTP 200. The deployed bundle exposes the expected cache key, stale message and retry action. Finance runtime reported `RESEARCH / 0 SEK / NONE`, eight watchlist instruments, no broker/PAPER/LIVE and no active research run. The API container identity remained unchanged. Physical iPhone/PWA outage/recovery review remains pending.
+
 ## BB-128A Alpaca activation readiness
 
 - `FinanceAlpacaActivationReadinessTests` verifies that unresolved entitlement blocks before a
