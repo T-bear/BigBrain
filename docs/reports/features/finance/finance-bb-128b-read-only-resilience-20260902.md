@@ -8,7 +8,7 @@ Detta är en sanerad GitHub-version. It contains no credential, private address,
 - Baseline: `8d374e22f5927cb4afce7c0de77ee5cca9b32d49`
 - Implementation: `6eabbafed72c5df9a7484167a98acb0249c8a39d`
 - GitHub Actions: `33657212798` — backend, frontend, documentation and secrets passed
-- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX REVIEW PENDING**
+- Result: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX VERIFIED**
 - Finance: `RESEARCH / 0 SEK / NONE`
 
 ## Status
@@ -53,7 +53,7 @@ The owner-facing overview, risk and autonomous-research panels retain their exis
 - Production Web build: `npm run build` — passed.
 - Backend tests: not required; no backend/read-model source changed.
 - Deployment/runtime: Web-only deployment and bounded runtime verification passed on 2026-09-02.
-- Owner iPhone/PWA UX: pending after deployment.
+- Owner iPhone/PWA resilience UX: verified on 2026-09-03 during a natural transient failure; visual conformance is followed up by BB-128C.
 
 The deterministic tests cover successful persistence, cached-first render, refresh success/failure, retained content, no fatal cached failure, first-use failure/retry, repeated failure, request deduplication, visibility/online recovery, abort behavior, malformed/incompatible/oversized cache, allowlisted persistence, unexpected credential-field exclusion and lazy detail reads. Existing Finance tests continue to prove research-only safety and local panel degradation.
 
@@ -77,8 +77,8 @@ Rollback was not required. If needed, restore the retained prior Web image tag t
 
 ## Remaining work
 
-Only the bounded observation snapshot is durable across browser sessions. First-layer overview, risk and autonomous-research details may show their local unavailable states during an outage rather than cached values. Cache is device/browser-profile local and disappears if site storage is cleared. No future live observation is cached. The next owner action is the documented physical iPhone/PWA recovery test; owner UX must remain pending until explicit approval.
+Only the bounded observation snapshot is durable across browser sessions. First-layer overview, risk and autonomous-research details may show their local unavailable states during an outage rather than cached values. Cache is device/browser-profile local and disappears if site storage is cleared. No future live observation is cached. On 2026-09-03 a natural transient iPhone/PWA failure retained cached Finance, exposed retry and recovered after one owner retry. Functional resilience is therefore owner verified; the owner explicitly withheld visual approval and BB-128C follows up the degraded presentation.
 
 ## Resumption
 
-Resume from this report, `docs/STATUS.md`, `docs/BACKLOG.md`, `docs/modules/finance.md` and `TESTING.md`. The smallest safe next step is the documented iPhone/PWA outage/recovery test followed by an explicit owner verdict.
+Resume from this report, `docs/STATUS.md`, `docs/BACKLOG.md`, `docs/modules/finance.md` and `TESTING.md`. Functional recovery is verified; the next bounded step is BB-128C visual conformance and physical owner review.

@@ -38,6 +38,14 @@ afterEach(() => {
 })
 
 describe('Finance read-only observation UI', () => {
+  test('uses the shared loading primitive for the initial Finance read', () => {
+    vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(() => undefined))
+    const { container } = render(<FinanceObservation />)
+    expect(container.querySelector('.bb-loading-indicator')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Hämtar Finance-status')
+    expect(container.querySelector('.finance-view')).toHaveAttribute('aria-busy', 'true')
+  })
+
   test('persists a successful first read as bounded last-known-good display state', async () => {
     const observation = vi.spyOn(api, 'getFinanceObservation').mockResolvedValueOnce(empty)
     render(<FinanceObservation />)
@@ -88,9 +96,23 @@ describe('Finance read-only observation UI', () => {
     fireEvent(window, new Event('online'))
     fireEvent(window, new Event('online'))
     expect(observation).toHaveBeenCalledTimes(1)
-    expect(screen.getByRole('button', { name: 'Uppdaterar…' })).toBeDisabled()
+    const retry = screen.getByRole('button', { name: 'Försök igen pågår' })
+    expect(retry).toBeDisabled()
+    expect(retry).toHaveAttribute('aria-busy', 'true')
+    expect(retry.querySelector('.bb-loading-indicator')).toBeInTheDocument()
     finish!(empty)
     await waitFor(() => expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument())
+  })
+
+  test('keeps stale label and fetched time as wrapping-safe elements without a literal separator', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    vi.spyOn(api, 'getFinanceObservation').mockRejectedValue(new Error('offline'))
+    const { container } = render(<FinanceObservation />)
+    await screen.findByText('Uppdatering misslyckades')
+    const freshness = container.querySelector('.finance-stale-notice__freshness')!
+    expect(freshness.querySelector('strong')).toHaveTextContent('Visar senast hämtade data')
+    expect(freshness.querySelector('time')).toHaveTextContent('20:04')
+    expect(freshness.textContent).not.toContain('·')
   })
 
   test('revalidates once when the visible page returns to the foreground', async () => {

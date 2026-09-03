@@ -1,5 +1,11 @@
 # Testa BigBrain
 
+## BB-128C Finance async/degraded design-system conformance
+
+- Focused tests verify the shared loading indicator, accessible standardized busy button, no overlapping refresh, cached content retention, successful/failed recovery, fetch-time visibility and separator-free wrapping-safe markup.
+- Existing BB-128B tests remain authoritative for cache versioning, first-load failure, abort, foreground/online recovery, bounded persistence and Finance research-only safety.
+- Result 2026-09-03: focused component/Finance 27/27 and full Web 173/173 passed. The production Web build completed successfully. Deployment/runtime and owner visual review remain pending.
+
 ## BB-128B Finance last-known-good resilience
 
 - `financeSnapshotCache.test.ts` verifies malformed/version-incompatible rejection, explicit display-safe field projection, secret-like unexpected-field exclusion and bounded watchlist persistence.

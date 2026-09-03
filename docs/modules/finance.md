@@ -1,5 +1,11 @@
 # Finance module
 
+## BB-128C async/degraded design-system conformance — 2026-09-03
+
+Finance initial loading and retry use the shared `BBLoadingIndicator` and `BBButton busy` primitives. The shared semantic tokens, accessibility contract and reduced-motion behavior are authoritative; the module does not copy UX-lab CSS or create a local spinner. Cached-state messaging remains visible but uses a compact warning treatment, with fetch label and timestamp represented as independent wrapping-safe elements.
+
+BB-128B cache, revalidation, failure and request-deduplication semantics are unchanged. Owner testing during a real transient iPhone/PWA failure verified that last-known-good content remained visible and recovered after one retry. BB-128C visual owner review remains pending. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-128B read-only display resilience — 2026-09-02
 
 The Finance Web first layer uses a versioned last-known-good cache for the bounded observation read model. On entry, compatible cached data renders immediately as stale while a background read revalidates it. A temporary observation failure retains the page and exposes `Försök igen`; only a first load with no usable cache shows the full unavailable state. Visibility and browser-online events trigger one deduplicated revalidation; there is no polling loop.
@@ -8,7 +14,7 @@ Cache version 1 stores only an explicit display-safe projection: fetch time, dec
 
 The cache describes what BigBrain last knew; it cannot decide what BigBrain may do now. All acquisition, entitlement, research eligibility, risk and any future execution authority remain backend fail-closed. Detail-only features, backtests, robustness, datasets, backups, shadow and scheduler/governor/operations reads are lazy behind `Detaljer & forskning`. First-layer overview, risk and autonomous-research failures remain local to those panels. Finance remains `RESEARCH / 0 SEK / NONE`.
 
-The Web-only BB-128B deployment was runtime verified on 2026-09-02. Web/API health and the Web-proxied Finance observation read returned HTTP 200; the deployed hashed bundle contains the versioned cache key, stale treatment and retry action. The API container and its Finance configuration were unchanged. Owner iPhone/PWA outage/recovery approval remains pending.
+The Web-only BB-128B deployment was runtime verified on 2026-09-02. Web/API health and the Web-proxied Finance observation read returned HTTP 200; the deployed hashed bundle contains the versioned cache key, stale treatment and retry action. The API container and its Finance configuration were unchanged. Owner iPhone/PWA resilience/recovery behavior was verified on 2026-09-03; degraded-state visual polish is followed up by BB-128C.
 
 ## Alpaca Basic/IEX activation readiness — 2026-09-02
 

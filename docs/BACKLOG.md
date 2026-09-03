@@ -1,11 +1,18 @@
 # BigBrain Backlog
 
+## BB-128C — Finance Design-System Conformance for Async & Degraded States
+
+- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER VISUAL REVIEW PENDING**.
+- Finance reuses shared loading and busy-button primitives; cached stale content, one-in-flight retry, foreground/online recovery and first-load failure semantics are unchanged.
+- The degraded strip is compact and calm, while stale state, fetch time and failure remain explicit. Label and time wrap independently without a literal separator.
+- Remaining acceptance: Web-only deployment/runtime verification and owner visual review on the physical iPhone/PWA. Finance remains `RESEARCH / 0 SEK / NONE`.
+
 ## BB-128B — Finance Read-Only Resilience & Last-Known-Good UX
 
-- Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX REVIEW PENDING** (`6eabbafed72c5df9a7484167a98acb0249c8a39d`, Actions `33657212798`).
+- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX VERIFIED** (`6eabbafed72c5df9a7484167a98acb0249c8a39d`, Actions `33657212798`).
 - Versioned bounded display-only Finance observation cache, stale-while-revalidate, manual in-place retry, visibility/online recovery and detail-request deferral are implemented.
 - Cache data is never backend authority and cannot enable acquisition, entitlement, PAPER/LIVE/AUTO, broker/orders or capital allocation. Finance remains `RESEARCH / 0 SEK / NONE`.
-- Remaining acceptance: run the documented iPhone/PWA outage/recovery test and record explicit owner UX approval.
+- Owner evidence: during a natural transient iPhone/PWA failure, cached Finance remained visible, one manual retry was available and Finance recovered normally. Visual polish was not approved and is followed up by BB-128C.
 
 ## BB-128A — Alpaca Live Market Data Activation Readiness
 

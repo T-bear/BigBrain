@@ -1,5 +1,6 @@
 # Reports Index
 
+- [BB-128C Finance Design-System Conformance for Async & Degraded States](../reports/features/finance/finance-bb-128c-design-system-conformance-20260903.md)
 - [BB-128B Finance Read-Only Resilience & Last-Known-Good UX](../reports/features/finance/finance-bb-128b-read-only-resilience-20260902.md)
 - [GOOGLEFINANCE GOOG First Owner Intake](../reports/features/finance/finance-googlefinance-goog-owner-intake-20260901.md)
 - [BB-126 Finance Owner Market-Data Drop & Quarantine Inspection](../reports/features/finance/finance-bb-126-owner-market-data-drop-20260901.md)
