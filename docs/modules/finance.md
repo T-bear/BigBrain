@@ -6,6 +6,8 @@ Finance initial loading and retry use the shared `BBLoadingIndicator` and `BBBut
 
 BB-128B cache, revalidation, failure and request-deduplication semantics are unchanged. Owner testing during a real transient iPhone/PWA failure verified that last-known-good content remained visible and recovered after one retry. BB-128C visual owner review remains pending. Finance remains `RESEARCH / 0 SEK / NONE`.
 
+BB-128C Web image `sha256:39389c5…` is deployed. Web/API/Sentinel are healthy, the deployed bundle carries the shared primitive markup and the read-only Finance endpoint remains available with no backend recreation or authority change. Owner visual approval is not inferred from runtime evidence.
+
 ## BB-128B read-only display resilience — 2026-09-02
 
 The Finance Web first layer uses a versioned last-known-good cache for the bounded observation read model. On entry, compatible cached data renders immediately as stale while a background read revalidates it. A temporary observation failure retains the page and exposes `Försök igen`; only a first load with no usable cache shows the full unavailable state. Visibility and browser-online events trigger one deduplicated revalidation; there is no polling loop.

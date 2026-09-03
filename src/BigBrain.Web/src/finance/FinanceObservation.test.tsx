@@ -111,7 +111,8 @@ describe('Finance read-only observation UI', () => {
     await screen.findByText('Uppdatering misslyckades')
     const freshness = container.querySelector('.finance-stale-notice__freshness')!
     expect(freshness.querySelector('strong')).toHaveTextContent('Visar senast hämtade data')
-    expect(freshness.querySelector('time')).toHaveTextContent('20:04')
+    expect(freshness.querySelector('time')).toHaveAttribute('dateTime', '2026-09-02T18:04:00Z')
+    expect(freshness.querySelector('time')?.textContent).toMatch(/^\d{2}:\d{2}$/)
     expect(freshness.textContent).not.toContain('·')
   })
 

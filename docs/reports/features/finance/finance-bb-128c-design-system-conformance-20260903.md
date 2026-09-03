@@ -7,7 +7,7 @@
 
 ## Status
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER VISUAL REVIEW PENDING**
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI REVERIFICATION PENDING / OWNER VISUAL REVIEW PENDING**
 - Safety: Finance `RESEARCH / 0 SEK / NONE`
 
 ## Authority and gap
@@ -28,7 +28,9 @@ BB-128B's cache version, stored projection, background refresh, foreground/onlin
 
 Focused component and Finance tests passed 27/27. The full Web suite passed 173/173 and the production build completed. Tests cover standardized initial loading, standardized retry busy state, request deduplication, retained cached view on failure, recovery on success, timestamp exposure, absence of an orphanable separator and the existing research-only boundary. Shared component CSS explicitly disables loading animation under reduced motion.
 
-Deployment/runtime evidence will be appended only after the authorized Web-only deployment. Owner visual approval remains pending.
+Only Web was rebuilt and recreated. The retained prior image is `sha256:25e88b6…`; deployed image `sha256:39389c5…` is healthy and is the rollback boundary. API and Sentinel remained healthy and were not recreated. Web, Web health, API health and the read-only Finance observation returned HTTP 200. The deployed hashed JavaScript/CSS bundles contain the BB-128C shared busy/loading and wrapping-safe freshness markers and do not contain the replaced visible `Uppdaterar…`, `Försöker igen…` or `Hämtar Finance-status…` phrases. Finance reported `research`, no broker and PAPER/LIVE disabled.
+
+GitHub Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion that expected Stockholm-local `20:04` in CI's UTC environment. Product code and runtime were unaffected. The deterministic correction verifies the exact ISO `dateTime` and locale-independent two-digit time shape; focused 27/27, full Web 173/173 and production build pass after the correction. Follow-up CI remains pending until this evidence commit is published.
 
 ## Owner evidence and remaining review
 
@@ -40,7 +42,7 @@ Detta är en sanerad GitHub-version. It contains no secret, private address, raw
 
 ## Remaining work
 
-Deploy only Web, verify Web/API/Finance health and the deployed bundle, then request physical iPhone/PWA visual review. Do not infer owner visual approval from automated checks.
+Verify follow-up CI, then request physical iPhone/PWA visual review. Do not infer owner visual approval from automated checks.
 
 ## Resumption
 

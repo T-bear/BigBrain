@@ -2,10 +2,10 @@
 
 ## BB-128C — Finance Design-System Conformance for Async & Degraded States
 
-- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYMENT PENDING / OWNER VISUAL REVIEW PENDING**.
+- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI REVERIFICATION PENDING / OWNER VISUAL REVIEW PENDING** (`8499797347e5bd41849d5ff184f9278ea4dc4707`).
 - Finance reuses shared loading and busy-button primitives; cached stale content, one-in-flight retry, foreground/online recovery and first-load failure semantics are unchanged.
 - The degraded strip is compact and calm, while stale state, fetch time and failure remain explicit. Label and time wrap independently without a literal separator.
-- Remaining acceptance: Web-only deployment/runtime verification and owner visual review on the physical iPhone/PWA. Finance remains `RESEARCH / 0 SEK / NONE`.
+- Web image `sha256:39389c5…`, Web/API/Sentinel health and Finance read are runtime verified. Initial CI exposed and locally resolved one timezone-coupled test expectation; remaining acceptance is green follow-up CI and owner visual review on the physical iPhone/PWA. Finance remains `RESEARCH / 0 SEK / NONE`.
 
 ## BB-128B — Finance Read-Only Resilience & Last-Known-Good UX
 
