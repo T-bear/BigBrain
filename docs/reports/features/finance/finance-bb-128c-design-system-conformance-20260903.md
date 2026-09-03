@@ -7,7 +7,7 @@
 
 ## Status
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI REVERIFICATION PENDING / OWNER VISUAL REVIEW PENDING**
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL REVIEW PENDING**
 - Safety: Finance `RESEARCH / 0 SEK / NONE`
 
 ## Authority and gap
@@ -30,7 +30,7 @@ Focused component and Finance tests passed 27/27. The full Web suite passed 173/
 
 Only Web was rebuilt and recreated. The retained prior image is `sha256:25e88b6…`; deployed image `sha256:39389c5…` is healthy and is the rollback boundary. API and Sentinel remained healthy and were not recreated. Web, Web health, API health and the read-only Finance observation returned HTTP 200. The deployed hashed JavaScript/CSS bundles contain the BB-128C shared busy/loading and wrapping-safe freshness markers and do not contain the replaced visible `Uppdaterar…`, `Försöker igen…` or `Hämtar Finance-status…` phrases. Finance reported `research`, no broker and PAPER/LIVE disabled.
 
-GitHub Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion that expected Stockholm-local `20:04` in CI's UTC environment. Product code and runtime were unaffected. The deterministic correction verifies the exact ISO `dateTime` and locale-independent two-digit time shape; focused 27/27, full Web 173/173 and production build pass after the correction. Follow-up CI remains pending until this evidence commit is published.
+GitHub Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion that expected Stockholm-local `20:04` in CI's UTC environment. Product code and runtime were unaffected. The deterministic correction verifies the exact ISO `dateTime` and locale-independent two-digit time shape; focused 27/27, full Web 173/173 and production build pass after the correction. Follow-up Actions run `33715603341` passed backend, frontend, documentation and secrets for evidence commit `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`.
 
 ## Owner evidence and remaining review
 
@@ -42,7 +42,7 @@ Detta är en sanerad GitHub-version. It contains no secret, private address, raw
 
 ## Remaining work
 
-Verify follow-up CI, then request physical iPhone/PWA visual review. Do not infer owner visual approval from automated checks.
+Request physical iPhone/PWA visual review. Do not infer owner visual approval from automated checks.
 
 ## Resumption
 

@@ -4,7 +4,7 @@
 
 - Focused tests verify the shared loading indicator, accessible standardized busy button, no overlapping refresh, cached content retention, successful/failed recovery, fetch-time visibility and separator-free wrapping-safe markup.
 - Existing BB-128B tests remain authoritative for cache versioning, first-load failure, abort, foreground/online recovery, bounded persistence and Finance research-only safety.
-- Result 2026-09-03: focused component/Finance 27/27 and full Web 173/173 passed. The production Web build completed successfully. Web-only deployment/runtime passed. Initial Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion because it expected Stockholm-formatted `20:04` under CI's UTC locale; the corrected test checks exact ISO `dateTime` and a locale-independent `HH:MM` shape. Focused/full/build reruns pass; follow-up CI and owner visual review remain pending.
+- Result 2026-09-03: focused component/Finance 27/27 and full Web 173/173 passed. The production Web build completed successfully. Web-only deployment/runtime passed. Initial Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion because it expected Stockholm-formatted `20:04` under CI's UTC locale; the corrected test checks exact ISO `dateTime` and a locale-independent `HH:MM` shape. Focused/full/build reruns pass; follow-up Actions run `33715603341` passed all jobs. Owner visual review remains pending.
 
 ## BB-128B Finance last-known-good resilience
 
