@@ -2507,3 +2507,8 @@ Definition of Done includes functional parity for meal planning, meal library, g
 # BB-099 — Whole-App UX Audit & Premium Composition Pass
 
 **Status (2026-08-23): TECHNICALLY COMPLETE — OWNER UX REVIEW PENDING.** All seven registered views, embedded Settings and important interaction states were audited against Family as the golden reference. Home provides independently resolving real information instead of duplicating the dock; Media controls receive shared dock/safe-area clearance and progressive technical disclosure; Finance prioritizes market, current research, prospective evidence and risk while preserving all advanced evidence. Local validation passed 121 frontend, 495 API and 32 Sentinel tests plus both builds, documentation, Compose and diff checks. GitHub Actions runs 32643858026 and 32644787645 passed. Only Web was recreated; image `sha256:ae1d52afd99e5dfd3b680dcae19c69e15fa5b76a0d7d0dd27d8d7b52a325c14c` is healthy. Appliance route/theme/reachability smoke passed. Finance remains `RESEARCH / 0 SEK / NONE`, with scheduler enabled and unchanged. No migrated view is owner-approved by technical completion.
+## BB-129A — Multi-Dataset Strategy Research Campaign
+
+- Status: In progress — implementation and focused tests complete; full verification/publication/deployment pending.
+- Scope: immutable bounded grouping, deterministic allowlisted population, all-attempt accounting, fail-closed BB-127 eligibility, categorical scorecard, independent instrument lineage and read-only APIs.
+- Definition of Done: publish/deploy verified API/docs, runtime-check safety/read APIs, then execute exactly one fixed-definition campaign if safe. Zero robust candidates is valid.

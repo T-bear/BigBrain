@@ -218,6 +218,7 @@ public partial class Program
         builder.Services.AddSingleton(_ => new FinanceMacroMemory(eodhdOptions,fredOptions));
         builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
         builder.Services.AddSingleton<IFinanceResearchDatasetReader, FinanceResearchDatasetReader>();
+        builder.Services.AddSingleton<IFinanceResearchCampaignReader, FinanceResearchCampaignReader>();
         builder.Services.AddSingleton<FinanceOwnerDatasetDropScanner>();
         builder.Services.AddHostedService<FinanceOwnerDatasetDropWorker>();
         builder.Services.AddSingleton<FinanceDataProtectionStore>();

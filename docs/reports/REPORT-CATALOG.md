@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-129A` — [Multi-Dataset Strategy Research Campaign](features/finance/finance-bb-129a-multi-dataset-campaign-20260903.md)
+
 - Owner intake — [GOOGLEFINANCE GOOG](features/finance/finance-googlefinance-goog-owner-intake-20260901.md)
 
 - `BB-126` — [Owner Market-Data Drop & Quarantine Inspection](features/finance/finance-bb-126-owner-market-data-drop-20260901.md)

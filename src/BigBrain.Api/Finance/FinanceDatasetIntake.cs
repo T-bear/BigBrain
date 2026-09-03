@@ -64,7 +64,7 @@ internal sealed partial class FinanceDatasetIntakeStore
         source_row INTEGER NOT NULL,PRIMARY KEY(candidate_id,symbol,session_date));
       CREATE INDEX IF NOT EXISTS ix_dataset_state ON dataset_candidates(state,updated_utc);
       UPDATE dataset_candidates SET state=CASE WHEN state='Downloading' THEN 'Rejected' ELSE 'Downloaded' END,promotion_result='interruptedBeforeValidation',updated_utc=datetime('now') WHERE state IN ('Downloading','Inspecting','Validating');
-      """;x.ExecuteNonQuery();InitializeResearchDatasetStorage(c);if(!ColumnExists(c,"dataset_candidates","cleanup_state"))Exec(c,"ALTER TABLE dataset_candidates ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'Retained'");
+      """;x.ExecuteNonQuery();InitializeResearchDatasetStorage(c);InitializeResearchCampaignStorage(c);if(!ColumnExists(c,"dataset_candidates","cleanup_state"))Exec(c,"ALTER TABLE dataset_candidates ADD COLUMN cleanup_state TEXT NOT NULL DEFAULT 'Retained'");
       var pending=new List<(string Id,string File)>();using(var q=c.CreateCommand()){q.CommandText="SELECT candidate_id,filename FROM dataset_candidates WHERE cleanup_state='CleanupPending'";using var r=q.ExecuteReader();while(r.Read())pending.Add((r.GetString(0),r.GetString(1)));}
       foreach(var item in pending){var exists=File.Exists(Path.Combine(_options.QuarantineDirectory,item.Id,"artifact",SafeName(item.File)));Exec(c,"UPDATE dataset_candidates SET cleanup_state=$state WHERE candidate_id=$id AND cleanup_state='CleanupPending'",("$state",exists?"Retained":"PayloadDeleted"),("$id",item.Id));}}
 
@@ -207,7 +207,7 @@ internal static class FinanceDatasetMaintenanceCommand
     internal static bool TryRun(string[] args,IConfiguration configuration)
     {
         if(args.Length==0||args[0] is not ("finance-dataset-intake" or "finance-owner-drop-scan" or
-            "finance-research-dataset-catalog" or "finance-research-backtest" or "finance-candidate-research-eligibility"))return false;
+            "finance-research-dataset-catalog" or "finance-research-backtest" or "finance-candidate-research-eligibility" or "finance-research-campaign"))return false;
         var market=configuration.GetSection(EodhdFinanceOptions.Section).Get<EodhdFinanceOptions>()??new();
         var options=configuration.GetSection(FinanceDatasetOptions.Section).Get<FinanceDatasetOptions>()??new();
         _ = new EodhdMarketMemory(market);
@@ -226,6 +226,11 @@ internal static class FinanceDatasetMaintenanceCommand
         {
             if(args.Length!=2)throw new ArgumentException("Use finance-research-backtest <research-revision-id>.");
             Console.WriteLine(JsonSerializer.Serialize(store.RunBoundedResearchBacktest(args[1]),OutputJson));return true;
+        }
+        if(args[0]=="finance-research-campaign")
+        {
+            if(args.Length!=2||!DateTimeOffset.TryParse(args[1],CultureInfo.InvariantCulture,DateTimeStyles.RoundtripKind,out var knowledgeTime))throw new ArgumentException("Use finance-research-campaign <immutable-knowledge-time-utc>.");
+            Console.WriteLine(JsonSerializer.Serialize(store.RunResearchCampaign(knowledgeTime),OutputJson));return true;
         }
         if(args[0]=="finance-candidate-research-eligibility")
         {

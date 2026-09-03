@@ -478,3 +478,6 @@ BB-090 closure adds empty/legacy/interrupted/concurrent migration coverage, reje
 # BB-091 test additions
 
 Network-free sanitized Riksbank JSON and ECB SDMX CSV fixtures cover selected-series identity, policy/FX values, explicit base/quote semantics, malformed artifacts, rights denial, quarantine rejection, exact-artifact idempotence, cross-provider EUR/SEK tolerances and region/evidence-class as-of isolation. Live official acquisition is maintenance evidence only. Current-history bootstrap remains revised-history exploratory.
+## BB-129A campaign verification
+
+Focused tests cover deterministic bounded population, categorical fail-closed dispositions, BB-127 eligibility/schema boundaries, BB-123 execution regression and BB-124 selection/holdout regression. Completion additionally requires full API, Release build, architecture/documentation/Compose, diff and full-history secret gates. Runtime must verify both campaign read APIs and `RESEARCH / 0 SEK / NONE`.

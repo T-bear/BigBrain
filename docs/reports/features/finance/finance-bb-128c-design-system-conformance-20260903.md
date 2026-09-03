@@ -7,8 +7,10 @@
 
 ## Status
 
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL REVIEW PENDING**
+- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL VERIFIED**
 - Safety: Finance `RESEARCH / 0 SEK / NONE`
+
+The first physical iPhone/PWA owner review found two simultaneous loaders. The deployed micro-fix corrected that defect. After reviewing the corrected result, the owner explicitly stated `Jag är nöjd`; this records owner visual verification while preserving the earlier finding.
 
 ## Authority and gap
 

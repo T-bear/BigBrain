@@ -548,3 +548,8 @@ state merely because Finance presents them in one module. Reusable market observ
 only with compatible provenance and time semantics; research/training evidence must retain account and
 mandate identity. This is an architecture/backlog safeguard only: no account, broker, order, PAPER,
 LIVE/AUTO or execution capability is introduced, and current `RESEARCH / 0 SEK / NONE` remains binding.
+## BB-129A bounded multi-dataset campaigns — 2026-09-03
+
+`finance-research-campaign-v1` groups exact BB-127 revision IDs, dataset fingerprints, independent instruments, predeclared allowlisted momentum/SMA variants, policy versions, limitations, hard bounds, categorical dispositions and a deterministic checksum. Attempt ordinals count every dataset/variant outcome; histories are never concatenated. Read-only APIs are `/api/v1/modules/finance/research/campaigns` and `/api/v1/modules/finance/research/campaigns/{campaignId}`.
+
+A result cannot become `ROBUST CANDIDATE` unless eligibility, schema, integrity, OOS, clean single-use holdout, cost and robustness gates all pass. Return cannot override a failed gate. BB-127 revisions currently lack BB-124-compatible feature/selection evidence, so the campaign reports not-evaluable evidence rather than using a weaker substitute. Finance remains `RESEARCH / 0 SEK / NONE`.

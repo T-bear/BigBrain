@@ -33,6 +33,8 @@ public static class FinanceEndpoints
             reader.GetEvaluation(evaluationId) is { } result?Results.Json(result,JsonOptions):Results.NotFound());
         endpoints.MapGet("/api/v1/modules/finance/datasets",(IFinanceDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/research/datasets",(IFinanceResearchDatasetReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/campaigns",(IFinanceResearchCampaignReader reader)=>Results.Json(reader.GetCatalog(),JsonOptions));
+        endpoints.MapGet("/api/v1/modules/finance/research/campaigns/{campaignId}",(string campaignId,IFinanceResearchCampaignReader reader)=>reader.GetDetail(campaignId) is { } campaign?Results.Json(campaign,JsonOptions):Results.Problem(statusCode:404,title:"Research campaign not found",extensions:new Dictionary<string,object?>{{"code","finance.research.campaignNotFound"}}));
         endpoints.MapGet("/api/v1/modules/finance/backups",(IFinanceBackupReader reader)=>Results.Json(reader.GetInventory(),JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/shadow/predictions",(string? instrument,string? strategy,string? state,
             DateOnly? from,DateOnly? to,int? limit,EodhdMarketMemory memory)=>ShadowResult(() => memory.ShadowCatalog(instrument,strategy,state,from,to,limit??50)));
