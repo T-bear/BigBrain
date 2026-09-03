@@ -8,7 +8,7 @@ BB-128B resilience behavior is now **OWNER UX VERIFIED** from a natural physical
 
 Web-only deployment replaced image `sha256:25e88b6…` with `sha256:39389c5…`; Web, API and Sentinel are healthy, the Finance read returned HTTP 200, and the deployed bundle contains shared busy/loading markup while omitting the replaced visible busy phrases. API identity was unchanged. Initial Actions run `33715050244` passed backend, documentation and secrets but exposed a timezone-coupled frontend assertion; the test now verifies the authoritative ISO `dateTime` plus locale-independent time shape. Local focused 27/27, full Web 173/173 and production build pass. Follow-up Actions run `33715603341` passed all jobs.
 
-Owner visual review then found two simultaneous loaders during automatic stale revalidation. The scoped micro-fix renders no retry button until refresh has failed; automatic refresh has only the compact status loader, while manual retry has only `BBButton`'s busy loader. Cached content and BB-128B behavior remain unchanged. Focused Finance tests pass 23/23; micro-fix deployment and renewed owner visual approval remain pending.
+Owner visual review then found two simultaneous loaders during automatic stale revalidation. The scoped micro-fix renders no retry button until refresh has failed; automatic refresh has only the compact status loader, while manual retry has only `BBButton`'s busy loader. Cached content and BB-128B behavior remain unchanged. Focused Finance tests pass 23/23. Web image `sha256:1c10a3c…` is deployed and healthy; API remained unchanged and Finance stayed `RESEARCH / 0 SEK / NONE`. Renewed owner visual approval remains pending.
 
 ## BB-128B Finance Read-Only Resilience & Last-Known-Good UX (2026-09-02)
 

@@ -32,7 +32,7 @@ Only Web was rebuilt and recreated. The retained prior image is `sha256:25e88b6�
 
 GitHub Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion that expected Stockholm-local `20:04` in CI's UTC environment. Product code and runtime were unaffected. The deterministic correction verifies the exact ISO `dateTime` and locale-independent two-digit time shape; focused 27/27, full Web 173/173 and production build pass after the correction. Follow-up Actions run `33715603341` passed backend, frontend, documentation and secrets for evidence commit `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`.
 
-Physical owner review found that automatic stale revalidation displayed both the compact status loader and the busy retry button. The micro-fix conditionally withholds retry until a refresh has failed. Automatic refresh now shows one status loader; a manual retry retains the button and shows only its standardized busy loader. Focused Finance verification passes 23/23. Deployment and renewed owner visual approval remain pending.
+Physical owner review found that automatic stale revalidation displayed both the compact status loader and the busy retry button. The micro-fix conditionally withholds retry until a refresh has failed. Automatic refresh now shows one status loader; a manual retry retains the button and shows only its standardized busy loader. Focused Finance verification passes 23/23. Production build passed; only Web was recreated from `sha256:39389c5…` to healthy `sha256:1c10a3c…`. API identity remained unchanged, Finance read returned HTTP 200 and safety stayed `RESEARCH / 0 SEK / NONE`. Renewed owner visual approval remains pending.
 
 ## Owner evidence and remaining review
 
