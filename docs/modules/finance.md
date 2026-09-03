@@ -4,9 +4,9 @@
 
 Finance initial loading and retry use the shared `BBLoadingIndicator` and `BBButton busy` primitives. The shared semantic tokens, accessibility contract and reduced-motion behavior are authoritative; the module does not copy UX-lab CSS or create a local spinner. Cached-state messaging remains visible but uses a compact warning treatment, with fetch label and timestamp represented as independent wrapping-safe elements.
 
-BB-128B cache, revalidation, failure and request-deduplication semantics are unchanged. Owner testing during a real transient iPhone/PWA failure verified that last-known-good content remained visible and recovered after one retry. BB-128C visual owner review remains pending. Finance remains `RESEARCH / 0 SEK / NONE`.
+BB-128B cache, revalidation, failure and request-deduplication semantics are unchanged. Owner testing during a real transient iPhone/PWA failure verified that last-known-good content remained visible and recovered after one retry. The first BB-128C owner review found duplicate loaders; the deployed micro-fix corrected them and the owner then stated `Jag är nöjd`, so BB-128C is `OWNER VISUAL VERIFIED`. Finance remains `RESEARCH / 0 SEK / NONE`.
 
-BB-128C Web image `sha256:39389c5…` is deployed. Web/API/Sentinel are healthy, the deployed bundle carries the shared primitive markup and the read-only Finance endpoint remains available with no backend recreation or authority change. Owner visual approval is not inferred from runtime evidence.
+BB-128C Web image `sha256:39389c5…` is deployed. Web/API/Sentinel are healthy, the deployed bundle carries the shared primitive markup and the read-only Finance endpoint remains available with no backend recreation or authority change. The later micro-fix image `sha256:1c10a3c…` was physically owner approved as recorded above.
 
 ## BB-128B read-only display resilience — 2026-09-02
 
@@ -553,3 +553,5 @@ LIVE/AUTO or execution capability is introduced, and current `RESEARCH / 0 SEK /
 `finance-research-campaign-v1` groups exact BB-127 revision IDs, dataset fingerprints, independent instruments, predeclared allowlisted momentum/SMA variants, policy versions, limitations, hard bounds, categorical dispositions and a deterministic checksum. Attempt ordinals count every dataset/variant outcome; histories are never concatenated. Read-only APIs are `/api/v1/modules/finance/research/campaigns` and `/api/v1/modules/finance/research/campaigns/{campaignId}`.
 
 A result cannot become `ROBUST CANDIDATE` unless eligibility, schema, integrity, OOS, clean single-use holdout, cost and robustness gates all pass. Return cannot override a failed gate. BB-127 revisions currently lack BB-124-compatible feature/selection evidence, so the campaign reports not-evaluable evidence rather than using a weaker substitute. Finance remains `RESEARCH / 0 SEK / NONE`.
+
+Runtime campaign `campaign-cac9adb016ada14f` pinned eight independent revisions for GBPSEK, OMXS30, VIX, AAPL, SPY, QQQ, SP500 and EURSEK at knowledge time `2026-09-03T08:30:00Z`. Its 24 attempts produced 15 `DATASET_INELIGIBLE` and 9 `INSUFFICIENT_DATA`, hence 24 inconclusive/not-evaluable outcomes and zero robust candidates. A deterministic replay returned the same ID/checksum without another logical campaign. API image `sha256:ce133d43…` is healthy; Alpaca remains inactive/blocked.

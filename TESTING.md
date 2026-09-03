@@ -481,3 +481,5 @@ Network-free sanitized Riksbank JSON and ECB SDMX CSV fixtures cover selected-se
 ## BB-129A campaign verification
 
 Focused tests cover deterministic bounded population, categorical fail-closed dispositions, BB-127 eligibility/schema boundaries, BB-123 execution regression and BB-124 selection/holdout regression. Completion additionally requires full API, Release build, architecture/documentation/Compose, diff and full-history secret gates. Runtime must verify both campaign read APIs and `RESEARCH / 0 SEK / NONE`.
+
+Result 2026-09-03: focused Finance 40/40, full API 608/608 and Sentinel/architecture 32/32 passed. Release solution build passed with zero warnings/errors. Documentation verification passed 217 files/89 unique IDs; Compose and diff checks passed. Local gitleaks was unavailable; GitHub Actions run `33732206649` passed backend, frontend, documentation and authoritative full-history secrets. API health and campaign catalog/detail returned successfully after API-only deployment. Fixed-input replay returned campaign/checksum unchanged and catalog count remained one.
