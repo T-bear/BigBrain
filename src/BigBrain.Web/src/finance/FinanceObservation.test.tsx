@@ -96,12 +96,26 @@ describe('Finance read-only observation UI', () => {
     fireEvent(window, new Event('online'))
     fireEvent(window, new Event('online'))
     expect(observation).toHaveBeenCalledTimes(1)
-    const retry = screen.getByRole('button', { name: 'Försök igen pågår' })
-    expect(retry).toBeDisabled()
-    expect(retry).toHaveAttribute('aria-busy', 'true')
-    expect(retry.querySelector('.bb-loading-indicator')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Försök igen/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('status').filter(status => status.classList.contains('bb-loading-indicator'))).toHaveLength(1)
     finish!(empty)
     await waitFor(() => expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument())
+  })
+
+  test('uses only the retry button loader during a manual retry', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    let finish: ((value: FinanceObservationSnapshot) => void) | undefined
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockRejectedValueOnce(new Error('offline')).mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    render(<FinanceObservation />)
+    await screen.findByText('Uppdatering misslyckades')
+    fireEvent.click(screen.getByRole('button', { name: 'Försök igen' }))
+    const retry = screen.getByRole('button', { name: 'Försök igen pågår' })
+    expect(retry).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getAllByRole('status').filter(status => status.classList.contains('bb-loading-indicator'))).toHaveLength(1)
+    expect(screen.getAllByText('Ingen handel med riktiga pengar')[0]).toBeVisible()
+    finish!(empty)
+    await waitFor(() => expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument())
+    expect(observation).toHaveBeenCalledTimes(2)
   })
 
   test('keeps stale label and fetched time as wrapping-safe elements without a literal separator', async () => {
