@@ -1,10 +1,47 @@
-# BigBrain – Arkitekturförslag
+# BigBrain – architecture baseline and future direction
 
 **Status:** Arkitekturbaslinje, godkänd i huvudsak  
 **Målgrupp:** Arkitekter, utvecklare, DevOps och produktansvariga  
 **Tidshorisont:** Flerårig utveckling
 
-> **Proposed Sentinel amendment:** The accepted baseline below uses the historical term `Host Agent`. ADR 0002 proposes replacing that narrower concept with `BigBrain Sentinel` as the exclusive boundary for node-local system access. Until ADR 0002 and its prerequisite PKI, transport, policy, privilege, schema, and v1 threat-model decisions are accepted, this note records the proposed direction without retroactively changing the accepted baseline. ADR 0001 remains the accepted minimum rule that Web API must not directly control Docker.
+## Current accepted boundaries and implementation scope (BB-130A, 2026-09-05)
+
+BigBrain is a modular monolith/control plane on Debian: ASP.NET Core, React/TypeScript,
+compiled first-party modules and integration adapters. Brain is AI orchestration only.
+Current source uses one Finance SQLite database with immutable provider/evidence files,
+not a deployed PostgreSQL replacement. Module tables remain module-owned.
+[STATUS](docs/STATUS.md) owns dated deployment/runtime facts; code is not proof of full
+architectural or operational acceptance.
+
+Accepted ADR 0003 freezes Sentinel v1 and inherits ADR 0002's exclusive-access/security
+principles even though ADR 0002's full lifecycle remains Proposed. ADR 0001 prohibits
+direct Docker/socket/shell control from Web/API. Current read-only System Metrics is
+implemented in separate Sentinel delivery with an authenticated local client.
+[ADR 0005](docs/adr/0005-read-only-system-metrics-capability.md) distinguishes this
+implemented subset from its still-Proposed full contract. Container/in-process delivery,
+policy overlay, certificate validity/EKU, response validation and audit hardening gaps
+remain visible; this documentation accepts no weaker requirements or broader authority.
+
+General application authentication/authorization is not a complete internal boundary.
+OIDC, roles, persistent identity-bound audit and future execution controls below are
+targets, not implemented guarantees. Broker/trading authority, Docker or camera control,
+high-impact Home Assistant operations and broader exposure require an accepted
+authentication/authorization design and the existing security gates first.
+Finance remains RESEARCH / 0 SEK / NONE. No new provider or execution authority follows
+from the target architecture.
+
+## Historical terminology and future architecture
+
+The original sections below are preserved as long-term design and early-sprint history.
+Host Agent is historical terminology; accepted Sentinel invariants above govern current
+node-access boundaries. PostgreSQL, OIDC, external SDK, observability stack, generic
+jobs/permissions, mutation examples and Sprint 1–10 are future/historical direction
+unless separately evidenced in STATUS and accepted ADRs. They are not instructions to
+install infrastructure or claims it already runs. The early statement that the environment
+lacked .NET describes initial planning, not the current toolchain. Priority is owned by
+[ROADMAP](ROADMAP.md); unfinished work by [BACKLOG](docs/BACKLOG.md), with
+[BB-130](docs/architecture/bb-130-stabilization.md) preceding further Finance expansion.
+Historical decisions are not erased or retroactively accepted by this clarification.
 
 ## Syfte
 

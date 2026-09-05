@@ -1,9 +1,79 @@
 # ADR 0005: Read-only System Metrics capability
 
 - Status: Proposed
-- Date: 2026-07-29
-- Applies to: Sentinel v1 read-only capability set and single-node local transport profile
-- Builds on: ADR 0001, ADR 0002, ADR 0003 and ADR 0004
+- Original date: 2026-07-29
+- Reconciled: 2026-09-05, BB-130A owner/architect decision
+- Lifecycle: existing bounded implementation documented; full proposal acceptance and conformance remain incomplete
+- Source baseline: 7fd89a5ccbe9be82699dc70950f461d3fbb6589c
+
+## Current decision and acceptance boundary
+
+The owner/architect approved documenting the existing read-only System Metrics
+implementation, not introducing new security or privilege semantics. This ADR stays
+**Proposed** for its full normative contract because the implementation does not
+establish every inherited requirement. The former index-only Accepted label was
+unsupported. Implemented behavior and full architecture conformance are separate facts.
+ADR 0003 remains Accepted; its Sentinel v1 invariants and the exclusive-access/security
+principles inherited from ADR 0002 remain mandatory. ADR 0004 continues to describe
+its historical bootstrap exception, not current capability coverage.
+
+This reconciliation grants no new runtime authority and changes no code. It does not
+make signed policy overlays optional, approve a different in-process privilege model,
+weaken separation, alter audit/certificate guarantees, or authorize broader resources,
+Docker control, mutation, shell or generic execution. The pre-existing local proposal
+to split implementation and release gates is **not adopted**. See the
+[BB-130 baseline review](../reports/documentation/bb-130-architecture-code-review-20260905.md)
+and BB-009 in [BACKLOG](../BACKLOG.md).
+
+## Implemented scope and evidence limits
+
+Source inspection establishes a separate Sentinel process, a locally configured Unix
+socket with mutually authenticated TLS/HTTP2 and pinned certificates, a fixed System
+Metrics request contract, signed ECDSA proofs with node/expiry/key/replay checks, and
+uptime, aggregate CPU/memory and configured filesystem capacity reads. The Control
+Plane consumes this through LocalSentinelClient and SentinelSystemMetricsProvider;
+unconfigured/unavailable communication has an unavailable provider path. Docker
+inventory remains unavailable. API/Web receive no new host access in this decision.
+
+Source: src/BigBrain.Sentinel/Program.cs, SentinelProtocolSecurity.cs,
+SentinelSnapshotRequestValidator.cs, SystemMetricsSnapshotService.cs and
+src/BigBrain.Api/Sentinel/. Tests: SentinelProtocolIntegrationTests,
+SystemMetricsSnapshotServiceTests, SentinelSystemMetricsProviderTests.
+Current test results belong in the BB-130 review; historical deployed-system evidence
+is in STATUS. This text is not a new runtime or penetration-test certification.
+
+## Explicit conformance gaps — not waivers
+
+- Delivery: repository Compose/Dockerfile uses a separate unprivileged container;
+  the proposal below described a native service/reader boundary. Current collection
+  is in-process. Neither observed implementation fact approves a different privilege
+  model or proves host-namespace semantics for every metric.
+- Policy: the fixed allowlist/proof checks do not prove the complete signed narrowing
+  operational-overlay lifecycle required by the frozen architecture. Its requirement
+  is preserved, not made optional.
+- Certificates: callbacks compare pinned certificate bytes; explicit validity/EKU
+  checks and the complete expiry/rotation/revocation negative evidence are not established.
+  No claim that expired/wrong-purpose pinned credentials fail closed is made here.
+- Validation/bounds: the Control Plane checks non-null response and node identity;
+  complete response schema/range/size/freshness validation and the full rate/concurrency
+  contract are not established. Existing request validation must not be weakened.
+- Audit: capability logging records capability/version/outcome, including a fixed
+  Partial outcome before collection. It does not establish the stronger identity,
+  policy, timing, completion and durable audit guarantees below.
+- Lifecycle: normative compatibility vectors, certificate lifecycle, supply-chain,
+  packaging/sandbox and operational acceptance need separate evidence and decisions.
+
+These are tracked under BB-009 and the existing security/pentest backlog, not silently
+closed by BB-130. Remediation requires review against ADR 0003 and separately scoped
+implementation; no production security changes are part of BB-130A.
+
+## Historical proposal — preserved requirements, not current-state evidence
+
+The following original proposal is retained from the published source baseline.
+Its future-tense and bootstrap/unavailable statements describe 2026-07-29, not the
+current implementation. Its stronger security requirements are not waived by observed
+code or this reconciliation. Do not interpret the historical final paragraph as a
+claim that the current capability registry is empty.
 
 ## Context
 

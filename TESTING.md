@@ -4,7 +4,7 @@
 
 - Focused tests verify the shared loading indicator, accessible standardized busy button, no overlapping refresh, cached content retention, successful/failed recovery, fetch-time visibility and separator-free wrapping-safe markup.
 - Existing BB-128B tests remain authoritative for cache versioning, first-load failure, abort, foreground/online recovery, bounded persistence and Finance research-only safety.
-- Result 2026-09-03: focused component/Finance 27/27 and full Web 173/173 passed. The production Web build completed successfully. Web-only deployment/runtime passed. Initial Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion because it expected Stockholm-formatted `20:04` under CI's UTC locale; the corrected test checks exact ISO `dateTime` and a locale-independent `HH:MM` shape. Focused/full/build reruns pass; follow-up Actions run `33715603341` passed all jobs. Owner visual review remains pending.
+- Result 2026-09-03: focused component/Finance 27/27 and full Web 173/173 passed. The production Web build completed successfully. Web-only deployment/runtime passed. Initial Actions run `33715050244` passed backend, documentation and secrets but failed one frontend assertion because it expected Stockholm-formatted `20:04` under CI's UTC locale; the corrected test checks exact ISO `dateTime` and a locale-independent `HH:MM` shape. Focused/full/build reruns pass; follow-up Actions run `33715603341` passed all jobs. Owner visual review was subsequently completed after the micro-fix; see the BB-128C report and STATUS.
 - Micro-fix 2026-09-03: focused Finance 23/23 verifies exactly one loader for automatic refresh, hidden retry until failure, only the button loader during manual retry, retained cached content and successful stale-state clearing. Production Web build and Web-only deployment passed; Web/API and Finance read are healthy.
 
 ## BB-128B Finance last-known-good resilience
@@ -22,7 +22,7 @@ Manual iPhone/PWA owner test after deployment:
 5. Restore the API, press `Försök igen` (or foreground/reconnect the PWA), and confirm fresh state replaces stale state without restarting the PWA.
 6. Confirm no cached state is presented as LIVE or as authorization for acquisition/trading.
 
-Deployment result 2026-09-02: only `web` was rebuilt and recreated with `--no-deps`. The Web image changed from `sha256:28f348d…` to `sha256:25e88b6…`; Web/API health and Finance via the Web proxy returned HTTP 200. The deployed bundle exposes the expected cache key, stale message and retry action. Finance runtime reported `RESEARCH / 0 SEK / NONE`, eight watchlist instruments, no broker/PAPER/LIVE and no active research run. The API container identity remained unchanged. Physical iPhone/PWA outage/recovery review remains pending.
+Deployment result 2026-09-02: only `web` was rebuilt and recreated with `--no-deps`. The Web image changed from `sha256:28f348d…` to `sha256:25e88b6…`; Web/API health and Finance via the Web proxy returned HTTP 200. The deployed bundle exposes the expected cache key, stale message and retry action. Finance runtime reported `RESEARCH / 0 SEK / NONE`, eight watchlist instruments, no broker/PAPER/LIVE and no active research run. The API container identity remained unchanged. Physical iPhone/PWA outage/recovery was subsequently explicitly owner verified on 2026-09-03; see BB-128B/C in STATUS.
 
 ## BB-128A Alpaca activation readiness
 

@@ -1,5 +1,10 @@
 # Project Report Catalog
 
+- `BB-130A` — [Baseline architecture/code review and continuity reconciliation](documentation/bb-130-architecture-code-review-20260905.md)
+- `BB-128C` — [Async/degraded conformance and explicit owner visual acceptance](features/finance/finance-bb-128c-design-system-conformance-20260903.md)
+- `BB-128B` — [Read-only resilience and last-known-good cache](features/finance/finance-bb-128b-read-only-resilience-20260902.md)
+- `BB-124` — [Anti-overfitting and OOS governance](features/finance/finance-bb-124-anti-overfitting-oos-governance-20260901.md)
+
 - `BB-129A` — [Multi-Dataset Strategy Research Campaign](features/finance/finance-bb-129a-multi-dataset-campaign-20260903.md)
 
 - Owner intake — [GOOGLEFINANCE GOOG](features/finance/finance-googlefinance-goog-owner-intake-20260901.md)

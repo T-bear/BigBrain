@@ -20,6 +20,10 @@ When sources disagree, use this order and resolve the inconsistency explicitly:
 
 ## Entry points
 
+- [Start here / continuity](../START-HERE.md): mandatory read order and significant-work contract.
+- [Product roadmap](../../ROADMAP.md): direction and domain-roadmap delegation.
+- [BB-130 ordered stabilization plan](../architecture/bb-130-stabilization.md): phase scope and DoD.
+
 - [README](../../README.md): product overview and development entry point.
 - [STATUS](../STATUS.md): compact current reality and verification level.
 - [BACKLOG](../BACKLOG.md): remaining work and acceptance criteria.

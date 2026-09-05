@@ -1,5 +1,30 @@
 # BigBrain Finance – master roadmap
 
+## Current planning authority — 2026-09-05
+
+The owner prioritizes [BB-130A–D](../bb-130-stabilization.md) before further Finance
+features. This document owns Finance's longer-term milestone gates; [ROADMAP](../../../ROADMAP.md)
+owns product direction, [BACKLOG](../../BACKLOG.md) unfinished work and
+[STATUS](../../STATUS.md) current dated evidence. No second roadmap is introduced.
+
+The published chain through BB-129A is RESEARCH / 0 SEK / NONE. BB-119 resolved the
+BB-118 readiness/metrics issue; BB-123/124 delivered versioned costs and holdout
+governance; BB-127 delivered limited research datasets; BB-128B/C resilient loading
+has explicit owner evidence. BB-129A found no robust candidate and did not evaluate
+actual OOS performance where lineage was missing. Preserve that result.
+
+Application authentication/authorization and security/pentest remain prerequisites
+before future high-authority capabilities. No provider activation, PAPER, broker,
+orders, capital or LIVE/AUTO follows from BB-130. Following stabilization, review
+those security prerequisites and seek owner prioritization of any research expansion.
+
+## Historical milestone and direction ledger
+
+The dated text below, including the former “Current state and next gate” section,
+records its named baseline. Its old counts, blockers and next-step recommendations
+are superseded for current planning by the entry above and current STATUS. Milestone
+promotion requirements remain binding; no historical decision or evidence is erased.
+
 BB-088 implements the bounded daily cadence and Finance UI v1.0 product hierarchy. The worker
 separates internal recovery checks from actual provider calls, treats weekends/no-new-session as
 healthy and preserves exactly-once/anti-backfill/clock gates. The read model owns market breadth,

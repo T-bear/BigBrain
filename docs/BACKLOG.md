@@ -1,18 +1,31 @@
 # BigBrain Backlog
 
+### BB-130 – Platform stabilization, performance and continuity
+
+- Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
+- Status 2026-09-05: A documentation implemented, validation/publication in progress; B/C/D planned.
+- Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
+- A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
+- B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
+- C: characterize and refactor Finance UI/intake/persistence, composition and structural schema authority.
+- D: deterministic quality gates, full regressions and final reconciliation.
+- Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
+- Next: publish coherent verified A checkpoint, then B measurement before implementation.
+- Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
+
 ## BB-128C — Finance Design-System Conformance for Async & Degraded States
 
-- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL REVIEW PENDING** (`8499797347e5bd41849d5ff184f9278ea4dc4707`, evidence `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`, Actions `33715603341`).
+- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL VERIFIED** (`8499797347e5bd41849d5ff184f9278ea4dc4707`, evidence `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`, Actions `33715603341`).
 - Finance reuses shared loading and busy-button primitives; cached stale content, one-in-flight retry, foreground/online recovery and first-load failure semantics are unchanged.
 - The degraded strip is compact and calm, while stale state, fetch time and failure remain explicit. Label and time wrap independently without a literal separator.
-- Web image `sha256:39389c5…`, Web/API/Sentinel health and Finance read are runtime verified. Initial CI exposed and resolved one timezone-coupled test expectation; follow-up CI passed. Remaining acceptance is owner visual review on the physical iPhone/PWA. Finance remains `RESEARCH / 0 SEK / NONE`.
+- Web image `sha256:39389c5…`, Web/API/Sentinel health and Finance read are runtime verified. Initial CI exposed and resolved one timezone-coupled test expectation; follow-up CI passed. This was the initial deployment. The later single-loader micro-fix (71badae, deployment evidence 5e0e1ab) was explicitly owner approved on physical iPhone/PWA; see the BB-128C report. Finance remains `RESEARCH / 0 SEK / NONE`.
 
 ## BB-128B — Finance Read-Only Resilience & Last-Known-Good UX
 
 - Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX VERIFIED** (`6eabbafed72c5df9a7484167a98acb0249c8a39d`, Actions `33657212798`).
 - Versioned bounded display-only Finance observation cache, stale-while-revalidate, manual in-place retry, visibility/online recovery and detail-request deferral are implemented.
 - Cache data is never backend authority and cannot enable acquisition, entitlement, PAPER/LIVE/AUTO, broker/orders or capital allocation. Finance remains `RESEARCH / 0 SEK / NONE`.
-- Owner evidence: during a natural transient iPhone/PWA failure, cached Finance remained visible, one manual retry was available and Finance recovered normally. Visual polish was not approved and is followed up by BB-128C.
+- Owner evidence: during a natural transient iPhone/PWA failure, cached Finance remained visible, one manual retry was available and Finance recovered normally. Visual polish was not approved in that first review; BB-128C subsequently obtained explicit owner approval after its micro-fix.
 
 ## BB-128A — Alpaca Live Market Data Activation Readiness
 
@@ -2195,7 +2208,7 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 - Modul: Produktstyrning
 - Typ: Governance
 - Prioritet: P2
-- Status: Ny
+- Status: Klar — BB-130A documentation verification, 2026-09-05
 - Upptäckt: 2026-08-03
 - Beskrivning: Fastställ ROADMAP.md:s ansvar och relation till backlog och stabiliseringsplan.
 - Motiv: Parallella planeringsytor skapar otydlig prioritet.
@@ -2203,6 +2216,8 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 - Risk: Konkurrerande planer styr arbetet.
 - Definition of Done: En normativ roadmap med ägare, scope och länkar.
 - Relaterade dokument: `ROADMAP.md`, `docs/BACKLOG.md`, `STABILIZATION_PLAN.md`.
+
+- BB-130A evidence: ROADMAP.md now declares owner, scope, links and delegation to the Finance roadmap; START-HERE defines authority versus STATUS/BACKLOG. No competing roadmap was created.
 
 ### BB-008 – Aktivera eller avveckla CHANGELOG-policy
 
@@ -2219,6 +2234,16 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 - Relaterade dokument: `CHANGELOG.md`, `ROADMAP.md`.
 
 ### BB-009 – Klassificera Proposed ADR 0002 och 0006–0009
+
+- BB-130A review 2026-09-05 extends this existing follow-up to ADR 0005 conformance:
+  fixed allowlist/proof checks do not establish signed-overlay lifecycle; certificate
+  validity/EKU and lifecycle tests, complete response validation/bounds, truthful
+  identity/policy/timing/completion audit, and container/in-process privilege/host-semantics
+  evidence remain incomplete. Status: **OPEN / SECURITY REVIEW REQUIRED**, no waiver.
+- DoD extension: owner/architect-reviewed disposition of each gap, isolated negative/
+  compatibility/security tests and truthful runtime scope before full acceptance.
+  New privilege or security semantics require a separate Proposed ADR; no hardening
+  implementation is smuggled into BB-130A. Local ADR 0006–0009 stay unpublished.
 
 - Modul: Arkitektur
 - Typ: ADR-review

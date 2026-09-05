@@ -2,6 +2,12 @@
 
 ## Scope
 
+BB-130A source review (2026-09-05): App currently starts modules, Docker inventory,
+recovery and system overview together; system overview polls every five seconds.
+Finance adds five initial reads while research details are already deferred. These
+are source-level triggers, not measured latency or concurrency results. The
+[BB-130 plan](bb-130-stabilization.md) requires measurement before B changes loading.
+
 The framework exposes seven instant client-side views through one reusable shell:
 
 - **Hem** – a calm module launcher and attention-only system signal.

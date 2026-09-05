@@ -1,10 +1,32 @@
 # BigBrain Status
 
+## BB-130 stabilization — 2026-09-05
+
+BB-130A is **IN PROGRESS / DOCUMENTATION IMPLEMENTED / VALIDATION IN PROGRESS** against
+baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`. The [continuity contract](START-HERE.md),
+[ordered A–D plan](architecture/bb-130-stabilization.md) and [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md)
+record scope, authority, tests and next actions. BB-130B/C/D are **PLANNED**, not complete.
+No loading improvement, code refactor, deployment or new owner UX approval is claimed.
+
+ADR 0005 documents existing System Metrics but stays Proposed for full conformance;
+certificate, response-validation, audit, overlay and delivery/privilege gaps remain
+under BB-009/security review. General application auth remains a prerequisite before
+high-authority capabilities or broader exposure. No security boundary is weakened.
+
+Latest published Finance slice is [BB-129A](reports/features/finance/finance-bb-129a-multi-dataset-campaign-20260903.md):
+implemented/CI/deployed/bounded-research verified on 2026-09-03, 24 campaign attempts,
+0 robust candidates; missing scientific lineage remains a limitation. BB-130 does not
+rerun or reinterpret this evidence. Finance remains **RESEARCH / 0 SEK / NONE**.
+
+The dated sections below retain historical evidence. Old next-step and runtime claims
+apply only to their named slice; this entry and newer slice evidence supersede them
+for current planning. No runtime was reverified on 2026-09-05 in A.
+
 ## BB-128C Finance Design-System Conformance (2026-09-03)
 
 BB-128C is **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL VERIFIED** from baseline `2fa43170f51f434e6adb04765618d88ffb74c601`, implementation `8499797347e5bd41849d5ff184f9278ea4dc4707` and evidence `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`. Finance initial loading and retry now consume the shared `BBLoadingIndicator` and `BBButton busy` contracts instead of swapping visible labels. The cached/degraded treatment is compact, retains an explicit stale/failure status, and renders label and fetch time as wrapping-safe elements without an orphanable literal separator. Shared reduced-motion and accessible busy semantics remain authoritative.
 
-BB-128B resilience behavior is now **OWNER UX VERIFIED** from a natural physical iPhone/PWA failure: cached Finance remained visible, the owner retried once, and Finance recovered normally. That verifies resilience/recovery behavior, not the degraded-state visual design; BB-128C visual approval remains pending. Finance data flow, cache version, refresh deduplication, backend/API and `RESEARCH / 0 SEK / NONE` are unchanged.
+BB-128B resilience behavior is now **OWNER UX VERIFIED** from a natural physical iPhone/PWA failure: cached Finance remained visible, the owner retried once, and Finance recovered normally. That verifies resilience/recovery behavior, not the degraded-state visual design; BB-128C visual approval was pending at that point and was subsequently granted after the micro-fix documented below. Finance data flow, cache version, refresh deduplication, backend/API and `RESEARCH / 0 SEK / NONE` are unchanged.
 
 Web-only deployment replaced image `sha256:25e88b6…` with `sha256:39389c5…`; Web, API and Sentinel are healthy, the Finance read returned HTTP 200, and the deployed bundle contains shared busy/loading markup while omitting the replaced visible busy phrases. API identity was unchanged. Initial Actions run `33715050244` passed backend, documentation and secrets but exposed a timezone-coupled frontend assertion; the test now verifies the authoritative ISO `dateTime` plus locale-independent time shape. Local focused 27/27, full Web 173/173 and production build pass. Follow-up Actions run `33715603341` passed all jobs.
 
@@ -451,12 +473,12 @@ Status skiljer uttryckligen mellan implementerat, automatiskt verifierat, deploy
 ## Sentinel och systemstatus
 
 - Status: grundläggande systemstatus är deployad; den bredare Sentinel-arkitekturen är föreslagen och inte godkänd som generell mutationsplattform.
-- Kända begränsningar: lokala, ännu inte publicerade Sentinel-förslag är inte del av denna baseline.
+- Kända begränsningar: ADR 0005 dokumenterar implementerad System Metrics men full konformitet är inte accepterad/verifierad; se BB-009. Lokala ADR 0006–0009 är inte publicerad auktoritet.
 - Dokument: [arkitektur](architecture/sentinel-architecture.md), [kunskap](knowledge/sentinel.md), [ADR-index](indexes/adr.md).
 
 ## Finance
 
-- **Current state is the BB-118 baseline at the top of this document.** Finance spans several delivered bounded research slices rather than “early M2 only”: real EOD data/persistence, deterministic features/backtests/robustness, macro evidence, prospective shadow/risk evidence and autonomous-research operations are implemented and deployed. Trading-related M4/M5/M7+ gates remain incomplete.
+- **Current state is the BB-130/BB-129A entry and later Finance slices above; BB-118 is a dated historical baseline.** Finance spans several delivered bounded research slices rather than “early M2 only”: real EOD data/persistence, deterministic features/backtests/robustness, macro evidence, prospective shadow/risk evidence and autonomous-research operations are implemented and deployed. Trading-related M4/M5/M7+ gates remain incomplete.
 - The chronological bullets below preserve dated historical evidence. Statements such as “no provider”, “no real data”, “not deployed” or “scheduler disabled/default-off” describe their original slice and are superseded as current-state claims by BB-078 activation, BB-095 commissioning and BB-118 runtime evidence.
 - Historical foundation ledger begins here: M0 planning plus decimal-based money/price/quantity/risk primitives,
   UTC market observations, provider-neutral market-data and strategy contracts, explicit

@@ -6,6 +6,18 @@ Skilja implementerade skydd från framtida identitets- och behörighetsmål.
 
 ## Verifierade fakta
 
+- BB-130A source review 2026-09-05: general application authentication/authorization
+  middleware and identity-bound policy enforcement are not wired in API Program.
+  Preview/confirmation tokens, widget permission metadata and Finance safety gates
+  do not replace authenticated user identity.
+- An accepted authentication/authorization design is a prerequisite before broker/
+  trading authority, Docker/camera control, high-impact Home Assistant operations or
+  broader network exposure. The existing security/pentest and passwordless investigation
+  backlog own this work; BB-130A implements no OIDC system.
+- Sentinel is a separate authenticated boundary with explicit conformance gaps in
+  [ADR 0005](../adr/0005-read-only-system-metrics-capability.md). Its mTLS is not
+  application-user authentication or proof of full security certification.
+
 - Kontrollerade mediarequests använder preview, kortlivad bekräftelse och idempotens.
 - Sentinel använder ett autentiserat lokalt protokoll.
 
@@ -35,7 +47,7 @@ Skilja implementerade skydd från framtida identitets- och behörighetsmål.
 
 ## Senast verifierad
 
-2026-08-03.
+2026-09-05 source review; no new runtime or penetration test. Earlier knowledge baseline: 2026-08-03.
 
 ## Källa och evidens
 

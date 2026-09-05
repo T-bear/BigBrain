@@ -1,5 +1,12 @@
 # Finance module
 
+BB-130 continuity note (2026-09-05): the [ordered stabilization plan](../architecture/bb-130-stabilization.md)
+precedes further Finance expansion. Current source still has mixed provider-neutral
+persistence ownership in EodhdMarketMemory and store-owned structural schema alongside
+FinanceSchemaMigrator; BB-130C must reconcile these without a second DB or scientific
+change. The dated delivery ledger below is historical per slice; current progress and
+latest evidence are in [STATUS](../STATUS.md). RESEARCH / 0 SEK / NONE remains mandatory.
+
 ## BB-128C async/degraded design-system conformance — 2026-09-03
 
 Finance initial loading and retry use the shared `BBLoadingIndicator` and `BBButton busy` primitives. The shared semantic tokens, accessibility contract and reduced-motion behavior are authoritative; the module does not copy UX-lab CSS or create a local spinner. Cached-state messaging remains visible but uses a compact warning treatment, with fetch label and timestamp represented as independent wrapping-safe elements.

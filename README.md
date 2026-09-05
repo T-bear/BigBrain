@@ -1,5 +1,10 @@
 # BigBrain
 
+Start with [project continuity](docs/START-HERE.md) for the mandatory read order,
+source-of-truth contract and safe resumption. Current stabilization scope is
+[BB-130A–D](docs/architecture/bb-130-stabilization.md); progress is in
+[STATUS](docs/STATUS.md), not implied by this plan.
+
 BB-089 establishes the first M5 Hard Risk Engine slice for RESEARCH/shadow decisions. Central
 `research-eod-v1` policy evaluates temporal/data/lineage/health, instrument, price/move,
 20-session volatility, EOD volume-liquidity, hypothetical exposure and simulated loss/drawdown/

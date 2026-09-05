@@ -1,5 +1,33 @@
 # BigBrain Roadmap
 
+## Authority and current direction — BB-130A, 2026-09-05
+
+Owner: product owner. This is the canonical product-direction map; detailed Finance
+gates remain in the [Finance master roadmap](docs/architecture/finance/master-roadmap.md).
+[BACKLOG](docs/BACKLOG.md) owns incomplete work/DoD, [STATUS](docs/STATUS.md) owns
+current dated evidence, and [Start here](docs/START-HERE.md) defines continuity.
+The absent historical STABILIZATION_PLAN is not a competing current roadmap.
+
+The owner prioritizes [BB-130A–D stabilization](docs/architecture/bb-130-stabilization.md)
+before further Finance features. After stabilization, review the existing security,
+application-auth and penetration-testing prerequisites before high-authority work;
+any Finance evidence expansion still requires owner prioritization and its gates.
+No broker/trading, Docker/camera control, high-impact Home Assistant operations or
+broader network exposure without an accepted authentication/authorization design.
+
+Latest published Finance work through BB-129A remains RESEARCH / 0 SEK / NONE.
+BB-119 resolved the BB-118 scheduler/readiness inconsistency; it is not a current
+implementation blocker. BB-123/124 strengthened cost/OOS governance, BB-127 added
+bounded research datasets, BB-128B/C established owner-verified resilient loading,
+and BB-129A preserves honest not-evaluable campaign outcomes. See STATUS/reports for
+exact dated evidence; no runtime verification is implied by this roadmap.
+
+## Historical direction ledger
+
+The dated recommendations below preserve the decisions at each slice. Their “next”
+or “current” wording is historical and does not override the priority above. Domain
+roadmaps retain longer-term PAPER, live and autonomy gates as planned, not enabled.
+
 ## BB-089 – M5 Hard Risk Engine foundation (implemented 2026-08-16)
 
 Finance now has a mandatory deterministic server-side risk authority for new RESEARCH/shadow

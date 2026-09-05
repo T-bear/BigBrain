@@ -17,6 +17,23 @@
 - Undvik microservices, message brokers, Redis, Kubernetes och dynamiska plugins tills ett verifierat behov finns och arkitekturbeslutet har dokumenterats.
 - Varje sprint ska ha ett tydligt mål och en tydlig Definition of Done. Om en ny idé uppstår under sprinten och inte krävs för att uppnå sprintmålet ska den dokumenteras som en framtida förbättring i stället för att implementeras direkt.
 
+## Kontinuitet och Adaptive Reasoning / Compute Economy
+
+- Läs [Start here](docs/START-HERE.md) för obligatorisk läsordning och dokumentauktoritet.
+- **NO UNDOCUMENTED SIGNIFICANT WORK:** betydande arkitektur-, status-, backlog-, roadmap-,
+  runtime-, säkerhets- och återhämtningsbeslut samt viktiga tekniska lärdomar ska dokumenteras
+  i rätt kanoniska dokument. Chatt och terminalhistorik är inte bestående source of truth.
+- Använd lägsta resonemangsnivå som passar uppgiften; eskalera när komplexiteten kräver det.
+  LOW: mekanisk dokumentation, formatering, repetitiva specificerade ändringar, isolerad
+  UI/text och små mekaniska testuppdateringar. MEDIUM: normal implementation, flerfilsrefaktor,
+  integration och vanlig felsökning. HIGH: Finance-korrekthet och beräkningar/modeller,
+  marknadsdatasemantik/lineage, arkitekturbeslut, migrationer, säkerhetsgränser, samtidighet,
+  race conditions, svår felsökning, stora riskfyllda refaktorer och kritisk kodreview.
+- Compute economy får ALDRIG användas för att hoppa över tester, verifiering, säkerhetsreview,
+  fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.
+  Finance-korrekthet, säkerhet och arkitekturintegritet går före användningsoptimering.
+  Policyn är uppgiftsklassificering, inte ett påstående att verktyget kan byta modellinställning.
+
 ## Säkerhet och data
 
 - Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.
