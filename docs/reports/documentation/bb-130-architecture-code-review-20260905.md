@@ -10,7 +10,7 @@
 
 ## Status
 
-BB-130A documentation is being verified for publication. BB-130B measurements and
+BB-130A is complete, documentation verified, published and CI verified at checkpoint 58563475bfed7bdddece87d11895adeec83d9c30. BB-130B measurements and
 BB-130C/D implementation are not complete. No deployment or new owner UX acceptance
 is part of A. Repository inspection is distinct from runtime or penetration testing.
 
@@ -91,7 +91,7 @@ performed. The existing BB-009 and security/pentest items own follow-up.
 - Control Plane provider: dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore --filter FullyQualifiedName~SentinelSystemMetricsProviderTests: passed 2/2. First attempt hit sandbox MSBuild named-pipe permission denial; approved rerun passed.
 - node scripts/verify-documentation.mjs: passed 220 Markdown files / 90 unique backlog IDs.
 - docker compose config --quiet and git diff --check: passed.
-- No separate full local application build/regression is needed for this documentation-only A change; CI still runs all existing jobs. Publication/secrets results follow.
+- No separate full local application build/regression is needed for this documentation-only A change; CI still runs all existing jobs. Staged patch scan via git diff --cached piped to docker run --rm -i --network none zricethezav/gitleaks:v8.28.0 stdin --redact --no-banner passed with no leaks. Actions run 33982397667 passed backend restore/Release build/full tests, frontend install/full tests/build, documentation and full-history secrets. origin/main matched HEAD before and after push.
 - BB-128C explicit owner acceptance already exists in the published report/header and
   STATUS: after the single-loader micro-fix the owner stated `Jag är nöjd`. A reconciles
   stale pending language; it does not invent another UX approval.
@@ -119,7 +119,7 @@ API/Web receive no Docker socket, shell or new host access.
 
 ## Remaining work
 
-Complete and publish A validation; B measurement/improvement, C ownership refactors
+A validation/publication is complete. B measurement/improvement, C ownership refactors
 and D quality gates remain. Scientific sample/lineage limitations, general auth,
 Sentinel conformance, physical appliance recovery gates and domain roadmap decisions
 are not solved by documentation. No Finance expansion or high-authority activation.

@@ -1,5 +1,17 @@
 # Testa BigBrain
 
+## BB-130A continuity verification — 2026-09-05
+
+Documentation-only checkpoint: Sentinel suite 32/32 and focused Control Plane
+SentinelSystemMetricsProviderTests 2/2 pass in Release. The latter initially hit
+sandbox MSBuild named-pipe permission denial; the approved rerun passed.
+Documentation verification (220 Markdown / 90 unique BB IDs), Compose config and
+diff checks pass. Staged patch scan with gitleaks v8.28.0 found no leaks. Exact
+commands, CI and limitations are in the [BB-130 review](docs/reports/documentation/bb-130-architecture-code-review-20260905.md).
+No full local application regression or deployment is required for A's documentation
+change. CI retains backend/frontend builds/tests, docs and full-history secrets.
+Later phases must run the [BB-130 characterization and verification map](docs/architecture/bb-130-stabilization.md).
+
 ## BB-128C Finance async/degraded design-system conformance
 
 - Focused tests verify the shared loading indicator, accessible standardized busy button, no overlapping refresh, cached content retention, successful/failed recovery, fetch-time visibility and separator-free wrapping-safe markup.

@@ -2,11 +2,16 @@
 
 ## BB-130 stabilization — 2026-09-05
 
-BB-130A is **IN PROGRESS / DOCUMENTATION IMPLEMENTED / VALIDATION IN PROGRESS** against
+- Senast uppdaterad: 2026-09-05, BB-130A source/documentation review.
+- Verifierad mot commit: `58563475bfed7bdddece87d11895adeec83d9c30` (published A checkpoint).
+- Runtime senast verifierad: historical per-slice evidence below; latest Finance
+  campaign/loader evidence is dated 2026-09-03. No new runtime verification in A.
+
+BB-130A is **COMPLETE / DOCUMENTATION VERIFIED / PUBLISHED / CI VERIFIED** against
 baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`. The [continuity contract](START-HERE.md),
 [ordered A–D plan](architecture/bb-130-stabilization.md) and [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md)
 record scope, authority, tests and next actions. BB-130B/C/D are **PLANNED**, not complete.
-No loading improvement, code refactor, deployment or new owner UX approval is claimed.
+Checkpoint 58563475bfed7bdddece87d11895adeec83d9c30 passed all four jobs in Actions run 33982397667 (backend, frontend, documentation, full-history secrets). Local Sentinel 32/32, provider tests 2/2, documentation/Compose/diff and staged secrets passed. No loading improvement, code refactor, deployment or new owner UX approval is claimed.
 
 ADR 0005 documents existing System Metrics but stays Proposed for full conformance;
 certificate, response-validation, audit, overlay and delivery/privilege gaps remain
@@ -368,6 +373,8 @@ clean/unclean state, storage/clock/disk gates, recovery API/UI, Sentinel readine
 grace are active. API PID-1 crash recovered as `UNCLEAN`; Finance requests remained 16 with
 no duplicate evidence. Host unit install, Docker restart and reboot are blocked by interactive
 sudo; physical power test is pending. Finance remains `RESEARCH`; no shutdown/trading API.
+
+Historical BB-083 metadata (not the current whole-project baseline):
 
 - Senast uppdaterad: 2026-08-12 (Europe/Stockholm)
 - Verifierad mot commit: `eaa3a0446356316dc21b2fee3e0e0a2b30c5211c` (BB-083 resilience

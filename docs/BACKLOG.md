@@ -3,14 +3,14 @@
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-05: A documentation implemented, validation/publication in progress; B/C/D planned.
+- Status 2026-09-05: A complete/published/CI verified (5856347, Actions 33982397667); B/C/D planned.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
 - C: characterize and refactor Finance UI/intake/persistence, composition and structural schema authority.
 - D: deterministic quality gates, full regressions and final reconciliation.
 - Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
-- Next: publish coherent verified A checkpoint, then B measurement before implementation.
+- Next: B measurement before changing request triggers; A is complete.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
 
 ## BB-128C — Finance Design-System Conformance for Async & Degraded States
