@@ -4,7 +4,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import * as api from '../api'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
 import { FINANCE_SNAPSHOT_CACHE_KEY, writeFinanceSnapshotCache } from './financeSnapshotCache'
-import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
+import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceBacktestCatalog, FinanceBacktestResult, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -31,6 +31,29 @@ const autonomousFixture:FinanceAutonomousResearch={generatedAtUtc:'2026-08-22T10
 const schedulerFixture:FinanceResearchSchedulerStatus={currentUtc:'2026-08-23T01:00:00Z',enabled:true,schedulerVersion:'finance-research-scheduler-v1',nextDueUtc:'2026-08-23T02:00:00Z',lastOpportunity:{opportunityId:'finance-research-scheduler-v1:2026-08-22',researchDate:'2026-08-22',dueAtUtc:'2026-08-23T02:00:00Z',attemptedAtUtc:'2026-08-23T02:03:00Z',completedAtUtc:'2026-08-23T02:04:00Z',state:'Completed',researchRunId:'research-run-fixture',reason:'finance.research.scheduler.completed',nextEligibilityUtc:null},lastResearchRunId:'research-run-fixture',lastOutcome:'Completed',lastReason:'finance.research.scheduler.completed',researchCurrentlyRunning:false,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE',historicalEvidenceAvailable:true,currentSessionRequired:true,requiredResearchDate:'2026-08-22',currentSessionReadiness:'COMPLETE',featureLineageReadiness:'READY',dataReady:true,readinessReason:'finance.research.scheduler.ready',currentInstrumentCount:8,expectedInstrumentCount:8}
 const governorFixture:FinanceResearchResourceDecision={decision:'defer',evaluatedAtUtc:'2026-08-23T01:00:00Z',governorVersion:'finance-research-resource-governor-v1',reasonCodes:['finance.research.scheduler.resource.memory'],evidence:{cpuUsagePercent:32,memoryUsagePercent:88,availableMemoryBytes:536870912,minimumAvailableDiskBytes:107374182400,availableDiskCount:1,temperatureCelsius:null,temperatureSupported:false,metricsStatus:'Healthy',collectedAtUtc:'2026-08-23T01:00:00Z'},operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
 const operationsFixture:FinanceResearchOperationsStatus={operationsVersion:'finance-research-operations-v1',evaluatedAtUtc:'2026-08-23T03:00:00Z',state:'attentionRequired',requiresAttention:true,currentActivity:'OPERATIONAL_FAILURE_STREAK',schedulerEnabled:true,maintenancePaused:false,lastSchedulerEvaluationUtc:'2026-08-23T03:00:00Z',lastSuccessfulResearchUtc:'2026-08-22T02:04:00Z',lastOperationalFailureUtc:'2026-08-23T03:00:00Z',consecutiveOperationalFailures:3,lastFailureReason:'finance.research.scheduler.unexpected.SqliteException',lastSuccessfulEvidenceRefreshUtc:'2026-08-22T22:10:00Z',historicalEvidenceAvailable:true,currentSessionRequired:true,requiredResearchDate:'2026-08-22',dataReadiness:'COMPLETE',featureLineageReadiness:'READY',resourceDecision:'DEFER',activeResearchRunId:null,operatingMode:'RESEARCH',budgetSek:0,executionAuthority:'NONE'}
+
+const backtestCatalog: FinanceBacktestCatalog = {
+  generatedAtUtc: '2026-09-06T12:00:00Z', operatingMode: 'RESEARCH', strategies: [],
+  runs: ['first', 'second'].map(id => ({
+    runId: id, checksum: `checksum-${id}`, strategyId: `strategy-${id}`, strategyVersion: 'v1',
+    parameters: {}, costModel: 'fixture-cost', from: '2020-01-01', to: '2021-01-01',
+    initialEquity: 100, finalEquity: 101, grossReturn: .01, netReturn: .01,
+    maxDrawdown: 0, trades: 1, costImpact: 0, benchmarkReturn: null, excessReturn: null,
+    marketRevisionIds: ['fixture-market'], featureRevisionId: 'fixture-feature',
+    simulationModel: 'fixture', sizingPolicy: 'fixture', status: 'complete', limitations: [],
+  })),
+}
+const backtestResultFixture: FinanceBacktestResult = {
+  runId: 'first', checksum: 'checksum-first', fills: [], events: [], metrics: {},
+  equityCurve: [0, 1].map(day => ({ session: `2020-01-0${day + 1}`, cash: 100,
+    holdingsValue: day, totalEquity: 100 + day, drawdown: 0 })),
+}
+const setResearchOpen = (open: boolean) => {
+  const details = screen.getAllByText('Detaljer & forskning').at(-1)!.closest('details')!
+  details.open = open
+  fireEvent(details, new Event('toggle'))
+}
+
 const openResearchDetails = () => fireEvent.click(screen.getAllByText('Detaljer & forskning').at(-1)!)
 
 afterEach(() => {
@@ -40,6 +63,78 @@ afterEach(() => {
 })
 
 describe('Finance read-only observation UI', () => {
+
+  test('nine detail reads abort on close, restart on reopen, and ignore ordinary observation refresh', async () => {
+    const snapshot = { ...empty, watchlist: [{ ...empty.watchlist[0], price: 100 }] }
+    vi.spyOn(api, 'getFinanceObservation').mockResolvedValue(snapshot)
+    const features = vi.spyOn(api, 'getFinanceFeatures').mockImplementation(() => new Promise(() => {}))
+    const details = [vi.spyOn(api, 'getFinanceBacktests'), vi.spyOn(api, 'getFinanceRobustness'),
+      vi.spyOn(api, 'getFinanceDatasets'), vi.spyOn(api, 'getFinanceBackups'), vi.spyOn(api, 'getFinanceShadow'),
+      vi.spyOn(api, 'getFinanceResearchSchedulerStatus'), vi.spyOn(api, 'getFinanceResearchGovernorStatus'),
+      vi.spyOn(api, 'getFinanceResearchOperationsStatus')]
+    details.forEach(read => read.mockImplementation(() => new Promise<never>(() => {})))
+    const view = render(<FinanceObservation />)
+    await screen.findByText('Ingen handel med riktiga pengar')
+    details.forEach(read => expect(read).not.toHaveBeenCalled())
+    expect(features).not.toHaveBeenCalled()
+    setResearchOpen(true)
+    details.forEach(read => expect(read).toHaveBeenCalledTimes(1))
+    expect(features).toHaveBeenCalledTimes(1)
+    await act(async () => { fireEvent(window, new Event('online')) })
+    details.forEach(read => expect(read).toHaveBeenCalledTimes(1))
+    expect(features).toHaveBeenCalledTimes(1)
+    setResearchOpen(false)
+    details.forEach(read => expect(read.mock.calls[0][0]?.aborted).toBe(true))
+    expect(features.mock.calls[0][1]?.aborted).toBe(true)
+    setResearchOpen(true)
+    details.forEach(read => expect(read).toHaveBeenCalledTimes(2))
+    expect(features).toHaveBeenCalledTimes(2)
+    view.unmount()
+    details.forEach(read => expect(read.mock.calls[1][0]?.aborted).toBe(true))
+    expect(features.mock.calls[1][1]?.aborted).toBe(true)
+  })
+
+  test('backtest catalog selects first result; close does not abort selected-result read and reopen does not refetch same ID', async () => {
+    const catalog = vi.spyOn(api, 'getFinanceBacktests').mockResolvedValue(backtestCatalog)
+    let finish: (value: FinanceBacktestResult) => void = () => {}
+    const result = vi.spyOn(api, 'getFinanceBacktest').mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    const view = render(<FinanceObservation initialSnapshot={empty} />)
+    expect(result).not.toHaveBeenCalled()
+    setResearchOpen(true)
+    await waitFor(() => expect(result).toHaveBeenCalledTimes(1))
+    expect(result.mock.calls[0][0]).toBe('first')
+    setResearchOpen(false)
+    expect(catalog.mock.calls[0][0]?.aborted).toBe(true)
+    expect(result.mock.calls[0][1]?.aborted).toBe(false)
+    await act(async () => { finish(backtestResultFixture) })
+    setResearchOpen(true)
+    await waitFor(() => expect(catalog).toHaveBeenCalledTimes(2))
+    expect(result).toHaveBeenCalledTimes(1)
+    expect(screen.getByLabelText('Equity curve och drawdown')).toBeVisible()
+    view.unmount()
+    expect(result.mock.calls[0][1]?.aborted).toBe(true)
+  })
+
+  test('characterizes existing old backtest curve retained beside new selected summary until result settles', async () => {
+    vi.spyOn(api, 'getFinanceBacktests').mockResolvedValue(backtestCatalog)
+    let rejectSecond: (reason: Error) => void = () => {}
+    const result = vi.spyOn(api, 'getFinanceBacktest').mockResolvedValueOnce(backtestResultFixture)
+      .mockImplementation(() => new Promise((_resolve, reject) => { rejectSecond = reject }))
+    render(<FinanceObservation initialSnapshot={empty} />)
+    setResearchOpen(true)
+    await screen.findByLabelText('Equity curve och drawdown')
+    fireEvent.click(screen.getByRole('button', { name: /strategy-second/ }))
+    expect(result.mock.calls[1][0]).toBe('second')
+    expect(result.mock.calls[0][1]?.aborted).toBe(true)
+    expect(screen.getByText('second / checksum-second')).toBeVisible()
+    // Existing behavior, not approval: the first run's curve has no identity/loading guard.
+    expect(screen.getByLabelText('Equity curve och drawdown')).toBeVisible()
+    await act(async () => { rejectSecond(new Error('unavailable')) })
+    expect(screen.queryByLabelText('Equity curve och drawdown')).not.toBeInTheDocument()
+    expect(screen.getByText('second / checksum-second')).toBeVisible()
+    expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+  })
+
   test('cached observation starts secondary reads while refresh is pending and aborts them on exit', async () => {
     writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
     const observation = vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(() => {}))

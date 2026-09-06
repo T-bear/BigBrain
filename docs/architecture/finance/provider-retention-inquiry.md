@@ -1,5 +1,16 @@
 # BB-071 provider retention inquiry
 
+## Current Alpaca evidence — 2026-09-06
+
+[Owner-supplied written support evidence](../../reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md)
+answers the six submitted private storage/research uses; those questions are no longer
+outstanding. Historical SIP is distinct from BB-128A real-time IEX. Activation is still
+blocked pending current terms/plan/feed revalidation, unaddressed termination/product
+scopes, reviewed policy/technical mapping and separate owner approval. Runtime policy
+is unchanged. Older inquiry/qualification/next-step wording below is dated history and
+is superseded on these specific answered questions; it must not trigger a duplicate inquiry.
+
+
 BB-087 prospective records retain EODHD source/revision lineage and remain covered by the existing subscription/deletion policy. Deletion preview identity includes prediction/outcome counts, and confirmed provider deletion removes outcomes before predictions. These records are excluded from ordinary indefinite public-domain backup eligibility.
 
 BB-084 distinguishes archive rights from provider entitlement. WIKI public-domain evidence is

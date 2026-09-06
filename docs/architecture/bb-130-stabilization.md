@@ -68,6 +68,12 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-06 next bounded scope: owner-supplied Finance source documentation and research-detail
+characterization only unless a clean extraction is demonstrated. [Current characterization](../reports/features/finance/bb-130c-research-detail-characterization-20260906.md)
+reproduces a selected-summary/prior-result display mismatch; extraction is deferred pending
+owner/architect behavior review. No additional backend or provider scope is authorized.
+
+
 Work in small independently tested sub-checkpoints:
 
 - Finance UI: observation/cache/retry hook, cohesive hero/overview/instrument/risk/

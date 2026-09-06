@@ -1,5 +1,16 @@
 # Finance market-data provider selection
 
+## Current Alpaca evidence — 2026-09-06
+
+[Owner-supplied written support evidence](../../reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md)
+answers the six submitted private storage/research uses; those questions are no longer
+outstanding. Historical SIP is distinct from BB-128A real-time IEX. Activation is still
+blocked pending current terms/plan/feed revalidation, unaddressed termination/product
+scopes, reviewed policy/technical mapping and separate owner approval. Runtime policy
+is unchanged. Older inquiry/qualification/next-step wording below is dated history and
+is superseded on these specific answered questions; it must not trigger a duplicate inquiry.
+
+
 ## GOOGLEFINANCE manual owner evidence (2026-09-01)
 
 A manually exported GOOG package is retained only as quarantined owner evidence. This is not an

@@ -1,5 +1,15 @@
 # Testa BigBrain
 
+## BB-130C research-detail characterization — 2026-09-06
+
+[Evidence](docs/reports/features/finance/bb-130c-research-detail-characterization-20260906.md)
+records 59 focused passing tests on unchanged production code; full Web 190/190 and
+production build passed. Coverage includes all-nine detail
+close/reopen/refresh/cancellation, selected-result dependencies and a reproduced existing
+summary/curve mismatch. The mismatch test characterizes a defect, not an approved invariant;
+a future authorized fix must update its expectation. No refactor is claimed.
+
+
 ## BB-130C observation lifecycle characterization — 2026-09-06
 
 [Evidence and exact commands](docs/reports/features/finance/bb-130c-observation-lifecycle-20260906.md):

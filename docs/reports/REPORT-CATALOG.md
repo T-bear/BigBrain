@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-130C` — [Research-detail characterization and deferred extraction boundary](features/finance/bb-130c-research-detail-characterization-20260906.md)
+
+- Alpaca — [Owner-supplied support evidence, storage/research scope and remaining gates](features/finance/finance-alpaca-owner-support-evidence-20260906.md)
+
 - `BB-130C` — [Bounded observation lifecycle characterization and extraction](features/finance/bb-130c-observation-lifecycle-20260906.md)
 
 - `BB-130B` — [Measured loading and view-owned request checkpoint](features/platform/bb-130b-loading-20260906.md)

@@ -105,6 +105,32 @@ När ett uppdrag tillför långsiktigt relevant kunskap ska Codex skapa eller up
 - Inga orelaterade ändringar får följa med. Ingen force push. `origin/main` ska verifieras före och efter push.
 - Vid ren analys eller read-only-verifiering där ingen dokumentation behöver ändras ska slutsvaret ange att dokumenten granskats utan uppdateringsbehov.
 
+### Kompakt ägargodkännande vid stopp
+
+När fortsatt arbete kräver ägarens godkännande ska det granskningsbara underlaget först
+vara färdigt och full teknisk återhämtningsstatus finnas i `docs/operations/codex-recovery.md`.
+Avsluta godkännandefrågan med följande kompakta block, endast dessa fält (utelämna
+Finance/safety-fältet när det inte är tillämpligt). Lägg det efter DOCUMENTATION STATUS
+men före den obligatoriska sista dokumentationsmeningen. Begär inte redan givet godkännande igen.
+
+```text
+OWNER APPROVAL BLOCK
+
+- Task/checkpoint:
+- Baseline SHA:
+- What changed:
+- Tests/result:
+- Important discovered behavior or risk:
+- Finance/safety invariants:
+- Publication state:
+- Exact approval requested:
+```
+
+Blocket är en kort beslutsöversikt, inte en andra recovery-not. Ägaren ska inte behöva
+kopiera terminaltranskript: publicerad GitHub-historik/dokumentation är fortsatt source
+of truth, och den enda recovery-noten beskriver fullständigt opublicerat arbete.
+Befintliga krav på uttryckligt Git-godkännande, sanering och verifiering gäller oförändrat.
+
 ### Obligatoriskt slutblock
 
 Varje framtida uppdrag ska avslutas med:

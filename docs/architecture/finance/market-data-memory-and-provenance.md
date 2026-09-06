@@ -1,5 +1,16 @@
 # Finance market-data memory, provenance and learning foundation
 
+## Current Alpaca evidence — 2026-09-06
+
+[Owner-supplied written support evidence](../../reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md)
+answers the six submitted private storage/research uses; those questions are no longer
+outstanding. Historical SIP is distinct from BB-128A real-time IEX. Activation is still
+blocked pending current terms/plan/feed revalidation, unaddressed termination/product
+scopes, reviewed policy/technical mapping and separate owner approval. Runtime policy
+is unchanged. Older inquiry/qualification/next-step wording below is dated history and
+is superseded on these specific answered questions; it must not trigger a duplicate inquiry.
+
+
 BB-088 runs the BB-087 knowledge-time contract automatically through a bounded cadence. Internal
 30-minute state checks do not imply provider access; provider calls are weekday-only after 22:00 UTC
 and existing EODHD daily/request/retry gates remain authoritative. Cadence operational metadata

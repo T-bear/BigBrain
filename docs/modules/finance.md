@@ -1,5 +1,38 @@
 # Finance module
 
+BB-130C research-detail characterization (2026-09-06, local): all nine read triggers and
+catalog/result ownership are mapped in [evidence](../reports/features/finance/bb-130c-research-detail-characterization-20260906.md).
+No extraction: reproduced backtest selected-summary/prior-curve mismatch awaits owner/architect
+review. This changes neither immutable results nor deployed UI; C remains partial.
+
+
+## Source evidence and future educational context — 2026-09-06
+
+[Alpaca support evidence](../reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md)
+now documents the owner's written YES answers on private daily-bar storage, normalized
+DB, backups, revisions/checksums, accumulation and derived research retention. Historical
+SIP guidance is attributed to that correspondence. Older BB-125/128A lifecycle wording
+below is historical; the unchanged runtime gate is still blocked, not newly authorized.
+Remaining terms/termination/feed/policy/technical and owner-approval gates are in the record.
+
+### Future Investopedia educational/hypothesis role — planned only
+
+Owner intent: educational/reference material, terminology and concept explanations,
+candidate research ideas and human-readable context. It is not market data, canonical
+strategy-success evidence, scientific validation, execution authority or risk authority.
+For precise mathematical/financial definitions prefer appropriate primary/technical sources.
+
+External educational source → concept/hypothesis → existing BigBrain deterministic
+research pipeline → independent evidence testing/falsification → robustness/risk gates →
+ROBUST CANDIDATE, INCONCLUSIVE / NOT EVALUABLE, or REJECTED.
+
+**AI may propose. Data must prove. Risk may veto.** A robust research candidate is not
+execution approval. Source material cannot bypass any existing gate. No Knowledge Layer,
+scraper, integration, content ingestion or new pipeline is implemented. Future source-use
+rights and provenance must be reviewed before integrating content. Planning intent is
+tracked without a newly allocated BB ID in [BACKLOG](../BACKLOG.md).
+
+
 BB-130C published checkpoint (2026-09-06): `useFinanceObservation` owns the existing
 observation/cache/refresh lifecycle and selected-ID reconciliation. The component retains
 secondary/detail request effects and rendering; cache schema, APIs and safety are unchanged.

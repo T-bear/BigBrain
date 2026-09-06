@@ -1,5 +1,19 @@
 # BigBrain Backlog
 
+## Finance source evidence update — 2026-09-06
+
+- Alpaca's six private storage/research questions are answered by [owner-supplied support
+  evidence](reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md).
+  BB-125/128A historical unanswered wording below is superseded for those questions.
+  Activation remains blocked pending terms/plan/feed revalidation, unaddressed lifecycle
+  scopes, reviewed policy/technical mapping and separate owner approval; no implementation.
+- Future intent, unnumbered/unprioritized: Investopedia educational/reference and hypothesis
+  context only. [Finance role and authority](modules/finance.md#future-investopedia-educationalhypothesis-role--planned-only).
+  DoD for future planning: review source-use/provenance and define a bounded hypothesis
+  path through existing deterministic evidence/robustness/risk gates. No scraper or
+  Knowledge Layer now; no new BB ID or sprint priority is assigned.
+
+
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
@@ -11,7 +25,9 @@
 - D: deterministic quality gates, full regressions and final reconciliation.
 - Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
-- Next: separately authorized research-detail ownership characterization before another extraction; this publication stops here. Do not start backend work automatically. No deployment authorization.
+- Current local checkpoint: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
+- Verified debt: selecting another backtest shows its summary beside the previous curve while its result is pending. Owner/architect must decide result-identity/loading/error behavior before correction/extraction; robustness has analogous source-level coupling to review. No new BB ID assigned.
+- Next: approve publication of documentation/characterization; separately review that defect and scope a backtest-detail checkpoint. No backend work or deployment.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
@@ -34,8 +50,8 @@
 
 - Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION**.
 - Reuses the existing live observation, entitlement and prospective shadow contracts. Read-only activation metadata identifies Basic/IEX as real-time single-exchange US stock/ETF coverage with a documented 30-symbol WebSocket limit; it cannot masquerade as SIP or consolidated US data.
-- Acquisition stays fail-closed through `MarketDataEntitlementEvaluator`: unresolved raw/normalized persistence, accumulation, backup/revision, derived-evidence and post-account retention rights prevent any provider delegate from executing. No adapter/network client, account, credential, data, deployment or trading capability exists.
-- Remaining owner action: supply Alpaca's written lifecycle clarification. Only a separately approved activation sprint may add credentials and a real adapter after policy review; the provider-processing timestamp mapping also remains `UNKNOWN`.
+- Acquisition stays fail-closed through unchanged `MarketDataEntitlementEvaluator` policy. Its BB-128A evidence/reason has not yet incorporated the new support record; runtime metadata is not the updated documentary assessment. No adapter/network client, credential, data or trading capability was added.
+- Update 2026-09-06: storage/research clarification received; see current evidence above. Revalidate remaining lifecycle/terms/feed scopes and review policy before any separately approved activation; live provider-processing timestamp remains `UNKNOWN`.
 - Publication: implementation `646078efe77dfb4c8876afb7c65c4cdcdd421a95`; GitHub Actions run `33651291772` passed all four jobs.
 
 ## BB-127 — Owner Research Dataset Capabilities & XLSX Intake
@@ -65,14 +81,16 @@
 ## BB-125 — Zero-Cost Historical Market Data Qualification
 
 - Status 2026-09-01: **QUALIFIED FAIL-CLOSED / NO STATE A / NO ACQUISITION**.
-- SimFin Free and Alpaca Basic/free are `HUMAN CONFIRMATION REQUIRED`; no account or inquiry was
-  created/sent. Yahoo Finance and yfinance are rejected for automated canonical intake under the
+- SimFin Free remains `HUMAN CONFIRMATION REQUIRED`; Alpaca has the six-use support clarification
+  recorded above but is not activated or pilot-approved. No account or inquiry was created/sent
+  by this checkpoint. Yahoo Finance and yfinance are rejected for automated canonical intake under the
   current permission/client evidence. Tiingo Starter is rejected for persistent intake because its
   Terms expressly prohibit durable storage.
 - Current limitation: no new zero-cost source improves the short/biased canonical evidence. EODHD
   Free and WIKI remain independent; provider stitching remains prohibited.
-- Next owner decision: optionally send the published SimFin inquiry first, then Alpaca. A complete
-  written lifecycle grant and separately approved account action are prerequisites to any pilot.
+- Next source decision: optionally pursue SimFin separately; for Alpaca review the supplied
+  support record and remaining gates rather than resending answered questions. No pilot or
+  account action is authorized.
 
 ## BB-122 — Historical Security Identity Evidence Pilot
 

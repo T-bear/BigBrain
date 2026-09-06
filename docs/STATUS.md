@@ -1,5 +1,28 @@
 # BigBrain Status
 
+## BB-130C research-detail characterization — local checkpoint, 2026-09-06
+
+[Characterization evidence](reports/features/finance/bb-130c-research-detail-characterization-20260906.md):
+59 focused tests pass against unchanged production code; full Web 190/190 and production
+build pass. Documentation verification passes (224 Markdown / 90 BB IDs). The nine first-level reads remain
+on demand; close/reopen and selected-result dependencies are mapped. A reproduced existing
+backtest display mismatch pairs a new selected summary with the previous curve while the
+new result is pending. Extraction is deferred for owner/architect review of identity/loading/
+error semantics. No production refactor or scientific-data change; C remains partial, D not
+started. Separate publication approval is pending. Earlier observation checkpoint stays valid.
+
+
+## Finance source documentation — 2026-09-06, local checkpoint
+
+Baseline `3d923c42d75eaa405ebac9baba3c156430208255`. The owner's supplied Alpaca Support
+summary answers six private storage/research questions. [Dated provenance and remaining
+gates](reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md) supersede
+BB-125/128A's historical unanswered wording for those questions only. Acquisition and
+runtime policy remain blocked/unchanged. Historical SIP guidance is not real-time SIP
+entitlement. Investopedia is future educational/hypothesis context only, documented in
+Finance/BACKLOG; no integration. Publication pending; no deployment or new runtime evidence.
+
+
 ## BB-130C observation lifecycle — published checkpoint, 2026-09-06
 
 Baseline `9f43229961adbbaf45902e919a5ee94e65abc774`. A/B remain published and CI verified.

@@ -1,5 +1,17 @@
 # BB-128A Alpaca Live Market Data Activation Readiness
 
+## Evidence amendment — 2026-09-06
+
+[Owner-supplied Alpaca Support clarification](finance-alpaca-owner-support-evidence-20260906.md) now answers private
+historical daily-bar storage, normalized database, backups, checksums/revisions,
+accumulation and derived research retention. These specific questions are no longer
+awaiting a response. Historical SIP and IEX coverage are distinguished in that record.
+The original dated findings below remain historical; their outstanding-evidence wording
+does not describe the updated documentary state. Activation remains blocked: formal
+terms/plan revalidation, unaddressed termination/product scopes, policy/technical review
+and separate owner approval remain. Existing runtime policy is unchanged.
+
+
 Detta är en sanerad GitHub-version. It contains no credential, private address, provider payload
 or market observation.
 
