@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C` — [Bounded observation lifecycle characterization and extraction](features/finance/bb-130c-observation-lifecycle-20260906.md)
+
 - `BB-130B` — [Measured loading and view-owned request checkpoint](features/platform/bb-130b-loading-20260906.md)
 
 - `BB-130A` — [Baseline architecture/code review and continuity reconciliation](documentation/bb-130-architecture-code-review-20260905.md)

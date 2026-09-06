@@ -22,7 +22,10 @@ Use the existing modular monolith, adapters and shared UI primitives. Every
 extraction must own a verified responsibility, not just reduce line count.
 The owner authorized this ordered sprint, BB-130A publication and subsequently the
 BB-130B implementation/evidence and final documentation publication. The B publication
-task explicitly stops before C; wait for the owner to resume C. Deployment is a
+task stopped before C. The owner has now authorized only the first C observation/cache/refresh
+implementation checkpoint, with separate publication approval required. Characterization
+precedes extraction; no backend work or next checkpoint starts automatically. See the
+[bounded evidence](../reports/features/finance/bb-130c-observation-lifecycle-20260906.md). Deployment is a
 separate action requiring explicit authorization. Sentinel security reconciliation
 records gaps; it does not accept weaker requirements or start a security redesign.
 

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { getFinanceAutonomousResearch, getFinanceBacktest, getFinanceBacktests, getFinanceBackups, getFinanceDatasets, getFinanceFeatures, getFinanceObservation, getFinanceOverview, getFinanceResearchGovernorStatus, getFinanceResearchOperationsStatus, getFinanceResearchSchedulerStatus, getFinanceRiskEvaluations, getFinanceRiskStatus, getFinanceRobustness, getFinanceRobustnessEvaluation, getFinanceShadow } from '../api'
+import { useEffect, useState } from 'react'
+import { getFinanceAutonomousResearch, getFinanceBacktest, getFinanceBacktests, getFinanceBackups, getFinanceDatasets, getFinanceFeatures, getFinanceOverview, getFinanceResearchGovernorStatus, getFinanceResearchOperationsStatus, getFinanceResearchSchedulerStatus, getFinanceRiskEvaluations, getFinanceRiskStatus, getFinanceRobustness, getFinanceRobustnessEvaluation, getFinanceShadow } from '../api'
 import { BBButton, BBLoadingIndicator } from '../components'
 import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceBacktestCatalog, FinanceBacktestResult, FinanceDatasetCatalog, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceRobustnessEvaluation, FinanceShadowCatalog } from '../types'
-import { readFinanceSnapshotCache, writeFinanceSnapshotCache } from './financeSnapshotCache'
+import { useFinanceObservation } from './useFinanceObservation'
 
 const labels: Record<string, string> = {
   noneAuthorized: 'Ingen provider auktoriserad', candidate: 'Kandidat', authorized: 'Auktoriserad', unavailable: 'Saknas', unknown: 'Okänd',
@@ -44,18 +44,10 @@ export function FinancePriceChart({ instrument }: { instrument: FinanceObservati
 const visibleFeatures = ['sma.20','ema.20','rsi.14','atr.14','volatility.20','momentum.20','volume.ratio.20']
 
 export function FinanceObservation({ initialSnapshot, initialFeatures, initialRobustness, initialEvaluation, initialBackups,initialShadow,initialOverview,initialRiskStatus,initialRiskEvaluations,initialAutonomousResearch,initialResearchScheduler,initialResearchGovernor,initialResearchOperations }: { initialSnapshot?: FinanceObservationSnapshot; initialFeatures?: FinanceFeatureSnapshot; initialRobustness?: FinanceRobustnessCatalog; initialEvaluation?: FinanceRobustnessEvaluation;initialBackups?:FinanceBackupInventory;initialShadow?:FinanceShadowCatalog;initialOverview?:FinanceOverview;initialRiskStatus?:FinanceRiskStatus;initialRiskEvaluations?:FinanceRiskEvaluation[];initialAutonomousResearch?:FinanceAutonomousResearch;initialResearchScheduler?:FinanceResearchSchedulerStatus;initialResearchGovernor?:FinanceResearchResourceDecision;initialResearchOperations?:FinanceResearchOperationsStatus }) {
-  const [cachedEntry] = useState(() => initialSnapshot ? null : readFinanceSnapshotCache())
-  const [snapshot, setSnapshot] = useState<FinanceObservationSnapshot | null>(initialSnapshot ?? cachedEntry?.snapshot ?? null)
+  const { snapshot, failed, refreshing, stale, lastFetchedAt, selected, setSelected, refresh } = useFinanceObservation(initialSnapshot)
   const [features, setFeatures] = useState<FinanceFeatureSnapshot | null>(initialFeatures ?? null)
-  const [failed, setFailed] = useState(false)
-  const [refreshing,setRefreshing]=useState(false)
-  const [stale,setStale]=useState(Boolean(cachedEntry))
-  const [lastFetchedAt,setLastFetchedAt]=useState<string|null>(cachedEntry?.fetchedAtUtc??null)
   const observationAvailable = snapshot !== null
   const [detailsOpen,setDetailsOpen]=useState(false)
-  const [selected, setSelected] = useState<string | null>((initialSnapshot??cachedEntry?.snapshot)?.watchlist.find(item => item.price !== null)?.instrumentId ?? null)
-  const requestRef=useRef<Promise<void>|null>(null)
-  const controllerRef=useRef<AbortController|null>(null)
   const [backtests,setBacktests]=useState<FinanceBacktestCatalog|null>(null)
   const [selectedRun,setSelectedRun]=useState<string|null>(null)
   const [backtestResult,setBacktestResult]=useState<FinanceBacktestResult|null>(null)
@@ -72,24 +64,6 @@ export function FinanceObservation({ initialSnapshot, initialFeatures, initialRo
   const [researchScheduler,setResearchScheduler]=useState<FinanceResearchSchedulerStatus|null>(initialResearchScheduler??null)
   const [researchGovernor,setResearchGovernor]=useState<FinanceResearchResourceDecision|null>(initialResearchGovernor??null)
   const [researchOperations,setResearchOperations]=useState<FinanceResearchOperationsStatus|null>(initialResearchOperations??null)
-  const refresh=useCallback(()=>{
-    if(initialSnapshot)return Promise.resolve()
-    if(requestRef.current)return requestRef.current
-    const controller=new AbortController();controllerRef.current=controller;setRefreshing(true)
-    const request=getFinanceObservation(controller.signal).then(value=>{
-      const fetchedAt=new Date().toISOString();setSnapshot(value);setSelected(current=>value.watchlist.some(item=>item.instrumentId===current)?current:value.watchlist.find(item=>item.price!==null)?.instrumentId??null)
-      writeFinanceSnapshotCache(value,fetchedAt);setLastFetchedAt(fetchedAt);setFailed(false);setStale(false)
-    }).catch(error=>{if(!(error instanceof Error)||error.name!=='AbortError'){setFailed(true);setStale(true)}}).finally(()=>{if(!controller.signal.aborted)setRefreshing(false);if(requestRef.current===request)requestRef.current=null})
-    requestRef.current=request;return request
-  },[initialSnapshot])
-  useEffect(()=>{
-    if(initialSnapshot)return
-    void refresh()
-    const visible=()=>{if(document.visibilityState==='visible')void refresh()}
-    const online=()=>void refresh()
-    document.addEventListener('visibilitychange',visible);window.addEventListener('online',online)
-    return()=>{document.removeEventListener('visibilitychange',visible);window.removeEventListener('online',online);controllerRef.current?.abort();requestRef.current=null}
-  },[initialSnapshot,refresh])
   useEffect(() => {
     if (!detailsOpen || !selected || (initialFeatures && selected === initialFeatures.instrumentId)) return
     const controller = new AbortController()

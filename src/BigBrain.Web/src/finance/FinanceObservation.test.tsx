@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { StrictMode } from 'react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import * as api from '../api'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
@@ -34,10 +35,142 @@ const openResearchDetails = () => fireEvent.click(screen.getAllByText('Detaljer 
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
 describe('Finance read-only observation UI', () => {
+  test('cached observation starts secondary reads while refresh is pending and aborts them on exit', async () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(() => {}))
+    const secondary = [
+      vi.spyOn(api, 'getFinanceOverview').mockImplementation(() => new Promise(() => {})),
+      vi.spyOn(api, 'getFinanceRiskStatus').mockImplementation(() => new Promise(() => {})),
+      vi.spyOn(api, 'getFinanceRiskEvaluations').mockImplementation(() => new Promise(() => {})),
+      vi.spyOn(api, 'getFinanceAutonomousResearch').mockImplementation(() => new Promise(() => {})),
+    ]
+    const view = render(<FinanceObservation />)
+    expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+    expect(screen.getByText('Riskstatus kunde inte läsas. Inget riskgodkännande antas.')).toBeVisible()
+    secondary.forEach(request => expect(request).toHaveBeenCalledTimes(1))
+    expect(observation.mock.calls[0][0]?.aborted).toBe(false)
+    view.unmount()
+    expect(observation.mock.calls[0][0]?.aborted).toBe(true)
+    secondary.forEach(request => expect(request.mock.calls[0][0]?.aborted).toBe(true))
+    fireEvent(window, new Event('online'))
+    fireEvent(document, new Event('visibilitychange'))
+    expect(observation).toHaveBeenCalledTimes(1)
+  })
+
+  test('hidden visibility does not refresh; online still recovers while hidden without overlap or polling', async () => {
+    vi.useFakeTimers()
+    const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+    let finish: (value: FinanceObservationSnapshot) => void = () => {}
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockResolvedValueOnce(empty)
+      .mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    render(<FinanceObservation />)
+    await act(async () => {})
+    visibility.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    await act(async () => { await vi.advanceTimersByTimeAsync(60_000) })
+    expect(observation).toHaveBeenCalledTimes(1)
+    fireEvent(window, new Event('online'))
+    expect(observation).toHaveBeenCalledTimes(2)
+    visibility.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+    fireEvent(window, new Event('online'))
+    expect(observation).toHaveBeenCalledTimes(2)
+    // An ordinary refresh of fresh content has no stale banner or new initial loader.
+    expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument()
+    expect(screen.queryByText('Hämtar Finance-status')).not.toBeInTheDocument()
+    await act(async () => { finish(empty) })
+  })
+
+  test('StrictMode abort cleanup cannot clear the replacement in-flight refresh or overwrite its cache', async () => {
+    const requests: Array<{ signal?: AbortSignal; finish: (value: FinanceObservationSnapshot) => void }> = []
+    const observation = vi.spyOn(api, 'getFinanceObservation').mockImplementation(signal => new Promise((resolve, reject) => {
+      requests.push({ signal, finish: resolve })
+      // Exercise the existing same-realm Error/name guard (jsdom DOMException is a different realm).
+      signal?.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })))
+    }))
+    const view = render(<StrictMode><FinanceObservation /></StrictMode>)
+    expect(requests).toHaveLength(2)
+    expect(requests[0].signal?.aborted).toBe(true)
+    expect(requests[1].signal?.aborted).toBe(false)
+    await act(async () => {})
+    fireEvent(window, new Event('online'))
+    expect(observation).toHaveBeenCalledTimes(2)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    await act(async () => { requests[1].finish(empty) })
+    const cache = localStorage.getItem(FINANCE_SNAPSHOT_CACHE_KEY)
+    fireEvent(window, new Event('online'))
+    expect(requests).toHaveLength(3)
+    view.unmount()
+    expect(requests[2].signal?.aborted).toBe(true)
+    await act(async () => { requests[2].finish({ ...empty, generatedAtUtc: '2026-09-06T10:00:00Z' }) })
+    expect(localStorage.getItem(FINANCE_SNAPSHOT_CACHE_KEY)).toBe(cache)
+    fireEvent(window, new Event('online'))
+    expect(observation).toHaveBeenCalledTimes(3)
+  })
+
+  test('an explicit initial snapshot bypasses cache acquisition and observation recovery listeners', () => {
+    writeFinanceSnapshotCache(empty, '2026-09-02T18:04:00Z')
+    const observation = vi.spyOn(api, 'getFinanceObservation')
+    render(<FinanceObservation initialSnapshot={empty} />)
+    fireEvent(window, new Event('online'))
+    fireEvent(document, new Event('visibilitychange'))
+    expect(observation).not.toHaveBeenCalled()
+    expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument()
+    expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+  })
+
+  test('failed cache persistence does not turn a successful observation into an unavailable read', async () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
+    vi.spyOn(api, 'getFinanceObservation').mockResolvedValue(empty)
+    render(<FinanceObservation />)
+    expect(await screen.findByText('Ingen handel med riktiga pengar')).toBeVisible()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByText('Visar senast hämtade data')).not.toBeInTheDocument()
+    expect(localStorage.getItem(FINANCE_SNAPSHOT_CACHE_KEY)).toBeNull()
+  })
+
+  test('first-load retry keeps the failure message and only a disabled accessible button loader until success', async () => {
+    let finish: (value: FinanceObservationSnapshot) => void = () => {}
+    vi.spyOn(api, 'getFinanceObservation').mockRejectedValueOnce('offline')
+      .mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    render(<FinanceObservation />)
+    await screen.findByText('Finance är otillgängligt')
+    fireEvent.click(screen.getByRole('button', { name: 'Försök igen' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('Ingen handel eller datainhämtning har startats.')
+    expect(screen.getByRole('button', { name: 'Försök igen pågår' })).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
+    expect(screen.queryByText('Hämtar Finance-status')).not.toBeInTheDocument()
+    await act(async () => { finish(empty) })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  test('refresh preserves a user-selected instrument and falls back only when it leaves the observation', async () => {
+    const first = { ...empty.watchlist[0], price: 100 }
+    const second = { ...first, instrumentId: 'fixture-second', symbol: 'SECOND', displayName: 'Second fixture' }
+    const initial = { ...empty, watchlist: [first, second] }
+    vi.spyOn(api, 'getFinanceObservation').mockResolvedValueOnce(initial)
+      .mockResolvedValueOnce({ ...initial, watchlist: [second, first] })
+      .mockResolvedValueOnce({ ...initial, watchlist: [first] })
+    const features = vi.spyOn(api, 'getFinanceFeatures').mockRejectedValue(new Error('unavailable'))
+    render(<FinanceObservation />)
+    await screen.findByText('Ingen handel med riktiga pengar')
+    openResearchDetails()
+    await waitFor(() => expect(features).toHaveBeenCalledTimes(1))
+    fireEvent.click(screen.getByRole('button', { name: /SECOND/ }))
+    await waitFor(() => expect(features).toHaveBeenCalledTimes(2))
+    await act(async () => { fireEvent(window, new Event('online')) })
+    expect(screen.getByRole('button', { name: /SECOND/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(features).toHaveBeenCalledTimes(2)
+    await act(async () => { fireEvent(window, new Event('online')) })
+    expect(screen.getByRole('button', { name: /MSFT/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(features).toHaveBeenCalledTimes(3)
+    expect(features.mock.calls.map(([instrument]) => instrument)).toEqual([first.instrumentId, second.instrumentId, first.instrumentId])
+  })
   test('uses the shared loading primitive for the initial Finance read', () => {
     vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(() => undefined))
     const { container } = render(<FinanceObservation />)
@@ -142,12 +275,21 @@ describe('Finance read-only observation UI', () => {
   test('defers technical detail requests until the details section opens', async () => {
     const features = vi.spyOn(api, 'getFinanceFeatures').mockRejectedValue(new Error('unavailable'))
     const backtests = vi.spyOn(api, 'getFinanceBacktests').mockRejectedValue(new Error('unavailable'))
+    const otherDetails = [
+      vi.spyOn(api, 'getFinanceRobustness'), vi.spyOn(api, 'getFinanceDatasets'),
+      vi.spyOn(api, 'getFinanceBackups'), vi.spyOn(api, 'getFinanceShadow'),
+      vi.spyOn(api, 'getFinanceResearchSchedulerStatus'), vi.spyOn(api, 'getFinanceResearchGovernorStatus'),
+      vi.spyOn(api, 'getFinanceResearchOperationsStatus'),
+    ]
+    otherDetails.forEach(request => request.mockRejectedValue(new Error('unavailable')))
     render(<FinanceObservation initialSnapshot={{ ...empty, watchlist: [{ ...empty.watchlist[0], price: 100 }] }} />)
     expect(features).not.toHaveBeenCalled()
     expect(backtests).not.toHaveBeenCalled()
+    otherDetails.forEach(request => expect(request).not.toHaveBeenCalled())
     openResearchDetails()
     await waitFor(() => expect(features).toHaveBeenCalledTimes(1))
     expect(backtests).toHaveBeenCalledTimes(1)
+    otherDetails.forEach(request => expect(request).toHaveBeenCalledTimes(1))
     expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
   })
 

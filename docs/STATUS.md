@@ -1,5 +1,18 @@
 # BigBrain Status
 
+## BB-130C observation lifecycle — local checkpoint, 2026-09-06
+
+Baseline `9f43229961adbbaf45902e919a5ee94e65abc774`. A/B remain published and CI verified.
+C is **IN PROGRESS**: only observation/cache/refresh ownership is implemented and locally
+automatically verified; publication approval and new CI remain pending. D has not started.
+[Characterization and boundary evidence](reports/features/finance/bb-130c-observation-lifecycle-20260906.md):
+56 focused tests passed before and after extraction, full Web 187/187 and production build passed.
+The hook owns existing lifecycle and selected-ID reconciliation; all secondary/detail effects
+and JSX remain unchanged. No speedup, deployment or new owner/mobile approval is claimed.
+Finance remains **RESEARCH / 0 SEK / NONE**; backend/scientific/data semantics are untouched.
+Next: obtain explicit publication approval for this bounded checkpoint, publish and verify CI.
+Further frontend/intake/persistence/composition/schema work remains separately scoped C work.
+
 ## BB-130B loading checkpoint — 2026-09-06
 
 - Senast uppdaterad: 2026-09-06, BB-130B publication and CI reconciliation.
@@ -9,8 +22,8 @@
 B is **COMPLETE / IMPLEMENTED / AUTOMATICALLY VERIFIED / BROWSER MEASURED / PUBLISHED / CI VERIFIED**.
 [Actions 34030095008](https://github.com/T-bear/BigBrain/actions/runs/34030095008) passed
 backend restore/Release build/full tests, frontend install/full tests/build, documentation
-and full-history secrets for the implementation SHA above. A/B are complete; C/D remain
-planned and have not started. The resolved recovery note is cleared in this documentation checkpoint. [Measured evidence and exact limits](reports/features/platform/bb-130b-loading-20260906.md)
+and full-history secrets for the implementation SHA above. At this historical B checkpoint A/B were complete and C/D had not started;
+current C state is recorded above. The resolved recovery note is cleared in this documentation checkpoint. [Measured evidence and exact limits](reports/features/platform/bb-130b-loading-20260906.md)
 record Home/Finance/Media request graphs, classification and reproducible commands.
 Cold peak requests through response headers fell from 10/10/14 to 5/4/8. Compatible
 cached Finance peaked at 6 instead of 10 and still rendered before refresh completed.

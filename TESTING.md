@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C observation lifecycle characterization — 2026-09-06
+
+[Evidence and exact commands](docs/reports/features/finance/bb-130c-observation-lifecycle-20260906.md):
+56 focused Finance/cache/App/shared-control tests passed both before and after extraction;
+full Web 187/187 and production build passed. Tests cover cached secondary triggers,
+visibility/online deduplication, StrictMode cancellation, seed bypass, failed cache writes,
+retry transitions and instrument reconciliation. Shared accessibility/motion contracts
+remain unchanged. Publication CI and new device verification are not yet claimed.
+
 ## BB-130B loading verification — 2026-09-06
 
 The [measurement report](docs/reports/features/platform/bb-130b-loading-20260906.md)
