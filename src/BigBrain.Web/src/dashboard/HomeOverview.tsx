@@ -25,15 +25,28 @@ export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | 
   const [snapshot, setSnapshot] = useState<HomeSnapshot>({ todayMeals: [], nextEvent: null, shoppingRemaining: null, media: null, finance: null })
 
   useEffect(() => {
-    let current = true
-    const update = (change: Partial<HomeSnapshot>) => { if (current) setSnapshot(previous => ({ ...previous, ...change })) }
+    const controller = new AbortController()
+    const update = (change: Partial<HomeSnapshot>) => { if (!controller.signal.aborted) setSnapshot(previous => ({ ...previous, ...change })) }
     const today = localDate()
-    void getMealPlannerSchedules().then(schedules => update({ todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today) })).catch(() => undefined)
-    void getCalendarWeek().then(calendar => update({ nextEvent: calendar.events.filter(event => event.date >= today).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ?? null })).catch(() => undefined)
-    void getShoppingList().then(shopping => update({ shoppingRemaining: shopping.items.filter(item => !item.purchased).length })).catch(() => undefined)
-    void getMediaOverview().then(media => update({ media })).catch(() => undefined)
-    void getFinanceOverview().then(finance => update({ finance })).catch(() => undefined)
-    return () => { current = false }
+    // Three first-render reads lead the queue; each freed slot hydrates a glance.
+    // One slow card cannot hold up every secondary card. The bound is local to Home.
+    const reads = [
+      () => getMealPlannerSchedules(controller.signal).then(schedules => update({ todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today) })),
+      () => getCalendarWeek(controller.signal).then(calendar => update({ nextEvent: calendar.events.filter(event => event.date >= today).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ?? null })),
+      () => getShoppingList(controller.signal).then(shopping => update({ shoppingRemaining: shopping.items.filter(item => !item.purchased).length })),
+      () => getMediaOverview(controller.signal).then(media => update({ media })),
+      () => getFinanceOverview(controller.signal).then(finance => update({ finance })),
+    ]
+    let next = 0
+    const hydrate = async () => {
+      while (!controller.signal.aborted) {
+        const read = reads[next++]
+        if (!read) return
+        try { await read() } catch { /* Each card retains its own unavailable state. */ }
+      }
+    }
+    for (let slot = 0; slot < 3; slot++) void hydrate()
+    return () => controller.abort()
   }, [])
 
   const mediaActive = snapshot.media?.qBittorrent.activeCount ?? 0

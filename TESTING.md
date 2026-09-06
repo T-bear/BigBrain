@@ -1,5 +1,18 @@
 # Testa BigBrain
 
+## BB-130B loading verification — 2026-09-06
+
+The [measurement report](docs/reports/features/platform/bb-130b-loading-20260906.md)
+contains commands, sanitized browser graphs, priority classification and timing limits.
+App tests assert cold request sets, Home slot/cancellation semantics and Admin-only
+one-in-flight/visibility polling. Finance tests preserve BB-128B/C and ensure secondaries
+wait for an observation without restarting on refresh. Media tests cover closed/open
+technical reads and non-overlapping polling. Run `npm test -- --reporter=dot` and
+`npm run build` in `src/BigBrain.Web`; run `node scripts/verify-documentation.mjs`
+and diff/secrets checks from the root. Publication CI still runs backend/full Web/docs/
+full-history secrets; browser preview is not deployment or physical-iPhone approval.
+Final checkpoint counts and publication state are authoritative in STATUS.
+
 ## BB-130A continuity verification — 2026-09-05
 
 Documentation-only checkpoint: Sentinel suite 32/32 and focused Control Plane

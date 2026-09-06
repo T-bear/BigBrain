@@ -188,3 +188,82 @@ test('polls system overview without overlapping the dashboard navigation state',
   expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/api/v1/system/overview'))).toHaveLength(2)
   expect(screen.getByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument()
 })
+
+test('cold Finance requests no inactive global data and no system polling', async () => {
+  vi.useFakeTimers()
+  window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'finance', views: {} }))
+  const fetchMock = vi.fn(() => new Promise<Response>(() => {}))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<App />)
+  await act(async () => { await vi.advanceTimersByTimeAsync(15_000) })
+  expect(fetchMock.mock.calls.map(call => String((call as unknown[])[0])).sort()).toEqual([
+    '/api/v1/modules/finance/observation', '/api/v1/settings/theme',
+  ])
+})
+
+test('cold Media starts eight visible-view reads with technical administration deferred', () => {
+  window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'media', views: {} }))
+  const fetchMock = vi.fn((url: string) => { void url; return new Promise<Response>(() => {}) })
+  vi.stubGlobal('fetch', fetchMock)
+  render(<App />)
+  expect(fetchMock.mock.calls.map(([url]) => url).sort()).toEqual([
+    '/api/v1/modules/media/audiobooks/acquisition/jobs?offset=0&limit=25',
+    '/api/v1/modules/media/audiobooks/acquisition/provider-status',
+    '/api/v1/modules/media/audiobooks/overview',
+    '/api/v1/modules/media/audiobooks/playback/availability',
+    '/api/v1/modules/media/downloads', '/api/v1/modules/media/jobs?limit=50',
+    '/api/v1/modules/media/smart-shuffle/options', '/api/v1/settings/theme',
+  ])
+})
+
+test('Home starts core reads first, hydrates secondary reads within the bound and aborts on navigation', async () => {
+  const pending = new Map<string, { resolve: (value: unknown) => void; signal?: AbortSignal }>()
+  const fetchMock = vi.fn((url: string, init?: RequestInit) => new Promise(resolve => {
+    pending.set(url, { resolve, signal: init?.signal ?? undefined })
+  }))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<App />)
+  expect([...pending.keys()].sort()).toEqual([
+    '/api/v1/modules/calendar/week', '/api/v1/modules/meal-planner/schedules', '/api/v1/modules/shopping-list/items',
+    '/api/v1/settings/theme', '/api/v1/system/recovery',
+  ])
+  await act(async () => { pending.get('/api/v1/modules/meal-planner/schedules')!.resolve(response([])) })
+  expect(pending.has('/api/v1/modules/media')).toBe(true)
+  expect(pending.has('/api/v1/modules/finance/overview')).toBe(false)
+  const calendar = pending.get('/api/v1/modules/calendar/week')!
+  switchView('Finance')
+  expect(calendar.signal?.aborted).toBe(true)
+  expect(pending.get('/api/v1/modules/media')!.signal?.aborted).toBe(true)
+  expect(pending.get('/api/v1/modules/shopping-list/items')!.signal?.aborted).toBe(true)
+  await act(async () => { calendar.resolve(response({ events: [] })) })
+  expect(pending.has('/api/v1/modules/finance/overview')).toBe(false)
+})
+
+test('Admin polling has one in-flight read, pauses when hidden and stops on exit', async () => {
+  vi.useFakeTimers()
+  const normal = successfulFetch()
+  let resolveSystem: (value: unknown) => void = () => {}
+  let signal: AbortSignal | undefined
+  const fetchMock = vi.fn((url: RequestInfo | URL, init?: RequestInit) => {
+    if (String(url).endsWith('/system/overview')) return new Promise(resolve => { resolveSystem = resolve; signal = init?.signal ?? undefined })
+    return normal(url)
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  const calls = () => fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/system/overview')).length
+  render(<App />)
+  switchView('Admin')
+  await act(async () => { await vi.advanceTimersByTimeAsync(15_000) })
+  expect(calls()).toBe(1)
+  await act(async () => { resolveSystem(response(overview)) })
+  const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
+  await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
+  expect(calls()).toBe(1)
+  visibility.mockReturnValue('visible')
+  fireEvent(document, new Event('visibilitychange'))
+  expect(calls()).toBe(2)
+  switchView('Hem')
+  expect(signal?.aborted).toBe(true)
+  await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
+  expect(calls()).toBe(2)
+  visibility.mockRestore()
+})

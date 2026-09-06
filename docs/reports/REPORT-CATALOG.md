@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130B` — [Measured loading and view-owned request checkpoint](features/platform/bb-130b-loading-20260906.md)
+
 - `BB-130A` — [Baseline architecture/code review and continuity reconciliation](documentation/bb-130-architecture-code-review-20260905.md)
 - `BB-128C` — [Async/degraded conformance and explicit owner visual acceptance](features/finance/finance-bb-128c-design-system-conformance-20260903.md)
 - `BB-128B` — [Read-only resilience and last-known-good cache](features/finance/finance-bb-128b-read-only-resilience-20260902.md)

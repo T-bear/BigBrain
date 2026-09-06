@@ -2,11 +2,20 @@
 
 ## Scope
 
-BB-130A source review (2026-09-05): App currently starts modules, Docker inventory,
-recovery and system overview together; system overview polls every five seconds.
-Finance adds five initial reads while research details are already deferred. These
-are source-level triggers, not measured latency or concurrency results. The
-[BB-130 plan](bb-130-stabilization.md) requires measurement before B changes loading.
+BB-130B (local checkpoint, 2026-09-06): request ownership follows the active view
+inside the existing WidgetProvider. Modules load in Family, recovery in Home/Admin,
+Docker/system in Admin. System polling is one-in-flight every five seconds only in
+visible Admin and aborts on exit. Home has a local three-slot hydration queue: core
+meal/calendar/shopping reads precede secondary Media/Finance glances. Cancellation
+prevents queued reads after navigation. Finance secondaries wait for an available
+observation (including compatible cache). Closed Media technical administration starts
+no overview/service-link reads; opening hydrates them and closing stops overview polling.
+
+[BB-130B evidence](../reports/features/platform/bb-130b-loading-20260906.md) records
+baseline and local-preview measurements, exact priority classification and limits.
+No new global scheduler, state framework, API aggregation or deployment is introduced.
+Explicitly opened Finance details still have a measured nine-read fan-out; this is not
+covered by the cold-load bounds. Existing cache/availability/safety semantics remain.
 
 The framework exposes seven instant client-side views through one reusable shell:
 

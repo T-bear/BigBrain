@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import * as api from '../api'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
@@ -149,6 +149,25 @@ describe('Finance read-only observation UI', () => {
     await waitFor(() => expect(features).toHaveBeenCalledTimes(1))
     expect(backtests).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+  })
+
+  test('cold observation renders before secondary reads and refresh does not restart them', async () => {
+    let resolveObservation: (value: FinanceObservationSnapshot) => void = () => {}
+    vi.spyOn(api, 'getFinanceObservation').mockImplementation(() => new Promise(resolve => { resolveObservation = resolve }))
+    const secondary = [
+      vi.spyOn(api, 'getFinanceOverview').mockRejectedValue(new Error('unavailable')),
+      vi.spyOn(api, 'getFinanceRiskStatus').mockRejectedValue(new Error('unavailable')),
+      vi.spyOn(api, 'getFinanceRiskEvaluations').mockRejectedValue(new Error('unavailable')),
+      vi.spyOn(api, 'getFinanceAutonomousResearch').mockRejectedValue(new Error('unavailable')),
+    ]
+    render(<FinanceObservation />)
+    secondary.forEach(request => expect(request).not.toHaveBeenCalled())
+    await act(async () => { resolveObservation(empty) })
+    expect(screen.getByText('Ingen handel med riktiga pengar')).toBeVisible()
+    secondary.forEach(request => expect(request).toHaveBeenCalledTimes(1))
+    fireEvent(window, new Event('online'))
+    await act(async () => { resolveObservation({ ...empty }) })
+    secondary.forEach(request => expect(request).toHaveBeenCalledTimes(1))
   })
 
   test('aborted navigation is not rendered as a backend failure', () => {

@@ -1,5 +1,35 @@
 # BigBrain Status
 
+## BB-130B loading checkpoint — 2026-09-06
+
+- Senast uppdaterad: 2026-09-06, BB-130B local implementation and browser measurement.
+- Verifierad mot commit: `fddf3394591ac6c716090444276f60c0c564e873` plus the local B working tree; publication pending.
+- Runtime senast verifierad: 2026-09-06, isolated browser baseline and candidate preview against existing read APIs; no deployment or owner UX approval.
+
+B is **IMPLEMENTED LOCALLY / AUTOMATICALLY VERIFIED / BROWSER MEASURED**; publication
+and CI remain pending, so the phase is not yet complete under its DoD. A is complete;
+C/D remain planned. [Measured evidence and exact limits](reports/features/platform/bb-130b-loading-20260906.md)
+record Home/Finance/Media request graphs, classification and reproducible commands.
+Cold peak requests through response headers fell from 10/10/14 to 5/4/8. Compatible
+cached Finance peaked at 6 instead of 10 and still rendered before refresh completed.
+System polling is Admin-only and pauses when hidden. Home locally bounds hydration;
+Finance secondaries wait for renderable observation; closed Media technical reads defer.
+
+This verifies request ownership/order, not a statistically established speedup.
+Initial Finance reads exceeded the approximately 45-second sample; later reads
+completed. Their intermittent latency remains unresolved. Nine-way explicitly opened
+Finance detail reads and large payloads remain visible debt. Existing Finance scientific
+code, safety, cache version, single-loader/retry and **RESEARCH / 0 SEK / NONE** are unchanged.
+
+Validation: baseline Web 174/174; final candidate full Web 180/180 across 26 files.
+Production Web build and documentation verification (221 Markdown / 90 unique BB IDs)
+pass, with unchanged CSS and a clean diff check. Gitleaks v8.28.0 found no leaks in
+the staged patch or all 225 commits. Firefox emitted script-timeout warnings seen
+at shutdown; timing origin/cause was not attributed, so full browser UX is not claimed. No local backend changes or test
+rerun; publication CI must retain backend/full Web/docs/full-history secrets gates.
+Next: obtain B commit/push approval, publish and verify CI
+before C. Deployment requires separate authorization; physical iPhone/PWA review remains.
+
 ## BB-130 stabilization — 2026-09-05
 
 - Senast uppdaterad: 2026-09-05, BB-130A source/documentation review.
@@ -10,7 +40,8 @@
 BB-130A is **COMPLETE / DOCUMENTATION VERIFIED / PUBLISHED / CI VERIFIED** against
 baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`. The [continuity contract](START-HERE.md),
 [ordered A–D plan](architecture/bb-130-stabilization.md) and [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md)
-record scope, authority, tests and next actions. BB-130B/C/D are **PLANNED**, not complete.
+record scope, authority, tests and next actions. B/C/D were planned at that A checkpoint;
+see the newer B entry above for current state.
 Checkpoint 58563475bfed7bdddece87d11895adeec83d9c30 passed all four jobs in Actions run 33982397667 (backend, frontend, documentation, full-history secrets). Local Sentinel 32/32, provider tests 2/2, documentation/Compose/diff and staged secrets passed. No loading improvement, code refactor, deployment or new owner UX approval is claimed.
 
 ADR 0005 documents existing System Metrics but stays Proposed for full conformance;

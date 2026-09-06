@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { MediaDashboard } from './MediaDashboard'
 import type { MediaOverview, MediaServiceStatus } from './types'
@@ -72,7 +72,27 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
+})
+
+test('closed technical Media reads nothing; opening starts reads once and closing stops polling', async () => {
+  vi.useFakeTimers()
+  const fetchMock = vi.fn(() => new Promise<Response>(() => {}))
+  vi.stubGlobal('fetch', fetchMock)
+  const { container } = render(<MediaDashboard administrationOnly administrationOpen={false} />)
+  await act(async () => { await vi.advanceTimersByTimeAsync(45_000) })
+  expect(fetchMock).not.toHaveBeenCalled()
+  const details = container.querySelector('details')!
+  details.open = true
+  fireEvent(details, new Event('toggle'))
+  expect(fetchMock).toHaveBeenCalledTimes(2)
+  await act(async () => { await vi.advanceTimersByTimeAsync(90_000) })
+  expect(fetchMock).toHaveBeenCalledTimes(2)
+  details.open = false
+  fireEvent(details, new Event('toggle'))
+  await act(async () => { await vi.advanceTimersByTimeAsync(90_000) })
+  expect(fetchMock).toHaveBeenCalledTimes(2)
 })
 
 test('shows loading and then online activity without write controls', async () => {

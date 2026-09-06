@@ -153,7 +153,7 @@ export const getMealPlannerTags = () => getJson<MealPlannerTag[]>(`${mealPlanner
 export const createMealPlannerTag = (name: string, category: MealPlannerTag['category']) =>
   sendJson<MealPlannerTag>(`${mealPlannerBase}/tags`, 'POST', { name, category })
 export const deleteMealPlannerTag = (id: string) => deleteRequest(`${mealPlannerBase}/tags/${encodeURIComponent(id)}`)
-export const getMealPlannerSchedules = () => getJson<MealPlannerSchedule[]>(`${mealPlannerBase}/schedules`)
+export const getMealPlannerSchedules = (signal?: AbortSignal) => getJson<MealPlannerSchedule[]>(`${mealPlannerBase}/schedules`, signal)
 export const generateMealPlannerSchedule = (startDate: string, weekCount: number, title: string) =>
   sendJson<MealPlannerSchedule>(`${mealPlannerBase}/schedules/generate`, 'POST', { startDate, weekCount, title: title || null, seed: 0 })
 export const replaceMealPlannerDay = (scheduleId: string, date: string, mealType: MealPlannerDay['mealType']) =>

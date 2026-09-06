@@ -7,6 +7,18 @@ FinanceSchemaMigrator; BB-130C must reconcile these without a second DB or scien
 change. The dated delivery ledger below is historical per slice; current progress and
 latest evidence are in [STATUS](../STATUS.md). RESEARCH / 0 SEK / NONE remains mandatory.
 
+## BB-130B staged reads — local checkpoint, 2026-09-06
+
+Observation remains the critical initial read. Overview, risk status/evaluations and
+autonomous research hydrate when an observation can render, including compatible
+last-known-good cache. Cache version/projection, one-in-flight refresh, visibility/online,
+retry, degraded copy, single-loader and safety semantics are unchanged. Technical
+research requests still wait for Details/research to open; their nine-read fan-out
+remains measured debt. [Before/after evidence](../reports/features/platform/bb-130b-loading-20260906.md)
+distinguishes request reductions from unproven latency improvements. No backend,
+scientific, migration or production-evidence change; no deployment/mobile approval.
+Publication and CI remain pending per STATUS.
+
 ## BB-128C async/degraded design-system conformance — 2026-09-03
 
 Finance initial loading and retry use the shared `BBLoadingIndicator` and `BBButton busy` primitives. The shared semantic tokens, accessibility contract and reduced-motion behavior are authoritative; the module does not copy UX-lab CSS or create a local spinner. Cached-state messaging remains visible but uses a compact warning treatment, with fetch label and timestamp represented as independent wrapping-safe elements.
