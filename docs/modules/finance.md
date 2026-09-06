@@ -1,10 +1,11 @@
 # Finance module
 
-BB-130C local checkpoint (2026-09-06): `useFinanceObservation` owns the existing
+BB-130C published checkpoint (2026-09-06): `useFinanceObservation` owns the existing
 observation/cache/refresh lifecycle and selected-ID reconciliation. The component retains
 secondary/detail request effects and rendering; cache schema, APIs and safety are unchanged.
 [Characterization and verification](../reports/features/finance/bb-130c-observation-lifecycle-20260906.md).
-Publication/CI pending; this does not complete C or change runtime.
+Implementation `5d80efbf3f7ee2bbb793c2dbf77c2f0466168d0f` passed CI
+(Actions 34046148403); this does not complete C or change runtime.
 
 BB-130 continuity note (2026-09-05): the [ordered stabilization plan](../architecture/bb-130-stabilization.md)
 precedes further Finance expansion. Current source still has mixed provider-neutral

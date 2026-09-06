@@ -12,9 +12,11 @@
 ## Status
 
 Characterization passed before production edits; the bounded extraction is implemented
-and locally automatically verified. Publication approval and CI remain pending. A/B are published and CI verified; C is in progress, not complete;
-D has not started. This bounded implementation is owner authorized, but publication
-requires separate explicit approval under AGENTS. No new owner/mobile acceptance.
+and automatically verified, published with explicit owner approval and CI verified.
+Implementation `5d80efbf3f7ee2bbb793c2dbf77c2f0466168d0f`; [Actions 34046148403](https://github.com/T-bear/BigBrain/actions/runs/34046148403)
+passed all four jobs: backend restore/Release build/full tests, frontend install/full
+tests/build, documentation and full-history secrets. A/B remain complete; C overall
+is still in progress and D has not started. No deployment or new owner/mobile acceptance.
 
 ## Evidence
 
@@ -117,7 +119,7 @@ is not acquisition/execution authority. No host/Sentinel privilege or auth chang
 
 ## Remaining work
 
-- Obtain separate publication approval, publish this verified extraction and check CI.
+- This bounded checkpoint is complete and published; the resolved recovery note is cleared.
 - Remaining FinanceObservation rendering, secondary/detail effects and catalog selections
   are not refactored here. The B nine-read details fan-out, payload sizes, intermittent
   latency and browser-warning evidence remain documented debt, not performance targets here.
@@ -131,6 +133,7 @@ is not acquisition/execution authority. No host/Sentinel privilege or auth chang
 Use [START-HERE](../../../START-HERE.md), [STATUS](../../../STATUS.md),
 [BACKLOG](../../../BACKLOG.md), [the C plan](../../../architecture/bb-130-stabilization.md)
 and [recovery](../../../operations/codex-recovery.md). Preserve unrelated mockups/ADRs.
-Do not automatically start another C checkpoint. After this checkpoint is verified,
-prepare it for owner publication approval; then recommend a separately scoped
-Finance research-detail loading ownership characterization before further extraction.
+Do not automatically start another C checkpoint. The next recommended checkpoint is a separately owner-scoped Finance research-detail
+loading ownership characterization before further extraction. This publication starts no
+new implementation. The documentation reconciliation commit follows the implementation
+in Git history; its own CI status is available on that commit in GitHub Actions.

@@ -1,16 +1,20 @@
 # BigBrain Status
 
-## BB-130C observation lifecycle — local checkpoint, 2026-09-06
+## BB-130C observation lifecycle — published checkpoint, 2026-09-06
 
 Baseline `9f43229961adbbaf45902e919a5ee94e65abc774`. A/B remain published and CI verified.
-C is **IN PROGRESS**: only observation/cache/refresh ownership is implemented and locally
-automatically verified; publication approval and new CI remain pending. D has not started.
+C is **IN PROGRESS** overall. This bounded observation/cache/refresh checkpoint is
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / PUBLISHED / CI VERIFIED**. D has not started.
+Implementation `5d80efbf3f7ee2bbb793c2dbf77c2f0466168d0f`; [Actions 34046148403](https://github.com/T-bear/BigBrain/actions/runs/34046148403)
+passed backend restore/Release build/full tests, frontend install/full tests/build,
+documentation and full-history secrets. The resolved recovery note is cleared.
 [Characterization and boundary evidence](reports/features/finance/bb-130c-observation-lifecycle-20260906.md):
 56 focused tests passed before and after extraction, full Web 187/187 and production build passed.
 The hook owns existing lifecycle and selected-ID reconciliation; all secondary/detail effects
 and JSX remain unchanged. No speedup, deployment or new owner/mobile approval is claimed.
 Finance remains **RESEARCH / 0 SEK / NONE**; backend/scientific/data semantics are untouched.
-Next: obtain explicit publication approval for this bounded checkpoint, publish and verify CI.
+Next: owner-scoped characterization of research-detail loading ownership before another
+small extraction. This publication does not start the next checkpoint.
 Further frontend/intake/persistence/composition/schema work remains separately scoped C work.
 
 ## BB-130B loading checkpoint — 2026-09-06

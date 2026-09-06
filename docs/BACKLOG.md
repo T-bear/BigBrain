@@ -3,7 +3,7 @@
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-06: A/B complete/published/CI verified; B implementation `b8bb896aba88faba00c5fde46ffd947d847c63c0`, Actions 34030095008 passed all four jobs; C observation lifecycle implemented/locally verified, pending publication approval/CI; remaining C planned and D not started.
+- Status 2026-09-06: A/B complete/published/CI verified; B implementation `b8bb896aba88faba00c5fde46ffd947d847c63c0`, Actions 34030095008 passed all four jobs; C observation lifecycle published/CI verified (`5d80efbf3f7ee2bbb793c2dbf77c2f0466168d0f`, Actions 34046148403); remaining C planned and D not started.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -11,7 +11,7 @@
 - D: deterministic quality gates, full regressions and final reconciliation.
 - Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
-- Next: explicit owner publication approval for this checkpoint, then publish/check CI. Recommend a separately authorized research-detail ownership characterization next; do not start backend work automatically. No deployment authorization.
+- Next: separately authorized research-detail ownership characterization before another extraction; this publication stops here. Do not start backend work automatically. No deployment authorization.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

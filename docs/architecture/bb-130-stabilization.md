@@ -23,7 +23,8 @@ extraction must own a verified responsibility, not just reduce line count.
 The owner authorized this ordered sprint, BB-130A publication and subsequently the
 BB-130B implementation/evidence and final documentation publication. The B publication
 task stopped before C. The owner has now authorized only the first C observation/cache/refresh
-implementation checkpoint, with separate publication approval required. Characterization
+implementation checkpoint, then explicitly approved its publication and CI reconciliation.
+That bounded checkpoint is published/CI verified; C overall remains partial. Characterization
 precedes extraction; no backend work or next checkpoint starts automatically. See the
 [bounded evidence](../reports/features/finance/bb-130c-observation-lifecycle-20260906.md). Deployment is a
 separate action requiring explicit authorization. Sentinel security reconciliation

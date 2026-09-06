@@ -7,7 +7,8 @@
 full Web 187/187 and production build passed. Tests cover cached secondary triggers,
 visibility/online deduplication, StrictMode cancellation, seed bypass, failed cache writes,
 retry transitions and instrument reconciliation. Shared accessibility/motion contracts
-remain unchanged. Publication CI and new device verification are not yet claimed.
+remain unchanged. Implementation CI passed all four jobs (Actions 34046148403, implementation
+`5d80efbf3f7ee2bbb793c2dbf77c2f0466168d0f`). New device verification is not claimed.
 
 ## BB-130B loading verification — 2026-09-06
 
