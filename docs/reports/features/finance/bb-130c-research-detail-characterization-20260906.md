@@ -13,8 +13,10 @@
 
 CHARACTERIZATION VERIFIED / EXTRACTION DEFERRED FOR OWNER/ARCHITECT REVIEW.
 A/B and the first C observation hook remain published/CI verified. C overall is incomplete;
-D has not started. This checkpoint adds tests and documentation only, pending publication
-approval. No production code, API contract, UI behavior, cache or scientific result changed.
+D has not started. This tests/documentation checkpoint is owner-approved, published and
+CI verified: `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e`, [Actions 34047595837](https://github.com/T-bear/BigBrain/actions/runs/34047595837)
+passed backend restore/Release build/full tests, frontend install/test/build, documentation
+and full-history secrets. Recovery is cleared. No production code, API contract, UI behavior, cache or scientific result changed.
 
 ## Evidence and responsibility map
 
@@ -108,6 +110,9 @@ Scope check confirms only documentation and one test file changed. Backend repla
 no backend, research model, evidence, schema or provider code was touched.
 
 ## Changes
+
+The owner-approved publication also adds AGENTS.md's compact OWNER APPROVAL BLOCK.
+It does not replace full canonical recovery state or weaken GitHub/Git approval rules.
 
 - Tests: `src/BigBrain.Web/src/finance/FinanceObservation.test.tsx` only; no production extraction.
 - Documents: current STATUS/BACKLOG/plan/module/testing/catalog, this report and the

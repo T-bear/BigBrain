@@ -1,6 +1,6 @@
 # Finance module
 
-BB-130C research-detail characterization (2026-09-06, local): all nine read triggers and
+BB-130C research-detail characterization (2026-09-06, published/CI verified): all nine read triggers and
 catalog/result ownership are mapped in [evidence](../reports/features/finance/bb-130c-research-detail-characterization-20260906.md).
 No extraction: reproduced backtest selected-summary/prior-curve mismatch awaits owner/architect
 review. This changes neither immutable results nor deployed UI; C remains partial.

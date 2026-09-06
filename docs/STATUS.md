@@ -1,6 +1,6 @@
 # BigBrain Status
 
-## BB-130C research-detail characterization — local checkpoint, 2026-09-06
+## BB-130C research-detail characterization — published checkpoint, 2026-09-06
 
 [Characterization evidence](reports/features/finance/bb-130c-research-detail-characterization-20260906.md):
 59 focused tests pass against unchanged production code; full Web 190/190 and production
@@ -9,10 +9,14 @@ on demand; close/reopen and selected-result dependencies are mapped. A reproduce
 backtest display mismatch pairs a new selected summary with the previous curve while the
 new result is pending. Extraction is deferred for owner/architect review of identity/loading/
 error semantics. No production refactor or scientific-data change; C remains partial, D not
-started. Separate publication approval is pending. Earlier observation checkpoint stays valid.
+started. Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` passed
+[Actions 34047595837](https://github.com/T-bear/BigBrain/actions/runs/34047595837) across backend restore/Release build/full tests, frontend
+install/test/build, documentation and full-history secrets. Earlier observation checkpoint
+stays valid. Recovery is cleared. AGENTS now defines a compact OWNER APPROVAL BLOCK;
+full unpublished technical state still belongs only in the canonical recovery note.
 
 
-## Finance source documentation — 2026-09-06, local checkpoint
+## Finance source documentation — 2026-09-06, published checkpoint
 
 Baseline `3d923c42d75eaa405ebac9baba3c156430208255`. The owner's supplied Alpaca Support
 summary answers six private storage/research questions. [Dated provenance and remaining
@@ -20,7 +24,8 @@ gates](reports/features/finance/finance-alpaca-owner-support-evidence-20260906.m
 BB-125/128A's historical unanswered wording for those questions only. Acquisition and
 runtime policy remain blocked/unchanged. Historical SIP guidance is not real-time SIP
 entitlement. Investopedia is future educational/hypothesis context only, documented in
-Finance/BACKLOG; no integration. Publication pending; no deployment or new runtime evidence.
+Finance/BACKLOG; no integration. Published/CI verified with the checkpoint above;
+no deployment or new runtime evidence.
 
 
 ## BB-130C observation lifecycle — published checkpoint, 2026-09-06

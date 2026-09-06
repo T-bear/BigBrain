@@ -16,7 +16,8 @@ WRITTEN STORAGE/RESEARCH CLARIFICATION RECEIVED — NOT ACTIVATED.
 This closes the specific pending request for the six uses below at the owner-supplied
 support-evidence level. It is not a formal market-data agreement, a perpetual license,
 provider selection, policy implementation or approval to acquire data. No new data or
-runtime evidence was produced. Publication pending separate owner approval.
+runtime evidence was produced. Published with explicit owner approval in `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e`.
+[Actions 34047595837](https://github.com/T-bear/BigBrain/actions/runs/34047595837) passed all four jobs (backend, frontend, documentation, secrets).
 
 ## Evidence
 

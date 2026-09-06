@@ -25,9 +25,9 @@
 - D: deterministic quality gates, full regressions and final reconciliation.
 - Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
-- Current local checkpoint: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
+- Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Verified debt: selecting another backtest shows its summary beside the previous curve while its result is pending. Owner/architect must decide result-identity/loading/error behavior before correction/extraction; robustness has analogous source-level coupling to review. No new BB ID assigned.
-- Next: approve publication of documentation/characterization; separately review that defect and scope a backtest-detail checkpoint. No backend work or deployment.
+- Next: owner/architect review of that defect and a separately scoped backtest-detail checkpoint. No correction/extraction starts from this publication; no backend work or deployment.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

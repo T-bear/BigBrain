@@ -8,6 +8,8 @@ production build passed. Coverage includes all-nine detail
 close/reopen/refresh/cancellation, selected-result dependencies and a reproduced existing
 summary/curve mismatch. The mismatch test characterizes a defect, not an approved invariant;
 a future authorized fix must update its expectation. No refactor is claimed.
+Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` passed all CI jobs
+(Actions 34047595837); source/test content did not change during publication.
 
 
 ## BB-130C observation lifecycle characterization — 2026-09-06
