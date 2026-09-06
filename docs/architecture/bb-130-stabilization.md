@@ -20,7 +20,9 @@ defect stops the refactor for documented owner/architect review.
 
 Use the existing modular monolith, adapters and shared UI primitives. Every
 extraction must own a verified responsibility, not just reduce line count.
-The owner authorized this ordered sprint and BB-130A publication. Deployment is a
+The owner authorized this ordered sprint, BB-130A publication and subsequently the
+BB-130B implementation/evidence and final documentation publication. The B publication
+task explicitly stops before C; wait for the owner to resume C. Deployment is a
 separate action requiring explicit authorization. Sentinel security reconciliation
 records gaps; it does not accept weaker requirements or start a security redesign.
 

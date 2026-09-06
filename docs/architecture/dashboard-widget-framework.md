@@ -2,7 +2,7 @@
 
 ## Scope
 
-BB-130B (local checkpoint, 2026-09-06): request ownership follows the active view
+BB-130B (published/CI verified checkpoint, 2026-09-06): request ownership follows the active view
 inside the existing WidgetProvider. Modules load in Family, recovery in Home/Admin,
 Docker/system in Admin. System polling is one-in-flight every five seconds only in
 visible Admin and aborts on exit. Home has a local three-slot hydration queue: core

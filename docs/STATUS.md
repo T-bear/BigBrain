@@ -2,13 +2,15 @@
 
 ## BB-130B loading checkpoint — 2026-09-06
 
-- Senast uppdaterad: 2026-09-06, BB-130B local implementation and browser measurement.
-- Verifierad mot commit: `fddf3394591ac6c716090444276f60c0c564e873` plus the local B working tree; publication pending.
+- Senast uppdaterad: 2026-09-06, BB-130B publication and CI reconciliation.
+- Verifierad mot commit: `b8bb896aba88faba00c5fde46ffd947d847c63c0` (published implementation); baseline `fddf3394591ac6c716090444276f60c0c564e873`.
 - Runtime senast verifierad: 2026-09-06, isolated browser baseline and candidate preview against existing read APIs; no deployment or owner UX approval.
 
-B is **IMPLEMENTED LOCALLY / AUTOMATICALLY VERIFIED / BROWSER MEASURED**; publication
-and CI remain pending, so the phase is not yet complete under its DoD. A is complete;
-C/D remain planned. [Measured evidence and exact limits](reports/features/platform/bb-130b-loading-20260906.md)
+B is **COMPLETE / IMPLEMENTED / AUTOMATICALLY VERIFIED / BROWSER MEASURED / PUBLISHED / CI VERIFIED**.
+[Actions 34030095008](https://github.com/T-bear/BigBrain/actions/runs/34030095008) passed
+backend restore/Release build/full tests, frontend install/full tests/build, documentation
+and full-history secrets for the implementation SHA above. A/B are complete; C/D remain
+planned and have not started. The resolved recovery note is cleared in this documentation checkpoint. [Measured evidence and exact limits](reports/features/platform/bb-130b-loading-20260906.md)
 record Home/Finance/Media request graphs, classification and reproducible commands.
 Cold peak requests through response headers fell from 10/10/14 to 5/4/8. Compatible
 cached Finance peaked at 6 instead of 10 and still rendered before refresh completed.
@@ -26,9 +28,10 @@ Production Web build and documentation verification (221 Markdown / 90 unique BB
 pass, with unchanged CSS and a clean diff check. Gitleaks v8.28.0 found no leaks in
 the staged patch or all 225 commits. Firefox emitted script-timeout warnings seen
 at shutdown; timing origin/cause was not attributed, so full browser UX is not claimed. No local backend changes or test
-rerun; publication CI must retain backend/full Web/docs/full-history secrets gates.
-Next: obtain B commit/push approval, publish and verify CI
-before C. Deployment requires separate authorization; physical iPhone/PWA review remains.
+rerun was needed for the frontend-only change; the full backend suite passed in CI.
+Next, only when the owner resumes C: characterize Finance observation/cache/retry and
+extract its existing refresh ownership in a small behavior-preserving checkpoint.
+Do not start C as part of this publication task. Deployment requires separate authorization; physical iPhone/PWA review remains.
 
 ## BB-130 stabilization — 2026-09-05
 
