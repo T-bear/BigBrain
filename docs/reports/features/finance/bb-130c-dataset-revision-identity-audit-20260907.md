@@ -15,12 +15,16 @@ historical identifiers and source findings are included; no raw market rows or p
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — READ-ONLY AUDIT**. Bounded evidence handoff, not full
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED — READ-ONLY AUDIT**. Bounded evidence handoff, not full
 production compatibility certification. The owner requested reuse of completed work
 after interruption, explicit UNKNOWN where evidence is missing, and publication without
 expensive rediscovery. No new production queries were run during final reconciliation.
 The lineage defect remains **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**.
-No CI, architect acceptance or main merge of this audit is claimed.
+Owner/architect approved audit SHA `76a71d28f271b3a9c0e39b9da9b709035aa07aa0`
+and Option B as architectural direction. Merge `eb21b7c654e5adfaa25065a2264293b8ffbfed6d` passed
+[main CI](https://github.com/T-bear/BigBrain/actions/runs/34112859688) (backend, frontend, documentation, secrets).
+Approval does not authorize an identity correction. No historical rekeying is authorized;
+no alias layer is justified by current evidence.
 
 ## Evidence
 
@@ -200,7 +204,8 @@ The probe's final Release build passed with zero warnings/errors after matching 
 repository's explicit SQLite native-library pin (2.1.12). Its first temporary project
 omitted that pin and restore warned on transitive 2.1.11; no repository dependency
 was changed and no audit correctness claim depends on suppressing the warning.
-No unrelated full suite, deployment or CI success is claimed.
+Local verification did not repeat unrelated suites. The subsequent main CI above passed
+full backend and frontend verification. No deployment was performed.
 
 ## Security
 
@@ -220,7 +225,7 @@ owner/architect's next bounded decision.
 
 ## Resumption
 
-Review this audit branch's exact remote SHA; do not merge the blocker branch. Next
+The audit is accepted and merged; the blocker branch remains NOT MERGEABLE. Next
 recommended checkpoint, after explicit owner/architect approval, is to design the
 versioned invariant identity correction with legacy replay/duplicate handling and
 the single-revision recomputation above if needed to settle compatibility. Do not

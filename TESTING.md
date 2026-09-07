@@ -2,7 +2,7 @@
 
 ## BB-130C revision identity audit — 2026-09-07
 
-The main-derived audit branch contains documentation only. The deliberately failing
+The accepted main-derived audit contains documentation only. The deliberately failing
 blocker regression stays on its non-mergeable branch. Relevant isolated-fixture command:
 
 ```sh
@@ -12,7 +12,9 @@ dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj -c Release --no-r
 Production inventory used ReadOnly SQLite and a read-only Finance volume mount;
 no application initialization. Exact artifact recomputation did not complete and
 is not test evidence. See [audit classifications and limits](docs/reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md).
-Result: 22/22 passed, 0 failed/skipped. No unrelated full suite or audit-branch CI claim.
+Result: 22/22 passed, 0 failed/skipped locally. Merge `eb21b7c654e5adfaa25065a2264293b8ffbfed6d`
+passed [main CI](https://github.com/T-bear/BigBrain/actions/runs/34112859688): backend Release build/full tests,
+frontend tests/build, documentation and full-history secrets scan.
 
 ## BB-130C backtest identity — merged and CI verified, 2026-09-07
 

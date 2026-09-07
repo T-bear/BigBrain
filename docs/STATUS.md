@@ -1,8 +1,8 @@
 # BigBrain Status
 
-## BB-130C identity audit — review candidate, 2026-09-07
+## BB-130C identity audit — merged and CI verified, 2026-09-07
 
-**REVIEW CANDIDATE ONLY — READ-ONLY AUDIT** on
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED — READ-ONLY AUDIT** from
 `bb-130c/dataset-revision-identity-audit`, from main
 `1d7f1f16a8afbfce7768dedc75df7660a9648985`. The accepted synthetic blocker remains
 on a separate non-mergeable branch. [Audit evidence and limits](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md):
@@ -10,7 +10,13 @@ on a separate non-mergeable branch. [Audit evidence and limits](reports/features
 feature revision/78,162 values. WIKI classification: 0 proven invariant-compatible,
 0 proven non-invariant, 1 UNKNOWN; 0 distinct-ID WIKI duplicate pairs. Full downstream
 and exact artifact recomputation did not complete. Option B is recommended, not implemented.
-No production writes, correction, extraction, merge or deployment. Finance RESEARCH / 0 SEK / NONE.
+Approved audit SHA `76a71d28f271b3a9c0e39b9da9b709035aa07aa0` merged as
+`eb21b7c654e5adfaa25065a2264293b8ffbfed6d`; [main CI](https://github.com/T-bear/BigBrain/actions/runs/34112859688) passed backend, frontend, documentation and secrets.
+Option B is the approved architectural direction: versioned future invariant identity,
+legacy IDs preserved. The culture-dependent defect remains unresolved; exact WIKI
+compatibility remains UNKNOWN. No historical rekeying authorized or alias layer justified.
+Intake extraction remains stopped pending a separately authorized correction checkpoint.
+No production writes, identity correction or deployment. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 

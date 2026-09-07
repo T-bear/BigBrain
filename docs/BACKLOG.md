@@ -5,9 +5,11 @@
 - **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at
   `8b597d1f95fe2dff109d378afe0a81433801c79a` is accepted as evidence; its branch is
   **BLOCKER HANDOFF — NOT MERGEABLE**, not an implementation baseline.
-- [Read-only audit candidate](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
-  recommends Option B (explicit future algorithm version; all legacy IDs preserved).
+- [Accepted read-only audit](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
+  is merged and main-CI verified; Option B is the approved direction (explicit future
+  invariant algorithm version; all legacy IDs preserved), not an implemented correction.
   Existing WIKI compatibility is UNKNOWN; no cross-provider duplicate guarantee is claimed.
+  No historical rekeying is authorized and no alias layer is justified by current evidence.
 - Next, only after authorization: settle the versioned identity/replay/duplicate contract,
   optionally completing one bounded original-artifact recomputation. Reuse completed
   inventory; no historical rekeying or speculative aliases. No new BB ID assigned.
