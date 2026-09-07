@@ -1,5 +1,17 @@
 # BigBrain Backlog
 
+## BB-130C canonical product metadata blocker — 2026-09-07
+
+- **BLOCKED — STABLE CANONICAL PRODUCT METADATA UNAVAILABLE**.
+  [Main-derived handoff](reports/features/finance/bb-130c-versioned-dataset-revision-identity-v2-20260907.md)
+  is docs-only and NOT MERGEABLE; earlier cross-candidate evidence remains non-mergeable.
+- Accepted future contract: version + source + product + content; candidate is provenance only.
+  Equivalent submissions share one canonical row set; different source/product remains separate.
+- Next decision: explicit authoritative product metadata, validation and missing-product policy,
+  retained without schema migration. No guessing from names/URLs or universal generic product.
+- V2 correction, culture and row-growth regressions remain unfinished; no historical rekeying,
+  aliases, deployment or intake extraction. No new BB ID assigned.
+
 ## BB-130C canonical identity blocker and bounded audit — 2026-09-07
 
 - **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at

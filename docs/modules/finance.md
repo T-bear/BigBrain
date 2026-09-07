@@ -1,5 +1,16 @@
 # Finance module
 
+## BB-130C future canonical identity — approved direction, implementation blocked
+
+Future v2 identity must bind algorithm version, canonical source, canonical product and
+canonical content. CandidateId is provenance/lifecycle only. Equivalent candidates must
+share one revision/row set; source/product differences remain distinct. Existing legacy
+IDs/observations are never rekeyed or reinterpreted; no migration or alias layer.
+[Metadata blocker](../reports/features/finance/bb-130c-versioned-dataset-revision-identity-v2-20260907.md):
+WIKI has WIKI/PRICES, but existing generic candidate/sidecar metadata lacks a stable canonical
+product contract. Implementation stops pending explicit metadata/validation authority.
+This is not provider activation, a new eligibility policy or permission to resume extraction.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 `useFinanceBacktestDetails` owns the existing backtest catalog/result read boundary.

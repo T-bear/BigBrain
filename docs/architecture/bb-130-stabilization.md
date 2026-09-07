@@ -68,6 +68,13 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-07 identity correction exception: owner/architect approved future versioned invariant
+canonical identity binding source + product + content, with candidate identity provenance-only
+and every legacy ID preserved. [Product metadata blocker](../reports/features/finance/bb-130c-versioned-dataset-revision-identity-v2-20260907.md)
+stops implementation: no safe generic product descriptor exists in current metadata. The
+culture and cross-candidate row-growth defects remain unresolved. No schema migration,
+aliasing, historical rekeying or intake extraction is authorized through this handoff.
+
 2026-09-07 bounded checkpoint: backtest catalog/result identity is isolated in
 `useFinanceBacktestDetails`. The selected result must match the loaded `runId`; pending
 and failed states render coherently without an old curve. Rapid stale completions are

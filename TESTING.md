@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C v2 product metadata blocker — 2026-09-07
+
+[Source-inspection handoff](docs/reports/features/finance/bb-130c-versioned-dataset-revision-identity-v2-20260907.md)
+contains documentation only. No new production/test code and no behavioral suite rerun.
+The previously accepted row-growth test (1 pass, 1 intentional failure) remains on
+`0dcb15b127652e692bbfa0e531baf557975bd619`, not in this main-derived branch.
+V2 deterministic serialization/storage tests and full correction gates are not complete.
+No green implementation or CI claim; status is BLOCKER HANDOFF — NOT MERGEABLE.
+
 ## BB-130C revision identity audit — 2026-09-07
 
 The accepted main-derived audit contains documentation only. The deliberately failing

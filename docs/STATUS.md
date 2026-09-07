@@ -1,5 +1,18 @@
 # BigBrain Status
 
+## BB-130C v2 source/product correction — metadata blocker, 2026-09-07
+
+**BLOCKER HANDOFF — NOT MERGEABLE** on `bb-130c/versioned-dataset-revision-identity-v2`,
+from main `3bf3bde9c1e2321972e6f31443d740d6b92341f9`.
+[Source evidence](reports/features/finance/bb-130c-versioned-dataset-revision-identity-v2-20260907.md)
+shows no existing safe generic canonical product descriptor. WIKI has WIKI/PRICES;
+CandidateId, URL and filename cannot be silently substituted for a product contract.
+The approved future identity binds version + canonical source + canonical product + content,
+with CandidateId only provenance/lifecycle. No implementation or tests changed; both culture
+and cross-candidate row-growth defects remain unresolved. Legacy WIKI compatibility UNKNOWN.
+No production data/schema change, rekeying, aliases or deployment. Intake extraction stopped;
+Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-130C identity audit — merged and CI verified, 2026-09-07
 
 **ACCEPTED / MERGED TO MAIN / CI VERIFIED — READ-ONLY AUDIT** from
