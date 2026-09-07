@@ -12,7 +12,7 @@
 
 ## Status
 
-REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. Candidate SHA is `83accda0c1f9778c1256fbd53f408ae74aa44249` on `bb-130c/backtest-result-identity`; owner/architect review and merge approval remain pending.
+REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. Candidate SHA is `81e5673e47899e459ad9f867e683c2370b76a971` on `bb-130c/backtest-result-identity`; owner/architect review and merge approval remain pending.
 
 ## Evidence
 
