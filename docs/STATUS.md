@@ -1,15 +1,16 @@
 # BigBrain Status
 
-## BB-130C backtest result identity — review candidate, 2026-09-07
+## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
-Branch `bb-130c/backtest-result-identity` is a pushed, tested review candidate at
-current pushed branch tip, from main
-`904694f3992400d4d58e587afd4832e0bf7f857a`. The backtest detail hook keeps catalog
+The approved branch `bb-130c/backtest-result-identity` was merged to main as
+`f0b4dbd73c50047c078227edff0bf9c0d5aa7bde`, from reviewed baseline
+`904694f3992400d4d58e587afd4832e0bf7f857a`. Main CI run
+`34082759615` passed all required jobs. The backtest detail hook keeps catalog
 selection, loaded result identity, loading/error/retry and cancellation together.
 Selecting B clears A's curve immediately; only a result whose `runId` matches the
-selected catalog entry is rendered. A→B→C stale completions are ignored. No merge,
-deployment or owner acceptance is claimed yet. [Evidence](reports/features/finance/bb-130c-backtest-result-identity-20260907.md).
-Full Web 191/191, production build and documentation/secrets gates passed. Review branch publication is complete; main remains unchanged.
+selected catalog entry is rendered. No deployment or scientific behavior change occurred.
+[Evidence](reports/features/finance/bb-130c-backtest-result-identity-20260907.md).
+Full Web 191/191, production build and documentation/secrets gates passed. Robustness remains outside this checkpoint.
 
 
 ## BB-130C research-detail characterization — published checkpoint, 2026-09-06
@@ -17,10 +18,10 @@ Full Web 191/191, production build and documentation/secrets gates passed. Revie
 [Characterization evidence](reports/features/finance/bb-130c-research-detail-characterization-20260906.md):
 59 focused tests pass against unchanged production code; full Web 190/190 and production
 build pass. Documentation verification passes (224 Markdown / 90 BB IDs). The nine first-level reads remain
-on demand; close/reopen and selected-result dependencies are mapped. A reproduced existing
-backtest display mismatch pairs a new selected summary with the previous curve while the
-new result is pending. Extraction is deferred for owner/architect review of identity/loading/
-error semantics. No production refactor or scientific-data change; C remains partial, D not
+on demand; close/reopen and selected-result dependencies are mapped. This characterization
+historically reproduced a backtest display mismatch pairing a new selected summary with the
+previous curve while the new result was pending. Extraction was deferred in that checkpoint;
+the later identity checkpoint corrected the defect. No scientific-data change; C remains partial, D not
 started. Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` passed
 [Actions 34047595837](https://github.com/T-bear/BigBrain/actions/runs/34047595837) across backend restore/Release build/full tests, frontend
 install/test/build, documentation and full-history secrets. Earlier observation checkpoint

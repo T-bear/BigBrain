@@ -68,16 +68,16 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
-2026-09-07 bounded review candidate: backtest catalog/result identity is isolated in
+2026-09-07 bounded checkpoint: backtest catalog/result identity is isolated in
 `useFinanceBacktestDetails`. The selected result must match the loaded `runId`; pending
 and failed states render coherently without an old curve. Rapid stale completions are
-ignored. Robustness remains separate pending review. The candidate is branch-only until
-owner/architect approval; no main merge or next checkpoint follows automatically.
+ignored. Robustness remains separate pending review. Merged to main and CI verified in
+`f0b4dbd73c50047c078227edff0bf9c0d5aa7bde` (Actions `34082759615`).
 
 2026-09-06 next bounded scope: owner-supplied Finance source documentation and research-detail
 characterization only unless a clean extraction is demonstrated. [Current characterization](../reports/features/finance/bb-130c-research-detail-characterization-20260906.md)
-reproduces a selected-summary/prior-result display mismatch; extraction is deferred pending
-owner/architect behavior review. No additional backend or provider scope is authorized.
+reproduced a selected-summary/prior-result display mismatch; the later identity checkpoint
+corrected that defect. No additional backend or provider scope is authorized.
 
 
 Work in small independently tested sub-checkpoints:

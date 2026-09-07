@@ -1,10 +1,10 @@
-# BB-130C — backtest result identity review candidate
+# BB-130C — backtest result identity merged checkpoint
 
 ## Metadata
 
 - Date: 2026-09-07.
 - Baseline main: `904694f3992400d4d58e587afd4832e0bf7f857a`.
-- Review branch: `bb-130c/backtest-result-identity`.
+- Review branch: `bb-130c/backtest-result-identity` (merged to main).
 - Scope: frontend backtest detail identity/loading only. No backend, calculation,
   persistence, schema, provider or deployment work.
 - Detta är en sanerad GitHub-version. No credentials, private identities, raw market
@@ -12,7 +12,7 @@
 
 ## Status
 
-REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. The current pushed tip of `bb-130c/backtest-result-identity` is awaiting owner/architect review and merge approval.
+ACCEPTED / MERGED TO MAIN / CI VERIFIED. Review SHA `e3f9ee6c84f28e12393e59bf52634d69dedbd69e` was merged to main as `f0b4dbd73c50047c078227edff0bf9c0d5aa7bde`; Actions run `34082759615` passed all required jobs. No deployment is claimed.
 
 ## Evidence
 
@@ -41,6 +41,7 @@ semantics; observation refresh does not restart detail reads.
 - Full Web suite: 191/191 in 26 files.
 - Production Web build: passed.
 - Documentation verification, diff checks and staged secrets scan: passed after final staging.
+- Main CI: Actions run `34082759615` passed backend, frontend, documentation and full-history secrets jobs.
 
 ## Security
 
@@ -57,5 +58,5 @@ robustness change is included here.
 
 ## Resumption
 
-Review this branch and the canonical recovery note. After branch push, stop; do not merge
-main or start another checkpoint. Merge requires explicit approval of the exact branch SHA.
+This checkpoint is merged and CI verified. The canonical recovery note is clear. Do not deploy
+or start another checkpoint until a new bounded checkpoint is explicitly planned.
