@@ -1,5 +1,19 @@
 # BigBrain Backlog
 
+## BB-130C canonical identity blocker and bounded audit — 2026-09-07
+
+- **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at
+  `8b597d1f95fe2dff109d378afe0a81433801c79a` is accepted as evidence; its branch is
+  **BLOCKER HANDOFF — NOT MERGEABLE**, not an implementation baseline.
+- [Read-only audit candidate](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
+  recommends Option B (explicit future algorithm version; all legacy IDs preserved).
+  Existing WIKI compatibility is UNKNOWN; no cross-provider duplicate guarantee is claimed.
+- Next, only after authorization: settle the versioned identity/replay/duplicate contract,
+  optionally completing one bounded original-artifact recomputation. Reuse completed
+  inventory; no historical rekeying or speculative aliases. No new BB ID assigned.
+- Intake extraction remains stopped; remaining C and D are incomplete. No fix or deployment
+  follows automatically from audit publication or acceptance.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 - Approved review branch `bb-130c/backtest-result-identity` was merged to main as

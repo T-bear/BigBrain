@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## BB-130C identity audit — review candidate, 2026-09-07
+
+**REVIEW CANDIDATE ONLY — READ-ONLY AUDIT** on
+`bb-130c/dataset-revision-identity-audit`, from main
+`1d7f1f16a8afbfce7768dedc75df7660a9648985`. The accepted synthetic blocker remains
+on a separate non-mergeable branch. [Audit evidence and limits](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md):
+145 canonical revisions inventoried; one WIKI revision/3,722 rows, referenced by one
+feature revision/78,162 values. WIKI classification: 0 proven invariant-compatible,
+0 proven non-invariant, 1 UNKNOWN; 0 distinct-ID WIKI duplicate pairs. Full downstream
+and exact artifact recomputation did not complete. Option B is recommended, not implemented.
+No production writes, correction, extraction, merge or deployment. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 The approved branch `bb-130c/backtest-result-identity` was merged to main as
