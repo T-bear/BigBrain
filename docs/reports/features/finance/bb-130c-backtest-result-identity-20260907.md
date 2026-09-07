@@ -12,7 +12,7 @@
 
 ## Status
 
-REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. Candidate SHA is `03ca688af83dfdbf75bf267dc604c33b5c8e65ce` on `bb-130c/backtest-result-identity`; owner/architect review and merge approval remain pending.
+REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. The current pushed tip of `bb-130c/backtest-result-identity` is awaiting owner/architect review and merge approval.
 
 ## Evidence
 
