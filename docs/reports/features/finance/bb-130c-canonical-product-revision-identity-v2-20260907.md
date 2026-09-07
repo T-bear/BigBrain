@@ -14,10 +14,12 @@ Detta är en sanerad GitHub-version. Only source findings and synthetic fixture 
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. The owner authorized the bounded
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**. The owner authorized the bounded
 Option B correction and explicit product metadata. Implementation and local verification
-are described below; no main acceptance, GitHub CI, deployment or runtime verification
-is claimed by branch publication. Intake responsibility extraction has not resumed.
+are described below. Candidate `90cdc22f4f4cde06bc957f816abab2f6b437d7e0` merged as
+`09cf880dc6b34416d6b1cc8e6cdd50f30e5280e1`; [main CI run 34140339378](https://github.com/T-bear/BigBrain/actions/runs/34140339378)
+passed backend, frontend, documentation and secrets. No deployment or runtime verification
+is claimed. Intake responsibility extraction has not resumed.
 
 ## Decisions and identity metadata
 
@@ -201,7 +203,7 @@ No Web build/test rerun is required for the additive local sidecar/candidate man
 Publication gates passed: `node scripts/verify-documentation.mjs` (227 Markdown files,
 90 unique backlog IDs), `git diff --check`, `git diff --cached --check`, and staged
 Gitleaks v8.28.0 (no leaks). Main remained at the required baseline; unrelated local
-files are excluded. GitHub CI has not been claimed for this review-only publication.
+files are excluded. The merge main CI run above passed all required jobs.
 
 ## Security
 

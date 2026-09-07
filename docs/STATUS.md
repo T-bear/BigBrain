@@ -1,18 +1,20 @@
 # BigBrain Status
 
-## BB-130C canonical product/revision v2 — review candidate, 2026-09-07
+## BB-130C canonical product/revision v2 — merged and CI verified, 2026-09-07
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN** on `bb-130c/canonical-product-revision-identity-v2`,
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED** from `bb-130c/canonical-product-revision-identity-v2`,
 from `3bf3bde9c1e2321972e6f31443d740d6b92341f9`.
 [Implementation contract/evidence](reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md):
 explicit product claim, invariant version/source/product/content hashing and consistent observation
 keys correct the future-promotion culture and cross-candidate defects on this branch. Existing
 legacy IDs/rows remain unchanged; exact production WIKI compatibility stays UNKNOWN.
 Local verification: focused 62/62, full API 640/640, Sentinel 32/32, Release build zero warnings/errors;
-three isolated CLI processes preserve the pinned synthetic identity and replay state. No CI claim.
+three isolated CLI processes preserve the pinned synthetic identity and replay state. Merge
+`90cdc22f4f4cde06bc957f816abab2f6b437d7e0` produced main `09cf880dc6b34416d6b1cc8e6cdd50f30e5280e1`;
+[main CI run 34140339378](https://github.com/T-bear/BigBrain/actions/runs/34140339378) passed all required jobs.
 No schema migration, aliases or deployment; Finance RESEARCH / 0 SEK / NONE. Owner-drop product
 is an identity claim only. Intake extraction is still deferred. Audit-era unresolved status below
-is historical main evidence; this candidate is not accepted or running in production.
+is now accepted and merged, but has not been deployed.
 
 ## BB-130C identity audit — merged and CI verified, 2026-09-07
 

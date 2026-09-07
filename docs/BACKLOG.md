@@ -1,11 +1,12 @@
 # BigBrain Backlog
 
-## BB-130C canonical product/revision v2 — candidate, 2026-09-07
+## BB-130C canonical product/revision v2 — merged and CI verified, 2026-09-07
 
 - [Bounded implementation](reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
-  resolves the future v2 contract on its review branch: explicit validated product, source/product/content
+  resolves the future v2 contract: explicit validated product, source/product/content
   hash and storage scope, stable cross-candidate counts, immutable legacy replay.
-- **REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**; architect review is next. Previous blocker branches
+- Approved candidate `90cdc22f4f4cde06bc957f816abab2f6b437d7e0` merged to main as
+  `09cf880dc6b34416d6b1cc8e6cdd50f30e5280e1`; main CI run `34140339378` passed. Previous blocker branches
   remain NOT MERGEABLE and are not implementation ancestors. No new BB ID.
 - Remaining: legacy WIKI compatibility UNKNOWN; no cross-version alias/dedup layer. No historical
   rekeying or migration. Intake extraction and other BB-130C/D work remain separately scoped.

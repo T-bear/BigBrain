@@ -69,7 +69,7 @@ to gather loading evidence.
 ## C — behavior-preserving code health
 
 2026-09-07 bounded correction exception: [canonical product and identity v2](../reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
-is a review candidate, not merged/deployed. Owner-authorized Option B binds version + normalized
+is merged and CI verified, not deployed. Owner-authorized Option B binds version + normalized
 source + explicit product + canonical content, uses the same observation scope, and retains every
 legacy ID. Existing manifests carry metadata; no DDL/migration/aliases. This corrects future
 promotion identity only and does not resume intake responsibility extraction.
