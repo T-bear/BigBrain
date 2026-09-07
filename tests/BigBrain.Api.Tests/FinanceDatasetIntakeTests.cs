@@ -65,6 +65,47 @@ public sealed class FinanceDatasetIntakeTests
         Assert.Throws<InvalidDataException>(()=>fixture.Store.InspectValidatePromote(WikiCandidate() with{CandidateId="unsafe-zip",OriginalFilename="unsafe.zip"},zip));
     }
 
+    // BLOCKER HANDOFF: unchanged production must not grow an immutable revision
+    // when equivalent canonical content arrives under another candidate identity.
+    [Theory]
+    [InlineData("NASDAQ-WIKI")]
+    [InlineData("SYNTHETIC-SOURCE")]
+    public void EquivalentCandidatesMustNotAppendRowsToAnExistingCanonicalRevision(string source)
+    {
+        var culture = CultureInfo.CurrentCulture;
+        var uiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            using var fixture = new IntakeFixture();
+            var candidate = WikiCandidate() with { SourceName = source, CandidateId = "equivalent-a" };
+            var csv = fixture.Write("equivalent.csv", CsvRows());
+            var first = fixture.Store.InspectValidatePromote(candidate, csv);
+            Assert.Equal("Promoted", first.Status);
+            Assert.Equal(2, first.PromotedObservationCount);
+            var replay = fixture.Store.InspectValidatePromote(candidate, csv);
+            Assert.Equal(first.CanonicalRevisionId, replay.CanonicalRevisionId);
+            Assert.Equal(2, fixture.Count("observations", "1=1"));
+
+            var second = fixture.Store.InspectValidatePromote(
+                candidate with { CandidateId = "equivalent-b" }, csv);
+            Assert.Equal("Promoted", second.Status);
+            Assert.Equal(first.ArtifactSha256, second.ArtifactSha256);
+            Assert.Equal(first.CanonicalRevisionId, second.CanonicalRevisionId);
+            Assert.Equal(1, fixture.Count("revisions", "1=1"));
+            Assert.Equal(1, fixture.Count("revisions", "observation_count=2"));
+            Assert.Equal(2, fixture.Count("dataset_candidates", "state='Promoted'"));
+            // WIKI passes; the generic source currently grows to four stored rows.
+            Assert.Equal(2, fixture.Count("observations", "1=1"));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = uiCulture;
+        }
+    }
+
     [Fact]
     public void UnknownUnderlyingRightsRemainManualReviewAndPublishNothing()
     {

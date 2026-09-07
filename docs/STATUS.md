@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## BB-130C v2 identity correction — blocked during characterization, 2026-09-07
+
+**BLOCKER HANDOFF — NOT MERGEABLE** on `bb-130c/versioned-dataset-revision-identity`,
+from main `3bf3bde9c1e2321972e6f31443d740d6b92341f9`.
+[New isolated evidence](reports/features/finance/bb-130c-versioned-dataset-revision-identity-20260907.md):
+equivalent non-WIKI candidates produce the same revision ID but grow its canonical row set
+from 2 to 4 while revision metadata still records 2. WIKI control passes (1 pass, 1 failure).
+No production code changed; v2 implementation stopped before its serialization contract
+was completed. Option B remains the direction; source/product/candidate identity needs
+architect review. Legacy WIKI compatibility remains UNKNOWN. No data/schema mutation,
+rekeying, aliases or deployment; Finance RESEARCH / 0 SEK / NONE. Intake extraction remains stopped.
+
 ## BB-130C identity audit — merged and CI verified, 2026-09-07
 
 **ACCEPTED / MERGED TO MAIN / CI VERIFIED — READ-ONLY AUDIT** from

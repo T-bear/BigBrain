@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-130C additional canonical identity blocker — 2026-09-07
+
+- **BLOCKED — CROSS-CANDIDATE CANONICAL REVISION ROW GROWTH**.
+  [Synthetic reproduction](reports/features/finance/bb-130c-versioned-dataset-revision-identity-20260907.md)
+  proves same-source equivalent non-WIKI candidates append duplicate rows beneath one revision ID.
+- The v2 correction branch is **BLOCKER HANDOFF — NOT MERGEABLE**, not implementation.
+- Next: architect/owner settles canonical content versus product identity and candidate provenance;
+  correction then requires separate bounded authorization from main. No choice or fix is smuggled
+  into versioned formatting. Existing culture blocker, UNKNOWN WIKI compatibility and intake stop remain.
+- No historical rekeying, speculative alias layer, migration or deployment. No new BB ID.
+
 ## BB-130C canonical identity blocker and bounded audit — 2026-09-07
 
 - **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at

@@ -19,17 +19,15 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## Current recovery state
+## Current blocker handoff state — 2026-09-07
 
-No interrupted run or pending audit review is active. The approved read-only audit
-`76a71d28f271b3a9c0e39b9da9b709035aa07aa0` was merged as
-`eb21b7c654e5adfaa25065a2264293b8ffbfed6d` and [main CI](https://github.com/T-bear/BigBrain/actions/runs/34112859688) passed all four jobs.
-The documentation reconciliation commit records this resolved publication state;
-its exact SHA and CI are available in main history and GitHub Actions.
-
-The culture-dependent identity defect remains unresolved, exact WIKI compatibility
-remains UNKNOWN, and intake extraction remains stopped. Option B is the approved
-architectural direction only: versioned future invariant identity preserving legacy IDs.
-No historical rekeying is authorized; no alias layer is justified. No correction or
-deployment occurred. Finance remains RESEARCH / 0 SEK / NONE. The next correction
-checkpoint requires separate authorization; no new checkpoint has started.
+Status: BLOCKER HANDOFF — NOT MERGEABLE
+Task: BB-130C versioned canonical dataset revision identity correction; stopped during required cross-candidate characterization.
+Baseline/source-of-truth SHA: 3bf3bde9c1e2321972e6f31443d740d6b92341f9; origin/main reverified unchanged.
+Git status: bb-130c/versioned-dataset-revision-identity is main-derived; publication commit identifies handoff SHA. Unrelated mockups and four ADR proposals preserved/excluded.
+Changed files: tests/BigBrain.Api.Tests/FinanceDatasetIntakeTests.cs; TESTING.md; docs/STATUS.md; docs/BACKLOG.md; docs/reports/REPORT-CATALOG.md; docs/reports/features/finance/bb-130c-versioned-dataset-revision-identity-20260907.md; docs/operations/codex-recovery.md.
+Completed and valid: baseline/pre-read/source inspection; isolated same-candidate and equivalent-candidate test. WIKI control passes. Generic same-source candidates share revision ID/checksum but append rows (2 to 4) while revisions.observation_count remains 2. No production code changed.
+Remaining: architect reviews source/product/content identity boundary before separately authorizing correction. V2 exact serialization/tests/implementation and full affected gates are not complete. Do not resume extraction or merge this blocker branch.
+Tests/builds already run and results: focused two-case theory compiled in Release; 1 passed, 1 failed, 0 skipped, intended failure expected 2 actual 4. Initial interrupted invocation result unavailable; sandbox rerun failed at MSBuild IPC; authorized unsandboxed run produced verified result. See report for publication gates. No green CI/full-build claim.
+Blockers/assumptions: canonical hash omits product/candidate but observation PK contains product, which is CandidateId for non-WIKI. Only synthetic data inspected; production occurrence unknown. Option B remains direction, no alias/rekey/migration; existing WIKI compatibility UNKNOWN. Finance RESEARCH / 0 SEK / NONE.
+Exact next action: architect review exact remote handoff SHA and decide source/product/candidate identity contract; any correction requires separate main-derived checkpoint authorization. No merge, deployment or new checkpoint automatically follows.

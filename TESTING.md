@@ -1,5 +1,15 @@
 # Testa BigBrain
 
+## BB-130C v2 correction blocker — 2026-09-07
+
+`EquivalentCandidatesMustNotAppendRowsToAnExistingCanonicalRevision` characterizes
+same-candidate replay and equivalent separate candidates under invariant culture.
+[Command and evidence](docs/reports/features/finance/bb-130c-versioned-dataset-revision-identity-20260907.md):
+**1 passed (WIKI), 1 failed (generic source), 0 skipped**, expected 2 observations, actual 4.
+This deliberate failing regression lives on a **BLOCKER HANDOFF — NOT MERGEABLE** branch.
+Production code is unchanged. Full correction/build/regression gates were not run after the
+mandatory stop; no green implementation or CI is claimed.
+
 ## BB-130C revision identity audit — 2026-09-07
 
 The accepted main-derived audit contains documentation only. The deliberately failing
