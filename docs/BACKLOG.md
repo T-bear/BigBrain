@@ -1,5 +1,17 @@
 # BigBrain Backlog
 
+## BB-130C intake responsibility extraction #1 — review checkpoint, 2026-09-07
+
+- [Quarantine path/payload-lifetime extraction](reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md) on
+  `bb-130c/intake-safe-artifact-boundary` from `44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e`.
+- Four new characterization tests pass before/after with the existing identity/research suites.
+  Candidate scope is one concrete filesystem collaborator; no schema/identity/API changes.
+- Await exact branch review and explicit merge approval. No deployment or next checkpoint.
+- Remaining: acquisition, artifact recording, parsing/validation, promotion and lifecycle/catalog
+  persistence; schema authority and other C/D work remain separate. A possible next bounded
+  task is CSV parsing characterization, only after separate scope approval. No new BB ID.
+
+
 ## BB-130C canonical product/revision v2 — merged and CI verified, 2026-09-07
 
 - [Bounded implementation](reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
