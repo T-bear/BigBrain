@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-130C dataset intake — BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY, 2026-09-07
+
+- **BLOCKER HANDOFF — NOT MERGEABLE**. Characterization reproduces different canonical revision IDs for identical
+  synthetic CSV bytes under invariant versus Swedish process culture. The hash input
+  in `FinanceDatasetIntakeStore.Promote` uses culture-sensitive decimal interpolation and calendar formatting.
+- [Evidence and exact failing test](reports/features/finance/bb-130c-dataset-intake-responsibilities-20260907.md).
+  No new BB ID assigned. No production impact or workbook/campaign impact is claimed.
+- Next: architect decision on identity compatibility and correction scope before
+  resuming this extraction. Preserve immutable evidence; do not silently repair IDs.
+  A–R characterization and extraction remain incomplete; C is partial and D not started.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 - Approved review branch `bb-130c/backtest-result-identity` was merged to main as

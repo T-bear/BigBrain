@@ -1,5 +1,14 @@
 # BigBrain Status
 
+## BB-130C dataset intake — BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY, 2026-09-07
+
+Baseline `1d7f1f16a8afbfce7768dedc75df7660a9648985`; handoff branch
+`bb-130c/dataset-intake-responsibilities`. A new isolated regression reproduces
+culture-dependent canonical CSV revision identity on unchanged production code.
+The required identity-equality assertion fails; extraction has stopped for architect
+review. [Blocker evidence](reports/features/finance/bb-130c-dataset-intake-responsibilities-20260907.md).
+Publication is **BLOCKER HANDOFF — NOT MERGEABLE**, not completed extraction or green implementation. No deployment or production-data change. Four pinned culture cases pass, including a Thai calendar difference; focused intake results are 21 passed / 1 deliberately failing determinism regression. The canonical recovery note records the handoff.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 The approved branch `bb-130c/backtest-result-identity` was merged to main as

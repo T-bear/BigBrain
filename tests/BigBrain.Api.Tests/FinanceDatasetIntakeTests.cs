@@ -59,6 +59,60 @@ public sealed class FinanceDatasetIntakeTests
     }
 
     [Fact]
+    public void IdenticalCsvPromotionKeepsRevisionIdentityAcrossProcessCultures()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            using var invariantFixture = new IntakeFixture();
+            using var swedishFixture = new IntakeFixture();
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            var invariant = invariantFixture.Store.InspectValidatePromote(
+                WikiCandidate(), invariantFixture.Write("wiki.csv", CsvRows()));
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("sv-SE");
+            var swedish = swedishFixture.Store.InspectValidatePromote(
+                WikiCandidate(), swedishFixture.Write("wiki.csv", CsvRows()));
+
+            Assert.Equal("Promoted", invariant.Status);
+            Assert.Equal("Promoted", swedish.Status);
+            Assert.Equal(invariant.ArtifactSha256, swedish.ArtifactSha256);
+            Assert.Equal(invariant.PromotedObservationCount, swedish.PromotedObservationCount);
+            Assert.Equal(invariant.CanonicalRevisionId, swedish.CanonicalRevisionId);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Theory]
+    [InlineData("", "wiki-dde8381ccbe9ccc5")]
+    [InlineData("en-US", "wiki-dde8381ccbe9ccc5")]
+    [InlineData("sv-SE", "wiki-3c39237eb91a02b8")]
+    [InlineData("th-TH", "wiki-f0b1622232dc5894")]
+    public void PromotionCultureCharacterizationPreservesArtifactAndStoredBars(string culture, string expectedRevision)
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            using var reference = new IntakeFixture();
+            using var contrasting = new IntakeFixture();
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            var baseline = reference.Store.InspectValidatePromote(WikiCandidate(), reference.Write("wiki.csv", CsvRows()));
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+            var result = contrasting.Store.InspectValidatePromote(WikiCandidate(), contrasting.Write("wiki.csv", CsvRows()));
+            Assert.Equal(baseline.ArtifactSha256, result.ArtifactSha256);
+            Assert.Equal(baseline.ArtifactBytes, result.ArtifactBytes);
+            Assert.Equal(baseline.PromotedObservationCount, result.PromotedObservationCount);
+            Assert.Equal(baseline.Status, result.Status);
+            Assert.Equal(baseline.PromotedSymbols, result.PromotedSymbols);
+            Assert.Equal(reference.StoredBars(), contrasting.StoredBars());
+            Assert.Equal(expectedRevision, result.CanonicalRevisionId);
+        }
+        finally { CultureInfo.CurrentCulture = originalCulture; }
+    }
+
+    [Fact]
     public void ZipTraversalIsRejectedBeforeExtraction()
     {
         using var fixture=new IntakeFixture();var zip=fixture.Zip("unsafe.zip",archive=>{var entry=archive.CreateEntry("../escape.csv");using var writer=new StreamWriter(entry.Open());writer.Write("ticker,date,open,high,low,close,volume\nAAPL,2024-01-02,1,1,1,1,1\n");});
@@ -217,6 +271,17 @@ public sealed class FinanceDatasetIntakeTests
         internal void ReadyZip(string name,Action<ZipArchive> write){Directory.CreateDirectory(Options.OwnerDropDirectory);var path=Path.Combine(Options.OwnerDropDirectory,name);using(var archive=ZipFile.Open(path,ZipArchiveMode.Create))write(archive);Drop(name+".ready","");}
         internal string Zip(string name,Action<ZipArchive> write){Directory.CreateDirectory(_root);var path=Path.Combine(_root,name);using var archive=ZipFile.Open(path,ZipArchiveMode.Create);write(archive);return path;}
         internal int Count(string table,string where){using var c=new Microsoft.Data.Sqlite.SqliteConnection(new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder{DataSource=Market.DatabasePath}.ToString());c.Open();using var x=c.CreateCommand();x.CommandText=$"SELECT COUNT(*) FROM {table} WHERE {where}";return Convert.ToInt32(x.ExecuteScalar(),CultureInfo.InvariantCulture);}
+        internal string[] StoredBars()
+        {
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder { DataSource = Market.DatabasePath }.ToString());
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT symbol,session_date,open,high,low,close,adjusted_close,volume FROM observations ORDER BY symbol,session_date";
+            using var reader = command.ExecuteReader();
+            var rows = new List<string>();
+            while (reader.Read()) rows.Add(string.Join('|', Enumerable.Range(0, reader.FieldCount).Select(i => Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture))));
+            return rows.ToArray();
+        }
         public void Dispose(){if(Directory.Exists(_root))Directory.Delete(_root,true);}
     }
 

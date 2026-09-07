@@ -1,5 +1,15 @@
 # Testa BigBrain
 
+## BB-130C dataset intake — BLOCKER HANDOFF — NOT MERGEABLE, 2026-09-07
+
+`IdenticalCsvPromotionKeepsRevisionIdentityAcrossProcessCultures` reproduces a
+pre-existing canonical CSV identity defect in two temporary databases: identical
+artifact bytes and promoted row counts, different revision IDs under invariant and
+`sv-SE` culture. Focused intake Release suite: 21 passed, 1 failed at ID equality, 0 skipped. Four pinned invariant/en-US/sv-SE/th-TH cases also compare stored bars; Thai calendar formatting is an additional source of mismatch.
+The failing regression is retained for the explicitly authorized blocker handoff.
+No extraction or full-suite equivalence verification is claimed; work stopped for
+architect review. [Evidence](docs/reports/features/finance/bb-130c-dataset-intake-responsibilities-20260907.md).
+
 ## BB-130C backtest identity — merged and CI verified, 2026-09-07
 
 The merged candidate tests A→B pending/success/failure, rapid A→B→C stale completion,

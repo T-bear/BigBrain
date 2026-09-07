@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C` — [Dataset intake partial characterization and lineage blocker — BLOCKER HANDOFF — NOT MERGEABLE](features/finance/bb-130c-dataset-intake-responsibilities-20260907.md)
+
 - `BB-130C` — [Backtest result identity merged checkpoint](features/finance/bb-130c-backtest-result-identity-20260907.md)
 
 - `BB-130C` — [Research-detail characterization and deferred extraction boundary](features/finance/bb-130c-research-detail-characterization-20260906.md)
