@@ -21,13 +21,13 @@ Noten får inte innehålla hemligheter, credentials, privata adresser, råa kän
 
 ## Current checkpoint state — 2026-09-07
 
-Status: REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN
+Status: ACCEPTED / MERGED TO MAIN / CI VERIFIED
 Task: BB-130C Dataset Intake Responsibility Extraction #1, raw quarantine path/payload lifetime.
 Baseline/source-of-truth SHA: 44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e.
-Git status: branch bb-130c/intake-safe-artifact-boundary from baseline main. Unrelated mockups and four ADR proposals preserved and excluded.
+Git status: implementation merged to main as `5a775b9f54784ea2f8562ea73299618ea7b0889f`; unrelated mockups and four ADR proposals preserved and excluded.
 Changed files: src/BigBrain.Api/Finance/FinanceDatasetIntake.cs; src/BigBrain.Api/Finance/FinanceDatasetQuarantine.cs; tests/BigBrain.Api.Tests/FinanceDatasetIntakeTests.cs; tests/BigBrain.Api.Tests/FinanceDataProtectionTests.cs; TESTING.md; docs/STATUS.md; docs/BACKLOG.md; docs/modules/finance.md; docs/architecture/bb-130-stabilization.md; docs/reports/REPORT-CATALOG.md; docs/reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md; this note.
 Completed and valid: initial reads reused; four characterization tests passed with unchanged production, then smallest physical quarantine collaborator extracted. SQL/state ordering, file metadata/hash stream lifetimes, parsing/acquisition/cancellation and v2 identity remain unchanged. No schema work, production data access or deployment.
-Remaining: architect/owner review and explicit merge approval of the exact remote branch SHA. No next checkpoint.
+Remaining: acquisition, parsing/validation, persistence and other BB-130C work remain separately scoped. No next checkpoint.
 Tests/builds already run and results: focused 66/66 before and after, zero failed/skipped. Release solution build zero warnings/errors. Full API 644/644 and Sentinel 32/32 passed, zero failures/skips. Documentation verification 228 Markdown / 90 BB IDs, diff/staged-diff and staged Gitleaks v8.28.0 passed with no leaks. First sandbox test attempt was blocked by MSBuild pipes before execution; authorized rerun passed.
 Blockers/assumptions: none. Known retained extracted files/partial behavior unchanged. Legacy production WIKI compatibility remains UNKNOWN. Prior blocker branches remain NOT MERGEABLE. Finance RESEARCH / 0 SEK / NONE.
-Exact next action: review the published branch tip (git ls-remote origin refs/heads/bb-130c/intake-safe-artifact-boundary) and the bounded report; exact verified remote SHA is supplied in the publication response. No merge until explicit approval of that SHA. Do not deploy or begin another checkpoint.
+Exact next action: retain main as source of truth and await a separately authorized next BB-130C checkpoint. Do not deploy or begin another checkpoint.

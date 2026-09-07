@@ -1,6 +1,6 @@
 # BigBrain Status
 
-## BB-130C intake quarantine boundary — review checkpoint, 2026-09-07
+## BB-130C intake quarantine boundary — merged and CI verified, 2026-09-07
 
 From baseline `44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e`, branch
 `bb-130c/intake-safe-artifact-boundary`. [Evidence and responsibility map](reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).
@@ -8,7 +8,9 @@ One concrete collaborator owns raw-payload paths, download disk gates and physic
 the store retains lifecycle SQL, checksum recording, parsing and promotion. Focused pre/post
 characterization passes 66/66. Full API 644/644, Sentinel 32/32 and Release build with zero
 warnings/errors pass. Final repository gates are recorded in the report/recovery.
-Review candidate only; not merged, CI verified, deployed or owner accepted. Finance
+Approved candidate `ef89c5e288085e3c2f717731f00b82bdce169ce3` merged as
+`5a775b9f54784ea2f8562ea73299618ea7b0889f`; main CI run `34157988954` passed all required jobs.
+No deployment or owner runtime verification. Finance
 RESEARCH / 0 SEK / NONE; schema, v2/legacy identity and scientific behavior unchanged.
 This is the first bounded intake extraction; remaining C/D work stays separate.
 

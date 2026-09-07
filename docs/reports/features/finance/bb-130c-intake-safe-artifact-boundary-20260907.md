@@ -11,8 +11,9 @@ Detta är en sanerad GitHub-version. Source inspection and isolated synthetic fi
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. Implemented and locally verified.
-The committed branch is published for owner/architect review; no merge approval is inferred.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**. Approved candidate `ef89c5e288085e3c2f717731f00b82bdce169ce3`
+merged as `5a775b9f54784ea2f8562ea73299618ea7b0889f`; main CI run `34157988954` passed backend,
+frontend, documentation and secrets. No deployment or runtime verification is claimed.
 - No deployment, runtime or owner acceptance. Finance **RESEARCH / 0 SEK / NONE**.
 
 ## Evidence
@@ -118,8 +119,8 @@ were not extracted together. Later persistence/schema/composition work and BB-13
 
 ## Resumption
 
-Next action: owner/architect review of this exact branch tip, then explicit approval before any
-merge. A possible next intake checkpoint is bounded CSV parsing characterization, separating
+Next action: retain main as source of truth. A possible next intake checkpoint is bounded CSV
+parsing characterization, separating
 format parsing from existing comparison/persistence only if a clean boundary is demonstrated.
 Do not start it automatically. Use [canonical recovery](../../../operations/codex-recovery.md)
 and [BB-130 plan](../../../architecture/bb-130-stabilization.md) for continuation.

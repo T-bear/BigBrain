@@ -1,12 +1,13 @@
 # Finance module
 
-## BB-130C intake quarantine boundary — review candidate only
+## BB-130C intake quarantine boundary — merged and CI verified, not deployed
 
 [Bounded responsibility/evidence](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).
 `FinanceDatasetQuarantine` owns raw payload paths, download disk-space checks and physical
 existence/deletion. FinanceDatasetIntakeStore retains SQL/lifecycle ordering, artifact checksum
 binding, parsing, validation and promotion. Owner ingress remains its existing separate boundary.
-No schema, v2/legacy ID, scientific or API contract changes. Not merged or deployed.
+No schema, v2/legacy ID, scientific or API contract changes. Merged as
+`5a775b9f54784ea2f8562ea73299618ea7b0889f`; main CI run `34157988954` passed. Not deployed.
 
 
 ## BB-130C canonical product/revision v2 — merged and CI verified, not deployed

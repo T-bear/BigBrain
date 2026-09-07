@@ -69,9 +69,10 @@ to gather loading evidence.
 ## C — behavior-preserving code health
 
 2026-09-07 first bounded intake extraction: [quarantine path/payload lifetime](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md)
-is a review checkpoint only. It isolates physical quarantine operations while preserving lifecycle,
-SQL, parsing, acquisition and identity behavior. No schema authority moves. Remaining intake and
-other C/D responsibilities remain separately authorized checkpoints.
+was merged as `5a775b9f54784ea2f8562ea73299618ea7b0889f` and main CI run `34157988954` passed.
+It isolates physical quarantine operations while preserving lifecycle, SQL, parsing, acquisition
+and identity behavior. No schema authority moves. Remaining intake and other C/D responsibilities
+remain separately authorized checkpoints; this change is not deployed.
 
 2026-09-07 bounded correction exception: [canonical product and identity v2](../reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
 is merged and CI verified, not deployed. Owner-authorized Option B binds version + normalized
