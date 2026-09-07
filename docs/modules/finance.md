@@ -1,5 +1,13 @@
 # Finance module
 
+## BB-130C backtest result identity — review candidate, 2026-09-07
+
+`useFinanceBacktestDetails` owns the existing backtest catalog/result read boundary.
+The selected catalog identity and loaded result identity must match. A new selection
+clears the prior curve and displays a busy state; failures retain the selected summary
+with a local retry and no visualization. Aborted or stale results cannot replace the
+current selection. This branch is review-only and not merged to main.
+
 BB-130C research-detail characterization (2026-09-06, published/CI verified): all nine read triggers and
 catalog/result ownership are mapped in [evidence](../reports/features/finance/bb-130c-research-detail-characterization-20260906.md).
 No extraction: reproduced backtest selected-summary/prior-curve mismatch awaits owner/architect

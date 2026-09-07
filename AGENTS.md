@@ -107,6 +107,25 @@ När ett uppdrag tillför långsiktigt relevant kunskap ska Codex skapa eller up
 
 ### Kompakt ägargodkännande vid stopp
 
+### Permanent checkpoint-branch workflow
+
+`main` är endast owner/architect-accepted, merged source of truth. Varje bounded
+implementation checkpoint arbetar på en separat branch skapad från verifierad
+`origin/main`, till exempel `bb-130c/backtest-result-identity`.
+
+En komplett, testad branch får pushas som **REVIEW CANDIDATE ONLY**. Det är inte
+acceptans i main, deployment, runtime approval eller tillstånd att fortsätta med
+nästa checkpoint. Codex stoppar efter branch-push. Merge till main får ske endast
+efter explicit owner approval av exakt granskad branch-SHA. Före merge verifieras
+att branch-SHA är oförändrad och att origin/main inte avancerat oväntat; annars
+stoppas arbetet för re-review. Efter merge pushas main, CI väntas in och verifieras,
+och status/recovery avstäms mot slut-SHA innan nästa branch skapas.
+
+Ingen force push används. En branch per checkpoint gäller; inga långlivade
+utvecklingsbrancher. GitHub-branch, kanonisk dokumentation och recovery-note ska
+räcka för arkitektgranskning utan terminalhistorik. Befintliga krav på separat
+deployment-, konto-, credential-, provider- och high-authority-godkännande gäller.
+
 När fortsatt arbete kräver ägarens godkännande ska det granskningsbara underlaget först
 vara färdigt och full teknisk återhämtningsstatus finnas i `docs/operations/codex-recovery.md`.
 Avsluta godkännandefrågan med följande kompakta block, endast dessa fält (utelämna
