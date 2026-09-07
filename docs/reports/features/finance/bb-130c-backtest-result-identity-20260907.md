@@ -12,8 +12,7 @@
 
 ## Status
 
-REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN. The candidate extracts one focused hook
-and is awaiting branch push and owner/architect review.
+REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN. Candidate SHA is `83accda0c1f9778c1256fbd53f408ae74aa44249` on `bb-130c/backtest-result-identity`; owner/architect review and merge approval remain pending.
 
 ## Evidence
 

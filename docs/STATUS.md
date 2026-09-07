@@ -2,12 +2,14 @@
 
 ## BB-130C backtest result identity — review candidate, 2026-09-07
 
-Branch `bb-130c/backtest-result-identity` is a tested review candidate from main
+Branch `bb-130c/backtest-result-identity` is a pushed, tested review candidate at
+`83accda0c1f9778c1256fbd53f408ae74aa44249`, from main
 `904694f3992400d4d58e587afd4832e0bf7f857a`. The backtest detail hook keeps catalog
 selection, loaded result identity, loading/error/retry and cancellation together.
 Selecting B clears A's curve immediately; only a result whose `runId` matches the
 selected catalog entry is rendered. A→B→C stale completions are ignored. No merge,
 deployment or owner acceptance is claimed yet. [Evidence](reports/features/finance/bb-130c-backtest-result-identity-20260907.md).
+Full Web 191/191, production build and documentation/secrets gates passed. Review branch publication is complete; main remains unchanged.
 
 
 ## BB-130C research-detail characterization — published checkpoint, 2026-09-06
