@@ -3,7 +3,7 @@
 ## BB-130C backtest result identity — review candidate, 2026-09-07
 
 - Branch `bb-130c/backtest-result-identity` contains pushed SHA
-  `81e5673e47899e459ad9f867e683c2370b76a971` with the bounded frontend correction and documentation reconciliation;
+  `03ca688af83dfdbf75bf267dc604c33b5c8e65ce` with the bounded frontend correction and documentation reconciliation;
   it is review-only and not merged to main. Full Web 191/191, build and repository gates pass.
 - The result-specific area now prevents summary/curve identity mixing, shows loading
   while B is pending, handles failure with retry, and ignores stale A/B completions.

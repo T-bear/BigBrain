@@ -3,7 +3,7 @@
 ## BB-130C backtest result identity — review candidate, 2026-09-07
 
 Branch `bb-130c/backtest-result-identity` is a pushed, tested review candidate at
-`81e5673e47899e459ad9f867e683c2370b76a971`, from main
+`03ca688af83dfdbf75bf267dc604c33b5c8e65ce`, from main
 `904694f3992400d4d58e587afd4832e0bf7f857a`. The backtest detail hook keeps catalog
 selection, loaded result identity, loading/error/retry and cancellation together.
 Selecting B clears A's curve immediately; only a result whose `runId` matches the
