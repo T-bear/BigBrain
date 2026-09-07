@@ -9,6 +9,35 @@ namespace BigBrain.Api.Tests;
 public sealed class FinanceDatasetIntakeTests
 {
     [Fact]
+    public async Task DownloadSizeGateRejectsBeforeCreatingPayloadAndRestartRejectsInterruptedCandidate()
+    {
+        using var fixture = new IntakeFixture();
+        var candidate = WikiCandidate() with { ExpectedBytes = fixture.Options.MaximumDownloadBytes + 1 };
+        var error = await Assert.ThrowsAsync<IOException>(() => fixture.Store.DownloadAsync(candidate, CancellationToken.None));
+        Assert.Equal("Dataset download blocked by configured size/disk safety gate.", error.Message);
+        var item = Assert.Single(fixture.Store.Catalog().Datasets);
+        Assert.Equal("Downloading", item.Status);
+        Assert.Equal(0, item.ArtifactBytes);
+        Assert.Empty(item.ArtifactSha256);
+        Assert.Empty(Directory.GetFileSystemEntries(fixture.Options.QuarantineDirectory));
+        var restarted = new FinanceDatasetIntakeStore(fixture.Market, fixture.Options);
+        var recovered = Assert.Single(restarted.Catalog().Datasets);
+        Assert.Equal("Rejected", recovered.Status);
+        Assert.Equal("interruptedBeforeValidation", recovered.PromotionDecision);
+    }
+
+    [Fact]
+    public async Task InvalidDownloadFilenameFailsBeforeNetworkOrPayloadCreation()
+    {
+        using var fixture = new IntakeFixture();
+        var candidate = WikiCandidate() with { OriginalFilename = " ", ExpectedBytes = 0 };
+        var error = await Assert.ThrowsAsync<ArgumentException>(() => fixture.Store.DownloadAsync(candidate, CancellationToken.None));
+        Assert.Equal("Invalid artifact filename.", error.Message);
+        Assert.Equal("Downloading", Assert.Single(fixture.Store.Catalog().Datasets).Status);
+        Assert.Empty(Directory.GetFileSystemEntries(fixture.Options.QuarantineDirectory));
+    }
+
+    [Fact]
     public void StateMachineRejectsSkippedAndTerminalTransitions()
     {
         DatasetCandidateStateMachine.EnsureTransition(DatasetCandidateState.Discovered,DatasetCandidateState.Downloading);

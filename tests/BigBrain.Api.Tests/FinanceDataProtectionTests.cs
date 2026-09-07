@@ -66,6 +66,49 @@ public sealed class FinanceDataProtectionTests
         _=new FinanceDatasetIntakeStore(fixture.Market,new(){QuarantineDirectory=Path.Combine(fixture.Root,"quarantine"),MinimumFreeBytesAfterDownload=0});Assert.Equal("PayloadDeleted",fixture.Intake.Catalog().Datasets.Single(x=>x.CandidateId=="crash").CleanupState);
     }
 
+    [Fact]
+    public void CleanupUsesBasenameRetainsExtractedFilesAndReconcilesPendingPayloadOnRestart()
+    {
+        using var fixture = new ProtectionFixture();
+        var rejected = fixture.RejectCandidate("retained", DatasetLicenseClass.Incompatible, DatasetEvidenceResult.Fail);
+        var payload = fixture.CopyIntoQuarantine(rejected.CandidateId, "retained.csv");
+        var extracted = Path.Combine(fixture.Root, "quarantine", rejected.CandidateId, "extracted", "rows.csv");
+        Directory.CreateDirectory(Path.GetDirectoryName(extracted)!);
+        File.WriteAllText(extracted, "retained extracted fixture");
+        fixture.Execute("UPDATE dataset_candidates SET filename='original/folder/retained.csv',cleanup_state='CleanupPending' WHERE candidate_id='retained'");
+        var restarted = new FinanceDatasetIntakeStore(fixture.Market, new() { QuarantineDirectory = Path.Combine(fixture.Root, "quarantine"), MinimumFreeBytesAfterDownload = 0 });
+        Assert.Equal("Retained", Assert.Single(restarted.Catalog().Datasets).CleanupState);
+        Assert.Equal(0, restarted.CleanupRejected(DateTimeOffset.MinValue).EligibleCandidates);
+        Assert.True(File.Exists(payload));
+        var cleanup = restarted.CleanupRejected(DateTimeOffset.UtcNow.AddDays(1));
+        Assert.Equal(1, cleanup.PayloadsDeleted);
+        Assert.Equal(rejected.ArtifactBytes, cleanup.BytesReleased);
+        Assert.False(File.Exists(payload));
+        Assert.True(File.Exists(extracted));
+        var after = Assert.Single(restarted.Catalog().Datasets);
+        Assert.Equal(rejected.ArtifactSha256, after.ArtifactSha256);
+        Assert.Equal(rejected.ArtifactBytes, after.ArtifactBytes);
+        Assert.True(after.ManifestRetained);
+        Assert.Equal("Rejected", after.Status);
+        Assert.Equal("PayloadDeleted", after.CleanupState);
+        Assert.True(restarted.CleanupRejected(DateTimeOffset.UtcNow.AddDays(1)).Idempotent);
+    }
+
+    [Fact]
+    public void CleanupMissingPayloadCompletesWithoutClaimingReleasedBytes()
+    {
+        using var fixture = new ProtectionFixture();
+        var rejected = fixture.RejectCandidate("absent", DatasetLicenseClass.Incompatible, DatasetEvidenceResult.Fail);
+        var cleanup = fixture.Intake.CleanupRejected(DateTimeOffset.UtcNow.AddDays(1));
+        Assert.Equal(1, cleanup.EligibleCandidates);
+        Assert.Equal(0, cleanup.PayloadsDeleted);
+        Assert.Equal(0, cleanup.BytesReleased);
+        var after = Assert.Single(fixture.Intake.Catalog().Datasets);
+        Assert.Equal("PayloadDeleted", after.CleanupState);
+        Assert.Equal(rejected.ArtifactSha256, after.ArtifactSha256);
+        Assert.True(after.ManifestRetained);
+    }
+
     private sealed class ProtectionFixture:IDisposable
     {
         private readonly string _root=Path.Combine(Path.GetTempPath(),"bb-protection-tests",Guid.NewGuid().ToString("N"));

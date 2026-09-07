@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C intake quarantine boundary — 2026-09-07
+
+[Commands and evidence](docs/reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).
+Four new tests characterize download size/filename failure timing and cleanup/restart retention.
+Focused intake/protection/identity/research suite passes **66/66 before and after extraction**.
+Release build passes with **zero warnings/errors**. Full API **644/644** and Sentinel **32/32**
+pass with zero failures/skips. Publication gate commands are recorded in the report. Existing v2 vectors and legacy fixtures are unchanged; isolated data only.
+
+
 ## BB-130C canonical product/revision identity v2 — 2026-09-07
 
 [Exact commands, vectors and scope](docs/reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md).

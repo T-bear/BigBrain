@@ -1,6 +1,15 @@
 # Finance module
 
-## BB-130C canonical product/revision v2 — review candidate only
+## BB-130C intake quarantine boundary — review candidate only
+
+[Bounded responsibility/evidence](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).
+`FinanceDatasetQuarantine` owns raw payload paths, download disk-space checks and physical
+existence/deletion. FinanceDatasetIntakeStore retains SQL/lifecycle ordering, artifact checksum
+binding, parsing, validation and promotion. Owner ingress remains its existing separate boundary.
+No schema, v2/legacy ID, scientific or API contract changes. Not merged or deployed.
+
+
+## BB-130C canonical product/revision v2 — merged and CI verified, not deployed
 
 [Canonical contract](../reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md):
 new candidates may supply CanonicalProduct; canonical promotion requires strict invariant ASCII
