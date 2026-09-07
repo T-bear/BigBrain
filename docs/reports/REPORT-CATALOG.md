@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C` — [Canonical revision identity compatibility audit — read-only review candidate](features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
+
 - `BB-130C` — [Backtest result identity merged checkpoint](features/finance/bb-130c-backtest-result-identity-20260907.md)
 
 - `BB-130C` — [Research-detail characterization and deferred extraction boundary](features/finance/bb-130c-research-detail-characterization-20260906.md)

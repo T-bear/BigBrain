@@ -107,6 +107,20 @@ När ett uppdrag tillför långsiktigt relevant kunskap ska Codex skapa eller up
 
 ### Kompakt ägargodkännande vid stopp
 
+### Blocker handoff — not mergeable
+
+Vid en reproducerbar befintlig korrekthets-, säkerhets-, vetenskaps- eller lineage-defekt
+som kräver stopp får Codex publicera en avgränsad blocker-branch med endast säkra
+karakteriseringstester och sanerad dokumentation/evidens. Status ska vara
+**BLOCKER HANDOFF — NOT MERGEABLE**. Avsiktligt felande karakterisering är tillåten
+om felet och testresultatet tydligt redovisas; det får aldrig kallas grön implementation.
+Ingen produktionskorrigering eller refaktor får följa med. Rapportera exakt verifierad
+remote-SHA och stoppa. ChatGPT/systemarkitekten granskar GitHub-underlaget; ägaren
+ska inte behöva klistra in terminalhistorik. En korrigering kräver ett separat uttryckligen
+auktoriserat checkpoint från verifierad main. Blocker-branchen får inte mergas till main.
+Main förblir accepterad source of truth; blocker-evidens ersätter den inte. Ingen force
+push och inget deployment-tillstånd följer av detta undantag. Orelaterat arbete bevaras.
+
 ### Permanent checkpoint-branch workflow
 
 `main` är endast owner/architect-accepted, merged source of truth. Varje bounded
