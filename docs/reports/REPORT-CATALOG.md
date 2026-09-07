@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C` — [Canonical product metadata and revision identity v2 — review candidate](features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
+
 - `BB-130C` — [Canonical revision identity compatibility audit — accepted, merged and CI verified](features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
 
 - `BB-130C` — [Backtest result identity merged checkpoint](features/finance/bb-130c-backtest-result-identity-20260907.md)

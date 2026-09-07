@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C canonical product/revision identity v2 — 2026-09-07
+
+[Exact commands, vectors and scope](docs/reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md).
+Focused identity/intake/protection/research-dataset suites: **62/62**, zero failures/skips.
+Release solution build: **0 warnings / 0 errors**. Full solution tests: API **640/640**,
+Sentinel **32/32**, zero failures/skips. Three isolated CLI processes verified persisted replay
+and fresh-process identity. Publication checks and exact scope are recorded in the report. Synthetic legacy ID/checksum remains unchanged; future IDs are explicitly v2.
+No production evidence is used. Web/API response shapes are unchanged; no Web rerun required.
+
 ## BB-130C revision identity audit — 2026-09-07
 
 The accepted main-derived audit contains documentation only. The deliberately failing

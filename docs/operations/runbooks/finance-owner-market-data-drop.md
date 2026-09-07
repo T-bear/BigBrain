@@ -40,7 +40,7 @@ macro/binary content, embeddings and external relationships. It reads stored cac
 only and never recalculates formulas. `EXPORT_MANIFEST` is required and checked against each
 historical sheet. Support sheets and `CURRENT_METADATA` do not become historical datasets.
 
-Optional sidecar fields are `sourceProvider`, `originalUrl`, `downloadedOn`,
+Optional sidecar fields are `sourceProvider`, `canonicalProduct`, `originalUrl`, `downloadedOn`,
 `licenseOrTermsUrl`, `declaredLicense`, `ownerNotes`, `expectedSymbols`, `expectedMarket`,
 `priceBasis`, `downloadedManually` and `permissionReference`. URLs must be absolute HTTP(S).
 For a ZIP containing exactly one market CSV, the same top-level basename sidecar may be embedded
@@ -48,6 +48,23 @@ as `<csv-basename>.metadata.json`; it is read with the archive safety limits. An
 file does not trigger intake—the ZIP itself still requires an external `<zip-filename>.ready`.
 `ownerRightsDecision: APPROVED_BY_OWNER` (or the legacy exact `OWNER_APPROVED` declaration plus an
 evidence reference) records owner policy only and never verifies external rights.
+
+## Canonical product identity claim — v2 review candidate, not deployed
+
+`canonicalProduct` is optional for owner research inspection and an identity claim only.
+If supplied, it and `sourceProvider` must trim to 1–64 ASCII letters/digits/dot/underscore/hyphen,
+starting with a letter/digit. Canonical IDs use invariant uppercase. No names, paths or URLs
+are inferred as product. For example, the known WIKI scope is `sourceProvider: NASDAQ-WIKI`
+and `canonicalProduct: PRICES`; this claim does not verify that the supplied data is WIKI.
+Unknown fields remain rejected; invalid specified identity fields give `invalidOrUnsafeSidecar`.
+
+The value is retained in existing candidate/manifest metadata. Changing the sidecar creates a
+new provenance candidate, never edits a historical canonical revision. No-product sidecars still
+enter the existing review/research path, but a future all-pass canonical promotion requires an
+explicit valid source/product. Product claims do not establish license, provenance, entitlement,
+corporate actions or scientific suitability. Owner drop never automatically promotes, with or
+without the new field. XLSX remains research-only; its research IDs/eligibility are unchanged.
+See the [v2 contract](../../reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md).
 
 ## Outcomes, restart and retry
 
