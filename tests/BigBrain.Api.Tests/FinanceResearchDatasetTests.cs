@@ -9,6 +9,24 @@ namespace BigBrain.Api.Tests;
 public sealed class FinanceResearchDatasetTests
 {
     [Fact]
+    public void CanonicalProductClaimIsRetainedWithoutCanonicalWorkbookPromotion()
+    {
+        using var fixture = new Fixture();
+        fixture.WriteReadyPackage("claim.zip");
+        var candidate = new ExternalDatasetCandidate("workbook-claim", "SOURCE", "https://example.test", "fixture", "claim.zip",
+            new(DatasetLicenseClass.Unknown, "UNKNOWN", "", new(2026, 9, 7), "fixture", DatasetEvidenceResult.Unknown, false, ""),
+            "fixture", DatasetPriceBasis.Unclear, DatasetSurvivorshipBias.SurvivorshipUnknown, CanonicalProduct: "PRICES");
+        _ = fixture.Store.InspectOwnerWorkbookForResearch(candidate, Path.Combine(fixture.Options.OwnerDropDirectory, "claim.zip"));
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder { DataSource = fixture.Market.DatabasePath }.ToString());
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT manifest_json FROM dataset_candidates WHERE candidate_id='workbook-claim'";
+        using var manifest = System.Text.Json.JsonDocument.Parse((string)command.ExecuteScalar()!);
+        Assert.Equal("PRICES", manifest.RootElement.GetProperty("canonicalProduct").GetString());
+        Assert.All(fixture.Store.Catalog().Datasets, x => Assert.Null(x.CanonicalRevisionId));
+    }
+
+    [Fact]
     public void EligibilitySeparatesOwnerApprovalExternalRightsAndSemanticPurpose()
     {
         var facts = new ResearchDatasetFacts(ResearchDatasetClass.DailyOhlcv,

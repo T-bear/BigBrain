@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-130C canonical product/revision v2 — candidate, 2026-09-07
+
+- [Bounded implementation](reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
+  resolves the future v2 contract on its review branch: explicit validated product, source/product/content
+  hash and storage scope, stable cross-candidate counts, immutable legacy replay.
+- **REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**; architect review is next. Previous blocker branches
+  remain NOT MERGEABLE and are not implementation ancestors. No new BB ID.
+- Remaining: legacy WIKI compatibility UNKNOWN; no cross-version alias/dedup layer. No historical
+  rekeying or migration. Intake extraction and other BB-130C/D work remain separately scoped.
+- No deployment, provider activation or scientific change. Canonical product never proves rights.
+
 ## BB-130C canonical identity blocker and bounded audit — 2026-09-07
 
 - **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at

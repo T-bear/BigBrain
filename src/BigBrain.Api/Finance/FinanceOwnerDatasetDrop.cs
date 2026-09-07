@@ -11,6 +11,7 @@ namespace BigBrain.Api.Finance;
 public sealed record OwnerDatasetDropMetadata
 {
     public string? SourceProvider { get; init; }
+    public string? CanonicalProduct { get; init; }
     public string? OriginalUrl { get; init; }
     public DateOnly? DownloadedOn { get; init; }
     public string? LicenseOrTermsUrl { get; init; }
@@ -200,7 +201,7 @@ internal sealed class FinanceOwnerDatasetDropScanner
                 false, Clean(metadata?.PermissionReference, 500) ?? ""),
             string.Join("; ", notes.Where(x => x is not null)), DatasetPriceBasis.Unclear,
             DatasetSurvivorshipBias.SurvivorshipUnknown, bytes, OwnerDecision(metadata),
-            Clean(metadata?.PermissionReference, 500) ?? "", Clean(metadata?.PriceBasis, 40)?.ToUpperInvariant() ?? "UNKNOWN");
+            Clean(metadata?.PermissionReference, 500) ?? "", Clean(metadata?.PriceBasis, 40)?.ToUpperInvariant() ?? "UNKNOWN", metadata?.CanonicalProduct);
     }
 
     private byte[]? ReadSidecarBytes(string sourcePath, string filename, string externalSidecarPath)
@@ -246,12 +247,17 @@ internal sealed class FinanceOwnerDatasetDropScanner
 
     private static void ValidateMetadata(OwnerDatasetDropMetadata metadata)
     {
-        var values = new[] { metadata.SourceProvider, metadata.OriginalUrl, metadata.LicenseOrTermsUrl,
+        var values = new[] { metadata.SourceProvider, metadata.CanonicalProduct, metadata.OriginalUrl, metadata.LicenseOrTermsUrl,
             metadata.DeclaredLicense, metadata.OwnerNotes, metadata.ExpectedMarket, metadata.PriceBasis,
             metadata.PermissionReference, metadata.OwnerRightsDecision }.Concat(metadata.ExpectedSymbols ?? []);
         if ((metadata.ExpectedSymbols?.Count ?? 0) > 100 || values.Any(x => x is { Length: > 2_000 }))
             throw new InvalidDataException("Sidecar exceeds field limits.");
         _ = Clean(metadata.SourceProvider, 120);
+        if (metadata.CanonicalProduct is not null)
+        {
+            _ = CanonicalDatasetRevisionIdentityV2.NormalizeIdentifier(metadata.SourceProvider);
+            _ = CanonicalDatasetRevisionIdentityV2.NormalizeIdentifier(metadata.CanonicalProduct);
+        }
         _ = Clean(metadata.DeclaredLicense, 240);
         _ = Clean(metadata.ExpectedMarket, 80);
         _ = Clean(metadata.PriceBasis, 40);

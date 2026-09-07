@@ -55,7 +55,7 @@ public sealed class FinanceDatasetIntakeTests
         var result=fixture.Store.InspectValidatePromote(candidate,csv);Assert.Equal("Promoted",result.Status);Assert.Equal(["AAPL","MSFT"],result.PromotedSymbols);Assert.NotNull(result.CanonicalRevisionId);
         var repeated=fixture.Store.InspectValidatePromote(candidate,csv);Assert.Equal(result.CanonicalRevisionId,repeated.CanonicalRevisionId);Assert.Equal(result.ArtifactSha256,repeated.ArtifactSha256);Assert.Equal(result.PromotedSymbols,repeated.PromotedSymbols);
         var changed=fixture.Write("changed.csv",File.ReadAllText(csv)+"AAPL,2016-01-05,101,103,100,102,900,0,1,101,103,100,102,900\n");Assert.Throws<InvalidDataException>(()=>fixture.Store.InspectValidatePromote(candidate,changed));
-        Assert.Equal(2,fixture.Count("observations","provider='NASDAQ-WIKI'"));Assert.Equal(1,fixture.Count("revisions","revision_id LIKE 'wiki-%'"));
+        Assert.Equal(2,fixture.Count("observations","provider='NASDAQ-WIKI'"));Assert.Equal(1,fixture.Count("revisions","revision_id LIKE 'dataset-v2-%'"));
     }
 
     [Fact]
@@ -204,7 +204,36 @@ public sealed class FinanceDatasetIntakeTests
     }
 
     private static DatasetValidationSummary Summary(IEnumerable<DatasetGateResult> gates)=>new([..gates],"sha256:test",100,1,new(2024,1,1),new(2024,6,1),0,0,0,DatasetComparisonClass.Consistent,[]);
-    private static ExternalDatasetCandidate WikiCandidate()=>new("wiki-fixture","NASDAQ-WIKI","https://github.com/example","GitHub Git LFS","wiki.csv",new(DatasetLicenseClass.PublicDomain,"Public domain","https://docs.data.nasdaq.com",new(2026,8,15),"fixture",DatasetEvidenceResult.Pass,true,"Nasdaq"),"fixture mirror",DatasetPriceBasis.RawAndAdjusted,DatasetSurvivorshipBias.SurvivorshipUnknown);
+
+    [Fact]
+    public void OwnerCanonicalProductIsOnlyAnIdentityClaimAndCannotPromote()
+    {
+        using var fixture = new IntakeFixture();
+        fixture.ReadyDrop("claim.csv", CsvRows());
+        fixture.Drop("claim.metadata.json", "{\"sourceProvider\":\"NASDAQ-WIKI\",\"canonicalProduct\":\" prices \",\"declaredLicense\":\"OWNER_APPROVED\",\"permissionReference\":\"OWNER_APPROVED_BY_OWNER_TEST\",\"priceBasis\":\"RAW\"}");
+        var item = Assert.Single(fixture.Scanner.ScanOnce()).Inspection!;
+        Assert.Equal("ApprovedByOwner", item.OwnerRightsDecision);
+        Assert.Equal("Unknown", item.ExternalRightsVerification);
+        Assert.Null(item.CanonicalRevisionId);
+        Assert.Equal(0, fixture.Count("observations", "1=1"));
+        Assert.Equal(item.CandidateId, Assert.Single(fixture.Scanner.ScanOnce()).CandidateId);
+    }
+
+    [Theory]
+    [InlineData("{\"sourceProvider\":\"SOURCE\",\"canonicalProduct\":\"../bad\"}")]
+    [InlineData("{\"sourceProvider\":\"Human Source Name\",\"canonicalProduct\":\"PRICES\"}")]
+    [InlineData("{\"sourceProvider\":\"SOURCE\",\"canonicalProduct\":\"PRICES\",\"unknownProductField\":true}")]
+    public void InvalidProductAndUnknownOwnerSidecarFieldsRemainFailClosed(string metadata)
+    {
+        using var fixture = new IntakeFixture();
+        fixture.ReadyDrop("claim.csv", CsvRows());
+        fixture.Drop("claim.metadata.json", metadata);
+        var result = Assert.Single(fixture.Scanner.ScanOnce());
+        Assert.Equal("Rejected", result.Status);
+        Assert.Equal("invalidOrUnsafeSidecar", result.Reason);
+        Assert.Empty(fixture.Store.Catalog().Datasets);
+    }
+    private static ExternalDatasetCandidate WikiCandidate()=>new("wiki-fixture","NASDAQ-WIKI","https://github.com/example","GitHub Git LFS","wiki.csv",new(DatasetLicenseClass.PublicDomain,"Public domain","https://docs.data.nasdaq.com",new(2026,8,15),"fixture",DatasetEvidenceResult.Pass,true,"Nasdaq"),"fixture mirror",DatasetPriceBasis.RawAndAdjusted,DatasetSurvivorshipBias.SurvivorshipUnknown,CanonicalProduct:"PRICES");
 
     private sealed class IntakeFixture:IDisposable
     {

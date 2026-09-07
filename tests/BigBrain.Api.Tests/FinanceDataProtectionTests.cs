@@ -90,7 +90,7 @@ public sealed class FinanceDataProtectionTests
         internal bool RevisionExists(string id){using var c=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=Market.DatabasePath}.ToString());c.Open();using var x=c.CreateCommand();x.CommandText="SELECT COUNT(*) FROM revisions WHERE revision_id=$id";x.Parameters.AddWithValue("$id",id);return Convert.ToInt32(x.ExecuteScalar(),CultureInfo.InvariantCulture)==1;}
         internal void Execute(string sql){using var c=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=Market.DatabasePath}.ToString());c.Open();using var x=c.CreateCommand();x.CommandText=sql;x.ExecuteNonQuery();}
         private string Write(string name,string content){Directory.CreateDirectory(_root);var path=Path.Combine(_root,name);File.WriteAllText(path,content);return path;}
-        private static ExternalDatasetCandidate Candidate(string id,string name,DatasetLicenseClass license,DatasetEvidenceResult provenance)=>new(id,"NASDAQ-WIKI","https://example.invalid","fixture",name,new(license,license.ToString(),"https://example.invalid",new(2026,8,15),"fixture",provenance,true,"fixture"),"fixture",DatasetPriceBasis.RawAndAdjusted,DatasetSurvivorshipBias.SurvivorshipUnknown);
+        private static ExternalDatasetCandidate Candidate(string id,string name,DatasetLicenseClass license,DatasetEvidenceResult provenance)=>new(id,"NASDAQ-WIKI","https://example.invalid","fixture",name,new(license,license.ToString(),"https://example.invalid",new(2026,8,15),"fixture",provenance,true,"fixture"),"fixture",DatasetPriceBasis.RawAndAdjusted,DatasetSurvivorshipBias.SurvivorshipUnknown,CanonicalProduct:"PRICES");
         public void Dispose(){if(Directory.Exists(_root))Directory.Delete(_root,true);}
     }
 }

@@ -21,7 +21,8 @@ public sealed record ExternalDatasetCandidate(string CandidateId, string SourceN
     string HostingPlatform, string OriginalFilename, DatasetRightsEvidence Rights, string Provenance,
     DatasetPriceBasis PriceBasis, DatasetSurvivorshipBias SurvivorshipBias, long? ExpectedBytes = null,
     DatasetOwnerRightsDecision OwnerRightsDecision = DatasetOwnerRightsDecision.NotProvided,
-    string OwnerRightsEvidence = "", string OwnerDeclaredPriceBasis = "UNKNOWN");
+    string OwnerRightsEvidence = "", string OwnerDeclaredPriceBasis = "UNKNOWN",
+    string? CanonicalProduct = null);
 
 public sealed record DatasetGateResult(DatasetGate Gate, DatasetEvidenceResult Result, string Code, string Detail);
 

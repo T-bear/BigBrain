@@ -1,5 +1,16 @@
 # Finance module
 
+## BB-130C canonical product/revision v2 — review candidate only
+
+[Canonical contract](../reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md):
+new candidates may supply CanonicalProduct; canonical promotion requires strict invariant ASCII
+source/product IDs. Normalized source/product and ordered content feed the explicit v2 hash and
+observation keys. Separate equivalent candidates share one revision/row set. WIKI keeps existing
+source key NASDAQ-WIKI and explicitly declares product PRICES. Old WIKI/PRICES rows remain untouched.
+The existing manifest stores claims/algorithm without schema changes. Product is never rights,
+provenance or suitability evidence. Owner-drop remains review-only. Legacy replay preserves stored
+IDs; there is no migration, alias layer or historical rewrite. Intake extraction remains deferred.
+
 ## BB-130C backtest result identity — merged and CI verified, 2026-09-07
 
 `useFinanceBacktestDetails` owns the existing backtest catalog/result read boundary.
