@@ -34,7 +34,7 @@ const operationsFixture:FinanceResearchOperationsStatus={operationsVersion:'fina
 
 const backtestCatalog: FinanceBacktestCatalog = {
   generatedAtUtc: '2026-09-06T12:00:00Z', operatingMode: 'RESEARCH', strategies: [],
-  runs: ['first', 'second'].map(id => ({
+  runs: ['first', 'second', 'third'].map(id => ({
     runId: id, checksum: `checksum-${id}`, strategyId: `strategy-${id}`, strategyVersion: 'v1',
     parameters: {}, costModel: 'fixture-cost', from: '2020-01-01', to: '2021-01-01',
     initialEquity: 100, finalEquity: 101, grossReturn: .01, netReturn: .01,
@@ -115,7 +115,25 @@ describe('Finance read-only observation UI', () => {
     expect(result.mock.calls[0][1]?.aborted).toBe(true)
   })
 
-  test('characterizes existing old backtest curve retained beside new selected summary until result settles', async () => {
+  test('rapid A to B to C ignores stale B completion and shows only C result', async () => {
+    vi.spyOn(api, 'getFinanceBacktests').mockResolvedValue(backtestCatalog)
+    const pending: Array<{ id: string; resolve: (value: FinanceBacktestResult) => void }> = []
+    const result = vi.spyOn(api, 'getFinanceBacktest').mockImplementation(id => new Promise(resolve => { pending.push({ id, resolve }) }))
+    render(<FinanceObservation initialSnapshot={empty} />)
+    setResearchOpen(true)
+    await waitFor(() => expect(result).toHaveBeenCalledTimes(1))
+    fireEvent.click(screen.getByRole('button', { name: /strategy-second/ }))
+    fireEvent.click(screen.getByRole('button', { name: /strategy-third/ }))
+    await waitFor(() => expect(result).toHaveBeenCalledTimes(3))
+    await act(async () => { pending[1].resolve({ ...backtestResultFixture, runId: 'second', checksum: 'checksum-second' }) })
+    expect(screen.getByText('strategy-third / v1')).toBeVisible()
+    expect(screen.queryByLabelText('Equity curve och drawdown')).not.toBeInTheDocument()
+    await act(async () => { pending[2].resolve({ ...backtestResultFixture, runId: 'third', checksum: 'checksum-third' }) })
+    expect(screen.getByLabelText('Equity curve och drawdown')).toBeVisible()
+    expect(screen.getByText('third / checksum-third')).toBeVisible()
+  })
+
+  test('backtest selection never pairs new summary with prior curve while pending or failed', async () => {
     vi.spyOn(api, 'getFinanceBacktests').mockResolvedValue(backtestCatalog)
     let rejectSecond: (reason: Error) => void = () => {}
     const result = vi.spyOn(api, 'getFinanceBacktest').mockResolvedValueOnce(backtestResultFixture)
@@ -127,8 +145,8 @@ describe('Finance read-only observation UI', () => {
     expect(result.mock.calls[1][0]).toBe('second')
     expect(result.mock.calls[0][1]?.aborted).toBe(true)
     expect(screen.getByText('second / checksum-second')).toBeVisible()
-    // Existing behavior, not approval: the first run's curve has no identity/loading guard.
-    expect(screen.getByLabelText('Equity curve och drawdown')).toBeVisible()
+    // Regression: selected B must never retain A's visualization.
+    expect(screen.queryByLabelText('Equity curve och drawdown')).not.toBeInTheDocument()
     await act(async () => { rejectSecond(new Error('unavailable')) })
     expect(screen.queryByLabelText('Equity curve och drawdown')).not.toBeInTheDocument()
     expect(screen.getByText('second / checksum-second')).toBeVisible()

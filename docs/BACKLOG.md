@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-130C backtest result identity — review candidate, 2026-09-07
+
+- Branch `bb-130c/backtest-result-identity` contains the bounded frontend correction; local Finance/Web tests and build pass;
+  it is review-only and not merged to main.
+- The result-specific area now prevents summary/curve identity mixing, shows loading
+  while B is pending, handles failure with retry, and ignores stale A/B completions.
+- Robustness detail has analogous coupling but is intentionally untouched.
+- Next: owner/architect review of the exact branch SHA; merge only after approval and
+  main/branch re-verification under the checkpoint workflow.
+
+
 ## Finance source evidence update — 2026-09-06
 
 - Alpaca's six private storage/research questions are answered by [owner-supplied support

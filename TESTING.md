@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-130C backtest identity review candidate — 2026-09-07
+
+The branch candidate tests A→B pending/success/failure, rapid A→B→C stale completion,
+close/reopen, refresh independence and unmount cancellation. The focused Finance suite
+passes 35/35; full Web and build are required before branch publication. The prior
+summary/curve mismatch test is now a regression test for the corrected identity rule.
+
 ## BB-130C research-detail characterization — 2026-09-06
 
 [Evidence](docs/reports/features/finance/bb-130c-research-detail-characterization-20260906.md)
