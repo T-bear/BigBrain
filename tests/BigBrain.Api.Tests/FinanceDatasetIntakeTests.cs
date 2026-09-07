@@ -8,6 +8,40 @@ namespace BigBrain.Api.Tests;
 
 public sealed class FinanceDatasetIntakeTests
 {
+    // BLOCKER HANDOFF — NOT MERGEABLE: deliberately failing on unchanged production.
+    // A recognized optional column must not disappear solely because it is column zero.
+    [Theory]
+    [InlineData("ex-dividend")]
+    [InlineData("split_ratio")]
+    public void CorporateActionEvidenceMustSurviveCsvHeaderReordering(string firstColumn)
+    {
+        using var fixture = new IntakeFixture();
+        var original = fixture.Write("control.csv",
+            "ticker,date,open,high,low,close,volume,ex-dividend,split_ratio\n" +
+            "AAPL,2024-01-02,100,102,99,101,1000,1.25,2\n");
+        var reordered = fixture.Write("reordered.csv", firstColumn == "ex-dividend"
+            ? "ex-dividend,ticker,date,open,high,low,close,volume,split_ratio\n1.25,AAPL,2024-01-02,100,102,99,101,1000,2\n"
+            : "split_ratio,ticker,date,open,high,low,close,volume,ex-dividend\n2,AAPL,2024-01-02,100,102,99,101,1000,1.25\n");
+        var control = fixture.Store.InspectValidatePromote(
+            WikiCandidate() with { CandidateId = "actions-control", OriginalFilename = "control.csv" }, original);
+        var result = fixture.Store.InspectValidatePromote(
+            WikiCandidate() with { CandidateId = "actions-reordered", OriginalFilename = "reordered.csv" }, reordered);
+
+        Assert.Equal("Promoted", control.Status);
+        Assert.Equal("Promoted", result.Status);
+        Assert.Equal(control.CanonicalRevisionId, result.CanonicalRevisionId);
+        Assert.Equal(1, result.PromotedObservationCount);
+        Assert.Equal(1, fixture.Count("observations", "provider='NASDAQ-WIKI'"));
+        Assert.NotEqual(control.ArtifactSha256, result.ArtifactSha256); // Reordered bytes, identical named values.
+        Assert.Equal(1, fixture.Count("dataset_corporate_actions",
+            "candidate_id='actions-control' AND ex_dividend='1.25' AND split_ratio='2'"));
+        var lostField = firstColumn == "ex-dividend" ? "ex_dividend" : "split_ratio";
+        Assert.Equal(1, fixture.Count("dataset_corporate_actions",
+            "candidate_id='actions-reordered' AND " + lostField + "=''")); // Reproduced data loss.
+        Assert.Equal(1, fixture.Count("dataset_corporate_actions",
+            "candidate_id='actions-reordered' AND ex_dividend='1.25' AND split_ratio='2'"));
+    }
+
     [Fact]
     public async Task DownloadSizeGateRejectsBeforeCreatingPayloadAndRestartRejectsInterruptedCandidate()
     {

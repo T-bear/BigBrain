@@ -1,5 +1,14 @@
 # Finance module
 
+## BB-130C CSV parsing blocker — characterization only
+
+[Synthetic evidence](../reports/features/finance/bb-130c-intake-csv-parsing-boundary-20260907.md)
+shows optional corporate-action values are lost at CSV column zero. The parser uses a positive
+index check, conflating a valid first column with an absent field. Candidate promotion succeeds;
+this is a correctness defect, not a new parsing contract. Production incidence is UNKNOWN.
+Extraction #2 stopped before production edits. BLOCKER HANDOFF — NOT MERGEABLE; no identity,
+schema, rights, scientific or runtime change. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-130C intake quarantine boundary — merged and CI verified, not deployed
 
 [Bounded responsibility/evidence](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).

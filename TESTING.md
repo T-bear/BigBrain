@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C CSV optional-column blocker — 2026-09-07
+
+**BLOCKER HANDOFF — NOT MERGEABLE**. One two-case test in FinanceDatasetIntakeTests deliberately
+fails on unchanged production: optional ex-dividend/split_ratio evidence disappears at column zero.
+[Exact fixture assertions, commands and scope](docs/reports/features/finance/bb-130c-intake-csv-parsing-boundary-20260907.md).
+Do not treat this branch as green implementation or merge it. No production data is accessed.
+Focused intake/protection/identity/research suite: **66 passed, 2 deliberately failed, 0 skipped**.
+No full solution/Sentinel/Web rerun: mandatory stop occurred before production extraction.
+
 ## BB-130C intake quarantine boundary — 2026-09-07
 
 [Commands and evidence](docs/reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).

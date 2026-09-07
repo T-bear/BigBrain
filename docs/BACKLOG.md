@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-130C CSV parsing extraction #2 — correctness blocker, 2026-09-07
+
+- **BLOCKER HANDOFF — NOT MERGEABLE** on `bb-130c/intake-csv-parsing-boundary` from
+  `81c80d1c7e361086b5871de512b5ef3855a70f49`.
+- [Reproduced optional-column evidence loss](reports/features/finance/bb-130c-intake-csv-parsing-boundary-20260907.md):
+  ex-dividend or split_ratio in column zero is treated as absent despite successful promotion.
+- Next: architect review of exact blocker SHA and separately authorized correction scope.
+  DoD must cover header-order preservation, existing canonical IDs/rows and candidate evidence;
+  no historical rewrite or identity redesign is authorized. Production impact UNKNOWN.
+- No extraction, schema/production change or deployment. No new BB ID; remaining C/D stays separate.
+
 ## BB-130C intake responsibility extraction #1 — merged and CI verified, 2026-09-07
 
 - [Quarantine path/payload-lifetime extraction](reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md) on

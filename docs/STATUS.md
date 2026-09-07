@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-130C CSV parsing extraction #2 — blocked, 2026-09-07
+
+**BLOCKER HANDOFF — NOT MERGEABLE**, branch `bb-130c/intake-csv-parsing-boundary`, from
+`81c80d1c7e361086b5871de512b5ef3855a70f49`. [Synthetic characterization](reports/features/finance/bb-130c-intake-csv-parsing-boundary-20260907.md)
+reproduces loss of ex-dividend/split-ratio evidence when that optional CSV field is column zero.
+Both candidates still promote; canonical v2 identity/row count stays equal. No production change
+or extraction was made. Production incidence is UNKNOWN. Tests deliberately fail the preservation
+invariant; this is not a green implementation. Finance RESEARCH / 0 SEK / NONE; no deployment.
+Await architect blocker review and separately authorized correction before resuming extraction.
+
 ## BB-130C intake quarantine boundary — merged and CI verified, 2026-09-07
 
 From baseline `44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e`, branch
