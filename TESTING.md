@@ -1,5 +1,13 @@
 # Testa BigBrain
 
+## BB-130C Finance persistence characterization — review checkpoint, 2026-09-08
+
+[Ownership and test evidence](docs/reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md).
+One new isolated regression freezes non-EODHD exact-lineage feature/backtest persistence with
+acquisition disabled, restart reload, shared-writer idempotency and checksum-conflict rejection.
+Focused **187/187**, API **659/659**, Sentinel **32/32**, zero failures/skips; Release **0 warnings/errors**.
+No production/schema change. Remaining persistence coverage gaps are distinguished in the report.
+
 ## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
 
 [Characterization and commands](docs/reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md).

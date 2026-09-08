@@ -200,6 +200,39 @@ public sealed class CanonicalDatasetRevisionIdentityTests
             new(DatasetLicenseClass.PublicDomain, "Public domain", "https://example.test/rights", new(2026, 9, 7), "fixture", DatasetEvidenceResult.Pass, true, "fixture"),
             "fixture", DatasetPriceBasis.RawAndAdjusted, DatasetSurvivorshipBias.SurvivorshipUnknown, CanonicalProduct: product);
 
+    [Fact]
+    public void NonEodhdEvidenceUsesSharedPersistenceWithoutAcquisitionAndSurvivesRestart()
+    {
+        using var fixture = new Fixture();
+        var canonical = fixture.Store.InspectValidatePromote(Candidate("neutral"), fixture.Path);
+        var memory = fixture.Memory();
+        // Default BuildFeatures still means EODHD; explicit lineage selects the non-EODHD revision.
+        Assert.Throws<InvalidOperationException>(() => memory.BuildFeatures());
+        var features = memory.BuildFeatures([canonical.CanonicalRevisionId!]);
+        Assert.Equal([Revision], features.SourceMarketRevisions);
+        memory.BuildReferenceBacktests();
+        var runs = memory.BacktestCatalog().Runs;
+        Assert.Equal(6, runs.Count);
+        var before = runs.Select(x => JsonSerializer.Serialize(memory.BacktestResult(x.RunId))).ToArray();
+        var counts = fixture.Scalar("SELECT (SELECT COUNT(*) FROM backtest_runs)||'|'||(SELECT COUNT(*) FROM backtest_events)||'|'||(SELECT COUNT(*) FROM backtest_fills)||'|'||(SELECT COUNT(*) FROM backtest_equity)");
+
+        var restarted = fixture.Memory();
+        Assert.True(restarted.BuildFeatures([Revision]).Idempotent);
+        Assert.Equal(features.RevisionId, restarted.FeatureSnapshot(null, null, null, null, null, 10).Revision!.RevisionId);
+        Assert.Equal(before, restarted.BacktestCatalog().Runs.Select(x => JsonSerializer.Serialize(restarted.BacktestResult(x.RunId))));
+        Assert.Null(restarted.BacktestResult("missing-fixture-run"));
+        using var connection = fixture.Connection();
+        var result = restarted.BacktestResult(runs[0].RunId)!;
+        Assert.Equal([Revision], result.Configuration.MarketRevisionIds);
+        Assert.Equal(features.RevisionId, result.Configuration.FeatureRevisionId);
+        Assert.False(EodhdMarketMemory.PersistBacktest(connection, result));
+        Assert.Throws<InvalidOperationException>(() => EodhdMarketMemory.PersistBacktest(connection, result with { Checksum = "sha256:synthetic-conflict" }));
+        Assert.Equal(counts, fixture.Scalar("SELECT (SELECT COUNT(*) FROM backtest_runs)||'|'||(SELECT COUNT(*) FROM backtest_events)||'|'||(SELECT COUNT(*) FROM backtest_fills)||'|'||(SELECT COUNT(*) FROM backtest_equity)"));
+        Assert.Equal(before[0], JsonSerializer.Serialize(restarted.BacktestResult(result.RunId)));
+        Assert.Equal("0", fixture.Scalar("SELECT COUNT(*) FROM acquisitions"));
+        Assert.Equal("0", fixture.Scalar("SELECT COUNT(*) FROM observations WHERE provider='EODHD'"));
+    }
+
     private sealed class CultureScope : IDisposable
     {
         private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
@@ -225,6 +258,19 @@ public sealed class CanonicalDatasetRevisionIdentityTests
         internal string Path { get; }
         internal FinanceDatasetIntakeStore Store { get; }
         internal FinanceDatasetIntakeStore Restart() => new(_market, _options);
+        internal EodhdMarketMemory Memory()
+        {
+            Assert.False(_market.Enabled);
+            Assert.False(_market.AccountActive);
+            Assert.True(string.IsNullOrEmpty(_market.ApiToken));
+            return new(_market);
+        }
+        internal SqliteConnection Connection()
+        {
+            var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = _market.DatabasePath }.ToString());
+            connection.Open();
+            return connection;
+        }
         internal string Scalar(string sql)
         {
             using var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = _market.DatabasePath }.ToString()); connection.Open();
