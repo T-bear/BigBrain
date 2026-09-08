@@ -122,8 +122,57 @@ public sealed class FinanceDatasetIntakeTests
     [Fact]
     public void CsvParserHandlesQuotesAndRejectsUnterminatedField()
     {
-        Assert.Equal(["AAPL","hello, world","3"],FinanceDatasetIntakeStore.Csv("AAPL,\"hello, world\",3"));
-        Assert.Throws<InvalidDataException>(()=>FinanceDatasetIntakeStore.Csv("AAPL,\"broken"));
+        Assert.Equal(["AAPL","hello, world","3"],FinanceDatasetCsvTokenizer.Tokenize("AAPL,\"hello, world\",3"));
+        Assert.Throws<InvalidDataException>(()=>FinanceDatasetCsvTokenizer.Tokenize("AAPL,\"broken"));
+    }
+
+    [Theory]
+    [InlineData("", new[] { "" })]
+    [InlineData(",,", new[] { "", "", "" })]
+    [InlineData(" AAPL ,\"hello, world\",", new[] { " AAPL ", "hello, world", "" })]
+    [InlineData("\"a\"\"b\",\"\"", new[] { "a\"b", "" })]
+    [InlineData("\"åäö\",2", new[] { "åäö", "2" })]
+    public void CsvTokenizationPreservesRawFields(string line, string[] expected)
+    {
+        Assert.Equal(expected, FinanceDatasetCsvTokenizer.Tokenize(line));
+    }
+
+    [Theory]
+    [InlineData("ticker,date,open,high,low,close\n", "CSV is missing required field volume.")]
+    [InlineData("ticker,date,open,high,low,close,volume\nAAPL,2024-01-02,100\n", "Malformed CSV field count at row 2.")]
+    [InlineData("ticker,date,open,high,low,close,volume\n\"AAPL,2024-01-02,100,102,99,101,1000\n", "Unterminated quoted CSV field.")]
+    public void CsvStructuralFailuresRetainValidationStateAndArtifact(string csv, string message)
+    {
+        using var fixture = new IntakeFixture();
+        var path = fixture.Write("wiki.csv", csv);
+        var error = Assert.Throws<InvalidDataException>(() => fixture.Store.InspectValidatePromote(WikiCandidate(), path));
+        Assert.Equal(message, error.Message);
+        var item = Assert.Single(fixture.Store.Catalog().Datasets);
+        Assert.Equal("Validating", item.Status);
+        using var artifact = File.OpenRead(path);
+        Assert.Equal(DatasetContentIdentity.Sha256(artifact), item.ArtifactSha256);
+        Assert.Equal(0, fixture.Count("observations", "1=1"));
+    }
+
+    [Fact]
+    public void CsvQuotedNormalizedHeadersAndValuesPreserveCanonicalContent()
+    {
+        using var fixture = new IntakeFixture();
+        var plain = fixture.Store.InspectValidatePromote(WikiCandidate(), fixture.Write("wiki.csv", CsvRows()));
+        var quoted = fixture.Write("quoted.csv", "\uFEFF\" TICKER \", Date ,OPEN,high,low,close,volume,adj_close,notes\n" +
+            "\"AAPL\",2024-01-02,1e2,102,99,101,1000,,\"hello, \"\"world\"\"\"\n" +
+            "MSFT,2024-01-02,50,51,49,50.5,2000, ,\"\"\n");
+        var result = fixture.Store.InspectValidatePromote(WikiCandidate() with { CandidateId = "quoted" }, quoted);
+        Assert.Equal("Promoted", result.Status);
+        Assert.Equal("dataset-v2-31c6ed4a006c7514de08409dca1998be6c8e7af9ee2e06a72cb349f69aa15522", result.CanonicalRevisionId);
+        Assert.Equal(plain.CanonicalRevisionId, result.CanonicalRevisionId);
+        Assert.Equal(2, result.PromotedObservationCount);
+        Assert.Equal(2, fixture.Count("observations", "1=1"));
+        Assert.Equal(0, result.InvalidOhlcv);
+        Assert.Equal(0, result.DuplicateKeys);
+        Assert.NotEqual(plain.ArtifactSha256, result.ArtifactSha256);
+        using var artifact = File.OpenRead(quoted);
+        Assert.Equal(DatasetContentIdentity.Sha256(artifact), result.ArtifactSha256);
     }
 
     [Fact]

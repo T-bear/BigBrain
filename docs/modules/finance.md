@@ -1,5 +1,13 @@
 # Finance module
 
+## BB-130C CSV syntactic tokenizer — review candidate only
+
+[Boundary/evidence](../reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md).
+FinanceDatasetCsvTokenizer interprets raw fields from one physical line. Store call sites for
+normal intake, archive combination and detection use the same extracted algorithm. Reading,
+header lookup, lexical values, validation, policy and SQL stay with the store. No schema/identity,
+column-zero, rights/provenance or runtime change. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-130C CSV optional corporate-action correction — accepted, merged and CI verified
 
 [Correction contract/evidence](../reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md):
