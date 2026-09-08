@@ -7,7 +7,10 @@ On clean main-derived history: pre-fix five targeted cases produced three passes
 expected column-zero failures. Post-fix focused intake/protection/identity/research: **71/71**.
 Release build: **zero warnings/errors**. Full API **649/649**, Sentinel **32/32**, zero failures/skips.
 Publication gates are recorded in the report. Existing identity vectors and legacy replay remain
-unchanged. No production data; no branch CI claim.
+unchanged. No production data.
+Approved candidate `50769e82e3df033066cd307aae78de2856b27092` merged as
+`946eb98f139824e65780bf93d41686ea3724c1a3`; [main CI run 34188274546](https://github.com/T-bear/BigBrain/actions/runs/34188274546)
+passed backend, frontend, documentation and secrets on 2026-09-08.
 
 ## BB-130C intake quarantine boundary — 2026-09-07
 

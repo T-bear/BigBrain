@@ -16,10 +16,12 @@ Detta är en sanerad GitHub-version. Only source inspection and isolated synthet
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. Implemented and locally verified.
-The committed correction branch is published for exact-SHA architect/owner review.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `50769e82e3df033066cd307aae78de2856b27092` merged as
+`946eb98f139824e65780bf93d41686ea3724c1a3`; [main CI run 34188274546](https://github.com/T-bear/BigBrain/actions/runs/34188274546)
+passed backend, frontend, documentation and secrets on 2026-09-08.
 Scope is only the authorized optional-column correction. CSV parsing extraction has not resumed.
-No main merge, deployment, runtime or owner acceptance is claimed. Finance **RESEARCH / 0 SEK / NONE**.
+No deployment or runtime verification is claimed. Finance **RESEARCH / 0 SEK / NONE**.
 
 ## Evidence
 
@@ -91,7 +93,7 @@ passes (229 Markdown files / 90 unique backlog IDs); working-tree diff check pas
 Staged-diff check passed; staged Gitleaks v8.28.0 found no leaks. Final publication staging
 contains only the two intended code/test files and eight documentation files.
 No Web rerun is required: no consumed API/UI contract change. Compose/runbooks are unchanged.
-CI runs on main pushes/pull requests; a branch push alone supplies no CI evidence.
+The subsequent approved main merge passed all four required CI jobs, as linked above.
 
 ## Changes
 
@@ -111,14 +113,14 @@ No deployment or production repair.
 
 ## Remaining work
 
-Architect review and owner merge approval of the exact correction SHA. CSV parser extraction
-and other intake, persistence/schema/composition and BB-130D responsibilities remain separate.
+CSV parser extraction and other intake, persistence/schema/composition and BB-130D
+responsibilities remain separate and require a separately authorized checkpoint.
 If the owner needs production-incidence evidence, a bounded read-only audit is a possible separately
 authorized task; no historical damage or need for repair is inferred here. No new BB ID assigned.
 
 ## Resumption
 
 Use [canonical recovery](../../../operations/codex-recovery.md) and
-[BB-130 plan](../../../architecture/bb-130-stabilization.md). Review this branch's exact remote
-SHA, then require explicit approval before merging it. Never merge the blocker branch.
+[BB-130 plan](../../../architecture/bb-130-stabilization.md). This correction is accepted and merged;
+its temporary recovery state is resolved. Never merge the historical blocker branch.
 Do not deploy, start the next checkpoint or resume parser extraction automatically.
