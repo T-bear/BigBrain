@@ -225,8 +225,8 @@ public sealed class CanonicalDatasetRevisionIdentityTests
         var result = restarted.BacktestResult(runs[0].RunId)!;
         Assert.Equal([Revision], result.Configuration.MarketRevisionIds);
         Assert.Equal(features.RevisionId, result.Configuration.FeatureRevisionId);
-        Assert.False(EodhdMarketMemory.PersistBacktest(connection, result));
-        Assert.Throws<InvalidOperationException>(() => EodhdMarketMemory.PersistBacktest(connection, result with { Checksum = "sha256:synthetic-conflict" }));
+        Assert.False(FinanceBacktestPersistence.PersistBacktest(connection, result));
+        Assert.Throws<InvalidOperationException>(() => FinanceBacktestPersistence.PersistBacktest(connection, result with { Checksum = "sha256:synthetic-conflict" }));
         Assert.Equal(counts, fixture.Scalar("SELECT (SELECT COUNT(*) FROM backtest_runs)||'|'||(SELECT COUNT(*) FROM backtest_events)||'|'||(SELECT COUNT(*) FROM backtest_fills)||'|'||(SELECT COUNT(*) FROM backtest_equity)"));
         Assert.Equal(before[0], JsonSerializer.Serialize(restarted.BacktestResult(result.RunId)));
         Assert.Equal("0", fixture.Scalar("SELECT COUNT(*) FROM acquisitions"));

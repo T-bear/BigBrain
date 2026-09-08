@@ -1,13 +1,24 @@
 # Finance module
 
+## BB-130C shared immutable backtest writer — review candidate, 2026-09-08
+
+[Boundary and deterministic evidence](../reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
+From `4ec675864d76f6da11d747026d917491f085f9e7` on `bb-130c/backtest-persistence-writer`.
+FinanceBacktestPersistence now owns only the immutable four-table write across reference,
+robustness and research-dataset callers. Schema, connections, readers and calculations stay put.
+Pre-move characterization 4/4; post-move focused 82/82. full API **661/661**, Sentinel **32/32**, zero failures/skips; Release **0 warnings / 0 errors**.
+**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**; no CI/owner/runtime acceptance claim.
+Finance RESEARCH / 0 SEK / NONE; no schema change, production access or deployment.
+Other persistence, intake, composition/schema and BB-130D work remains separately scoped.
+
+
 ## BB-130C persistence ownership — characterization accepted, merged and CI verified
 
 [Concrete SQL/caller/init/test map](../reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md).
 One Finance SQLite path remains configured by EodhdFinanceOptions. EodhdMarketMemory hosts both
 provider acquisition and neutral feature/backtest/robustness/risk/research responsibilities; intake
 and macro stores open the same path. Central migration version 93 does not own all structural DDL.
-Shared backtest result writing has three caller families and is the smallest recommended next
-extraction, not implemented here. No schema/scientific/lineage/runtime change. RESEARCH / 0 SEK / NONE.
+The three-family shared writer recommendation is implemented only by the review candidate above. No schema/scientific/lineage/runtime change. RESEARCH / 0 SEK / NONE.
 Merged as `e16c0c9b62f486955483b0ce782167f53e687714`; main CI run `34226093232` passed. Not deployed.
 
 ## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified
