@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130C` — [CSV syntactic tokenizer — review candidate](features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md)
+- `BB-130C` — [CSV syntactic tokenizer — accepted, merged and CI verified](features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md)
 
 - `BB-130C` — [CSV optional corporate-action column-zero correction — accepted, merged and CI verified](features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)
 

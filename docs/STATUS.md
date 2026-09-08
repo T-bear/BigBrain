@@ -1,13 +1,17 @@
 # BigBrain Status
 
-## BB-130C CSV syntactic tokenizer — review checkpoint, 2026-09-08
+## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
 
 From main `39af684e8aa8a84b40caff4525b430794838c6eb`, branch
 `bb-130c/intake-csv-syntactic-parser`. [Evidence](reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md).
 One internal tokenizer owns raw comma/quote field splitting at five existing call sites.
 The store retains reading, headers, lexical/domain validation, policy and SQL. Focused before/after
 80/80 pass. Full API 658/658, Sentinel 32/32, Release build 0 warnings/errors.
-REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN; no CI/deployment/runtime claim.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `653ee3b0824d6d7edda0d9cde4e2b9884a4f92ef` merged as
+`a0f1ff2031016df72744574c5a4e2ee0810b3116`; [main CI run 34192468991](https://github.com/T-bear/BigBrain/actions/runs/34192468991)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No deployment or runtime verification.
 Schema, identity and column-zero correction preserved; Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-130C CSV corporate-action column-zero correction — accepted, merged and CI verified, 2026-09-08

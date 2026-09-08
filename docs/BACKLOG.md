@@ -1,8 +1,9 @@
 # BigBrain Backlog
 
-## BB-130C CSV syntactic tokenizer — review checkpoint, 2026-09-08
+## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
 
-- [Bounded tokenization extraction](reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md): implemented and locally verified on `bb-130c/intake-csv-syntactic-parser`; awaiting exact-SHA review/merge approval.
+- [Bounded tokenization extraction](reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md): **ACCEPTED / MERGED TO MAIN / CI VERIFIED** from `bb-130c/intake-csv-syntactic-parser`.
+- Merge `a0f1ff2031016df72744574c5a4e2ee0810b3116`; main CI run `34192468991` passed all four jobs.
 - Only raw line tokenization moved. Reading/header/value ownership, domain validation/comparison, acquisition, promotion and lifecycle/persistence remain separately scoped.
 - No deployment or new checkpoint; historical blocker remains NOT MERGEABLE and production incidence UNKNOWN.
 

@@ -69,7 +69,8 @@ to gather loading evidence.
 ## C — behavior-preserving code health
 
 2026-09-08 [CSV syntactic tokenizer](../reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md)
-is a locally verified review candidate only. Just raw line tokenization moves; the mixed ParseCsv
+is accepted and merged as `a0f1ff2031016df72744574c5a4e2ee0810b3116`; main CI run `34192468991` passed.
+Just raw line tokenization moves; the mixed ParseCsv
 orchestration, domain validation and SQL remain in the store. No schema/identity change or deployment.
 
 2026-09-08 bounded correction: [CSV optional-column presence](../reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)

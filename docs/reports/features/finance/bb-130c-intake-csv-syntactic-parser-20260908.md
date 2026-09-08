@@ -16,9 +16,11 @@ Detta är en sanerad GitHub-version. Source inspection and isolated synthetic fi
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. Implemented and locally verified;
-this committed branch is published for exact-SHA architect review and owner merge approval.
-No CI, main acceptance, deployment or runtime verification is claimed for this candidate.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `653ee3b0824d6d7edda0d9cde4e2b9884a4f92ef` merged as
+`a0f1ff2031016df72744574c5a4e2ee0810b3116`; [main CI run 34192468991](https://github.com/T-bear/BigBrain/actions/runs/34192468991)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No deployment or runtime verification is claimed.
 Finance **RESEARCH / 0 SEK / NONE**. BB-130C overall remains partial; BB-130D is separate.
 
 ## Evidence
@@ -90,7 +92,7 @@ zero failures/skips. Documentation verification passed: **230 Markdown files / 9
 Working/staged diff checks passed; staged Gitleaks v8.28.0 found no leaks. The first documentation
 check identified two required report headings; these were corrected and verification rerun successfully.
 No Web-consumed contract changed: no Web rerun is required. No Compose/runbook change.
-Branch push alone does not trigger this repository's main/pull-request CI; no CI claim.
+The subsequent approved main merge passed all required CI jobs, as linked above.
 
 ## Security
 
@@ -110,6 +112,7 @@ and BB-130D stay separate. No new defect or performance improvement is claimed.
 
 ## Resumption
 
-Review the exact remote branch SHA, then obtain explicit owner merge approval; do not merge
-historical blocker branches. Use [canonical recovery](../../../operations/codex-recovery.md)
-and the [BB-130 plan](../../../architecture/bb-130-stabilization.md). Stop after review publication.
+This checkpoint is accepted and merged; its temporary review/recovery state is resolved.
+Do not merge historical blocker branches. Use [canonical recovery](../../../operations/codex-recovery.md)
+and the [BB-130 plan](../../../architecture/bb-130-stabilization.md). Further work requires a separate
+authorized checkpoint; do not deploy or start it automatically.

@@ -1,11 +1,14 @@
 # Testa BigBrain
 
-## BB-130C CSV syntactic tokenizer — review checkpoint, 2026-09-08
+## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
 
 [Characterization and commands](docs/reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md).
 Nine new syntax/lifecycle cases pass before/after extraction with the existing suites: **80/80**.
 Canonical v2/legacy identity, column-zero evidence and artifact checksums remain unchanged.
 Full API **658/658**, Sentinel **32/32**, zero failures/skips; Release build **0 warnings/errors**.
+Approved candidate `653ee3b0824d6d7edda0d9cde4e2b9884a4f92ef` merged as
+`a0f1ff2031016df72744574c5a4e2ee0810b3116`; [main CI run 34192468991](https://github.com/T-bear/BigBrain/actions/runs/34192468991)
+passed backend, frontend, documentation and secrets on 2026-09-08.
 
 ## BB-130C CSV corporate-action column-zero correction — 2026-09-08
 
