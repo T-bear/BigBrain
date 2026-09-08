@@ -1,5 +1,12 @@
 # BigBrain Backlog
 
+## BB-130C Finance persistence characterization — review checkpoint, 2026-09-08
+
+- [Responsibility and evidence map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md): tests/docs only on `bb-130c/finance-persistence-characterization`, awaiting exact-SHA review and owner acceptance/merge approval.
+- Recommended next bounded scope: shared immutable PersistBacktest writer only; retain schema, constructors, readers and orchestration. HIGH reasoning; separate authorization required.
+- Gaps remain in whole-initializer concurrency, child-write fault injection, campaign SQL replay and broader legacy initialization coverage. These are unverified scenarios, not reproduced defects.
+- No migration, new database, production access, provider activation, deployment or next implementation.
+
 ## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
 
 - [Bounded tokenization extraction](reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md): **ACCEPTED / MERGED TO MAIN / CI VERIFIED** from `bb-130c/intake-csv-syntactic-parser`.

@@ -68,6 +68,11 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-08 [Finance persistence characterization](../reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md)
+is a tested review candidate only. It maps shared SQLite ownership, distributed DDL/recovery and
+provider-neutral storage under EodhdMarketMemory. No production extraction. The recommended next
+scope is only shared immutable backtest writing, subject to separate owner/architect authorization.
+
 2026-09-08 [CSV syntactic tokenizer](../reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md)
 is accepted and merged as `a0f1ff2031016df72744574c5a4e2ee0810b3116`; main CI run `34192468991` passed.
 Just raw line tokenization moves; the mixed ParseCsv
