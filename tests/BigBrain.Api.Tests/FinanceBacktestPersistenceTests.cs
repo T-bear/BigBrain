@@ -69,6 +69,70 @@ public sealed class FinanceBacktestPersistenceTests
         Assert.Equal(1 + result.Events.Count + result.Fills.Count + result.EquityCurve.Count, Snapshot(connection).Length);
     }
 
+    [Fact]
+    public void ReaderCatalogOrdersStoredRunsAndReopensWithoutChangingEvidence()
+    {
+        using var fixture = new Fixture();
+        using var connection = fixture.Open();
+        var results = new[]
+        {
+            Result(2, BacktestCostModel.Conservative, momentum: true),
+            Result(1, BacktestCostModel.Zero),
+            Result(2),
+            Result(1)
+        };
+        foreach (var result in results.Reverse()) Assert.True(FinanceBacktestPersistence.PersistBacktest(connection, result));
+        var before = Snapshot(connection);
+        var memory = fixture.Memory();
+        var reader = new EodhdFinanceBacktestReader(memory);
+        var expected = results.OrderBy(x => x.Configuration.Strategy.Id, StringComparer.Ordinal)
+            .ThenBy(x => $"{x.Configuration.CostModel.Id}-{x.Configuration.CostModel.Version}", StringComparer.Ordinal)
+            .ThenBy(x => x.RunId, StringComparer.Ordinal).ToArray();
+        var catalog = reader.GetCatalog();
+        Assert.Equal("RESEARCH", catalog.OperatingMode);
+        string[] expectedStrategies = ["buy-and-hold", "sma-crossover", "momentum"];
+        Assert.Equal(expectedStrategies, catalog.Strategies.Select(x => x.Id));
+        Assert.Equal(expected.Select(x => x.RunId), catalog.Runs.Select(x => x.RunId));
+        Assert.Equal(expected.Select(x => x.Checksum), catalog.Runs.Select(x => x.Checksum));
+        foreach (var result in expected)
+        {
+            var summary = catalog.Runs.Single(x => x.RunId == result.RunId);
+            Assert.Equal(result.Configuration.FeatureRevisionId, summary.FeatureRevisionId);
+            Assert.Equal(result.Configuration.MarketRevisionIds, summary.MarketRevisionIds);
+            Assert.Equal(Math.Max(0, result.Metrics.GrossReturn - result.Metrics.NetReturn), summary.CostImpact);
+            Assert.Equal(JsonSerializer.Serialize(result, Json), JsonSerializer.Serialize(reader.GetResult(result.RunId), Json));
+        }
+        Assert.Null(reader.GetResult("missing-synthetic-run"));
+        Assert.Null(reader.GetResult("' OR 1=1 --"));
+        var reopened = new EodhdFinanceBacktestReader(fixture.Memory());
+        Assert.Equal(JsonSerializer.Serialize(catalog.Runs, Json), JsonSerializer.Serialize(reopened.GetCatalog().Runs, Json));
+        Assert.Equal(before, Snapshot(connection));
+        Assert.Equal("0", Read(connection, "SELECT CAST(COUNT(*) AS TEXT) FROM acquisitions").Single());
+    }
+
+    [Fact]
+    public void ReaderRejectsMalformedStoredJsonWithoutRepairingOrSkippingTheRow()
+    {
+        using var fixture = new Fixture();
+        using var connection = fixture.Open();
+        var result = Result();
+        Assert.True(FinanceBacktestPersistence.PersistBacktest(connection, result));
+        // Deliberately damaged synthetic payload; no production data or repair path.
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "UPDATE backtest_runs SET result_json=$json WHERE run_id=$id";
+            command.Parameters.AddWithValue("$json", "{");
+            command.Parameters.AddWithValue("$id", result.RunId);
+            Assert.Equal(1, command.ExecuteNonQuery());
+        }
+        var before = Snapshot(connection);
+        var reader = new EodhdFinanceBacktestReader(fixture.Memory());
+        Assert.Throws<JsonException>(() => reader.GetResult(result.RunId));
+        Assert.Throws<JsonException>(() => reader.GetCatalog());
+        Assert.Null(reader.GetResult("missing-synthetic-run"));
+        Assert.Equal(before, Snapshot(connection));
+    }
+
     private static string[] Snapshot(SqliteConnection connection) =>
         Read(connection, "SELECT run_id || checksum || result_json || created_utc FROM backtest_runs ORDER BY run_id")
         .Concat(Read(connection, "SELECT event_json FROM backtest_events ORDER BY run_id,sequence"))
@@ -85,13 +149,13 @@ public sealed class FinanceBacktestPersistenceTests
         return rows.ToArray();
     }
 
-    private static BacktestResult Result()
+    private static BacktestResult Result(int seed = 0, BacktestCostModel? cost = null, bool momentum = false)
     {
-        var strategy = new BuyAndHoldResearchStrategy();
+        IResearchBacktestStrategy strategy = momentum ? new MomentumResearchStrategy() : new BuyAndHoldResearchStrategy();
         var configuration = new BacktestRunConfiguration(["market-1"], "feature-1", strategy.Identity,
-            strategy.Parameters, DeterministicBacktestEngine.SimulationModel, BacktestCostModel.Conservative,
+            strategy.Parameters, DeterministicBacktestEngine.SimulationModel, cost ?? BacktestCostModel.Conservative,
             10_000, ["US:XNAS:TEST"], new(2026, 1, 2), new(2026, 1, 30),
-            DeterministicBacktestEngine.SizingPolicy, 0, FillModel: BacktestFillModel.NextSessionOpen);
+            DeterministicBacktestEngine.SizingPolicy, seed, FillModel: BacktestFillModel.NextSessionOpen);
         var dates = new[] { new DateOnly(2026, 1, 2), new DateOnly(2026, 1, 5), new DateOnly(2026, 1, 6) };
         var bars = dates.Select((date, i) => new BacktestMarketBar(new("US:XNAS:TEST"), "market-1",
             date, 100 + i * 10, 100 + i * 10, new DateTimeOffset(2026, 1, 1, 22, 0, 0, TimeSpan.Zero).AddDays(i)));
