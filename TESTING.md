@@ -1,5 +1,14 @@
 # Testa BigBrain
 
+## BB-130C CSV corporate-action column-zero correction — 2026-09-08
+
+[Regression and command evidence](docs/reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md).
+On clean main-derived history: pre-fix five targeted cases produced three passes and the two
+expected column-zero failures. Post-fix focused intake/protection/identity/research: **71/71**.
+Release build: **zero warnings/errors**. Full API **649/649**, Sentinel **32/32**, zero failures/skips.
+Publication gates are recorded in the report. Existing identity vectors and legacy replay remain
+unchanged. No production data; no branch CI claim.
+
 ## BB-130C intake quarantine boundary — 2026-09-07
 
 [Commands and evidence](docs/reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).

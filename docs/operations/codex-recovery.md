@@ -19,15 +19,15 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## Current checkpoint state — 2026-09-07
+## Current checkpoint state — resumed 2026-09-08
 
-Status: ACCEPTED / MERGED TO MAIN / CI VERIFIED
-Task: BB-130C Dataset Intake Responsibility Extraction #1, raw quarantine path/payload lifetime.
-Baseline/source-of-truth SHA: 44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e.
-Git status: implementation merged to main as `5a775b9f54784ea2f8562ea73299618ea7b0889f`; unrelated mockups and four ADR proposals preserved and excluded.
-Changed files: src/BigBrain.Api/Finance/FinanceDatasetIntake.cs; src/BigBrain.Api/Finance/FinanceDatasetQuarantine.cs; tests/BigBrain.Api.Tests/FinanceDatasetIntakeTests.cs; tests/BigBrain.Api.Tests/FinanceDataProtectionTests.cs; TESTING.md; docs/STATUS.md; docs/BACKLOG.md; docs/modules/finance.md; docs/architecture/bb-130-stabilization.md; docs/reports/REPORT-CATALOG.md; docs/reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md; this note.
-Completed and valid: initial reads reused; four characterization tests passed with unchanged production, then smallest physical quarantine collaborator extracted. SQL/state ordering, file metadata/hash stream lifetimes, parsing/acquisition/cancellation and v2 identity remain unchanged. No schema work, production data access or deployment.
-Remaining: acquisition, parsing/validation, persistence and other BB-130C work remain separately scoped. No next checkpoint.
-Tests/builds already run and results: focused 66/66 before and after, zero failed/skipped. Release solution build zero warnings/errors. Full API 644/644 and Sentinel 32/32 passed, zero failures/skips. Documentation verification 228 Markdown / 90 BB IDs, diff/staged-diff and staged Gitleaks v8.28.0 passed with no leaks. First sandbox test attempt was blocked by MSBuild pipes before execution; authorized rerun passed.
-Blockers/assumptions: none. Known retained extracted files/partial behavior unchanged. Legacy production WIKI compatibility remains UNKNOWN. Prior blocker branches remain NOT MERGEABLE. Finance RESEARCH / 0 SEK / NONE.
-Exact next action: retain main as source of truth and await a separately authorized next BB-130C checkpoint. Do not deploy or begin another checkpoint.
+Status: REVIEW CANDIDATE PUSHED — NOT MERGED TO MAIN
+Task: BB-130C CSV optional corporate-action column-zero correction.
+Baseline/source-of-truth SHA: 81c80d1c7e361086b5871de512b5ef3855a70f49.
+Git status: bb-130c/csv-corporate-action-column-zero-fix directly from baseline main. No blocker ancestry. Two valid local implementation/test changes preserved at resume; unrelated mockups/four ADR proposals preserved and excluded.
+Changed files: src/BigBrain.Api/Finance/FinanceDatasetIntake.cs; tests/BigBrain.Api.Tests/FinanceDatasetIntakeTests.cs; docs/reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md; TESTING.md; docs/STATUS.md; docs/BACKLOG.md; docs/modules/finance.md; docs/architecture/bb-130-stabilization.md; docs/reports/REPORT-CATALOG.md; this note.
+Completed and valid: five main-derived regression cases; pre-fix two expected failures and three passes; production correction preserves both TryGetValue presence booleans and uses them when reading optional action fields. No extraction, schema/identity change, historical rewrite, production access or deployment.
+Remaining: architect review and explicit owner merge approval of the exact remote correction SHA. No main merge, deployment or next checkpoint.
+Tests/builds already run and results: pre-fix 3 passed/2 expected failures; post-fix focused intake/protection/identity/research 71/71 passed; Release solution build 0 warnings/errors. These completed results were reused after verifying unchanged source/test content at resume. Remaining full API 649/649 and Sentinel 32/32 passed with zero failures/skips. Documentation verifier 229 Markdown/90 BB IDs and working-tree diff pass. Final staged checks are recorded in the report; no branch CI claim.
+Blockers/assumptions: none blocking correction. Production incidence UNKNOWN; no audit or repair authorized. Evidence-only blocker 6ad73c53e2d2e87df99a8ab2840ab20d73106d5b remains NOT MERGEABLE. Finance RESEARCH / 0 SEK / NONE.
+Exact next action: review the exact published correction branch SHA and report; the verified remote SHA is supplied in the publication response and available via git ls-remote origin refs/heads/bb-130c/csv-corporate-action-column-zero-fix. Merge requires explicit owner approval of that SHA. Do not deploy or resume CSV extraction.

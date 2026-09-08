@@ -68,6 +68,11 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-08 bounded correction: [CSV optional-column presence](../reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)
+retains first-column corporate-action evidence using existing lookup booleans. Review candidate
+only; no schema/identity contract change, historical rewrite or deployment. This does not resume
+CSV parsing extraction. The original blocker remains NOT MERGEABLE evidence, outside ancestry.
+
 2026-09-07 first bounded intake extraction: [quarantine path/payload lifetime](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md)
 was merged as `5a775b9f54784ea2f8562ea73299618ea7b0889f` and main CI run `34157988954` passed.
 It isolates physical quarantine operations while preserving lifecycle, SQL, parsing, acquisition

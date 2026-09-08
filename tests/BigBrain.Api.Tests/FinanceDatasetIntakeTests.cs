@@ -8,6 +8,55 @@ namespace BigBrain.Api.Tests;
 
 public sealed class FinanceDatasetIntakeTests
 {
+    [Theory]
+    [InlineData("ex-dividend")]
+    [InlineData("split_ratio")]
+    public void CorporateActionEvidenceSurvivesCsvHeaderReordering(string firstColumn)
+    {
+        using var fixture = new IntakeFixture();
+        var original = fixture.Write("control.csv",
+            "ticker,date,open,high,low,close,volume,ex-dividend,split_ratio\n" +
+            "AAPL,2024-01-02,100,102,99,101,1000,1.25,2\n");
+        var reordered = fixture.Write("reordered.csv", firstColumn == "ex-dividend"
+            ? "ex-dividend,ticker,date,open,high,low,close,volume,split_ratio\n1.25,AAPL,2024-01-02,100,102,99,101,1000,2\n"
+            : "split_ratio,ticker,date,open,high,low,close,volume,ex-dividend\n2,AAPL,2024-01-02,100,102,99,101,1000,1.25\n");
+        var control = fixture.Store.InspectValidatePromote(
+            WikiCandidate() with { CandidateId = "actions-control", OriginalFilename = "control.csv" }, original);
+        var result = fixture.Store.InspectValidatePromote(
+            WikiCandidate() with { CandidateId = "actions-reordered", OriginalFilename = "reordered.csv" }, reordered);
+
+        Assert.Equal("Promoted", control.Status);
+        Assert.Equal("Promoted", result.Status);
+        Assert.Equal(control.CanonicalRevisionId, result.CanonicalRevisionId);
+        Assert.Equal(1, result.PromotedObservationCount);
+        Assert.Equal(1, fixture.Count("observations", "provider='NASDAQ-WIKI'"));
+        Assert.NotEqual(control.ArtifactSha256, result.ArtifactSha256);
+        using var artifact = File.OpenRead(reordered);
+        Assert.Equal(DatasetContentIdentity.Sha256(artifact), result.ArtifactSha256);
+        Assert.Equal(1, fixture.Count("dataset_corporate_actions",
+            "candidate_id='actions-control' AND ex_dividend='1.25' AND split_ratio='2'"));
+        Assert.Equal(1, fixture.Count("dataset_corporate_actions",
+            "candidate_id='actions-reordered' AND ex_dividend='1.25' AND split_ratio='2'"));
+    }
+
+    [Theory]
+    [InlineData("", "", "", "", 0)]
+    [InlineData(",ex-dividend", ",1.25", "1.25", "", 1)]
+    [InlineData(",split_ratio", ",2", "", "2", 1)]
+    public void CorporateActionAbsentColumnsRemainAbsent(string extraHeaders, string extraValues,
+        string expectedDividend, string expectedSplit, int expectedRows)
+    {
+        using var fixture = new IntakeFixture();
+        var path = fixture.Write("wiki.csv", "ticker,date,open,high,low,close,volume" + extraHeaders +
+            "\nAAPL,2024-01-02,100,102,99,101,1000" + extraValues + "\n");
+        var result = fixture.Store.InspectValidatePromote(WikiCandidate(), path);
+        Assert.Equal("Promoted", result.Status);
+        Assert.Equal(1, result.PromotedObservationCount);
+        Assert.Equal(expectedRows, fixture.Count("dataset_corporate_actions", "1=1"));
+        Assert.Equal(expectedRows, fixture.Count("dataset_corporate_actions",
+            $"ex_dividend='{expectedDividend}' AND split_ratio='{expectedSplit}'"));
+    }
+
     [Fact]
     public async Task DownloadSizeGateRejectsBeforeCreatingPayloadAndRestartRejectsInterruptedCandidate()
     {

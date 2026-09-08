@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## BB-130C CSV corporate-action column-zero correction — review checkpoint, 2026-09-08
+
+From main `81c80d1c7e361086b5871de512b5ef3855a70f49` on
+`bb-130c/csv-corporate-action-column-zero-fix`. [Correction evidence](reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md).
+Optional ex-dividend/split_ratio columns now use lookup presence rather than a positive index,
+preserving first-column evidence. Pre-fix regression fails twice as expected; post-fix focused
+71/71 and warning-free Release build pass. Full API 649/649 and Sentinel 32/32 pass with zero
+failures/skips. Final gates/publication state are in the report/recovery.
+Not merged, deployed or runtime verified. Production incidence UNKNOWN; no historical repair,
+schema/identity change or parser extraction. Finance RESEARCH / 0 SEK / NONE.
+Original blocker `6ad73c53e2d2e87df99a8ab2840ab20d73106d5b` remains NOT MERGEABLE evidence only.
+
 ## BB-130C intake quarantine boundary — merged and CI verified, 2026-09-07
 
 From baseline `44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e`, branch

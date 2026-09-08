@@ -1,5 +1,14 @@
 # Finance module
 
+## BB-130C CSV optional corporate-action correction — review candidate only
+
+[Correction contract/evidence](../reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md):
+existing optional header lookup booleans distinguish absent columns from present index zero.
+Both ex-dividend and split_ratio survive header reordering as candidate-bound evidence.
+They remain excluded from canonical price identity. No schema/identity/lifecycle/rights change,
+production data access or deployment. Historical incidence UNKNOWN; no historical rewrite.
+This corrects only the reproduced defect; CSV parsing extraction is still deferred.
+
 ## BB-130C intake quarantine boundary — merged and CI verified, not deployed
 
 [Bounded responsibility/evidence](../reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md).
