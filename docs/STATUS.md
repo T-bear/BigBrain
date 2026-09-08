@@ -1,13 +1,17 @@
 # BigBrain Status
 
-## BB-130C Finance persistence characterization — review checkpoint, 2026-09-08
+## BB-130C Finance persistence characterization — accepted, merged and CI verified, 2026-09-08
 
 From main `b1e84267a9909a55980e472bb6bd6054953d5588`, branch
 `bb-130c/finance-persistence-characterization`. [Evidence/map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md).
 Provider-neutral storage is hosted by EodhdMarketMemory alongside provider-specific acquisition;
 DDL and runtime recovery are distributed. One new isolated regression; focused 187/187, full API
 659/659, Sentinel 32/32 and warning-free Release build pass. No production change.
-REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN; no CI/deployment/runtime claim.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `888ee57fa0c25ee5d3a733c9e2bbff77294fb3aa` merged as
+`e16c0c9b62f486955483b0ce782167f53e687714`; [main CI run 34226093232](https://github.com/T-bear/BigBrain/actions/runs/34226093232)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No deployment or runtime verification.
 Next recommended boundary is shared backtest result writing, requiring separate authorization.
 Finance RESEARCH / 0 SEK / NONE; no schema change or production-data access.
 

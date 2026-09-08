@@ -1,8 +1,9 @@
 # BigBrain Backlog
 
-## BB-130C Finance persistence characterization — review checkpoint, 2026-09-08
+## BB-130C Finance persistence characterization — accepted, merged and CI verified, 2026-09-08
 
-- [Responsibility and evidence map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md): tests/docs only on `bb-130c/finance-persistence-characterization`, awaiting exact-SHA review and owner acceptance/merge approval.
+- [Responsibility and evidence map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md): tests/docs only from `bb-130c/finance-persistence-characterization`; **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+- Merge `e16c0c9b62f486955483b0ce782167f53e687714`; main CI run `34226093232` passed all four jobs.
 - Recommended next bounded scope: shared immutable PersistBacktest writer only; retain schema, constructors, readers and orchestration. HIGH reasoning; separate authorization required.
 - Gaps remain in whole-initializer concurrency, child-write fault injection, campaign SQL replay and broader legacy initialization coverage. These are unverified scenarios, not reproduced defects.
 - No migration, new database, production access, provider activation, deployment or next implementation.

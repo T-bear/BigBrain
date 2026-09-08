@@ -13,10 +13,12 @@ Detta är en sanerad GitHub-version. Source inspection and isolated synthetic te
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. Characterization and local verification only.
-The committed branch is published for exact-SHA architect review and owner acceptance/merge approval.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `888ee57fa0c25ee5d3a733c9e2bbff77294fb3aa` merged as
+`e16c0c9b62f486955483b0ce782167f53e687714`; [main CI run 34226093232](https://github.com/T-bear/BigBrain/actions/runs/34226093232)
+passed backend, frontend, documentation and secrets on 2026-09-08.
 No production file changes, schema migration, production data access, deployment or runtime claim.
-No CI success is claimed for this branch. Finance **RESEARCH / 0 SEK / NONE**.
+Finance **RESEARCH / 0 SEK / NONE**.
 The recommendation below is not implemented or authorized for implementation by this report.
 
 ## Evidence
@@ -243,7 +245,7 @@ Further intake, composition, frontend detail debt and BB-130D are not started by
 
 ## Resumption
 
-Architect reviews the exact remote characterization SHA and this map. Owner acceptance/merge requires
-explicit approval of that SHA, with main reconciled; publication is not implementation or deployment
-authorization. Use [canonical recovery](../../../operations/codex-recovery.md) and
-[BB-130 plan](../../../architecture/bb-130-stabilization.md). Stop after review-branch publication.
+This characterization is accepted and merged; temporary review/recovery state is resolved.
+The recommended extraction still requires a separate owner/architect-authorized checkpoint.
+Use [canonical recovery](../../../operations/codex-recovery.md) and
+[BB-130 plan](../../../architecture/bb-130-stabilization.md). Do not implement or deploy automatically.
