@@ -1,5 +1,12 @@
 # Testa BigBrain
 
+## BB-130C CSV syntactic tokenizer — review checkpoint, 2026-09-08
+
+[Characterization and commands](docs/reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md).
+Nine new syntax/lifecycle cases pass before/after extraction with the existing suites: **80/80**.
+Canonical v2/legacy identity, column-zero evidence and artifact checksums remain unchanged.
+Full API **658/658**, Sentinel **32/32**, zero failures/skips; Release build **0 warnings/errors**.
+
 ## BB-130C CSV corporate-action column-zero correction — 2026-09-08
 
 [Regression and command evidence](docs/reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md).
