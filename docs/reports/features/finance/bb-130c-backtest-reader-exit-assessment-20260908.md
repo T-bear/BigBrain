@@ -8,22 +8,25 @@ Detta är en sanerad GitHub-version. Source inspection and isolated synthetic SQ
 - Verified main baseline: `6bfcd011a655a7d9f225bc9c023063738d10db3b` (main CI `34248375970` succeeded).
 - Branch: `bb-130c/backtest-reader-exit-assessment`, directly from that baseline.
 - WHY: make the immutable read contract understandable and bound the remaining stabilization work.
-- SCOPE: reader characterization and proposed C exit criteria; no production extraction.
+- SCOPE: reader characterization and accepted C exit criteria; no production extraction.
 - Authorities: ARCHITECTURE current boundaries; ADR 0021/0023/0024/0025; accepted
   [persistence map](bb-130c-finance-persistence-characterization-20260908.md) and
   [immutable writer](bb-130c-backtest-persistence-writer-20260908.md).
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. **DECISION B — DO NOT EXTRACT**.
-No production files changed. Local test results below; no candidate CI, owner acceptance,
-deployment or runtime claim. Proposed BB-130C exit readiness: **NOT READY**, two bounded
-characterization checkpoints remain. C is not marked complete; D is not started.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**. **DECISION B — DO NOT EXTRACT**.
+Approved candidate `e868b601d511e17554452c24ac7ed9d591bf051f` merged as
+`796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`; [main CI run 34275678369](https://github.com/T-bear/BigBrain/actions/runs/34275678369)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No production files changed. Local test results below; no deployment or runtime claim.
+BB-130C exit readiness: **NOT READY**; E1 and E2 are the only currently known remaining blocking
+checkpoints. BB-130D is **NOT STARTED**.
 
-The exit classifications are recommendations for owner/architect acceptance. The original C plan
-included composition and sole schema authority. These are not delivered and are not erased:
-accepting their explicit deferral is required before using the shorter exit plan. This report
-neither silently waives that scope nor authorizes any subsequent implementation.
+The owner and architect accepted the shortened exit plan and explicit deferral of all non-blocking
+debt classified below beyond BB-130. Original composition and sole schema authority goals are not
+delivered; their accepted deferral reconciles scope without erasing the goals or waiving safety.
+This acceptance does not authorize E1/E2 implementation or any subsequent checkpoint.
 
 ## Evidence
 
@@ -129,7 +132,7 @@ or a separately authorized connection/reader policy boundary; no performance cla
 
 ## BB-130C EXIT ASSESSMENT
 
-Every concern below has one classification. **Deferral is proposed, not a claim the original work
+Every concern below has one classification. **Deferral is explicitly accepted, not a claim the original work
 was completed.** Exit is sufficient stability and evidence for D, not zero technical debt. A new
 reproduced defect would invoke the blocker workflow and change this assessment; none was reproduced
 by the reader characterization. Synthetic malformed JSON testing is not production incidence evidence.
@@ -239,30 +242,31 @@ and sanitized. No new correctness/scientific/security/lineage defect reproduced 
 
 ## Remaining work
 
-Architect review must accept/revise the no-extraction decision and explicit exit deferrals. Branch
-publication is not main acceptance. Remaining gaps are not proven defects, nor proof all failure
-modes are safe. E1/E2 are recommendations only and are not started in this checkpoint.
+The no-extraction decision and explicit exit deferrals are accepted. Remaining gaps are not proven
+defects, nor proof all failure modes are safe. E1/E2 are accepted as the only known C blocking
+checkpoints, but neither is authorized to start in this publication task.
 
 ## Resumption
 
-Review the exact pushed SHA using [canonical recovery](../../../operations/codex-recovery.md),
-[STATUS](../../../STATUS.md) and [BB-130 plan](../../../architecture/bb-130-stabilization.md).
-Do not merge, deploy or start E1/E2 automatically. Only exact-SHA owner approval permits main merge.
+Accepted main publication resolves the temporary review/recovery state. Use
+[STATUS](../../../STATUS.md), [BB-130 plan](../../../architecture/bb-130-stabilization.md) and
+[canonical recovery](../../../operations/codex-recovery.md). E1/E2 require separate bounded
+authorization; do not start them or deploy automatically.
 
 ## BB-130C EXIT PLAN
 
-- **Current exit readiness: NOT READY.** Proposed remaining blocking checkpoints, in order:
+- **Current exit readiness: NOT READY.** Accepted remaining blocking checkpoints (only currently known blockers), in order:
   1. **E1: robustness UI selected-result identity characterization** — close the specifically known
      cross-selection presentation question; separate correction only if a defect is reproduced.
   2. **E2: campaign SQLite replay/reload characterization** — freeze persisted aggregate/lineage and
      honest NOT EVALUABLE behavior with an isolated deterministic test.
-- **Explicitly defer beyond BB-130**, subject to owner/architect acceptance: additional reader and
+- **Explicitly deferred beyond BB-130 by owner/architect acceptance**: additional reader and
   feature/robustness/risk/macro/intake extraction; shared path/options naming; composition extensions;
   sole DDL authority; broader startup/concurrency/legacy/crash matrices; reader integrity hardening
   before widened trust; JSON/request optimization; future artifact coverage; new data/provider work;
   auth/Sentinel hardening before high-authority use. No existing safety gate is waived.
-- **Transition to BB-130D** only when this assessment/deferral is accepted and merged with green CI,
-  E1/E2 evidence is accepted on main, any reproduced blockers are separately corrected/accepted,
+- **Transition to BB-130D**: this assessment/deferral is now accepted and merged with green CI.
+  Transition still requires E1/E2 evidence accepted on main, any reproduced blockers separately corrected/accepted,
   and the owner/architect confirms zero remaining C blockers. D then owns deterministic static/format
   gates, full regression and final documentation/runtime-verification reconciliation.
 - Do not start another checkpoint now. Research Learning follows completed D and separate owner

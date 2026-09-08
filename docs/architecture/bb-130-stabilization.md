@@ -68,14 +68,16 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
-2026-09-08 [reader characterization / proposed exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
-REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN; no production extraction. Current proposed exit readiness
-is NOT READY: E1 robustness UI selected-result characterization, then E2 campaign SQL replay/reload.
-The report classifies all remaining concerns and recommends explicit deferral of broader extraction,
-composition and sole schema authority beyond BB-130. This is a proposed scope reconciliation, not a
-claim those original goals below were delivered. Owner/architect acceptance of deferrals plus accepted
-E1/E2 evidence and resolution of any reproduced blockers is required before transition to D.
-No next checkpoint or deployment starts through this assessment.
+2026-09-08 [reader characterization / accepted exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
+ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
+main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.
+Current C exit readiness is NOT READY: only E1 robustness UI selected-result characterization,
+then E2 campaign SQL replay/reload remain known blocking checkpoints. BB-130D is NOT STARTED.
+The report's non-blocking debt is explicitly accepted for deferral beyond BB-130, including broader
+extraction, composition and sole schema authority. This reconciles the original scope below;
+it does not claim those goals were delivered or waive safety gates. Accepted E1/E2 evidence and
+resolution of any reproduced blockers are required before D. Neither E1 nor E2 is authorized to
+start by this acceptance; no next checkpoint or deployment starts here.
 
 2026-09-08 [shared immutable writer](../reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED. Merge `e28b9850b0ee40f12a68d508f65c9e4c65d57085`;

@@ -1,17 +1,22 @@
 # BigBrain Status
 
-## BB-130C backtest readers and exit assessment — review candidate, 2026-09-08
+## BB-130C backtest readers and exit assessment — accepted, merged and CI verified, 2026-09-08
 
 [Reader map, evidence and exit plan](reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
 Baseline `6bfcd011a655a7d9f225bc9c023063738d10db3b`; branch `bb-130c/backtest-reader-exit-assessment`.
 **DO NOT EXTRACT**: one shared JSON read implementation; catalog projection and initialization
 ownership make another helper unjustified now. Two new isolated ordering/malformed-JSON tests;
 existing exact reload/identity/writer evidence reused. Focused **84/84**, full API **663/663**, Sentinel **32/32**, zero failures/skips; Release **0 warnings/errors**.
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. No production/schema change or deployment.
-Proposed C exit: **NOT READY**. Remaining bounded evidence: (1) robustness UI selection identity,
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `e868b601d511e17554452c24ac7ed9d591bf051f` merged as
+`796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`; [main CI run 34275678369](https://github.com/T-bear/BigBrain/actions/runs/34275678369)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No production/schema change, deployment or runtime verification.
+Accepted C exit plan: **NOT READY**. Only currently known remaining blockers: (1) robustness UI selection identity,
 (2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
-Further extraction, sole schema authority and composition are proposed explicit post-BB-130 debt;
-architect/owner must accept those deferrals before using the shortened exit plan. They are not completed.
+The report's non-blocking debt, including further extraction, sole schema authority and composition,
+is explicitly accepted for deferral beyond BB-130, not completed. E1/E2 are not authorized to start;
+BB-130D remains NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
 
 
