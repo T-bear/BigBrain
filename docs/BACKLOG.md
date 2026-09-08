@@ -1,5 +1,15 @@
 # BigBrain Backlog
 
+## BB-130C CSV optional-column correction — review checkpoint, 2026-09-08
+
+- [Bounded correction/evidence](reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)
+  on `bb-130c/csv-corporate-action-column-zero-fix`, from `81c80d1c7e361086b5871de512b5ef3855a70f49`.
+- Preserve present index-zero ex-dividend/split_ratio values; absent/nonzero behavior and canonical
+  v2 identity remain intact. Await exact-SHA architect review and owner merge approval.
+- Blocker SHA `6ad73c53e2d2e87df99a8ab2840ab20d73106d5b` remains NOT MERGEABLE and is not ancestry.
+- Production incidence UNKNOWN; no historical audit/repair, schema change or deployment authorized.
+  Parsing extraction and remaining C/D work stay separate; no new BB ID.
+
 ## BB-130C intake responsibility extraction #1 — merged and CI verified, 2026-09-07
 
 - [Quarantine path/payload-lifetime extraction](reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md) on

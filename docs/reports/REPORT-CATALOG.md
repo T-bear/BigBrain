@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C` — [CSV optional corporate-action column-zero correction — review candidate](features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)
+
 - `BB-130C` — [Intake quarantine path and payload lifetime — merged and CI verified](features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md)
 
 - `BB-130C` — [Canonical product metadata and revision identity v2 — accepted, merged and CI verified](features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
