@@ -50,10 +50,10 @@ internal sealed partial class EodhdMarketMemory
         foreach (var cost in new[] { BacktestCostModel.Zero, BacktestCostModel.Conservative })
         {
             var benchmarkStrategy = new BuyAndHoldResearchStrategy(); var benchmark = Run(benchmarkStrategy, cost, null);
-            anyNew |= PersistBacktest(connection, benchmark); results.Add(benchmark);
+            anyNew |= FinanceBacktestPersistence.PersistBacktest(connection, benchmark); results.Add(benchmark);
             foreach (var strategy in new IResearchBacktestStrategy[] { new SmaCrossoverResearchStrategy(), new MomentumResearchStrategy() })
             {
-                var result = Run(strategy, cost, benchmark.Metrics.NetReturn); anyNew |= PersistBacktest(connection, result); results.Add(result);
+                var result = Run(strategy, cost, benchmark.Metrics.NetReturn); anyNew |= FinanceBacktestPersistence.PersistBacktest(connection, result); results.Add(result);
             }
         }
         watch.Stop();
@@ -91,32 +91,6 @@ internal sealed partial class EodhdMarketMemory
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         var json = ScalarTextOrNull(connection, "SELECT result_json FROM backtest_runs WHERE run_id=$id", ("$id", runId));
         return json is null ? null : JsonSerializer.Deserialize<BacktestResult>(json, BacktestJson);
-    }
-
-    internal static bool PersistBacktest(SqliteConnection connection, BacktestResult result)
-    {
-        var existing = ScalarTextOrNull(connection, "SELECT checksum FROM backtest_runs WHERE run_id=$id", ("$id", result.RunId));
-        if (existing is not null)
-        {
-            if (existing != result.Checksum) throw new InvalidOperationException($"Immutable backtest identity conflict for {result.RunId}: stored {existing}, computed {result.Checksum}.");
-            return false;
-        }
-        using var transaction = connection.BeginTransaction();
-        using var insert=connection.CreateCommand();insert.Transaction=transaction;insert.CommandText="INSERT OR IGNORE INTO backtest_runs VALUES($id,$checksum,$strategy,$version,$cost,$feature,$markets,$from,$to,$json,$created)";
-        foreach(var value in new (string Name,object Value)[]{("$id",result.RunId),("$checksum",result.Checksum),("$strategy",result.Configuration.Strategy.Id),("$version",result.Configuration.Strategy.Version),
-            ("$cost",$"{result.Configuration.CostModel.Id}-{result.Configuration.CostModel.Version}"),("$feature",result.Configuration.FeatureRevisionId),
-            ("$markets",JsonSerializer.Serialize(result.Configuration.MarketRevisionIds)),("$from",result.Configuration.From.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),
-            ("$to",result.Configuration.To.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$json",JsonSerializer.Serialize(result,BacktestJson)),("$created",DateTimeOffset.UtcNow.ToString("O"))})insert.Parameters.AddWithValue(value.Name,value.Value);
-        if(insert.ExecuteNonQuery()==0)
-        {
-            transaction.Rollback();var winner=ScalarTextOrNull(connection,"SELECT checksum FROM backtest_runs WHERE run_id=$id",("$id",result.RunId));
-            if(winner!=result.Checksum)throw new InvalidOperationException($"Immutable backtest identity conflict for {result.RunId}: stored {winner??"missing"}, computed {result.Checksum}.");
-            return false;
-        }
-        foreach (var item in result.Events) Execute(connection, transaction, "INSERT INTO backtest_events VALUES($run,$sequence,$json)",("$run",result.RunId),("$sequence",item.Sequence),("$json",JsonSerializer.Serialize(item,BacktestJson)));
-        foreach (var item in result.Fills) Execute(connection, transaction, "INSERT INTO backtest_fills VALUES($run,$id,$json)",("$run",result.RunId),("$id",item.FillId),("$json",JsonSerializer.Serialize(item,BacktestJson)));
-        foreach (var item in result.EquityCurve) Execute(connection, transaction, "INSERT INTO backtest_equity VALUES($run,$date,$json)",("$run",result.RunId),("$date",item.Session.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture)),("$json",JsonSerializer.Serialize(item,BacktestJson)));
-        transaction.Commit(); return true;
     }
 
     private static List<BacktestMarketBar> ReadBacktestMarket(SqliteConnection connection, IReadOnlyList<string> revisions)

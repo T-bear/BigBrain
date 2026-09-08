@@ -164,7 +164,7 @@ internal sealed partial class FinanceDatasetIntakeStore
             [boundedIdentity], bars.Min(x => x.SessionDate), bars.Max(x => x.SessionDate),
             DeterministicBacktestEngine.SizingPolicy, 0, "owner-research-dataset-v1", BacktestFillModel.NextSessionOpen, lineage);
         var result = DeterministicBacktestEngine.Run(configuration, strategy, bars, []);
-        EodhdMarketMemory.PersistBacktest(connection, result);
+        FinanceBacktestPersistence.PersistBacktest(connection, result);
         return result;
     }
 

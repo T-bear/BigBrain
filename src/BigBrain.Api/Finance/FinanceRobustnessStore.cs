@@ -57,7 +57,7 @@ internal sealed partial class EodhdMarketMemory
                 x.Plan.From==from&&x.Plan.To==to&&x.SelectionGovernance?.FinalHoldoutState==HoldoutEvidenceState.Evaluated)?1:0;
             var plan=DeterministicRobustnessEvaluator.CreatePlan(marketRevisions,featureRevision,strategy,universe,from,to,priorHoldoutEvaluations:priorHoldoutEvaluations);
             var build=DeterministicRobustnessEvaluator.Evaluate(plan,strategy,market,features);
-            foreach(var run in build.UnderlyingRuns)PersistBacktest(connection,run);
+            foreach(var run in build.UnderlyingRuns)FinanceBacktestPersistence.PersistBacktest(connection,run);
             anyNew|=PersistEvaluation(connection,build.Evaluation);builds.Add(build);
         }
         watch.Stop();var allRuns=builds.SelectMany(x=>x.Evaluation.UnderlyingRunIds).Distinct(StringComparer.Ordinal).Count();

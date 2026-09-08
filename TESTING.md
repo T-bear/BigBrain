@@ -1,5 +1,17 @@
 # Testa BigBrain
 
+## BB-130C shared immutable backtest writer — review candidate, 2026-09-08
+
+[Boundary and deterministic evidence](docs/reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
+From `4ec675864d76f6da11d747026d917491f085f9e7` on `bb-130c/backtest-persistence-writer`.
+FinanceBacktestPersistence now owns only the immutable four-table write across reference,
+robustness and research-dataset callers. Schema, connections, readers and calculations stay put.
+Pre-move characterization 4/4; post-move focused 82/82. full API **661/661**, Sentinel **32/32**, zero failures/skips; Release **0 warnings / 0 errors**.
+**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**; no CI/owner/runtime acceptance claim.
+Finance RESEARCH / 0 SEK / NONE; no schema change, production access or deployment.
+Other persistence, intake, composition/schema and BB-130D work remains separately scoped.
+
+
 ## BB-130C Finance persistence characterization — accepted, merged and CI verified, 2026-09-08
 
 [Ownership and test evidence](docs/reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md).

@@ -68,11 +68,16 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-08 [shared immutable writer](../reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md):
+REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN. One concrete Finance-owned four-table writer;
+reference/robustness/research callers share it. No schema, connection, reader or scientific change.
+Rollback/replay/conflict and deterministic JSON evidence are verified; no deployment.
+
 2026-09-08 [Finance persistence characterization](../reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md)
 is accepted and merged as `e16c0c9b62f486955483b0ce782167f53e687714`; main CI run `34226093232` passed.
 It maps shared SQLite ownership, distributed DDL/recovery and
 provider-neutral storage under EodhdMarketMemory. No production extraction. The recommended next
-scope is only shared immutable backtest writing, subject to separate owner/architect authorization.
+scope was shared immutable backtest writing; its separately authorized review candidate is above.
 
 2026-09-08 [CSV syntactic tokenizer](../reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md)
 is accepted and merged as `a0f1ff2031016df72744574c5a4e2ee0810b3116`; main CI run `34192468991` passed.
