@@ -1,13 +1,17 @@
 # BigBrain Backlog
 
-## BB-130C shared immutable backtest writer — review candidate, 2026-09-08
+## BB-130C shared immutable backtest writer — accepted, merged and CI verified, 2026-09-08
 
 [Boundary and deterministic evidence](reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
 From `4ec675864d76f6da11d747026d917491f085f9e7` on `bb-130c/backtest-persistence-writer`.
 FinanceBacktestPersistence now owns only the immutable four-table write across reference,
 robustness and research-dataset callers. Schema, connections, readers and calculations stay put.
 Pre-move characterization 4/4; post-move focused 82/82. full API **661/661**, Sentinel **32/32**, zero failures/skips; Release **0 warnings / 0 errors**.
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**; no CI/owner/runtime acceptance claim.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `6463a407221a0e6c47c5b429766f3398a1231994` merged as
+`e28b9850b0ee40f12a68d508f65c9e4c65d57085`; [main CI run 34247876050](https://github.com/T-bear/BigBrain/actions/runs/34247876050)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+No deployment or production runtime verification.
 Finance RESEARCH / 0 SEK / NONE; no schema change, production access or deployment.
 Other persistence, intake, composition/schema and BB-130D work remains separately scoped.
 
@@ -16,7 +20,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 
 - [Responsibility and evidence map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md): tests/docs only from `bb-130c/finance-persistence-characterization`; **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
 - Merge `e16c0c9b62f486955483b0ce782167f53e687714`; main CI run `34226093232` passed all four jobs.
-- The recommended shared writer scope is implemented only in the review candidate above; acceptance remains pending.
+- The recommended shared writer scope is accepted, merged and CI verified as documented above.
 - Gaps remain in whole-initializer concurrency, campaign SQL replay and broader legacy initialization coverage. These are unverified scenarios, not reproduced defects.
 - No migration, new database, production access, provider activation, deployment or next implementation.
 

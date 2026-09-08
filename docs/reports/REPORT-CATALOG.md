@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130C` — [Shared immutable backtest writer — review candidate](features/finance/bb-130c-backtest-persistence-writer-20260908.md)
+- `BB-130C` — [Shared immutable backtest writer — accepted, merged and CI verified](features/finance/bb-130c-backtest-persistence-writer-20260908.md)
 
 - `BB-130C` — [Finance persistence responsibility characterization — accepted, merged and CI verified](features/finance/bb-130c-finance-persistence-characterization-20260908.md)
 

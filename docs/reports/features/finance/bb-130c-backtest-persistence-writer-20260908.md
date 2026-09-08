@@ -12,9 +12,12 @@ Detta är en sanerad GitHub-version. Synthetic temporary SQLite evidence only.
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. Local verification recorded below.
-Branch publication is for architect review; no owner acceptance, main CI claim,
-deployment or runtime verification. Finance **RESEARCH / 0 SEK / NONE**.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `6463a407221a0e6c47c5b429766f3398a1231994` merged as
+`e28b9850b0ee40f12a68d508f65c9e4c65d57085`; [main CI run 34247876050](https://github.com/T-bear/BigBrain/actions/runs/34247876050)
+passed backend, frontend, documentation and secrets on 2026-09-08.
+Local verification remains recorded below. No deployment or production runtime verification.
+Finance **RESEARCH / 0 SEK / NONE**.
 
 ## Evidence
 
@@ -120,7 +123,7 @@ Rights/provenance, fail-closed, cost/execution, holdout/OOS and NOT EVALUABLE se
 
 ## Remaining work
 
-Review/owner acceptance and exact-SHA merge are still required. Other provider-neutral storage,
+This bounded writer extraction is accepted and merged. Other provider-neutral storage,
 shared path naming/ownership, distributed initialization/schema authority, reader full-JSON cost,
 intake and composition debt remain separately scoped; BB-130C is not complete and BB-130D is not begun.
 Unverified broader initializer concurrency/campaign SQL replay remains a gap, not a proven defect.
@@ -130,6 +133,7 @@ before a separately authorized move; no reader optimization or schema work is pr
 
 ## Resumption
 
-Review the exact pushed branch SHA and this evidence. Do not merge, deploy or start another
-checkpoint automatically. Full temporary review state belongs only in
-[canonical recovery](../../../operations/codex-recovery.md). Main remains accepted source of truth.
+Accepted publication resolves the temporary review/recovery note. Main and its CI history are
+source of truth. Any reader characterization or other checkpoint requires separate owner/architect
+authorization; none is started. Do not deploy automatically. Use
+[canonical recovery](../../../operations/codex-recovery.md) only for unfinished work.
