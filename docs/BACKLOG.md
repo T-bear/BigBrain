@@ -1,5 +1,20 @@
 # BigBrain Backlog
 
+## BB-130C backtest readers and exit assessment — review candidate, 2026-09-08
+
+[Reader map, evidence and exit plan](reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
+Baseline `6bfcd011a655a7d9f225bc9c023063738d10db3b`; branch `bb-130c/backtest-reader-exit-assessment`.
+**DO NOT EXTRACT**: one shared JSON read implementation; catalog projection and initialization
+ownership make another helper unjustified now. Two new isolated ordering/malformed-JSON tests;
+existing exact reload/identity/writer evidence reused. Focused **84/84**, full API **663/663**, Sentinel **32/32**, zero failures/skips; Release **0 warnings/errors**.
+**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. No production/schema change or deployment.
+Proposed C exit: **NOT READY**. Remaining bounded evidence: (1) robustness UI selection identity,
+(2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
+Further extraction, sole schema authority and composition are proposed explicit post-BB-130 debt;
+architect/owner must accept those deferrals before using the shortened exit plan. They are not completed.
+Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
+
+
 ## BB-130C shared immutable backtest writer — accepted, merged and CI verified, 2026-09-08
 
 [Boundary and deterministic evidence](reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
@@ -113,7 +128,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-07: A/B complete/published/CI verified; C observation lifecycle and backtest-result identity are published/CI verified (`f0b4dbd73c50047c078227edff0bf9c0d5aa7bde`, Actions 34082759615); remaining C planned and D not started.
+- Status 2026-09-08: A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C remains partial; D not started. The current reader/exit review candidate proposes two remaining characterization checkpoints and explicit debt deferrals, pending owner/architect acceptance.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -123,7 +138,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness has analogous source-level coupling and remains outside this checkpoint.
-- Next: separately scope the next BB-130C backend/intake/persistence/schema or other approved responsibility; no deployment.
+- Next: review the reader/exit assessment above; E1 robustness UI identity and E2 campaign SQL replay are recommended evidence checkpoints only. Do not start them or change accepted scope automatically.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

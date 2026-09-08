@@ -68,6 +68,15 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-08 [reader characterization / proposed exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
+REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN; no production extraction. Current proposed exit readiness
+is NOT READY: E1 robustness UI selected-result characterization, then E2 campaign SQL replay/reload.
+The report classifies all remaining concerns and recommends explicit deferral of broader extraction,
+composition and sole schema authority beyond BB-130. This is a proposed scope reconciliation, not a
+claim those original goals below were delivered. Owner/architect acceptance of deferrals plus accepted
+E1/E2 evidence and resolution of any reproduced blockers is required before transition to D.
+No next checkpoint or deployment starts through this assessment.
+
 2026-09-08 [shared immutable writer](../reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED. Merge `e28b9850b0ee40f12a68d508f65c9e4c65d57085`;
 main CI run `34247876050` passed all four jobs. One concrete Finance-owned four-table writer;

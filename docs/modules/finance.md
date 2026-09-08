@@ -1,5 +1,20 @@
 # Finance module
 
+## BB-130C backtest readers and exit assessment — review candidate, 2026-09-08
+
+[Reader map, evidence and exit plan](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
+Baseline `6bfcd011a655a7d9f225bc9c023063738d10db3b`; branch `bb-130c/backtest-reader-exit-assessment`.
+**DO NOT EXTRACT**: one shared JSON read implementation; catalog projection and initialization
+ownership make another helper unjustified now. Two new isolated ordering/malformed-JSON tests;
+existing exact reload/identity/writer evidence reused. Focused **84/84**, full API **663/663**, Sentinel **32/32**, zero failures/skips; Release **0 warnings/errors**.
+**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN**. No production/schema change or deployment.
+Proposed C exit: **NOT READY**. Remaining bounded evidence: (1) robustness UI selection identity,
+(2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
+Further extraction, sole schema authority and composition are proposed explicit post-BB-130 debt;
+architect/owner must accept those deferrals before using the shortened exit plan. They are not completed.
+Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
+
+
 ## BB-130C shared immutable backtest writer — accepted, merged and CI verified, 2026-09-08
 
 [Boundary and deterministic evidence](../reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
