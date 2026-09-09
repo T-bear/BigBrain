@@ -68,6 +68,13 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-09 [E1 robustness identity correction](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md):
+**E1 CORRECTION — REVIEW CANDIDATE ONLY**. Existing evaluationId/checksum gates visible detail;
+obsolete request completions cannot replace current evidence. Web-only bounded correction; no
+scientific/schema change. Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains NOT MERGEABLE,
+not correction ancestry. E1 awaits acceptance; E2 NOT STARTED; C NOT READY; D NOT STARTED.
+Accepted non-blocking debt remains deferred beyond BB-130. No deployment or provider authority.
+
 2026-09-08 [reader characterization / accepted exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
 main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.

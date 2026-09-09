@@ -1,5 +1,20 @@
 # Finance module
 
+## BB-130C E1 robustness identity correction — review candidate, 2026-09-09
+
+[Correction contract and verification](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md).
+Baseline `87d53241439b6fcbd97a07cd5a3986b59653eab9`; branch
+`bb-130c/robustness-selected-result-identity-fix`. **E1 CORRECTION — REVIEW CANDIDATE ONLY**.
+Selected catalog evaluationId/checksum now gates visible detail; effect-lifetime guards exclude
+obsolete success/failure. Pending/error shows no stale detail; existing reselection behavior remains.
+E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
+Documentation/diff/secrets publication evidence is recorded in the report.
+Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
+E1 NOT ACCEPTED; E2 NOT STARTED; C NOT READY; D NOT STARTED. Accepted debt deferrals unchanged.
+Only Web presentation/request ownership changed. No backend/schema/scientific change, production
+access or deployment. Finance **RESEARCH / 0 SEK / NONE**.
+
+
 ## BB-130C backtest readers and exit assessment — accepted, merged and CI verified, 2026-09-08
 
 [Reader map, evidence and exit plan](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
@@ -15,7 +30,7 @@ No production/schema change, deployment or runtime verification.
 Accepted C exit plan: **NOT READY**. Only currently known remaining blockers: (1) robustness UI selection identity,
 (2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
 The report's non-blocking debt, including further extraction, sole schema authority and composition,
-is explicitly accepted for deferral beyond BB-130, not completed. E1/E2 are not authorized to start;
+is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; separately authorized E1 correction is recorded above;
 BB-130D remains NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
 
