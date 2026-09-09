@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-130C E2 campaign SQLite replay/reload — review candidate, 2026-09-09
+
+[Responsibility map and isolated evidence](docs/reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md).
+Baseline `04a7a9c1f5d4d9afb02f313a272b6c4369709f5a`; branch
+`bb-130c/campaign-sqlite-replay-characterization`. **OUTCOME A / REVIEW CANDIDATE ONLY**.
+One new persistence/reconstruction/replay test; existing BB-127 fixture reused. Production unchanged.
+One campaign / six unique attempts / two dataset revisions and 124 research observations remain
+identical after fresh store/reader reload and replay. Six NOT EVALUABLE outcomes, null BacktestRunId;
+no scientific fallback. Campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
+Release build zero warnings/errors. Publication gates and commands in report.
+E1 remains accepted. E2 awaits architect/owner acceptance, merge and green main CI; C remains
+NOT READY until that acceptance. D NOT STARTED; accepted post-BB-130 debt remains deferred.
+No production data, schema change, provider work or deployment. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-130C E1 robustness identity correction — accepted, merged and CI verified, 2026-09-09
 
 [Correction contract and verification](docs/reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md).
@@ -13,7 +27,8 @@ obsolete success/failure. Pending/error shows no stale detail; existing reselect
 E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
 Documentation/diff/secrets publication evidence is recorded in the report.
 Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
-E1 identity defect resolved and accepted; E2 NOT STARTED and the remaining known C exit requirement.
+E1 identity defect resolved and accepted; E2 remains the known C exit requirement, now characterized
+in the separate review candidate above, not yet accepted.
 C NOT READY until E2 acceptance; D NOT STARTED. Accepted debt deferrals unchanged.
 No deployment, runtime or device UX approval is implied.
 Only Web presentation/request ownership changed. No backend/schema/scientific change, production

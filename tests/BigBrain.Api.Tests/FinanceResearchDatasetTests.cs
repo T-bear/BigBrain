@@ -135,7 +135,7 @@ public sealed class FinanceResearchDatasetTests
         Assert.Equal(4, fixture.Store.ResearchCatalog().Datasets.Count);
     }
 
-    private sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         private readonly string _root = Path.Combine(Path.GetTempPath(), "bb-research-dataset-" + Guid.NewGuid().ToString("N"));
         internal Fixture()

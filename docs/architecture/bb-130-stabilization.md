@@ -68,6 +68,14 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-09 [E2 campaign SQLite replay/reload characterization](../reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md):
+**OUTCOME A / REVIEW CANDIDATE ONLY**. One isolated regression preserves the complete campaign
+row, six attempt identities/outcomes and 126 dataset rows through store reconstruction and replay.
+No production change or blocker reproduced. E1 remains accepted; E2 awaits review/acceptance,
+merge and green main CI. C remains NOT READY until then; D NOT STARTED. If E2 is accepted,
+no further currently-known C blockers remain; exit confirmation and D authorization are separate.
+Accepted post-BB-130 debt stays deferred. No deployment, provider or scientific change.
+
 2026-09-09 [E1 robustness identity correction](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md):
 **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
 Approved candidate `b34178aa40024cb8e7e953c72706bd88b3dda688` merged as `1204322a8764df33c0182db5b1e98d3cd6912d81`.
@@ -76,8 +84,8 @@ passed backend, frontend, documentation and secrets on 2026-09-09.
 Existing evaluationId/checksum gates visible detail;
 obsolete request completions cannot replace current evidence. Web-only bounded correction; no
 scientific/schema change. Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains NOT MERGEABLE,
-not correction ancestry and never merged. E1 is resolved/accepted; E2 NOT STARTED is the
-remaining known exit requirement. C NOT READY until E2 acceptance; D NOT STARTED.
+not correction ancestry and never merged. E1 is resolved/accepted; E2 is the
+remaining known exit requirement, now a characterization review candidate above. C NOT READY until E2 acceptance; D NOT STARTED.
 No deployment, runtime or device UX approval is implied.
 Accepted non-blocking debt remains deferred beyond BB-130. No deployment or provider authority.
 
