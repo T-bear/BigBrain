@@ -19,41 +19,39 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## Current checkpoint review state — 2026-09-09
+## Published E2 reconciliation / C exit-review handoff — 2026-09-09
 
-Status: REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN
-Task: BB-130C E2 campaign SQLite persistence/replay/reload characterization.
-Baseline/source-of-truth SHA: `04a7a9c1f5d4d9afb02f313a272b6c4369709f5a`.
-Branch: `bb-130c/campaign-sqlite-replay-characterization`, directly from that baseline.
-Review identity: the branch commit containing this note/report; verify its exact remote SHA
-before review/merge. Main remains the accepted source of truth.
+Status: E2 ACCEPTED / MERGED TO MAIN / CI VERIFIED; no interrupted implementation remains.
 
-Completed and valid: OUTCOME A. One new isolated SQLite test reuses the BB-127 fixture,
-reconstructs store/reader and connections, and compares complete campaign JSON/raw row snapshots
-before reload, same-definition replay and final reload. One campaign, six unique attempts,
-two research revisions plus 124 research observations stay unchanged. NOT EVALUABLE and null
-BacktestRunId remain intact; missing ID returns null. No blocker reproduced or production change.
+- Accepted candidate: `c59f0200cf73bb936fb6f83ceaf603c0e1cf9d40`.
+- Original main / candidate sole parent: `04a7a9c1f5d4d9afb02f313a272b6c4369709f5a`.
+- Merge main SHA: `f8f5df5f0c91688c58b2466cb276dda0dfa8c346`.
+- [Merge CI 34337618297](https://github.com/T-bear/BigBrain/actions/runs/34337618297):
+  completed/success; backend, frontend, documentation and secrets all succeeded.
+- Reconciliation/final main SHA: the documentation commit titled
+  `docs: reconcile accepted E2 and pending BB-130C exit review` containing this handoff.
+  Resolve its full SHA from GitHub history (or `git log -1 --format=%H --grep='^docs: reconcile accepted E2 and pending BB-130C exit review$' origin/main`).
+- Final main CI: GitHub Actions CI for that exact reconciliation SHA, event push, branch main.
+  Require completed/success and all four jobs successful; do not use the earlier merge run as a substitute.
+  The commit cannot embed its own future hash/run ID. This immutable commit identity plus GitHub's
+  exact-SHA Actions record reconstructs final publication without terminal history. A pending/failed
+  final run means reconciliation publication is not yet verified; stop rather than starting new work.
 
-Changed files: `tests/BigBrain.Api.Tests/FinanceResearchCampaignTests.cs` and fixture visibility
-only in `tests/BigBrain.Api.Tests/FinanceResearchDatasetTests.cs`; `TESTING.md`, `docs/STATUS.md`,
-`docs/BACKLOG.md`, `docs/modules/finance.md`, `docs/architecture/bb-130-stabilization.md`,
-`docs/reports/REPORT-CATALOG.md`, this note and
+OUTCOME A: campaign creation/reconstruction/replay preserves one campaign, six unique attempts,
+CampaignId/checksum/definition/lineage/scorecard/results and all dataset snapshot rows. NOT EVALUABLE
+and null BacktestRunId remain intact. No blocker reproduced; no production source changed.
+Local evidence: campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
+Release zero warnings/errors. Exact commands and limitations remain in
 [the E2 report](../reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md).
+Only canonical documentation changes in reconciliation; tests and production source remain untouched.
+Existing unrelated untracked mockups and ADR drafts remain preserved/excluded.
 
-Tests/builds: campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
-Release solution build zero warnings/errors. Exact commands and publication gates are in the report.
-No Web/shared API change; no unrelated Web rerun. No GitHub CI claim for this review candidate.
+E1 and E2 accepted. No currently-known BB-130C blocking checkpoint remains.
+**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
+C is not formally exited/closed/completed. BB-130D NOT STARTED. Accepted post-BB-130 debt remains
+explicitly deferred, not delivered. Historical blocker branches remain NOT MERGEABLE.
 
-Git/unrelated work: only intended test/documentation files belong to this checkpoint. Existing
-untracked design mockups and ADR 0006–0009 drafts are unrelated, preserved and excluded.
-No incomplete implementation or interrupted run remains in this checkpoint.
-
-Remaining: architect review and exact-SHA owner merge approval; then controlled merge/main CI
-and documentation reconciliation. E1 remains accepted. E2 is not accepted; C remains NOT READY
-until E2 acceptance/merge/green main CI and exit confirmation. D NOT STARTED. Existing accepted
-post-BB-130 debt stays deferred. Sequential replay is characterized; concurrent creators,
-corruption and power-loss behavior are unverified scenarios, not reproduced defects.
-
-Exact next action: architect reviews the published E2 branch/report. Do not merge without
-exact-SHA owner approval, begin D, deploy, or incorporate outside Alpaca clarification.
-Finance RESEARCH / 0 SEK / NONE; no schema, science, production data or provider changes.
+Exact next action after final main CI succeeds: Return to ChatGPT with "Codex är klar" for
+BB-130C exit review. Do not start D, another C checkpoint or Alpaca work.
+Finance RESEARCH / 0 SEK / NONE. No scientific/schema/data/provider/trading/deployment action;
+no production access or runtime/device UX approval is implied.

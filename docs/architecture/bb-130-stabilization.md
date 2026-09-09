@@ -69,11 +69,18 @@ to gather loading evidence.
 ## C — behavior-preserving code health
 
 2026-09-09 [E2 campaign SQLite replay/reload characterization](../reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md):
-**OUTCOME A / REVIEW CANDIDATE ONLY**. One isolated regression preserves the complete campaign
+**OUTCOME A / ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `c59f0200cf73bb936fb6f83ceaf603c0e1cf9d40` merged as
+`f8f5df5f0c91688c58b2466cb276dda0dfa8c346`; [merge CI 34337618297](https://github.com/T-bear/BigBrain/actions/runs/34337618297)
+passed backend, frontend, documentation and secrets on 2026-09-09.
+
+One isolated regression preserves the complete campaign
 row, six attempt identities/outcomes and 126 dataset rows through store reconstruction and replay.
-No production change or blocker reproduced. E1 remains accepted; E2 awaits review/acceptance,
-merge and green main CI. C remains NOT READY until then; D NOT STARTED. If E2 is accepted,
-no further currently-known C blockers remain; exit confirmation and D authorization are separate.
+No production change or blocker reproduced.
+E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
+**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
+C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
 Accepted post-BB-130 debt stays deferred. No deployment, provider or scientific change.
 
 2026-09-09 [E1 robustness identity correction](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md):
@@ -84,16 +91,16 @@ passed backend, frontend, documentation and secrets on 2026-09-09.
 Existing evaluationId/checksum gates visible detail;
 obsolete request completions cannot replace current evidence. Web-only bounded correction; no
 scientific/schema change. Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains NOT MERGEABLE,
-not correction ancestry and never merged. E1 is resolved/accepted; E2 is the
-remaining known exit requirement, now a characterization review candidate above. C NOT READY until E2 acceptance; D NOT STARTED.
+not correction ancestry and never merged. E1 and E2 are resolved/accepted above. C checkpoints are satisfied, pending architect/owner exit confirmation; D NOT STARTED.
 No deployment, runtime or device UX approval is implied.
 Accepted non-blocking debt remains deferred beyond BB-130. No deployment or provider authority.
 
 2026-09-08 [reader characterization / accepted exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
 main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.
-The reader assessment identified E1 then E2. E1 is now resolved above. Current C exit readiness
-is NOT READY: E2 campaign SQL replay/reload remains the known exit requirement. BB-130D is NOT STARTED.
+The reader assessment identified E1 then E2. Both are now accepted above; no currently-known C
+blocking checkpoint remains. C checkpoints are satisfied, pending architect/owner exit confirmation.
+BB-130D is NOT STARTED.
 The report's non-blocking debt is explicitly accepted for deferral beyond BB-130, including broader
 extraction, composition and sole schema authority. This reconciles the original scope below;
 it does not claim those goals were delivered or waive safety gates. Accepted E1/E2 evidence and

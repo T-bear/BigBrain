@@ -1,17 +1,23 @@
 # BigBrain Status
 
-## BB-130C E2 campaign SQLite replay/reload — review candidate, 2026-09-09
+## BB-130C E2 campaign SQLite replay/reload — accepted, merged and CI verified, 2026-09-09
 
 [Responsibility map and isolated evidence](reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md).
 Baseline `04a7a9c1f5d4d9afb02f313a272b6c4369709f5a`; branch
-`bb-130c/campaign-sqlite-replay-characterization`. **OUTCOME A / REVIEW CANDIDATE ONLY**.
+`bb-130c/campaign-sqlite-replay-characterization`. **OUTCOME A / ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `c59f0200cf73bb936fb6f83ceaf603c0e1cf9d40` merged as
+`f8f5df5f0c91688c58b2466cb276dda0dfa8c346`; [merge CI 34337618297](https://github.com/T-bear/BigBrain/actions/runs/34337618297)
+passed backend, frontend, documentation and secrets on 2026-09-09.
+
 One new persistence/reconstruction/replay test; existing BB-127 fixture reused. Production unchanged.
 One campaign / six unique attempts / two dataset revisions and 124 research observations remain
 identical after fresh store/reader reload and replay. Six NOT EVALUABLE outcomes, null BacktestRunId;
 no scientific fallback. Campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
 Release build zero warnings/errors. Publication gates and commands in report.
-E1 remains accepted. E2 awaits architect/owner acceptance, merge and green main CI; C remains
-NOT READY until that acceptance. D NOT STARTED; accepted post-BB-130 debt remains deferred.
+E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
+**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
+C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
 No production data, schema change, provider work or deployment. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-130C E1 robustness identity correction — accepted, merged and CI verified, 2026-09-09
@@ -27,9 +33,8 @@ obsolete success/failure. Pending/error shows no stale detail; existing reselect
 E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
 Documentation/diff/secrets publication evidence is recorded in the report.
 Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
-E1 identity defect resolved and accepted; E2 remains the known C exit requirement, now characterized
-in the separate review candidate above, not yet accepted.
-C NOT READY until E2 acceptance; D NOT STARTED. Accepted debt deferrals unchanged.
+E1 identity defect resolved and accepted; E2 is now accepted above. C implementation checkpoints
+are satisfied, pending architect/owner exit confirmation. D NOT STARTED. Accepted debt deferrals unchanged.
 No deployment, runtime or device UX approval is implied.
 Only Web presentation/request ownership changed. No backend/schema/scientific change, production
 access or deployment. Finance **RESEARCH / 0 SEK / NONE**.
@@ -48,10 +53,10 @@ Approved candidate `e868b601d511e17554452c24ac7ed9d591bf051f` merged as
 passed backend, frontend, documentation and secrets on 2026-09-08.
 No production/schema change, deployment or runtime verification.
 At the reader checkpoint the accepted C exit plan identified E1 robustness identity and E2
-campaign SQLite replay/reload. E1 is now resolved above; C remains **NOT READY** pending E2.
-New defects, if reproduced in E2, require separate correction.
+campaign SQLite replay/reload. E1 and E2 are now accepted above; no currently-known C blocking
+checkpoint remains. C awaits architect/owner exit confirmation; no E2 blocker was reproduced.
 The report's non-blocking debt, including further extraction, sole schema authority and composition,
-is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; the separately approved E1 merge is recorded above;
+is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; the separately approved E1 and E2 merges are recorded above;
 BB-130D remains NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
 

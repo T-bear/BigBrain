@@ -16,10 +16,17 @@
 ## Status
 
 **OUTCOME A — CURRENT IMPLEMENTATION SATISFIES THE CHARACTERIZED CAMPAIGN PERSISTENCE / REPLAY IDENTITY CONTRACT.**
-**REVIEW CANDIDATE ONLY — NOT MERGED TO MAIN.** No reproduced blocker and no production refactor.
-E1 remains accepted/merged/CI verified. E2 characterization is locally verified, pending architect
-review and owner acceptance. BB-130C remains **NOT READY** until E2 acceptance, merge and green
-main CI; BB-130D is **NOT STARTED**. No deployment, runtime or device/owner UX claim.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**. No reproduced blocker and no production refactor.
+Approved candidate `c59f0200cf73bb936fb6f83ceaf603c0e1cf9d40` merged as
+`f8f5df5f0c91688c58b2466cb276dda0dfa8c346`; [merge CI 34337618297](https://github.com/T-bear/BigBrain/actions/runs/34337618297)
+passed backend, frontend, documentation and secrets on 2026-09-09.
+
+E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
+**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
+C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
+No deployment, runtime or device/owner UX claim. Final reconciliation commit and its exact-SHA CI
+are identified through the canonical recovery instructions; merge CI is not substituted for final CI.
 
 ## Production path map
 
@@ -128,7 +135,9 @@ git diff --cached | docker run --rm -i --network none zricethezav/gitleaks:v8.28
 - Full API: **664/664**; Sentinel/architecture: **32/32**, zero failures/skips.
 - Documentation verifier: **passed**, 235 Markdown files / 90 unique backlog IDs.
 - Working and staged diff checks: **passed**. Staged Gitleaks v8.28.0: **no leaks found**.
-- Local results are not GitHub CI or main acceptance; this is branch publication for review.
+- Local results remain distinct from the successful merge CI recorded above. Documentation reconciliation
+  runs the documentation verifier, working/staged diff checks and staged Gitleaks separately; final
+  documentation main CI must pass before publication is reported complete.
 - Web not rerun: no Web or shared/frontend/API contract changed. Compose unchanged.
 
 ## Changes
@@ -148,11 +157,11 @@ report contains no raw datasets, secrets, private identities or sensitive paths.
 
 ## Remaining work
 
-Architect review and owner acceptance/merge/main CI are still required. E1 remains accepted;
-E2 now has passing bounded evidence, not accepted completion. No new blocker was reproduced.
-After E2 acceptance there are no further currently-known C blocking checkpoints in the accepted
-short exit plan; owner/architect must confirm exit before separately authorizing BB-130D.
-C is not marked complete here. Existing post-BB-130 debt remains explicitly deferred.
+E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
+**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
+C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
+No new blocker was reproduced. Accepted deferred debt is not claimed as delivered implementation.
 
 Limits: sequential replay/reconstruction over unchanged inputs; no corruption injection, concurrent
 campaign creators, power failure or transitional candidate recovery matrix. It does not establish
@@ -163,5 +172,5 @@ performance claim. Scientific feature/holdout absence remains a legitimate limit
 ## Resumption
 
 Use [canonical recovery](../../../operations/codex-recovery.md), current STATUS and the published
-branch SHA. Review this bounded evidence; merge only after exact-SHA owner approval. No E2 production
-fix, BB-130D, deployment or new provider work is authorized automatically by this publication.
+main history and exact-SHA GitHub CI. E2 is accepted; return to ChatGPT with "Codex är klar"
+for BB-130C exit review. No E2 production fix, BB-130D, deployment or new provider work is authorized.
