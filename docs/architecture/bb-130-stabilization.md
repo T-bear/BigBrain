@@ -69,17 +69,23 @@ to gather loading evidence.
 ## C — behavior-preserving code health
 
 2026-09-09 [E1 robustness identity correction](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md):
-**E1 CORRECTION — REVIEW CANDIDATE ONLY**. Existing evaluationId/checksum gates visible detail;
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `b34178aa40024cb8e7e953c72706bd88b3dda688` merged as `1204322a8764df33c0182db5b1e98d3cd6912d81`.
+[Main CI run 34312516174](https://github.com/T-bear/BigBrain/actions/runs/34312516174)
+passed backend, frontend, documentation and secrets on 2026-09-09.
+Existing evaluationId/checksum gates visible detail;
 obsolete request completions cannot replace current evidence. Web-only bounded correction; no
 scientific/schema change. Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains NOT MERGEABLE,
-not correction ancestry. E1 awaits acceptance; E2 NOT STARTED; C NOT READY; D NOT STARTED.
+not correction ancestry and never merged. E1 is resolved/accepted; E2 NOT STARTED is the
+remaining known exit requirement. C NOT READY until E2 acceptance; D NOT STARTED.
+No deployment, runtime or device UX approval is implied.
 Accepted non-blocking debt remains deferred beyond BB-130. No deployment or provider authority.
 
 2026-09-08 [reader characterization / accepted exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
 main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.
-Current C exit readiness is NOT READY: only E1 robustness UI selected-result characterization,
-then E2 campaign SQL replay/reload remain known blocking checkpoints. BB-130D is NOT STARTED.
+The reader assessment identified E1 then E2. E1 is now resolved above. Current C exit readiness
+is NOT READY: E2 campaign SQL replay/reload remains the known exit requirement. BB-130D is NOT STARTED.
 The report's non-blocking debt is explicitly accepted for deferral beyond BB-130, including broader
 extraction, composition and sole schema authority. This reconciles the original scope below;
 it does not claim those goals were delivered or waive safety gates. Accepted E1/E2 evidence and

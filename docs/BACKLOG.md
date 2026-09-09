@@ -1,16 +1,21 @@
 # BigBrain Backlog
 
-## BB-130C E1 robustness identity correction — review candidate, 2026-09-09
+## BB-130C E1 robustness identity correction — accepted, merged and CI verified, 2026-09-09
 
 [Correction contract and verification](reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md).
 Baseline `87d53241439b6fcbd97a07cd5a3986b59653eab9`; branch
-`bb-130c/robustness-selected-result-identity-fix`. **E1 CORRECTION — REVIEW CANDIDATE ONLY**.
+`bb-130c/robustness-selected-result-identity-fix`. **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `b34178aa40024cb8e7e953c72706bd88b3dda688` merged as `1204322a8764df33c0182db5b1e98d3cd6912d81`.
+[Main CI run 34312516174](https://github.com/T-bear/BigBrain/actions/runs/34312516174)
+passed backend, frontend, documentation and secrets on 2026-09-09.
 Selected catalog evaluationId/checksum now gates visible detail; effect-lifetime guards exclude
 obsolete success/failure. Pending/error shows no stale detail; existing reselection behavior remains.
 E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
 Documentation/diff/secrets publication evidence is recorded in the report.
 Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
-E1 NOT ACCEPTED; E2 NOT STARTED; C NOT READY; D NOT STARTED. Accepted debt deferrals unchanged.
+E1 identity defect resolved and accepted; E2 NOT STARTED and the remaining known C exit requirement.
+C NOT READY until E2 acceptance; D NOT STARTED. Accepted debt deferrals unchanged.
+No deployment, runtime or device UX approval is implied.
 Only Web presentation/request ownership changed. No backend/schema/scientific change, production
 access or deployment. Finance **RESEARCH / 0 SEK / NONE**.
 
@@ -27,10 +32,11 @@ Approved candidate `e868b601d511e17554452c24ac7ed9d591bf051f` merged as
 `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`; [main CI run 34275678369](https://github.com/T-bear/BigBrain/actions/runs/34275678369)
 passed backend, frontend, documentation and secrets on 2026-09-08.
 No production/schema change, deployment or runtime verification.
-Accepted C exit plan: **NOT READY**. Only currently known remaining blockers: (1) robustness UI selection identity,
-(2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
+At the reader checkpoint the accepted C exit plan identified E1 robustness identity and E2
+campaign SQLite replay/reload. E1 is now resolved above; C remains **NOT READY** pending E2.
+New defects, if reproduced in E2, require separate correction.
 The report's non-blocking debt, including further extraction, sole schema authority and composition,
-is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; separately authorized E1 correction is recorded above;
+is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; the separately approved E1 merge is recorded above;
 BB-130D remains NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
 
@@ -148,7 +154,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-08: A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C remains partial; D not started. The accepted reader/exit plan has only E1/E2 as currently known blockers and explicitly defers non-blocking debt beyond BB-130.
+- Status 2026-09-08: A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C remains partial; D not started. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 is now resolved; only E2 remains a known exit requirement.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -157,8 +163,8 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
-- Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now a review candidate above, not accepted.
-- Next: architect review and exact-SHA owner merge approval for the E1 correction candidate. E2 campaign SQLite replay remains separately scoped and NOT STARTED; E1/E2 acceptance is required before D.
+- Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
+- Next recommendation only: obtain separate owner authorization for E2 campaign SQLite replay/reload characterization. Do not start it automatically. E1 is accepted; C remains NOT READY until E2 acceptance, and D is NOT STARTED.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

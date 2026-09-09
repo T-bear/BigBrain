@@ -13,9 +13,13 @@
 
 ## Status
 
-**E1 CORRECTION — REVIEW CANDIDATE ONLY. NOT MERGED TO MAIN.**
-Implementation is limited to Web presentation/request ownership. Architect review and owner
-acceptance remain pending. E2 **NOT STARTED**, BB-130C **NOT READY**, BB-130D **NOT STARTED**.
+**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
+Approved candidate `b34178aa40024cb8e7e953c72706bd88b3dda688` merged as `1204322a8764df33c0182db5b1e98d3cd6912d81`.
+[Main CI run 34312516174](https://github.com/T-bear/BigBrain/actions/runs/34312516174)
+passed backend, frontend, documentation and secrets on 2026-09-09.
+The selected-summary/detail defect is resolved in accepted source. Implementation is limited
+to Web presentation/request ownership. E2 **NOT STARTED** remains the known exit requirement;
+BB-130C **NOT READY** until E2 acceptance, BB-130D **NOT STARTED**.
 Accepted non-blocking debt deferrals remain in force. No deployment or runtime/owner UX claim.
 
 ## Root cause and identity contract
@@ -110,7 +114,8 @@ git diff --cached | docker run --rm -i --network none zricethezav/gitleaks:v8.28
 - Documentation verifier: **passed, 234 Markdown files / 90 unique backlog IDs**.
 - Working/staged diff checks: **passed**. Staged Gitleaks v8.28.0: **no leaks**.
 - Bounded publication: one production file, one test file, eight documentation files.
-  Unrelated mockups and ADR proposals excluded. No branch CI or accepted/main status inferred.
+  Unrelated mockups and ADR proposals excluded. Local evidence above predates acceptance;
+  actual main CI and exact accepted candidate/merge identities are recorded in Status.
 - Backend/API/Sentinel/backend Release/Compose not rerun: no backend, shared/API contract,
   schema or Compose changes. No production Finance data used.
 
@@ -135,15 +140,15 @@ No new Alpaca support evidence or integration is included. Sanitized synthetic e
 
 ## Remaining work
 
-Architect review and owner approval of this exact correction branch SHA. E1 is not accepted
-until reviewed/merged with verified main CI. E2 remains separately scoped and NOT STARTED;
-C remains NOT READY until accepted E1/E2 completion. Existing broader debt stays deferred.
+E1 correction is accepted, merged and CI verified. E2 remains separately scoped and NOT STARTED;
+C remains NOT READY until E2 acceptance. Existing broader debt stays deferred. E2 and D were
+not authorized to start by this merge. No deployment/runtime/device UX approval is implied.
 No production incidence audit, device-specific manual UX approval, adversarial JSON integrity
 validation or performance claim. This correction does not certify every unrelated catalog race.
 
 ## Resumption
 
-Use [canonical recovery](../../../operations/codex-recovery.md) and the branch's published SHA.
-Main remains accepted source of truth. The blocker evidence branch must never be merged.
-Review this correction, then obtain explicit exact-SHA merge approval; do not automatically
-start E2, BB-130D, provider work or deployment.
+The checkpoint review note is cleared in [canonical recovery](../../../operations/codex-recovery.md).
+Main contains the accepted correction and publication evidence. The historical blocker was
+excluded from ancestry, never merged and remains NOT MERGEABLE. The next recommendation is
+separate authorization for E2; do not start E2, BB-130D, provider work or deployment automatically.
