@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C exit, 2026-09-09` — [Architect/owner exit approved; accepted debt remains deferred](../architecture/bb-130-stabilization.md#bb-130c-exit-approved--2026-09-09). Historical reports retain their dated scope; BB-130D NOT STARTED.
+
 - `BB-130C E2` — [Campaign SQLite persistence/replay/reload characterization — accepted, merged and CI verified](features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md)
 
 - `BB-130C E1` — [Robustness selected-result identity correction — accepted, merged and CI verified](features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md)

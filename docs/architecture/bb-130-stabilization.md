@@ -1,5 +1,20 @@
 # BB-130 — platform stabilization, performance and continuity
 
+## BB-130C exit approved — 2026-09-09
+
+Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**
+after review of `00a1fb1ab58a7db8ed1d05ff159f8cebd13b5359` and successful
+[CI 34338386364](https://github.com/T-bear/BigBrain/actions/runs/34338386364).
+BB-130A COMPLETE; BB-130B COMPLETE; BB-130C COMPLETE / EXIT APPROVED;
+BB-130D NOT STARTED and requires separate authorization.
+E1 and E2 remain ACCEPTED / MERGED / CI VERIFIED. No currently-known C blocking checkpoint remains.
+Broader persistence/naming, composition/DI, sole schema/DDL authority, initialization/recovery,
+structural hardening, reader extraction and other accepted post-BB-130 debt remain DEFERRED,
+not implemented. C exit does not claim all original aspirational refactors were delivered.
+No deployment, physical-device/runtime approval or new Finance authority is implied.
+Finance RESEARCH / 0 SEK / NONE. Next: independent verification of this reconciliation in ChatGPT;
+do not start D, Research Learning or Live Market Shadow.
+
 ## WHY / BASELINE / SCOPE
 
 Owner priority is stabilization before further Finance features. Improve continuity,
@@ -22,9 +37,9 @@ Use the existing modular monolith, adapters and shared UI primitives. Every
 extraction must own a verified responsibility, not just reduce line count.
 The owner authorized this ordered sprint, BB-130A publication and subsequently the
 BB-130B implementation/evidence and final documentation publication. The B publication
-task stopped before C. The owner has now authorized only the first C observation/cache/refresh
+task stopped before C. At that point the owner authorized only the first C observation/cache/refresh
 implementation checkpoint, then explicitly approved its publication and CI reconciliation.
-That bounded checkpoint is published/CI verified; C overall remains partial. Characterization
+That bounded checkpoint was published/CI verified while C was still partial; current C exit approval is recorded above. Characterization
 precedes extraction; no backend work or next checkpoint starts automatically. See the
 [bounded evidence](../reports/features/finance/bb-130c-observation-lifecycle-20260906.md). Deployment is a
 separate action requiring explicit authorization. Sentinel security reconciliation
@@ -78,9 +93,9 @@ One isolated regression preserves the complete campaign
 row, six attempt identities/outcomes and 126 dataset rows through store reconstruction and replay.
 No production change or blocker reproduced.
 E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
-**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
-C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
-remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
+**BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**.
+C exit was approved by architect/owner on 2026-09-09. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent publication verification; D requires separate authorization.
 Accepted post-BB-130 debt stays deferred. No deployment, provider or scientific change.
 
 2026-09-09 [E1 robustness identity correction](../reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md):
@@ -91,7 +106,7 @@ passed backend, frontend, documentation and secrets on 2026-09-09.
 Existing evaluationId/checksum gates visible detail;
 obsolete request completions cannot replace current evidence. Web-only bounded correction; no
 scientific/schema change. Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains NOT MERGEABLE,
-not correction ancestry and never merged. E1 and E2 are resolved/accepted above. C checkpoints are satisfied, pending architect/owner exit confirmation; D NOT STARTED.
+not correction ancestry and never merged. E1 and E2 are resolved/accepted above. C is complete / exit approved on 2026-09-09; D NOT STARTED.
 No deployment, runtime or device UX approval is implied.
 Accepted non-blocking debt remains deferred beyond BB-130. No deployment or provider authority.
 
@@ -99,7 +114,7 @@ Accepted non-blocking debt remains deferred beyond BB-130. No deployment or prov
 ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
 main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.
 The reader assessment identified E1 then E2. Both are now accepted above; no currently-known C
-blocking checkpoint remains. C checkpoints are satisfied, pending architect/owner exit confirmation.
+blocking checkpoint remains. C is complete / exit approved on 2026-09-09.
 BB-130D is NOT STARTED.
 The report's non-blocking debt is explicitly accepted for deferral beyond BB-130, including broader
 extraction, composition and sole schema authority. This reconciles the original scope below;

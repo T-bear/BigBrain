@@ -1,5 +1,20 @@
 # BigBrain Status
 
+## BB-130C exit approved — 2026-09-09
+
+Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**
+after review of `00a1fb1ab58a7db8ed1d05ff159f8cebd13b5359` and successful
+[CI 34338386364](https://github.com/T-bear/BigBrain/actions/runs/34338386364).
+BB-130A COMPLETE; BB-130B COMPLETE; BB-130C COMPLETE / EXIT APPROVED;
+BB-130D NOT STARTED and requires separate authorization.
+E1 and E2 remain ACCEPTED / MERGED / CI VERIFIED. No currently-known C blocking checkpoint remains.
+Broader persistence/naming, composition/DI, sole schema/DDL authority, initialization/recovery,
+structural hardening, reader extraction and other accepted post-BB-130 debt remain DEFERRED,
+not implemented. C exit does not claim all original aspirational refactors were delivered.
+No deployment, physical-device/runtime approval or new Finance authority is implied.
+Finance RESEARCH / 0 SEK / NONE. Next: independent verification of this reconciliation in ChatGPT;
+do not start D, Research Learning or Live Market Shadow.
+
 ## BB-130C E2 campaign SQLite replay/reload — accepted, merged and CI verified, 2026-09-09
 
 [Responsibility map and isolated evidence](reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md).
@@ -15,9 +30,9 @@ identical after fresh store/reader reload and replay. Six NOT EVALUABLE outcomes
 no scientific fallback. Campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
 Release build zero warnings/errors. Publication gates and commands in report.
 E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
-**BB-130C IMPLEMENTATION CHECKPOINTS SATISFIED — PENDING ARCHITECT/OWNER EXIT CONFIRMATION**.
-C is not declared exited/closed/completed. BB-130D remains NOT STARTED; accepted post-BB-130 debt
-remains deferred, not implemented. Next action: independent C exit review; no next work authorized.
+**BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**.
+C exit was approved by architect/owner on 2026-09-09. BB-130D remains NOT STARTED; accepted post-BB-130 debt
+remains deferred, not implemented. Next action: independent publication verification; D requires separate authorization.
 No production data, schema change, provider work or deployment. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-130C E1 robustness identity correction — accepted, merged and CI verified, 2026-09-09
@@ -33,8 +48,7 @@ obsolete success/failure. Pending/error shows no stale detail; existing reselect
 E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
 Documentation/diff/secrets publication evidence is recorded in the report.
 Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
-E1 identity defect resolved and accepted; E2 is now accepted above. C implementation checkpoints
-are satisfied, pending architect/owner exit confirmation. D NOT STARTED. Accepted debt deferrals unchanged.
+E1 identity defect resolved and accepted; E2 is now accepted above. C is complete / exit approved on 2026-09-09. D NOT STARTED. Accepted debt deferrals unchanged.
 No deployment, runtime or device UX approval is implied.
 Only Web presentation/request ownership changed. No backend/schema/scientific change, production
 access or deployment. Finance **RESEARCH / 0 SEK / NONE**.
@@ -54,7 +68,7 @@ passed backend, frontend, documentation and secrets on 2026-09-08.
 No production/schema change, deployment or runtime verification.
 At the reader checkpoint the accepted C exit plan identified E1 robustness identity and E2
 campaign SQLite replay/reload. E1 and E2 are now accepted above; no currently-known C blocking
-checkpoint remains. C awaits architect/owner exit confirmation; no E2 blocker was reproduced.
+checkpoint remains. C is complete / exit approved; no E2 blocker was reproduced.
 The report's non-blocking debt, including further extraction, sole schema authority and composition,
 is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; the separately approved E1 and E2 merges are recorded above;
 BB-130D remains NOT STARTED.
@@ -191,7 +205,7 @@ build pass. Documentation verification passes (224 Markdown / 90 BB IDs). The ni
 on demand; close/reopen and selected-result dependencies are mapped. This characterization
 historically reproduced a backtest display mismatch pairing a new selected summary with the
 previous curve while the new result was pending. Extraction was deferred in that checkpoint;
-the later identity checkpoint corrected the defect. No scientific-data change; C remains partial, D not
+the later identity checkpoint corrected the defect. No scientific-data change; that checkpoint left C partial. Current C exit is approved above; D remains not
 started. Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` passed
 [Actions 34047595837](https://github.com/T-bear/BigBrain/actions/runs/34047595837) across backend restore/Release build/full tests, frontend
 install/test/build, documentation and full-history secrets. Earlier observation checkpoint
