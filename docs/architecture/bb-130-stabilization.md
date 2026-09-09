@@ -68,6 +68,14 @@ to gather loading evidence.
 
 ## C — behavior-preserving code health
 
+2026-09-09 [E1 robustness selected-result identity](../reports/features/finance/bb-130c-robustness-selected-result-identity-20260908.md):
+**BLOCKER HANDOFF — NOT MERGEABLE / DECISION B**. Synthetic unchanged-production tests
+reproduce B summary with A detail while pending and after late A completion. E1 is BLOCKED,
+not accepted; separate main-derived correction authorization is required. Only tests/docs changed.
+Focused Web file: 37 pass / 2 intentionally fail. E2 NOT STARTED; C NOT READY; D NOT STARTED.
+No change to accepted deferrals, scientific gates or Finance RESEARCH / 0 SEK / NONE.
+
+
 2026-09-08 [reader characterization / accepted exit assessment](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md):
 ACCEPTED / MERGED TO MAIN / CI VERIFIED; merge `796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`,
 main CI `34275678369` passed all four jobs. DO NOT EXTRACT is accepted; no production extraction.

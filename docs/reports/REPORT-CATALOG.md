@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130C E1` — [Robustness selected-result identity — BLOCKER HANDOFF — NOT MERGEABLE](features/finance/bb-130c-robustness-selected-result-identity-20260908.md)
+
 - `BB-130C` — [Backtest reader characterization and exit assessment — accepted, merged and CI verified](features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md)
 
 - `BB-130C` — [Shared immutable backtest writer — accepted, merged and CI verified](features/finance/bb-130c-backtest-persistence-writer-20260908.md)

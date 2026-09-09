@@ -4,7 +4,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import * as api from '../api'
 import { aggregateSignalRisk, FinanceObservation } from './FinanceObservation'
 import { FINANCE_SNAPSHOT_CACHE_KEY, writeFinanceSnapshotCache } from './financeSnapshotCache'
-import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceBacktestCatalog, FinanceBacktestResult, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceShadowCatalog } from '../types'
+import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceBacktestCatalog, FinanceBacktestResult, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceRobustnessEvaluation, FinanceShadowCatalog } from '../types'
 import { dashboardRegistry } from '../dashboard/appWidgets'
 
 const empty: FinanceObservationSnapshot = {
@@ -553,5 +553,136 @@ describe('Finance read-only observation UI', () => {
     expect(screen.getByText('PAUSAD — SYSTEMBELASTNING')).toBeVisible();expect(screen.getByText('finance.research.scheduler.resource.memory')).toBeVisible()
     expect(screen.getByText('BEHÖVER UPPMÄRKSAMHET')).toBeVisible();expect(screen.getAllByText('3').length).toBeGreaterThan(0)
     expect(screen.queryByText(/trading active/i)).not.toBeInTheDocument()
+  })
+})
+
+
+// BB-130C E1: BLOCKER HANDOFF — NOT MERGEABLE if the identity assertions fail.
+// Synthetic API promises deliberately permit late completion after abort to test
+// UI stale-response protection independently of transport cancellation.
+describe('BB-130C E1 robustness selected-result identity', () => {
+  const catalog: FinanceRobustnessCatalog = {
+    generatedAtUtc: '2026-09-08T12:00:00Z', operatingMode: 'RESEARCH', plans: [],
+    evaluations: ['A', 'B'].map(id => ({
+      evaluationId: `evaluation-${id}`, checksum: `checksum-${id}`,
+      strategyId: `robustness-${id}`, strategyVersion: 'v1', planId: `plan-${id}`, planVersion: 'v1',
+      verdict: 'insufficientData', score: id === 'A' ? 11 : 22, evidenceLabel: `evidence-${id}`,
+      trainSessions: 100, testSessions: 20, embargoSessions: 50, walkForwardWindows: 1,
+      parameterVariants: 1, costVariants: 1, featureRevisionId: `feature-${id}`,
+      marketRevisionIds: [`market-${id}`], limitations: [`limitations-${id}`],
+    })),
+  }
+  const result = (id: 'A' | 'B'): FinanceRobustnessEvaluation => ({
+    evaluationId: `evaluation-${id}`, checksum: `checksum-${id}`, verdict: 'insufficientData',
+    verdictReasons: [], trainSessions: 100, testSessions: 20,
+    primarySplit: { train: { netReturn: id === 'A' ? .11 : .22 }, test: { netReturn: .01 },
+      netReturnDegradation: 0, drawdownDegradation: 0, sharpeDegradation: null, benchmarkRelativeDegradation: null },
+    parameterSensitivity: { variantsEvaluated: 1, medianNetReturn: .01, minimumNetReturn: .01,
+      maximumNetReturn: .01, returnStandardDeviation: 0, medianDrawdown: 0, worstDrawdown: 0,
+      percentBeatingBenchmark: 0, percentPositive: 100, verdict: `parameters-${id}`, points: [] },
+    costSensitivity: { points: [{ costModel: `cost-${id}`, netReturn: .01, degradation: 0,
+      costBurdenOfGrossPnl: 0, trades: 1, averageHoldingSessions: 1 }],
+      estimatedBreakEvenSlippageBps: null, rankingStable: true },
+    walkForwardWindows: [], walkForwardPositivePercent: id === 'A' ? 11 : 22,
+    score: { total: id === 'A' ? 11 : 22, label: `evidence-${id}`, components: [] }, limitations: [],
+  })
+  const deferred = () => {
+    let resolve!: (value: FinanceRobustnessEvaluation) => void
+    let reject!: (reason: Error) => void
+    const promise = new Promise<FinanceRobustnessEvaluation>((yes, no) => { resolve = yes; reject = no })
+    return { promise, resolve, reject }
+  }
+  const setup = async () => {
+    // All unrelated IO fails locally; no network, provider or production data.
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('synthetic unrelated read unavailable'))
+    const catalogRead = vi.spyOn(api, 'getFinanceRobustness').mockResolvedValue(catalog)
+    const a = deferred(), b = deferred()
+    const detailRead = vi.spyOn(api, 'getFinanceRobustnessEvaluation').mockImplementation(id => {
+      if (id === 'evaluation-A') return a.promise
+      if (id === 'evaluation-B') return b.promise
+      throw new Error('Unexpected synthetic identity')
+    })
+    const view = render(<FinanceObservation initialSnapshot={empty} />)
+    expect(catalogRead).not.toHaveBeenCalled()
+    expect(detailRead).not.toHaveBeenCalled()
+    await act(async () => { setResearchOpen(true) })
+    expect(detailRead).toHaveBeenCalledWith('evaluation-A', expect.any(AbortSignal))
+    const panel = within(screen.getByRole('region', { name: 'Robusthet / Out-of-sample' }))
+    const select = (id: 'A' | 'B') => fireEvent.click(panel.getByRole('button', { name: `robustness-${id}insufficientData` }))
+    const coherent = (id: 'A' | 'B') => {
+      const other = id === 'A' ? 'B' : 'A'
+      expect(panel.getByText(`evaluation-${id} / checksum-${id}`)).toBeVisible()
+      expect(panel.getByText(`parameters-${id}`)).toBeVisible()
+      expect(panel.getByText(`cost-${id}`)).toBeVisible()
+      expect(panel.getByText(`${id === 'A' ? '11' : '22'}.00 % → 1.00 %`)).toBeVisible()
+      expect(panel.getByText(`${id === 'A' ? '11' : '22'}.0 % positiva benchmark-relative testfönster`)).toBeVisible()
+      expect(panel.queryByText(`parameters-${other}`)).not.toBeInTheDocument()
+    }
+    return { ...view, a, b, detailRead, panel, select, coherent }
+  }
+
+  test('control: A and then successful B render their own evidence; unmount aborts B', async () => {
+    const ui = await setup()
+    await act(async () => { ui.a.resolve(result('A')) })
+    ui.coherent('A')
+    ui.select('B')
+    expect(ui.detailRead.mock.calls[0][1]?.aborted).toBe(true)
+    await act(async () => { ui.b.resolve(result('B')) })
+    ui.coherent('B')
+    ui.unmount()
+    expect(ui.detailRead.mock.calls[1][1]?.aborted).toBe(true)
+  })
+
+  test('BLOCKER: selecting B pending must not display A evidence, including close/reopen', async () => {
+    const ui = await setup()
+    await act(async () => { ui.a.resolve(result('A')) })
+    ui.coherent('A')
+    ui.select('B')
+    expect(ui.panel.getByText('evaluation-B / checksum-B')).toBeVisible()
+    expect.soft(ui.panel.queryByText('parameters-A')).not.toBeInTheDocument()
+    expect.soft(ui.panel.queryByText('cost-A')).not.toBeInTheDocument()
+    await act(async () => { setResearchOpen(false) })
+    expect(ui.detailRead.mock.calls[1][1]?.aborted).toBe(false)
+    await act(async () => { setResearchOpen(true) })
+    // Catalog reopens and selects A; B's pending request is now aborted.
+    expect(ui.detailRead.mock.calls[1][1]?.aborted).toBe(true)
+    ui.select('B')
+    expect(ui.panel.getByText('evaluation-B / checksum-B')).toBeVisible()
+    expect.soft(ui.panel.queryByText('parameters-A')).not.toBeInTheDocument()
+    await act(async () => { ui.b.resolve(result('B')) })
+    ui.coherent('B')
+  })
+
+  test('BLOCKER: late aborted A must not replace already resolved selected B', async () => {
+    const ui = await setup()
+    ui.select('B')
+    expect(ui.detailRead.mock.calls[0][1]?.aborted).toBe(true)
+    await act(async () => { ui.b.resolve(result('B')) })
+    ui.coherent('B')
+    await act(async () => { ui.a.resolve(result('A')) })
+    expect(ui.panel.getByText('evaluation-B / checksum-B')).toBeVisible()
+    expect.soft(ui.panel.queryByText('parameters-A')).not.toBeInTheDocument()
+    expect.soft(ui.panel.queryByText('parameters-B')).toBeVisible()
+  })
+
+  test('control: B failure clears detail, no retry control; reselect retries the current identity', async () => {
+    const ui = await setup()
+    await act(async () => { ui.a.resolve(result('A')) })
+    ui.select('B')
+    await act(async () => { ui.b.reject(new Error('synthetic B unavailable')) })
+    expect(ui.panel.getByText('evaluation-B / checksum-B')).toBeVisible()
+    expect(ui.panel.queryByText('parameters-A')).not.toBeInTheDocument()
+    expect(ui.panel.queryByRole('alert')).not.toBeInTheDocument()
+    expect(ui.panel.queryByRole('button', { name: /Försök igen/ })).not.toBeInTheDocument()
+    ui.select('B')
+    expect(ui.detailRead).toHaveBeenCalledTimes(2)
+    ui.select('A')
+    await act(async () => {})
+    ui.coherent('A')
+    ui.detailRead.mockImplementationOnce(async () => result('B'))
+    ui.select('B')
+    await act(async () => {})
+    expect(ui.detailRead).toHaveBeenLastCalledWith('evaluation-B', expect.any(AbortSignal))
+    ui.coherent('B')
   })
 })

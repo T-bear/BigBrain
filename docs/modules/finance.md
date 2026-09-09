@@ -1,5 +1,18 @@
 # Finance module
 
+## BB-130C E1 robustness identity — BLOCKER HANDOFF — NOT MERGEABLE, 2026-09-09
+
+[Request/state map and synthetic blocker evidence](../reports/features/finance/bb-130c-robustness-selected-result-identity-20260908.md).
+Baseline `87d53241439b6fcbd97a07cd5a3986b59653eab9`; branch
+`bb-130c/robustness-selected-result-identity`. **DECISION B**: selecting B retains A detail
+beside B summary; a late aborted A completion can replace B detail. Production code unchanged.
+New tests: **2 pass / 2 intentionally fail**; focused FinanceObservation file: **37 pass / 2 fail**,
+including all 35 existing tests passing. Full Web/build/backend gates not rerun for blocker evidence.
+E1 **BLOCKED / NOT ACCEPTED**: separate main-derived correction requires architect/owner authorization.
+E2 **NOT STARTED**; C **NOT READY**; D **NOT STARTED**. Accepted non-blocking debt remains deferred.
+No merge, deployment or production-data access; Finance **RESEARCH / 0 SEK / NONE**.
+
+
 ## BB-130C backtest readers and exit assessment — accepted, merged and CI verified, 2026-09-08
 
 [Reader map, evidence and exit plan](../reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
@@ -15,7 +28,7 @@ No production/schema change, deployment or runtime verification.
 Accepted C exit plan: **NOT READY**. Only currently known remaining blockers: (1) robustness UI selection identity,
 (2) campaign SQLite replay/reload. New defects, if reproduced there, require separate correction.
 The report's non-blocking debt, including further extraction, sole schema authority and composition,
-is explicitly accepted for deferral beyond BB-130, not completed. E1/E2 are not authorized to start;
+is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; subsequent E1 blocker evidence is recorded above;
 BB-130D remains NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
 
