@@ -19,39 +19,39 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## D1 review handoff — 2026-09-14
+## D1 accepted publication reconciliation — 2026-09-14
 
-Status: REVIEW CANDIDATE ONLY — completed evidence checkpoint, no interrupted implementation.
-Task: BB-130D1 backend quality-gate baseline; only D1 was authorized.
-Baseline/accepted main: `df848b422022d7a257eff34d27d2572503ff807c`;
-[baseline CI 34367694026](https://github.com/T-bear/BigBrain/actions/runs/34367694026) SUCCESS.
-Branch: `bb-130d/backend-quality-gate-baseline`.
-Candidate identity: the documentation commit containing this handoff. Resolve the exact
-published SHA with `git ls-remote origin refs/heads/bb-130d/backend-quality-gate-baseline`
-and compare with local HEAD. A commit cannot contain its own future SHA. Main remains
-accepted source of truth; this branch awaits explicit architect/owner review and merge approval.
+Status: BB-130D1 ACCEPTED / MERGED / CI VERIFIED; final documentation publication must
+also pass its own exact-main CI before this task is complete. No interrupted implementation.
+Owner/architect explicitly approved candidate `ccd7f7906b8d460a5060711e4a5f2b99039492cf`.
+Pre-merge accepted main: `df848b422022d7a257eff34d27d2572503ff807c`.
+Merge/main SHA: `81baaf4f5667310e00e83cccb19da3daf9cb790b`.
+[Merge CI 34786050596](https://github.com/T-bear/BigBrain/actions/runs/34786050596) SUCCESS:
+backend, frontend, documentation and secrets verified for that exact merge SHA.
 
-Changed files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
-docs/architecture/bb-130-stabilization.md; this recovery note;
-docs/reports/REPORT-CATALOG.md;
+Final source of truth: the separate main commit `docs: reconcile accepted BB-130D1 publication`
+containing this record. Resolve its full SHA using
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D1 publication$' origin/main`.
+Compare local HEAD, origin/main and `git ls-remote origin refs/heads/main`; query GitHub Actions
+for that exact head_sha and verify all four jobs and the CI run conclude SUCCESS.
+A commit cannot contain its own future SHA/run ID; GitHub history and exact-SHA CI reconstruct
+final publication without terminal history. If final CI is pending/failed, publication is
+unfinished: preserve evidence and stop for review; no fixes outside this approved scope.
+
+Completed and valid: A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS / D1 ACCEPTED. No source/configuration changes. Backend formatter gate
+NOT ENABLED: 59 files / 22,573 characterized WHITESPACE diagnostics, not correctness failure.
+Backend cleanup requires separate authorization. Frontend D2 NOT STARTED.
+Original local Release/test/format evidence remains in the
+[D1 report](../reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md).
+Reconciliation files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
+docs/architecture/bb-130-stabilization.md; this note; docs/reports/REPORT-CATALOG.md;
 docs/reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md.
-Completed and valid: clean tracked-source restore/Release build; API 664/664 and Sentinel
-32/32; two identical check-only format results, exit 2, 22,573 WHITESPACE locations in
-59 files. No source/configuration edits, mass formatting or policy weakening. D1 is an
-evidence/report checkpoint. Frontend tooling inspected only; no installation or gate.
-See the [D1 report](../reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md)
-for exact commands, reproducibility, publication checks, limitations and deferred scope.
-
-Git state for the handoff: only the seven D1 documents belong to the candidate.
-Unrelated untracked mockups and ADR 0006–0009 remain preserved/excluded. Publication is
-verified by comparing remote branch SHA and local HEAD and rechecking origin/main.
-No uncommitted D1 work should remain after successful publication. If push fails, preserve
-the complete local commit and retry publication; never reset/recreate valid work.
-Candidate CI is not claimed: unchanged CI triggers only main pushes and pull requests.
-Remaining: exact candidate review/approval before merge; separately authorized backend
-whitespace cleanup, frontend D2 and final D reconciliation. No interrupted original scope.
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D started/partial. Existing post-BB-130 debt stays deferred.
-Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device/owner UX verification,
-production data access, provider/broker/capital action or scientific behavior change.
-Exact next action: return to ChatGPT with "Codex är klar" and the remote candidate SHA.
-Stop before merge, D2, cleanup or any further implementation.
+Publication checks: documentation verifier, unstaged/staged diff checks and staged/full-history
+Gitleaks; backend/frontend builds/tests are verified through exact-main CI.
+Unrelated untracked mockups and ADR 0006–0009 remain preserved/excluded. After successful
+publication, no uncommitted reconciliation work remains; retain the untouched recovery template.
+Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device approval, provider/broker,
+PAPER/LIVE/AUTO/capital or scientific behavior change. Existing post-BB-130 debt stays deferred.
+Exact next action after final CI SUCCESS: return to ChatGPT with "Codex är klar" and stop.
+No backend cleanup, format CI gate, D2, Research Learning or Finance feature work is authorized.

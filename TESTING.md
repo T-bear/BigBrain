@@ -2,10 +2,13 @@
 
 ## BB-130D1 backend quality-gate baseline — 2026-09-14
 
-**REVIEW CANDIDATE ONLY — evidence checkpoint; no new CI gate.** Owner authorized D1
-only from `df848b422022d7a257eff34d27d2572503ff807c`. A/B remain complete; C remains
-complete / exit approved. D is now started and partial; earlier dated D NOT STARTED
-entries below describe their historical authorization state.
+**ACCEPTED / MERGED / CI VERIFIED — evidence checkpoint; no new CI gate.**
+Owner/architect approved exact candidate `ccd7f7906b8d460a5060711e4a5f2b99039492cf`.
+Merged unchanged as `81baaf4f5667310e00e83cccb19da3daf9cb790b`;
+[merge CI 34786050596](https://github.com/T-bear/BigBrain/actions/runs/34786050596)
+passed backend, frontend, documentation and secrets on 2026-09-14.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS / D1 ACCEPTED.
+Earlier dated D NOT STARTED entries below describe their historical authorization state.
 
 [Sanitized D1 report](docs/reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md): SDK 10.0.302 restore/Release build pass with zero
 warnings/errors; API 664/664 and Sentinel 32/32 pass. Two check-only format runs exit 2
@@ -20,9 +23,12 @@ Exact local tool versions: `dotnet --version` = `10.0.302`; `dotnet format --ver
 Reproduce the characterization after restore with `dotnet format BigBrain.slnx --verify-no-changes --no-restore`.
 This currently fails on existing debt and is not a required green CI gate.
 
-Next: architect/owner review of exact remote candidate SHA before merge; no D2, cleanup
-or final D acceptance follows. Finance RESEARCH / 0 SEK / NONE. No deployment, runtime,
-device or owner UX verification. Candidate CI is not claimed for this branch-only publication.
+Backend formatter gate: NOT ENABLED — blocked by characterized pre-existing whitespace
+debt, not correctness failure. Cleanup requires separate authorization. D2: NOT STARTED.
+Next: verify the separate final reconciliation commit's exact-main CI, then stop for ChatGPT
+review; no cleanup, D2 or final D acceptance follows. Finance RESEARCH / 0 SEK / NONE.
+No deployment, runtime/device approval, provider/broker/capital or scientific behavior change.
+Final publication identity and exact-SHA CI lookup are recorded in the canonical recovery note.
 
 ## BB-130C exit approved — 2026-09-09
 

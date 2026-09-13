@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130D1, 2026-09-14` — [Backend quality-gate baseline: reproducible format debt, no new gate; REVIEW CANDIDATE ONLY](features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md). D started/partial; D2 not started.
+- `BB-130D1, 2026-09-14` — [Backend quality-gate baseline: reproducible format debt, no new gate; ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md). D IN PROGRESS / D1 ACCEPTED; D2 NOT STARTED. Merge CI `34786050596` passed all four jobs.
 
 - `BB-130C exit, 2026-09-09` — [Architect/owner exit approved; accepted debt remains deferred](../architecture/bb-130-stabilization.md#bb-130c-exit-approved--2026-09-09). Historical reports retain their dated scope; BB-130D NOT STARTED.
 

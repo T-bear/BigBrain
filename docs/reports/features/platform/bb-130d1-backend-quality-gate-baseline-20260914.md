@@ -5,15 +5,20 @@
 - Date: 2026-09-14 (local characterization began 2026-09-13, Europe/Stockholm).
 - Baseline/source of truth: `df848b422022d7a257eff34d27d2572503ff807c`.
 - Branch: `bb-130d/backend-quality-gate-baseline`.
-- Candidate: the documentation commit containing this report; resolve its exact SHA
-  from the remote branch. Main remains the accepted source until explicit approval/merge.
+- Approved candidate: `ccd7f7906b8d460a5060711e4a5f2b99039492cf`.
+- Merge/main SHA: `81baaf4f5667310e00e83cccb19da3daf9cb790b`.
 - Scope: existing backend build/test/format characterization and frontend tooling inspection.
 - Detta är en sanerad GitHub-version. Only aggregate diagnostics and repository paths
   are published; local raw reports/logs are not publication artifacts.
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — evidence checkpoint, no CI gate implemented.**
+**ACCEPTED / MERGED / CI VERIFIED — evidence checkpoint, no CI gate implemented.**
+Publication amendment, 2026-09-14: owner/architect explicitly approved the exact candidate
+above; normal non-force merge preserved its complete tree.
+[Merge CI 34786050596](https://github.com/T-bear/BigBrain/actions/runs/34786050596)
+completed SUCCESS for the exact merge SHA, including backend, frontend, documentation
+and secrets. D IN PROGRESS / D1 ACCEPTED. Original characterization evidence below is unchanged.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D started with D1 only and remains partial.
 Backend baseline automatically verified. Full format verification reproducibly fails
 on existing whitespace debt; this is not a green formatter implementation or a reproduced
@@ -21,8 +26,8 @@ correctness/security/scientific/lineage defect. No source fixes or analyzer-poli
 No deployment, runtime/device testing or owner UX approval. Finance RESEARCH / 0 SEK / NONE.
 
 Baseline [CI 34367694026](https://github.com/T-bear/BigBrain/actions/runs/34367694026)
-succeeded for the exact baseline SHA. Candidate CI is not claimed: the unchanged workflow
-runs on main pushes and pull requests, not ordinary checkpoint branch pushes.
+succeeded for the exact baseline SHA. The original branch-only publication did not trigger CI;
+the exact merge CI above now supplies accepted-main evidence.
 
 ## Evidence
 
@@ -143,13 +148,29 @@ NOT EVALUABLE remains valid. No PAPER/LIVE/AUTO/capital or scientific work.
 
 ## Remaining work
 
-D1 evidence awaits architect/owner review of the exact remote candidate SHA. Backend
-format debt is known and deferred, not repaired. D2 frontend characterization and final D
-reconciliation remain separately authorized work. Candidate CI, merge and runtime approval
-are not inferred from baseline CI or local tests. Existing accepted post-BB-130 debt remains deferred.
+D1 is accepted, merged and CI verified. Backend gate remains NOT ENABLED because of
+59 files / 22,573 pre-existing WHITESPACE diagnostics, not correctness failure. Cleanup
+requires separate authorization. D2 NOT STARTED; final D reconciliation remains separate.
+The final documentation reconciliation is a separate main commit, requiring its own exact-SHA
+CI; see the canonical recovery note for reconstruction. No deployment/runtime/device approval.
+Existing accepted post-BB-130 debt remains deferred.
 
 ## Resumption
 
 Read START-HERE, STATUS, BACKLOG, the BB-130 plan and the canonical recovery note.
-Verify baseline and remote candidate SHA. Next action is architect/owner review before
-any merge; do not start cleanup, D2, Research Learning or new Finance work.
+Verify the final reconciliation commit and its exact-main CI, then return to ChatGPT with
+"Codex är klar". No cleanup, D2, Research Learning, deployment or new Finance work starts.
+
+### Reconciliation publication checks — 2026-09-14
+
+The separately authorized reconciliation changes only the same seven canonical documents.
+`node scripts/verify-documentation.mjs` passed (236 Markdown files / 90 unique BB IDs).
+`git diff --check` and `git diff --cached --check` passed. Gitleaks v8.28.0
+`git --pre-commit --staged --redact --no-banner` passed with no leaks;
+`git --log-opts='--all' --redact --no-banner` passed (264 commits, no leaks).
+All commands exited 0; exact-main secrets CI additionally verifies the published history.
+Backend restore/build/test and frontend install/test/build run in both exact-main CI runs;
+local source suites are not repeated for this documentation-only reconciliation.
+README, architecture/ADRs, module contracts and runbooks still need no behavioral updates.
+Final SHA cannot be embedded in its own commit; the recovery note defines the exact commit
+lookup and required final-CI check, and GitHub retains the definitive result.
