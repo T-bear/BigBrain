@@ -1,5 +1,23 @@
 # BigBrain Backlog
 
+## BB-130D1 backend quality-gate baseline — 2026-09-14
+
+**REVIEW CANDIDATE ONLY — evidence checkpoint; no new CI gate.** Owner authorized D1
+only from `df848b422022d7a257eff34d27d2572503ff807c`. A/B remain complete; C remains
+complete / exit approved. D is now started and partial; earlier dated D NOT STARTED
+entries below describe their historical authorization state.
+
+[Sanitized D1 report](reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md): SDK 10.0.302 restore/Release build pass with zero
+warnings/errors; API 664/664 and Sentinel 32/32 pass. Two check-only format runs exit 2
+with identical 22,573 WHITESPACE locations across 59 files. No source or CI/configuration
+changes; no mass formatting or weaker analyzer policy. Backend format debt remains deferred
+to separately authorized cleanup. Frontend tooling was inspected only; D2 needs a fresh
+check-only characterization before any gate or cleanup. D2 is not started.
+
+Next: architect/owner review of exact remote candidate SHA before merge; no D2, cleanup
+or final D acceptance follows. Finance RESEARCH / 0 SEK / NONE. No deployment, runtime,
+device or owner UX verification. Candidate CI is not claimed for this branch-only publication.
+
 ## BB-130C exit approved — 2026-09-09
 
 Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**
@@ -188,7 +206,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-09: A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C is complete / exit approved on 2026-09-09; D not started. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 and E2 are accepted; no currently-known C blocking checkpoint remains.
+- Status 2026-09-14: D1 evidence checkpoint is REVIEW CANDIDATE ONLY; D started/partial, with backend formatting debt deferred and frontend D2 not started. A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C is complete / exit approved on 2026-09-09. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 and E2 are accepted; no currently-known C blocking checkpoint remains.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -198,7 +216,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: return to ChatGPT for independent verification of the approved C exit reconciliation; do not start BB-130D without separate authorization.
+- Next: architect/owner review of the exact D1 remote candidate SHA before merge. Separately authorize backend whitespace cleanup and D2 frontend characterization; neither starts automatically.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

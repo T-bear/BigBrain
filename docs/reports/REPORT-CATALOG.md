@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130D1, 2026-09-14` — [Backend quality-gate baseline: reproducible format debt, no new gate; REVIEW CANDIDATE ONLY](features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md). D started/partial; D2 not started.
+
 - `BB-130C exit, 2026-09-09` — [Architect/owner exit approved; accepted debt remains deferred](../architecture/bb-130-stabilization.md#bb-130c-exit-approved--2026-09-09). Historical reports retain their dated scope; BB-130D NOT STARTED.
 
 - `BB-130C E2` — [Campaign SQLite persistence/replay/reload characterization — accepted, merged and CI verified](features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md)

@@ -1,5 +1,29 @@
 # Testa BigBrain
 
+## BB-130D1 backend quality-gate baseline — 2026-09-14
+
+**REVIEW CANDIDATE ONLY — evidence checkpoint; no new CI gate.** Owner authorized D1
+only from `df848b422022d7a257eff34d27d2572503ff807c`. A/B remain complete; C remains
+complete / exit approved. D is now started and partial; earlier dated D NOT STARTED
+entries below describe their historical authorization state.
+
+[Sanitized D1 report](docs/reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md): SDK 10.0.302 restore/Release build pass with zero
+warnings/errors; API 664/664 and Sentinel 32/32 pass. Two check-only format runs exit 2
+with identical 22,573 WHITESPACE locations across 59 files. No source or CI/configuration
+changes; no mass formatting or weaker analyzer policy. Backend format debt remains deferred
+to separately authorized cleanup. Frontend tooling was inspected only; D2 needs a fresh
+check-only characterization before any gate or cleanup. D2 is not started.
+
+Exact local tool versions: `dotnet --version` = `10.0.302`; `dotnet format --version` =
+`10.0.302-servicing.26329.109+35b593bebfcba58f8e78298cef14c2761f5d86c6`.
+
+Reproduce the characterization after restore with `dotnet format BigBrain.slnx --verify-no-changes --no-restore`.
+This currently fails on existing debt and is not a required green CI gate.
+
+Next: architect/owner review of exact remote candidate SHA before merge; no D2, cleanup
+or final D acceptance follows. Finance RESEARCH / 0 SEK / NONE. No deployment, runtime,
+device or owner UX verification. Candidate CI is not claimed for this branch-only publication.
+
 ## BB-130C exit approved — 2026-09-09
 
 Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**
