@@ -106,15 +106,15 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     [Fact]
     public void ConcurrentEquivalentBacktestBuildsConvergeWithoutImmutableIdentityConflict()
     {
-        var options=Options();var instrument=EodhdCatalog.Watchlist.Single(value=>value.Symbol=="AAPL");
-        var acquired=new DateTimeOffset(2026,8,11,18,0,0,TimeSpan.Zero);var seed=new EodhdMarketMemory(options);
-        seed.Store(instrument,EodhdAdapter.Parse(Fixture()),Fixture(),new(2026,8,1),new(2026,8,11),acquired.AddSeconds(-1),acquired,0);
-        seed.BuildFeatures();var first=new EodhdMarketMemory(options);var second=new EodhdMarketMemory(options);
+        var options = Options(); var instrument = EodhdCatalog.Watchlist.Single(value => value.Symbol == "AAPL");
+        var acquired = new DateTimeOffset(2026, 8, 11, 18, 0, 0, TimeSpan.Zero); var seed = new EodhdMarketMemory(options);
+        seed.Store(instrument, EodhdAdapter.Parse(Fixture()), Fixture(), new(2026, 8, 1), new(2026, 8, 11), acquired.AddSeconds(-1), acquired, 0);
+        seed.BuildFeatures(); var first = new EodhdMarketMemory(options); var second = new EodhdMarketMemory(options);
 
-        Parallel.Invoke(()=>first.BuildReferenceBacktests(),()=>second.BuildReferenceBacktests());
+        Parallel.Invoke(() => first.BuildReferenceBacktests(), () => second.BuildReferenceBacktests());
 
-        var runs=new EodhdMarketMemory(options).BacktestCatalog().Runs;
-        Assert.Equal(6,runs.Count);Assert.Equal(6,runs.Select(x=>x.RunId).Distinct(StringComparer.Ordinal).Count());
+        var runs = new EodhdMarketMemory(options).BacktestCatalog().Runs;
+        Assert.Equal(6, runs.Count); Assert.Equal(6, runs.Select(x => x.RunId).Distinct(StringComparer.Ordinal).Count());
     }
 
     [Fact]
@@ -162,13 +162,16 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     [Fact]
     public void DeletionInventoryIncludesRobustnessArtifactsAndProtectsUnrelatedFiles()
     {
-        var options=Options();var memory=new EodhdMarketMemory(options);var unrelated=Path.Combine(_root,"unrelated-evaluation.txt");File.WriteAllText(unrelated,"keep");
-        using(var connection=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=options.DatabasePath}.ToString())){connection.Open();
+        var options = Options(); var memory = new EodhdMarketMemory(options); var unrelated = Path.Combine(_root, "unrelated-evaluation.txt"); File.WriteAllText(unrelated, "keep");
+        using (var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = options.DatabasePath }.ToString()))
+        {
+            connection.Open();
             Execute("INSERT INTO robustness_evaluations VALUES('evaluation-1','sha256:x','plan','v1','momentum','v1','feature-1','[]','InsufficientData','10','{}','2026-08-12T00:00:00Z')");
-            Execute("INSERT INTO robustness_windows VALUES('evaluation-1','wf-1','{}')");Execute("INSERT INTO robustness_parameter_sensitivity VALUES('evaluation-1',0,'{}')");Execute("INSERT INTO robustness_cost_sensitivity VALUES('evaluation-1',0,'{}')");Execute("INSERT INTO robustness_run_references VALUES('evaluation-1','run-1')");
-            void Execute(string sql){using var command=connection.CreateCommand();command.CommandText=sql;command.ExecuteNonQuery();}}
-        var preview=memory.PreviewDeletion();Assert.Equal(1,preview.RobustnessEvaluations);Assert.Equal(1,preview.RobustnessWindows);Assert.Equal(1,preview.RobustnessParameterPoints);Assert.Equal(1,preview.RobustnessCostPoints);Assert.Equal(1,preview.RobustnessRunReferences);
-        memory.ExecuteDeletion(preview,$"DELETE {preview.PreviewId}",DateTimeOffset.UtcNow);Assert.True(File.Exists(unrelated));Assert.Equal(0,memory.PreviewDeletion().RobustnessEvaluations);
+            Execute("INSERT INTO robustness_windows VALUES('evaluation-1','wf-1','{}')"); Execute("INSERT INTO robustness_parameter_sensitivity VALUES('evaluation-1',0,'{}')"); Execute("INSERT INTO robustness_cost_sensitivity VALUES('evaluation-1',0,'{}')"); Execute("INSERT INTO robustness_run_references VALUES('evaluation-1','run-1')");
+            void Execute(string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; command.ExecuteNonQuery(); }
+        }
+        var preview = memory.PreviewDeletion(); Assert.Equal(1, preview.RobustnessEvaluations); Assert.Equal(1, preview.RobustnessWindows); Assert.Equal(1, preview.RobustnessParameterPoints); Assert.Equal(1, preview.RobustnessCostPoints); Assert.Equal(1, preview.RobustnessRunReferences);
+        memory.ExecuteDeletion(preview, $"DELETE {preview.PreviewId}", DateTimeOffset.UtcNow); Assert.True(File.Exists(unrelated)); Assert.Equal(0, memory.PreviewDeletion().RobustnessEvaluations);
     }
 
     [Fact]
@@ -189,8 +192,13 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
 
     private EodhdFinanceOptions Options(string token = "") => new()
     {
-        Enabled = true, AccountActive = true, ApiToken = token, DatabasePath = Path.Combine(_root, "memory.db"),
-        PayloadDirectory = Path.Combine(_root, "payloads"), BaseUrl = "https://example.invalid/api", TimeoutSeconds = 3
+        Enabled = true,
+        AccountActive = true,
+        ApiToken = token,
+        DatabasePath = Path.Combine(_root, "memory.db"),
+        PayloadDirectory = Path.Combine(_root, "payloads"),
+        BaseUrl = "https://example.invalid/api",
+        TimeoutSeconds = 3
     };
 
     private static byte[] Fixture() => Encoding.UTF8.GetBytes("""

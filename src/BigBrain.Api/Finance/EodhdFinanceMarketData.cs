@@ -133,8 +133,8 @@ internal sealed class EodhdAdapter : IDisposable
 
 internal sealed record EodhdDeletionPreview(string PreviewId, int Observations, int Revisions, int Payloads,
     int FeatureValues, int FeatureRevisions, int BacktestRuns, int BacktestEvents, int BacktestFills,
-    int BacktestEquityPoints,int RobustnessEvaluations,int RobustnessWindows,int RobustnessParameterPoints,
-    int RobustnessCostPoints,int RobustnessRunReferences,DateTimeOffset? DeadlineUtc, string Scope);
+    int BacktestEquityPoints, int RobustnessEvaluations, int RobustnessWindows, int RobustnessParameterPoints,
+    int RobustnessCostPoints, int RobustnessRunReferences, DateTimeOffset? DeadlineUtc, string Scope);
 
 internal sealed record EodhdRuntimeEvidence(int ExternalRequests, int AcquisitionAttempts, int SuccessfulAttempts,
     int FailedAttempts, int Retries, int Observations, int Revisions, int Payloads, DateOnly? CoverageFrom,
@@ -318,12 +318,12 @@ internal sealed partial class EodhdMarketMemory
         var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
         var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values");
         var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
-        var backtestRuns=Scalar(connection,"SELECT COUNT(*) FROM backtest_runs");var backtestEvents=Scalar(connection,"SELECT COUNT(*) FROM backtest_events");var backtestFills=Scalar(connection,"SELECT COUNT(*) FROM backtest_fills");var backtestEquity=Scalar(connection,"SELECT COUNT(*) FROM backtest_equity");
-        var evaluations=Scalar(connection,"SELECT COUNT(*) FROM robustness_evaluations");var windows=Scalar(connection,"SELECT COUNT(*) FROM robustness_windows");var parameterPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_parameter_sensitivity");var costPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_cost_sensitivity");var runReferences=Scalar(connection,"SELECT COUNT(*) FROM robustness_run_references");
-        var shadowPredictions=Scalar(connection,"SELECT COUNT(*) FROM shadow_predictions");var shadowOutcomes=Scalar(connection,"SELECT COUNT(*) FROM shadow_outcomes");
-        var riskEvaluations=Scalar(connection,"SELECT COUNT(*) FROM risk_evaluations");
+        var backtestRuns = Scalar(connection, "SELECT COUNT(*) FROM backtest_runs"); var backtestEvents = Scalar(connection, "SELECT COUNT(*) FROM backtest_events"); var backtestFills = Scalar(connection, "SELECT COUNT(*) FROM backtest_fills"); var backtestEquity = Scalar(connection, "SELECT COUNT(*) FROM backtest_equity");
+        var evaluations = Scalar(connection, "SELECT COUNT(*) FROM robustness_evaluations"); var windows = Scalar(connection, "SELECT COUNT(*) FROM robustness_windows"); var parameterPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_parameter_sensitivity"); var costPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_cost_sensitivity"); var runReferences = Scalar(connection, "SELECT COUNT(*) FROM robustness_run_references");
+        var shadowPredictions = Scalar(connection, "SELECT COUNT(*) FROM shadow_predictions"); var shadowOutcomes = Scalar(connection, "SELECT COUNT(*) FROM shadow_outcomes");
+        var riskEvaluations = Scalar(connection, "SELECT COUNT(*) FROM risk_evaluations");
         var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}|{evaluations}|{windows}|{parameterPoints}|{costPoints}|{runReferences}|{shadowPredictions}|{shadowOutcomes}|{riskEvaluations}";
-        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,evaluations,windows,parameterPoints,costPoints,runReferences,
+        return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions, backtestRuns, backtestEvents, backtestFills, backtestEquity, evaluations, windows, parameterPoints, costPoints, runReferences,
             _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtests, robustness, prospective shadow and source-dependent risk evaluations; pure halt audit metadata is retained");
     }
 
@@ -335,9 +335,9 @@ internal sealed partial class EodhdMarketMemory
         var paths = new List<string>(); using (var command = connection.CreateCommand()) { command.Transaction = transaction; command.CommandText = "SELECT path FROM payloads"; using var reader = command.ExecuteReader(); while (reader.Read()) paths.Add(reader.GetString(0)); }
         foreach (var path in paths.Where(File.Exists)) File.Delete(path);
         if (paths.Any(File.Exists)) throw new IOException("One or more covered EODHD payloads could not be deleted.");
-        Execute(connection,transaction,"DELETE FROM risk_evaluations");Execute(connection,transaction,"DELETE FROM shadow_outcomes");Execute(connection,transaction,"DELETE FROM shadow_predictions");
-        Execute(connection,transaction,"DELETE FROM robustness_run_references");Execute(connection,transaction,"DELETE FROM robustness_windows");Execute(connection,transaction,"DELETE FROM robustness_parameter_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_cost_sensitivity");Execute(connection,transaction,"DELETE FROM robustness_evaluations");
-        Execute(connection,transaction,"DELETE FROM backtest_events");Execute(connection,transaction,"DELETE FROM backtest_fills");Execute(connection,transaction,"DELETE FROM backtest_equity");Execute(connection,transaction,"DELETE FROM backtest_runs");
+        Execute(connection, transaction, "DELETE FROM risk_evaluations"); Execute(connection, transaction, "DELETE FROM shadow_outcomes"); Execute(connection, transaction, "DELETE FROM shadow_predictions");
+        Execute(connection, transaction, "DELETE FROM robustness_run_references"); Execute(connection, transaction, "DELETE FROM robustness_windows"); Execute(connection, transaction, "DELETE FROM robustness_parameter_sensitivity"); Execute(connection, transaction, "DELETE FROM robustness_cost_sensitivity"); Execute(connection, transaction, "DELETE FROM robustness_evaluations");
+        Execute(connection, transaction, "DELETE FROM backtest_events"); Execute(connection, transaction, "DELETE FROM backtest_fills"); Execute(connection, transaction, "DELETE FROM backtest_equity"); Execute(connection, transaction, "DELETE FROM backtest_runs");
         Execute(connection, transaction, "DELETE FROM feature_values"); Execute(connection, transaction, "DELETE FROM feature_revisions");
         Execute(connection, transaction, "DELETE FROM observations"); Execute(connection, transaction, "DELETE FROM revisions"); Execute(connection, transaction, "DELETE FROM payloads");
         var fingerprint = Sha(Encoding.UTF8.GetBytes($"{preview.PreviewId}|{deletedAtUtc:O}|{preview.Observations}|{preview.Revisions}|{preview.Payloads}|{preview.FeatureValues}|{preview.FeatureRevisions}"));
@@ -346,8 +346,8 @@ internal sealed partial class EodhdMarketMemory
             ("$o", preview.Observations), ("$r", preview.Revisions), ("$p", preview.Payloads), ("$f", fingerprint));
         Execute(connection, transaction, "INSERT INTO feature_deletion_receipts VALUES($id,$values,$revisions)",
             ("$id", receipt), ("$values", preview.FeatureValues), ("$revisions", preview.FeatureRevisions));
-        Execute(connection,transaction,"INSERT INTO backtest_deletion_receipts VALUES($id,$runs,$events,$fills,$equity)",( "$id",receipt),("$runs",preview.BacktestRuns),("$events",preview.BacktestEvents),("$fills",preview.BacktestFills),("$equity",preview.BacktestEquityPoints));
-        Execute(connection,transaction,"INSERT INTO robustness_deletion_receipts VALUES($id,$evaluations,$windows,$parameters,$costs,$runs)",( "$id",receipt),("$evaluations",preview.RobustnessEvaluations),("$windows",preview.RobustnessWindows),("$parameters",preview.RobustnessParameterPoints),("$costs",preview.RobustnessCostPoints),("$runs",preview.RobustnessRunReferences));
+        Execute(connection, transaction, "INSERT INTO backtest_deletion_receipts VALUES($id,$runs,$events,$fills,$equity)", ("$id", receipt), ("$runs", preview.BacktestRuns), ("$events", preview.BacktestEvents), ("$fills", preview.BacktestFills), ("$equity", preview.BacktestEquityPoints));
+        Execute(connection, transaction, "INSERT INTO robustness_deletion_receipts VALUES($id,$evaluations,$windows,$parameters,$costs,$runs)", ("$id", receipt), ("$evaluations", preview.RobustnessEvaluations), ("$windows", preview.RobustnessWindows), ("$parameters", preview.RobustnessParameterPoints), ("$costs", preview.RobustnessCostPoints), ("$runs", preview.RobustnessRunReferences));
         transaction.Commit(); return receipt;
     }
 
@@ -384,14 +384,14 @@ internal sealed partial class EodhdMarketMemory
     {
         var observations = Scalar(connection, "SELECT COUNT(*) FROM observations"); var revisions = Scalar(connection, "SELECT COUNT(*) FROM revisions"); var payloads = Scalar(connection, "SELECT COUNT(*) FROM payloads");
         var featureValues = Scalar(connection, "SELECT COUNT(*) FROM feature_values"); var featureRevisions = Scalar(connection, "SELECT COUNT(*) FROM feature_revisions");
-        var backtestRuns=Scalar(connection,"SELECT COUNT(*) FROM backtest_runs");var backtestEvents=Scalar(connection,"SELECT COUNT(*) FROM backtest_events");var backtestFills=Scalar(connection,"SELECT COUNT(*) FROM backtest_fills");var backtestEquity=Scalar(connection,"SELECT COUNT(*) FROM backtest_equity");
-        var evaluations=Scalar(connection,"SELECT COUNT(*) FROM robustness_evaluations");var windows=Scalar(connection,"SELECT COUNT(*) FROM robustness_windows");var parameterPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_parameter_sensitivity");var costPoints=Scalar(connection,"SELECT COUNT(*) FROM robustness_cost_sensitivity");var runReferences=Scalar(connection,"SELECT COUNT(*) FROM robustness_run_references");
+        var backtestRuns = Scalar(connection, "SELECT COUNT(*) FROM backtest_runs"); var backtestEvents = Scalar(connection, "SELECT COUNT(*) FROM backtest_events"); var backtestFills = Scalar(connection, "SELECT COUNT(*) FROM backtest_fills"); var backtestEquity = Scalar(connection, "SELECT COUNT(*) FROM backtest_equity");
+        var evaluations = Scalar(connection, "SELECT COUNT(*) FROM robustness_evaluations"); var windows = Scalar(connection, "SELECT COUNT(*) FROM robustness_windows"); var parameterPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_parameter_sensitivity"); var costPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_cost_sensitivity"); var runReferences = Scalar(connection, "SELECT COUNT(*) FROM robustness_run_references");
         string? receipt = null; using (var command = connection.CreateCommand()) { command.CommandText = "SELECT receipt_id FROM deletion_receipts ORDER BY deleted_utc DESC LIMIT 1"; receipt = command.ExecuteScalar() as string; }
         var deadline = _options.EntitlementEndsAtUtc?.AddMonths(1); var state = receipt is not null && observations == 0 ? FinanceRetentionState.DeletionComplete :
             accountActive ? FinanceRetentionState.Active : deadline is null ? FinanceRetentionState.Unknown : DateTimeOffset.UtcNow > deadline ? FinanceRetentionState.ExpiredBlocked : FinanceRetentionState.DeletionRequired;
         return new(state, _options.EntitlementEndsAtUtc, deadline, observations, revisions, payloads,
             "raw payloads, normalized observations, market revisions, derived feature values/revisions and catalog indexes", receipt,
-            featureValues, featureRevisions,backtestRuns,backtestEvents,backtestFills,backtestEquity,evaluations,windows,parameterPoints,costPoints,runReferences);
+            featureValues, featureRevisions, backtestRuns, backtestEvents, backtestFills, backtestEquity, evaluations, windows, parameterPoints, costPoints, runReferences);
     }
 
     private static int Scalar(SqliteConnection connection, string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; return Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
@@ -458,7 +458,7 @@ internal static class EodhdMaintenanceCommand
         var memory = new EodhdMarketMemory(options);
         if (args[0] == "finance-features-build")
         {
-            var result = memory.BuildFeatures(args.Length>1?args[1..]:null);
+            var result = memory.BuildFeatures(args.Length > 1 ? args[1..] : null);
             Console.WriteLine($"feature-revision={result.RevisionId} source-revisions={result.SourceMarketRevisions.Count} values={result.ValueCount} available={result.AvailableCount} warmup={result.WarmupCount} quality-issues={result.QualityIssueCount} checksum={result.Checksum} elapsed-ms={result.BuildElapsedMilliseconds} idempotent={result.Idempotent}");
             return true;
         }
@@ -468,10 +468,10 @@ internal static class EodhdMaintenanceCommand
             Console.WriteLine($"feature-revision={result.FeatureRevisionId} market-revisions={string.Join(',', result.MarketRevisionIds)} runs={string.Join(',', result.RunIds)} checksums={string.Join(',', result.Checksums)} sessions={result.Sessions} instruments={result.Instruments} feature-reads={result.FeatureReads} fills={result.Fills} events={result.Events} elapsed-ms={result.ElapsedMilliseconds} idempotent={result.Idempotent}");
             return true;
         }
-        if(args[0]=="finance-robustness-build")
+        if (args[0] == "finance-robustness-build")
         {
-            var result=memory.BuildRobustnessEvaluations();
-            Console.WriteLine($"feature-revision={result.FeatureRevisionId} market-revisions={string.Join(',',result.MarketRevisionIds)} evaluations={string.Join(',',result.EvaluationIds)} checksums={string.Join(',',result.Checksums)} unique-runs={result.UniqueBacktestRuns} windows={result.EvaluationWindows} parameter-variants={result.ParameterVariants} cost-variants={result.CostVariants} elapsed-ms={result.ElapsedMilliseconds} idempotent={result.Idempotent}");return true;
+            var result = memory.BuildRobustnessEvaluations();
+            Console.WriteLine($"feature-revision={result.FeatureRevisionId} market-revisions={string.Join(',', result.MarketRevisionIds)} evaluations={string.Join(',', result.EvaluationIds)} checksums={string.Join(',', result.Checksums)} unique-runs={result.UniqueBacktestRuns} windows={result.EvaluationWindows} parameter-variants={result.ParameterVariants} cost-variants={result.CostVariants} elapsed-ms={result.ElapsedMilliseconds} idempotent={result.Idempotent}"); return true;
         }
         if (args[0] == "finance-eodhd-runtime-evidence")
         {

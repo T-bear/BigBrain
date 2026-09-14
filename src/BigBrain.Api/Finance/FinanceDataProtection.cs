@@ -141,9 +141,9 @@ internal sealed class FinanceDataProtectionStore
     internal FinanceCorruptionDrillResult DrillCorruption(string backupId)
     {
         if (!Verify(backupId)) throw new InvalidDataException("Original backup must verify before the corruption drill.");
-        var manifest=ReadManifest(backupId);var artifact=manifest.Artifacts.Single();EnsureDisk(artifact.Bytes);var staging=Path.Combine(_options.RestoreStagingDirectory,$".staging-corruption-{backupId}-{Guid.NewGuid():N}");Directory.CreateDirectory(staging);
-        try{var copy=Path.Combine(staging,artifact.Path);File.Copy(Path.Combine(_options.BackupDirectory,artifact.Path),copy);using(var stream=new FileStream(copy,FileMode.Append,FileAccess.Write,FileShare.None))stream.WriteByte(0x00);var mismatch=Sha(File.ReadAllBytes(copy))!=artifact.Sha256;return new(backupId,mismatch,mismatch,"CorruptedCopyRejectedThenRemoved");}
-        finally{if(Directory.Exists(staging))Directory.Delete(staging,true);}
+        var manifest = ReadManifest(backupId); var artifact = manifest.Artifacts.Single(); EnsureDisk(artifact.Bytes); var staging = Path.Combine(_options.RestoreStagingDirectory, $".staging-corruption-{backupId}-{Guid.NewGuid():N}"); Directory.CreateDirectory(staging);
+        try { var copy = Path.Combine(staging, artifact.Path); File.Copy(Path.Combine(_options.BackupDirectory, artifact.Path), copy); using (var stream = new FileStream(copy, FileMode.Append, FileAccess.Write, FileShare.None)) stream.WriteByte(0x00); var mismatch = Sha(File.ReadAllBytes(copy)) != artifact.Sha256; return new(backupId, mismatch, mismatch, "CorruptedCopyRejectedThenRemoved"); }
+        finally { if (Directory.Exists(staging)) Directory.Delete(staging, true); }
     }
 
     private FinanceBackupManifest ReadManifest(string backupId)
@@ -156,7 +156,7 @@ internal sealed class FinanceDataProtectionStore
     private List<FinanceSourceProtection> ClassifySources()
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open(); var values = new List<FinanceSourceProtection>();
-        using var command = connection.CreateCommand(); command.CommandText = TableExists(connection,"dataset_candidates") ? """
+        using var command = connection.CreateCommand(); command.CommandText = TableExists(connection, "dataset_candidates") ? """
           SELECT o.provider,o.product,o.policy,c.license_class,c.provenance_result,c.state FROM observations o
           LEFT JOIN dataset_candidates c ON c.canonical_revision_id=o.revision_id
           GROUP BY o.provider,o.product,o.policy,c.license_class,c.provenance_result,c.state ORDER BY o.provider,o.product,o.policy
@@ -186,11 +186,11 @@ internal sealed class FinanceDataProtectionStore
         var featureIds = RelatedIds(connection, "feature_revisions", "revision_id", "source_revisions_json", revisionSet);
         var backtestIds = RelatedIds(connection, "backtest_runs", "run_id", "market_revisions_json", revisionSet, "feature_revision_id", featureIds);
         var robustnessIds = RelatedIds(connection, "robustness_evaluations", "evaluation_id", "market_revisions_json", revisionSet, "feature_revision_id", featureIds);
-        var featureSet=featureIds.ToHashSet(StringComparer.Ordinal);var backtestSet=backtestIds.ToHashSet(StringComparer.Ordinal);var robustnessSet=robustnessIds.ToHashSet(StringComparer.Ordinal);
-        var researchExperiments=Rows(connection,"research_experiments","robustness_evaluation_id",robustnessSet);
-        var researchExperimentSet=researchExperiments.Select(x=>x["experiment_id"]!).ToHashSet(StringComparer.Ordinal);
-        var researchHypothesisSet=researchExperiments.Select(x=>x["hypothesis_id"]!).ToHashSet(StringComparer.Ordinal);
-        var researchRunSet=EligibleResearchRunIds(connection,researchExperimentSet);
+        var featureSet = featureIds.ToHashSet(StringComparer.Ordinal); var backtestSet = backtestIds.ToHashSet(StringComparer.Ordinal); var robustnessSet = robustnessIds.ToHashSet(StringComparer.Ordinal);
+        var researchExperiments = Rows(connection, "research_experiments", "robustness_evaluation_id", robustnessSet);
+        var researchExperimentSet = researchExperiments.Select(x => x["experiment_id"]!).ToHashSet(StringComparer.Ordinal);
+        var researchHypothesisSet = researchExperiments.Select(x => x["hypothesis_id"]!).ToHashSet(StringComparer.Ordinal);
+        var researchRunSet = EligibleResearchRunIds(connection, researchExperimentSet);
         var tables = new List<BackupTable>
         {
             new("dataset_candidates", Rows(connection,"dataset_candidates","canonical_revision_id",revisionSet)),
@@ -230,55 +230,57 @@ internal sealed class FinanceDataProtectionStore
         return ids.ToArray();
     }
 
-    private static List<SortedDictionary<string,string?>> RowsForCandidates(SqliteConnection connection, HashSet<string> revisions)
+    private static List<SortedDictionary<string, string?>> RowsForCandidates(SqliteConnection connection, HashSet<string> revisions)
     {
-        if (!TableExists(connection,"dataset_corporate_actions")) return [];
-        var candidates = Rows(connection,"dataset_candidates","canonical_revision_id",revisions).Select(x => x["candidate_id"]!).ToHashSet(StringComparer.Ordinal);
-        return Rows(connection,"dataset_corporate_actions","candidate_id",candidates);
+        if (!TableExists(connection, "dataset_corporate_actions")) return [];
+        var candidates = Rows(connection, "dataset_candidates", "canonical_revision_id", revisions).Select(x => x["candidate_id"]!).ToHashSet(StringComparer.Ordinal);
+        return Rows(connection, "dataset_corporate_actions", "candidate_id", candidates);
     }
 
     private static HashSet<string> EligibleResearchRunIds(SqliteConnection connection, HashSet<string> eligibleExperiments)
     {
-        var eligibleRuns=new HashSet<string>(StringComparer.Ordinal);
-        if(eligibleExperiments.Count==0||!TableExists(connection,"research_run_experiments"))return eligibleRuns;
-        using var command=connection.CreateCommand();command.CommandText="SELECT run_id,experiment_id FROM research_run_experiments ORDER BY run_id,ordinal";
-        using var reader=command.ExecuteReader();var runs=new Dictionary<string,List<string>>(StringComparer.Ordinal);
-        while(reader.Read()){var run=reader.GetString(0);if(!runs.TryGetValue(run,out var experiments)){experiments=[];runs.Add(run,experiments);}experiments.Add(reader.GetString(1));}
-        foreach(var run in runs)if(run.Value.Count>0&&run.Value.All(eligibleExperiments.Contains))eligibleRuns.Add(run.Key);
+        var eligibleRuns = new HashSet<string>(StringComparer.Ordinal);
+        if (eligibleExperiments.Count == 0 || !TableExists(connection, "research_run_experiments")) return eligibleRuns;
+        using var command = connection.CreateCommand(); command.CommandText = "SELECT run_id,experiment_id FROM research_run_experiments ORDER BY run_id,ordinal";
+        using var reader = command.ExecuteReader(); var runs = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        while (reader.Read()) { var run = reader.GetString(0); if (!runs.TryGetValue(run, out var experiments)) { experiments = []; runs.Add(run, experiments); } experiments.Add(reader.GetString(1)); }
+        foreach (var run in runs) if (run.Value.Count > 0 && run.Value.All(eligibleExperiments.Contains)) eligibleRuns.Add(run.Key);
         return eligibleRuns;
     }
 
-    private static List<SortedDictionary<string,string?>> SchedulerRows(SqliteConnection connection,HashSet<string> eligibleRuns)
+    private static List<SortedDictionary<string, string?>> SchedulerRows(SqliteConnection connection, HashSet<string> eligibleRuns)
     {
-        if(!TableExists(connection,"research_schedule_opportunities"))return [];using var command=connection.CreateCommand();command.CommandText="SELECT * FROM research_schedule_opportunities ORDER BY opportunity_id";using var reader=command.ExecuteReader();var rows=new List<SortedDictionary<string,string?>>();
-        while(reader.Read()){var runOrdinal=reader.GetOrdinal("research_run_id");if(!reader.IsDBNull(runOrdinal)&&!eligibleRuns.Contains(reader.GetString(runOrdinal)))continue;var row=new SortedDictionary<string,string?>(StringComparer.Ordinal);for(var i=0;i<reader.FieldCount;i++)row[reader.GetName(i)]=reader.IsDBNull(i)?null:Convert.ToString(reader.GetValue(i),CultureInfo.InvariantCulture);rows.Add(row);}return rows;
+        if (!TableExists(connection, "research_schedule_opportunities")) return []; using var command = connection.CreateCommand(); command.CommandText = "SELECT * FROM research_schedule_opportunities ORDER BY opportunity_id"; using var reader = command.ExecuteReader(); var rows = new List<SortedDictionary<string, string?>>();
+        while (reader.Read()) { var runOrdinal = reader.GetOrdinal("research_run_id"); if (!reader.IsDBNull(runOrdinal) && !eligibleRuns.Contains(reader.GetString(runOrdinal))) continue; var row = new SortedDictionary<string, string?>(StringComparer.Ordinal); for (var i = 0; i < reader.FieldCount; i++) row[reader.GetName(i)] = reader.IsDBNull(i) ? null : Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture); rows.Add(row); }
+        return rows;
     }
 
-    private static List<SortedDictionary<string,string?>> Rows(SqliteConnection connection, string table, string filterColumn, HashSet<string> accepted)
+    private static List<SortedDictionary<string, string?>> Rows(SqliteConnection connection, string table, string filterColumn, HashSet<string> accepted)
     {
         if (accepted.Count == 0 || !TableExists(connection, table)) return [];
-        using var command = connection.CreateCommand(); command.CommandText = $"SELECT * FROM {table} ORDER BY {filterColumn}"; using var reader = command.ExecuteReader(); var rows = new List<SortedDictionary<string,string?>>();
+        using var command = connection.CreateCommand(); command.CommandText = $"SELECT * FROM {table} ORDER BY {filterColumn}"; using var reader = command.ExecuteReader(); var rows = new List<SortedDictionary<string, string?>>();
         while (reader.Read()) if (!reader.IsDBNull(reader.GetOrdinal(filterColumn)) && accepted.Contains(reader.GetString(reader.GetOrdinal(filterColumn))))
         {
-            var row = new SortedDictionary<string,string?>(StringComparer.Ordinal); for (var i=0;i<reader.FieldCount;i++) row[reader.GetName(i)] = reader.IsDBNull(i) ? null : Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture); rows.Add(row);
+            var row = new SortedDictionary<string, string?>(StringComparer.Ordinal); for (var i = 0; i < reader.FieldCount; i++) row[reader.GetName(i)] = reader.IsDBNull(i) ? null : Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture); rows.Add(row);
         }
         return rows.OrderBy(x => string.Join('\u001f', x.Values), StringComparer.Ordinal).ToList();
     }
 
-    private static List<SortedDictionary<string,string?>> AllRows(SqliteConnection connection,string table,string orderColumn)
+    private static List<SortedDictionary<string, string?>> AllRows(SqliteConnection connection, string table, string orderColumn)
     {
-        if(!TableExists(connection,table))return [];using var command=connection.CreateCommand();command.CommandText=$"SELECT * FROM {table} ORDER BY {orderColumn}";using var reader=command.ExecuteReader();var rows=new List<SortedDictionary<string,string?>>();while(reader.Read()){var row=new SortedDictionary<string,string?>(StringComparer.Ordinal);for(var i=0;i<reader.FieldCount;i++)row[reader.GetName(i)]=reader.IsDBNull(i)?null:Convert.ToString(reader.GetValue(i),CultureInfo.InvariantCulture);rows.Add(row);}return rows;
+        if (!TableExists(connection, table)) return []; using var command = connection.CreateCommand(); command.CommandText = $"SELECT * FROM {table} ORDER BY {orderColumn}"; using var reader = command.ExecuteReader(); var rows = new List<SortedDictionary<string, string?>>(); while (reader.Read()) { var row = new SortedDictionary<string, string?>(StringComparer.Ordinal); for (var i = 0; i < reader.FieldCount; i++) row[reader.GetName(i)] = reader.IsDBNull(i) ? null : Convert.ToString(reader.GetValue(i), CultureInfo.InvariantCulture); rows.Add(row); }
+        return rows;
     }
 
     private static bool TableExists(SqliteConnection connection, string table)
-    { using var command=connection.CreateCommand();command.CommandText="SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$name";command.Parameters.AddWithValue("$name",table);return Convert.ToInt32(command.ExecuteScalar(),CultureInfo.InvariantCulture)>0; }
-    private void EnsureDisk(long required) { var drive = new DriveInfo(Path.GetPathRoot(Path.GetFullPath(_options.BackupDirectory))!); if (drive.AvailableFreeSpace-required < _options.MinimumFreeBytesAfterOperation) throw new IOException("Finance backup/restore blocked by disk safety gate."); }
+    { using var command = connection.CreateCommand(); command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$name"; command.Parameters.AddWithValue("$name", table); return Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture) > 0; }
+    private void EnsureDisk(long required) { var drive = new DriveInfo(Path.GetPathRoot(Path.GetFullPath(_options.BackupDirectory))!); if (drive.AvailableFreeSpace - required < _options.MinimumFreeBytesAfterOperation) throw new IOException("Finance backup/restore blocked by disk safety gate."); }
     private static string Sha(byte[] bytes) => "sha256:" + Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
     private sealed record BackupPayload(string SchemaVersion, IReadOnlyList<FinanceBackupRevision> Revisions,
-        IReadOnlyList<SortedDictionary<string,string?>> Observations, IReadOnlyList<string> FeatureRevisionIds,
+        IReadOnlyList<SortedDictionary<string, string?>> Observations, IReadOnlyList<string> FeatureRevisionIds,
         IReadOnlyList<string> BacktestRunIds, IReadOnlyList<string> RobustnessEvaluationIds, IReadOnlyList<BackupTable> Tables);
-    private sealed record BackupTable(string Name, IReadOnlyList<SortedDictionary<string,string?>> Rows);
+    private sealed record BackupTable(string Name, IReadOnlyList<SortedDictionary<string, string?>> Rows);
 }
 
 public interface IFinanceBackupReader { FinanceBackupInventory GetInventory(); }

@@ -76,7 +76,8 @@ public sealed class DownloadControlTests
             captured = request;
             form = await request.Content!.ReadAsStringAsync();
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
-        })) { BaseAddress = new Uri("http://qbittorrent.test/") };
+        }))
+        { BaseAddress = new Uri("http://qbittorrent.test/") };
         var client = new QBittorrentClient(http, new MediaOptions
         {
             QBittorrent = new QBittorrentOptions { BaseUrl = "http://qbittorrent.test/", ApiKey = "fake" }

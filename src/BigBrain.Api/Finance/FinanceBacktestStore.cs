@@ -97,26 +97,26 @@ internal sealed partial class EodhdMarketMemory
     {
         var rows = new List<BacktestMarketBar>(); using var command = connection.CreateCommand();
         command.CommandText = "SELECT instrument_id,revision_id,session_date,open,close,acquired_utc,volume FROM observations ORDER BY session_date,instrument_id";
-        using var reader = command.ExecuteReader(); while(reader.Read()) if(revisions.Contains(reader.GetString(1),StringComparer.Ordinal))
-            rows.Add(new(new InstrumentId(reader.GetString(0)),reader.GetString(1),DateOnly.Parse(reader.GetString(2),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(3),CultureInfo.InvariantCulture),decimal.Parse(reader.GetString(4),CultureInfo.InvariantCulture),DateTimeOffset.Parse(reader.GetString(5),CultureInfo.InvariantCulture),reader.GetInt64(6)));
+        using var reader = command.ExecuteReader(); while (reader.Read()) if (revisions.Contains(reader.GetString(1), StringComparer.Ordinal))
+            rows.Add(new(new InstrumentId(reader.GetString(0)), reader.GetString(1), DateOnly.Parse(reader.GetString(2), CultureInfo.InvariantCulture), decimal.Parse(reader.GetString(3), CultureInfo.InvariantCulture), decimal.Parse(reader.GetString(4), CultureInfo.InvariantCulture), DateTimeOffset.Parse(reader.GetString(5), CultureInfo.InvariantCulture), reader.GetInt64(6)));
         return rows;
     }
-    private static List<BacktestFeatureValue> ReadBacktestFeatures(SqliteConnection connection,string revision)
+    private static List<BacktestFeatureValue> ReadBacktestFeatures(SqliteConnection connection, string revision)
     {
-        var rows=new List<BacktestFeatureValue>(); using var command=connection.CreateCommand(); command.CommandText="SELECT instrument_id,session_date,definition_id,value,knowledge_utc FROM feature_values WHERE revision_id=$id ORDER BY session_date,instrument_id,definition_id"; command.Parameters.AddWithValue("$id",revision);
-        using var reader=command.ExecuteReader(); while(reader.Read()) rows.Add(new(new InstrumentId(reader.GetString(0)),DateOnly.Parse(reader.GetString(1),CultureInfo.InvariantCulture),reader.GetString(2),reader.IsDBNull(3)?null:decimal.Parse(reader.GetString(3),CultureInfo.InvariantCulture),DateTimeOffset.Parse(reader.GetString(4),CultureInfo.InvariantCulture),revision)); return rows;
+        var rows = new List<BacktestFeatureValue>(); using var command = connection.CreateCommand(); command.CommandText = "SELECT instrument_id,session_date,definition_id,value,knowledge_utc FROM feature_values WHERE revision_id=$id ORDER BY session_date,instrument_id,definition_id"; command.Parameters.AddWithValue("$id", revision);
+        using var reader = command.ExecuteReader(); while (reader.Read()) rows.Add(new(new InstrumentId(reader.GetString(0)), DateOnly.Parse(reader.GetString(1), CultureInfo.InvariantCulture), reader.GetString(2), reader.IsDBNull(3) ? null : decimal.Parse(reader.GetString(3), CultureInfo.InvariantCulture), DateTimeOffset.Parse(reader.GetString(4), CultureInfo.InvariantCulture), revision)); return rows;
     }
-    private static string? LatestFeatureRevisionId(SqliteConnection connection)=>ScalarTextOrNull(connection,"SELECT revision_id FROM feature_revisions ORDER BY created_utc DESC,revision_id DESC LIMIT 1");
-    private static string ScalarText(SqliteConnection c,string sql,params (string Name,object Value)[] args)=>ScalarTextOrNull(c,sql,args)??throw new InvalidOperationException("Required value is unavailable.");
-    private static string? ScalarTextOrNull(SqliteConnection c,string sql,params (string Name,object Value)[] args){using var command=c.CreateCommand();command.CommandText=sql;foreach(var x in args)command.Parameters.AddWithValue(x.Name,x.Value);return command.ExecuteScalar() as string;}
-    private static FinanceBacktestRunSummary Summary(BacktestResult x)=>new(x.RunId,x.Checksum,x.Configuration.Strategy.Id,x.Configuration.Strategy.Version,x.Configuration.StrategyParameters,$"{x.Configuration.CostModel.Id}-{x.Configuration.CostModel.Version}",x.Configuration.From,x.Configuration.To,x.Metrics.InitialEquity,x.Metrics.FinalEquity,x.Metrics.GrossReturn,x.Metrics.NetReturn,x.Metrics.MaxDrawdown,x.Metrics.Trades,Math.Max(0,x.Metrics.GrossReturn-x.Metrics.NetReturn),x.Metrics.BenchmarkReturn,x.Metrics.ExcessReturn,x.Configuration.MarketRevisionIds,x.Configuration.FeatureRevisionId,x.Configuration.SimulationModel,x.Configuration.SizingPolicy,x.Status,x.Limitations);
+    private static string? LatestFeatureRevisionId(SqliteConnection connection) => ScalarTextOrNull(connection, "SELECT revision_id FROM feature_revisions ORDER BY created_utc DESC,revision_id DESC LIMIT 1");
+    private static string ScalarText(SqliteConnection c, string sql, params (string Name, object Value)[] args) => ScalarTextOrNull(c, sql, args) ?? throw new InvalidOperationException("Required value is unavailable.");
+    private static string? ScalarTextOrNull(SqliteConnection c, string sql, params (string Name, object Value)[] args) { using var command = c.CreateCommand(); command.CommandText = sql; foreach (var x in args) command.Parameters.AddWithValue(x.Name, x.Value); return command.ExecuteScalar() as string; }
+    private static FinanceBacktestRunSummary Summary(BacktestResult x) => new(x.RunId, x.Checksum, x.Configuration.Strategy.Id, x.Configuration.Strategy.Version, x.Configuration.StrategyParameters, $"{x.Configuration.CostModel.Id}-{x.Configuration.CostModel.Version}", x.Configuration.From, x.Configuration.To, x.Metrics.InitialEquity, x.Metrics.FinalEquity, x.Metrics.GrossReturn, x.Metrics.NetReturn, x.Metrics.MaxDrawdown, x.Metrics.Trades, Math.Max(0, x.Metrics.GrossReturn - x.Metrics.NetReturn), x.Metrics.BenchmarkReturn, x.Metrics.ExcessReturn, x.Configuration.MarketRevisionIds, x.Configuration.FeatureRevisionId, x.Configuration.SimulationModel, x.Configuration.SizingPolicy, x.Status, x.Limitations);
 }
 
 public interface IFinanceBacktestReader { FinanceBacktestCatalog GetCatalog(); BacktestResult? GetResult(string runId); }
-internal sealed class EodhdFinanceBacktestReader(EodhdMarketMemory memory):IFinanceBacktestReader
-{ public FinanceBacktestCatalog GetCatalog()=>memory.BacktestCatalog(); public BacktestResult? GetResult(string runId)=>memory.BacktestResult(runId); }
+internal sealed class EodhdFinanceBacktestReader(EodhdMarketMemory memory) : IFinanceBacktestReader
+{ public FinanceBacktestCatalog GetCatalog() => memory.BacktestCatalog(); public BacktestResult? GetResult(string runId) => memory.BacktestResult(runId); }
 
-internal sealed class FinanceBacktestBuildWorker(EodhdFinanceOptions options,EodhdMarketMemory memory,BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery):BackgroundService
+internal sealed class FinanceBacktestBuildWorker(EodhdFinanceOptions options, EodhdMarketMemory memory, BigBrain.Api.SystemRecovery.SystemRecoveryCoordinator recovery) : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken token){await recovery.WaitUntilRecoveredAsync(token);if(!options.Enabled||!options.AccountActive)return;await Task.Delay(TimeSpan.FromSeconds(18),token);try{memory.BuildReferenceBacktests();}catch(InvalidOperationException){}}
+    protected override async Task ExecuteAsync(CancellationToken token) { await recovery.WaitUntilRecoveredAsync(token); if (!options.Enabled || !options.AccountActive) return; await Task.Delay(TimeSpan.FromSeconds(18), token); try { memory.BuildReferenceBacktests(); } catch (InvalidOperationException) { } }
 }

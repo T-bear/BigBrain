@@ -164,7 +164,7 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     public async Task MissingJobAndProviderFailureAreControlled()
     {
         using var store = Store(); var service = new AudiobookAcquisitionService(new FakeProvider { Fail = true }, store, TimeProvider.System);
-        var missing = await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => service.GetAsync(new string('a',32), CancellationToken.None));
+        var missing = await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => service.GetAsync(new string('a', 32), CancellationToken.None));
         Assert.Equal("jobNotFound", missing.Code); Assert.Equal(404, missing.StatusCode);
         Assert.Equal("providerUnavailable", (await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => service.StatusAsync(CancellationToken.None))).Code);
     }
@@ -182,8 +182,8 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     }
 
     private AudiobookAcquisitionStore Store() => new(new MediaOptions { Audiobookshelf = new() { AcquisitionDatabasePath = Path.Combine(directory, "jobs.db") } });
-    private static AudiobookAcquisitionCandidate Candidate(string language, string narrator, string id="edition") => new("work",id,"Boken","Författaren",narrator,language,AudiobookLanguages.DisplayName(language),"Oavkortad",100,2025,null,"fixture","available",language=="und"?"unknown":"verified");
-    public void Dispose(){if(Directory.Exists(directory))Directory.Delete(directory,true);}
+    private static AudiobookAcquisitionCandidate Candidate(string language, string narrator, string id = "edition") => new("work", id, "Boken", "Författaren", narrator, language, AudiobookLanguages.DisplayName(language), "Oavkortad", 100, 2025, null, "fixture", "available", language == "und" ? "unknown" : "verified");
+    public void Dispose() { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
 
     private sealed class FakeProvider : IAudiobookAcquisitionProvider
     {
@@ -193,11 +193,11 @@ public sealed class AudiobookAcquisitionTests : IDisposable
         public ConcurrentBag<string> Searches { get; } = [];
         public int RequestCount { get; private set; }
         public AudiobookProviderJob? JobStatus { get; set; }
-        public Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token) => Fail?throw new HttpRequestException():Task.FromResult(new AudiobookAcquisitionProviderStatus("configuredHealthy","fixture",true,true,true,null));
-        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query,string? author,string language,CancellationToken token){Searches.Add(query);return query==FailingQuery?throw new HttpRequestException():Task.FromResult(Results);}
-        public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request,CancellationToken token){RequestCount++;return Task.FromResult(new AudiobookProviderJob("provider-job",AudiobookAcquisitionStatuses.Queued,null));}
-        public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId,CancellationToken token)=>Task.FromResult(JobStatus);
-        public Task<AudiobookProviderJob> CancelAsync(string providerJobId,CancellationToken token)=>Task.FromResult(new AudiobookProviderJob(providerJobId,AudiobookAcquisitionStatuses.Cancelled,null));
+        public Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token) => Fail ? throw new HttpRequestException() : Task.FromResult(new AudiobookAcquisitionProviderStatus("configuredHealthy", "fixture", true, true, true, null));
+        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token) { Searches.Add(query); return query == FailingQuery ? throw new HttpRequestException() : Task.FromResult(Results); }
+        public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request, CancellationToken token) { RequestCount++; return Task.FromResult(new AudiobookProviderJob("provider-job", AudiobookAcquisitionStatuses.Queued, null)); }
+        public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId, CancellationToken token) => Task.FromResult(JobStatus);
+        public Task<AudiobookProviderJob> CancelAsync(string providerJobId, CancellationToken token) => Task.FromResult(new AudiobookProviderJob(providerJobId, AudiobookAcquisitionStatuses.Cancelled, null));
     }
 
     private sealed class TestTimeProvider(DateTimeOffset now) : TimeProvider

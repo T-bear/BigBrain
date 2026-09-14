@@ -19,39 +19,38 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## D1 accepted publication reconciliation — 2026-09-14
+## Backend whitespace cleanup review handoff — 2026-09-14
 
-Status: BB-130D1 ACCEPTED / MERGED / CI VERIFIED; final documentation publication must
-also pass its own exact-main CI before this task is complete. No interrupted implementation.
-Owner/architect explicitly approved candidate `ccd7f7906b8d460a5060711e4a5f2b99039492cf`.
-Pre-merge accepted main: `df848b422022d7a257eff34d27d2572503ff807c`.
-Merge/main SHA: `81baaf4f5667310e00e83cccb19da3daf9cb790b`.
-[Merge CI 34786050596](https://github.com/T-bear/BigBrain/actions/runs/34786050596) SUCCESS:
-backend, frontend, documentation and secrets verified for that exact merge SHA.
+Status: REVIEW CANDIDATE ONLY — implemented / locally automatically verified; no interrupted implementation.
+Task: BB-130D backend whitespace cleanup only.
+Accepted main/baseline: `ce31f343851b71a77f3464ef3f2938f9574edbdf`;
+[baseline CI 34786279781](https://github.com/T-bear/BigBrain/actions/runs/34786279781) SUCCESS.
+Branch: `bb-130d/backend-whitespace-cleanup`.
+Candidate: the commit `style: normalize backend whitespace for BB-130D` containing this note.
+Resolve exact remote SHA with `git ls-remote origin refs/heads/bb-130d/backend-whitespace-cleanup`
+and compare with local HEAD. Main remains accepted source until explicit candidate-SHA approval/merge.
 
-Final source of truth: the separate main commit `docs: reconcile accepted BB-130D1 publication`
-containing this record. Resolve its full SHA using
-`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D1 publication$' origin/main`.
-Compare local HEAD, origin/main and `git ls-remote origin refs/heads/main`; query GitHub Actions
-for that exact head_sha and verify all four jobs and the CI run conclude SUCCESS.
-A commit cannot contain its own future SHA/run ID; GitHub history and exact-SHA CI reconstruct
-final publication without terminal history. If final CI is pending/failed, publication is
-unfinished: preserve evidence and stop for review; no fixes outside this approved scope.
+Completed and valid: pre-format exactly matches D1 (59 files / 22,573 WHITESPACE locations).
+One formatter write; all 59 source files pass exact token/literal/trivia and recursive-tree
+comparison. Post-format exit 0; pre/post Release builds zero warnings/errors; pre/post API
+664/664 and Sentinel 32/32 pass. No meaningful non-whitespace change or product blocker found.
+Initial sandbox build failure passed on approved host rerun. Roslyn raw equivalence flag on
+one existing block was characterized as representation/trivia, with strict tokens/tree and
+normalized/reparsed equivalence confirmed; report retains details and reproducible verifier.
+Changed files: exactly 59 formatter-scoped C# files listed in the
+[cleanup report](../reports/features/platform/bb-130d-backend-whitespace-cleanup-20260914.md),
+plus TESTING.md, docs/STATUS.md, docs/BACKLOG.md, docs/architecture/bb-130-stabilization.md,
+this note, docs/reports/REPORT-CATALOG.md and that report (66 files total).
+Publication checks: documentation, unstaged/staged diff and staged/full-history Gitleaks.
+Git state: only checkpoint files belong to the candidate; unrelated untracked mockups and
+ADR 0006–0009 remain preserved/excluded. No uncommitted checkpoint work remains after push.
+If publication fails, preserve the valid commit/working tree and resume publication, never reset.
 
-Completed and valid: A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
-D IN PROGRESS / D1 ACCEPTED. No source/configuration changes. Backend formatter gate
-NOT ENABLED: 59 files / 22,573 characterized WHITESPACE diagnostics, not correctness failure.
-Backend cleanup requires separate authorization. Frontend D2 NOT STARTED.
-Original local Release/test/format evidence remains in the
-[D1 report](../reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md).
-Reconciliation files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
-docs/architecture/bb-130-stabilization.md; this note; docs/reports/REPORT-CATALOG.md;
-docs/reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md.
-Publication checks: documentation verifier, unstaged/staged diff checks and staged/full-history
-Gitleaks; backend/frontend builds/tests are verified through exact-main CI.
-Unrelated untracked mockups and ADR 0006–0009 remain preserved/excluded. After successful
-publication, no uncommitted reconciliation work remains; retain the untouched recovery template.
-Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device approval, provider/broker,
-PAPER/LIVE/AUTO/capital or scientific behavior change. Existing post-BB-130 debt stays deferred.
-Exact next action after final CI SUCCESS: return to ChatGPT with "Codex är klar" and stop.
-No backend cleanup, format CI gate, D2, Research Learning or Finance feature work is authorized.
+Remaining: architect/owner review of exact candidate SHA before merge. A/B COMPLETE;
+C COMPLETE / EXIT APPROVED; D IN PROGRESS, D1 ACCEPTED. Cleanup acceptance pending.
+Backend formatter CI gate NOT ENABLED; activation is a separate checkpoint. D2 NOT STARTED.
+Candidate CI not claimed: unchanged workflow triggers main pushes and pull requests only.
+No deployment, runtime/device approval, schema/DDL semantics, provider/broker/PAPER/LIVE/AUTO,
+capital or scientific behavior change. Finance RESEARCH / 0 SEK / NONE; NOT EVALUABLE valid.
+Exact next action: return to ChatGPT with "Codex är klar" and remote candidate SHA, then stop.
+No merge, gate activation, D2, Research Learning or new Finance work is authorized here.

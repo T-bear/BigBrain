@@ -140,7 +140,7 @@ public sealed class InstrumentMappingCatalog
             throw new ArgumentException("Every mapping must reference a canonical instrument.", nameof(mappings));
 
         foreach (var group in _mappings.GroupBy(mapping => new
-                 { mapping.InstrumentId, mapping.Provider, mapping.ProviderDataset, mapping.Mic }))
+        { mapping.InstrumentId, mapping.Provider, mapping.ProviderDataset, mapping.Mic }))
         {
             var ordered = group.OrderBy(mapping => mapping.ValidFrom).ToArray();
             for (var index = 1; index < ordered.Length; index++)

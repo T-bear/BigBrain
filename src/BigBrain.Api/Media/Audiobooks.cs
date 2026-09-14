@@ -18,7 +18,10 @@ public static class AudiobookLanguages
     };
     public static string DisplayName(string code) => Normalize(code) switch
     {
-        "sv" => "Svenska", "en" => "Engelska", "de" => "Tyska", _ => "Språk okänt"
+        "sv" => "Svenska",
+        "en" => "Engelska",
+        "de" => "Tyska",
+        _ => "Språk okänt"
     };
 }
 

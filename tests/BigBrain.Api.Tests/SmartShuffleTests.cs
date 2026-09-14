@@ -167,7 +167,9 @@ public sealed class SmartShuffleTests
         var selector = new SmartShuffleSelector(new SeededRandom(seed));
         var candidates = new Dictionary<string, SmartShuffleCandidate>
         {
-            ["a"] = new("a", true, 0, 0), ["b"] = new("b", true, 0, 0), ["c"] = new("c", true, 0, 0)
+            ["a"] = new("a", true, 0, 0),
+            ["b"] = new("b", true, 0, 0),
+            ["c"] = new("c", true, 0, 0)
         };
         var result = new List<string>();
         string? previous = null;

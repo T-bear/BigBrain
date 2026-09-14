@@ -103,8 +103,11 @@ public sealed class CanonicalDatasetRevisionIdentityTests
         Assert.Equal(a.CanonicalRevisionId, replay.CanonicalRevisionId);
         var b = store.InspectValidatePromote(Candidate("b") with
         {
-            SourceName = " nasdaq-wiki ", CanonicalProduct = " prices ",
-            Provenance = "Equivalent independent submission", SourceUrl = "https://example.test/other-mirror", OriginalFilename = "renamed.csv"
+            SourceName = " nasdaq-wiki ",
+            CanonicalProduct = " prices ",
+            Provenance = "Equivalent independent submission",
+            SourceUrl = "https://example.test/other-mirror",
+            OriginalFilename = "renamed.csv"
         }, fixture.Path);
         Assert.Equal(a.ArtifactSha256, b.ArtifactSha256);
         Assert.Equal(a.CanonicalRevisionId, b.CanonicalRevisionId);
