@@ -1,5 +1,20 @@
 # BigBrain Backlog
 
+## BB-130D backend format CI gate — 2026-09-14
+
+**IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Baseline `e6fca47d87bc77bce153e77c98251d3b7d5e546b`; branch
+`bb-130d/backend-format-ci-gate`. [Gate evidence](reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
+One check-only backend step runs `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
+after restore, before unchanged Release build/test. Nonzero exit fails the backend job.
+Frontend, documentation and secrets jobs are unchanged. No source formatting or write mode.
+The gate is candidate-only, NOT accepted/merged/enforced on main. Main still has a clean
+format baseline without the gate; historical D1/cleanup evidence below remains unchanged.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; D1/cleanup ACCEPTED / MERGED / CI VERIFIED.
+D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device approval.
+Next: architect/owner review of exact remote candidate SHA before merge; stop before D2
+or any other checkpoint. Candidate CI is not claimed for this branch-only publication.
+
 ## BB-130D backend whitespace cleanup — 2026-09-14
 
 **ACCEPTED / MERGED / CI VERIFIED.**
@@ -239,7 +254,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-14: D1 evidence checkpoint is ACCEPTED / MERGED / CI VERIFIED; D IN PROGRESS / D1 ACCEPTED. Backend whitespace cleanup is ACCEPTED / MERGED / CI VERIFIED; accepted main format baseline CLEAN; formatter CI gate NOT ENABLED. Frontend D2 not started. A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C is complete / exit approved on 2026-09-09. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 and E2 are accepted; no currently-known C blocking checkpoint remains.
+- Status 2026-09-14: D1 evidence checkpoint is ACCEPTED / MERGED / CI VERIFIED; D IN PROGRESS / D1 ACCEPTED. Backend whitespace cleanup is ACCEPTED / MERGED / CI VERIFIED; accepted main format baseline CLEAN; formatter CI gate IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY, not enabled on main. Frontend D2 not started. A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C is complete / exit approved on 2026-09-09. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 and E2 are accepted; no currently-known C blocking checkpoint remains.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -249,7 +264,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: verify the final reconciliation exact-main CI and return to ChatGPT; formatter CI activation and D2 remain separately authorized checkpoints.
+- Next: review the exact backend-format-ci-gate candidate SHA before merge; D2 remains NOT STARTED and separately authorized.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).

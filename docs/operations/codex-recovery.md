@@ -19,42 +19,39 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## Accepted backend cleanup publication — 2026-09-14
+## Backend format CI gate review handoff — 2026-09-14
 
-Status: backend whitespace cleanup ACCEPTED / MERGED / CI VERIFIED; final documentation
-publication also requires its own exact-main CI SUCCESS. No interrupted implementation.
-Owner/architect approved candidate `8a795b16be87c97319705e9536b90472c83920aa`.
-Pre-merge main: `ce31f343851b71a77f3464ef3f2938f9574edbdf`.
-Merge/main: `c090a4fbb9450d1e94a0613a2cf8eb0ef5877150`.
-[Merge CI 34806580492](https://github.com/T-bear/BigBrain/actions/runs/34806580492) SUCCESS:
-backend, frontend, documentation and secrets verified for this exact SHA.
-Accepted-main restore and `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
-both exit 0; clean tracked tree afterward. No formatter write mode or new source changes.
+Status: IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY; no interrupted implementation.
+Task: BB-130D backend format CI gate only.
+Accepted main/baseline: `e6fca47d87bc77bce153e77c98251d3b7d5e546b`;
+[baseline CI 34806907520](https://github.com/T-bear/BigBrain/actions/runs/34806907520) SUCCESS.
+Branch: `bb-130d/backend-format-ci-gate`.
+Candidate: the commit `ci: enforce backend format verification` containing this note.
+Resolve exact remote SHA with `git ls-remote origin refs/heads/bb-130d/backend-format-ci-gate`
+and compare with HEAD. Main remains accepted source until explicit exact-SHA approval/merge.
 
-Final source of truth is the separate main commit `docs: reconcile accepted BB-130D backend cleanup`
-containing this record. Resolve its exact full SHA with
-`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D backend cleanup$' origin/main`.
-Compare HEAD, origin/main and `git ls-remote origin refs/heads/main`; inspect GitHub Actions
-for that exact head_sha and require SUCCESS from the run and all four required jobs.
-A commit cannot contain its own future SHA/run ID. GitHub history and exact-SHA CI provide
-permanent final evidence without terminal transcripts. If final CI is pending/failed, publication
-is unfinished: preserve evidence, stop for review, and do not start unrelated fixes.
+Completed and valid: one check-only `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
+step after backend restore, before unchanged Release build/test. Formatter failure fails the job;
+no continue-on-error or second restore. All other workflow bytes are identical to baseline.
+Pre/post local restore and format pass; pre/post Release builds zero warnings/errors;
+pre/post API 664/664 and Sentinel 32/32 pass, none skipped. Known local pipe permissions used.
+No source files were reformatted; no write/fix mode. Frontend, tests, packages, SDK/analyzer
+policy, solution/projects, runtime and historical D1/cleanup reports remain unchanged.
+Changed files: .github/workflows/ci.yml; TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
+docs/architecture/bb-130-stabilization.md; this note; docs/reports/REPORT-CATALOG.md;
+docs/reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md.
+Exact commands and publication checks are in the
+[gate report](../reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
+Git state: only these eight checkpoint files belong to the candidate. Unrelated untracked
+mockups and ADR 0006–0009 remain preserved/excluded. After successful push, no uncommitted
+checkpoint work remains. If publication fails, preserve valid work and resume publication.
 
-Completed: A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS;
-D1 and backend whitespace cleanup ACCEPTED / MERGED / CI VERIFIED.
-Backend format baseline CLEAN: D1's historical 59 files / 22,573 WHITESPACE locations
-are cleaned on accepted main. Backend formatter CI gate STILL NOT ENABLED; activation
-requires the next separately authorized checkpoint. Frontend D2 NOT STARTED.
-Source-review and regression evidence remains in the
-[cleanup report](../reports/features/platform/bb-130d-backend-whitespace-cleanup-20260914.md);
-D1 remains historical pre-cleanup evidence.
-Reconciliation changes only TESTING.md, docs/STATUS.md, docs/BACKLOG.md,
-docs/architecture/bb-130-stabilization.md, this note, docs/reports/REPORT-CATALOG.md
-and the existing cleanup report. Documentation/diff/staged/full-history Gitleaks checks apply;
-both exact-main CI runs verify backend/frontend builds and tests.
-Unrelated untracked mockups and ADR 0006–0009 remain preserved/excluded. No uncommitted
-reconciliation work remains after successful publication. Recovery template stays untouched.
-Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device approval, provider/broker,
-PAPER/LIVE/AUTO/capital work or scientific behavior change.
-Exact next action after final CI SUCCESS: return to ChatGPT with "Codex är klar" and stop.
-No formatter CI gate, D2, deployment, Research Learning or Finance feature work starts here.
+Remaining: architect/owner review of exact candidate SHA before merge and exact-main CI.
+The gate is NOT accepted, merged or enforced on main yet. Candidate CI not claimed: unchanged
+workflow triggers main pushes and pull requests only. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS. D1 and cleanup ACCEPTED / MERGED / CI VERIFIED; formatting baseline CLEAN.
+D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; fail-closed and NOT EVALUABLE unchanged.
+No deployment, runtime/device approval, provider/broker/orders/PAPER/LIVE/AUTO/capital or
+scientific behavior change. No Research Learning or Finance feature work.
+Exact next action: return to ChatGPT with "Codex är klar" and remote candidate SHA, then stop.
+No merge, D2 or next checkpoint is authorized by this publication.

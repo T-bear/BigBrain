@@ -1,5 +1,20 @@
 # BigBrain Status
 
+## BB-130D backend format CI gate — 2026-09-14
+
+**IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Baseline `e6fca47d87bc77bce153e77c98251d3b7d5e546b`; branch
+`bb-130d/backend-format-ci-gate`. [Gate evidence](reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
+One check-only backend step runs `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
+after restore, before unchanged Release build/test. Nonzero exit fails the backend job.
+Frontend, documentation and secrets jobs are unchanged. No source formatting or write mode.
+The gate is candidate-only, NOT accepted/merged/enforced on main. Main still has a clean
+format baseline without the gate; historical D1/cleanup evidence below remains unchanged.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; D1/cleanup ACCEPTED / MERGED / CI VERIFIED.
+D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device approval.
+Next: architect/owner review of exact remote candidate SHA before merge; stop before D2
+or any other checkpoint. Candidate CI is not claimed for this branch-only publication.
+
 ## BB-130D backend whitespace cleanup — 2026-09-14
 
 **ACCEPTED / MERGED / CI VERIFIED.**
