@@ -2,18 +2,24 @@
 
 ## BB-130D backend format CI gate — 2026-09-14
 
-**IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY.**
-Baseline `e6fca47d87bc77bce153e77c98251d3b7d5e546b`; branch
-`bb-130d/backend-format-ci-gate`. [Gate evidence](../reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
-One check-only backend step runs `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
-after restore, before unchanged Release build/test. Nonzero exit fails the backend job.
-Frontend, documentation and secrets jobs are unchanged. No source formatting or write mode.
-The gate is candidate-only, NOT accepted/merged/enforced on main. Main still has a clean
-format baseline without the gate; historical D1/cleanup evidence below remains unchanged.
+**ACCEPTED / MERGED / CI VERIFIED — ENABLED / ENFORCED ON MAIN.**
+Owner/architect approved exact candidate `332bc90975f6479d25622635f13d4b5567f82634`
+from baseline `e6fca47d87bc77bce153e77c98251d3b7d5e546b`.
+Merged unchanged as `47542cc9815b4f95c2dbb1c73dc8538dd29d0240`;
+[CI 34842088867](https://github.com/T-bear/BigBrain/actions/runs/34842088867)
+passed backend, frontend, documentation and secrets. Backend step 5 actually executed
+`dotnet format BigBrain.slnx --verify-no-changes --no-restore` and passed after restore
+(step 4), before Release build/test (steps 6/7). [Gate evidence](../reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
+Accepted-main local restore/format/build/test all exit 0; format baseline CLEAN,
+zero build warnings/errors, API 664/664 and Sentinel 32/32 passed with none skipped.
+The historical 59-file / 22,573-location D1 debt was cleaned by the accepted cleanup;
+historical D1/cleanup sections below describe those checkpoints, not current gate status.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; D1/cleanup ACCEPTED / MERGED / CI VERIFIED.
-D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device approval.
-Next: architect/owner review of exact remote candidate SHA before merge; stop before D2
-or any other checkpoint. Candidate CI is not claimed for this branch-only publication.
+D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device approval
+or scientific behavior change. No formatter write mode or source changes in this publication.
+The separate documentation reconciliation commit must pass its own exact-SHA CI,
+including the formatter step; final publication resolution is in the recovery note.
+Next checkpoint requires separate authorization; stop before D2 or any other work.
 
 ## BB-130D backend whitespace cleanup — 2026-09-14
 

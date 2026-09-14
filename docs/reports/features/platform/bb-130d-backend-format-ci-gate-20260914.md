@@ -4,16 +4,19 @@
 
 - Date: 2026-09-14.
 - Baseline/accepted main: `e6fca47d87bc77bce153e77c98251d3b7d5e546b`.
-- Branch: `bb-130d/backend-format-ci-gate`; candidate is the commit containing this report.
+- Branch: `bb-130d/backend-format-ci-gate`; approved candidate `332bc90975f6479d25622635f13d4b5567f82634`.
 - Scope: one backend CI verification step and canonical documentation only.
 - Detta är en sanerad GitHub-version. No secrets, private addresses, user data or raw logs.
 
 ## Status
 
-**IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY.**
-The candidate backend job enforces check-only formatting. The gate is NOT accepted,
-merged or enforced on main yet; candidate CI is not claimed. The unchanged workflow triggers
-main pushes/pull requests, so branch publication alone does not run candidate CI.
+**ACCEPTED / MERGED / CI VERIFIED / ENABLED ON MAIN.**
+Owner/architect approved candidate `332bc90975f6479d25622635f13d4b5567f82634` unchanged.
+Merge/main `47542cc9815b4f95c2dbb1c73dc8538dd29d0240` passed
+[CI 34842088867](https://github.com/T-bear/BigBrain/actions/runs/34842088867):
+backend, frontend, documentation and secrets SUCCESS. Backend formatter step 5 actually
+executed and passed, after restore step 4 and before build/test steps 6/7.
+The check-only gate is now enforced on main. Original candidate evidence below is historical.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1 and whitespace cleanup
 remain ACCEPTED / MERGED / CI VERIFIED; backend format baseline CLEAN. D2 NOT STARTED.
 Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device approval or scientific change.
@@ -85,14 +88,28 @@ API/schema/data/provider or Finance behavior changes. RESEARCH / 0 SEK / NONE; n
 orders, PAPER/LIVE/AUTO, capital, provider activation or scientific retuning. Fail-closed and
 NOT EVALUABLE behavior remain unchanged. No runtime services or user data were touched.
 
+## Accepted-main verification and publication reconciliation
+
+On 2026-09-14, after merge, the same four commands in the table above ran locally against
+exact merge/main: restore exit 0; check-only format exit 0 / CLEAN; Release build exit 0
+with zero warnings/errors; full tests exit 0, API 664/664 and Sentinel 32/32, none skipped.
+No formatter write mode, application/source changes or additional CI edits occurred.
+Only seven canonical documentation files are reconciled; D1 and cleanup reports remain intact.
+Publication checks passed: documentation verifier exit 0 (238 Markdown files / 90 BB IDs),
+unstaged/staged diff checks exit 0, Gitleaks v8.28.0 staged and full-history (268 commits)
+exit 0 with no leaks. The verifier required permission for its Git subprocess; its required
+Resumption heading was restored before the successful run. Exact final-main CI must also
+pass all four jobs, with formatter execution/order verified again.
+
 ## Remaining work
 
-Architect/owner review of the exact remote candidate SHA before merge. Only a separately
-approved merge and exact-main CI can establish accepted/enforced-on-main status. D remains
-in progress; D2, deployment, Research Learning and Finance features are not started.
+D remains IN PROGRESS; D2 NOT STARTED and separately authorized. No deployment/runtime/device
+approval, Research Learning or Finance work follows from publication.
 
 ## Resumption
 
-Read START-HERE and the canonical recovery note. Verify baseline and remote candidate SHA,
-preserve unrelated work, then return to ChatGPT with "Codex är klar". Stop before merge or
-any next checkpoint. The commit title is `ci: enforce backend format verification`.
+The final reconciliation is the main commit `docs: reconcile accepted BB-130D backend format gate`.
+Resolve its SHA from Git history and its exact-head CI from GitHub Actions as described in
+[recovery](../../../operations/codex-recovery.md). Its own SHA/run cannot be embedded in itself;
+GitHub commit/run records provide final publication evidence. Stop after final CI verification
+and return to ChatGPT with "Codex är klar".

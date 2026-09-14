@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130D format gate, 2026-09-14` — [One check-only backend CI step — IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY](features/platform/bb-130d-backend-format-ci-gate-20260914.md). Not accepted/enforced on main; D2 not started.
+- `BB-130D format gate, 2026-09-14` — [One check-only backend CI step — ACCEPTED / MERGED / CI VERIFIED / ENABLED ON MAIN](features/platform/bb-130d-backend-format-ci-gate-20260914.md). Formatter step passed on exact merge-main CI; D2 not started.
 
 - `BB-130D cleanup, 2026-09-14` — [Backend whitespace-only cleanup: clean main format baseline; ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d-backend-whitespace-cleanup-20260914.md). Merge CI `34806580492` SUCCESS; main format check passes. CI gate not enabled; D2 not started.
 
