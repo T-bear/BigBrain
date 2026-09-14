@@ -19,43 +19,45 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## Backend format CI gate accepted publication — 2026-09-14
+## BB-130D2 characterization handoff — 2026-09-14
 
-Status: ACCEPTED / MERGED / CI VERIFIED / ENABLED ON MAIN; no interrupted implementation.
-Task: BB-130D backend format CI gate merge and documentation reconciliation only.
-Original baseline: `e6fca47d87bc77bce153e77c98251d3b7d5e546b`.
-Approved branch: `bb-130d/backend-format-ci-gate`.
-Approved candidate: `332bc90975f6479d25622635f13d4b5567f82634`.
-Merged unchanged as `47542cc9815b4f95c2dbb1c73dc8538dd29d0240`;
-[merge CI 34842088867](https://github.com/T-bear/BigBrain/actions/runs/34842088867) SUCCESS
-for backend, frontend, documentation and secrets. Actual backend formatter step 5 passed
-after restore step 4, before build/test steps 6/7.
+Status: BB-130D2 CHARACTERIZATION / REVIEW CANDIDATE ONLY; not D2 complete.
+Task: frontend quality-gate read/characterize/recommend only.
+Baseline/source of truth: `1d824f6d2a9b4e6e2fc679705bd357860042ddbb`.
+Branch: `bb-130d/frontend-quality-characterization`.
+Candidate: commit `docs: characterize BB-130D2 frontend quality gate` containing this record.
+Resolve exact remote SHA using `git ls-remote origin refs/heads/bb-130d/frontend-quality-characterization`
+and compare to HEAD; main must remain baseline. No merge or force operation authorized.
 
-Completed and valid: accepted-main local restore and check-only format exit 0 / CLEAN;
-Release build zero warnings/errors; API 664/664 and Sentinel 32/32 passed, none skipped.
-Exact commands and gate behavior are in the
-[gate report](../reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
-No source edits, formatter write mode or additional workflow changes.
-Reconciliation files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
-docs/architecture/bb-130-stabilization.md; this note; docs/reports/REPORT-CATALOG.md;
-docs/reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md.
-Unrelated untracked mockups and ADR 0006–0009 remain preserved/excluded.
+Previous publication continuity closed: exact baseline CI
+[34842836925](https://github.com/T-bear/BigBrain/actions/runs/34842836925) SUCCESS in all four jobs;
+backend formatter step 5 actually passed after restore 4, before build/test 6/7.
+No previous merge/commit was repeated. Backend format baseline CLEAN; gate enforced on main.
 
-Publication resolution: the separate main commit `docs: reconcile accepted BB-130D backend format gate`
-contains this record. Resolve with
-`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D backend format gate$' origin/main`.
-Compare HEAD, origin/main and `git ls-remote origin refs/heads/main`; query Actions by that
-exact head_sha and verify backend/frontend/documentation/secrets SUCCESS. Inspect backend
-steps again: the exact `dotnet format BigBrain.slnx --verify-no-changes --no-restore`
-command must have executed successfully after restore and before build/test. This commit's
-own future SHA/run is resolved from GitHub history, not recursively embedded in itself.
-If interrupted before that verification, preserve this valid commit/work and resume the
-first incomplete publication/CI step without recreating or merging again.
+Completed and valid: inventory 113 tracked frontend files; 83 TS/TSX proposed scope.
+Ephemeral Prettier 3.9.6 in /tmp, proposed 120-column/single-quote/no-semi/two-space/LF config:
+check-only exit 1, 80 files would change, repeat CLI output identical. In-memory scope/line
+records repeat identically; 7,822 lines become 18,199, with no source writes. No parser errors.
+Baseline npm ci exit 0; baseline and post-documentation Web 199/199 tests in 26 files and
+production TypeScript/Vite builds pass. Documentation verifier 239 files / 90 BB IDs and
+diff/source-unchanged checks pass. Full-history Gitleaks 269 commits, no leaks.
+No persistent formatter/linter, package/source/config/CI changes; no cleanup or write-mode command.
+Exact commands, style measures, exclusions, validation and limitations are in the
+[report](../reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md).
 
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1 and cleanup ACCEPTED / MERGED /
-CI VERIFIED. Historical 59-file / 22,573-location debt cleaned; format baseline CLEAN;
-backend gate ENABLED / ENFORCED ON MAIN. D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE;
-fail-closed and NOT EVALUABLE unchanged. No deployment/runtime/device approval,
-provider/broker/orders/PAPER/LIVE/AUTO/capital or scientific behavior change.
-Exact next action after final exact-main CI verification: return to ChatGPT with
-"Codex är klar" and stop. No D2, frontend tooling, Research Learning or Finance feature work.
+Changed files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
+docs/architecture/bb-130-stabilization.md; this recovery note; docs/reports/REPORT-CATALOG.md;
+docs/reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md.
+Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. Historical reports unchanged.
+After successful commit/push no uncommitted checkpoint work remains. If interrupted before
+publication, preserve valid documentation and resume the first incomplete validation/publication step.
+
+Known limitation: npm audit reports five dependency findings (3 moderate, 2 high); no product
+exploitability reproduced or tested. Separate applicability review before cleanup recommended.
+No package fix or security acceptance. Reproduced defects require blocker handoff, not D2 fixes.
+Remaining: architect review of exact candidate and proposed scope; separately authorized cleanup
+batches and subsequent CI gate activation. Lint/CSS/JS scopes deferred, D2 not complete.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; D1/backend cleanup accepted.
+Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device/UX/scientific behavior change,
+provider/broker/orders/PAPER/LIVE/AUTO/capital, Research Learning or Finance feature work.
+Exact next action: return to ChatGPT with "Codex är klar" and exact remote SHA; stop.
