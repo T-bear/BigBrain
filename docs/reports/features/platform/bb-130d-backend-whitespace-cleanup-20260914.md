@@ -4,18 +4,24 @@
 
 - Date: 2026-09-14.
 - Baseline/accepted main: `ce31f343851b71a77f3464ef3f2938f9574edbdf`.
-- Branch: `bb-130d/backend-whitespace-cleanup`; candidate is the commit containing this report.
+- Branch: `bb-130d/backend-whitespace-cleanup`.
+- Approved candidate: `8a795b16be87c97319705e9536b90472c83920aa`.
+- Merge/main SHA: `c090a4fbb9450d1e94a0613a2cf8eb0ef5877150`.
 - Scope: only formatter-defined whitespace in the exact D1 solution baseline.
 - Detta är en sanerad GitHub-version. Aggregate results, commands and repository paths
   only; no private addresses, raw sensitive logs, credentials or runtime/user data.
 
 ## Status
 
-**REVIEW CANDIDATE ONLY — implemented / locally automatically verified.**
-The candidate has a clean backend formatting baseline; main acceptance is pending.
+**ACCEPTED / MERGED / CI VERIFIED.**
+Publication amendment, 2026-09-14: owner/architect approved the exact candidate above;
+normal non-force merge preserved its entire tree. All four jobs passed for the exact merge
+in [CI 34806580492](https://github.com/T-bear/BigBrain/actions/runs/34806580492).
+Accepted-main formatter baseline is CLEAN: the historical 59-file / 22,573-location D1 debt
+is cleaned. Original characterization and source-review evidence below remains unchanged.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS, D1 ACCEPTED.
-Backend format CI gate NOT ENABLED. CI workflow unchanged; branch pushes alone do not
-trigger its main/pull-request workflow, so candidate CI is not claimed.
+Backend format CI gate STILL NOT ENABLED; activation requires a separately authorized checkpoint.
+CI workflow unchanged; the exact merge-main run supplies current acceptance evidence.
 Frontend/D2 NOT STARTED. No deployment, runtime/device approval or scientific behavior change.
 Finance RESEARCH / 0 SEK / NONE.
 
@@ -199,15 +205,41 @@ Finance RESEARCH / 0 SEK / NONE. No secrets or private operational evidence is p
 
 ## Remaining work
 
-Review/approve the exact candidate SHA before merge. Backend formatter gate remains NOT ENABLED;
-activation is a separate checkpoint after acceptance. D2 NOT STARTED; no frontend scope granted.
+Cleanup is accepted, merged and CI verified. Backend formatter gate remains NOT ENABLED;
+activation requires the next separately authorized checkpoint. D2 NOT STARTED; no frontend scope granted.
 No final D acceptance, deployment or Research Learning/Finance feature work follows.
 
 ## Resumption
 
 Read START-HERE, current STATUS/BACKLOG and the canonical recovery note. Verify remote main
-and candidate SHA, preserve unrelated work, and return to ChatGPT with "Codex är klar".
-A pushed candidate is REVIEW CANDIDATE ONLY, not merge/deployment or next-checkpoint authority.
+and the exact final reconciliation CI, preserve unrelated work, and return to ChatGPT with
+"Codex är klar". No deployment or next-checkpoint authority follows.
+
+### Accepted-main verification and reconciliation — 2026-09-14
+
+On merge/main `c090a4fbb9450d1e94a0613a2cf8eb0ef5877150`:
+
+- `dotnet restore BigBrain.slnx`: exit 0; all projects up to date.
+- `dotnet format BigBrain.slnx --verify-no-changes --no-restore`: exit 0, empty output;
+  known Roslyn local-pipe permission used. No write-mode invocation.
+- `git diff --exit-code`: exit 0 after verification; approved candidate tree unchanged.
+- CI `34806580492`: backend, frontend, documentation and secrets all SUCCESS for that SHA.
+
+Reconciliation publication checks (all exit 0):
+
+- `node scripts/verify-documentation.mjs`: 237 Markdown files / 90 unique BB IDs.
+- `git diff --check` and `git diff --cached --check`: passed.
+- Gitleaks v8.28.0 `git --pre-commit --staged --redact --no-banner`: no leaks.
+- Gitleaks v8.28.0 `git --log-opts='--all' --redact --no-banner`: 266 commits, no leaks.
+- Full backend/frontend restore/install/build/test remain verified by each exact-main CI;
+  no source-suite rerun is needed for the documentation-only reconciliation.
+
+Only the seven canonical documentation files are changed by this reconciliation; no source,
+CI, packages or frontend files. D1 report remains historical and unchanged. Other documentation,
+including README, ARCHITECTURE/ADRs, module contracts and runbooks, needs no behavioral update.
+The final documentation commit must pass its own exact-main CI. Its own future SHA/run ID
+cannot be embedded in itself; the recovery note defines the exact commit lookup, and GitHub
+retains the authoritative exact-SHA result. No older CI substitutes for final verification.
 
 ### Reproducible read-only comparison
 

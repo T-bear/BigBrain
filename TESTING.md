@@ -2,7 +2,14 @@
 
 ## BB-130D backend whitespace cleanup — 2026-09-14
 
-**REVIEW CANDIDATE ONLY — implemented / locally automatically verified.**
+**ACCEPTED / MERGED / CI VERIFIED.**
+Owner/architect approved exact candidate `8a795b16be87c97319705e9536b90472c83920aa`.
+Merged unchanged as `c090a4fbb9450d1e94a0613a2cf8eb0ef5877150`;
+[merge CI 34806580492](https://github.com/T-bear/BigBrain/actions/runs/34806580492)
+passed backend, frontend, documentation and secrets on 2026-09-14.
+Accepted-main `dotnet restore BigBrain.slnx` and
+`dotnet format BigBrain.slnx --verify-no-changes --no-restore` both exit 0.
+Backend format baseline: CLEAN; historical D1 debt (59 files / 22,573 locations) is cleaned on main.
 Baseline `ce31f343851b71a77f3464ef3f2938f9574edbdf`; branch
 `bb-130d/backend-whitespace-cleanup`. [Cleanup evidence](docs/reports/features/platform/bb-130d-backend-whitespace-cleanup-20260914.md).
 Pre-check exactly reproduced D1: 59 files / 22,573 WHITESPACE locations. One formatter
@@ -11,13 +18,14 @@ passed; full-solution format verification now exits 0. Pre/post Release builds h
 warnings/errors; pre/post API 664/664 and Sentinel 32/32 tests pass. No manual source edits.
 
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS, D1 ACCEPTED. Backend format
-CI gate NOT ENABLED; enabling it requires a later separately authorized checkpoint after
-cleanup review/acceptance. Frontend/D2 NOT STARTED. Historical D1 evidence below is unchanged
-and describes its pre-cleanup baseline; clean formatting is currently candidate-only.
+CI gate STILL NOT ENABLED; activation requires the next separately authorized checkpoint.
+Frontend/D2 NOT STARTED. Historical D1 evidence below remains pre-cleanup evidence;
+the accepted main formatting baseline is now clean.
 No CI configuration, packages, schema semantics, scientific behavior or runtime changes.
 Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device or owner UX approval.
-Next: architect/owner review of exact remote candidate SHA before merge; stop before any
-CI gate, D2, Research Learning or Finance feature work. Candidate CI is not claimed.
+Next: verify exact-final-main CI for the separate documentation reconciliation, then return
+to ChatGPT and stop. Final commit lookup is recorded in the canonical recovery note.
+No CI gate, D2, Research Learning or Finance feature work is authorized by this publication.
 
 ## BB-130D1 backend quality-gate baseline — 2026-09-14
 
