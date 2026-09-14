@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130D2, 2026-09-14` — [Frontend quality-gate characterization — REVIEW CANDIDATE ONLY](features/platform/bb-130d2-frontend-quality-characterization-20260914.md). 80/83 TS/TSX files nonconforming; formatter-only proposal, cleanup/lint/CI deferred; dependency audit findings require separate triage.
+
 - `BB-130D format gate, 2026-09-14` — [One check-only backend CI step — ACCEPTED / MERGED / CI VERIFIED / ENABLED ON MAIN](features/platform/bb-130d-backend-format-ci-gate-20260914.md). Formatter step passed on exact merge-main CI; D2 not started.
 
 - `BB-130D cleanup, 2026-09-14` — [Backend whitespace-only cleanup: clean main format baseline; ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d-backend-whitespace-cleanup-20260914.md). Merge CI `34806580492` SUCCESS; main format check passes. CI gate not enabled; D2 not started.
