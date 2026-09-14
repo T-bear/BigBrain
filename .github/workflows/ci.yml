@@ -17,6 +17,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - run: dotnet restore BigBrain.slnx
+      - run: dotnet format BigBrain.slnx --verify-no-changes --no-restore
       - run: dotnet build BigBrain.slnx --configuration Release --no-restore
       - run: dotnet test BigBrain.slnx --configuration Release --no-build
 
