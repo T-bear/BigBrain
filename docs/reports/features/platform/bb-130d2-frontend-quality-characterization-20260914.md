@@ -11,7 +11,15 @@
 
 ## Status
 
-**BB-130D2 CHARACTERIZATION / REVIEW CANDIDATE ONLY.** D2 is not complete or accepted.
+**BB-130D2 characterization ACCEPTED / MERGED / CI VERIFIED.**
+Publication amendment: owner/architect approved exact candidate
+`01129fc54bdd3871b61eeda47e5cadbadc3ad81c`, merged unchanged as
+`9181f2c75b8ffc12520ce497b7067e60527f459f`.
+[CI 34877864965](https://github.com/T-bear/BigBrain/actions/runs/34877864965) passed backend,
+frontend, documentation and secrets on that exact merge SHA. Backend formatter step 5 actually
+passed after restore step 4, before build/test steps 6/7. Frontend npm ci, npm test -- --run
+and npm run build all passed; no frontend lint/format gate. Original characterization evidence
+below remains historical. D2 cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
 No frontend formatter/linter dependency, config, script or CI gate has been committed.
 No source formatting, application/UX/scientific behavior or runtime change.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1 and backend cleanup accepted.
@@ -225,8 +233,8 @@ No deployment, runtime data or services touched. Gitleaks and existing safety po
 
 ## Remaining work
 
-1. Architect review of this exact candidate and proposed scope/configuration; D2 is not complete.
-2. Separate dependency-advisory applicability review; no upgrades inside this characterization.
+1. Characterization is accepted; D2 implementation/cleanup/tool installation/gate is NOT STARTED / NOT COMPLETE.
+2. Dependency advisories: TRIAGE REQUIRED; exploitability is unverified. Separate applicability review; no upgrades here.
 3. If approved, establish formatter baseline through separately authorized bounded cleanup batches
    grouped by responsibility (shared TS, shell/components, feature areas/tests), with exact scope,
    semantic/JSX review and full Web tests/build. No full-scope green gate until every batch is clean.
@@ -250,8 +258,29 @@ No custom framework, lint dependency or CI step is needed in this characterizati
 presentation from correctness rules. No cleanup, final gate, D completion, deployment or new
 Finance/Research Learning checkpoint is authorized by this recommendation.
 
+## Publication reconciliation
+
+This merge/publication changes only the same seven canonical documents. No local formatter execution,
+package/tool installation, source formatting, frontend gate, deployment or behavior changes.
+Historical local tests/build and formatter counts remain unchanged; both exact-main CI runs
+provide publication regression evidence. Local source suites were not rerun for documentation-only
+reconciliation. README, ARCHITECTURE/ADRs, roadmap, modules, knowledge/index and runbooks were
+reassessed; no behavioral or architectural updates needed. Catalog retains historical entries.
+
+Publication checks passed: `node scripts/verify-documentation.mjs` exit 0 (239 Markdown files /
+90 BB IDs); `git diff --check` and `git diff --cached --check` exit 0; Gitleaks v8.28.0
+`git --pre-commit --staged --redact --no-banner` and
+`git --log-opts='--all' --redact --no-banner` exit 0, no leaks (270 history commits).
+Only the seven intended documents are staged; remote main/candidate remain expected.
+Final reconciliation CI must pass all
+four jobs, with the backend formatter step explicitly verified again, before completion.
+
 ## Resumption
 
-Read AGENTS, START-HERE, current STATUS/BACKLOG and the canonical recovery note. Verify baseline
-and remote characterization SHA, preserve unrelated work, return to ChatGPT with "Codex är klar"
-and stop. Candidate publication does not trigger the main/PR-only workflow; no candidate CI claim.
+Read AGENTS, START-HERE and canonical recovery. Final source of truth is the separate main
+commit `docs: reconcile accepted BB-130D2 characterization` containing this amendment.
+Resolve its SHA from Git history and inspect GitHub Actions for that exact head_sha, including
+actual formatter execution. Its own future SHA/run cannot be embedded in itself; GitHub history
+and exact-head CI retain the definitive publication evidence. Preserve unrelated work and resume
+only incomplete publication verification if interrupted. After final CI passes, return to ChatGPT
+with "Codex är klar" and stop. No cleanup, triage implementation or gate activation is authorized.

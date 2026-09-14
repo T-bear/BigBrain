@@ -2,7 +2,13 @@
 
 ## BB-130D2 frontend characterization — 2026-09-14
 
-**BB-130D2 CHARACTERIZATION / REVIEW CANDIDATE ONLY.** Not D2 complete or accepted.
+**BB-130D2 characterization ACCEPTED / MERGED / CI VERIFIED.**
+Owner/architect approved candidate `01129fc54bdd3871b61eeda47e5cadbadc3ad81c` unchanged.
+Merge/main `9181f2c75b8ffc12520ce497b7067e60527f459f` passed
+[CI 34877864965](https://github.com/T-bear/BigBrain/actions/runs/34877864965):
+backend, frontend, documentation and secrets SUCCESS. Backend formatter step 5 actually
+passed after restore and before build/test. Frontend npm ci/test/build all passed;
+no frontend formatter/linter gate exists. D2 cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
 Baseline `1d824f6d2a9b4e6e2fc679705bd357860042ddbb`; branch
 `bb-130d/frontend-quality-characterization`. [Characterization evidence](reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md).
 83 tracked TS/TSX files: pinned ephemeral Prettier 3.9.6 check flags 80 files, exit 1,
@@ -11,14 +17,16 @@ Existing frontend baseline: npm ci, 199/199 tests (26 files), TypeScript/Vite bu
 Large wrapping/normalization debt requires separately authorized cleanup batches and later
 CI activation. CSS/JS asset-test contracts need separate assessment; lint is deferred.
 Registry audit reports five dependency findings (3 moderate, 2 high); applicability/exploitability
-is unverified. Separate dependency triage is recommended; no audit fix or reproduced product defect.
+is unverified. Dependency advisories: TRIAGE REQUIRED; no audit fix or reproduced product defect.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1/backend cleanup accepted;
 backend format baseline CLEAN and formatter gate ENABLED ON MAIN. Previous final-main
 [CI 34842836925](https://github.com/T-bear/BigBrain/actions/runs/34842836925) is now verified
 SUCCESS for exact baseline, including actual formatter step 5 after restore/before build/test.
 Historical sections below retain their checkpoint state; D2 characterization is current here.
 Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device/UX/scientific behavior change.
-Next: review exact remote candidate; no cleanup, gate activation or next checkpoint starts here.
+Next: separately authorize dependency triage and any later cleanup/gate work. No next checkpoint
+starts here. The separate documentation reconciliation requires its own exact-main CI;
+final publication resolution is recorded in the canonical recovery note.
 
 ## BB-130D backend format CI gate — 2026-09-14
 
@@ -290,7 +298,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: review D2 characterization above, triage dependency advisories, then separately authorize bounded cleanup and eventual gate activation. D2 is not complete.
+- Next: D2 characterization is accepted; separately authorize dependency triage, then bounded cleanup and eventual gate activation. D2 implementation is NOT STARTED / NOT COMPLETE.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
