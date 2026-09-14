@@ -254,7 +254,8 @@ public sealed class DeterministicHistoricalReplay
                 var findings = request.QualityEvidence.Where(finding => finding.InstrumentId == instrumentId && finding.TradingDate == date).ToArray();
                 foreach (var finding in findings)
                     Add(events, BaseEvent(HistoricalReplayEventType.QualityFindingObserved, instrumentId, date, finding.ObservedAtUtc,
-                        request.DatasetRevisionId, reference) with { QualityEvidence = finding, GapClassification = finding.Classification }, 40, finding.FindingCode.ToString());
+                        request.DatasetRevisionId, reference) with
+                    { QualityEvidence = finding, GapClassification = finding.Classification }, 40, finding.FindingCode.ToString());
 
                 var bars = request.Bars.Where(bar => bar.InstrumentId == instrumentId && bar.SessionDate == date).ToArray();
                 var invalid = findings.Any(finding => finding.Classification == ObservationGapClassification.InvalidObservation &&

@@ -115,12 +115,12 @@ public static class DatasetCrossSourceComparerV1
     public const string Version = "cross-source-comparison-v1";
     public static DatasetOverlapMetrics Compare(IEnumerable<DatasetComparableBar> a, IEnumerable<DatasetComparableBar> b)
     {
-        var left = a.GroupBy(x => $"{x.Symbol}|{x.Date:yyyy-MM-dd}",StringComparer.Ordinal).ToDictionary(x=>x.Key,x=>x.Last(),StringComparer.Ordinal);
-        var right = b.GroupBy(x => $"{x.Symbol}|{x.Date:yyyy-MM-dd}",StringComparer.Ordinal).ToDictionary(x=>x.Key,x=>x.Last(),StringComparer.Ordinal);
+        var left = a.GroupBy(x => $"{x.Symbol}|{x.Date:yyyy-MM-dd}", StringComparer.Ordinal).ToDictionary(x => x.Key, x => x.Last(), StringComparer.Ordinal);
+        var right = b.GroupBy(x => $"{x.Symbol}|{x.Date:yyyy-MM-dd}", StringComparer.Ordinal).ToDictionary(x => x.Key, x => x.Last(), StringComparer.Ordinal);
         var overlap = left.Keys.Intersect(right.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
         if (overlap.Length < 20) return new(overlap.Length, left.Keys.Except(right.Keys).Count(), right.Keys.Except(left.Keys).Count(), null, null, [], DatasetComparisonClass.InsufficientOverlap);
         var price = overlap.Select(k => Math.Abs(left[k].Close - right[k].Close) / Math.Max(Math.Abs(right[k].Close), 0.00000001m)).Order().ToArray();
-        var volume = overlap.Where(k => right[k].Volume != 0).Select(k => Math.Abs(left[k].Volume-right[k].Volume)/Math.Abs(right[k].Volume)).Order().ToImmutableArray();
+        var volume = overlap.Where(k => right[k].Volume != 0).Select(k => Math.Abs(left[k].Volume - right[k].Volume) / Math.Abs(right[k].Volume)).Order().ToImmutableArray();
         var basisDiff = overlap.Any(k => left[k].PriceBasis != right[k].PriceBasis);
         var median = price[price.Length / 2]; var maximum = price[^1];
         var classification = basisDiff && median > 0.01m ? DatasetComparisonClass.PriceBasisDifference

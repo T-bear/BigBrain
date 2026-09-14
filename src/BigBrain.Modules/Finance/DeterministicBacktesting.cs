@@ -77,8 +77,8 @@ public sealed record BacktestFillModel(string Id, string Version, bool WholeShar
 public sealed record BacktestRunConfiguration(IReadOnlyList<string> MarketRevisionIds, string FeatureRevisionId,
     StrategyIdentity Strategy, IReadOnlyDictionary<string, decimal> StrategyParameters, string SimulationModel,
     BacktestCostModel CostModel, decimal InitialCapital, IReadOnlyList<string> Universe, DateOnly From, DateOnly To,
-    string SizingPolicy, int Seed,string? EvaluationContext=null, BacktestFillModel? FillModel=null,
-    ResearchDatasetLineage? ResearchDatasetLineage=null);
+    string SizingPolicy, int Seed, string? EvaluationContext = null, BacktestFillModel? FillModel = null,
+    ResearchDatasetLineage? ResearchDatasetLineage = null);
 public sealed record BacktestFill(string FillId, string InstrumentId, DateOnly IntentSession, DateOnly FillSession,
     string Side, int Quantity, decimal ReferenceOpen, decimal FillPrice, decimal Commission, decimal EstimatedSlippage,
     decimal CashBefore, decimal CashAfter, int PositionBefore, int PositionAfter, decimal EstimatedSpreadCost = 0);
@@ -249,9 +249,9 @@ public static class DeterministicBacktestEngine
             throw new ArgumentException("Backtest configuration is invalid or does not match the strategy.");
         if (c.SimulationModel != SimulationModel || c.SizingPolicy != SizingPolicy || c.FillModel != BacktestFillModel.NextSessionOpen)
             throw new ArgumentException("Unsupported versioned simulation, fill or sizing model.");
-        var cost=c.CostModel;
-        if(cost.CommissionPerShare<0||cost.MinimumCommission<0||cost.SlippageBasisPoints<0||cost.FixedCommissionPerFill<0||
-            cost.ProportionalCommissionBasisPoints<0||cost.AssumedFullSpreadBasisPoints<0||cost.SlippageBasisPoints+cost.AssumedFullSpreadBasisPoints/2m>=10_000m)
+        var cost = c.CostModel;
+        if (cost.CommissionPerShare < 0 || cost.MinimumCommission < 0 || cost.SlippageBasisPoints < 0 || cost.FixedCommissionPerFill < 0 ||
+            cost.ProportionalCommissionBasisPoints < 0 || cost.AssumedFullSpreadBasisPoints < 0 || cost.SlippageBasisPoints + cost.AssumedFullSpreadBasisPoints / 2m >= 10_000m)
             throw new ArgumentException("Execution friction assumptions must be non-negative and preserve a positive sell fill price.");
         if (!c.StrategyParameters.OrderBy(x => x.Key).SequenceEqual(strategy.Parameters.OrderBy(x => x.Key))) throw new ArgumentException("Pinned strategy parameters do not match strategy instance.");
     }
@@ -267,8 +267,8 @@ public static class DeterministicBacktestEngine
     private static decimal Round(decimal value, int places = 2) => Math.Round(value, places, MidpointRounding.AwayFromZero);
     private static DateTimeOffset AtOpen(DateOnly date) => UsMarketCalendar.Session(date)?.OpenUtc ?? throw new InvalidOperationException($"{date} is not a {UsMarketCalendar.Version} session.");
     private static DateTimeOffset AtClose(DateOnly date) => UsMarketCalendar.Session(date)?.CloseUtc ?? throw new InvalidOperationException($"{date} is not a {UsMarketCalendar.Version} session.");
-    private static DateOnly NextSession(DateOnly date){do{date=date.AddDays(1);}while(!UsMarketCalendar.IsSession(date));return date;}
-    private static string AttemptId(string instrumentId,DateOnly intent,DateOnly expected,string side)=>"attempt-"+Hash($"{instrumentId}|{intent:yyyy-MM-dd}|{expected:yyyy-MM-dd}|{side}")[7..23];
+    private static DateOnly NextSession(DateOnly date) { do { date = date.AddDays(1); } while (!UsMarketCalendar.IsSession(date)); return date; }
+    private static string AttemptId(string instrumentId, DateOnly intent, DateOnly expected, string side) => "attempt-" + Hash($"{instrumentId}|{intent:yyyy-MM-dd}|{expected:yyyy-MM-dd}|{side}")[7..23];
     private static string Canonical(BacktestRunConfiguration c) => JsonSerializer.Serialize(c with { MarketRevisionIds = c.MarketRevisionIds.Order(StringComparer.Ordinal).ToArray(), Universe = c.Universe.Order(StringComparer.Ordinal).ToArray(), StrategyParameters = c.StrategyParameters.OrderBy(x => x.Key).ToDictionary() }, JsonOptions);
     private static string Hash(string value) => "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = false };

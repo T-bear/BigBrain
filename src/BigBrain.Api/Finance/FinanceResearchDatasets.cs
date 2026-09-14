@@ -263,8 +263,12 @@ internal sealed partial class FinanceDatasetIntakeStore
 
     private static XmlReaderSettings SafeXmlSettings() => new()
     {
-        DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = MaximumWorkbookXmlBytes,
-        MaxCharactersFromEntities = 0, IgnoreComments = true, IgnoreProcessingInstructions = true
+        DtdProcessing = DtdProcessing.Prohibit,
+        XmlResolver = null,
+        MaxCharactersInDocument = MaximumWorkbookXmlBytes,
+        MaxCharactersFromEntities = 0,
+        IgnoreComments = true,
+        IgnoreProcessingInstructions = true
     };
 
     private static void ValidateArchiveName(string name)
@@ -459,9 +463,14 @@ internal sealed partial class FinanceDatasetIntakeStore
         Exec(connection, transaction, "UPDATE dataset_candidates SET validation_json=$validation,manifest_json=$manifest,promotion_policy=$policy,promotion_result=$result,canonical_revision_id=NULL,updated_utc=$now WHERE candidate_id=$id",
             ("$validation", JsonSerializer.Serialize(stored, Json)), ("$manifest", JsonSerializer.Serialize(new
             {
-                candidate.CandidateId, candidate.CanonicalProduct, WorkbookSha256 = workbookSha, OwnerDecision = DatasetOwnerRightsDecision.ApprovedByOwner,
-                OwnerDecisionEvidence = OwnerWorkbookDecisionEvidence, ExternalRights = DatasetEvidenceResult.Unknown,
-                ResearchPolicy = ResearchDatasetEligibilityPolicyV1.Id, Datasets = parsed.Datasets.Select(x => new { x.DatasetId, x.RevisionId, x.SheetName, x.Fingerprint })
+                candidate.CandidateId,
+                candidate.CanonicalProduct,
+                WorkbookSha256 = workbookSha,
+                OwnerDecision = DatasetOwnerRightsDecision.ApprovedByOwner,
+                OwnerDecisionEvidence = OwnerWorkbookDecisionEvidence,
+                ExternalRights = DatasetEvidenceResult.Unknown,
+                ResearchPolicy = ResearchDatasetEligibilityPolicyV1.Id,
+                Datasets = parsed.Datasets.Select(x => new { x.DatasetId, x.RevisionId, x.SheetName, x.Fingerprint })
             }, Json)), ("$policy", DatasetPromotionPolicyV1.Id), ("$result", "researchOnlyWorkbookCanonicalReviewBlocked"), ("$now", now), ("$id", candidate.CandidateId));
         transaction.Commit();
     }

@@ -78,7 +78,8 @@ static Result RunSqlite(Scale scale, string root)
     watch.Restart(); var sequential = Convert.ToInt32(Scalar(connection, "SELECT count(*) FROM bars WHERE revision='revision-001' ORDER BY instrument,day"), CultureInfo.InvariantCulture); watch.Stop(); var read = watch.Elapsed.TotalMilliseconds;
     watch.Restart(); var checksum = SqliteChecksum(connection, "revision-001"); watch.Stop(); var verify = watch.Elapsed.TotalMilliseconds;
     Execute(connection, "PRAGMA wal_checkpoint(TRUNCATE);"); var bytes = new FileInfo(path).Length;
-    watch.Restart(); using (var transaction = connection.BeginTransaction()) { Execute(connection, "DELETE FROM bars WHERE provider='SyntheticFixture' AND product='Synthetic-EOD-Personal' AND policy='synthetic-policy@1';", transaction); transaction.Commit(); } watch.Stop(); var deletion = watch.Elapsed.TotalMilliseconds;
+    watch.Restart(); using (var transaction = connection.BeginTransaction()) { Execute(connection, "DELETE FROM bars WHERE provider='SyntheticFixture' AND product='Synthetic-EOD-Personal' AND policy='synthetic-policy@1';", transaction); transaction.Commit(); }
+    watch.Stop(); var deletion = watch.Elapsed.TotalMilliseconds;
     return new Result(scale.Name, "sqlite-v1", scale.Rows, write, append, revision, query, read, verify, deletion, bytes, queryCount, sequential, checksum);
 }
 

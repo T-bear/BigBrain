@@ -29,7 +29,7 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDataProtectionMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceMacroMaintenanceCommand.TryRun(args,builder.Configuration) || FinanceClosureMaintenanceCommand.TryRun(args,builder.Configuration)) return;
+        if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDataProtectionMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceMacroMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceClosureMaintenanceCommand.TryRun(args, builder.Configuration)) return;
 
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
@@ -195,27 +195,27 @@ public partial class Program
         builder.Services.AddSingleton(datasetOptions);
         var dataProtectionOptions = builder.Configuration.GetSection(FinanceDataProtectionOptions.Section).Get<FinanceDataProtectionOptions>() ?? new();
         builder.Services.AddSingleton(dataProtectionOptions);
-        var cadenceOptions=builder.Configuration.GetSection(FinanceCadenceOptions.Section).Get<FinanceCadenceOptions>()??new();
+        var cadenceOptions = builder.Configuration.GetSection(FinanceCadenceOptions.Section).Get<FinanceCadenceOptions>() ?? new();
         builder.Services.AddSingleton(cadenceOptions);
-        var researchSchedulerOptions=builder.Configuration.GetSection(FinanceResearchSchedulerOptions.Section).Get<FinanceResearchSchedulerOptions>()??new();
+        var researchSchedulerOptions = builder.Configuration.GetSection(FinanceResearchSchedulerOptions.Section).Get<FinanceResearchSchedulerOptions>() ?? new();
         researchSchedulerOptions.Validate();
         builder.Services.AddSingleton(researchSchedulerOptions);
-        var researchGovernorOptions=builder.Configuration.GetSection(FinanceResearchResourceGovernorOptions.Section).Get<FinanceResearchResourceGovernorOptions>()??new();
+        var researchGovernorOptions = builder.Configuration.GetSection(FinanceResearchResourceGovernorOptions.Section).Get<FinanceResearchResourceGovernorOptions>() ?? new();
         researchGovernorOptions.Validate();
         builder.Services.AddSingleton(researchGovernorOptions);
-        builder.Services.AddSingleton<IFinanceResearchResourceGovernor,FinanceResearchResourceGovernor>();
-        var researchOperationsOptions=builder.Configuration.GetSection(FinanceResearchOperationsOptions.Section).Get<FinanceResearchOperationsOptions>()??new();
+        builder.Services.AddSingleton<IFinanceResearchResourceGovernor, FinanceResearchResourceGovernor>();
+        var researchOperationsOptions = builder.Configuration.GetSection(FinanceResearchOperationsOptions.Section).Get<FinanceResearchOperationsOptions>() ?? new();
         researchOperationsOptions.Validate();
         builder.Services.AddSingleton(researchOperationsOptions);
-        var riskOptions=builder.Configuration.GetSection(FinanceRiskOptions.Section).Get<FinanceRiskOptions>()??new();
+        var riskOptions = builder.Configuration.GetSection(FinanceRiskOptions.Section).Get<FinanceRiskOptions>() ?? new();
         riskOptions.Validate();
         builder.Services.AddSingleton(riskOptions);
-        var fredOptions=builder.Configuration.GetSection(FinanceFredOptions.Section).Get<FinanceFredOptions>()??new();
+        var fredOptions = builder.Configuration.GetSection(FinanceFredOptions.Section).Get<FinanceFredOptions>() ?? new();
         fredOptions.Validate();
         builder.Services.AddSingleton(fredOptions);
         builder.Services.AddSingleton<FredApiClient>();
-        builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions,riskOptions));
-        builder.Services.AddSingleton(_ => new FinanceMacroMemory(eodhdOptions,fredOptions));
+        builder.Services.AddSingleton(_ => new EodhdMarketMemory(eodhdOptions, riskOptions));
+        builder.Services.AddSingleton(_ => new FinanceMacroMemory(eodhdOptions, fredOptions));
         builder.Services.AddSingleton<FinanceDatasetIntakeStore>();
         builder.Services.AddSingleton<IFinanceResearchDatasetReader, FinanceResearchDatasetReader>();
         builder.Services.AddSingleton<IFinanceResearchCampaignReader, FinanceResearchCampaignReader>();

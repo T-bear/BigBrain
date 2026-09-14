@@ -168,9 +168,9 @@ public sealed partial class ShoppingListStore : IDisposable
         var q = query.Trim(); if (q.Length == 0) return [];
         await using var connection = await OpenAsync(token); var result = new List<ShoppingSuggestion>();
         await using var command = connection.CreateCommand(); command.CommandText = "SELECT DisplayName,PurchaseCount,LastPurchasedAtUtc FROM ItemStats WHERE DisplayName LIKE $q COLLATE NOCASE ORDER BY PurchaseCount DESC,LastPurchasedAtUtc DESC LIMIT 8"; command.Parameters.AddWithValue("$q", $"%{q}%");
-        await using var reader = await command.ExecuteReaderAsync(token); while (await reader.ReadAsync(token)) result.Add(new(reader.GetString(0), reader.GetInt32(1)>0 ? "historik" : "tidigare"));
-        var basics = new[] { "Mjölk","Bröd","Smör","Ägg","Ost","Kaffe","Bananer","Äpplen","Potatis","Ris","Pasta","Köttfärs","Kyckling","Tomater","Gurka","Toalettpapper","Hushållspapper","Diskmedel","Tvättmedel" };
-        foreach (var item in basics.Where(x => x.Contains(q, StringComparison.CurrentCultureIgnoreCase))) if (result.All(x => Normalize(x.Name)!=Normalize(item))) result.Add(new(item,"grundlista"));
+        await using var reader = await command.ExecuteReaderAsync(token); while (await reader.ReadAsync(token)) result.Add(new(reader.GetString(0), reader.GetInt32(1) > 0 ? "historik" : "tidigare"));
+        var basics = new[] { "Mjölk", "Bröd", "Smör", "Ägg", "Ost", "Kaffe", "Bananer", "Äpplen", "Potatis", "Ris", "Pasta", "Köttfärs", "Kyckling", "Tomater", "Gurka", "Toalettpapper", "Hushållspapper", "Diskmedel", "Tvättmedel" };
+        foreach (var item in basics.Where(x => x.Contains(q, StringComparison.CurrentCultureIgnoreCase))) if (result.All(x => Normalize(x.Name) != Normalize(item))) result.Add(new(item, "grundlista"));
         return result.Take(8).ToArray();
     }
 
@@ -178,7 +178,7 @@ public sealed partial class ShoppingListStore : IDisposable
     {
         await using var connection = await OpenAsync(token); var result = new List<FrequentItem>(); await using var command = connection.CreateCommand();
         command.CommandText = "SELECT DisplayName,PurchaseCount,LastPurchasedAtUtc FROM ItemStats WHERE PurchaseCount>0 ORDER BY PurchaseCount DESC,LastPurchasedAtUtc DESC,DisplayName LIMIT 8";
-        await using var reader = await command.ExecuteReaderAsync(token); while(await reader.ReadAsync(token)) result.Add(new(reader.GetString(0),reader.GetInt32(1),reader.IsDBNull(2)?null:DateTimeOffset.Parse(reader.GetString(2), CultureInfo.InvariantCulture)));
+        await using var reader = await command.ExecuteReaderAsync(token); while (await reader.ReadAsync(token)) result.Add(new(reader.GetString(0), reader.GetInt32(1), reader.IsDBNull(2) ? null : DateTimeOffset.Parse(reader.GetString(2), CultureInfo.InvariantCulture)));
         return result;
     }
 
@@ -187,29 +187,29 @@ public sealed partial class ShoppingListStore : IDisposable
         await gate.WaitAsync(token);
         try
         {
-            await using var connection = await OpenAsync(token); await using var transaction=(SqliteTransaction)await connection.BeginTransactionAsync(token); var now=DateTimeOffset.UtcNow;
-            var sessionId = await ScalarAsync(connection,"SELECT Id FROM Sessions WHERE EndedAtUtc IS NULL ORDER BY StartedAtUtc DESC LIMIT 1",token,transaction) as string;
+            await using var connection = await OpenAsync(token); await using var transaction = (SqliteTransaction)await connection.BeginTransactionAsync(token); var now = DateTimeOffset.UtcNow;
+            var sessionId = await ScalarAsync(connection, "SELECT Id FROM Sessions WHERE EndedAtUtc IS NULL ORDER BY StartedAtUtc DESC LIMIT 1", token, transaction) as string;
             if (sessionId is not null)
             {
-                await using var stats=connection.CreateCommand(); stats.Transaction=transaction; stats.CommandText="""
+                await using var stats = connection.CreateCommand(); stats.Transaction = transaction; stats.CommandText = """
                     INSERT INTO ItemStats(NormalizedName,DisplayName,AddedCount,PurchaseCount,LastPurchasedAtUtc,AveragePosition,ObservationCount)
                     SELECT e.NormalizedName,MAX(i.Name),0,COUNT(*),MAX(e.CheckedAtUtc),AVG(CAST(e.Position AS REAL)),COUNT(*) FROM CheckEvents e JOIN Items i ON i.Id=e.ItemId WHERE e.SessionId=$session GROUP BY e.NormalizedName
                     ON CONFLICT(NormalizedName) DO UPDATE SET PurchaseCount=PurchaseCount+excluded.PurchaseCount,LastPurchasedAtUtc=excluded.LastPurchasedAtUtc,
                     AveragePosition=((ItemStats.AveragePosition*ItemStats.ObservationCount)+(excluded.AveragePosition*excluded.ObservationCount*1.15))/(ItemStats.ObservationCount+(excluded.ObservationCount*1.15)),ObservationCount=ItemStats.ObservationCount+excluded.ObservationCount
-                    """; stats.Parameters.AddWithValue("$session",sessionId); await stats.ExecuteNonQueryAsync(token);
-                await using var end=connection.CreateCommand(); end.Transaction=transaction; end.CommandText="UPDATE Sessions SET EndedAtUtc=$now WHERE Id=$id"; end.Parameters.AddWithValue("$now",now.ToString("O")); end.Parameters.AddWithValue("$id",sessionId); await end.ExecuteNonQueryAsync(token);
+                    """; stats.Parameters.AddWithValue("$session", sessionId); await stats.ExecuteNonQueryAsync(token);
+                await using var end = connection.CreateCommand(); end.Transaction = transaction; end.CommandText = "UPDATE Sessions SET EndedAtUtc=$now WHERE Id=$id"; end.Parameters.AddWithValue("$now", now.ToString("O")); end.Parameters.AddWithValue("$id", sessionId); await end.ExecuteNonQueryAsync(token);
             }
-            await using var count=connection.CreateCommand(); count.Transaction=transaction; count.CommandText="SELECT COUNT(*) FROM Items WHERE Purchased=1 AND ArchivedAtUtc IS NULL"; var archived=Convert.ToInt32(await count.ExecuteScalarAsync(token), CultureInfo.InvariantCulture);
-            await using var archive=connection.CreateCommand(); archive.Transaction=transaction; archive.CommandText="UPDATE Items SET ArchivedAtUtc=$now WHERE Purchased=1 AND ArchivedAtUtc IS NULL"; archive.Parameters.AddWithValue("$now",now.ToString("O")); await archive.ExecuteNonQueryAsync(token);
-            if (!keepUnpurchased) { await using var remove=connection.CreateCommand(); remove.Transaction=transaction; remove.CommandText="DELETE FROM Items WHERE Purchased=0 AND ArchivedAtUtc IS NULL"; await remove.ExecuteNonQueryAsync(token); }
-            await transaction.CommitAsync(token); return new(archived,(await GetAsync(token)).Items.Count);
+            await using var count = connection.CreateCommand(); count.Transaction = transaction; count.CommandText = "SELECT COUNT(*) FROM Items WHERE Purchased=1 AND ArchivedAtUtc IS NULL"; var archived = Convert.ToInt32(await count.ExecuteScalarAsync(token), CultureInfo.InvariantCulture);
+            await using var archive = connection.CreateCommand(); archive.Transaction = transaction; archive.CommandText = "UPDATE Items SET ArchivedAtUtc=$now WHERE Purchased=1 AND ArchivedAtUtc IS NULL"; archive.Parameters.AddWithValue("$now", now.ToString("O")); await archive.ExecuteNonQueryAsync(token);
+            if (!keepUnpurchased) { await using var remove = connection.CreateCommand(); remove.Transaction = transaction; remove.CommandText = "DELETE FROM Items WHERE Purchased=0 AND ArchivedAtUtc IS NULL"; await remove.ExecuteNonQueryAsync(token); }
+            await transaction.CommitAsync(token); return new(archived, (await GetAsync(token)).Items.Count);
         }
         finally { gate.Release(); }
     }
 
     private void Initialize()
     {
-        using var connection = new SqliteConnection(connectionString); connection.Open(); using var command=connection.CreateCommand(); command.CommandText="""
+        using var connection = new SqliteConnection(connectionString); connection.Open(); using var command = connection.CreateCommand(); command.CommandText = """
             PRAGMA journal_mode=WAL;
             CREATE TABLE IF NOT EXISTS SchemaInfo(Version INTEGER NOT NULL);
             INSERT INTO SchemaInfo(Version) SELECT 1 WHERE NOT EXISTS(SELECT 1 FROM SchemaInfo);
@@ -218,17 +218,17 @@ public sealed partial class ShoppingListStore : IDisposable
             CREATE TABLE IF NOT EXISTS Sessions(Id TEXT PRIMARY KEY,StartedAtUtc TEXT NOT NULL,EndedAtUtc TEXT NULL);
             CREATE TABLE IF NOT EXISTS CheckEvents(SessionId TEXT NOT NULL REFERENCES Sessions(Id),ItemId TEXT NOT NULL REFERENCES Items(Id),NormalizedName TEXT NOT NULL,Position INTEGER NOT NULL,CheckedAtUtc TEXT NOT NULL,PRIMARY KEY(SessionId,ItemId));
             CREATE TABLE IF NOT EXISTS ItemStats(NormalizedName TEXT PRIMARY KEY,DisplayName TEXT NOT NULL,AddedCount INTEGER NOT NULL DEFAULT 0,PurchaseCount INTEGER NOT NULL DEFAULT 0,LastPurchasedAtUtc TEXT NULL,AveragePosition REAL NOT NULL DEFAULT 0,ObservationCount INTEGER NOT NULL DEFAULT 0);
-            """; command.ExecuteNonQuery(); using var version=connection.CreateCommand(); version.CommandText="SELECT Version FROM SchemaInfo LIMIT 1"; if(Convert.ToInt32(version.ExecuteScalar(), CultureInfo.InvariantCulture)!=SchemaVersion) throw new InvalidDataException("Unsupported shopping list schema.");
+            """; command.ExecuteNonQuery(); using var version = connection.CreateCommand(); version.CommandText = "SELECT Version FROM SchemaInfo LIMIT 1"; if (Convert.ToInt32(version.ExecuteScalar(), CultureInfo.InvariantCulture) != SchemaVersion) throw new InvalidDataException("Unsupported shopping list schema.");
     }
-    private async Task<SqliteConnection> OpenAsync(CancellationToken token) { if(!IsAvailable) throw new ShoppingListUnavailableException(); var c=new SqliteConnection(connectionString); try { await c.OpenAsync(token); return c; } catch { await c.DisposeAsync(); throw new ShoppingListUnavailableException(); } }
-    private static async Task<object?> ScalarAsync(SqliteConnection c,string sql,CancellationToken token,SqliteTransaction? t=null){await using var cmd=c.CreateCommand();cmd.Transaction=t;cmd.CommandText=sql;return await cmd.ExecuteScalarAsync(token);}
-    private static async Task<string> EnsureSessionAsync(SqliteConnection c,SqliteTransaction t,CancellationToken token){var id=await ScalarAsync(c,"SELECT Id FROM Sessions WHERE EndedAtUtc IS NULL ORDER BY StartedAtUtc DESC LIMIT 1",token,t) as string;if(id is not null)return id;id=Guid.NewGuid().ToString("N");await using var cmd=c.CreateCommand();cmd.Transaction=t;cmd.CommandText="INSERT INTO Sessions VALUES($id,$now,NULL)";cmd.Parameters.AddWithValue("$id",id);cmd.Parameters.AddWithValue("$now",DateTimeOffset.UtcNow.ToString("O"));await cmd.ExecuteNonQueryAsync(token);return id;}
-    private static async Task UpsertAddedStatAsync(SqliteConnection c,string n,string display,CancellationToken token){await using var cmd=c.CreateCommand();cmd.CommandText="INSERT INTO ItemStats(NormalizedName,DisplayName,AddedCount) VALUES($n,$d,1) ON CONFLICT(NormalizedName) DO UPDATE SET DisplayName=$d,AddedCount=AddedCount+1";cmd.Parameters.AddWithValue("$n",n);cmd.Parameters.AddWithValue("$d",display);await cmd.ExecuteNonQueryAsync(token);}
-    private static void AddItemParameters(SqliteCommand c,ShoppingItem i){c.Parameters.AddWithValue("$id",i.Id);c.Parameters.AddWithValue("$name",i.Name);c.Parameters.AddWithValue("$normalized",i.NormalizedName);c.Parameters.AddWithValue("$quantity",i.Quantity);c.Parameters.AddWithValue("$now",i.CreatedAtUtc.ToString("O"));c.Parameters.AddWithValue("$ordinal",i.SortOrdinal);}
-    private static ShoppingItem ReadItem(SqliteDataReader r)=>new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetInt32(3),r.GetInt32(4)==1,DateTimeOffset.Parse(r.GetString(5),CultureInfo.InvariantCulture),DateTimeOffset.Parse(r.GetString(6),CultureInfo.InvariantCulture),r.GetInt32(7));
-    private static void ValidateQuantity(int q){if(q is <1 or >999)throw Invalid("Antal måste vara mellan 1 och 999.");}
-    private static ShoppingListException Invalid(string message)=>new(ShoppingListErrorCodes.InvalidRequest,message,400);
-    private static ShoppingListException NotFound()=>new(ShoppingListErrorCodes.NotFound,"Varan hittades inte.",404);
+    private async Task<SqliteConnection> OpenAsync(CancellationToken token) { if (!IsAvailable) throw new ShoppingListUnavailableException(); var c = new SqliteConnection(connectionString); try { await c.OpenAsync(token); return c; } catch { await c.DisposeAsync(); throw new ShoppingListUnavailableException(); } }
+    private static async Task<object?> ScalarAsync(SqliteConnection c, string sql, CancellationToken token, SqliteTransaction? t = null) { await using var cmd = c.CreateCommand(); cmd.Transaction = t; cmd.CommandText = sql; return await cmd.ExecuteScalarAsync(token); }
+    private static async Task<string> EnsureSessionAsync(SqliteConnection c, SqliteTransaction t, CancellationToken token) { var id = await ScalarAsync(c, "SELECT Id FROM Sessions WHERE EndedAtUtc IS NULL ORDER BY StartedAtUtc DESC LIMIT 1", token, t) as string; if (id is not null) return id; id = Guid.NewGuid().ToString("N"); await using var cmd = c.CreateCommand(); cmd.Transaction = t; cmd.CommandText = "INSERT INTO Sessions VALUES($id,$now,NULL)"; cmd.Parameters.AddWithValue("$id", id); cmd.Parameters.AddWithValue("$now", DateTimeOffset.UtcNow.ToString("O")); await cmd.ExecuteNonQueryAsync(token); return id; }
+    private static async Task UpsertAddedStatAsync(SqliteConnection c, string n, string display, CancellationToken token) { await using var cmd = c.CreateCommand(); cmd.CommandText = "INSERT INTO ItemStats(NormalizedName,DisplayName,AddedCount) VALUES($n,$d,1) ON CONFLICT(NormalizedName) DO UPDATE SET DisplayName=$d,AddedCount=AddedCount+1"; cmd.Parameters.AddWithValue("$n", n); cmd.Parameters.AddWithValue("$d", display); await cmd.ExecuteNonQueryAsync(token); }
+    private static void AddItemParameters(SqliteCommand c, ShoppingItem i) { c.Parameters.AddWithValue("$id", i.Id); c.Parameters.AddWithValue("$name", i.Name); c.Parameters.AddWithValue("$normalized", i.NormalizedName); c.Parameters.AddWithValue("$quantity", i.Quantity); c.Parameters.AddWithValue("$now", i.CreatedAtUtc.ToString("O")); c.Parameters.AddWithValue("$ordinal", i.SortOrdinal); }
+    private static ShoppingItem ReadItem(SqliteDataReader r) => new(r.GetString(0), r.GetString(1), r.GetString(2), r.GetInt32(3), r.GetInt32(4) == 1, DateTimeOffset.Parse(r.GetString(5), CultureInfo.InvariantCulture), DateTimeOffset.Parse(r.GetString(6), CultureInfo.InvariantCulture), r.GetInt32(7));
+    private static void ValidateQuantity(int q) { if (q is < 1 or > 999) throw Invalid("Antal måste vara mellan 1 och 999."); }
+    private static ShoppingListException Invalid(string message) => new(ShoppingListErrorCodes.InvalidRequest, message, 400);
+    private static ShoppingListException NotFound() => new(ShoppingListErrorCodes.NotFound, "Varan hittades inte.", 404);
     [GeneratedRegex(@"\s+")] private static partial Regex Spaces();
     public void Dispose() => gate.Dispose();
 }
