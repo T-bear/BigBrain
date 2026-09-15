@@ -11,7 +11,13 @@
 
 ## Status
 
-**TRIAGED / REVIEW CANDIDATE ONLY.** No currently reachable BigBrain product security defect
+**ACCEPTED / MERGED / CI VERIFIED.** Publication amendment, 2026-09-15:
+owner/architect approved exact candidate `ed57dba99d82eb47357b2b7d080baa9d72daf3d4`;
+merged unchanged as `73b7bdfe3befe8bb8505897d1d9480184d3e82ba`.
+[Merge CI 34993322513](https://github.com/T-bear/BigBrain/actions/runs/34993322513) SUCCESS
+for backend, frontend, documentation and secrets. Formatter step 5 actually passed after
+restore 4 and before build/test 6/7. Frontend npm ci/test/build all passed; no lint/format gate.
+Original dated triage evidence below is preserved. No currently reachable BigBrain product security defect
 requiring production/configuration correction was established. Normal triage handoff applies;
 this is not a declaration that the dependencies are safe or FIXED. Patch maintenance is
 recommended in a separately authorized checkpoint. Nothing has been upgraded or mitigated here.
@@ -214,7 +220,7 @@ No deployment, runtime/device/UX approval, Research Learning or Finance feature 
 
 ## Remaining work
 
-Architect/owner review of exact triage candidate. Separately authorize the minimal dependency
+Triage is accepted. Separately authorize **BB-130D2 — Minimal Frontend Dependency Maintenance**: the minimal dependency
 maintenance checkpoint above before frontend formatting work, with fresh advisory applicability
 and regression checks on its baseline. No cleanup, tooling installation or frontend gate starts
 here; D2 implementation remains NOT STARTED / NOT COMPLETE. Unknown live developer overrides
@@ -223,8 +229,10 @@ and future dependency/code changes require new applicability assessment. No advi
 ## Resumption
 
 Read AGENTS, START-HERE, current STATUS/BACKLOG and the sole recovery note. Verify main and
-exact remote triage SHA, preserve unrelated work, return to ChatGPT with "Codex är klar" and
-stop. This branch is REVIEW CANDIDATE ONLY; main remains accepted source. No merge authorized.
+final reconciliation SHA and its exact-head CI, preserve unrelated work, then return to ChatGPT
+with "Codex är klar" and stop. The main commit `docs: reconcile accepted BB-130D2 dependency triage`
+contains this amendment; resolve its own future SHA/run from GitHub history using the recovery
+note rather than recursively embedding it. No subsequent checkpoint is authorized.
 
 ### Reproducible isolated probes
 
@@ -274,3 +282,24 @@ const identical = result.output.filter(x => x.type === 'chunk' || x.fileName.end
   .every(x => Buffer.from(x.type === 'chunk' ? x.code : x.source).equals(fs.readFileSync(`dist/${x.fileName}`)))
 console.log({ modules: ids.size, affected, identical })
 ```
+
+### Accepted publication reconciliation — 2026-09-15
+
+Only seven canonical documentation files are reconciled. Original baseline, approved candidate,
+merge SHA and merge CI are above. No dependency/source/package/lock/CI/runtime changes, npm audit
+fix/update, Prettier installation or frontend formatting. D1/backend cleanup/gate and D2
+characterization/triage accepted; A/B complete, C complete/exit approved, D in progress.
+Dependency maintenance and formatter cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+Proposed minimal targets remain untested: Vitest 4.1.11, PostCSS 8.5.23, nanoid 3.3.18,
+undici 7.29.0. These require separately authorized implementation and fresh regression/audit.
+README, ARCHITECTURE/ADRs, ROADMAP, modules, knowledge/index and runbooks were reassessed;
+no behavior or architecture change requires updates. No live/runtime/device/UX/scientific claim.
+Local source suites are not rerun for documentation-only publication; exact-main CI verifies them.
+Final reconciliation must pass all four jobs and actual backend formatter execution again.
+
+Reconciliation publication checks: documentation verifier exit 0 (240 Markdown files / 90 BB IDs);
+`git diff --check` and `git diff --cached --check` exit 0. Gitleaks v8.28.0 full-history
+`git --log-opts='--all' --redact --no-banner` exit 0 (272 commits, no leaks);
+`git --pre-commit --staged --redact --no-banner` exit 0, no leaks. Only seven docs staged.
+Prepublication fetch confirms expected merge-main and unchanged approved candidate.
+Source/workflow comparison to original baseline exits 0, including package and lockfiles.

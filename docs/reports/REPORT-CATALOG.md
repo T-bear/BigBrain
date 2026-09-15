@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130D2 dependency triage, 2026-09-15` — [Frontend advisories — TRIAGED / REVIEW CANDIDATE ONLY](features/platform/bb-130d2-frontend-dependency-triage-20260914.md). Eight GHSAs: six C, two D; no current reachable product blocker established; not FIXED, separate patch maintenance recommended.
+- `BB-130D2 dependency triage, 2026-09-15` — [Frontend advisories — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-dependency-triage-20260914.md). Eight GHSAs: six C, two D; no current reachable product blocker established; not FIXED, separate patch maintenance NOT STARTED. Merge CI 34993322513 SUCCESS.
 
 - `BB-130D2, 2026-09-14` — [Frontend quality-gate characterization — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-quality-characterization-20260914.md). 80/83 TS/TSX files nonconforming; formatter-only proposal, cleanup/lint/CI deferred; dependency advisories TRIAGE REQUIRED. Merge CI 34877864965 passed; implementation NOT STARTED / NOT COMPLETE.
 

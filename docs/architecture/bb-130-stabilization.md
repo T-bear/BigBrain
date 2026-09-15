@@ -2,7 +2,13 @@
 
 ## BB-130D2 dependency triage — 2026-09-15
 
-**TRIAGED / REVIEW CANDIDATE ONLY.** Baseline `bcf69191b92b9257627cd3c9814c02758b4ae8ae`;
+**Dependency triage ACCEPTED / MERGED / CI VERIFIED.**
+Approved candidate `ed57dba99d82eb47357b2b7d080baa9d72daf3d4` merged unchanged as
+`73b7bdfe3befe8bb8505897d1d9480184d3e82ba`;
+[CI 34993322513](https://github.com/T-bear/BigBrain/actions/runs/34993322513) SUCCESS for
+backend/frontend/documentation/secrets. Actual backend formatter step 5 passed after restore 4,
+before build/test 6/7; frontend npm ci/test/build passed with no lint/format gate.
+Original baseline `bcf69191b92b9257627cd3c9814c02758b4ae8ae`;
 branch `bb-130d/frontend-dependency-triage`. [Advisory evidence](../reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md).
 Dated audit reproduces 5 affected packages / 3 moderate / 2 high, eight distinct GHSAs.
 Six classified C (affected dependency, vulnerable path not used currently); Vitest/mocker and
@@ -14,10 +20,15 @@ FIXED: patch maintenance recommended in a separately authorized dependency check
 Baseline 199/199 Web tests and production build pass; unchanged-source evidence reused on resume.
 No dependencies/source/tests/CI changed, no Prettier or formatter execution, no deployment.
 A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; backend format gate enabled.
-D2 characterization accepted; cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+D1, backend whitespace cleanup and backend formatter gate ACCEPTED / MERGED / CI VERIFIED;
+backend gate ENABLED. D2 characterization and dependency triage ACCEPTED / MERGED / CI VERIFIED.
+D2 dependency maintenance and formatter cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
 Finance RESEARCH / 0 SEK / NONE; no runtime/device/UX/scientific behavior or authority change.
-Next: review exact candidate, then separately authorize dependency maintenance. Earlier sections
-retain historical TRIAGE REQUIRED state; this candidate contains the proposed classification.
+Next: **BB-130D2 — Minimal Frontend Dependency Maintenance**, separately reviewed/authorized.
+Proposed, untested targets: Vitest 4.1.10 → 4.1.11; PostCSS 8.5.22 → 8.5.23;
+Nanoid 3.3.16 → 3.3.18; Undici 7.28.0 → 7.29.0. No correction or npm audit fix occurred.
+Earlier sections retain historical states. Final documentation reconciliation requires its own
+exact-main CI; resolution is in the canonical recovery note. No next checkpoint starts here.
 
 ## BB-130D2 frontend characterization — 2026-09-14
 
