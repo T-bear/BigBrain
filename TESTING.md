@@ -1,5 +1,24 @@
 # Testa BigBrain
 
+## BB-130D2 dependency triage — 2026-09-15
+
+**TRIAGED / REVIEW CANDIDATE ONLY.** Baseline `bcf69191b92b9257627cd3c9814c02758b4ae8ae`;
+branch `bb-130d/frontend-dependency-triage`. [Advisory evidence](docs/reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md).
+Dated audit reproduces 5 affected packages / 3 moderate / 2 high, eight distinct GHSAs.
+Six classified C (affected dependency, vulnerable path not used currently); Vitest/mocker and
+PostCSS classified D (dev/test/build boundary, current exploit prerequisites absent).
+70-module production inventory includes none of the affected packages and matches baseline
+JS/CSS bytes. This is repository/build evidence, not deployed-image or blanket security approval.
+No reachable current BigBrain product defect requiring blocker handoff established. No advisory
+FIXED: patch maintenance recommended in a separately authorized dependency checkpoint.
+Baseline 199/199 Web tests and production build pass; unchanged-source evidence reused on resume.
+No dependencies/source/tests/CI changed, no Prettier or formatter execution, no deployment.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; backend format gate enabled.
+D2 characterization accepted; cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+Finance RESEARCH / 0 SEK / NONE; no runtime/device/UX/scientific behavior or authority change.
+Next: review exact candidate, then separately authorize dependency maintenance. Earlier sections
+retain historical TRIAGE REQUIRED state; this candidate contains the proposed classification.
+
 ## BB-130D2 frontend characterization — 2026-09-14
 
 **BB-130D2 characterization ACCEPTED / MERGED / CI VERIFIED.**

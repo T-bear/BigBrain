@@ -19,46 +19,46 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-130D2 accepted characterization publication — 2026-09-14
+## BB-130D2 dependency triage review handoff — 2026-09-15
 
-Status: characterization ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.
-Task: approved D2 characterization merge and documentation reconciliation only.
-Original baseline: `1d824f6d2a9b4e6e2fc679705bd357860042ddbb`.
-Approved branch: `bb-130d/frontend-quality-characterization`.
-Approved candidate: `01129fc54bdd3871b61eeda47e5cadbadc3ad81c`.
-Merged unchanged as `9181f2c75b8ffc12520ce497b7067e60527f459f`;
-[merge CI 34877864965](https://github.com/T-bear/BigBrain/actions/runs/34877864965) SUCCESS
-for backend/frontend/documentation/secrets. Backend formatter step 5 actually passed after
-restore 4 and before build/test 6/7. Frontend npm ci/test/build all passed; no lint/format gate.
+Status: TRIAGED / REVIEW CANDIDATE ONLY; interruption resolved, not accepted/merged.
+Task: BB-130D2 frontend dependency advisory triage, read/reproduce/trace/classify only.
+Baseline/source-of-truth SHA: `bcf69191b92b9257627cd3c9814c02758b4ae8ae`.
+Branch: `bb-130d/frontend-dependency-triage`.
+Candidate: commit `docs: triage BB-130D2 frontend dependency advisories` containing this record.
+Resolve exact remote SHA with `git ls-remote origin refs/heads/bb-130d/frontend-dependency-triage`
+and compare with HEAD; main must remain baseline. No merge or next checkpoint authorized.
 
-Completed and valid: historical characterization of 83 TS/TSX files using pinned ephemeral
-Prettier 3.9.6 flags 80/83, check-only exit 1 with repeatable output. No source formatting or
-persistent formatter/linter dependency/config/script/CI gate. Historical Web 199/199 tests
-and production build pass; current exact merge-main CI supplies publication regression evidence.
-No new tool installation or formatter invocation in this publication.
-Exact historical commands/results and current amendment are in the
-[report](../reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md).
+Recovery: existing branch retained; initial tracked/staged tree clean, no task commit or report
+existed. Baseline tests/build/audit and source/advisory traces were reused, not restarted.
+Only failed artifact-helper and Vitest metadata tasks were completed before remaining triage.
+Completed and valid: npm ci exit 0, Web tests 199/199 (26 files), production build exit 0 on
+2026-09-14. Audit exit 1: five package findings, three moderate/two high; eight distinct GHSAs,
+same as accepted characterization. Snapshot reused with its date, not claimed immutable registry state.
+Six C classifications, two D (Vitest/mocker/PostCSS). No currently reachable product defect
+requiring blocker handoff established; no advisory FIXED. Patch maintenance recommended separately.
+Production module inventory: 70 modules, only React/react-dom/scheduler external packages,
+zero affected package modules; generated JS/CSS identical to saved baseline dist.
+Synthetic library probes reproduce unused-function failures without network/runtime access.
+Exact applicability, versions/ranges, graph, commands and limitations are in the
+[triage report](../reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md).
 
-Reconciliation files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
+Changed files: TESTING.md; docs/STATUS.md; docs/BACKLOG.md;
 docs/architecture/bb-130-stabilization.md; this note; docs/reports/REPORT-CATALOG.md;
-docs/reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md.
-Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. No source/package/CI changes.
+docs/reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md.
+Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. Historical reports unchanged.
+Source/package/lock/CI diff against baseline exits 0. Existing test/build evidence remains valid;
+resume authorization permits reuse because only documentation changed. Documentation verifier
+passes (240 Markdown files / 90 BB IDs); final diff/secrets/publication results are in the report.
+After successful commit/push no uncommitted task work remains. If publication is interrupted,
+preserve the valid commit/work and resume the first incomplete check/push step without duplication.
 
-Final publication resolution: resolve the separate main commit containing this record with
-`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D2 characterization$' origin/main`.
-Compare HEAD/origin/main with `git ls-remote origin refs/heads/main`. Query GitHub Actions for
-that exact head_sha: backend/frontend/documentation/secrets must be SUCCESS. Verify actual
-`dotnet format BigBrain.slnx --verify-no-changes --no-restore` step success after restore and
-before build/test again. The commit's own future SHA/run is resolved from GitHub, not embedded
-recursively. If interrupted, preserve this valid work/commit and resume the first incomplete
-publication/CI step without merging or recreating commits again.
-
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1/backend cleanup ACCEPTED / MERGED /
-CI VERIFIED; backend baseline CLEAN and format gate ACCEPTED / MERGED / CI VERIFIED / ENABLED
-ON MAIN. D2 characterization accepted; cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
-Dependency advisories TRIAGE REQUIRED; five registry findings, exploitability not demonstrated.
-No audit fix or security acceptance. Any reproduced defect requires the blocker-handoff workflow.
-Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device/UX/scientific behavior change,
-provider/broker/orders/PAPER/LIVE/AUTO/capital, Research Learning or Finance feature work.
-Exact next action after final exact-main CI: return to ChatGPT with "Codex är klar" and stop.
-No cleanup, tool installation or gate activation follows from this publication.
+Remaining: architect review of exact candidate, then separately authorize minimal dependency
+maintenance and regression/audit verification. No updates, audit fix, new tooling, formatting,
+CI changes, deployment or live exposure tests in this checkpoint. No claim of blanket safety.
+Unknown live developer overrides and future usages require new applicability review.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; backend formatter gate enabled.
+D2 characterization accepted; cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+Finance RESEARCH / 0 SEK / NONE; no provider/broker/orders/PAPER/LIVE/AUTO/capital,
+scientific/UX/runtime/device behavior change, Research Learning or Finance feature work.
+Exact next action: return to ChatGPT with "Codex är klar" and verified remote SHA, then stop.

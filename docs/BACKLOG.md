@@ -1,5 +1,24 @@
 # BigBrain Backlog
 
+## BB-130D2 dependency triage — 2026-09-15
+
+**TRIAGED / REVIEW CANDIDATE ONLY.** Baseline `bcf69191b92b9257627cd3c9814c02758b4ae8ae`;
+branch `bb-130d/frontend-dependency-triage`. [Advisory evidence](reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md).
+Dated audit reproduces 5 affected packages / 3 moderate / 2 high, eight distinct GHSAs.
+Six classified C (affected dependency, vulnerable path not used currently); Vitest/mocker and
+PostCSS classified D (dev/test/build boundary, current exploit prerequisites absent).
+70-module production inventory includes none of the affected packages and matches baseline
+JS/CSS bytes. This is repository/build evidence, not deployed-image or blanket security approval.
+No reachable current BigBrain product defect requiring blocker handoff established. No advisory
+FIXED: patch maintenance recommended in a separately authorized dependency checkpoint.
+Baseline 199/199 Web tests and production build pass; unchanged-source evidence reused on resume.
+No dependencies/source/tests/CI changed, no Prettier or formatter execution, no deployment.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; backend format gate enabled.
+D2 characterization accepted; cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+Finance RESEARCH / 0 SEK / NONE; no runtime/device/UX/scientific behavior or authority change.
+Next: review exact candidate, then separately authorize dependency maintenance. Earlier sections
+retain historical TRIAGE REQUIRED state; this candidate contains the proposed classification.
+
 ## BB-130D2 frontend characterization — 2026-09-14
 
 **BB-130D2 characterization ACCEPTED / MERGED / CI VERIFIED.**
@@ -298,7 +317,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: D2 characterization is accepted; separately authorize dependency triage, then bounded cleanup and eventual gate activation. D2 implementation is NOT STARTED / NOT COMPLETE.
+- Next: review dependency-triage candidate above; separately authorize minimal dependency maintenance before cleanup and eventual gate activation. D2 implementation is NOT STARTED / NOT COMPLETE.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
