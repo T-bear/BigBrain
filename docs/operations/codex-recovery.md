@@ -19,33 +19,49 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-130D2 dependency maintenance candidate — 2026-09-16
+## BB-130D2 dependency maintenance accepted publication — 2026-09-16
 
-Status: IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.
-Task: minimal frontend dependency maintenance only.
-Baseline/source-of-truth SHA: `914d35e596cd066b846e4f6d1c59632b1be84137`.
-Current branch: `bb-130d/frontend-dependency-maintenance`.
-Changed files: Web package.json/package-lock.json; STATUS, BACKLOG, TESTING, stabilization
-plan, REPORT-CATALOG, this note and new maintenance report.
-Completed: exact four target versions and seven Vitest companions; graph review, baseline
-199 tests/build and audit five; post-update 199 tests/build and audit zero; all eight GHSA
-patched ranges checked; 70-module artifact inventory excludes affected packages.
-Temporary npm 9 edgesOut failure bypassed with isolated npm (major 10, minor 9, patch 4) resolution; no toolchain
-change/persistent overrides; twelve unchanged package entries only gain MIT metadata.
-Final frontend npm ci/test/build/audit after documentation: all exit 0; 199/199 tests, audit zero.
-Full-history Gitleaks v8.28.0: exit 0, 273 commits, no leaks.
-Documentation verifier: exit 0, 241 Markdown files / 90 BB IDs; diff and staged diff checks
-exit 0; staged Gitleaks exit 0/no leaks. Only nine intended files staged.
-Remaining at handoff: owner/architect review after exact remote candidate verification; no merge authorized.
-No product blocker established; full limits/rollback in
+Status: ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.
+Task: approved dependency-maintenance merge and documentation publication only.
+Original baseline: `914d35e596cd066b846e4f6d1c59632b1be84137`.
+Owner/architect approved exact candidate `b043bffe21c3cc05f2c57c087d6aac3f26fa0e84`, merged unchanged as
+`55b5b5d7e4e982f7d1a194cdab554a4bf419a471`. [Merge CI 35124925562](https://github.com/T-bear/BigBrain/actions/runs/35124925562)
+SUCCESS: backend/frontend/documentation/secrets. Backend restore → format → Release build →
+tests all executed successfully; frontend npm ci/test/build passed, no formatter/linter gate.
+Post-merge npm audit --json exit 0, zero findings; installed graph verifies all target versions
+and all eight prior GHSAs remain outside their assessed affected installed ranges.
+
+Vitest + seven companions 4.1.11; PostCSS 8.5.23; nanoid 3.3.18; undici 7.29.0.
+Historical audit five packages/3 moderate/2 high; eight GHSAs assessed. Current audit zero is
+not blanket security approval. No dependency changes beyond approved candidate; npm edgesOut
+resolution limitation remains historical implementation evidence in the
 [maintenance report](../reports/features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md).
-Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. No source/CI/runtime change.
-Finance RESEARCH / 0 SEK / NONE; no deployment or scientific behavior change.
-Exact next action: finish final validation and fetch; main must equal baseline before publication.
-Commit subject: `chore: patch BB-130D2 frontend dependencies`. Resolve published SHA using
-`git log -1 --format=%H --grep='^chore: patch BB-130D2 frontend dependencies$' origin/bb-130d/frontend-dependency-maintenance`
-and compare with `git ls-remote origin refs/heads/bb-130d/frontend-dependency-maintenance`.
-After exact remote verification STOP for owner/architect review. Do not merge/start next checkpoint.
+Only seven docs reconciled: STATUS, BACKLOG, TESTING, stabilization plan, REPORT-CATALOG,
+this note and maintenance report. Unrelated untracked mockups/ADR 0006–0009 preserved/excluded.
+No source/tests/backend/CI/runtime changes, deployment, audit fix or formatter/linter installation.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1/backend cleanup/gate and D2
+characterization/triage/maintenance accepted; backend gate enabled. Frontend formatter
+cleanup/tool installation/gate NOT STARTED / NOT COMPLETE. Finance RESEARCH / 0 SEK / NONE.
+
+Reconciliation checks: documentation verifier exit 0 (241 Markdown files / 90 BB IDs);
+working/staged diff checks exit 0. Gitleaks v8.28.0 full-history exit 0 (274 commits)
+and staged check exit 0, no leaks. Only seven documentation files changed/staged.
+Source/tests/workflow/runtime comparison to merge-main exits 0. No local suites repeated
+for documentation-only changes; exact-main CI verifies the published tree. README,
+ARCHITECTURE/ADRs, ROADMAP, modules, knowledge/index and runbooks reassessed: no updates
+required for unchanged architecture/contracts/runtime. Historical triage reports unchanged.
+
+Final publication resolution: separate main commit `docs: reconcile accepted BB-130D2 dependency maintenance`
+contains this record. Resolve with
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D2 dependency maintenance$' origin/main`.
+Compare HEAD/origin/main with `git ls-remote origin refs/heads/main`; inspect Actions on exact
+head_sha for backend/frontend/documentation/secrets SUCCESS. Backend actual formatter step
+must pass after restore and before build/test; frontend remains npm ci/test/build only.
+Own future SHA/run is resolved from GitHub history, not embedded recursively. If interrupted
+before final verification, preserve valid work/commit and continue that first incomplete step.
+Do not merge again, recreate commits or start a checkpoint. After final exact-main CI verification
+STOP and return to ChatGPT with "Codex är klar". Proposed next: BB-130D2 — Frontend Formatter
+Tool Installation, requiring separate architect/owner authorization after publication review.
 
 ## BB-130D2 dependency triage accepted publication — 2026-09-15
 

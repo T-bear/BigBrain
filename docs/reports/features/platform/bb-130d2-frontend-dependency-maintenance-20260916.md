@@ -10,11 +10,20 @@
 
 ## Status
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Not accepted, merged, deployed or runtime/
-manual UX verified. Main remains the accepted baseline. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
-D IN PROGRESS. D1/backend cleanup/backend format gate and D2 characterization/triage remain
-accepted. Backend formatter gate enabled; frontend formatter cleanup/tool installation/gate
-NOT STARTED / NOT COMPLETE. No next checkpoint starts automatically.
+**ACCEPTED / MERGED / CI VERIFIED.** Publication amendment, 2026-09-16.
+Owner/architect approved exact candidate `b043bffe21c3cc05f2c57c087d6aac3f26fa0e84`, merged unchanged as
+`55b5b5d7e4e982f7d1a194cdab554a4bf419a471`. [Merge CI 35124925562](https://github.com/T-bear/BigBrain/actions/runs/35124925562)
+SUCCESS: backend/frontend/documentation/secrets. Backend restore → format → Release build →
+tests all executed successfully; frontend npm ci/test/build passed, no formatter/linter gate.
+Post-merge npm audit --json exit 0, zero findings; installed graph verifies all target versions
+and all eight prior GHSAs remain outside their assessed affected installed ranges.
+
+Original baseline and implementation evidence below remain historical, including npm 9 edgesOut
+and isolated resolution. That was a resolution-tool limitation, not a current runtime defect.
+No deployment or manual/runtime/UX approval. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS. D1/backend cleanup/backend gate and D2 characterization/triage/maintenance
+accepted; backend gate enabled. Frontend formatter cleanup/tool installation/gate
+NOT STARTED / NOT COMPLETE. Finance RESEARCH / 0 SEK / NONE.
 
 ## Changes
 
@@ -132,7 +141,7 @@ NOT EVALUABLE behavior changes. No deployment or runtime/UX behavior change inte
 
 ## Remaining work
 
-Owner/architect review of exact candidate SHA before any merge. D remains IN PROGRESS;
+Maintenance is accepted on main. D remains IN PROGRESS;
 frontend formatting cleanup/tooling/CI remains separately authorized work. No next checkpoint
 starts here. Rollback, if later authorized: revert this checkpoint's manifest and lock together
 through normal reviewed Git history, then npm ci/tests/build/audit. That reintroduces historical
@@ -142,9 +151,11 @@ contract/architecture/runtime procedure requires edits. Historical reports remai
 
 ## Resumption
 
-Read AGENTS/START-HERE and the canonical recovery note. Verify baseline main and candidate
-remote SHA; preserve unrelated mockups/ADRs. If publication completed, stop for architect review;
-do not recreate commits, merge or start frontend formatting.
+Read AGENTS/START-HERE and the canonical recovery note. Resolve the final reconciliation SHA
+from `docs: reconcile accepted BB-130D2 dependency maintenance` in origin/main history and
+verify its exact-head Actions run. Do not merge the candidate again or recreate reconciliation.
+Next proposed checkpoint: BB-130D2 — Frontend Formatter Tool Installation, separately authorized
+after publication review. No formatter installation, cleanup or gate activation starts here.
 
 ### Final candidate publication checks
 
@@ -155,3 +166,26 @@ Final npm ci/test/build/audit after documentation: exit 0 each, 199/199 tests, a
 Prepublication fetch confirms exact baseline. `git diff --cached --check` and Gitleaks
 `git --pre-commit --staged --redact --no-banner`: exit 0, no leaks. Only nine intended
 files staged. Exact remote candidate is resolved via recovery's command.
+
+### Accepted publication evidence
+
+The merge tree equals the approved candidate tree. Post-merge `npm audit --json`: exit 0,
+zero current findings, versus historical five affected packages (3 moderate/2 high).
+`npm ls vitest @vitest/expect @vitest/mocker @vitest/pretty-format @vitest/runner @vitest/snapshot @vitest/spy @vitest/utils postcss nanoid undici --all`:
+exit 0. Vitest and all seven companions 4.1.11; Vite 8.1.5 → PostCSS 8.5.23 → nanoid 3.3.18;
+jsdom 29.1.1 → undici 7.29.0. These equal the candidate versions assessed against all eight
+GHSA affected ranges in the table. No additional dependency update or audit fix during publication.
+No transitives promoted to direct dependencies. Audit is dated metadata, not blanket security approval.
+Only seven documentation files reconciled; source/tests/backend/CI/runtime configuration unchanged.
+No Prettier/linter or formatter work, deployment, Finance or scientific behavior changes.
+Final reconciliation commit requires its own exact-main CI, including actual backend format step
+and unchanged frontend npm ci/test/build. Own final SHA/run are resolved from GitHub history
+using recovery instructions rather than recursively embedded in their own commit.
+
+Reconciliation checks: documentation verifier exit 0 (241 Markdown files / 90 BB IDs);
+working/staged diff checks exit 0. Gitleaks v8.28.0 full-history exit 0 (274 commits)
+and staged check exit 0, no leaks. Only seven documentation files changed/staged.
+Source/tests/workflow/runtime comparison to merge-main exits 0. No local suites repeated
+for documentation-only changes; exact-main CI verifies the published tree. README,
+ARCHITECTURE/ADRs, ROADMAP, modules, knowledge/index and runbooks reassessed: no updates
+required for unchanged architecture/contracts/runtime. Historical triage reports unchanged.

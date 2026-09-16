@@ -2,18 +2,24 @@
 
 ## BB-130D2 dependency maintenance — 2026-09-16
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Baseline
+**ACCEPTED / MERGED / CI VERIFIED.** Baseline
 `914d35e596cd066b846e4f6d1c59632b1be84137`; branch `bb-130d/frontend-dependency-maintenance`.
 Vitest 4.1.11 (+ seven aligned family packages), PostCSS 8.5.23, nanoid 3.3.18,
 undici 7.29.0; no other version upgrades or persistent overrides. Tests 199/199 and
 production build pass; audit 5 findings → 0, all eight prior GHSAs remediated by installed
-patched dependencies in this candidate. Production inventory: 70 modules, none affected.
+patched dependencies on accepted main. Production inventory: 70 modules, none affected.
 [Exact graph, tooling limitations, commands and rollback](reports/features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md).
 No source/tests/CI/runtime changes, deployment, formatting or lint tooling. Finance RESEARCH / 0 SEK / NONE.
 A/B complete; C complete/exit approved; D in progress. D1/backend cleanup/gate and D2
-characterization/triage remain accepted; backend gate enabled. Maintenance awaits exact-SHA
-owner/architect review; frontend cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
-Earlier dated entries are historical. Next action is candidate review, not another checkpoint.
+characterization/triage remain accepted; backend gate enabled. Maintenance accepted; frontend cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
+Owner/architect approved exact candidate `b043bffe21c3cc05f2c57c087d6aac3f26fa0e84`, merged unchanged as
+`55b5b5d7e4e982f7d1a194cdab554a4bf419a471`. [Merge CI 35124925562](https://github.com/T-bear/BigBrain/actions/runs/35124925562)
+SUCCESS: backend/frontend/documentation/secrets. Backend restore → format → Release build →
+tests all executed successfully; frontend npm ci/test/build passed, no formatter/linter gate.
+Post-merge npm audit --json exit 0, zero findings; installed graph verifies all target versions
+and all eight prior GHSAs remain outside their assessed affected installed ranges.
+Earlier dated entries are historical. Next proposed checkpoint: BB-130D2 — Frontend Formatter Tool Installation, separately
+authorized after publication review; cleanup and CI activation remain separate bounded decisions.
 
 
 ## BB-130D2 dependency triage — 2026-09-15
