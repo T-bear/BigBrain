@@ -19,6 +19,34 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-130D2 dependency maintenance candidate — 2026-09-16
+
+Status: IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.
+Task: minimal frontend dependency maintenance only.
+Baseline/source-of-truth SHA: `914d35e596cd066b846e4f6d1c59632b1be84137`.
+Current branch: `bb-130d/frontend-dependency-maintenance`.
+Changed files: Web package.json/package-lock.json; STATUS, BACKLOG, TESTING, stabilization
+plan, REPORT-CATALOG, this note and new maintenance report.
+Completed: exact four target versions and seven Vitest companions; graph review, baseline
+199 tests/build and audit five; post-update 199 tests/build and audit zero; all eight GHSA
+patched ranges checked; 70-module artifact inventory excludes affected packages.
+Temporary npm 9 edgesOut failure bypassed with isolated npm (major 10, minor 9, patch 4) resolution; no toolchain
+change/persistent overrides; twelve unchanged package entries only gain MIT metadata.
+Final frontend npm ci/test/build/audit after documentation: all exit 0; 199/199 tests, audit zero.
+Full-history Gitleaks v8.28.0: exit 0, 273 commits, no leaks.
+Documentation verifier: exit 0, 241 Markdown files / 90 BB IDs; diff and staged diff checks
+exit 0; staged Gitleaks exit 0/no leaks. Only nine intended files staged.
+Remaining at handoff: owner/architect review after exact remote candidate verification; no merge authorized.
+No product blocker established; full limits/rollback in
+[maintenance report](../reports/features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md).
+Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. No source/CI/runtime change.
+Finance RESEARCH / 0 SEK / NONE; no deployment or scientific behavior change.
+Exact next action: finish final validation and fetch; main must equal baseline before publication.
+Commit subject: `chore: patch BB-130D2 frontend dependencies`. Resolve published SHA using
+`git log -1 --format=%H --grep='^chore: patch BB-130D2 frontend dependencies$' origin/bb-130d/frontend-dependency-maintenance`
+and compare with `git ls-remote origin refs/heads/bb-130d/frontend-dependency-maintenance`.
+After exact remote verification STOP for owner/architect review. Do not merge/start next checkpoint.
+
 ## BB-130D2 dependency triage accepted publication — 2026-09-15
 
 Status: ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.
