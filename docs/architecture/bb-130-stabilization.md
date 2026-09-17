@@ -2,19 +2,28 @@
 
 ## BB-130D2 formatter tooling — 2026-09-17
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Baseline
+**ACCEPTED / MERGED / CI VERIFIED.** Baseline
 `d7785b4ef2fea271cb78f0019c486b60acdad210`; branch `bb-130d/frontend-formatter-tooling`.
 Prettier 3.9.6 pinned dev-only; accepted config and explicit TS/TSX scripts installed.
 Exactly 83 selected, 80 nonconforming; repeated check exit 1 expected for historical debt.
 No write formatting or source/test changes. npm ci, 199/199 tests, build and audit zero verified;
-completed evidence reused on resume with unchanged package/source/config.
+fresh post-merge verification on 2026-09-17 confirms the same results.
 [Scope proof, commands and limits](../reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md).
 A/B complete; C complete/exit approved; D in progress. Prior D1/backend cleanup/gate and D2
-characterization/triage/maintenance accepted; backend gate enabled. Tooling awaits review;
+characterization/triage/maintenance accepted; backend gate enabled. Tooling accepted;
 frontend cleanup/gate NOT STARTED / NOT COMPLETE, lint deferred. No deployment/CI/runtime
-or scientific behavior change. Finance RESEARCH / 0 SEK / NONE. Next: exact candidate review;
-cleanup requires separate authorization. Earlier dated entries retain historical scope.
+or scientific behavior change. Finance RESEARCH / 0 SEK / NONE. Next proposed checkpoint: BB-130D2 — Frontend Formatter Cleanup, separately authorized;
+80-file formatting requires semantic/JSX review and strong regression verification. Earlier dated entries retain historical scope.
 
+
+Owner/architect approved exact candidate `d71ab8553871d9c5eb89c151ad8cb0392e0de08a`,
+merged unchanged as `ba0037ee41f16476e74037f090e83e2e3a78f205`.
+[Merge CI 35190196135](https://github.com/T-bear/BigBrain/actions/runs/35190196135): SUCCESS
+for backend/frontend/documentation/secrets. Backend restore → actual dotnet format check →
+Release build → tests passed. Frontend npm ci/test/build passed; no frontend formatter CI gate.
+Post-merge local npm ci/test/build/audit: exit 0, 199/199 tests, production build, audit zero.
+Prettier 3.9.6 dev-only, config/scripts unchanged; exact scope 83, 80 nonconforming,
+format:check exit 1 expected, output identical to characterization. No write formatting.
 
 ## BB-130D2 dependency maintenance — 2026-09-16
 

@@ -11,7 +11,16 @@
 
 ## Status
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Tool contract only; not accepted on main.
+**ACCEPTED / MERGED / CI VERIFIED.** Tool contract only; publication amendment 2026-09-17.
+Owner/architect approved exact candidate `d71ab8553871d9c5eb89c151ad8cb0392e0de08a`,
+merged unchanged as `ba0037ee41f16476e74037f090e83e2e3a78f205`.
+[Merge CI 35190196135](https://github.com/T-bear/BigBrain/actions/runs/35190196135): SUCCESS
+for backend/frontend/documentation/secrets. Backend restore → actual dotnet format check →
+Release build → tests passed. Frontend npm ci/test/build passed; no frontend formatter CI gate.
+Post-merge local npm ci/test/build/audit: exit 0, 199/199 tests, production build, audit zero.
+Prettier 3.9.6 dev-only, config/scripts unchanged; exact scope 83, 80 nonconforming,
+format:check exit 1 expected, output identical to characterization. No write formatting.
+
 No write-mode formatter executed. Cleanup and frontend formatter CI gate NOT STARTED / NOT COMPLETE.
 Lint deferred, no ESLint/Biome/Stylelint, plugins or EditorConfig added. Backend formatter CI remains
 unchanged and enabled. A/B complete; C complete/exit approved; D in progress. D1/backend cleanup/gate
@@ -125,7 +134,8 @@ entitlement/fail-closed or NOT EVALUABLE changes.
 
 ## Remaining work
 
-Owner/architect review of exact candidate SHA before merge. Then separately authorize bounded
+Tooling accepted on main. Next checkpoint: **BB-130D2 — Frontend Formatter Cleanup**, requiring
+separate owner/architect authorization. Plan bounded
 frontend formatter cleanup batches with semantic/JSX review and existing regression tests.
 Only after accepted full-scope cleanup should another checkpoint enable CI. Lint remains deferred.
 No cleanup starts here. Rollback if separately authorized: revert tooling manifest/lock/config
@@ -137,9 +147,8 @@ are updated; historical reports preserved.
 ## Resumption
 
 Read AGENTS/START-HERE and sole recovery note; preserve unrelated mockups/ADR 0006–0009.
-Verify origin/main and branch SHA before further actions. Resolve candidate from commit subject
-`chore: install BB-130D2 frontend formatter tooling` on its remote branch. After publication
-STOP for review; no merge, cleanup or CI activation authorized.
+Verify final reconciliation main and exact-head CI using the canonical recovery note. Do not
+merge again or recreate commits. After publication STOP; no cleanup or CI activation authorized.
 
 ### Publication checks — 2026-09-17
 
@@ -150,3 +159,25 @@ files and seven docs. Candidate remote SHA must match HEAD; no merge/CI success 
 
 `git diff --cached --check` and Gitleaks `git --pre-commit --staged --redact --no-banner`:
 exit 0, no leaks. All ten staged files match the bounded scope.
+
+### Accepted publication reconciliation — 2026-09-17
+
+The merge tree equals the approved candidate tree. Fresh local verification on exact merge-main:
+`npm ci`, `npm test -- --run`, `npm run build`, `npm audit --json` all exit 0; 199/199 tests
+in 26 files, 70 transformed modules, zero audit findings. `npm run format:check` exits 1
+solely for 80 existing differences; output byte-identical to candidate. Scope set comparison
+above again proves exactly 83 tracked intended files. Installed package/lock verify 3.9.6 dev-only;
+accepted config and scripts above unchanged. No overrides, unrelated updates or lint tooling.
+Source/tests/backend/workflow/runtime comparison to original baseline exits 0 excluding only
+the three approved tooling/package files. No write formatter command executed. No deployment.
+Only seven canonical docs reconciled; historical implementation/recovery evidence above retained.
+README, ARCHITECTURE/ADRs, ROADMAP, modules, knowledge/index and runbooks reassessed: no changed
+architecture/contracts/runtime need edits. Finance RESEARCH / 0 SEK / NONE; no scientific change.
+Final reconciliation commit requires its own exact-head CI with all four jobs and actual backend
+formatter execution. Resolve its SHA/run from GitHub history using recovery instructions;
+own future SHA is not embedded recursively. No frontend formatter gate enabled.
+
+Reconciliation publication checks: documentation verifier exit 0 (242 Markdown files / 90 BB IDs);
+working/staged diff checks exit 0; Gitleaks v8.28.0 full-history exit 0 (276 commits) and staged
+check exit 0, no leaks. Seven docs only; source/tests/CI/runtime unchanged. Prepublication fetch
+confirms exact merge-main and unchanged approved candidate. Final exact-main CI still required.

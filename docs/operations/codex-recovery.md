@@ -19,32 +19,45 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-130D2 formatter tooling recovery — 2026-09-17
+## BB-130D2 formatter tooling accepted publication — 2026-09-17
 
-Status: IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY; interrupted work completed.
-Task: Frontend Formatter Tool Installation only.
-Baseline/source-of-truth SHA: `d7785b4ef2fea271cb78f0019c486b60acdad210`.
-Current branch: `bb-130d/frontend-formatter-tooling`; HEAD initially baseline; no task commit/remote.
-Git status on resume: modified Web package.json/package-lock.json, untracked .prettierrc.json.
-Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. No staged work.
-Completed and valid: exact Prettier 3.9.6, config, scripts; 83 scope proof/80 format differences;
-repeat check output identical, exit 1 expected; source and CI unchanged. npm ci/test/build/audit
-completed 2026-09-16: exit 0, 199 tests/26 files, production build pass, audit zero. No relevant
-changes since validation; reused on explicit resume authorization. Old note described prior
-completed publication only; no formatter interruption note existed. No conflict or remote change.
-Changed files now: three tooling/package files and seven docs (STATUS/BACKLOG/TESTING/plan,
-REPORT-CATALOG, this note, [tooling report](../reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md)).
-Documentation verifier exit 0 (242 Markdown files / 90 BB IDs); diff check exit 0; full-history
-Gitleaks v8.28.0 exit 0 (275 commits, no leaks). Prepublication fetch: main equals baseline.
-Remaining after candidate publication: owner/architect review. No expensive suite rerun
-required for documentation-only remainder.
-Blockers/assumptions: none; known formatting debt expected, no source fixes authorized.
-Staged diff check and staged Gitleaks exit 0, no leaks; exactly ten intended files staged.
-Exact next action after publication: owner/architect review of verified remote SHA; stop.
-Resolve final SHA using `git log -1 --format=%H --grep='^chore: install BB-130D2 frontend formatter tooling$' origin/bb-130d/frontend-formatter-tooling`
-and compare `git ls-remote origin refs/heads/bb-130d/frontend-formatter-tooling`.
-No write mode, cleanup, lint, new CI, deployment or Finance change. RESEARCH / 0 SEK / NONE.
-After publication STOP for exact-SHA owner/architect review; no merge or next checkpoint.
+Status: ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.
+Task: approved formatter-tooling merge and documentation publication only.
+Original baseline: `d7785b4ef2fea271cb78f0019c486b60acdad210`.
+Owner/architect approved exact candidate `d71ab8553871d9c5eb89c151ad8cb0392e0de08a`,
+merged unchanged as `ba0037ee41f16476e74037f090e83e2e3a78f205`.
+[Merge CI 35190196135](https://github.com/T-bear/BigBrain/actions/runs/35190196135): SUCCESS
+for backend/frontend/documentation/secrets. Backend restore → actual dotnet format check →
+Release build → tests passed. Frontend npm ci/test/build passed; no frontend formatter CI gate.
+Post-merge local npm ci/test/build/audit: exit 0, 199/199 tests, production build, audit zero.
+Prettier 3.9.6 dev-only, config/scripts unchanged; exact scope 83, 80 nonconforming,
+format:check exit 1 expected, output identical to characterization. No write formatting.
+
+Only seven docs reconciled: STATUS, BACKLOG, TESTING, stabilization plan, REPORT-CATALOG,
+this note and [tooling report](../reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md).
+Unrelated mockups/ADR 0006–0009 preserved/excluded. No application/tests/backend/CI/runtime
+change, lint tooling, dependency update or deployment during publication.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1/backend cleanup/gate and D2
+characterization/triage/maintenance/tooling accepted; backend formatter gate enabled.
+Frontend cleanup and frontend formatter gate NOT STARTED / NOT COMPLETE; lint deferred.
+Finance RESEARCH / 0 SEK / NONE; no scientific, provider/broker/orders/PAPER/LIVE/AUTO/capital work.
+
+Reconciliation publication checks: documentation verifier exit 0 (242 Markdown files / 90 BB IDs);
+working/staged diff checks exit 0; Gitleaks v8.28.0 full-history exit 0 (276 commits) and staged
+check exit 0, no leaks. Seven docs only; source/tests/CI/runtime unchanged. Prepublication fetch
+confirms exact merge-main and unchanged approved candidate. Final exact-main CI still required.
+
+Final publication resolution: separate main commit `docs: reconcile accepted BB-130D2 formatter tooling`
+contains this record. Resolve using
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D2 formatter tooling$' origin/main`.
+Compare HEAD/origin/main with `git ls-remote origin refs/heads/main`; inspect exact head_sha
+Actions for backend/frontend/documentation/secrets SUCCESS. Backend actual format step must
+pass after restore/before build/test; frontend remains npm ci/test/build only. Own future SHA/run
+is resolved from GitHub history, not recursively embedded. If interrupted before final CI,
+preserve valid work/commit and continue first incomplete verification; no repeated merge/commit.
+After final exact-main CI STOP and return to ChatGPT with "Codex är klar".
+Next proposed checkpoint: BB-130D2 — Frontend Formatter Cleanup, separately authorized,
+with semantic/JSX review and strong verification of the large 80-file diff. Do not start here.
 
 ## BB-130D2 dependency maintenance accepted publication — 2026-09-16
 
