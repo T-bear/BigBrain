@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130D2 formatter tooling, 2026-09-17` — [Pinned formatter contract — IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY](features/platform/bb-130d2-frontend-formatter-tooling-20260917.md). 83 files / 80 existing format differences; no write formatting or CI gate; 199 tests/build pass, audit zero.
+
 - `BB-130D2 maintenance, 2026-09-16` — [Minimal dependency patches — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md). Four targets plus Vitest alignment; eight prior GHSAs outside affected installed ranges on accepted main, post-merge audit zero, 199 Web tests pass. Merge CI 35124925562 SUCCESS. No source/CI/deployment changes.
 
 - `BB-130D2 dependency triage, 2026-09-15` — [Frontend advisories — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-dependency-triage-20260914.md). Eight GHSAs: six C, two D; no current reachable product blocker established; not FIXED, separate patch maintenance NOT STARTED. Merge CI 34993322513 SUCCESS.

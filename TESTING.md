@@ -1,5 +1,21 @@
 # Testa BigBrain
 
+## BB-130D2 formatter tooling — 2026-09-17
+
+**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Baseline
+`d7785b4ef2fea271cb78f0019c486b60acdad210`; branch `bb-130d/frontend-formatter-tooling`.
+Prettier 3.9.6 pinned dev-only; accepted config and explicit TS/TSX scripts installed.
+Exactly 83 selected, 80 nonconforming; repeated check exit 1 expected for historical debt.
+No write formatting or source/test changes. npm ci, 199/199 tests, build and audit zero verified;
+completed evidence reused on resume with unchanged package/source/config.
+[Scope proof, commands and limits](docs/reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md).
+A/B complete; C complete/exit approved; D in progress. Prior D1/backend cleanup/gate and D2
+characterization/triage/maintenance accepted; backend gate enabled. Tooling awaits review;
+frontend cleanup/gate NOT STARTED / NOT COMPLETE, lint deferred. No deployment/CI/runtime
+or scientific behavior change. Finance RESEARCH / 0 SEK / NONE. Next: exact candidate review;
+cleanup requires separate authorization. Earlier dated entries retain historical scope.
+
+
 ## BB-130D2 dependency maintenance — 2026-09-16
 
 **ACCEPTED / MERGED / CI VERIFIED.** Baseline

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "format": "prettier --write --config .prettierrc.json --no-editorconfig \"src/**/*.{ts,tsx}\" vite.config.ts",
+    "format:check": "prettier --check --config .prettierrc.json --no-editorconfig \"src/**/*.{ts,tsx}\" vite.config.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.0.4",
@@ -21,6 +23,7 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "jsdom": "29.1.1",
+    "prettier": "3.9.6",
     "vitest": "4.1.11"
   }
 }
