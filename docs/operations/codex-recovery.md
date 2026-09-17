@@ -19,6 +19,33 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-130D2 formatter tooling recovery — 2026-09-17
+
+Status: IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY; interrupted work completed.
+Task: Frontend Formatter Tool Installation only.
+Baseline/source-of-truth SHA: `d7785b4ef2fea271cb78f0019c486b60acdad210`.
+Current branch: `bb-130d/frontend-formatter-tooling`; HEAD initially baseline; no task commit/remote.
+Git status on resume: modified Web package.json/package-lock.json, untracked .prettierrc.json.
+Unrelated untracked mockups and ADR 0006–0009 preserved/excluded. No staged work.
+Completed and valid: exact Prettier 3.9.6, config, scripts; 83 scope proof/80 format differences;
+repeat check output identical, exit 1 expected; source and CI unchanged. npm ci/test/build/audit
+completed 2026-09-16: exit 0, 199 tests/26 files, production build pass, audit zero. No relevant
+changes since validation; reused on explicit resume authorization. Old note described prior
+completed publication only; no formatter interruption note existed. No conflict or remote change.
+Changed files now: three tooling/package files and seven docs (STATUS/BACKLOG/TESTING/plan,
+REPORT-CATALOG, this note, [tooling report](../reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md)).
+Documentation verifier exit 0 (242 Markdown files / 90 BB IDs); diff check exit 0; full-history
+Gitleaks v8.28.0 exit 0 (275 commits, no leaks). Prepublication fetch: main equals baseline.
+Remaining after candidate publication: owner/architect review. No expensive suite rerun
+required for documentation-only remainder.
+Blockers/assumptions: none; known formatting debt expected, no source fixes authorized.
+Staged diff check and staged Gitleaks exit 0, no leaks; exactly ten intended files staged.
+Exact next action after publication: owner/architect review of verified remote SHA; stop.
+Resolve final SHA using `git log -1 --format=%H --grep='^chore: install BB-130D2 frontend formatter tooling$' origin/bb-130d/frontend-formatter-tooling`
+and compare `git ls-remote origin refs/heads/bb-130d/frontend-formatter-tooling`.
+No write mode, cleanup, lint, new CI, deployment or Finance change. RESEARCH / 0 SEK / NONE.
+After publication STOP for exact-SHA owner/architect review; no merge or next checkpoint.
+
 ## BB-130D2 dependency maintenance accepted publication — 2026-09-16
 
 Status: ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.
