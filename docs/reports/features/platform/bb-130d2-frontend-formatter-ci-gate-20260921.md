@@ -11,9 +11,24 @@
 
 ## Status
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Not accepted, merged, deployed or
-owner verified. BB-130D remains IN PROGRESS. The frontend gate is implemented on this
-candidate only; it is not yet enforced on main. No lint or subsequent checkpoint started.
+**ACCEPTED / MERGED / CI VERIFIED.** Publication amendment 2026-09-21.
+
+Owner/architect approved exact candidate `fde82cfc65e5e303f814c048d9032d6bd4f27f34`,
+merged unchanged as `d1b1dde14071fdcb646d99b383bf0a1819bbd0ca` from baseline
+`1e3552c5142ee3360e6a96036e8f7ed86b4f4d57` (one candidate commit).
+[Merge CI 35542112456](https://github.com/T-bear/BigBrain/actions/runs/35542112456):
+backend/frontend/documentation/secrets SUCCESS. Actual frontend steps npm ci →
+**npm run format:check SUCCESS** → npm test -- --run → npm run build all passed.
+Backend restore → dotnet format --verify-no-changes --no-restore → Release build → tests
+all passed. Both formatter gates are now enabled/enforced on main, check-only.
+Post-merge local format:check: exit 0, 83/83; audit: exit 0, zero findings.
+Prettier remains 3.9.6 dev-only; package/lock/config/scripts/source/backend/runtime unchanged.
+Candidate tests remain 199/199 in 26 files and build PASS; hosted test/build steps also pass.
+Negative characterization remains candidate evidence, not a new production mutation.
+No write mode, two-pass workaround or auto-fix exists in CI. Historical ThemeControl.test.tsx
+convergence remains cleanup history only. No deployment. Finance RESEARCH / 0 SEK / NONE.
+BB-130D remains IN PROGRESS. Proposed next action: **BB-130D final reconciliation / exit
+assessment**, requiring separate authorization; no lint or agent-neutral workflow work starts.
 
 ## Changes
 
@@ -76,9 +91,10 @@ No dependency updates, lint tooling, application refactor or new packages.
 
 ## Remaining work
 
-Architect review and owner approval of the exact candidate SHA before merge. GitHub Actions
-execution on accepted main remains a later publication step; local positive/negative checks
-do not claim hosted CI execution. No runtime/device/UX or blanket security approval.
+The exact candidate is accepted and merged. Next proposed action is BB-130D final
+reconciliation / exit assessment; separate authorization is required. No subsequent
+checkpoint, lint or agent-neutral workflow work is authorized. No runtime/device/UX or
+blanket security approval is claimed.
 Audit zero is a dated registry result, not proof that every possible vulnerability is absent.
 Rollback: separately authorize removal/revert of the single frontend format-check CI step;
 no source, dependency or runtime rollback is needed.
@@ -87,6 +103,6 @@ were assessed; no changes are needed because application architecture and runtim
 
 ## Resumption
 
-Read AGENTS.md, START-HERE and the canonical recovery note. Resolve the exact remote
-`bb-130d/frontend-formatter-ci-gate` SHA; compare main with the baseline before any approved
-merge. Stop after candidate publication. Do not start BB-130D exit, lint or another checkpoint.
+Read AGENTS.md, START-HERE and the canonical recovery note. This exact candidate is already
+merged; do not merge it again. Verify the final reconciliation commit and matching CI in GitHub.
+Stop after publication; do not start BB-130D exit, lint or another checkpoint.

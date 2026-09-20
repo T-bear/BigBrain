@@ -2,7 +2,7 @@
 
 ## BB-130D2 frontend formatter CI gate — 2026-09-21
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Baseline
+**ACCEPTED / MERGED / CI VERIFIED.** Baseline
 `1e3552c5142ee3360e6a96036e8f7ed86b4f4d57`; branch `bb-130d/frontend-formatter-ci-gate`.
 One frontend CI step adds `npm run format:check` after npm ci, before tests/build.
 Pinned Prettier 3.9.6, accepted config/scripts and scope remain unchanged. Positive checks
@@ -10,10 +10,24 @@ pass 83/83; temporary whitespace violation exits 1, exact restoration exits 0. B
 and post-edit npm ci, 199/199 tests in 26 files, build and audit zero pass.
 Application/test/backend/package/runtime files unchanged; backend/docs/secrets CI unchanged.
 [Commands, negative characterization and limitations](reports/features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md).
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. Earlier cleanup/tooling remain
-accepted; this gate is not yet accepted or enabled on main. No lint, deployment or next
-checkpoint. Finance RESEARCH / 0 SEK / NONE. Next: review exact candidate SHA before merge.
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS.
 
+Owner/architect approved exact candidate `fde82cfc65e5e303f814c048d9032d6bd4f27f34`,
+merged unchanged as `d1b1dde14071fdcb646d99b383bf0a1819bbd0ca` from baseline
+`1e3552c5142ee3360e6a96036e8f7ed86b4f4d57` (one candidate commit).
+[Merge CI 35542112456](https://github.com/T-bear/BigBrain/actions/runs/35542112456):
+backend/frontend/documentation/secrets SUCCESS. Actual frontend steps npm ci →
+**npm run format:check SUCCESS** → npm test -- --run → npm run build all passed.
+Backend restore → dotnet format --verify-no-changes --no-restore → Release build → tests
+all passed. Both formatter gates are now enabled/enforced on main, check-only.
+Post-merge local format:check: exit 0, 83/83; audit: exit 0, zero findings.
+Prettier remains 3.9.6 dev-only; package/lock/config/scripts/source/backend/runtime unchanged.
+Candidate tests remain 199/199 in 26 files and build PASS; hosted test/build steps also pass.
+Negative characterization remains candidate evidence, not a new production mutation.
+No write mode, two-pass workaround or auto-fix exists in CI. Historical ThemeControl.test.tsx
+convergence remains cleanup history only. No deployment. Finance RESEARCH / 0 SEK / NONE.
+BB-130D remains IN PROGRESS. Proposed next action: **BB-130D final reconciliation / exit
+assessment**, requiring separate authorization; no lint or agent-neutral workflow work starts.
 
 ## BB-130D2 frontend formatter cleanup — 2026-09-20
 
