@@ -17,22 +17,29 @@ export function MediaLookupResultCard({
   requestsEnabled: boolean
   onPrepare: (result: MediaLookupResult, trigger: HTMLButtonElement) => void
 }) {
-  return <article className="media-lookup-result-card">
-    <MediaPoster title={result.title} url={result.posterUrl} />
-    <div className="media-search-result-copy">
-      <h5 title={result.title}>{result.title}</h5>
-      <p>{result.mediaType === 'series' ? 'Serie' : 'Film'}{result.year !== null ? ` · ${result.year}` : ''}</p>
-      {result.overview && <p className="media-lookup-overview">{result.overview}</p>}
-      <div className="media-result-actions">
-        <strong className="media-search-state">{statusText(result)}</strong>
-        {!result.alreadyRegistered && requestsEnabled && result.canRequest !== false && <button
-            type="button"
-            className="secondary-button media-prepare-button"
-            onClick={event => onPrepare(result, event.currentTarget)}
-          >
-            {result.mediaType === 'series' ? 'Lägg till serie' : 'Lägg till film'}
-          </button>}
+  return (
+    <article className="media-lookup-result-card">
+      <MediaPoster title={result.title} url={result.posterUrl} />
+      <div className="media-search-result-copy">
+        <h5 title={result.title}>{result.title}</h5>
+        <p>
+          {result.mediaType === 'series' ? 'Serie' : 'Film'}
+          {result.year !== null ? ` · ${result.year}` : ''}
+        </p>
+        {result.overview && <p className="media-lookup-overview">{result.overview}</p>}
+        <div className="media-result-actions">
+          <strong className="media-search-state">{statusText(result)}</strong>
+          {!result.alreadyRegistered && requestsEnabled && result.canRequest !== false && (
+            <button
+              type="button"
+              className="secondary-button media-prepare-button"
+              onClick={event => onPrepare(result, event.currentTarget)}
+            >
+              {result.mediaType === 'series' ? 'Lägg till serie' : 'Lägg till film'}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  </article>
+    </article>
+  )
 }

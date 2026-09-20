@@ -12,15 +12,24 @@ const result: MediaSearchResponse = {
       provider: 'Jellyfin',
       status: 'online',
       error: null,
-      results: [{
-        sourceId: 'jf-1',
-        title: `Family Guy ${'x'.repeat(150)}`,
-        year: 1999,
-        mediaType: 'series',
-        state: 'available',
-        posterUrl: null,
-        metadata: { seasonCount: 23, episodeCount: null, episodeFileCount: null, hasFile: null, availableInLibrary: true, imageAvailable: true },
-      }],
+      results: [
+        {
+          sourceId: 'jf-1',
+          title: `Family Guy ${'x'.repeat(150)}`,
+          year: 1999,
+          mediaType: 'series',
+          state: 'available',
+          posterUrl: null,
+          metadata: {
+            seasonCount: 23,
+            episodeCount: null,
+            episodeFileCount: null,
+            hasFile: null,
+            availableInLibrary: true,
+            imageAvailable: true,
+          },
+        },
+      ],
     },
     { provider: 'Sonarr', status: 'unavailable', error: 'The provider could not be reached.', results: [] },
     { provider: 'Radarr', status: 'online', error: null, results: [] },
@@ -53,7 +62,12 @@ test('renders accessible search controls and prevents short queries', () => {
 
 test('Enter starts search and shows loading state', async () => {
   let resolveRequest: ((value: unknown) => void) | undefined
-  const fetch = vi.fn(() => new Promise(resolve => { resolveRequest = resolve }))
+  const fetch = vi.fn(
+    () =>
+      new Promise(resolve => {
+        resolveRequest = resolve
+      }),
+  )
   vi.stubGlobal('fetch', fetch)
   render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
@@ -68,7 +82,10 @@ test('Enter starts search and shows loading state', async () => {
 })
 
 test('groups results, empty state and partial provider failure without actions', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(result))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(result))),
+  )
   const { container } = render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 
@@ -88,7 +105,10 @@ test('groups results, empty state and partial provider failure without actions',
 })
 
 test('shows request failure', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('raw provider error'))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.reject(new Error('raw provider error'))),
+  )
   render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
 

@@ -28,7 +28,12 @@ export function CollapsibleModule({
   const headingId = `${moduleId}-heading`
   const Heading = headingLevel === 2 ? 'h2' : 'h3'
 
-  if (variant === 'family') return <div className={className} data-family-module={moduleId} id={moduleId}>{children}</div>
+  if (variant === 'family')
+    return (
+      <div className={className} data-family-module={moduleId} id={moduleId}>
+        {children}
+      </div>
+    )
 
   return (
     <section
@@ -52,7 +57,9 @@ export function CollapsibleModule({
             onClick={onToggle}
             type="button"
           >
-            <span aria-hidden="true" className="dashboard-module__chevron">⌄</span>
+            <span aria-hidden="true" className="dashboard-module__chevron">
+              ⌄
+            </span>
           </button>
         </div>
       </header>

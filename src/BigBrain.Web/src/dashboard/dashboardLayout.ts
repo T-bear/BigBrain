@@ -17,7 +17,7 @@ export const dashboardModules = [
   { id: 'details', defaultExpanded: false, collapsible: true },
 ] as const
 
-export type DashboardModuleId = typeof dashboardModules[number]['id']
+export type DashboardModuleId = (typeof dashboardModules)[number]['id']
 export type DashboardExpandedState = Record<DashboardModuleId, boolean>
 
 const defaults = Object.fromEntries(

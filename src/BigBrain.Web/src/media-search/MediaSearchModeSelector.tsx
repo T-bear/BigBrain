@@ -7,8 +7,14 @@ export function MediaSearchModeSelector({
   mode: MediaSearchMode
   onChange: (mode: MediaSearchMode) => void
 }) {
-  return <div className="media-search-modes" role="group" aria-label="Sökkälla">
-    <button type="button" aria-pressed={mode === 'external'} onClick={() => onChange('external')}>Hitta nytt</button>
-    <button type="button" aria-pressed={mode === 'libraries'} onClick={() => onChange('libraries')}>Mina bibliotek</button>
-  </div>
+  return (
+    <div className="media-search-modes" role="group" aria-label="Sökkälla">
+      <button type="button" aria-pressed={mode === 'external'} onClick={() => onChange('external')}>
+        Hitta nytt
+      </button>
+      <button type="button" aria-pressed={mode === 'libraries'} onClick={() => onChange('libraries')}>
+        Mina bibliotek
+      </button>
+    </div>
+  )
 }

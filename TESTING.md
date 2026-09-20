@@ -1,5 +1,60 @@
 # Testa BigBrain
 
+## BB-130D2 frontend formatter cleanup — 2026-09-20
+
+**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY — not accepted, not merged, not deployed.**
+Baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`, verified equal to `origin/main` before
+and immediately before publication; branch `bb-130d/frontend-formatter-cleanup`.
+Agent handoff **Codex → Claude**: the Codex session was interrupted by an exhausted usage
+limit having created only the branch; Git evidence proved no tracked change existed and that
+formatter write mode had not run. Claude reproduced the contract and baseline independently.
+
+The accepted formatter write operation rewrote exactly the **80** characterized nonconforming
+files of the **83**-file scope (15 `.ts`, 65 `.tsx`; 12,873 insertions, 2,498 deletions). The
+changed set equals the characterized set exactly, and the three already-clean files
+`src/main.tsx`, `src/test/setup.ts` and `vite.config.ts` remain untouched. No application
+source was hand-edited and no package, config, CI, backend, CSS, JS or runtime file changed.
+
+**Discovered deviation, owner-accepted and deliberately preserved.** `format:check` did not
+exit 0 after one write pass: `src/ThemeControl.test.tsx` is not a Prettier 3.9.6 fixed point
+after one pass. A second pass converges and a third is a no-op; a sweep of all 83 files shows
+exactly 82 of 83 reach a fixed point on pass 1. The change is member-chain line breaking in a
+test setup block with no token, argument or literal change. Work was halted under the
+checkpoint stop rule. The owner approved option (a) on 2026-09-20: accept the converged
+two-pass result as the cleanup candidate baseline with the deviation documented. This does
+**not** establish running Prettier twice as the normal workflow; the committed source is at
+the stable fixed point, and future formatter CI must verify that committed source is already
+conforming and must **not** depend on a second write pass.
+
+Verification: `format:check` exit 0 with 83/83 conforming and a further `npm run format` is a
+no-op; tests **199/199** in 26 files; focused Finance **46/46**; production build exit 0 with
+70 modules transformed; `npm audit --json` exit 0 with zero findings. Semantic verification
+used Prettier 3.9.6's own bundled TypeScript parser, because TypeScript 7.0.2 here is the
+native port with no JavaScript compiler API. All 83 files parsed without error and every
+semantic invariant is identical across all 80 reformatted files: identifiers, imports,
+exports, numbers, regexes, templates, JSX element names, JSX props, rendered JSX children,
+operators, object keys, executable statements, member paths and comments. Differences are
+representation only: JSX text re-wrapping with identical collapsed text, 28 `{' '}` separators
+whose only literal delta is the added space, and one ASI-guard `EmptyStatement`. Production
+artifacts: CSS, icons and manifest byte-identical; `index.html` differs only in the
+content-hashed asset name; the JS bundle differs by 81 bytes, proven to be adjacent JSX
+text-child splits only, with concatenated literals byte-identical at 82,558 bytes and
+literal-elided code skeletons byte-identical at 332,891 bytes.
+[Method, limitations and full evidence](docs/reports/features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md).
+
+Finance: no backend file changed at all, so deterministic identities, checksums, lineage,
+dataset/revision, campaign, holdout/OOS, robustness, cost, entitlement/fail-closed and
+NOT EVALUABLE semantics cannot have been affected. Four of six Finance frontend files have
+byte-identical normalized ASTs, preserving BB-128B/C cache, stale/degraded and single-loader
+semantics and BB-130C selected-result identity. Finance remains **RESEARCH / 0 SEK / NONE**.
+
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1, backend cleanup and the backend
+format gate remain accepted and enabled; D2 characterization, triage, dependency maintenance
+and formatter tooling remain accepted. The **frontend formatter CI gate remains NOT STARTED /
+NOT ENABLED** and lint remains deferred. No deployment, runtime, device or owner UX approval
+is claimed. Merge requires explicit owner approval of the exact reviewed branch SHA after
+verifying that SHA is unchanged and that `origin/main` has not advanced unexpectedly.
+
 ## BB-130D2 formatter tooling — 2026-09-17
 
 **ACCEPTED / MERGED / CI VERIFIED.** Baseline

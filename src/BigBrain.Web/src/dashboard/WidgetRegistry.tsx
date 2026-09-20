@@ -28,10 +28,7 @@ export class WidgetRegistry<TData> {
   private readonly widgets: readonly WidgetRegistration<TData>[]
   private readonly sections: readonly DashboardSectionRegistration[]
 
-  public constructor(
-    widgets: readonly WidgetRegistration<TData>[],
-    sections: readonly DashboardSectionRegistration[])
-  {
+  public constructor(widgets: readonly WidgetRegistration<TData>[], sections: readonly DashboardSectionRegistration[]) {
     this.widgets = [...widgets]
     this.sections = [...sections]
   }

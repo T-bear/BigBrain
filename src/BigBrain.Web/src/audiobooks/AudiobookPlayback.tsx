@@ -4,36 +4,328 @@ import { BBButton, BBMediaArtwork, BBSurface } from '../components'
 import type { AudiobookItem, AudiobookPlaybackSession, AudiobookPlaybackTrack } from '../types'
 import { SleepTimerControl } from './SleepTimerControl'
 
-type PlaybackContextValue={item:AudiobookItem|null;session:AudiobookPlaybackSession|null;currentTime:number;duration:number;playing:boolean;sleepDeadline:number|null;start:(item:AudiobookItem)=>Promise<void>;toggle:()=>Promise<void>;seek:(time:number)=>Promise<void>;jump:(seconds:number)=>Promise<void>;stop:()=>Promise<void>;setSleepMinutes:(minutes:number)=>void;setSleepClock:(clock:string)=>void;cancelSleepTimer:()=>void}
-const PlaybackContext=createContext<PlaybackContextValue|null>(null)
-const format=(seconds:number)=>{const safe=Math.max(0,Math.floor(seconds||0));const h=Math.floor(safe/3600);const m=Math.floor((safe%3600)/60);const s=safe%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
+type PlaybackContextValue = {
+  item: AudiobookItem | null
+  session: AudiobookPlaybackSession | null
+  currentTime: number
+  duration: number
+  playing: boolean
+  sleepDeadline: number | null
+  start: (item: AudiobookItem) => Promise<void>
+  toggle: () => Promise<void>
+  seek: (time: number) => Promise<void>
+  jump: (seconds: number) => Promise<void>
+  stop: () => Promise<void>
+  setSleepMinutes: (minutes: number) => void
+  setSleepClock: (clock: string) => void
+  cancelSleepTimer: () => void
+}
+const PlaybackContext = createContext<PlaybackContextValue | null>(null)
+const format = (seconds: number) => {
+  const safe = Math.max(0, Math.floor(seconds || 0))
+  const h = Math.floor(safe / 3600)
+  const m = Math.floor((safe % 3600) / 60)
+  const s = safe % 60
+  return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`
+}
 
-export function AudiobookPlaybackProvider({children}:{children:ReactNode}){
-  const audio=useRef<HTMLAudioElement|null>(null);const lastSync=useRef(0);const listenedSinceSync=useRef(0);const lastTick=useRef<number|null>(null)
-  const[item,setItem]=useState<AudiobookItem|null>(null);const[session,setSession]=useState<AudiobookPlaybackSession|null>(null);const[currentTime,setCurrentTime]=useState(0);const[playing,setPlaying]=useState(false);const[track,setTrack]=useState<AudiobookPlaybackTrack|null>(null);const[sleepDeadline,setSleepDeadline]=useState<number|null>(null)
-  const duration=session?.duration??item?.durationSeconds??0
-  const sessionRef=useRef(session);const trackRef=useRef(track);const durationRef=useRef(duration);sessionRef.current=session;trackRef.current=track;durationRef.current=duration
-  const position=()=>trackRef.current?(trackRef.current.startOffset+(audio.current?.currentTime??0)):currentTime
-  const chooseTrack=(value:number,tracks=session?.tracks??[])=>tracks.find((candidate,index)=>value>=candidate.startOffset&&value<(candidate.startOffset+candidate.duration)||(index===tracks.length-1&&value>=candidate.startOffset))??tracks[0]
-  const loadTrack=async(next:AudiobookPlaybackTrack,value:number,autoPlay:boolean)=>{const element=audio.current;if(!element)return;trackRef.current=next;setTrack(next);element.src=next.streamUrl;element.currentTime=Math.max(0,value-next.startOffset);element.load();if(autoPlay)await element.play()}
-  const start=async(nextItem:AudiobookItem)=>{const next=await startAudiobookPlayback(nextItem.id);setSleepDeadline(null);setItem(nextItem);setSession(next);setCurrentTime(next.currentTime);const selected=chooseTrack(next.currentTime,next.tracks);if(selected)await loadTrack(selected,next.currentTime,true)}
-  const toggle=async()=>{if(!audio.current)return;if(audio.current.paused)await audio.current.play();else audio.current.pause()}
-  const seek=async(value:number)=>{if(!session)return;const bounded=Math.max(0,Math.min(value,duration));const next=chooseTrack(bounded);if(!next)return;const wasPlaying=!!audio.current&&!audio.current.paused;if(track?.index===next.index&&audio.current)audio.current.currentTime=bounded-next.startOffset;else await loadTrack(next,bounded,wasPlaying);setCurrentTime(bounded)}
-  const sync=async(close=false)=>{const active=sessionRef.current;if(!active)return;const now=position();const listened=Math.min(300,listenedSinceSync.current);listenedSinceSync.current=0;lastSync.current=Date.now();await syncAudiobookPlayback(active.id,now,durationRef.current,listened,close).catch(()=>undefined)}
-  const stop=async()=>{setSleepDeadline(null);audio.current?.pause();await sync(true);audio.current?.removeAttribute('src');audio.current?.load();sessionRef.current=null;trackRef.current=null;setSession(null);setTrack(null);setItem(null)}
-  const setSleepMinutes=(minutes:number)=>setSleepDeadline(Date.now()+minutes*60_000)
-  const setSleepClock=(clock:string)=>{const[hours,minutes]=clock.split(':').map(Number);if(!Number.isInteger(hours)||!Number.isInteger(minutes))return;const deadline=new Date();deadline.setHours(hours,minutes,0,0);if(deadline.getTime()<=Date.now())deadline.setDate(deadline.getDate()+1);setSleepDeadline(deadline.getTime())}
-  useEffect(()=>{const element=new Audio();element.preload='metadata';audio.current=element;const time=()=>{const now=performance.now();if(!element.paused&&lastTick.current!==null)listenedSinceSync.current+=Math.max(0,(now-lastTick.current)/1000);lastTick.current=now;const value=position();setCurrentTime(value);if(Date.now()-lastSync.current>15000)void sync()};const play=()=>{lastTick.current=performance.now();setPlaying(true)};const pause=()=>{setPlaying(false);void sync()};const ended=()=>{const active=sessionRef.current;if(!active)return;const tracks=active.tracks;const index=tracks.findIndex(value=>value.index===trackRef.current?.index);if(index>=0&&index<tracks.length-1)void loadTrack(tracks[index+1],tracks[index+1].startOffset,true);else{setPlaying(false);void sync(true)}};element.addEventListener('timeupdate',time);element.addEventListener('play',play);element.addEventListener('pause',pause);element.addEventListener('ended',ended);return()=>{element.pause();element.removeEventListener('timeupdate',time);element.removeEventListener('play',play);element.removeEventListener('pause',pause);element.removeEventListener('ended',ended)}},[])
-  useEffect(()=>{const page=()=>{if(document.visibilityState==='hidden')void sync()};window.addEventListener('pagehide',page);document.addEventListener('visibilitychange',page);return()=>{window.removeEventListener('pagehide',page);document.removeEventListener('visibilitychange',page)}},[session,track,duration])
-  useEffect(()=>{if(sleepDeadline===null)return;const expire=()=>{if(Date.now()<sleepDeadline)return;setSleepDeadline(null);audio.current?.pause()};expire();const timer=window.setInterval(expire,1000);return()=>window.clearInterval(timer)},[sleepDeadline])
-  const value=useMemo<PlaybackContextValue>(()=>({item,session,currentTime,duration,playing,sleepDeadline,start,toggle,seek,jump:(seconds)=>seek(currentTime+seconds),stop,setSleepMinutes,setSleepClock,cancelSleepTimer:()=>setSleepDeadline(null)}),[item,session,currentTime,duration,playing,sleepDeadline,track])
+export function AudiobookPlaybackProvider({ children }: { children: ReactNode }) {
+  const audio = useRef<HTMLAudioElement | null>(null)
+  const lastSync = useRef(0)
+  const listenedSinceSync = useRef(0)
+  const lastTick = useRef<number | null>(null)
+  const [item, setItem] = useState<AudiobookItem | null>(null)
+  const [session, setSession] = useState<AudiobookPlaybackSession | null>(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const [track, setTrack] = useState<AudiobookPlaybackTrack | null>(null)
+  const [sleepDeadline, setSleepDeadline] = useState<number | null>(null)
+  const duration = session?.duration ?? item?.durationSeconds ?? 0
+  const sessionRef = useRef(session)
+  const trackRef = useRef(track)
+  const durationRef = useRef(duration)
+  sessionRef.current = session
+  trackRef.current = track
+  durationRef.current = duration
+  const position = () =>
+    trackRef.current ? trackRef.current.startOffset + (audio.current?.currentTime ?? 0) : currentTime
+  const chooseTrack = (value: number, tracks = session?.tracks ?? []) =>
+    tracks.find(
+      (candidate, index) =>
+        (value >= candidate.startOffset && value < candidate.startOffset + candidate.duration) ||
+        (index === tracks.length - 1 && value >= candidate.startOffset),
+    ) ?? tracks[0]
+  const loadTrack = async (next: AudiobookPlaybackTrack, value: number, autoPlay: boolean) => {
+    const element = audio.current
+    if (!element) return
+    trackRef.current = next
+    setTrack(next)
+    element.src = next.streamUrl
+    element.currentTime = Math.max(0, value - next.startOffset)
+    element.load()
+    if (autoPlay) await element.play()
+  }
+  const start = async (nextItem: AudiobookItem) => {
+    const next = await startAudiobookPlayback(nextItem.id)
+    setSleepDeadline(null)
+    setItem(nextItem)
+    setSession(next)
+    setCurrentTime(next.currentTime)
+    const selected = chooseTrack(next.currentTime, next.tracks)
+    if (selected) await loadTrack(selected, next.currentTime, true)
+  }
+  const toggle = async () => {
+    if (!audio.current) return
+    if (audio.current.paused) await audio.current.play()
+    else audio.current.pause()
+  }
+  const seek = async (value: number) => {
+    if (!session) return
+    const bounded = Math.max(0, Math.min(value, duration))
+    const next = chooseTrack(bounded)
+    if (!next) return
+    const wasPlaying = !!audio.current && !audio.current.paused
+    if (track?.index === next.index && audio.current) audio.current.currentTime = bounded - next.startOffset
+    else await loadTrack(next, bounded, wasPlaying)
+    setCurrentTime(bounded)
+  }
+  const sync = async (close = false) => {
+    const active = sessionRef.current
+    if (!active) return
+    const now = position()
+    const listened = Math.min(300, listenedSinceSync.current)
+    listenedSinceSync.current = 0
+    lastSync.current = Date.now()
+    await syncAudiobookPlayback(active.id, now, durationRef.current, listened, close).catch(() => undefined)
+  }
+  const stop = async () => {
+    setSleepDeadline(null)
+    audio.current?.pause()
+    await sync(true)
+    audio.current?.removeAttribute('src')
+    audio.current?.load()
+    sessionRef.current = null
+    trackRef.current = null
+    setSession(null)
+    setTrack(null)
+    setItem(null)
+  }
+  const setSleepMinutes = (minutes: number) => setSleepDeadline(Date.now() + minutes * 60_000)
+  const setSleepClock = (clock: string) => {
+    const [hours, minutes] = clock.split(':').map(Number)
+    if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return
+    const deadline = new Date()
+    deadline.setHours(hours, minutes, 0, 0)
+    if (deadline.getTime() <= Date.now()) deadline.setDate(deadline.getDate() + 1)
+    setSleepDeadline(deadline.getTime())
+  }
+  useEffect(() => {
+    const element = new Audio()
+    element.preload = 'metadata'
+    audio.current = element
+    const time = () => {
+      const now = performance.now()
+      if (!element.paused && lastTick.current !== null)
+        listenedSinceSync.current += Math.max(0, (now - lastTick.current) / 1000)
+      lastTick.current = now
+      const value = position()
+      setCurrentTime(value)
+      if (Date.now() - lastSync.current > 15000) void sync()
+    }
+    const play = () => {
+      lastTick.current = performance.now()
+      setPlaying(true)
+    }
+    const pause = () => {
+      setPlaying(false)
+      void sync()
+    }
+    const ended = () => {
+      const active = sessionRef.current
+      if (!active) return
+      const tracks = active.tracks
+      const index = tracks.findIndex(value => value.index === trackRef.current?.index)
+      if (index >= 0 && index < tracks.length - 1)
+        void loadTrack(tracks[index + 1], tracks[index + 1].startOffset, true)
+      else {
+        setPlaying(false)
+        void sync(true)
+      }
+    }
+    element.addEventListener('timeupdate', time)
+    element.addEventListener('play', play)
+    element.addEventListener('pause', pause)
+    element.addEventListener('ended', ended)
+    return () => {
+      element.pause()
+      element.removeEventListener('timeupdate', time)
+      element.removeEventListener('play', play)
+      element.removeEventListener('pause', pause)
+      element.removeEventListener('ended', ended)
+    }
+  }, [])
+  useEffect(() => {
+    const page = () => {
+      if (document.visibilityState === 'hidden') void sync()
+    }
+    window.addEventListener('pagehide', page)
+    document.addEventListener('visibilitychange', page)
+    return () => {
+      window.removeEventListener('pagehide', page)
+      document.removeEventListener('visibilitychange', page)
+    }
+  }, [session, track, duration])
+  useEffect(() => {
+    if (sleepDeadline === null) return
+    const expire = () => {
+      if (Date.now() < sleepDeadline) return
+      setSleepDeadline(null)
+      audio.current?.pause()
+    }
+    expire()
+    const timer = window.setInterval(expire, 1000)
+    return () => window.clearInterval(timer)
+  }, [sleepDeadline])
+  const value = useMemo<PlaybackContextValue>(
+    () => ({
+      item,
+      session,
+      currentTime,
+      duration,
+      playing,
+      sleepDeadline,
+      start,
+      toggle,
+      seek,
+      jump: seconds => seek(currentTime + seconds),
+      stop,
+      setSleepMinutes,
+      setSleepClock,
+      cancelSleepTimer: () => setSleepDeadline(null),
+    }),
+    [item, session, currentTime, duration, playing, sleepDeadline, track],
+  )
   return <PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>
 }
-const unavailablePlayback:PlaybackContextValue={item:null,session:null,currentTime:0,duration:0,playing:false,sleepDeadline:null,start:async()=>undefined,toggle:async()=>undefined,seek:async()=>undefined,jump:async()=>undefined,stop:async()=>undefined,setSleepMinutes:()=>undefined,setSleepClock:()=>undefined,cancelSleepTimer:()=>undefined}
-export function useAudiobookPlayback(){return useContext(PlaybackContext)??unavailablePlayback}
+const unavailablePlayback: PlaybackContextValue = {
+  item: null,
+  session: null,
+  currentTime: 0,
+  duration: 0,
+  playing: false,
+  sleepDeadline: null,
+  start: async () => undefined,
+  toggle: async () => undefined,
+  seek: async () => undefined,
+  jump: async () => undefined,
+  stop: async () => undefined,
+  setSleepMinutes: () => undefined,
+  setSleepClock: () => undefined,
+  cancelSleepTimer: () => undefined,
+}
+export function useAudiobookPlayback() {
+  return useContext(PlaybackContext) ?? unavailablePlayback
+}
 
-export function AudiobookSleepTimerStatus({className='' }:{className?:string}){const player=useAudiobookPlayback();const[now,setNow]=useState(Date.now());useEffect(()=>{if(player.sleepDeadline===null)return;setNow(Date.now());const timer=window.setInterval(()=>setNow(Date.now()),1000);return()=>window.clearInterval(timer)},[player.sleepDeadline]);if(player.sleepDeadline===null)return null;const remaining=Math.max(0,Math.ceil((player.sleepDeadline-now)/60_000));const clock=new Date(player.sleepDeadline).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});return <span aria-live="polite" className={`audiobook-sleep-timer__status ${className}`.trim()}>Stannar {clock} · {remaining} min kvar</span>}
+export function AudiobookSleepTimerStatus({ className = '' }: { className?: string }) {
+  const player = useAudiobookPlayback()
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    if (player.sleepDeadline === null) return
+    setNow(Date.now())
+    const timer = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(timer)
+  }, [player.sleepDeadline])
+  if (player.sleepDeadline === null) return null
+  const remaining = Math.max(0, Math.ceil((player.sleepDeadline - now) / 60_000))
+  const clock = new Date(player.sleepDeadline).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
+  return (
+    <span aria-live="polite" className={`audiobook-sleep-timer__status ${className}`.trim()}>
+      Stannar {clock} · {remaining} min kvar
+    </span>
+  )
+}
 
-export function AudiobookSleepTimer({available=true,compact=false,label='Sovtimer',onActivate,showStatus=true}:{available?:boolean;compact?:boolean;label?:string;onActivate?:()=>void;showStatus?:boolean}){const player=useAudiobookPlayback();return <><SleepTimerControl active={player.sleepDeadline!==null} available={available} compact={compact} label={label} onActivate={onActivate} onCancel={player.cancelSleepTimer} onClock={player.setSleepClock} onMinutes={player.setSleepMinutes}/>{showStatus&&<AudiobookSleepTimerStatus/>}</>}
+export function AudiobookSleepTimer({
+  available = true,
+  compact = false,
+  label = 'Sovtimer',
+  onActivate,
+  showStatus = true,
+}: {
+  available?: boolean
+  compact?: boolean
+  label?: string
+  onActivate?: () => void
+  showStatus?: boolean
+}) {
+  const player = useAudiobookPlayback()
+  return (
+    <>
+      <SleepTimerControl
+        active={player.sleepDeadline !== null}
+        available={available}
+        compact={compact}
+        label={label}
+        onActivate={onActivate}
+        onCancel={player.cancelSleepTimer}
+        onClock={player.setSleepClock}
+        onMinutes={player.setSleepMinutes}
+      />
+      {showStatus && <AudiobookSleepTimerStatus />}
+    </>
+  )
+}
 
-export function AudiobookPlayer({itemId}:{itemId?:string}){const player=useAudiobookPlayback();if(!player.item||!player.session||(itemId&&player.item.id!==itemId))return null;return <BBSurface aria-label={`Spelar ${player.item.title}`} className="audiobook-player" role="region"><div className="audiobook-player__identity"><BBMediaArtwork alt="" src={player.item.coverUrl??undefined}/><span><strong>{player.item.title}</strong>{player.item.author&&<small>Av {player.item.author}</small>}</span></div><div className="audiobook-player__controls"><BBButton aria-label="Hoppa bakåt 30 sekunder" onClick={()=>void player.jump(-30)} variant="tertiary">−30</BBButton><BBButton aria-label={player.playing?'Pausa ljudboken':'Spela ljudboken'} aria-pressed={player.playing} onClick={()=>void player.toggle()} variant="secondary">{player.playing?'Paus':'Spela'}</BBButton><BBButton aria-label="Hoppa framåt 30 sekunder" onClick={()=>void player.jump(30)} variant="tertiary">+30</BBButton></div><label className="audiobook-player__timeline"><span className="sr-only">Position i ljudboken</span><input aria-valuemax={Math.round(player.duration)} aria-valuemin={0} aria-valuenow={Math.round(player.currentTime)} max={player.duration||1} min="0" onChange={event=>void player.seek(Number(event.target.value))} step="1" type="range" value={Math.min(player.currentTime,player.duration||1)}/><span>{format(player.currentTime)} / {format(player.duration)}</span></label><AudiobookSleepTimer/><BBButton onClick={()=>void player.stop()} variant="tertiary">Stäng spelaren</BBButton></BBSurface>}
+export function AudiobookPlayer({ itemId }: { itemId?: string }) {
+  const player = useAudiobookPlayback()
+  if (!player.item || !player.session || (itemId && player.item.id !== itemId)) return null
+  return (
+    <BBSurface aria-label={`Spelar ${player.item.title}`} className="audiobook-player" role="region">
+      <div className="audiobook-player__identity">
+        <BBMediaArtwork alt="" src={player.item.coverUrl ?? undefined} />
+        <span>
+          <strong>{player.item.title}</strong>
+          {player.item.author && <small>Av {player.item.author}</small>}
+        </span>
+      </div>
+      <div className="audiobook-player__controls">
+        <BBButton aria-label="Hoppa bakåt 30 sekunder" onClick={() => void player.jump(-30)} variant="tertiary">
+          −30
+        </BBButton>
+        <BBButton
+          aria-label={player.playing ? 'Pausa ljudboken' : 'Spela ljudboken'}
+          aria-pressed={player.playing}
+          onClick={() => void player.toggle()}
+          variant="secondary"
+        >
+          {player.playing ? 'Paus' : 'Spela'}
+        </BBButton>
+        <BBButton aria-label="Hoppa framåt 30 sekunder" onClick={() => void player.jump(30)} variant="tertiary">
+          +30
+        </BBButton>
+      </div>
+      <label className="audiobook-player__timeline">
+        <span className="sr-only">Position i ljudboken</span>
+        <input
+          aria-valuemax={Math.round(player.duration)}
+          aria-valuemin={0}
+          aria-valuenow={Math.round(player.currentTime)}
+          max={player.duration || 1}
+          min="0"
+          onChange={event => void player.seek(Number(event.target.value))}
+          step="1"
+          type="range"
+          value={Math.min(player.currentTime, player.duration || 1)}
+        />
+        <span>
+          {format(player.currentTime)} / {format(player.duration)}
+        </span>
+      </label>
+      <AudiobookSleepTimer />
+      <BBButton onClick={() => void player.stop()} variant="tertiary">
+        Stäng spelaren
+      </BBButton>
+    </BBSurface>
+  )
+}

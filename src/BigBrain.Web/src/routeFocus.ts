@@ -4,10 +4,20 @@ let listening = false
 function listenForModality() {
   if (listening || typeof window === 'undefined') return
   listening = true
-  window.addEventListener('keydown', event => {
-    if (event.key === 'Tab' || event.key.startsWith('Arrow')) modality = 'keyboard'
-  }, true)
-  window.addEventListener('pointerdown', () => { modality = 'pointer' }, true)
+  window.addEventListener(
+    'keydown',
+    event => {
+      if (event.key === 'Tab' || event.key.startsWith('Arrow')) modality = 'keyboard'
+    },
+    true,
+  )
+  window.addEventListener(
+    'pointerdown',
+    () => {
+      modality = 'pointer'
+    },
+    true,
+  )
 }
 
 export function focusRouteHeading(heading: HTMLElement | null) {

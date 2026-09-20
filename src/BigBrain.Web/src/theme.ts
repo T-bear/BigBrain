@@ -23,11 +23,15 @@ export function resolveInitialTheme(storage: Pick<Storage, 'getItem'> = window.l
 
 export function applyTheme(theme: ThemeId) {
   document.documentElement.dataset.theme = theme
-  const colors: Record<ThemeId, string> = { 'obsidian-gold': '#080a0d', 'arctic-wind': '#071320', 'forest-night': '#06130e' }
+  const colors: Record<ThemeId, string> = {
+    'obsidian-gold': '#080a0d',
+    'arctic-wind': '#071320',
+    'forest-night': '#06130e',
+  }
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', colors[theme])
 }
 
 export function normalizeTheme(value: string | null): ThemeId | null {
   if (isThemeId(value)) return value
-  return value ? legacyThemes[value] ?? null : null
+  return value ? (legacyThemes[value] ?? null) : null
 }
