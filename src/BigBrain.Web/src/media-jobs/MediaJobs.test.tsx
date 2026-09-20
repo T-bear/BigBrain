@@ -34,13 +34,15 @@ const importingJob: MediaJob = {
   playItemId: null,
   canPlay: false,
   artwork: null,
-  details: [{
-    provider: 'Sonarr',
-    status: 'importing',
-    progressPercent: 98,
-    subtitle: 'Episode 1',
-    userMessage: null,
-  }],
+  details: [
+    {
+      provider: 'Sonarr',
+      status: 'importing',
+      progressPercent: 98,
+      subtitle: 'Episode 1',
+      userMessage: null,
+    },
+  ],
 }
 
 const importing: MediaJobsResponse = {
@@ -88,10 +90,18 @@ test('renders jobs, progress, episode aggregation and expandable provider detail
 })
 
 test('summarizes multiple active jobs compactly and expands their full cards', async () => {
-  getMediaJobs.mockResolvedValue({ ...importing, jobs: [
-    importingJob,
-    { ...importingJob, id: '918c6e2a440b345bf8cd73c2', title: 'Alien 1979 2160p UHD BluRay X265-GROUP', progressPercent: 42 },
-  ] })
+  getMediaJobs.mockResolvedValue({
+    ...importing,
+    jobs: [
+      importingJob,
+      {
+        ...importingJob,
+        id: '918c6e2a440b345bf8cd73c2',
+        title: 'Alien 1979 2160p UHD BluRay X265-GROUP',
+        progressPercent: 42,
+      },
+    ],
+  })
   render(<MediaJobs />)
   expect(await screen.findByRole('heading', { name: '2 pågående nedladdningar' })).toBeInTheDocument()
   expect(screen.getByText('The Expanse')).toBeInTheDocument()
@@ -108,11 +118,10 @@ test('summarizes multiple active jobs compactly and expands their full cards', a
 })
 
 test('polling transition to available resolves Jellyfin play metadata without reload', async () => {
-  getMediaJobs
-    .mockResolvedValueOnce(importing)
-    .mockResolvedValue({
-      ...importing,
-      jobs: [{
+  getMediaJobs.mockResolvedValueOnce(importing).mockResolvedValue({
+    ...importing,
+    jobs: [
+      {
         ...importingJob,
         mediaType: 'series',
         subtitle: null,
@@ -120,8 +129,9 @@ test('polling transition to available resolves Jellyfin play metadata without re
         progressPercent: 100,
         playItemId: 'abc123',
         canPlay: true,
-      }],
-    })
+      },
+    ],
+  })
   render(<MediaJobs />)
   await screen.findByRole('heading', { name: 'The Expanse' })
 
@@ -143,11 +153,14 @@ test('Jellyfin degraded state retains jobs and never shows an unverified play ac
     providers: importing.providers.map(provider =>
       provider.provider === 'Jellyfin'
         ? { ...provider, status: 'unavailable' as const, userMessage: 'sanitized' }
-        : provider),
+        : provider,
+    ),
   })
   render(<MediaJobs />)
 
-  expect(await screen.findByText('Vissa mediatjänster svarar inte just nu. Tillgängliga nedladdningar visas fortfarande.')).toBeInTheDocument()
+  expect(
+    await screen.findByText('Vissa mediatjänster svarar inte just nu. Tillgängliga nedladdningar visas fortfarande.'),
+  ).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'The Expanse' })).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /play in jellyfin/i })).not.toBeInTheDocument()
 })
@@ -160,7 +173,9 @@ test('polling failure keeps the latest snapshot and shows degraded update state'
   Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' })
   act(() => document.dispatchEvent(new Event('visibilitychange')))
 
-  expect(await screen.findByText('Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.')).toBeInTheDocument()
+  expect(
+    await screen.findByText('Automatisk uppdatering är tillfälligt otillgänglig. Senaste status visas.'),
+  ).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'The Expanse' })).toBeInTheDocument()
 })
 
@@ -189,21 +204,27 @@ test('filters jobs and reveals only a bounded first page', async () => {
 test('long titles remain in overflow-protected identity and errors are sanitized', async () => {
   getMediaJobs.mockResolvedValue({
     ...importing,
-    jobs: [{
-      ...importingJob,
-      title: 'A very long title '.repeat(30),
-      status: 'failed',
-      errorCode: 'providerJobFailed',
-      userMessage: 'This media job needs attention.',
-    }],
+    jobs: [
+      {
+        ...importingJob,
+        title: 'A very long title '.repeat(30),
+        status: 'failed',
+        errorCode: 'providerJobFailed',
+        userMessage: 'This media job needs attention.',
+      },
+    ],
   })
   const { container } = render(<MediaJobs />)
-  fireEvent.click(within(await screen.findByLabelText('Filtrera pågående media')).getByRole('button', { name: 'Problem' }))
+  fireEvent.click(
+    within(await screen.findByLabelText('Filtrera pågående media')).getByRole('button', { name: 'Problem' }),
+  )
 
   expect(await screen.findByRole('alert')).toHaveTextContent('This media job needs attention.')
   const article = screen.getByRole('article')
   expect(within(article).getByRole('heading')).toBeInTheDocument()
   expect(container.querySelector('.media-job__identity')).toBeInTheDocument()
   await waitFor(() => expect(screen.queryByText(/api\/v3|exception|\/srv\/|https?:\/\//i)).not.toBeInTheDocument())
-  expect(screen.queryByRole('button', { name: /delete|pause|resume|download|release|command/i })).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('button', { name: /delete|pause|resume|download|release|command/i }),
+  ).not.toBeInTheDocument()
 })

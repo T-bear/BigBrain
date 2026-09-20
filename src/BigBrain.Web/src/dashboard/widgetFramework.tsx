@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from 're
 import type { AppIconName } from '../AppIcon'
 
 export const dashboardViewIds = ['home', 'family', 'media', 'finance', 'more', 'ai', 'admin'] as const
-export type DashboardViewId = typeof dashboardViewIds[number]
+export type DashboardViewId = (typeof dashboardViewIds)[number]
 export type WidgetSize = 'small' | 'medium' | 'large' | 'full'
 
 export interface WidgetRenderContext {
@@ -94,11 +94,22 @@ function defaults(registry: ApplicationWidgetRegistry): DashboardPreferences {
   return {
     version: 2,
     activeView: 'home',
-    views: Object.fromEntries(dashboardViewIds.map(view => [view, {
-      order: registry.getForView(view).filter(widget => widget.defaultView === view).map(widget => widget.id),
-      hidden: registry.getForView(view).filter(widget => widget.defaultView !== view).map(widget => widget.id),
-      collapsed: [],
-    }])) as unknown as Record<DashboardViewId, WidgetPreferences>,
+    views: Object.fromEntries(
+      dashboardViewIds.map(view => [
+        view,
+        {
+          order: registry
+            .getForView(view)
+            .filter(widget => widget.defaultView === view)
+            .map(widget => widget.id),
+          hidden: registry
+            .getForView(view)
+            .filter(widget => widget.defaultView !== view)
+            .map(widget => widget.id),
+          collapsed: [],
+        },
+      ]),
+    ) as unknown as Record<DashboardViewId, WidgetPreferences>,
   }
 }
 
@@ -112,25 +123,34 @@ export function readDashboardPreferences(
 ): DashboardPreferences {
   const fallback = defaults(registry)
   try {
-    const parsed = JSON.parse(storage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? 'null') as Partial<DashboardPreferences> | null
-    if (!parsed || parsed.version !== 2 || !validView(parsed.activeView) || typeof parsed.views !== 'object') return fallback
+    const parsed = JSON.parse(
+      storage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? 'null',
+    ) as Partial<DashboardPreferences> | null
+    if (!parsed || parsed.version !== 2 || !validView(parsed.activeView) || typeof parsed.views !== 'object')
+      return fallback
 
-    const views = Object.fromEntries(dashboardViewIds.map(view => {
-      const available = registry.getForView(view).map(widget => widget.id)
-      const stored = parsed.views?.[view]
-      const known = (values: unknown) => Array.isArray(values)
-        ? values.filter((value): value is string => typeof value === 'string' && available.includes(value))
-        : []
-      const storedOrder = known(stored?.order)
-      const newDefaults = available.filter(id => !storedOrder.includes(id) && registry.get(id)?.defaultView === view)
-      const hidden = known(stored?.hidden)
-      const nonDefault = available.filter(id => registry.get(id)?.defaultView !== view && !storedOrder.includes(id))
-      return [view, {
-        order: [...storedOrder, ...newDefaults],
-        hidden: [...new Set([...hidden, ...nonDefault])],
-        collapsed: known(stored?.collapsed),
-      }]
-    })) as unknown as Record<DashboardViewId, WidgetPreferences>
+    const views = Object.fromEntries(
+      dashboardViewIds.map(view => {
+        const available = registry.getForView(view).map(widget => widget.id)
+        const stored = parsed.views?.[view]
+        const known = (values: unknown) =>
+          Array.isArray(values)
+            ? values.filter((value): value is string => typeof value === 'string' && available.includes(value))
+            : []
+        const storedOrder = known(stored?.order)
+        const newDefaults = available.filter(id => !storedOrder.includes(id) && registry.get(id)?.defaultView === view)
+        const hidden = known(stored?.hidden)
+        const nonDefault = available.filter(id => registry.get(id)?.defaultView !== view && !storedOrder.includes(id))
+        return [
+          view,
+          {
+            order: [...storedOrder, ...newDefaults],
+            hidden: [...new Set([...hidden, ...nonDefault])],
+            collapsed: known(stored?.collapsed),
+          },
+        ]
+      }),
+    ) as unknown as Record<DashboardViewId, WidgetPreferences>
 
     return { version: 2, activeView: parsed.activeView, views }
   } catch {
@@ -153,59 +173,73 @@ const WidgetContext = createContext<WidgetContextValue | null>(null)
 
 export function WidgetProvider({ children, registry }: { children: ReactNode; registry: ApplicationWidgetRegistry }) {
   const [preferences, setPreferences] = useState(() => {
-    const stored=readDashboardPreferences(registry)
-    if (window.location.pathname.startsWith('/media/audiobooks')) return {...stored,activeView:'media' as const}
-    if (window.location.pathname.startsWith('/admin/')) return {...stored,activeView:'admin' as const}
+    const stored = readDashboardPreferences(registry)
+    if (window.location.pathname.startsWith('/media/audiobooks')) return { ...stored, activeView: 'media' as const }
+    if (window.location.pathname.startsWith('/admin/')) return { ...stored, activeView: 'admin' as const }
     return stored
   })
 
   const update = (mutate: (current: DashboardPreferences) => DashboardPreferences) => {
     setPreferences(current => {
       const next = mutate(current)
-      try { window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify(next)) } catch { /* Keep in-memory state. */ }
+      try {
+        window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify(next))
+      } catch {
+        /* Keep in-memory state. */
+      }
       return next
     })
   }
 
   const setActiveView = (activeView: DashboardViewId) => update(current => ({ ...current, activeView }))
-  const updateView = (view: DashboardViewId, mutate: (current: WidgetPreferences) => WidgetPreferences) => update(current => ({
-    ...current,
-    views: { ...current.views, [view]: mutate(current.views[view] ?? { order: [], hidden: [], collapsed: [] }) },
-  }))
+  const updateView = (view: DashboardViewId, mutate: (current: WidgetPreferences) => WidgetPreferences) =>
+    update(current => ({
+      ...current,
+      views: { ...current.views, [view]: mutate(current.views[view] ?? { order: [], hidden: [], collapsed: [] }) },
+    }))
 
-  const value = useMemo<WidgetContextValue>(() => ({
-    activeView: preferences.activeView,
-    preferences,
-    registry,
-    setActiveView,
-    setVisible: (view, widgetId, visible) => updateView(view, current => ({
-      ...current,
-      order: current.order.includes(widgetId) ? current.order : [...current.order, widgetId],
-      hidden: visible ? current.hidden.filter(id => id !== widgetId) : [...new Set([...current.hidden, widgetId])],
-    })),
-    toggleCollapsed: (view, widgetId) => updateView(view, current => ({
-      ...current,
-      collapsed: current.collapsed.includes(widgetId) ? current.collapsed.filter(id => id !== widgetId) : [...current.collapsed, widgetId],
-    })),
-    moveWidget: (view, widgetId, direction) => updateView(view, current => {
-      const order = [...current.order]
-      const index = order.indexOf(widgetId)
-      const target = index + direction
-      if (index < 0 || target < 0 || target >= order.length) return current
-      ;[order[index], order[target]] = [order[target], order[index]]
-      return { ...current, order }
+  const value = useMemo<WidgetContextValue>(
+    () => ({
+      activeView: preferences.activeView,
+      preferences,
+      registry,
+      setActiveView,
+      setVisible: (view, widgetId, visible) =>
+        updateView(view, current => ({
+          ...current,
+          order: current.order.includes(widgetId) ? current.order : [...current.order, widgetId],
+          hidden: visible ? current.hidden.filter(id => id !== widgetId) : [...new Set([...current.hidden, widgetId])],
+        })),
+      toggleCollapsed: (view, widgetId) =>
+        updateView(view, current => ({
+          ...current,
+          collapsed: current.collapsed.includes(widgetId)
+            ? current.collapsed.filter(id => id !== widgetId)
+            : [...current.collapsed, widgetId],
+        })),
+      moveWidget: (view, widgetId, direction) =>
+        updateView(view, current => {
+          const order = [...current.order]
+          const index = order.indexOf(widgetId)
+          const target = index + direction
+          if (index < 0 || target < 0 || target >= order.length) return current
+          ;[order[index], order[target]] = [order[target], order[index]]
+          return { ...current, order }
+        }),
+      moveWidgetTo: (view, widgetId, targetId) =>
+        updateView(view, current => {
+          if (widgetId === targetId) return current
+          const order = current.order.filter(id => id !== widgetId)
+          const target = order.indexOf(targetId)
+          if (target < 0) return current
+          order.splice(target, 0, widgetId)
+          return { ...current, order }
+        }),
+      // The callbacks intentionally close over the current update function; preferences is the state dependency.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
-    moveWidgetTo: (view, widgetId, targetId) => updateView(view, current => {
-      if (widgetId === targetId) return current
-      const order = current.order.filter(id => id !== widgetId)
-      const target = order.indexOf(targetId)
-      if (target < 0) return current
-      order.splice(target, 0, widgetId)
-      return { ...current, order }
-    }),
-  // The callbacks intentionally close over the current update function; preferences is the state dependency.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [preferences, registry])
+    [preferences, registry],
+  )
 
   return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>
 }

@@ -19,16 +19,25 @@ function service(serviceName: string, status = 'online') {
 }
 
 function overview(status = 'online', serviceStatuses: Record<string, string> = {}): MediaOverview {
-  const services = ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent']
-    .map((name) => service(name, serviceStatuses[name] ?? status))
+  const services = ['Jellyfin', 'Sonarr', 'Radarr', 'Prowlarr', 'qBittorrent'].map(name =>
+    service(name, serviceStatuses[name] ?? status),
+  )
   return {
     status,
     healthScore: status === 'online' ? 100 : 40,
-    healthSummary: status === 'online' ? 'Everything looks great' : status === 'notConfigured' ? 'Configure media services to calculate health.' : 'Immediate attention is recommended',
+    healthSummary:
+      status === 'online'
+        ? 'Everything looks great'
+        : status === 'notConfigured'
+          ? 'Configure media services to calculate health.'
+          : 'Immediate attention is recommended',
     healthStatusLevel: status === 'online' ? 'excellent' : status === 'notConfigured' ? 'notConfigured' : 'critical',
-    insights: status === 'notConfigured' ? [] : status === 'online'
-      ? [{ severity: 'success', title: 'All services healthy', message: 'Everything is responding.' }]
-      : [{ severity: 'critical', title: 'Services unavailable', message: 'One service cannot be reached.' }],
+    insights:
+      status === 'notConfigured'
+        ? []
+        : status === 'online'
+          ? [{ severity: 'success', title: 'All services healthy', message: 'Everything is responding.' }]
+          : [{ severity: 'critical', title: 'Services unavailable', message: 'One service cannot be reached.' }],
     collectedAtUtc: checkedAtUtc,
     services,
     qBittorrent: {
@@ -43,12 +52,52 @@ function overview(status = 'online', serviceStatuses: Record<string, string> = {
       totalDownloadedBytes: 4_194_304,
       totalUploadedBytes: 2_097_152,
       freeSpaceBytes: 107_374_182_400,
-      torrents: [{ name: 'Safe download', progressPercent: 42.5, state: 'downloading', category: 'tv', etaSeconds: 3600 }],
+      torrents: [
+        { name: 'Safe download', progressPercent: 42.5, state: 'downloading', category: 'tv', etaSeconds: 3600 },
+      ],
     },
-    sonarr: { service: services[1], seriesCount: 20, monitoredSeriesCount: 18, missingMonitoredEpisodes: 3, queueCount: 0, queue: [], calendar: [], recentHistory: [], healthWarnings: [] },
-    radarr: { service: services[2], movieCount: 50, monitoredMovieCount: 45, missingMovieCount: 2, qualityUpgradeCount: 4, queueCount: 0, queue: [], recentHistory: [], healthWarnings: [] },
-    prowlarr: { service: services[3], indexerCount: 5, enabledIndexerCount: 4, onlineIndexerCount: 4, rssEnabledIndexerCount: 3, indexerStatuses: [], recentFailures: [], healthWarnings: [] },
-    jellyfin: { service: services[0], libraryCount: 2, movieCount: 10, seriesCount: 5, episodeCount: 80, activeUserCount: 1, activeStreamCount: 1, recentlyAdded: [{ name: 'New movie', mediaType: 'Movie', dateCreatedUtc: checkedAtUtc }] },
+    sonarr: {
+      service: services[1],
+      seriesCount: 20,
+      monitoredSeriesCount: 18,
+      missingMonitoredEpisodes: 3,
+      queueCount: 0,
+      queue: [],
+      calendar: [],
+      recentHistory: [],
+      healthWarnings: [],
+    },
+    radarr: {
+      service: services[2],
+      movieCount: 50,
+      monitoredMovieCount: 45,
+      missingMovieCount: 2,
+      qualityUpgradeCount: 4,
+      queueCount: 0,
+      queue: [],
+      recentHistory: [],
+      healthWarnings: [],
+    },
+    prowlarr: {
+      service: services[3],
+      indexerCount: 5,
+      enabledIndexerCount: 4,
+      onlineIndexerCount: 4,
+      rssEnabledIndexerCount: 3,
+      indexerStatuses: [],
+      recentFailures: [],
+      healthWarnings: [],
+    },
+    jellyfin: {
+      service: services[0],
+      libraryCount: 2,
+      movieCount: 10,
+      seriesCount: 5,
+      episodeCount: 80,
+      activeUserCount: 1,
+      activeStreamCount: 1,
+      recentlyAdded: [{ name: 'New movie', mediaType: 'Movie', dateCreatedUtc: checkedAtUtc }],
+    },
   } as MediaOverview
 }
 
@@ -57,17 +106,20 @@ function response(body: unknown) {
 }
 
 beforeEach(() => {
-  window.localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, JSON.stringify({
-    version: 1,
-    expanded: {
-      'media-jobs': true,
-      'media-health': true,
-      insights: true,
-      services: true,
-      activity: true,
-      details: true,
-    },
-  }))
+  window.localStorage.setItem(
+    DASHBOARD_LAYOUT_STORAGE_KEY,
+    JSON.stringify({
+      version: 1,
+      expanded: {
+        'media-jobs': true,
+        'media-health': true,
+        insights: true,
+        services: true,
+        activity: true,
+        details: true,
+      },
+    }),
+  )
 })
 
 afterEach(() => {
@@ -81,23 +133,37 @@ test('closed technical Media reads nothing; opening starts reads once and closin
   const fetchMock = vi.fn(() => new Promise<Response>(() => {}))
   vi.stubGlobal('fetch', fetchMock)
   const { container } = render(<MediaDashboard administrationOnly administrationOpen={false} />)
-  await act(async () => { await vi.advanceTimersByTimeAsync(45_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(45_000)
+  })
   expect(fetchMock).not.toHaveBeenCalled()
   const details = container.querySelector('details')!
   details.open = true
   fireEvent(details, new Event('toggle'))
   expect(fetchMock).toHaveBeenCalledTimes(2)
-  await act(async () => { await vi.advanceTimersByTimeAsync(90_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(90_000)
+  })
   expect(fetchMock).toHaveBeenCalledTimes(2)
   details.open = false
   fireEvent(details, new Event('toggle'))
-  await act(async () => { await vi.advanceTimersByTimeAsync(90_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(90_000)
+  })
   expect(fetchMock).toHaveBeenCalledTimes(2)
 })
 
 test('shows loading and then online activity without write controls', async () => {
   let resolveRequest: ((value: unknown) => void) | undefined
-  vi.stubGlobal('fetch', vi.fn(() => new Promise((resolve) => { resolveRequest = resolve })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      () =>
+        new Promise(resolve => {
+          resolveRequest = resolve
+        }),
+    ),
+  )
   render(<MediaDashboard />)
 
   expect(screen.getByText('Laddar film och serier…')).toBeInTheDocument()
@@ -115,7 +181,10 @@ test('shows loading and then online activity without write controls', async () =
 })
 
 test('keeps technical modules in Administration, closed by default and reachable on request', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   render(<MediaDashboard />)
   await screen.findByRole('heading', { name: 'Hitta film och serier' })
   const administration = screen.getByText('Administration', { selector: 'strong' }).closest('details')!
@@ -127,11 +196,20 @@ test('keeps technical modules in Administration, closed by default and reachable
 })
 
 test('shows partial success with degraded and unavailable services', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview('degraded', {
-    Jellyfin: 'online',
-    Sonarr: 'unavailable',
-    Radarr: 'degraded',
-  })))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve(
+        response(
+          overview('degraded', {
+            Jellyfin: 'online',
+            Sonarr: 'unavailable',
+            Radarr: 'degraded',
+          }),
+        ),
+      ),
+    ),
+  )
   render(<MediaDashboard />)
 
   expect(await screen.findByText('Critical')).toBeInTheDocument()
@@ -142,7 +220,10 @@ test('shows partial success with degraded and unavailable services', async () =>
 })
 
 test('shows not configured services', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview('notConfigured')))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview('notConfigured')))),
+  )
   render(<MediaDashboard />)
 
   expect(await screen.findAllByText('Service is notConfigured.')).toHaveLength(5)
@@ -153,7 +234,10 @@ test('shows not configured services', async () => {
 })
 
 test('keeps the dashboard usable when every service is offline', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview('unavailable')))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview('unavailable')))),
+  )
   render(<MediaDashboard />)
 
   expect(await screen.findAllByTitle('Service is unavailable.')).toHaveLength(5)
@@ -165,7 +249,10 @@ test('keeps the dashboard usable when every service is offline', async () => {
 })
 
 test('shows total API failure', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('network failure'))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.reject(new Error('network failure'))),
+  )
   render(<MediaDashboard />)
 
   expect(await screen.findByRole('alert')).toHaveTextContent('Film och serier kunde inte laddas.')
@@ -179,7 +266,10 @@ test('limits long lists and supports accessible show all and collapse controls',
     status: 'downloading',
     progressPercent: index * 10,
   }))
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(data))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(data))),
+  )
   render(<MediaDashboard />)
 
   const queue = await screen.findByRole('heading', { name: 'Sonarr queue' })
@@ -195,7 +285,11 @@ test('limits long lists and supports accessible show all and collapse controls',
   expect(collapse).toHaveAttribute('aria-expanded', 'true')
   fireEvent.click(collapse)
   expect(within(card!).getAllByRole('listitem')).toHaveLength(3)
-  expect(within(card!).getAllByTitle(/Very long release name/)[0].closest('.item-copy')).not.toBeNull()
+  expect(
+    within(card!)
+      .getAllByTitle(/Very long release name/)[0]
+      .closest('.item-copy'),
+  ).not.toBeNull()
 })
 
 test('separates active, paused and completed torrents', async () => {
@@ -205,7 +299,10 @@ test('separates active, paused and completed torrents', async () => {
     { name: 'Stopped item', progressPercent: 50, state: 'stoppedDL', category: null, etaSeconds: null },
     { name: 'Completed item', progressPercent: 100, state: 'stoppedUP', category: null, etaSeconds: null },
   ]
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(data))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(data))),
+  )
   render(<MediaDashboard />)
 
   const activeHeading = await screen.findByRole('heading', { name: /Active/ })
@@ -218,16 +315,25 @@ test('separates active, paused and completed torrents', async () => {
 })
 
 test('renders registered production sections in information hierarchy order', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   const { container } = render(<MediaDashboard />)
   await screen.findByText('Everything looks great')
 
-  expect([...container.querySelectorAll('[data-dashboard-section]')].map(element => element.getAttribute('data-dashboard-section')))
-    .toEqual(['media-health', 'insights', 'services', 'activity', 'details'])
+  expect(
+    [...container.querySelectorAll('[data-dashboard-section]')].map(element =>
+      element.getAttribute('data-dashboard-section'),
+    ),
+  ).toEqual(['media-health', 'insights', 'services', 'activity', 'details'])
 })
 
 test('collapses and expands a module with accessible state', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   render(<MediaDashboard />)
   await screen.findByText('All services healthy')
 
@@ -246,36 +352,47 @@ test('collapses and expands a module with accessible state', async () => {
 })
 
 test('restores persisted module state after a new render', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   const firstRender = render(<MediaDashboard />)
   await screen.findByText('All services healthy')
   fireEvent.click(screen.getByRole('button', { name: 'Minimera BigBrain Insights' }))
   firstRender.unmount()
 
   render(<MediaDashboard />)
-  expect(await screen.findByRole('button', { name: 'Expandera BigBrain Insights' }))
-    .toHaveAttribute('aria-expanded', 'false')
+  expect(await screen.findByRole('button', { name: 'Expandera BigBrain Insights' })).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  )
 })
 
 test('falls back safely when persisted module state is invalid', async () => {
   window.localStorage.setItem(DASHBOARD_LAYOUT_STORAGE_KEY, '{invalid json')
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   render(<MediaDashboard />)
 
-  expect(await screen.findByRole('button', { name: 'Minimera Medieflöde' }))
-    .toHaveAttribute('aria-expanded', 'true')
-  expect(screen.getByRole('button', { name: 'Expandera Media Health' }))
-    .toHaveAttribute('aria-expanded', 'false')
+  expect(await screen.findByRole('button', { name: 'Minimera Medieflöde' })).toHaveAttribute('aria-expanded', 'true')
+  expect(screen.getByRole('button', { name: 'Expandera Media Health' })).toHaveAttribute('aria-expanded', 'false')
 })
 
 test('explains the difference between the download queue and the media lifecycle without provider knowledge', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(response(overview()))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(response(overview()))),
+  )
   render(<MediaDashboard />)
 
   expect(await screen.findByRole('heading', { name: 'Nedladdningskö' })).toBeInTheDocument()
   expect(screen.getByText(/Pausa, återuppta, felsök eller hantera själva nedladdningen/)).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Medieflöde' })).toBeInTheDocument()
-  expect(screen.getByText(/genom sökning, nedladdning och bearbetning tills de finns i biblioteket/)).toBeInTheDocument()
+  expect(
+    screen.getByText(/genom sökning, nedladdning och bearbetning tills de finns i biblioteket/),
+  ).toBeInTheDocument()
   expect(screen.getByText(/kan därför synas här samtidigt/)).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Poster i Medieflödet' })).toBeInTheDocument()
 })

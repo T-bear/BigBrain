@@ -1,81 +1,241 @@
 import { useEffect, useState } from 'react'
-import { getFinanceAutonomousResearch,  getFinanceBackups, getFinanceDatasets, getFinanceFeatures, getFinanceOverview, getFinanceResearchGovernorStatus, getFinanceResearchOperationsStatus, getFinanceResearchSchedulerStatus, getFinanceRiskEvaluations, getFinanceRiskStatus, getFinanceRobustness, getFinanceRobustnessEvaluation, getFinanceShadow } from '../api'
+import {
+  getFinanceAutonomousResearch,
+  getFinanceBackups,
+  getFinanceDatasets,
+  getFinanceFeatures,
+  getFinanceOverview,
+  getFinanceResearchGovernorStatus,
+  getFinanceResearchOperationsStatus,
+  getFinanceResearchSchedulerStatus,
+  getFinanceRiskEvaluations,
+  getFinanceRiskStatus,
+  getFinanceRobustness,
+  getFinanceRobustnessEvaluation,
+  getFinanceShadow,
+} from '../api'
 import { BBButton, BBLoadingIndicator } from '../components'
-import type { FinanceAutonomousResearch, FinanceBackupInventory, FinanceBacktestResult, FinanceDatasetCatalog, FinanceFeatureSnapshot, FinanceObservationSnapshot, FinanceOverview, FinanceResearchOperationsStatus, FinanceResearchResourceDecision, FinanceResearchSchedulerStatus, FinanceRiskEvaluation, FinanceRiskStatus, FinanceRobustnessCatalog, FinanceRobustnessEvaluation, FinanceShadowCatalog } from '../types'
+import type {
+  FinanceAutonomousResearch,
+  FinanceBackupInventory,
+  FinanceBacktestResult,
+  FinanceDatasetCatalog,
+  FinanceFeatureSnapshot,
+  FinanceObservationSnapshot,
+  FinanceOverview,
+  FinanceResearchOperationsStatus,
+  FinanceResearchResourceDecision,
+  FinanceResearchSchedulerStatus,
+  FinanceRiskEvaluation,
+  FinanceRiskStatus,
+  FinanceRobustnessCatalog,
+  FinanceRobustnessEvaluation,
+  FinanceShadowCatalog,
+} from '../types'
 import { useFinanceObservation } from './useFinanceObservation'
 import { useFinanceBacktestDetails } from './useFinanceBacktestDetails'
 
 const labels: Record<string, string> = {
-  noneAuthorized: 'Ingen provider auktoriserad', candidate: 'Kandidat', authorized: 'Auktoriserad', unavailable: 'Saknas', unknown: 'Okänd',
-  pendingWrittenConfirmation: 'Skriftlig bekräftelse väntar', denied: 'Nekad', expired: 'Utgången', current: 'Aktuell', delayed: 'Fördröjd', stale: 'Inaktuell',
-  open: 'Öppen', closed: 'Stängd', preMarket: 'Förhandel', gap: 'Datagap', outage: 'Avbrott', good: 'God', warning: 'Varning', error: 'Fel',
-  notConfigured: 'Inte konfigurerad', fixtureMemory: 'Fixture-minne', durable: 'Beständig',
-  ownerAcceptedPersonalResearch: 'Ägargodkänd personlig research', active: 'Aktiv', deletionRequired: 'Radering krävs', expiredBlocked: 'Utgången / blockerad', deletionComplete: 'Radering klar',
-  available: 'Tillgänglig', warmup: 'Warmup', gapAffected: 'Gap-påverkad', invalidInput: 'Ogiltig input',
+  noneAuthorized: 'Ingen provider auktoriserad',
+  candidate: 'Kandidat',
+  authorized: 'Auktoriserad',
+  unavailable: 'Saknas',
+  unknown: 'Okänd',
+  pendingWrittenConfirmation: 'Skriftlig bekräftelse väntar',
+  denied: 'Nekad',
+  expired: 'Utgången',
+  current: 'Aktuell',
+  delayed: 'Fördröjd',
+  stale: 'Inaktuell',
+  open: 'Öppen',
+  closed: 'Stängd',
+  preMarket: 'Förhandel',
+  gap: 'Datagap',
+  outage: 'Avbrott',
+  good: 'God',
+  warning: 'Varning',
+  error: 'Fel',
+  notConfigured: 'Inte konfigurerad',
+  fixtureMemory: 'Fixture-minne',
+  durable: 'Beständig',
+  ownerAcceptedPersonalResearch: 'Ägargodkänd personlig research',
+  active: 'Aktiv',
+  deletionRequired: 'Radering krävs',
+  expiredBlocked: 'Utgången / blockerad',
+  deletionComplete: 'Radering klar',
+  available: 'Tillgänglig',
+  warmup: 'Warmup',
+  gapAffected: 'Gap-påverkad',
+  invalidInput: 'Ogiltig input',
 }
 const label = (value: string) => labels[value] ?? value
-const formatTime = (value: string | null) => value ? new Date(value).toLocaleString('sv-SE') : 'Ingen uppdatering'
+const formatTime = (value: string | null) => (value ? new Date(value).toLocaleString('sv-SE') : 'Ingen uppdatering')
 
-export const aggregateSignalRisk = (predictionIds:string[]|undefined,evaluations:FinanceRiskEvaluation[]) => {
-  const ids=[...new Set(predictionIds??[])].sort();if(!ids.length)return 'Riskbedömning saknas'
-  const exact=ids.map(id=>evaluations.filter(x=>x.shadowPredictionId===id).sort((a,b)=>b.evaluatedAtUtc.localeCompare(a.evaluatedAtUtc)||a.evaluationId.localeCompare(b.evaluationId))[0]).filter((x):x is FinanceRiskEvaluation=>Boolean(x))
-  if(!exact.length)return 'Riskbedömning saknas'
-  const verdicts=new Set(exact.map(x=>x.verdict));const mixed=exact.length!==ids.length||verdicts.size>1
-  const verdict=exact.some(x=>x.verdict==='halt')?'Stoppad':exact.some(x=>x.verdict==='deny')?'Blockerad':exact.some(x=>x.verdict==='insufficientData')?'Otillräcklig data':exact.some(x=>x.verdict==='reduce')?'Reducerad':'Godkänd'
-  return `Risk: ${verdict}${mixed?' (blandad)':''}`
+export const aggregateSignalRisk = (predictionIds: string[] | undefined, evaluations: FinanceRiskEvaluation[]) => {
+  const ids = [...new Set(predictionIds ?? [])].sort()
+  if (!ids.length) return 'Riskbedömning saknas'
+  const exact = ids
+    .map(
+      id =>
+        evaluations
+          .filter(x => x.shadowPredictionId === id)
+          .sort(
+            (a, b) => b.evaluatedAtUtc.localeCompare(a.evaluatedAtUtc) || a.evaluationId.localeCompare(b.evaluationId),
+          )[0],
+    )
+    .filter((x): x is FinanceRiskEvaluation => Boolean(x))
+  if (!exact.length) return 'Riskbedömning saknas'
+  const verdicts = new Set(exact.map(x => x.verdict))
+  const mixed = exact.length !== ids.length || verdicts.size > 1
+  const verdict = exact.some(x => x.verdict === 'halt')
+    ? 'Stoppad'
+    : exact.some(x => x.verdict === 'deny')
+      ? 'Blockerad'
+      : exact.some(x => x.verdict === 'insufficientData')
+        ? 'Otillräcklig data'
+        : exact.some(x => x.verdict === 'reduce')
+          ? 'Reducerad'
+          : 'Godkänd'
+  return `Risk: ${verdict}${mixed ? ' (blandad)' : ''}`
 }
 
-export function FinancePriceChart({ instrument }: { instrument: FinanceObservationSnapshot['watchlist'][number] | null }) {
+export function FinancePriceChart({
+  instrument,
+}: {
+  instrument: FinanceObservationSnapshot['watchlist'][number] | null
+}) {
   const points = instrument?.history.filter(point => point.value !== null) ?? []
-  if (!instrument || points.length < 2) return <div className="finance-chart-empty" role="status"><strong>Ingen prishistorik</strong><span>Diagrammet visas när observationer med historik finns.</span></div>
+  if (!instrument || points.length < 2)
+    return (
+      <div className="finance-chart-empty" role="status">
+        <strong>Ingen prishistorik</strong>
+        <span>Diagrammet visas när observationer med historik finns.</span>
+      </div>
+    )
   const values = points.map(point => point.value as number)
-  const min = Math.min(...values), max = Math.max(...values), range = Math.max(max - min, 0.0001)
+  const min = Math.min(...values),
+    max = Math.max(...values),
+    range = Math.max(max - min, 0.0001)
   const segments: string[] = []
   let current = ''
   points.forEach((point, index) => {
     const x = (index / (points.length - 1)) * 100
     const y = 38 - (((point.value as number) - min) / range) * 34
-    if (point.beginsAfterGap && current) { segments.push(current); current = '' }
+    if (point.beginsAfterGap && current) {
+      segments.push(current)
+      current = ''
+    }
     current += `${current ? ' L' : 'M'} ${x.toFixed(2)} ${y.toFixed(2)}`
   })
   if (current) segments.push(current)
-  return <figure className="finance-chart" aria-labelledby="finance-chart-caption"><svg aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 42">{segments.map((path, index) => <path d={path} key={index} />)}</svg><figcaption id="finance-chart-caption">{instrument.symbol}: {points.length} punkter, lägst {min.toFixed(2)} och högst {max.toFixed(2)} {instrument.currency}. Datagap ritas inte som sammanhängande linjer.</figcaption></figure>
+  return (
+    <figure className="finance-chart" aria-labelledby="finance-chart-caption">
+      <svg aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 42">
+        {segments.map((path, index) => (
+          <path d={path} key={index} />
+        ))}
+      </svg>
+      <figcaption id="finance-chart-caption">
+        {instrument.symbol}: {points.length} punkter, lägst {min.toFixed(2)} och högst {max.toFixed(2)}{' '}
+        {instrument.currency}. Datagap ritas inte som sammanhängande linjer.
+      </figcaption>
+    </figure>
+  )
 }
 
-const visibleFeatures = ['sma.20','ema.20','rsi.14','atr.14','volatility.20','momentum.20','volume.ratio.20']
+const visibleFeatures = ['sma.20', 'ema.20', 'rsi.14', 'atr.14', 'volatility.20', 'momentum.20', 'volume.ratio.20']
 
-export function FinanceObservation({ initialSnapshot, initialFeatures, initialRobustness, initialEvaluation, initialBackups,initialShadow,initialOverview,initialRiskStatus,initialRiskEvaluations,initialAutonomousResearch,initialResearchScheduler,initialResearchGovernor,initialResearchOperations }: { initialSnapshot?: FinanceObservationSnapshot; initialFeatures?: FinanceFeatureSnapshot; initialRobustness?: FinanceRobustnessCatalog; initialEvaluation?: FinanceRobustnessEvaluation;initialBackups?:FinanceBackupInventory;initialShadow?:FinanceShadowCatalog;initialOverview?:FinanceOverview;initialRiskStatus?:FinanceRiskStatus;initialRiskEvaluations?:FinanceRiskEvaluation[];initialAutonomousResearch?:FinanceAutonomousResearch;initialResearchScheduler?:FinanceResearchSchedulerStatus;initialResearchGovernor?:FinanceResearchResourceDecision;initialResearchOperations?:FinanceResearchOperationsStatus }) {
-  const { snapshot, failed, refreshing, stale, lastFetchedAt, selected, setSelected, refresh } = useFinanceObservation(initialSnapshot)
+export function FinanceObservation({
+  initialSnapshot,
+  initialFeatures,
+  initialRobustness,
+  initialEvaluation,
+  initialBackups,
+  initialShadow,
+  initialOverview,
+  initialRiskStatus,
+  initialRiskEvaluations,
+  initialAutonomousResearch,
+  initialResearchScheduler,
+  initialResearchGovernor,
+  initialResearchOperations,
+}: {
+  initialSnapshot?: FinanceObservationSnapshot
+  initialFeatures?: FinanceFeatureSnapshot
+  initialRobustness?: FinanceRobustnessCatalog
+  initialEvaluation?: FinanceRobustnessEvaluation
+  initialBackups?: FinanceBackupInventory
+  initialShadow?: FinanceShadowCatalog
+  initialOverview?: FinanceOverview
+  initialRiskStatus?: FinanceRiskStatus
+  initialRiskEvaluations?: FinanceRiskEvaluation[]
+  initialAutonomousResearch?: FinanceAutonomousResearch
+  initialResearchScheduler?: FinanceResearchSchedulerStatus
+  initialResearchGovernor?: FinanceResearchResourceDecision
+  initialResearchOperations?: FinanceResearchOperationsStatus
+}) {
+  const { snapshot, failed, refreshing, stale, lastFetchedAt, selected, setSelected, refresh } =
+    useFinanceObservation(initialSnapshot)
   const [features, setFeatures] = useState<FinanceFeatureSnapshot | null>(initialFeatures ?? null)
   const observationAvailable = snapshot !== null
-  const [detailsOpen,setDetailsOpen]=useState(false)
-  const { backtests, selectedRun, setSelectedRun, backtestResult, backtestLoading, backtestFailed, retryBacktest } = useFinanceBacktestDetails(detailsOpen)
-  const [robustness,setRobustness]=useState<FinanceRobustnessCatalog|null>(initialRobustness??null)
-  const [selectedEvaluation,setSelectedEvaluation]=useState<string|null>(initialRobustness?.evaluations[0]?.evaluationId??null)
-  const [evaluation,setEvaluation]=useState<FinanceRobustnessEvaluation|null>(initialEvaluation??null)
-  const selectedRobustness = robustness?.evaluations.find(x => x.evaluationId === selectedEvaluation) ?? robustness?.evaluations[0]
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const { backtests, selectedRun, setSelectedRun, backtestResult, backtestLoading, backtestFailed, retryBacktest } =
+    useFinanceBacktestDetails(detailsOpen)
+  const [robustness, setRobustness] = useState<FinanceRobustnessCatalog | null>(initialRobustness ?? null)
+  const [selectedEvaluation, setSelectedEvaluation] = useState<string | null>(
+    initialRobustness?.evaluations[0]?.evaluationId ?? null,
+  )
+  const [evaluation, setEvaluation] = useState<FinanceRobustnessEvaluation | null>(initialEvaluation ?? null)
+  const selectedRobustness =
+    robustness?.evaluations.find(x => x.evaluationId === selectedEvaluation) ?? robustness?.evaluations[0]
   const selectedChecksum = selectedRobustness?.checksum
   // Only evidence matching the selected immutable catalog identity may render,
   // including the render before the selection effect invalidates previous state.
-  const visibleEvaluation = evaluation?.evaluationId === selectedEvaluation &&
-    evaluation?.evaluationId === selectedRobustness?.evaluationId && evaluation?.checksum === selectedChecksum ? evaluation : null
-  const [datasets,setDatasets]=useState<FinanceDatasetCatalog|null>(null)
-  const [backups,setBackups]=useState<FinanceBackupInventory|null>(initialBackups??null)
-  const [shadow,setShadow]=useState<FinanceShadowCatalog|null>(initialShadow??null)
-  const [overview,setOverview]=useState<FinanceOverview|null>(initialOverview??null)
-  const [riskStatus,setRiskStatus]=useState<FinanceRiskStatus|null>(initialRiskStatus??null)
-  const [riskEvaluations,setRiskEvaluations]=useState<FinanceRiskEvaluation[]>(initialRiskEvaluations??[])
-  const [autonomousResearch,setAutonomousResearch]=useState<FinanceAutonomousResearch|null>(initialAutonomousResearch??null)
-  const [researchScheduler,setResearchScheduler]=useState<FinanceResearchSchedulerStatus|null>(initialResearchScheduler??null)
-  const [researchGovernor,setResearchGovernor]=useState<FinanceResearchResourceDecision|null>(initialResearchGovernor??null)
-  const [researchOperations,setResearchOperations]=useState<FinanceResearchOperationsStatus|null>(initialResearchOperations??null)
+  const visibleEvaluation =
+    evaluation?.evaluationId === selectedEvaluation &&
+    evaluation?.evaluationId === selectedRobustness?.evaluationId &&
+    evaluation?.checksum === selectedChecksum
+      ? evaluation
+      : null
+  const [datasets, setDatasets] = useState<FinanceDatasetCatalog | null>(null)
+  const [backups, setBackups] = useState<FinanceBackupInventory | null>(initialBackups ?? null)
+  const [shadow, setShadow] = useState<FinanceShadowCatalog | null>(initialShadow ?? null)
+  const [overview, setOverview] = useState<FinanceOverview | null>(initialOverview ?? null)
+  const [riskStatus, setRiskStatus] = useState<FinanceRiskStatus | null>(initialRiskStatus ?? null)
+  const [riskEvaluations, setRiskEvaluations] = useState<FinanceRiskEvaluation[]>(initialRiskEvaluations ?? [])
+  const [autonomousResearch, setAutonomousResearch] = useState<FinanceAutonomousResearch | null>(
+    initialAutonomousResearch ?? null,
+  )
+  const [researchScheduler, setResearchScheduler] = useState<FinanceResearchSchedulerStatus | null>(
+    initialResearchScheduler ?? null,
+  )
+  const [researchGovernor, setResearchGovernor] = useState<FinanceResearchResourceDecision | null>(
+    initialResearchGovernor ?? null,
+  )
+  const [researchOperations, setResearchOperations] = useState<FinanceResearchOperationsStatus | null>(
+    initialResearchOperations ?? null,
+  )
   useEffect(() => {
     if (!detailsOpen || !selected || (initialFeatures && selected === initialFeatures.instrumentId)) return
     const controller = new AbortController()
-    getFinanceFeatures(selected, controller.signal).then(setFeatures).catch(error => { if (error instanceof Error && error.name !== 'AbortError') setFeatures(null) })
+    getFinanceFeatures(selected, controller.signal)
+      .then(setFeatures)
+      .catch(error => {
+        if (error instanceof Error && error.name !== 'AbortError') setFeatures(null)
+      })
     return () => controller.abort()
   }, [detailsOpen, selected, initialFeatures])
-  useEffect(()=>{if(initialRobustness||!detailsOpen)return;const controller=new AbortController();getFinanceRobustness(controller.signal).then(value=>{setRobustness(value);setSelectedEvaluation(value.evaluations[0]?.evaluationId??null)}).catch(()=>setRobustness(null));return()=>controller.abort()},[initialRobustness,detailsOpen])
+  useEffect(() => {
+    if (initialRobustness || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceRobustness(controller.signal)
+      .then(value => {
+        setRobustness(value)
+        setSelectedEvaluation(value.evaluations[0]?.evaluationId ?? null)
+      })
+      .catch(() => setRobustness(null))
+    return () => controller.abort()
+  }, [initialRobustness, detailsOpen])
   useEffect(() => {
     setEvaluation(null)
     if (!selectedEvaluation || !selectedChecksum) return
@@ -85,65 +245,1251 @@ export function FinanceObservation({ initialSnapshot, initialFeatures, initialRo
     }
     const controller = new AbortController()
     let current = true
-    getFinanceRobustnessEvaluation(selectedEvaluation, controller.signal).then(value => {
-      if (!current) return
-      setEvaluation(value.evaluationId === selectedEvaluation && value.checksum === selectedChecksum ? value : null)
-    }).catch(() => {
-      if (current) setEvaluation(null)
-    })
-    return () => { current = false; controller.abort() }
+    getFinanceRobustnessEvaluation(selectedEvaluation, controller.signal)
+      .then(value => {
+        if (!current) return
+        setEvaluation(value.evaluationId === selectedEvaluation && value.checksum === selectedChecksum ? value : null)
+      })
+      .catch(() => {
+        if (current) setEvaluation(null)
+      })
+    return () => {
+      current = false
+      controller.abort()
+    }
   }, [selectedEvaluation, selectedChecksum, initialEvaluation])
-  useEffect(()=>{if(!detailsOpen)return;const controller=new AbortController();getFinanceDatasets(controller.signal).then(setDatasets).catch(()=>setDatasets(null));return()=>controller.abort()},[detailsOpen])
-  useEffect(()=>{if(initialBackups||!detailsOpen)return;const controller=new AbortController();getFinanceBackups(controller.signal).then(setBackups).catch(()=>setBackups(null));return()=>controller.abort()},[initialBackups,detailsOpen])
-  useEffect(()=>{if(initialShadow||!detailsOpen)return;const controller=new AbortController();getFinanceShadow(controller.signal).then(setShadow).catch(()=>setShadow(null));return()=>controller.abort()},[initialShadow,detailsOpen])
-  useEffect(()=>{if(initialOverview||!observationAvailable)return;const controller=new AbortController();getFinanceOverview(controller.signal).then(setOverview).catch(()=>setOverview(null));return()=>controller.abort()},[initialOverview,observationAvailable])
-  useEffect(()=>{if(initialRiskStatus||!observationAvailable)return;const controller=new AbortController();Promise.all([getFinanceRiskStatus(controller.signal),getFinanceRiskEvaluations(controller.signal)]).then(([status,evaluations])=>{setRiskStatus(status);setRiskEvaluations(evaluations)}).catch(()=>{setRiskStatus(null);setRiskEvaluations([])});return()=>controller.abort()},[initialRiskStatus,observationAvailable])
-  useEffect(()=>{if(initialAutonomousResearch||!observationAvailable)return;const controller=new AbortController();getFinanceAutonomousResearch(controller.signal).then(setAutonomousResearch).catch(()=>setAutonomousResearch(null));return()=>controller.abort()},[initialAutonomousResearch,observationAvailable])
-  useEffect(()=>{if(initialResearchScheduler||!detailsOpen)return;const controller=new AbortController();getFinanceResearchSchedulerStatus(controller.signal).then(setResearchScheduler).catch(()=>setResearchScheduler(null));return()=>controller.abort()},[initialResearchScheduler,detailsOpen])
-  useEffect(()=>{if(initialResearchGovernor||!detailsOpen)return;const controller=new AbortController();getFinanceResearchGovernorStatus(controller.signal).then(setResearchGovernor).catch(()=>setResearchGovernor(null));return()=>controller.abort()},[initialResearchGovernor,detailsOpen])
-  useEffect(()=>{if(initialResearchOperations||!detailsOpen)return;const controller=new AbortController();getFinanceResearchOperationsStatus(controller.signal).then(setResearchOperations).catch(()=>setResearchOperations(null));return()=>controller.abort()},[initialResearchOperations,detailsOpen])
-  if (failed&&!snapshot) return <section className="finance-view"><div className="notice notice--error" role="alert"><strong>Finance är otillgängligt</strong><p>Read-only-status kunde inte hämtas. Ingen handel eller datainhämtning har startats.</p><BBButton busy={refreshing} onClick={()=>void refresh()} type="button">Försök igen</BBButton></div></section>
-  if (!snapshot) return <section className="finance-view finance-initial-loading" aria-busy="true"><BBLoadingIndicator label="Hämtar Finance-status" /></section>
+  useEffect(() => {
+    if (!detailsOpen) return
+    const controller = new AbortController()
+    getFinanceDatasets(controller.signal)
+      .then(setDatasets)
+      .catch(() => setDatasets(null))
+    return () => controller.abort()
+  }, [detailsOpen])
+  useEffect(() => {
+    if (initialBackups || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceBackups(controller.signal)
+      .then(setBackups)
+      .catch(() => setBackups(null))
+    return () => controller.abort()
+  }, [initialBackups, detailsOpen])
+  useEffect(() => {
+    if (initialShadow || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceShadow(controller.signal)
+      .then(setShadow)
+      .catch(() => setShadow(null))
+    return () => controller.abort()
+  }, [initialShadow, detailsOpen])
+  useEffect(() => {
+    if (initialOverview || !observationAvailable) return
+    const controller = new AbortController()
+    getFinanceOverview(controller.signal)
+      .then(setOverview)
+      .catch(() => setOverview(null))
+    return () => controller.abort()
+  }, [initialOverview, observationAvailable])
+  useEffect(() => {
+    if (initialRiskStatus || !observationAvailable) return
+    const controller = new AbortController()
+    Promise.all([getFinanceRiskStatus(controller.signal), getFinanceRiskEvaluations(controller.signal)])
+      .then(([status, evaluations]) => {
+        setRiskStatus(status)
+        setRiskEvaluations(evaluations)
+      })
+      .catch(() => {
+        setRiskStatus(null)
+        setRiskEvaluations([])
+      })
+    return () => controller.abort()
+  }, [initialRiskStatus, observationAvailable])
+  useEffect(() => {
+    if (initialAutonomousResearch || !observationAvailable) return
+    const controller = new AbortController()
+    getFinanceAutonomousResearch(controller.signal)
+      .then(setAutonomousResearch)
+      .catch(() => setAutonomousResearch(null))
+    return () => controller.abort()
+  }, [initialAutonomousResearch, observationAvailable])
+  useEffect(() => {
+    if (initialResearchScheduler || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceResearchSchedulerStatus(controller.signal)
+      .then(setResearchScheduler)
+      .catch(() => setResearchScheduler(null))
+    return () => controller.abort()
+  }, [initialResearchScheduler, detailsOpen])
+  useEffect(() => {
+    if (initialResearchGovernor || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceResearchGovernorStatus(controller.signal)
+      .then(setResearchGovernor)
+      .catch(() => setResearchGovernor(null))
+    return () => controller.abort()
+  }, [initialResearchGovernor, detailsOpen])
+  useEffect(() => {
+    if (initialResearchOperations || !detailsOpen) return
+    const controller = new AbortController()
+    getFinanceResearchOperationsStatus(controller.signal)
+      .then(setResearchOperations)
+      .catch(() => setResearchOperations(null))
+    return () => controller.abort()
+  }, [initialResearchOperations, detailsOpen])
+  if (failed && !snapshot)
+    return (
+      <section className="finance-view">
+        <div className="notice notice--error" role="alert">
+          <strong>Finance är otillgängligt</strong>
+          <p>Read-only-status kunde inte hämtas. Ingen handel eller datainhämtning har startats.</p>
+          <BBButton busy={refreshing} onClick={() => void refresh()} type="button">
+            Försök igen
+          </BBButton>
+        </div>
+      </section>
+    )
+  if (!snapshot)
+    return (
+      <section className="finance-view finance-initial-loading" aria-busy="true">
+        <BBLoadingIndicator label="Hämtar Finance-status" />
+      </section>
+    )
   const selectedInstrument = snapshot.watchlist.find(item => item.instrumentId === selected) ?? null
   const memory = snapshot.historicalMemory
-  return <section className="finance-view" aria-labelledby="finance-title">
-    {stale&&<div className="notice notice--warning finance-stale-notice" role="status"><span className="finance-stale-notice__message"><span className="finance-stale-notice__freshness"><strong>Visar senast hämtade data</strong>{lastFetchedAt&&<time dateTime={lastFetchedAt}>{new Date(lastFetchedAt).toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'})}</time>}</span>{failed?<small>Uppdatering misslyckades</small>:<BBLoadingIndicator compact label="Uppdaterar Finance i bakgrunden" />}</span>{failed&&<BBButton busy={refreshing} onClick={()=>void refresh()} type="button">Försök igen</BBButton>}</div>}
-    <header className="finance-hero"><div><p className="finance-eyebrow">Marknadsobservation</p><h2 id="finance-title">Finance <span className="finance-research-badge">{label(snapshot.safety.mode).toUpperCase()}</span></h2><p className="finance-safety-copy">Ingen handel med riktiga pengar</p></div><dl className="finance-status-strip"><div><dt>Systemläge</dt><dd>{label(snapshot.safety.mode).toUpperCase()}</dd></div><div><dt>Provider</dt><dd>{label(snapshot.provider.state)}</dd></div><div><dt>Entitlement</dt><dd>{label(snapshot.provider.entitlement)}</dd></div><div><dt>Senast uppdaterad</dt><dd>{formatTime(snapshot.latestMarketDataUpdateUtc)}</dd></div></dl></header>
-    {snapshot.dataKind === 'syntheticFixture' && <p className="finance-synthetic-banner" role="status">SYNTHETISK FIXTURE – inte realt eller live market data</p>}
-    {snapshot.dataKind === 'real' && <p className="finance-real-banner" role="status">REAL EOD-MARKET DATA – senaste avslutade session, inte live</p>}
-    <div className="finance-overview">
-      <section className="finance-panel finance-panel--wide finance-overview-card" aria-labelledby="market-today-title"><header><div><p className="finance-eyebrow">Marknaden idag</p><h3 id="market-today-title">Bevakade marknaden</h3></div><span>{overview?.freshness??'CURRENT EOD'}</span></header>{!overview?<p className="muted">Marknadsöversikten är tillfälligt otillgänglig. Teknisk evidens finns nedan.</p>:<><p className="finance-overview-summary">{overview.marketSummary}</p><dl className="finance-status-strip"><div><dt>Senaste session</dt><dd>{overview.latestSession??'Ingen'}</dd></div><div><dt>Upp / ned / oförändrat</dt><dd>{overview.up} / {overview.down} / {overview.unchanged}</dd></div><div><dt>Dataklass</dt><dd>{overview.observationClass}</dd></div></dl></>}</section>
-      <section className="finance-panel finance-panel--wide finance-overview-card" aria-labelledby="bigbrain-now-title"><header><div><p className="finance-eyebrow">BigBrain just nu</p><h3 id="bigbrain-now-title">Aktuella researchsignaler</h3></div><span>INTE REKOMMENDATIONER</span></header>{!overview?.signals.length?<p className="muted">Inga giltiga aktuella strategisignaler.</p>:<div className="finance-signal-list">{overview.signals.map(signal=><article className={`finance-signal finance-signal--${signal.state.toLowerCase()}`} key={signal.instrumentId}><div><strong>{signal.symbol}</strong><small>{signal.name}</small></div><div><span aria-label={`Researchsignal ${signal.state}`}>{signal.state==='POSITIVE'?'▲ POSITIV':signal.state==='NEGATIVE'?'▼ NEGATIV':signal.state==='NEUTRAL'?'● NEUTRAL':'○ OTILLRÄCKLIG DATA'}</span><small>{aggregateSignalRisk(signal.predictionIds,riskEvaluations)}</small><small>{signal.sessionChangePercent===null?'Ingen sessionsrörelse':`${signal.sessionChangePercent>=0?'+':''}${signal.sessionChangePercent.toFixed(2)} % senaste sessionen`}</small><small>{signal.agreement}</small></div></article>)}</div>}</section>
-      <section className="finance-panel finance-panel--wide finance-overview-card" aria-labelledby="prospective-result-title"><header><div><p className="finance-eyebrow">Prospektivt resultat</p><h3 id="prospective-result-title">Shadow research</h3></div><span>{overview?.prospective.evidenceMaturity??'BOOTSTRAPPING'}</span></header>{!overview?<p className="muted">Prospektiv scorecard är tillfälligt otillgänglig.</p>:<><dl className="finance-details"><div><dt>Giltiga beslut</dt><dd>{overview.prospective.valid}</dd></div><div><dt>Väntar på utfall</dt><dd>{overview.prospective.pending}</dd></div><div><dt>Utvärderade</dt><dd>{overview.prospective.evaluated}</dd></div><div><dt>Rätt / fel</dt><dd>{overview.prospective.correct} / {overview.prospective.incorrect}</dd></div><div><dt>Träffsäkerhet</dt><dd>{overview.prospective.directionalAccuracy===null?'Otillräckligt underlag':`${(overview.prospective.directionalAccuracy*100).toFixed(1)} %`}</dd></div></dl>{overview.prospective.curve.length<2?<p className="finance-insufficient">Ingen resultatgraf ännu – utvärderad prospektiv evidens är fortfarande otillräcklig.</p>:<ProspectiveCurve points={overview.prospective.curve}/>}<p className="finance-safety-copy">Forskningsresultat – inga pengar handlas</p><small>{overview.evidenceSeparation}</small></>}</section>
-      <section className="finance-panel finance-panel--wide finance-overview-card" aria-labelledby="risk-summary-title"><header><div><p className="finance-eyebrow">Riskkontroll</p><h3 id="risk-summary-title">{riskStatus?.activeHalt?'Ny hypotetisk exponering blockerad':'Hard Risk Engine'}</h3></div><span>{riskStatus?.policyVersion??'EJ TILLGÄNGLIG'}</span></header><p className="finance-overview-summary">{!riskStatus?'Riskstatus kunde inte läsas. Inget riskgodkännande antas.':riskStatus.activeHalt?'En beständig riskspärr är aktiv.':'Server-side researchpolicy är laddad. Godkänd betyder endast att hypotetisk research passerar policyn.'}</p>{riskStatus?.haltReason&&<small>Orsak: {riskStatus.haltReason}</small>}</section>
-      <section className="finance-panel finance-panel--wide finance-overview-card" aria-labelledby="autonomous-research-title"><header><div><p className="finance-eyebrow">Autonom forskning</p><h3 id="autonomous-research-title">Autonomous Research</h3></div><span>{autonomousResearch?.status??'EJ KÖRD'}</span></header>{!autonomousResearch?<p className="muted">Forskningsstatus kunde inte läsas.</p>:<><dl className="finance-details"><div><dt>Senaste körning</dt><dd>{autonomousResearch.latestRun?.experimentCount??0} experiment</dd></div><div><dt>Totalt</dt><dd>{autonomousResearch.totalExperiments}</dd></div><div><dt>Förkastade</dt><dd>{autonomousResearch.rejectedCount}</dd></div><div><dt>Otillräckliga / ej utvärderbara</dt><dd>{autonomousResearch.inconclusiveCount} / {autonomousResearch.notEvaluableCount}</dd></div><div><dt>Challengers</dt><dd>{autonomousResearch.challengerCount}</dd></div><div><dt>Integrity</dt><dd>{autonomousResearch.latestRun?.experiments[0]?.integrity.state??'NOT_EVALUABLE'}</dd></div></dl><p className="finance-safety-copy">Research-only · 0 SEK · ingen execution authority</p></>}</section>
-    </div>
-    <details className="finance-research-details" onToggle={event=>setDetailsOpen(event.currentTarget.open)}><summary>Detaljer &amp; forskning</summary>
-    <div className="finance-layout">
-      <section className="finance-panel finance-panel--wide" aria-labelledby="autonomous-details-title"><header><div><h3 id="autonomous-details-title">Autonomous Research</h3><p>Alla försök behålls; challengers är forskningskandidater, inte strategibyten eller rekommendationer.</p></div><span>READ-ONLY RESEARCH</span></header>{researchScheduler&&<dl className="finance-details"><div><dt>Driftstatus</dt><dd>{researchOperations?.requiresAttention?'BEHÖVER UPPMÄRKSAMHET':researchOperations?.state==='maintenance'?'UNDERHÅLLSPAUS':researchOperations?.state==='disabled'?'AVSTÄNGD':'KÖR NORMALT'}</dd></div><div><dt>Operativa fel i följd</dt><dd>{researchOperations?.consecutiveOperationalFailures??0}</dd></div><div><dt>Senaste forskning</dt><dd>{formatTime(researchOperations?.lastSuccessfulResearchUtc??null)}</dd></div><div><dt>Schemaläggning</dt><dd>{researchScheduler.enabled?'AKTIV':'AVSTÄNGD'}</dd></div><div><dt>Resurser</dt><dd>{researchGovernor?.decision==='allow'?'REDO FÖR FORSKNING':researchGovernor?.decision==='block'?'BLOCKERAD — KRITISKT RESURSLÄGE':researchGovernor?.decision==='defer'?'PAUSAD — SYSTEMBELASTNING':'STATUS SAKNAS'}</dd></div><div><dt>Resursorsak</dt><dd>{researchGovernor?.reasonCodes.join(', ')??'Mätvärden kunde inte läsas'}</dd></div><div><dt>Nästa tillfälle</dt><dd>{formatTime(researchScheduler.nextDueUtc)}</dd></div><div><dt>Senaste tillfälle</dt><dd>{researchScheduler.lastOpportunity?.state??'EJ KÖRT'}</dd></div><div><dt>Orsak</dt><dd>{researchScheduler.lastReason??'Ingen'}</dd></div><div><dt>Auktoritet</dt><dd>{researchScheduler.operatingMode} · {researchScheduler.budgetSek} SEK · {researchScheduler.executionAuthority}</dd></div></dl>}{!autonomousResearch?.latestRun?<p className="finance-insufficient">ZERO EXPERIMENTS — körning kräver en explicit, begränsad server-trigger eller aktiverad scheduler.</p>:<><dl className="finance-details"><div><dt>Körning</dt><dd>{autonomousResearch.latestRun.runId}</dd></div><div><dt>Tillstånd</dt><dd>{autonomousResearch.latestRun.state} · {autonomousResearch.latestRun.recoveryStatus}</dd></div>{autonomousResearch.latestRun.failureReason&&<div><dt>Avbrott/fel</dt><dd>{autonomousResearch.latestRun.failureReason}</dd></div>}</dl><div className="finance-feature-grid">{autonomousResearch.latestRun.experiments.map(experiment=><article className="finance-feature" key={experiment.experimentId}><strong>{experiment.familyId} · {experiment.verdict.toUpperCase()}</strong><span>INTEGRITY {experiment.integrity.state.toUpperCase()}</span><small>{experiment.attemptCount??'Legacy okänt'} försök · familj kumulativt {experiment.familyAttemptCount} · complexity {experiment.complexity.score} · OOS {experiment.outOfSampleNetReturn===null?'NOT EVALUABLE':`${(experiment.outOfSampleNetReturn*100).toFixed(2)} %`}</small><small>Costs {experiment.costModel} · cutoff {formatTime(experiment.knowledgeCutoffUtc)}</small><details><summary>Integrity &amp; lineage</summary><dl className="finance-details">{experiment.integrity.checks.map(check=><div key={check.id}><dt>{check.id}</dt><dd>{check.state.toUpperCase()} · {check.evidence}</dd></div>)}<div><dt>Körningar</dt><dd>{experiment.runIds?.join(', ')??experiment.runId??'Legacy okänd'}</dd></div><div><dt>Revisioner</dt><dd>{experiment.marketRevisionIds.length} market / {experiment.featureRevisionId}</dd></div><div><dt>Rejection</dt><dd>{experiment.rejectionReason??'Ingen — mer evidens krävs ändå'}</dd></div></dl></details></article>)}</div></>}</section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="risk-details-title"><header><div><h3 id="risk-details-title">Hard Risk Engine</h3><p>Immutable server-side riskbevis, separat från strategisignalen.</p></div><span>READ-ONLY RESEARCH</span></header>{!riskStatus?<p className="finance-insufficient">Riskstatus saknas — fail closed.</p>:<><dl className="finance-details"><div><dt>Policy</dt><dd>{riskStatus.policyVersion}</dd></div><div><dt>Säkerhetsläge</dt><dd>{riskStatus.safetyState}</dd></div><div><dt>Evalueringar</dt><dd>{riskStatus.evaluationCount}</dd></div><div><dt>Execution authority</dt><dd>{riskStatus.executionAuthority}</dd></div></dl><div className="finance-feature-grid">{riskEvaluations.slice(0,8).map(r=><article className="finance-feature" key={r.evaluationId}><strong>{r.instrumentId} · {r.strategyId}/{r.strategyVersion}</strong><span>{r.direction} + RISK {r.verdict.toUpperCase()}</span><small>{r.reasonCodes.length?r.reasonCodes.join(', '):'Alla obligatoriska v1-regler passerade'}</small><small>{r.policyVersion} · {r.evaluationId}</small></article>)}</div></>}</section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="datasets-title"><header><div><h3 id="datasets-title">Datakällor / Dataset</h3><p>Current EOD och historiska arkiv hålls som separata källor; karantän är inte researchdata.</p></div><span>READ-ONLY</span></header><div className="finance-feature-grid"><article className="finance-feature"><strong>EODHD Free</strong><span>REAL CURRENT EOD</span><small>{memory.coverageFrom && memory.coverageTo ? `${memory.coverageFrom} – ${memory.coverageTo}` : 'Ingen data'} · source-specific retention</small></article>{datasets?.datasets.map(dataset=><article className="finance-feature" key={dataset.candidateId}><strong>{dataset.source}</strong><span>{dataset.status==='Promoted'?'HISTORICAL ARCHIVE DATA':dataset.status==='Rejected'?'QUARANTINED / REJECTED':'QUARANTINED / NOT APPROVED'}</span><small>{dataset.licenseClass} · provenance {dataset.provenanceResult} · {dataset.coverageFrom??'okänd'} – {dataset.coverageTo??'okänd'} · {dataset.observationCount} rader</small><small>{dataset.survivorshipBias} · {dataset.validationResult} · {dataset.canonicalRevisionId??'ingen canonical revision'}</small></article>)}</div></section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="protection-title"><header><div><h3 id="protection-title">Dataskydd / Historiskt minne</h3><p>Provider-tagged backupstatus och karantänhälsa; inga administrationskontroller.</p></div><span>READ-ONLY</span></header>{!backups?<p className="muted">Ingen backupinventering tillgänglig.</p>:<div className="finance-feature-grid"><article className="finance-feature"><strong>Senaste verifierbara backup</strong><span>{backups.backups[0]?.status==='Complete'?'BACKED UP':'INGEN KOMPLETT BACKUP'}</span><small>{backups.backups[0]?.backupId??'Ingen'} · {backups.backups[0]?.revisions.length??0} market-revisioner</small></article>{backups.sourcePolicies.map(source=><article className="finance-feature" key={`${source.provider}-${source.product}`}><strong>{source.provider} / {source.product}</strong><span>{source.backupEligibility}</span><small>{source.rightsClass} · {source.retentionClass} · {source.deletionRequirement}</small></article>)}<article className="finance-feature"><strong>Karantän</strong><span>SEPARAT FRÅN CANONICAL</span><small>{datasets?.datasets.filter(x=>x.status!=='Promoted').length??0} icke-promotade · {datasets?.datasets.filter(x=>x.cleanupState==='PayloadDeleted').length??0} payloads städade med manifest kvar</small></article></div>}</section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="shadow-title"><header><div><h3 id="shadow-title">Shadow research</h3><p>Prospektiv evidens: vad Finance förutsade innan senare utfall blev kända. Den placerar inga order.</p></div><span>READ-ONLY RESEARCH</span></header>{!shadow?<p className="muted">Shadow-journalen har ännu ingen läsbar evidens.</p>:<><dl className="finance-details"><div><dt>Observation</dt><dd>{shadow.observationClass}</dd></div><div><dt>Sample / mognad</dt><dd>{shadow.total} / {shadow.evidenceMaturity}</dd></div><div><dt>Pending / evaluated</dt><dd>{shadow.pending} / {shadow.evaluated}</dd></div><div><dt>Insufficient / missed</dt><dd>{shadow.insufficient} / {shadow.missed}</dd></div></dl>{shadow.total<20&&<p className="finance-insufficient">BOOTSTRAPPING – samplet bevisar pipelineintegritet, inte strategikvalitet.</p>}<div className="finance-feature-grid">{shadow.predictions.slice(0,8).map(p=><article className="finance-feature" key={p.predictionId}><strong>{p.symbol} · {p.strategyId}/{p.strategyVersion}</strong><span>{p.signal} · {p.state==='pending'?'PENDING':p.state.toUpperCase()}</span><small>{p.sessionDate} · cutoff {formatTime(p.knowledgeCutoffUtc)}</small><small>{p.horizon} · {p.sourceRevisionId}</small></article>)}</div></>}</section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="watchlist-title"><header><div><h3 id="watchlist-title">Research-watchlist</h3><p>Konfigurerade instrument innebär inte auktoriserad ingestion.</p></div><span>{snapshot.watchlist.filter(item => item.price !== null).length} observationer</span></header><div className="finance-watchlist">{snapshot.watchlist.map(item => <button aria-pressed={selected === item.instrumentId} className="finance-instrument" key={item.instrumentId} onClick={() => setSelected(item.instrumentId)} type="button"><span><strong>{item.symbol}</strong><small>{item.displayName}</small><small>{item.instrumentId}</small></span><span className="finance-instrument__value"><strong>{item.price === null ? 'Ingen observation' : `${item.price.toFixed(2)} ${item.currency}`}</strong>{item.dailyChangePercent !== null && <small>{item.dailyChangePercent >= 0 ? '+' : ''}{item.dailyChangePercent.toFixed(2)} %</small>}<small>{label(item.freshness)} · {label(item.session)}</small>{item.dataKind === 'syntheticFixture' && <mark>Syntetisk</mark>}{['warning','gap','error'].includes(item.quality) && <mark className="finance-warning">Kvalitet: {label(item.quality)}</mark>}</span></button>)}</div></section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="chart-title"><header><div><h3 id="chart-title">Prishistorik</h3><p>Provider-neutral observationsserie</p></div></header><FinancePriceChart instrument={selectedInstrument} /></section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="features-title"><header><div><h3 id="features-title">Indikatorer / Features</h3><p>Mätvärden för research – inga köp- eller säljsignaler</p></div><span>{features?.featureSetId ?? 'core-daily-v1'}</span></header>
-        {!features?.revision ? <p className="muted">Ingen feature-revision tillgänglig ännu.</p> : <><dl className="finance-details"><div><dt>Feature-revision</dt><dd>{features.revision.revisionId}</dd></div><div><dt>Market-revisioner</dt><dd>{features.revision.sourceMarketRevisions.length}</dd></div><div><dt>Prisbas</dt><dd>{features.revision.priceBasis}</dd></div><div><dt>Kvalitet / warmup</dt><dd>{features.revision.qualityIssueCount} / {features.revision.warmupCount}</dd></div></dl><div className="finance-feature-grid">{visibleFeatures.map(id=>{const value=features.latest.find(item=>item.definitionId===id);return <article className="finance-feature" key={id}><strong>{value?.name ?? id}</strong><span>{value?.value === null || value?.value === undefined ? label(value?.state ?? 'unavailable') : value.value.toFixed(6)}</span><small>{value?.sessionDate ?? 'Ingen'} · {label(value?.quality ?? 'unknown')}</small></article>})}</div></>}
-      </section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="robustness-title"><header><div><h3 id="robustness-title">Robusthet / Out-of-sample</h3><p>Begränsad metod- och generaliseringsevidens – inte optimering eller handelsrekommendation</p></div><span>RESEARCH</span></header>
-        {!robustness?.evaluations.length?<p className="muted">Ingen immutable robusthetsevaluering är tillgänglig ännu.</p>:<><div className="finance-backtest-tabs">{robustness.evaluations.map(x=><button aria-pressed={selectedEvaluation===x.evaluationId} key={x.evaluationId} onClick={()=>setSelectedEvaluation(x.evaluationId)} type="button">{x.strategyId}<small>{x.verdict}</small></button>)}</div>{(()=>{const summary=selectedRobustness;if(!summary)return null;return <><p className={summary.verdict==='insufficientData'?'finance-insufficient':'finance-synthetic-banner'}>{summary.verdict==='insufficientData'?'DATA INSUFFICIENT':'BEGRÄNSAD ROBUSTHETSEVIDENS'}</p><dl className="finance-details"><div><dt>Verdict / score</dt><dd>{summary.verdict} / {summary.score.toFixed(2)} ({summary.evidenceLabel})</dd></div><div><dt>Plan</dt><dd>{summary.planId} / {summary.planVersion}</dd></div><div><dt>Train / test / embargo</dt><dd>{summary.trainSessions} / {summary.testSessions} / {summary.embargoSessions} sessions</dd></div><div><dt>Walk-forward</dt><dd>{summary.walkForwardWindows} fönster</dd></div><div><dt>Diagnostisk omfattning</dt><dd>{summary.parameterVariants} parametervarianter / {summary.costVariants} kostnadsnivåer</dd></div><div><dt>Lineage</dt><dd>{summary.marketRevisionIds.length} market-revisioner / {summary.featureRevisionId}</dd></div><div><dt>Evaluation / checksum</dt><dd>{summary.evaluationId} / {summary.checksum}</dd></div></dl><RobustnessDetails evaluation={visibleEvaluation}/><p className="finance-limitations">{summary.limitations.join(' ')}</p></>})()}</>}
-      </section>
-      <section className="finance-panel finance-panel--wide" aria-labelledby="backtests-title"><header><div><h3 id="backtests-title">Backtests / Strategiforskning</h3><p>Offline historisk simulering – ingen order, broker eller handel med riktiga pengar</p></div><span>RESEARCH</span></header>
-        {!backtests?.runs.length?<p className="muted">Inga immutable backtestresultat är tillgängliga ännu.</p>:<><div className="finance-backtest-tabs">{backtests.runs.map(run=><button aria-pressed={selectedRun===run.runId} key={run.runId} onClick={()=>setSelectedRun(run.runId)} type="button">{run.strategyId}<small>{run.costModel}</small></button>)}</div>{(()=>{const run=backtests.runs.find(x=>x.runId===selectedRun);if(!run)return null;return <><dl className="finance-details"><div><dt>Strategi / version</dt><dd>{run.strategyId} / {run.strategyVersion}</dd></div><div><dt>Period</dt><dd>{run.from} – {run.to}</dd></div><div><dt>Initial / final equity</dt><dd>{run.initialEquity.toFixed(2)} / {run.finalEquity.toFixed(2)} USD</dd></div><div><dt>Gross / net return</dt><dd>{(run.grossReturn*100).toFixed(2)} % / {(run.netReturn*100).toFixed(2)} %</dd></div><div><dt>Benchmark / excess</dt><dd>{run.benchmarkReturn===null?'Benchmark-run':`${(run.benchmarkReturn*100).toFixed(2)} % / ${((run.excessReturn??0)*100).toFixed(2)} %`}</dd></div><div><dt>Max drawdown / trades</dt><dd>{(run.maxDrawdown*100).toFixed(2)} % / {run.trades}</dd></div><div><dt>Kostnadseffekt</dt><dd>{(run.costImpact*100).toFixed(3)} %-enheter</dd></div><div><dt>Reproducerbarhet</dt><dd>{run.runId} / {run.checksum}</dd></div><div><dt>Lineage</dt><dd>{run.marketRevisionIds.length} market-revisioner / {run.featureRevisionId}</dd></div><div><dt>Modeller</dt><dd>{run.simulationModel} / {run.costModel} / {run.sizingPolicy}</dd></div></dl><div aria-busy={backtestLoading}>{backtestLoading?<BBLoadingIndicator compact label="Hämtar valt backtestresultat" />:backtestFailed?<div role="alert"><p>Valt backtestresultat kunde inte hämtas.</p><BBButton onClick={retryBacktest} type="button">Försök igen</BBButton></div>:<BacktestCurve result={backtestResult}/>}</div><p className="finance-limitations">{run.limitations.join(' ')}</p></>})()}</>}
-      </section>
-      <section className="finance-panel" aria-labelledby="memory-title"><header><div><h3 id="memory-title">Historiskt minne</h3><p>Immutable revisions- och kvalitetsöversikt</p></div></header><dl className="finance-details"><div><dt>Observationer</dt><dd>{memory.observationCount}</dd></div><div><dt>Aktiv revision</dt><dd>{memory.activeRevisionId ?? 'Ingen'}</dd></div><div><dt>Täckning</dt><dd>{memory.coverageFrom && memory.coverageTo ? `${memory.coverageFrom} – ${memory.coverageTo}` : 'Ingen'}</dd></div><div><dt>Senaste acquisition</dt><dd>{formatTime(memory.lastAcquiredAtUtc)}</dd></div><div><dt>Gap / korrigeringar</dt><dd>{memory.gapCount} / {memory.correctionCount}</dd></div><div><dt>Persistence</dt><dd>{label(memory.persistence)}</dd></div><div><dt>Policy / provenance</dt><dd>{memory.policy} / {memory.provenance}</dd></div></dl></section>
-      <section className="finance-panel finance-entitlement" aria-labelledby="entitlement-title"><header><div><h3 id="entitlement-title">Provider och entitlement</h3><p>{snapshot.provider.entitlementGate}</p></div></header><dl className="finance-details"><div><dt>Provider</dt><dd>{snapshot.provider.displayName}</dd></div><div><dt>Evidensklass</dt><dd>{label(snapshot.provider.evidenceClass ?? 'unknown')}</dd></div><div><dt>Ingestion tillåten</dt><dd>{snapshot.safety.ingestionAllowed ? 'JA' : 'NEJ'}</dd></div><div><dt>Lagring av real providerdata</dt><dd>{snapshot.safety.realProviderStorageAllowed ? 'JA' : 'NEJ'}</dd></div><div><dt>Orsak</dt><dd>{snapshot.provider.reason}</dd></div></dl></section>
-      {snapshot.retention && <section className="finance-panel" aria-labelledby="retention-title"><header><div><h3 id="retention-title">Retention</h3><p>EODHD-datas livscykel</p></div></header><dl className="finance-details"><div><dt>Status</dt><dd>{label(snapshot.retention.state)}</dd></div><div><dt>Raderingsfrist</dt><dd>{formatTime(snapshot.retention.deletionDeadlineUtc)}</dd></div><div><dt>Omfattning</dt><dd>{snapshot.retention.coveredObservationCount} observationer / {snapshot.retention.coveredRevisionCount} market-revisioner / {snapshot.retention.coveredPayloadCount} payloads / {snapshot.retention.coveredFeatureValueCount ?? 0} feature-värden / {snapshot.retention.coveredFeatureRevisionCount ?? 0} feature-revisioner / {snapshot.retention.coveredBacktestRunCount ?? 0} backtest-runs / {snapshot.retention.coveredRobustnessEvaluationCount ?? 0} robustness-evalueringar</dd></div>{snapshot.retention.lastReceiptId && <div><dt>Kvitto</dt><dd>{snapshot.retention.lastReceiptId}</dd></div>}</dl></section>}
-    </div></details>
-  </section>
+  return (
+    <section className="finance-view" aria-labelledby="finance-title">
+      {stale && (
+        <div className="notice notice--warning finance-stale-notice" role="status">
+          <span className="finance-stale-notice__message">
+            <span className="finance-stale-notice__freshness">
+              <strong>Visar senast hämtade data</strong>
+              {lastFetchedAt && (
+                <time dateTime={lastFetchedAt}>
+                  {new Date(lastFetchedAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}
+                </time>
+              )}
+            </span>
+            {failed ? (
+              <small>Uppdatering misslyckades</small>
+            ) : (
+              <BBLoadingIndicator compact label="Uppdaterar Finance i bakgrunden" />
+            )}
+          </span>
+          {failed && (
+            <BBButton busy={refreshing} onClick={() => void refresh()} type="button">
+              Försök igen
+            </BBButton>
+          )}
+        </div>
+      )}
+      <header className="finance-hero">
+        <div>
+          <p className="finance-eyebrow">Marknadsobservation</p>
+          <h2 id="finance-title">
+            Finance <span className="finance-research-badge">{label(snapshot.safety.mode).toUpperCase()}</span>
+          </h2>
+          <p className="finance-safety-copy">Ingen handel med riktiga pengar</p>
+        </div>
+        <dl className="finance-status-strip">
+          <div>
+            <dt>Systemläge</dt>
+            <dd>{label(snapshot.safety.mode).toUpperCase()}</dd>
+          </div>
+          <div>
+            <dt>Provider</dt>
+            <dd>{label(snapshot.provider.state)}</dd>
+          </div>
+          <div>
+            <dt>Entitlement</dt>
+            <dd>{label(snapshot.provider.entitlement)}</dd>
+          </div>
+          <div>
+            <dt>Senast uppdaterad</dt>
+            <dd>{formatTime(snapshot.latestMarketDataUpdateUtc)}</dd>
+          </div>
+        </dl>
+      </header>
+      {snapshot.dataKind === 'syntheticFixture' && (
+        <p className="finance-synthetic-banner" role="status">
+          SYNTHETISK FIXTURE – inte realt eller live market data
+        </p>
+      )}
+      {snapshot.dataKind === 'real' && (
+        <p className="finance-real-banner" role="status">
+          REAL EOD-MARKET DATA – senaste avslutade session, inte live
+        </p>
+      )}
+      <div className="finance-overview">
+        <section
+          className="finance-panel finance-panel--wide finance-overview-card"
+          aria-labelledby="market-today-title"
+        >
+          <header>
+            <div>
+              <p className="finance-eyebrow">Marknaden idag</p>
+              <h3 id="market-today-title">Bevakade marknaden</h3>
+            </div>
+            <span>{overview?.freshness ?? 'CURRENT EOD'}</span>
+          </header>
+          {!overview ? (
+            <p className="muted">Marknadsöversikten är tillfälligt otillgänglig. Teknisk evidens finns nedan.</p>
+          ) : (
+            <>
+              <p className="finance-overview-summary">{overview.marketSummary}</p>
+              <dl className="finance-status-strip">
+                <div>
+                  <dt>Senaste session</dt>
+                  <dd>{overview.latestSession ?? 'Ingen'}</dd>
+                </div>
+                <div>
+                  <dt>Upp / ned / oförändrat</dt>
+                  <dd>
+                    {overview.up} / {overview.down} / {overview.unchanged}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Dataklass</dt>
+                  <dd>{overview.observationClass}</dd>
+                </div>
+              </dl>
+            </>
+          )}
+        </section>
+        <section
+          className="finance-panel finance-panel--wide finance-overview-card"
+          aria-labelledby="bigbrain-now-title"
+        >
+          <header>
+            <div>
+              <p className="finance-eyebrow">BigBrain just nu</p>
+              <h3 id="bigbrain-now-title">Aktuella researchsignaler</h3>
+            </div>
+            <span>INTE REKOMMENDATIONER</span>
+          </header>
+          {!overview?.signals.length ? (
+            <p className="muted">Inga giltiga aktuella strategisignaler.</p>
+          ) : (
+            <div className="finance-signal-list">
+              {overview.signals.map(signal => (
+                <article
+                  className={`finance-signal finance-signal--${signal.state.toLowerCase()}`}
+                  key={signal.instrumentId}
+                >
+                  <div>
+                    <strong>{signal.symbol}</strong>
+                    <small>{signal.name}</small>
+                  </div>
+                  <div>
+                    <span aria-label={`Researchsignal ${signal.state}`}>
+                      {signal.state === 'POSITIVE'
+                        ? '▲ POSITIV'
+                        : signal.state === 'NEGATIVE'
+                          ? '▼ NEGATIV'
+                          : signal.state === 'NEUTRAL'
+                            ? '● NEUTRAL'
+                            : '○ OTILLRÄCKLIG DATA'}
+                    </span>
+                    <small>{aggregateSignalRisk(signal.predictionIds, riskEvaluations)}</small>
+                    <small>
+                      {signal.sessionChangePercent === null
+                        ? 'Ingen sessionsrörelse'
+                        : `${signal.sessionChangePercent >= 0 ? '+' : ''}${signal.sessionChangePercent.toFixed(2)} % senaste sessionen`}
+                    </small>
+                    <small>{signal.agreement}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+        <section
+          className="finance-panel finance-panel--wide finance-overview-card"
+          aria-labelledby="prospective-result-title"
+        >
+          <header>
+            <div>
+              <p className="finance-eyebrow">Prospektivt resultat</p>
+              <h3 id="prospective-result-title">Shadow research</h3>
+            </div>
+            <span>{overview?.prospective.evidenceMaturity ?? 'BOOTSTRAPPING'}</span>
+          </header>
+          {!overview ? (
+            <p className="muted">Prospektiv scorecard är tillfälligt otillgänglig.</p>
+          ) : (
+            <>
+              <dl className="finance-details">
+                <div>
+                  <dt>Giltiga beslut</dt>
+                  <dd>{overview.prospective.valid}</dd>
+                </div>
+                <div>
+                  <dt>Väntar på utfall</dt>
+                  <dd>{overview.prospective.pending}</dd>
+                </div>
+                <div>
+                  <dt>Utvärderade</dt>
+                  <dd>{overview.prospective.evaluated}</dd>
+                </div>
+                <div>
+                  <dt>Rätt / fel</dt>
+                  <dd>
+                    {overview.prospective.correct} / {overview.prospective.incorrect}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Träffsäkerhet</dt>
+                  <dd>
+                    {overview.prospective.directionalAccuracy === null
+                      ? 'Otillräckligt underlag'
+                      : `${(overview.prospective.directionalAccuracy * 100).toFixed(1)} %`}
+                  </dd>
+                </div>
+              </dl>
+              {overview.prospective.curve.length < 2 ? (
+                <p className="finance-insufficient">
+                  Ingen resultatgraf ännu – utvärderad prospektiv evidens är fortfarande otillräcklig.
+                </p>
+              ) : (
+                <ProspectiveCurve points={overview.prospective.curve} />
+              )}
+              <p className="finance-safety-copy">Forskningsresultat – inga pengar handlas</p>
+              <small>{overview.evidenceSeparation}</small>
+            </>
+          )}
+        </section>
+        <section
+          className="finance-panel finance-panel--wide finance-overview-card"
+          aria-labelledby="risk-summary-title"
+        >
+          <header>
+            <div>
+              <p className="finance-eyebrow">Riskkontroll</p>
+              <h3 id="risk-summary-title">
+                {riskStatus?.activeHalt ? 'Ny hypotetisk exponering blockerad' : 'Hard Risk Engine'}
+              </h3>
+            </div>
+            <span>{riskStatus?.policyVersion ?? 'EJ TILLGÄNGLIG'}</span>
+          </header>
+          <p className="finance-overview-summary">
+            {!riskStatus
+              ? 'Riskstatus kunde inte läsas. Inget riskgodkännande antas.'
+              : riskStatus.activeHalt
+                ? 'En beständig riskspärr är aktiv.'
+                : 'Server-side researchpolicy är laddad. Godkänd betyder endast att hypotetisk research passerar policyn.'}
+          </p>
+          {riskStatus?.haltReason && <small>Orsak: {riskStatus.haltReason}</small>}
+        </section>
+        <section
+          className="finance-panel finance-panel--wide finance-overview-card"
+          aria-labelledby="autonomous-research-title"
+        >
+          <header>
+            <div>
+              <p className="finance-eyebrow">Autonom forskning</p>
+              <h3 id="autonomous-research-title">Autonomous Research</h3>
+            </div>
+            <span>{autonomousResearch?.status ?? 'EJ KÖRD'}</span>
+          </header>
+          {!autonomousResearch ? (
+            <p className="muted">Forskningsstatus kunde inte läsas.</p>
+          ) : (
+            <>
+              <dl className="finance-details">
+                <div>
+                  <dt>Senaste körning</dt>
+                  <dd>{autonomousResearch.latestRun?.experimentCount ?? 0} experiment</dd>
+                </div>
+                <div>
+                  <dt>Totalt</dt>
+                  <dd>{autonomousResearch.totalExperiments}</dd>
+                </div>
+                <div>
+                  <dt>Förkastade</dt>
+                  <dd>{autonomousResearch.rejectedCount}</dd>
+                </div>
+                <div>
+                  <dt>Otillräckliga / ej utvärderbara</dt>
+                  <dd>
+                    {autonomousResearch.inconclusiveCount} / {autonomousResearch.notEvaluableCount}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Challengers</dt>
+                  <dd>{autonomousResearch.challengerCount}</dd>
+                </div>
+                <div>
+                  <dt>Integrity</dt>
+                  <dd>{autonomousResearch.latestRun?.experiments[0]?.integrity.state ?? 'NOT_EVALUABLE'}</dd>
+                </div>
+              </dl>
+              <p className="finance-safety-copy">Research-only · 0 SEK · ingen execution authority</p>
+            </>
+          )}
+        </section>
+      </div>
+      <details className="finance-research-details" onToggle={event => setDetailsOpen(event.currentTarget.open)}>
+        <summary>Detaljer &amp; forskning</summary>
+        <div className="finance-layout">
+          <section className="finance-panel finance-panel--wide" aria-labelledby="autonomous-details-title">
+            <header>
+              <div>
+                <h3 id="autonomous-details-title">Autonomous Research</h3>
+                <p>
+                  Alla försök behålls; challengers är forskningskandidater, inte strategibyten eller rekommendationer.
+                </p>
+              </div>
+              <span>READ-ONLY RESEARCH</span>
+            </header>
+            {researchScheduler && (
+              <dl className="finance-details">
+                <div>
+                  <dt>Driftstatus</dt>
+                  <dd>
+                    {researchOperations?.requiresAttention
+                      ? 'BEHÖVER UPPMÄRKSAMHET'
+                      : researchOperations?.state === 'maintenance'
+                        ? 'UNDERHÅLLSPAUS'
+                        : researchOperations?.state === 'disabled'
+                          ? 'AVSTÄNGD'
+                          : 'KÖR NORMALT'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Operativa fel i följd</dt>
+                  <dd>{researchOperations?.consecutiveOperationalFailures ?? 0}</dd>
+                </div>
+                <div>
+                  <dt>Senaste forskning</dt>
+                  <dd>{formatTime(researchOperations?.lastSuccessfulResearchUtc ?? null)}</dd>
+                </div>
+                <div>
+                  <dt>Schemaläggning</dt>
+                  <dd>{researchScheduler.enabled ? 'AKTIV' : 'AVSTÄNGD'}</dd>
+                </div>
+                <div>
+                  <dt>Resurser</dt>
+                  <dd>
+                    {researchGovernor?.decision === 'allow'
+                      ? 'REDO FÖR FORSKNING'
+                      : researchGovernor?.decision === 'block'
+                        ? 'BLOCKERAD — KRITISKT RESURSLÄGE'
+                        : researchGovernor?.decision === 'defer'
+                          ? 'PAUSAD — SYSTEMBELASTNING'
+                          : 'STATUS SAKNAS'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Resursorsak</dt>
+                  <dd>{researchGovernor?.reasonCodes.join(', ') ?? 'Mätvärden kunde inte läsas'}</dd>
+                </div>
+                <div>
+                  <dt>Nästa tillfälle</dt>
+                  <dd>{formatTime(researchScheduler.nextDueUtc)}</dd>
+                </div>
+                <div>
+                  <dt>Senaste tillfälle</dt>
+                  <dd>{researchScheduler.lastOpportunity?.state ?? 'EJ KÖRT'}</dd>
+                </div>
+                <div>
+                  <dt>Orsak</dt>
+                  <dd>{researchScheduler.lastReason ?? 'Ingen'}</dd>
+                </div>
+                <div>
+                  <dt>Auktoritet</dt>
+                  <dd>
+                    {researchScheduler.operatingMode} · {researchScheduler.budgetSek} SEK ·{' '}
+                    {researchScheduler.executionAuthority}
+                  </dd>
+                </div>
+              </dl>
+            )}
+            {!autonomousResearch?.latestRun ? (
+              <p className="finance-insufficient">
+                ZERO EXPERIMENTS — körning kräver en explicit, begränsad server-trigger eller aktiverad scheduler.
+              </p>
+            ) : (
+              <>
+                <dl className="finance-details">
+                  <div>
+                    <dt>Körning</dt>
+                    <dd>{autonomousResearch.latestRun.runId}</dd>
+                  </div>
+                  <div>
+                    <dt>Tillstånd</dt>
+                    <dd>
+                      {autonomousResearch.latestRun.state} · {autonomousResearch.latestRun.recoveryStatus}
+                    </dd>
+                  </div>
+                  {autonomousResearch.latestRun.failureReason && (
+                    <div>
+                      <dt>Avbrott/fel</dt>
+                      <dd>{autonomousResearch.latestRun.failureReason}</dd>
+                    </div>
+                  )}
+                </dl>
+                <div className="finance-feature-grid">
+                  {autonomousResearch.latestRun.experiments.map(experiment => (
+                    <article className="finance-feature" key={experiment.experimentId}>
+                      <strong>
+                        {experiment.familyId} · {experiment.verdict.toUpperCase()}
+                      </strong>
+                      <span>INTEGRITY {experiment.integrity.state.toUpperCase()}</span>
+                      <small>
+                        {experiment.attemptCount ?? 'Legacy okänt'} försök · familj kumulativt{' '}
+                        {experiment.familyAttemptCount} · complexity {experiment.complexity.score} · OOS{' '}
+                        {experiment.outOfSampleNetReturn === null
+                          ? 'NOT EVALUABLE'
+                          : `${(experiment.outOfSampleNetReturn * 100).toFixed(2)} %`}
+                      </small>
+                      <small>
+                        Costs {experiment.costModel} · cutoff {formatTime(experiment.knowledgeCutoffUtc)}
+                      </small>
+                      <details>
+                        <summary>Integrity &amp; lineage</summary>
+                        <dl className="finance-details">
+                          {experiment.integrity.checks.map(check => (
+                            <div key={check.id}>
+                              <dt>{check.id}</dt>
+                              <dd>
+                                {check.state.toUpperCase()} · {check.evidence}
+                              </dd>
+                            </div>
+                          ))}
+                          <div>
+                            <dt>Körningar</dt>
+                            <dd>{experiment.runIds?.join(', ') ?? experiment.runId ?? 'Legacy okänd'}</dd>
+                          </div>
+                          <div>
+                            <dt>Revisioner</dt>
+                            <dd>
+                              {experiment.marketRevisionIds.length} market / {experiment.featureRevisionId}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Rejection</dt>
+                            <dd>{experiment.rejectionReason ?? 'Ingen — mer evidens krävs ändå'}</dd>
+                          </div>
+                        </dl>
+                      </details>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="risk-details-title">
+            <header>
+              <div>
+                <h3 id="risk-details-title">Hard Risk Engine</h3>
+                <p>Immutable server-side riskbevis, separat från strategisignalen.</p>
+              </div>
+              <span>READ-ONLY RESEARCH</span>
+            </header>
+            {!riskStatus ? (
+              <p className="finance-insufficient">Riskstatus saknas — fail closed.</p>
+            ) : (
+              <>
+                <dl className="finance-details">
+                  <div>
+                    <dt>Policy</dt>
+                    <dd>{riskStatus.policyVersion}</dd>
+                  </div>
+                  <div>
+                    <dt>Säkerhetsläge</dt>
+                    <dd>{riskStatus.safetyState}</dd>
+                  </div>
+                  <div>
+                    <dt>Evalueringar</dt>
+                    <dd>{riskStatus.evaluationCount}</dd>
+                  </div>
+                  <div>
+                    <dt>Execution authority</dt>
+                    <dd>{riskStatus.executionAuthority}</dd>
+                  </div>
+                </dl>
+                <div className="finance-feature-grid">
+                  {riskEvaluations.slice(0, 8).map(r => (
+                    <article className="finance-feature" key={r.evaluationId}>
+                      <strong>
+                        {r.instrumentId} · {r.strategyId}/{r.strategyVersion}
+                      </strong>
+                      <span>
+                        {r.direction} + RISK {r.verdict.toUpperCase()}
+                      </span>
+                      <small>
+                        {r.reasonCodes.length ? r.reasonCodes.join(', ') : 'Alla obligatoriska v1-regler passerade'}
+                      </small>
+                      <small>
+                        {r.policyVersion} · {r.evaluationId}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="datasets-title">
+            <header>
+              <div>
+                <h3 id="datasets-title">Datakällor / Dataset</h3>
+                <p>Current EOD och historiska arkiv hålls som separata källor; karantän är inte researchdata.</p>
+              </div>
+              <span>READ-ONLY</span>
+            </header>
+            <div className="finance-feature-grid">
+              <article className="finance-feature">
+                <strong>EODHD Free</strong>
+                <span>REAL CURRENT EOD</span>
+                <small>
+                  {memory.coverageFrom && memory.coverageTo
+                    ? `${memory.coverageFrom} – ${memory.coverageTo}`
+                    : 'Ingen data'}{' '}
+                  · source-specific retention
+                </small>
+              </article>
+              {datasets?.datasets.map(dataset => (
+                <article className="finance-feature" key={dataset.candidateId}>
+                  <strong>{dataset.source}</strong>
+                  <span>
+                    {dataset.status === 'Promoted'
+                      ? 'HISTORICAL ARCHIVE DATA'
+                      : dataset.status === 'Rejected'
+                        ? 'QUARANTINED / REJECTED'
+                        : 'QUARANTINED / NOT APPROVED'}
+                  </span>
+                  <small>
+                    {dataset.licenseClass} · provenance {dataset.provenanceResult} · {dataset.coverageFrom ?? 'okänd'} –{' '}
+                    {dataset.coverageTo ?? 'okänd'} · {dataset.observationCount} rader
+                  </small>
+                  <small>
+                    {dataset.survivorshipBias} · {dataset.validationResult} ·{' '}
+                    {dataset.canonicalRevisionId ?? 'ingen canonical revision'}
+                  </small>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="protection-title">
+            <header>
+              <div>
+                <h3 id="protection-title">Dataskydd / Historiskt minne</h3>
+                <p>Provider-tagged backupstatus och karantänhälsa; inga administrationskontroller.</p>
+              </div>
+              <span>READ-ONLY</span>
+            </header>
+            {!backups ? (
+              <p className="muted">Ingen backupinventering tillgänglig.</p>
+            ) : (
+              <div className="finance-feature-grid">
+                <article className="finance-feature">
+                  <strong>Senaste verifierbara backup</strong>
+                  <span>{backups.backups[0]?.status === 'Complete' ? 'BACKED UP' : 'INGEN KOMPLETT BACKUP'}</span>
+                  <small>
+                    {backups.backups[0]?.backupId ?? 'Ingen'} · {backups.backups[0]?.revisions.length ?? 0}{' '}
+                    market-revisioner
+                  </small>
+                </article>
+                {backups.sourcePolicies.map(source => (
+                  <article className="finance-feature" key={`${source.provider}-${source.product}`}>
+                    <strong>
+                      {source.provider} / {source.product}
+                    </strong>
+                    <span>{source.backupEligibility}</span>
+                    <small>
+                      {source.rightsClass} · {source.retentionClass} · {source.deletionRequirement}
+                    </small>
+                  </article>
+                ))}
+                <article className="finance-feature">
+                  <strong>Karantän</strong>
+                  <span>SEPARAT FRÅN CANONICAL</span>
+                  <small>
+                    {datasets?.datasets.filter(x => x.status !== 'Promoted').length ?? 0} icke-promotade ·{' '}
+                    {datasets?.datasets.filter(x => x.cleanupState === 'PayloadDeleted').length ?? 0} payloads städade
+                    med manifest kvar
+                  </small>
+                </article>
+              </div>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="shadow-title">
+            <header>
+              <div>
+                <h3 id="shadow-title">Shadow research</h3>
+                <p>
+                  Prospektiv evidens: vad Finance förutsade innan senare utfall blev kända. Den placerar inga order.
+                </p>
+              </div>
+              <span>READ-ONLY RESEARCH</span>
+            </header>
+            {!shadow ? (
+              <p className="muted">Shadow-journalen har ännu ingen läsbar evidens.</p>
+            ) : (
+              <>
+                <dl className="finance-details">
+                  <div>
+                    <dt>Observation</dt>
+                    <dd>{shadow.observationClass}</dd>
+                  </div>
+                  <div>
+                    <dt>Sample / mognad</dt>
+                    <dd>
+                      {shadow.total} / {shadow.evidenceMaturity}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Pending / evaluated</dt>
+                    <dd>
+                      {shadow.pending} / {shadow.evaluated}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Insufficient / missed</dt>
+                    <dd>
+                      {shadow.insufficient} / {shadow.missed}
+                    </dd>
+                  </div>
+                </dl>
+                {shadow.total < 20 && (
+                  <p className="finance-insufficient">
+                    BOOTSTRAPPING – samplet bevisar pipelineintegritet, inte strategikvalitet.
+                  </p>
+                )}
+                <div className="finance-feature-grid">
+                  {shadow.predictions.slice(0, 8).map(p => (
+                    <article className="finance-feature" key={p.predictionId}>
+                      <strong>
+                        {p.symbol} · {p.strategyId}/{p.strategyVersion}
+                      </strong>
+                      <span>
+                        {p.signal} · {p.state === 'pending' ? 'PENDING' : p.state.toUpperCase()}
+                      </span>
+                      <small>
+                        {p.sessionDate} · cutoff {formatTime(p.knowledgeCutoffUtc)}
+                      </small>
+                      <small>
+                        {p.horizon} · {p.sourceRevisionId}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="watchlist-title">
+            <header>
+              <div>
+                <h3 id="watchlist-title">Research-watchlist</h3>
+                <p>Konfigurerade instrument innebär inte auktoriserad ingestion.</p>
+              </div>
+              <span>{snapshot.watchlist.filter(item => item.price !== null).length} observationer</span>
+            </header>
+            <div className="finance-watchlist">
+              {snapshot.watchlist.map(item => (
+                <button
+                  aria-pressed={selected === item.instrumentId}
+                  className="finance-instrument"
+                  key={item.instrumentId}
+                  onClick={() => setSelected(item.instrumentId)}
+                  type="button"
+                >
+                  <span>
+                    <strong>{item.symbol}</strong>
+                    <small>{item.displayName}</small>
+                    <small>{item.instrumentId}</small>
+                  </span>
+                  <span className="finance-instrument__value">
+                    <strong>
+                      {item.price === null ? 'Ingen observation' : `${item.price.toFixed(2)} ${item.currency}`}
+                    </strong>
+                    {item.dailyChangePercent !== null && (
+                      <small>
+                        {item.dailyChangePercent >= 0 ? '+' : ''}
+                        {item.dailyChangePercent.toFixed(2)} %
+                      </small>
+                    )}
+                    <small>
+                      {label(item.freshness)} · {label(item.session)}
+                    </small>
+                    {item.dataKind === 'syntheticFixture' && <mark>Syntetisk</mark>}
+                    {['warning', 'gap', 'error'].includes(item.quality) && (
+                      <mark className="finance-warning">Kvalitet: {label(item.quality)}</mark>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="chart-title">
+            <header>
+              <div>
+                <h3 id="chart-title">Prishistorik</h3>
+                <p>Provider-neutral observationsserie</p>
+              </div>
+            </header>
+            <FinancePriceChart instrument={selectedInstrument} />
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="features-title">
+            <header>
+              <div>
+                <h3 id="features-title">Indikatorer / Features</h3>
+                <p>Mätvärden för research – inga köp- eller säljsignaler</p>
+              </div>
+              <span>{features?.featureSetId ?? 'core-daily-v1'}</span>
+            </header>
+            {!features?.revision ? (
+              <p className="muted">Ingen feature-revision tillgänglig ännu.</p>
+            ) : (
+              <>
+                <dl className="finance-details">
+                  <div>
+                    <dt>Feature-revision</dt>
+                    <dd>{features.revision.revisionId}</dd>
+                  </div>
+                  <div>
+                    <dt>Market-revisioner</dt>
+                    <dd>{features.revision.sourceMarketRevisions.length}</dd>
+                  </div>
+                  <div>
+                    <dt>Prisbas</dt>
+                    <dd>{features.revision.priceBasis}</dd>
+                  </div>
+                  <div>
+                    <dt>Kvalitet / warmup</dt>
+                    <dd>
+                      {features.revision.qualityIssueCount} / {features.revision.warmupCount}
+                    </dd>
+                  </div>
+                </dl>
+                <div className="finance-feature-grid">
+                  {visibleFeatures.map(id => {
+                    const value = features.latest.find(item => item.definitionId === id)
+                    return (
+                      <article className="finance-feature" key={id}>
+                        <strong>{value?.name ?? id}</strong>
+                        <span>
+                          {value?.value === null || value?.value === undefined
+                            ? label(value?.state ?? 'unavailable')
+                            : value.value.toFixed(6)}
+                        </span>
+                        <small>
+                          {value?.sessionDate ?? 'Ingen'} · {label(value?.quality ?? 'unknown')}
+                        </small>
+                      </article>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="robustness-title">
+            <header>
+              <div>
+                <h3 id="robustness-title">Robusthet / Out-of-sample</h3>
+                <p>Begränsad metod- och generaliseringsevidens – inte optimering eller handelsrekommendation</p>
+              </div>
+              <span>RESEARCH</span>
+            </header>
+            {!robustness?.evaluations.length ? (
+              <p className="muted">Ingen immutable robusthetsevaluering är tillgänglig ännu.</p>
+            ) : (
+              <>
+                <div className="finance-backtest-tabs">
+                  {robustness.evaluations.map(x => (
+                    <button
+                      aria-pressed={selectedEvaluation === x.evaluationId}
+                      key={x.evaluationId}
+                      onClick={() => setSelectedEvaluation(x.evaluationId)}
+                      type="button"
+                    >
+                      {x.strategyId}
+                      <small>{x.verdict}</small>
+                    </button>
+                  ))}
+                </div>
+                {(() => {
+                  const summary = selectedRobustness
+                  if (!summary) return null
+                  return (
+                    <>
+                      <p
+                        className={
+                          summary.verdict === 'insufficientData' ? 'finance-insufficient' : 'finance-synthetic-banner'
+                        }
+                      >
+                        {summary.verdict === 'insufficientData' ? 'DATA INSUFFICIENT' : 'BEGRÄNSAD ROBUSTHETSEVIDENS'}
+                      </p>
+                      <dl className="finance-details">
+                        <div>
+                          <dt>Verdict / score</dt>
+                          <dd>
+                            {summary.verdict} / {summary.score.toFixed(2)} ({summary.evidenceLabel})
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Plan</dt>
+                          <dd>
+                            {summary.planId} / {summary.planVersion}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Train / test / embargo</dt>
+                          <dd>
+                            {summary.trainSessions} / {summary.testSessions} / {summary.embargoSessions} sessions
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Walk-forward</dt>
+                          <dd>{summary.walkForwardWindows} fönster</dd>
+                        </div>
+                        <div>
+                          <dt>Diagnostisk omfattning</dt>
+                          <dd>
+                            {summary.parameterVariants} parametervarianter / {summary.costVariants} kostnadsnivåer
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Lineage</dt>
+                          <dd>
+                            {summary.marketRevisionIds.length} market-revisioner / {summary.featureRevisionId}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Evaluation / checksum</dt>
+                          <dd>
+                            {summary.evaluationId} / {summary.checksum}
+                          </dd>
+                        </div>
+                      </dl>
+                      <RobustnessDetails evaluation={visibleEvaluation} />
+                      <p className="finance-limitations">{summary.limitations.join(' ')}</p>
+                    </>
+                  )
+                })()}
+              </>
+            )}
+          </section>
+          <section className="finance-panel finance-panel--wide" aria-labelledby="backtests-title">
+            <header>
+              <div>
+                <h3 id="backtests-title">Backtests / Strategiforskning</h3>
+                <p>Offline historisk simulering – ingen order, broker eller handel med riktiga pengar</p>
+              </div>
+              <span>RESEARCH</span>
+            </header>
+            {!backtests?.runs.length ? (
+              <p className="muted">Inga immutable backtestresultat är tillgängliga ännu.</p>
+            ) : (
+              <>
+                <div className="finance-backtest-tabs">
+                  {backtests.runs.map(run => (
+                    <button
+                      aria-pressed={selectedRun === run.runId}
+                      key={run.runId}
+                      onClick={() => setSelectedRun(run.runId)}
+                      type="button"
+                    >
+                      {run.strategyId}
+                      <small>{run.costModel}</small>
+                    </button>
+                  ))}
+                </div>
+                {(() => {
+                  const run = backtests.runs.find(x => x.runId === selectedRun)
+                  if (!run) return null
+                  return (
+                    <>
+                      <dl className="finance-details">
+                        <div>
+                          <dt>Strategi / version</dt>
+                          <dd>
+                            {run.strategyId} / {run.strategyVersion}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Period</dt>
+                          <dd>
+                            {run.from} – {run.to}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Initial / final equity</dt>
+                          <dd>
+                            {run.initialEquity.toFixed(2)} / {run.finalEquity.toFixed(2)} USD
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Gross / net return</dt>
+                          <dd>
+                            {(run.grossReturn * 100).toFixed(2)} % / {(run.netReturn * 100).toFixed(2)} %
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Benchmark / excess</dt>
+                          <dd>
+                            {run.benchmarkReturn === null
+                              ? 'Benchmark-run'
+                              : `${(run.benchmarkReturn * 100).toFixed(2)} % / ${((run.excessReturn ?? 0) * 100).toFixed(2)} %`}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Max drawdown / trades</dt>
+                          <dd>
+                            {(run.maxDrawdown * 100).toFixed(2)} % / {run.trades}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Kostnadseffekt</dt>
+                          <dd>{(run.costImpact * 100).toFixed(3)} %-enheter</dd>
+                        </div>
+                        <div>
+                          <dt>Reproducerbarhet</dt>
+                          <dd>
+                            {run.runId} / {run.checksum}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Lineage</dt>
+                          <dd>
+                            {run.marketRevisionIds.length} market-revisioner / {run.featureRevisionId}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Modeller</dt>
+                          <dd>
+                            {run.simulationModel} / {run.costModel} / {run.sizingPolicy}
+                          </dd>
+                        </div>
+                      </dl>
+                      <div aria-busy={backtestLoading}>
+                        {backtestLoading ? (
+                          <BBLoadingIndicator compact label="Hämtar valt backtestresultat" />
+                        ) : backtestFailed ? (
+                          <div role="alert">
+                            <p>Valt backtestresultat kunde inte hämtas.</p>
+                            <BBButton onClick={retryBacktest} type="button">
+                              Försök igen
+                            </BBButton>
+                          </div>
+                        ) : (
+                          <BacktestCurve result={backtestResult} />
+                        )}
+                      </div>
+                      <p className="finance-limitations">{run.limitations.join(' ')}</p>
+                    </>
+                  )
+                })()}
+              </>
+            )}
+          </section>
+          <section className="finance-panel" aria-labelledby="memory-title">
+            <header>
+              <div>
+                <h3 id="memory-title">Historiskt minne</h3>
+                <p>Immutable revisions- och kvalitetsöversikt</p>
+              </div>
+            </header>
+            <dl className="finance-details">
+              <div>
+                <dt>Observationer</dt>
+                <dd>{memory.observationCount}</dd>
+              </div>
+              <div>
+                <dt>Aktiv revision</dt>
+                <dd>{memory.activeRevisionId ?? 'Ingen'}</dd>
+              </div>
+              <div>
+                <dt>Täckning</dt>
+                <dd>
+                  {memory.coverageFrom && memory.coverageTo ? `${memory.coverageFrom} – ${memory.coverageTo}` : 'Ingen'}
+                </dd>
+              </div>
+              <div>
+                <dt>Senaste acquisition</dt>
+                <dd>{formatTime(memory.lastAcquiredAtUtc)}</dd>
+              </div>
+              <div>
+                <dt>Gap / korrigeringar</dt>
+                <dd>
+                  {memory.gapCount} / {memory.correctionCount}
+                </dd>
+              </div>
+              <div>
+                <dt>Persistence</dt>
+                <dd>{label(memory.persistence)}</dd>
+              </div>
+              <div>
+                <dt>Policy / provenance</dt>
+                <dd>
+                  {memory.policy} / {memory.provenance}
+                </dd>
+              </div>
+            </dl>
+          </section>
+          <section className="finance-panel finance-entitlement" aria-labelledby="entitlement-title">
+            <header>
+              <div>
+                <h3 id="entitlement-title">Provider och entitlement</h3>
+                <p>{snapshot.provider.entitlementGate}</p>
+              </div>
+            </header>
+            <dl className="finance-details">
+              <div>
+                <dt>Provider</dt>
+                <dd>{snapshot.provider.displayName}</dd>
+              </div>
+              <div>
+                <dt>Evidensklass</dt>
+                <dd>{label(snapshot.provider.evidenceClass ?? 'unknown')}</dd>
+              </div>
+              <div>
+                <dt>Ingestion tillåten</dt>
+                <dd>{snapshot.safety.ingestionAllowed ? 'JA' : 'NEJ'}</dd>
+              </div>
+              <div>
+                <dt>Lagring av real providerdata</dt>
+                <dd>{snapshot.safety.realProviderStorageAllowed ? 'JA' : 'NEJ'}</dd>
+              </div>
+              <div>
+                <dt>Orsak</dt>
+                <dd>{snapshot.provider.reason}</dd>
+              </div>
+            </dl>
+          </section>
+          {snapshot.retention && (
+            <section className="finance-panel" aria-labelledby="retention-title">
+              <header>
+                <div>
+                  <h3 id="retention-title">Retention</h3>
+                  <p>EODHD-datas livscykel</p>
+                </div>
+              </header>
+              <dl className="finance-details">
+                <div>
+                  <dt>Status</dt>
+                  <dd>{label(snapshot.retention.state)}</dd>
+                </div>
+                <div>
+                  <dt>Raderingsfrist</dt>
+                  <dd>{formatTime(snapshot.retention.deletionDeadlineUtc)}</dd>
+                </div>
+                <div>
+                  <dt>Omfattning</dt>
+                  <dd>
+                    {snapshot.retention.coveredObservationCount} observationer /{' '}
+                    {snapshot.retention.coveredRevisionCount} market-revisioner /{' '}
+                    {snapshot.retention.coveredPayloadCount} payloads /{' '}
+                    {snapshot.retention.coveredFeatureValueCount ?? 0} feature-värden /{' '}
+                    {snapshot.retention.coveredFeatureRevisionCount ?? 0} feature-revisioner /{' '}
+                    {snapshot.retention.coveredBacktestRunCount ?? 0} backtest-runs /{' '}
+                    {snapshot.retention.coveredRobustnessEvaluationCount ?? 0} robustness-evalueringar
+                  </dd>
+                </div>
+                {snapshot.retention.lastReceiptId && (
+                  <div>
+                    <dt>Kvitto</dt>
+                    <dd>{snapshot.retention.lastReceiptId}</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          )}
+        </div>
+      </details>
+    </section>
+  )
 }
 
-function ProspectiveCurve({points}:{points:FinanceOverview['prospective']['curve']}){const values=points.map(x=>x.cumulativeReturn),min=Math.min(...values),max=Math.max(...values),range=Math.max(max-min,.000001);const path=points.map((x,i)=>`${i?'L':'M'} ${(i/(points.length-1)*100).toFixed(2)} ${(38-(x.cumulativeReturn-min)/range*34).toFixed(2)}`).join(' ');return <figure className="finance-chart"><svg aria-label="Kumulativ hypotetisk prospektiv avkastning" preserveAspectRatio="none" viewBox="0 0 100 42"><path d={path}/></svg><figcaption>Kumulativ hypotetisk avkastning för en likaviktad shadow-beslutskorg per session, {points.length} sessioner. Inte faktisk portföljavkastning.</figcaption></figure>}
+function ProspectiveCurve({ points }: { points: FinanceOverview['prospective']['curve'] }) {
+  const values = points.map(x => x.cumulativeReturn),
+    min = Math.min(...values),
+    max = Math.max(...values),
+    range = Math.max(max - min, 0.000001)
+  const path = points
+    .map(
+      (x, i) =>
+        `${i ? 'L' : 'M'} ${((i / (points.length - 1)) * 100).toFixed(2)} ${(38 - ((x.cumulativeReturn - min) / range) * 34).toFixed(2)}`,
+    )
+    .join(' ')
+  return (
+    <figure className="finance-chart">
+      <svg aria-label="Kumulativ hypotetisk prospektiv avkastning" preserveAspectRatio="none" viewBox="0 0 100 42">
+        <path d={path} />
+      </svg>
+      <figcaption>
+        Kumulativ hypotetisk avkastning för en likaviktad shadow-beslutskorg per session, {points.length} sessioner.
+        Inte faktisk portföljavkastning.
+      </figcaption>
+    </figure>
+  )
+}
 
-function BacktestCurve({result}:{result:FinanceBacktestResult|null}){const points=result?.equityCurve??[];if(points.length<2)return null;const values=points.map(x=>x.totalEquity),min=Math.min(...values),max=Math.max(...values),range=Math.max(max-min,.0001);const equity=points.map((x,i)=>`${i?'L':'M'} ${(i/(points.length-1)*100).toFixed(2)} ${(38-(x.totalEquity-min)/range*34).toFixed(2)}`).join(' ');const drawdown=points.map((x,i)=>`${i?'L':'M'} ${(i/(points.length-1)*100).toFixed(2)} ${(4+Math.abs(x.drawdown)*34).toFixed(2)}`).join(' ');return <figure className="finance-chart"><svg aria-label="Equity curve och drawdown" preserveAspectRatio="none" viewBox="0 0 100 42"><path d={equity}/><path className="finance-drawdown-path" d={drawdown}/></svg><figcaption>Equity curve och drawdown, {points.length} deterministiska sessionspunkter.</figcaption></figure>}
-function RobustnessDetails({evaluation}:{evaluation:FinanceRobustnessEvaluation|null}){if(!evaluation)return null;return <div className="finance-robustness-grid"><article><h4>Train vs test</h4><p>{((evaluation.primarySplit.train.netReturn??0)*100).toFixed(2)} % → {((evaluation.primarySplit.test.netReturn??0)*100).toFixed(2)} %</p><small>Observerad net return; degradation {(evaluation.primarySplit.netReturnDegradation*100).toFixed(2)} pp</small></article><article><h4>Parameterkänslighet</h4><p>{evaluation.parameterSensitivity.verdict}</p><small>Median {(evaluation.parameterSensitivity.medianNetReturn*100).toFixed(2)} %, intervall {(evaluation.parameterSensitivity.minimumNetReturn*100).toFixed(2)}–{(evaluation.parameterSensitivity.maximumNetReturn*100).toFixed(2)} %</small></article><article><h4>Kostnadskänslighet</h4>{evaluation.costSensitivity.points.map(x=><div className="finance-cost-row" key={x.costModel}><span>{x.costModel}</span><strong>{(x.netReturn*100).toFixed(2)} %</strong></div>)}</article><article><h4>Walk-forward</h4><p>{evaluation.walkForwardPositivePercent.toFixed(1)} % positiva benchmark-relative testfönster</p><small>{evaluation.walkForwardWindows.length} fasta expanding-window-steg</small></article></div>}
+function BacktestCurve({ result }: { result: FinanceBacktestResult | null }) {
+  const points = result?.equityCurve ?? []
+  if (points.length < 2) return null
+  const values = points.map(x => x.totalEquity),
+    min = Math.min(...values),
+    max = Math.max(...values),
+    range = Math.max(max - min, 0.0001)
+  const equity = points
+    .map(
+      (x, i) =>
+        `${i ? 'L' : 'M'} ${((i / (points.length - 1)) * 100).toFixed(2)} ${(38 - ((x.totalEquity - min) / range) * 34).toFixed(2)}`,
+    )
+    .join(' ')
+  const drawdown = points
+    .map(
+      (x, i) =>
+        `${i ? 'L' : 'M'} ${((i / (points.length - 1)) * 100).toFixed(2)} ${(4 + Math.abs(x.drawdown) * 34).toFixed(2)}`,
+    )
+    .join(' ')
+  return (
+    <figure className="finance-chart">
+      <svg aria-label="Equity curve och drawdown" preserveAspectRatio="none" viewBox="0 0 100 42">
+        <path d={equity} />
+        <path className="finance-drawdown-path" d={drawdown} />
+      </svg>
+      <figcaption>Equity curve och drawdown, {points.length} deterministiska sessionspunkter.</figcaption>
+    </figure>
+  )
+}
+function RobustnessDetails({ evaluation }: { evaluation: FinanceRobustnessEvaluation | null }) {
+  if (!evaluation) return null
+  return (
+    <div className="finance-robustness-grid">
+      <article>
+        <h4>Train vs test</h4>
+        <p>
+          {((evaluation.primarySplit.train.netReturn ?? 0) * 100).toFixed(2)} % →{' '}
+          {((evaluation.primarySplit.test.netReturn ?? 0) * 100).toFixed(2)} %
+        </p>
+        <small>
+          Observerad net return; degradation {(evaluation.primarySplit.netReturnDegradation * 100).toFixed(2)} pp
+        </small>
+      </article>
+      <article>
+        <h4>Parameterkänslighet</h4>
+        <p>{evaluation.parameterSensitivity.verdict}</p>
+        <small>
+          Median {(evaluation.parameterSensitivity.medianNetReturn * 100).toFixed(2)} %, intervall{' '}
+          {(evaluation.parameterSensitivity.minimumNetReturn * 100).toFixed(2)}–
+          {(evaluation.parameterSensitivity.maximumNetReturn * 100).toFixed(2)} %
+        </small>
+      </article>
+      <article>
+        <h4>Kostnadskänslighet</h4>
+        {evaluation.costSensitivity.points.map(x => (
+          <div className="finance-cost-row" key={x.costModel}>
+            <span>{x.costModel}</span>
+            <strong>{(x.netReturn * 100).toFixed(2)} %</strong>
+          </div>
+        ))}
+      </article>
+      <article>
+        <h4>Walk-forward</h4>
+        <p>{evaluation.walkForwardPositivePercent.toFixed(1)} % positiva benchmark-relative testfönster</p>
+        <small>{evaluation.walkForwardWindows.length} fasta expanding-window-steg</small>
+      </article>
+    </div>
+  )
+}

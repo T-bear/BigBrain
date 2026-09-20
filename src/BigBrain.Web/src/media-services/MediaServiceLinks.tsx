@@ -22,20 +22,50 @@ export function MediaServiceLinks() {
     prowlarr: '⌕',
     qbittorrent: '⇩',
   }
-  return <section id="quick-actions" className="media-service-links card" aria-labelledby="service-links-heading" data-dashboard-module="quick-actions">
-    <div><p className="eyebrow">Snabbval</p><h3 id="service-links-heading">Mediatjänster</h3></div>
-    {!loaded && <p className="muted" aria-live="polite">Laddar tjänstelänkar…</p>}
-    {loaded && links.length === 0 && <p className="muted">Tjänstelänkarna kunde inte hämtas.</p>}
-    {links.length > 0 && <div className="media-service-link-list">{links.map(link =>
-      link.enabled && link.url
-        ? <a key={link.id} href={link.url} target="_blank" rel="noreferrer">
-            <span className="media-service-link-icon" aria-hidden="true">{icons[link.id]}</span>
-            <span>Öppna <strong>{link.displayName}</strong></span>
-            <span aria-hidden="true">↗</span>
-          </a>
-        : <span key={link.id} className="media-service-link-disabled" aria-disabled="true">
-            <span className="media-service-link-icon" aria-hidden="true">{icons[link.id]}</span>
-            <span><strong>{link.displayName}</strong><small>Inte konfigurerad</small></span>
-          </span>)}</div>}
-  </section>
+  return (
+    <section
+      id="quick-actions"
+      className="media-service-links card"
+      aria-labelledby="service-links-heading"
+      data-dashboard-module="quick-actions"
+    >
+      <div>
+        <p className="eyebrow">Snabbval</p>
+        <h3 id="service-links-heading">Mediatjänster</h3>
+      </div>
+      {!loaded && (
+        <p className="muted" aria-live="polite">
+          Laddar tjänstelänkar…
+        </p>
+      )}
+      {loaded && links.length === 0 && <p className="muted">Tjänstelänkarna kunde inte hämtas.</p>}
+      {links.length > 0 && (
+        <div className="media-service-link-list">
+          {links.map(link =>
+            link.enabled && link.url ? (
+              <a key={link.id} href={link.url} target="_blank" rel="noreferrer">
+                <span className="media-service-link-icon" aria-hidden="true">
+                  {icons[link.id]}
+                </span>
+                <span>
+                  Öppna <strong>{link.displayName}</strong>
+                </span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <span key={link.id} className="media-service-link-disabled" aria-disabled="true">
+                <span className="media-service-link-icon" aria-hidden="true">
+                  {icons[link.id]}
+                </span>
+                <span>
+                  <strong>{link.displayName}</strong>
+                  <small>Inte konfigurerad</small>
+                </span>
+              </span>
+            ),
+          )}
+        </div>
+      )}
+    </section>
+  )
 }

@@ -2,12 +2,38 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, expect, test, vi } from 'vitest'
 import { SmartShuffle } from './SmartShuffle'
 
-const options = { enabled: true, series: [
-  { id: 'a', name: 'Serie A', hasPlayableEpisode: true },
-  { id: 'b', name: 'Serie B', hasPlayableEpisode: true },
-] }
-const device = { id: 'opaque-device', displayName: 'Vardagsrums-TV', clientType: 'Tizen', available: true, isPlaying: false }
-const session = { id: 'opaque-session', status: 'active', nowPlaying: { id: 'episode', seriesId: 'a', seriesName: 'Serie A', title: 'Pilot', seasonNumber: 1, episodeNumber: 1, playbackPositionTicks: null }, recentSeries: ['a'], remainingSeries: 2, deviceName: 'Vardagsrums-TV', startedAtUtc: '2026-08-03T20:00:00Z', errorCode: null }
+const options = {
+  enabled: true,
+  series: [
+    { id: 'a', name: 'Serie A', hasPlayableEpisode: true },
+    { id: 'b', name: 'Serie B', hasPlayableEpisode: true },
+  ],
+}
+const device = {
+  id: 'opaque-device',
+  displayName: 'Vardagsrums-TV',
+  clientType: 'Tizen',
+  available: true,
+  isPlaying: false,
+}
+const session = {
+  id: 'opaque-session',
+  status: 'active',
+  nowPlaying: {
+    id: 'episode',
+    seriesId: 'a',
+    seriesName: 'Serie A',
+    title: 'Pilot',
+    seasonNumber: 1,
+    episodeNumber: 1,
+    playbackPositionTicks: null,
+  },
+  recentSeries: ['a'],
+  remainingSeries: 2,
+  deviceName: 'Vardagsrums-TV',
+  startedAtUtc: '2026-08-03T20:00:00Z',
+  errorCode: null,
+}
 
 afterEach(() => {
   cleanup()
@@ -15,7 +41,8 @@ afterEach(() => {
 })
 
 test('requires two series and starts only from explicit button click', async () => {
-  const fetch = vi.fn()
+  const fetch = vi
+    .fn()
     .mockResolvedValueOnce({ ok: true, json: async () => options })
     .mockResolvedValueOnce({ ok: true, json: async () => [device] })
     .mockResolvedValueOnce({ ok: true, json: async () => session })
@@ -37,7 +64,8 @@ test('requires two series and starts only from explicit button click', async () 
 })
 
 test('shows guidance when no controllable TV exists and aborts load on unmount', async () => {
-  const fetch = vi.fn()
+  const fetch = vi
+    .fn()
     .mockResolvedValueOnce({ ok: true, json: async () => options })
     .mockResolvedValueOnce({ ok: true, json: async () => [] })
   vi.stubGlobal('fetch', fetch)
@@ -49,9 +77,14 @@ test('shows guidance when no controllable TV exists and aborts load on unmount',
 })
 
 test('active session can skip and stop automation through explicit actions', async () => {
-  const skipped = { ...session, nowPlaying: { ...session.nowPlaying!, seriesId: 'b', seriesName: 'Serie B' }, recentSeries: ['a', 'b'] }
+  const skipped = {
+    ...session,
+    nowPlaying: { ...session.nowPlaying!, seriesId: 'b', seriesName: 'Serie B' },
+    recentSeries: ['a', 'b'],
+  }
   const stopped = { ...skipped, status: 'stopped' as const }
-  const fetch = vi.fn()
+  const fetch = vi
+    .fn()
     .mockResolvedValueOnce({ ok: true, json: async () => options })
     .mockResolvedValueOnce({ ok: true, json: async () => [device] })
     .mockResolvedValueOnce({ ok: true, json: async () => session })
@@ -76,10 +109,17 @@ test('active session can skip and stop automation through explicit actions', asy
 })
 
 test('double click sends one create request and shows awaiting confirmation', async () => {
-  const pending = { ...session, status: 'awaitingPlaybackConfirmation' as const, errorCode: 'playbackConfirmationPending' }
+  const pending = {
+    ...session,
+    status: 'awaitingPlaybackConfirmation' as const,
+    errorCode: 'playbackConfirmationPending',
+  }
   let resolveCreate!: (value: unknown) => void
-  const createResponse = new Promise(resolve => { resolveCreate = resolve })
-  const fetch = vi.fn()
+  const createResponse = new Promise(resolve => {
+    resolveCreate = resolve
+  })
+  const fetch = vi
+    .fn()
     .mockResolvedValueOnce({ ok: true, json: async () => options })
     .mockResolvedValueOnce({ ok: true, json: async () => [device] })
     .mockReturnValueOnce(createResponse)
@@ -88,17 +128,22 @@ test('double click sends one create request and shows awaiting confirmation', as
   fireEvent.click(await screen.findByLabelText('Serie A'))
   fireEvent.click(screen.getByLabelText('Serie B'))
   const start = screen.getByRole('button', { name: 'Starta på TV' })
-  fireEvent.click(start); fireEvent.click(start)
+  fireEvent.click(start)
+  fireEvent.click(start)
   expect(fetch).toHaveBeenCalledTimes(3)
   resolveCreate({ ok: true, json: async () => pending })
   expect(await screen.findByText(/Startkommando skickat/)).toBeInTheDocument()
 })
 
 test('maps safe playback error and re-enables start', async () => {
-  const fetch = vi.fn()
+  const fetch = vi
+    .fn()
     .mockResolvedValueOnce({ ok: true, json: async () => options })
     .mockResolvedValueOnce({ ok: true, json: async () => [device] })
-    .mockResolvedValueOnce({ ok: false, json: async () => ({ code: 'playbackRejected', detail: 'raw upstream must not render' }) })
+    .mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ code: 'playbackRejected', detail: 'raw upstream must not render' }),
+    })
   vi.stubGlobal('fetch', fetch)
   render(<SmartShuffle />)
   fireEvent.click(await screen.findByLabelText('Serie A'))

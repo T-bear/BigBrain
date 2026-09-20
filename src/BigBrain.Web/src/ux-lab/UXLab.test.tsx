@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { UXLab } from './UXLab'
 
 describe('UX/UI Lab', () => {
-  afterEach(() => { cleanup(); vi.restoreAllMocks() })
+  afterEach(() => {
+    cleanup()
+    vi.restoreAllMocks()
+  })
   it('renders stable identities, review vocabulary and shared production primitives', () => {
     render(<UXLab />)
     expect(screen.getByRole('heading', { name: 'UX/UI-labb' })).toBeInTheDocument()

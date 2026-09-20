@@ -42,17 +42,41 @@ test('switching Film and Serie sends the selected media type', async () => {
 
 test('puts search first, ranks the best result and keeps additional results collapsed', async () => {
   const result = (title: string, foreignId: string) => ({
-    provider: 'Radarr', foreignId, title, originalTitle: null, year: 2026, overview: null,
-    network: null, runtimeMinutes: 90, status: 'released', mediaType: 'movie', lookupState: 'external',
-    imageAvailable: false, alreadyRegistered: false, existingSourceId: null,
+    provider: 'Radarr',
+    foreignId,
+    title,
+    originalTitle: null,
+    year: 2026,
+    overview: null,
+    network: null,
+    runtimeMinutes: 90,
+    status: 'released',
+    mediaType: 'movie',
+    lookupState: 'external',
+    imageAvailable: false,
+    alreadyRegistered: false,
+    existingSourceId: null,
   })
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({
-    ...emptyLookup,
-    query: 'Alien',
-    providers: [{ provider: 'Radarr', status: 'online', error: null, results: [
-      result('Alien: Romulus', '2'), result('Alien', '1'), result('Another title', '3'),
-    ] }],
-  }) })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: async () => ({
+          ...emptyLookup,
+          query: 'Alien',
+          providers: [
+            {
+              provider: 'Radarr',
+              status: 'online',
+              error: null,
+              results: [result('Alien: Romulus', '2'), result('Alien', '1'), result('Another title', '3')],
+            },
+          ],
+        }),
+      }),
+    ),
+  )
   const { container } = render(<MediaSearch />)
   const search = screen.getByRole('search')
   const type = screen.getByRole('group', { name: 'Jag söker' })
@@ -72,13 +96,58 @@ test('puts search first, ranks the best result and keeps additional results coll
 })
 
 test('shows contextual search actions only after results have scrolled away', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({
-    ...emptyLookup,
-    providers: [{ provider: 'Radarr', status: 'online', error: null, results: [
-      { provider: 'Radarr', foreignId: '1', title: 'Alien', originalTitle: null, year: 1979, overview: null, network: null, runtimeMinutes: 117, status: 'released', mediaType: 'movie', lookupState: 'external', imageAvailable: false, alreadyRegistered: false, existingSourceId: null },
-      { provider: 'Radarr', foreignId: '2', title: 'Aliens', originalTitle: null, year: 1986, overview: null, network: null, runtimeMinutes: 137, status: 'released', mediaType: 'movie', lookupState: 'external', imageAvailable: false, alreadyRegistered: false, existingSourceId: null },
-    ] }],
-  }) })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: async () => ({
+          ...emptyLookup,
+          providers: [
+            {
+              provider: 'Radarr',
+              status: 'online',
+              error: null,
+              results: [
+                {
+                  provider: 'Radarr',
+                  foreignId: '1',
+                  title: 'Alien',
+                  originalTitle: null,
+                  year: 1979,
+                  overview: null,
+                  network: null,
+                  runtimeMinutes: 117,
+                  status: 'released',
+                  mediaType: 'movie',
+                  lookupState: 'external',
+                  imageAvailable: false,
+                  alreadyRegistered: false,
+                  existingSourceId: null,
+                },
+                {
+                  provider: 'Radarr',
+                  foreignId: '2',
+                  title: 'Aliens',
+                  originalTitle: null,
+                  year: 1986,
+                  overview: null,
+                  network: null,
+                  runtimeMinutes: 137,
+                  status: 'released',
+                  mediaType: 'movie',
+                  lookupState: 'external',
+                  imageAvailable: false,
+                  alreadyRegistered: false,
+                  existingSourceId: null,
+                },
+              ],
+            },
+          ],
+        }),
+      }),
+    ),
+  )
   const { container } = render(<MediaSearch />)
   const formAnchor = container.querySelector('.media-search-form-anchor')!
   const formRect = vi.spyOn(formAnchor, 'getBoundingClientRect').mockReturnValue({ bottom: 200 } as DOMRect)
@@ -106,7 +175,10 @@ test('shows contextual search actions only after results have scrolled away', as
 })
 
 test('does not show contextual search actions for an empty result', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => emptyLookup })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve({ ok: true, json: async () => emptyLookup })),
+  )
   render(<MediaSearch />)
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Saknas' } })
   fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
@@ -123,19 +195,23 @@ test('poster falls back without leaving a broken image', () => {
 })
 
 test('valid poster is lazy loaded and missing poster uses placeholder', () => {
-  const { rerender } = render(
-    <MediaPoster title="Alien" url="/api/v1/modules/media/posters/signed-token" />)
+  const { rerender } = render(<MediaPoster title="Alien" url="/api/v1/modules/media/posters/signed-token" />)
   expect(screen.getByRole('img', { name: 'Poster för Alien' })).toHaveAttribute('loading', 'lazy')
   expect(screen.getByRole('img', { name: 'Poster för Alien' })).toHaveAttribute(
     'src',
-    '/api/v1/modules/media/posters/signed-token')
+    '/api/v1/modules/media/posters/signed-token',
+  )
 
   rerender(<MediaPoster title="Alien" url={null} />)
   expect(screen.getByRole('img', { name: 'Poster saknas för Alien' })).toBeInTheDocument()
 })
 
 test('mobile navigation has stable destinations and marks the active view', () => {
-  render(<WidgetProvider registry={new ApplicationWidgetRegistry([])}><MobileNavigation dashboards={dashboardRegistry} /></WidgetProvider>)
+  render(
+    <WidgetProvider registry={new ApplicationWidgetRegistry([])}>
+      <MobileNavigation dashboards={dashboardRegistry} />
+    </WidgetProvider>,
+  )
   expect(screen.getByRole('button', { name: /Hem/ })).toHaveAttribute('aria-current', 'page')
   fireEvent.click(screen.getByRole('button', { name: /Media/ }))
   expect(screen.getByRole('button', { name: /Media/ })).toHaveAttribute('aria-current', 'page')
@@ -145,10 +221,15 @@ test('mobile navigation has stable destinations and marks the active view', () =
 })
 
 test('provider timeout is shown with a Swedish safe message', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
-    ok: false,
-    json: async () => ({ code: 'timeout', detail: 'raw upstream detail' }),
-  })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve({
+        ok: false,
+        json: async () => ({ code: 'timeout', detail: 'raw upstream detail' }),
+      }),
+    ),
+  )
   render(<MediaSearch />)
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Alien' } })
   fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
@@ -157,16 +238,21 @@ test('provider timeout is shown with a Swedish safe message', async () => {
 })
 
 test('service shortcuts show configured links and clear disabled states', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
-    ok: true,
-    json: async () => [
-      { id: 'jellyfin', displayName: 'Jellyfin', url: 'https://media.example.test', enabled: true },
-      { id: 'radarr', displayName: 'Radarr', url: '', enabled: false },
-      { id: 'sonarr', displayName: 'Sonarr', url: '', enabled: false },
-      { id: 'prowlarr', displayName: 'Prowlarr', url: '', enabled: false },
-      { id: 'qbittorrent', displayName: 'qBittorrent', url: '', enabled: false },
-    ],
-  })))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: async () => [
+          { id: 'jellyfin', displayName: 'Jellyfin', url: 'https://media.example.test', enabled: true },
+          { id: 'radarr', displayName: 'Radarr', url: '', enabled: false },
+          { id: 'sonarr', displayName: 'Sonarr', url: '', enabled: false },
+          { id: 'prowlarr', displayName: 'Prowlarr', url: '', enabled: false },
+          { id: 'qbittorrent', displayName: 'qBittorrent', url: '', enabled: false },
+        ],
+      }),
+    ),
+  )
   render(<MediaServiceLinks />)
 
   const jellyfin = await screen.findByRole('link', { name: /Öppna Jellyfin/ })
@@ -177,34 +263,36 @@ test('service shortcuts show configured links and clear disabled states', async 
 })
 
 test('lookup status is placed above the request action with a dedicated gap', () => {
-  const { container } = render(<MediaLookupResultCard
-    result={{
-      provider: 'Radarr',
-      mediaType: 'movie',
-      foreignId: '348',
-      title: 'Alien',
-      originalTitle: 'Alien',
-      year: 1979,
-      overview: 'I rymden kan ingen höra dig skrika.',
-      network: null,
-      runtimeMinutes: 117,
-      status: 'released',
-      lookupState: 'external',
-      imageAvailable: false,
-      posterUrl: null,
-      alreadyExists: false,
-      alreadyRegistered: false,
-      existingSourceId: null,
-      providerId: '348',
-      monitored: false,
-      canRequest: true,
-      requestState: 'available',
-      errorCode: null,
-      errorMessage: null,
-    }}
-    requestsEnabled
-    onPrepare={vi.fn()}
-  />)
+  const { container } = render(
+    <MediaLookupResultCard
+      result={{
+        provider: 'Radarr',
+        mediaType: 'movie',
+        foreignId: '348',
+        title: 'Alien',
+        originalTitle: 'Alien',
+        year: 1979,
+        overview: 'I rymden kan ingen höra dig skrika.',
+        network: null,
+        runtimeMinutes: 117,
+        status: 'released',
+        lookupState: 'external',
+        imageAvailable: false,
+        posterUrl: null,
+        alreadyExists: false,
+        alreadyRegistered: false,
+        existingSourceId: null,
+        providerId: '348',
+        monitored: false,
+        canRequest: true,
+        requestState: 'available',
+        errorCode: null,
+        errorMessage: null,
+      }}
+      requestsEnabled
+      onPrepare={vi.fn()}
+    />,
+  )
 
   const actions = container.querySelector('.media-result-actions')
   expect(actions).not.toBeNull()

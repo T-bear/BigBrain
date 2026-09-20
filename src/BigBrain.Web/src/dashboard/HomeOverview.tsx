@@ -16,24 +16,51 @@ type HomeSnapshot = {
 }
 
 const localDate = () => new Date().toLocaleDateString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit' })
-const eventTime = (event: CalendarEvent) => event.isAllDay ? 'Hela dagen' : [event.startTime, event.endTime].filter(Boolean).join('–')
-const eventDate = (event: CalendarEvent) => new Intl.DateTimeFormat('sv-SE',{weekday:'short',day:'numeric',month:'short'}).format(new Date(`${event.date}T12:00:00`))
-export const nextEventLabel=(event:CalendarEvent)=>`${eventDate(event)} · ${event.title} · ${eventTime(event)}`
+const eventTime = (event: CalendarEvent) =>
+  event.isAllDay ? 'Hela dagen' : [event.startTime, event.endTime].filter(Boolean).join('–')
+const eventDate = (event: CalendarEvent) =>
+  new Intl.DateTimeFormat('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' }).format(
+    new Date(`${event.date}T12:00:00`),
+  )
+export const nextEventLabel = (event: CalendarEvent) => `${eventDate(event)} · ${event.title} · ${eventTime(event)}`
 
 export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | null }) {
   const { setActiveView } = useWidgets()
-  const [snapshot, setSnapshot] = useState<HomeSnapshot>({ todayMeals: [], nextEvent: null, shoppingRemaining: null, media: null, finance: null })
+  const [snapshot, setSnapshot] = useState<HomeSnapshot>({
+    todayMeals: [],
+    nextEvent: null,
+    shoppingRemaining: null,
+    media: null,
+    finance: null,
+  })
 
   useEffect(() => {
     const controller = new AbortController()
-    const update = (change: Partial<HomeSnapshot>) => { if (!controller.signal.aborted) setSnapshot(previous => ({ ...previous, ...change })) }
+    const update = (change: Partial<HomeSnapshot>) => {
+      if (!controller.signal.aborted) setSnapshot(previous => ({ ...previous, ...change }))
+    }
     const today = localDate()
     // Three first-render reads lead the queue; each freed slot hydrates a glance.
     // One slow card cannot hold up every secondary card. The bound is local to Home.
     const reads = [
-      () => getMealPlannerSchedules(controller.signal).then(schedules => update({ todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today) })),
-      () => getCalendarWeek(controller.signal).then(calendar => update({ nextEvent: calendar.events.filter(event => event.date >= today).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ?? null })),
-      () => getShoppingList(controller.signal).then(shopping => update({ shoppingRemaining: shopping.items.filter(item => !item.purchased).length })),
+      () =>
+        getMealPlannerSchedules(controller.signal).then(schedules =>
+          update({ todayMeals: schedules.flatMap(schedule => schedule.days).filter(day => day.date === today) }),
+        ),
+      () =>
+        getCalendarWeek(controller.signal).then(calendar =>
+          update({
+            nextEvent:
+              calendar.events
+                .filter(event => event.date >= today)
+                .sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`))[0] ??
+              null,
+          }),
+        ),
+      () =>
+        getShoppingList(controller.signal).then(shopping =>
+          update({ shoppingRemaining: shopping.items.filter(item => !item.purchased).length }),
+        ),
       () => getMediaOverview(controller.signal).then(media => update({ media })),
       () => getFinanceOverview(controller.signal).then(finance => update({ finance })),
     ]
@@ -42,7 +69,11 @@ export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | 
       while (!controller.signal.aborted) {
         const read = reads[next++]
         if (!read) return
-        try { await read() } catch { /* Each card retains its own unavailable state. */ }
+        try {
+          await read()
+        } catch {
+          /* Each card retains its own unavailable state. */
+        }
       }
     }
     for (let slot = 0; slot < 3; slot++) void hydrate()
@@ -50,22 +81,86 @@ export function HomeOverview({ recovery }: { recovery: SystemRecoverySnapshot | 
   }, [])
 
   const mediaActive = snapshot.media?.qBittorrent.activeCount ?? 0
-  const mediaWarnings = snapshot.media?.insights.filter(item => item.severity === 'warning' || item.severity === 'critical') ?? []
-  const needsAttention = recovery && recovery.overall !== 'healthy' ? `Systemstatus: ${recovery.overall}` : mediaWarnings[0]?.title
+  const mediaWarnings =
+    snapshot.media?.insights.filter(item => item.severity === 'warning' || item.severity === 'critical') ?? []
+  const needsAttention =
+    recovery && recovery.overall !== 'healthy' ? `Systemstatus: ${recovery.overall}` : mediaWarnings[0]?.title
 
-  return <div className="home-overview">
-    <section aria-labelledby="home-today-title" className="home-today">
-      <header><p className="eyebrow">Översikt</p><h2 id="home-today-title">Det viktigaste i dag</h2></header>
-      <div className="home-today__grid">
-        <div><span>Måltid</span><strong>{snapshot.todayMeals.length ? snapshot.todayMeals.map(meal => meal.mealName).join(' · ') : 'Ingen måltid planerad'}</strong></div>
-        <div><span>Nästa kalenderhändelse</span><strong>{snapshot.nextEvent ? nextEventLabel(snapshot.nextEvent) : 'Inget kommande i veckan'}</strong></div>
+  return (
+    <div className="home-overview">
+      <section aria-labelledby="home-today-title" className="home-today">
+        <header>
+          <p className="eyebrow">Översikt</p>
+          <h2 id="home-today-title">Det viktigaste i dag</h2>
+        </header>
+        <div className="home-today__grid">
+          <div>
+            <span>Måltid</span>
+            <strong>
+              {snapshot.todayMeals.length
+                ? snapshot.todayMeals.map(meal => meal.mealName).join(' · ')
+                : 'Ingen måltid planerad'}
+            </strong>
+          </div>
+          <div>
+            <span>Nästa kalenderhändelse</span>
+            <strong>{snapshot.nextEvent ? nextEventLabel(snapshot.nextEvent) : 'Inget kommande i veckan'}</strong>
+          </div>
+        </div>
+      </section>
+      <div className="home-glances">
+        <BBButton onClick={() => setActiveView('family')} type="button" variant="contextual">
+          <AppIcon name="family" size={24} />
+          <span>
+            <small>Familj</small>
+            <strong>
+              {snapshot.shoppingRemaining === null
+                ? 'Inköpslistan är inte tillgänglig'
+                : snapshot.shoppingRemaining
+                  ? `${snapshot.shoppingRemaining} ${snapshot.shoppingRemaining === 1 ? 'vara' : 'varor'} kvar att handla`
+                  : 'Inköpslistan är klar'}
+            </strong>
+          </span>
+          <AppIcon name="chevron" />
+        </BBButton>
+        <BBButton onClick={() => setActiveView('media')} type="button" variant="contextual">
+          <AppIcon name="media" size={24} />
+          <span>
+            <small>Media</small>
+            <strong>
+              {snapshot.media
+                ? mediaActive
+                  ? `${mediaActive} aktiva nedladdningar`
+                  : snapshot.media.healthSummary
+                : 'Mediastatus är inte tillgänglig'}
+            </strong>
+          </span>
+          <AppIcon name="chevron" />
+        </BBButton>
+        <BBButton onClick={() => setActiveView('finance')} type="button" variant="contextual">
+          <AppIcon name="finance" size={24} />
+          <span>
+            <small>Finance · RESEARCH</small>
+            <strong>
+              {snapshot.finance
+                ? snapshot.finance.signals.length
+                  ? `${snapshot.finance.signals.length} aktuella researchsignaler`
+                  : snapshot.finance.marketSummary
+                : 'Researchstatus är inte tillgänglig'}
+            </strong>
+          </span>
+          <AppIcon name="chevron" />
+        </BBButton>
       </div>
-    </section>
-    <div className="home-glances">
-      <BBButton onClick={() => setActiveView('family')} type="button" variant="contextual"><AppIcon name="family" size={24} /><span><small>Familj</small><strong>{snapshot.shoppingRemaining === null ? 'Inköpslistan är inte tillgänglig' : snapshot.shoppingRemaining ? `${snapshot.shoppingRemaining} ${snapshot.shoppingRemaining === 1 ? 'vara' : 'varor'} kvar att handla` : 'Inköpslistan är klar'}</strong></span><AppIcon name="chevron" /></BBButton>
-      <BBButton onClick={() => setActiveView('media')} type="button" variant="contextual"><AppIcon name="media" size={24} /><span><small>Media</small><strong>{snapshot.media ? mediaActive ? `${mediaActive} aktiva nedladdningar` : snapshot.media.healthSummary : 'Mediastatus är inte tillgänglig'}</strong></span><AppIcon name="chevron" /></BBButton>
-      <BBButton onClick={() => setActiveView('finance')} type="button" variant="contextual"><AppIcon name="finance" size={24} /><span><small>Finance · RESEARCH</small><strong>{snapshot.finance ? snapshot.finance.signals.length ? `${snapshot.finance.signals.length} aktuella researchsignaler` : snapshot.finance.marketSummary : 'Researchstatus är inte tillgänglig'}</strong></span><AppIcon name="chevron" /></BBButton>
+      {needsAttention && (
+        <section aria-labelledby="home-attention-title" className="home-attention">
+          <AppIcon name="admin" />
+          <div>
+            <p className="eyebrow">Behöver uppmärksamhet</p>
+            <h2 id="home-attention-title">{needsAttention}</h2>
+          </div>
+        </section>
+      )}
     </div>
-    {needsAttention && <section aria-labelledby="home-attention-title" className="home-attention"><AppIcon name="admin" /><div><p className="eyebrow">Behöver uppmärksamhet</p><h2 id="home-attention-title">{needsAttention}</h2></div></section>}
-  </div>
+  )
 }

@@ -13,43 +13,47 @@ const lookup = {
       provider: 'Sonarr',
       status: 'online',
       error: null,
-      results: [{
-        provider: 'Sonarr',
-        foreignId: '280619',
-        title: 'The Expanse',
-        originalTitle: null,
-        year: 2015,
-        overview: 'Humanity has colonized the solar system.',
-        network: 'Syfy',
-        runtimeMinutes: 45,
-        status: 'ended',
-        mediaType: 'series',
-        lookupState: 'external',
-        imageAvailable: true,
-        alreadyRegistered: false,
-        existingSourceId: null,
-      }],
+      results: [
+        {
+          provider: 'Sonarr',
+          foreignId: '280619',
+          title: 'The Expanse',
+          originalTitle: null,
+          year: 2015,
+          overview: 'Humanity has colonized the solar system.',
+          network: 'Syfy',
+          runtimeMinutes: 45,
+          status: 'ended',
+          mediaType: 'series',
+          lookupState: 'external',
+          imageAvailable: true,
+          alreadyRegistered: false,
+          existingSourceId: null,
+        },
+      ],
     },
     {
       provider: 'Radarr',
       status: 'online',
       error: null,
-      results: [{
-        provider: 'Radarr',
-        foreignId: '99',
-        title: 'Existing Movie',
-        originalTitle: null,
-        year: 2020,
-        overview: null,
-        network: null,
-        runtimeMinutes: 100,
-        status: 'released',
-        mediaType: 'movie',
-        lookupState: 'alreadyRegistered',
-        imageAvailable: false,
-        alreadyRegistered: true,
-        existingSourceId: '8',
-      }],
+      results: [
+        {
+          provider: 'Radarr',
+          foreignId: '99',
+          title: 'Existing Movie',
+          originalTitle: null,
+          year: 2020,
+          overview: null,
+          network: null,
+          runtimeMinutes: 100,
+          status: 'released',
+          mediaType: 'movie',
+          lookupState: 'alreadyRegistered',
+          imageAvailable: false,
+          alreadyRegistered: true,
+          existingSourceId: '8',
+        },
+      ],
     },
   ],
 }
@@ -102,19 +106,28 @@ test('requires options and preview review before one explicit confirm', async ()
   const fetch = vi.fn((url: string, init?: RequestInit) => {
     if (url.includes('/lookup')) return ok(lookup)
     if (url.includes('/add-options/')) return ok(options)
-    if (url.includes('/preview')) return ok({
-      requestToken: 'opaque-token',
-      expiresAtUtc: '2026-07-25T10:05:00Z',
-      status: 'previewReady',
-      summary: {
-        title: 'The Expanse', year: 2015, provider: 'Sonarr', mediaType: 'series',
-        rootFolder: 'TV Library', qualityProfile: 'HD 1080p', monitoring: 'All',
-        seriesType: 'Standard', searchAfterAdd: true,
-      },
-    })
+    if (url.includes('/preview'))
+      return ok({
+        requestToken: 'opaque-token',
+        expiresAtUtc: '2026-07-25T10:05:00Z',
+        status: 'previewReady',
+        summary: {
+          title: 'The Expanse',
+          year: 2015,
+          provider: 'Sonarr',
+          mediaType: 'series',
+          rootFolder: 'TV Library',
+          qualityProfile: 'HD 1080p',
+          monitoring: 'All',
+          seriesType: 'Standard',
+          searchAfterAdd: true,
+        },
+      })
     if (url.includes('/confirm')) {
       expect(init?.method).toBe('POST')
-      return new Promise(resolve => { confirmResolve = resolve })
+      return new Promise(resolve => {
+        confirmResolve = resolve
+      })
     }
     throw new Error(`Unexpected request: ${url}`)
   })
@@ -141,9 +154,16 @@ test('requires options and preview review before one explicit confirm', async ()
   await waitFor(() => expect(confirm).toBeDisabled())
   expect(fetch.mock.calls.filter(([url]) => String(url).includes('/confirm'))).toHaveLength(1)
 
-  confirmResolve?.({ ok: true, json: async () => ({
-    status: 'created', provider: 'Sonarr', mediaType: 'series', sourceId: '9', title: 'The Expanse',
-  }) })
+  confirmResolve?.({
+    ok: true,
+    json: async () => ({
+      status: 'created',
+      provider: 'Sonarr',
+      mediaType: 'series',
+      sourceId: '9',
+      title: 'The Expanse',
+    }),
+  })
   expect(await within(dialog).findByText('The Expanse har lagts till.')).toBeInTheDocument()
 })
 
@@ -153,10 +173,23 @@ test('retries the same owner action with the same idempotency key', async () => 
   const fetch = vi.fn((url: string, init?: RequestInit) => {
     if (url.includes('/lookup')) return ok(lookup)
     if (url.includes('/add-options/')) return ok(options)
-    if (url.includes('/preview')) return ok({
-      requestToken: 'opaque-token', expiresAtUtc: '2026-07-25T10:05:00Z', status: 'previewReady',
-      summary: { title: 'The Expanse', year: 2015, provider: 'Sonarr', mediaType: 'series', rootFolder: 'TV Library', qualityProfile: 'HD 1080p', monitoring: 'All', seriesType: 'Standard', searchAfterAdd: true },
-    })
+    if (url.includes('/preview'))
+      return ok({
+        requestToken: 'opaque-token',
+        expiresAtUtc: '2026-07-25T10:05:00Z',
+        status: 'previewReady',
+        summary: {
+          title: 'The Expanse',
+          year: 2015,
+          provider: 'Sonarr',
+          mediaType: 'series',
+          rootFolder: 'TV Library',
+          qualityProfile: 'HD 1080p',
+          monitoring: 'All',
+          seriesType: 'Standard',
+          searchAfterAdd: true,
+        },
+      })
     if (url.includes('/confirm')) {
       confirmBodies.push(JSON.parse(String(init?.body)))
       confirmAttempts++

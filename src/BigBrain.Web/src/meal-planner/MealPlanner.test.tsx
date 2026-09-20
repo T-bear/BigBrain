@@ -4,87 +4,189 @@ import { MealPlanner } from './MealPlanner'
 import type { MealPlannerTag } from '../types'
 
 const initialTags: MealPlannerTag[] = [
-  { id: 'portion-3-4', name: '3–4 personer', category: 'portion', createdAtUtc: '2026-08-01T00:00:00Z', isProtected: true },
+  {
+    id: 'portion-3-4',
+    name: '3–4 personer',
+    category: 'portion',
+    createdAtUtc: '2026-08-01T00:00:00Z',
+    isProtected: true,
+  },
   { id: 'easy', name: 'Lättlagat', category: 'occasion', createdAtUtc: '2026-08-01T00:00:00Z', isProtected: true },
-  { id: 'meal-type-lunch', name: 'Lunch', category: 'mealType', createdAtUtc: '2026-08-01T00:00:00Z', isProtected: true },
+  {
+    id: 'meal-type-lunch',
+    name: 'Lunch',
+    category: 'mealType',
+    createdAtUtc: '2026-08-01T00:00:00Z',
+    isProtected: true,
+  },
   { id: 'custom', name: 'Vegetariskt', category: 'custom', createdAtUtc: '2026-08-01T00:00:00Z', isProtected: false },
 ]
 const initialMeals = [
-  { id: 'pasta', name: 'Pasta pesto', tagIds: ['easy', 'custom'], createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' },
+  {
+    id: 'pasta',
+    name: 'Pasta pesto',
+    tagIds: ['easy', 'custom'],
+    createdAtUtc: '2026-08-01T00:00:00Z',
+    updatedAtUtc: '2026-08-01T00:00:00Z',
+  },
   { id: 'soup', name: 'Soppa', tagIds: [], createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' },
-  { id: 'pancakes', name: 'Pannkakor', tagIds: ['easy'], createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' },
+  {
+    id: 'pancakes',
+    name: 'Pannkakor',
+    tagIds: ['easy'],
+    createdAtUtc: '2026-08-01T00:00:00Z',
+    updatedAtUtc: '2026-08-01T00:00:00Z',
+  },
 ]
 const dates = Array.from({ length: 14 }, (_, index) => ({
   date: `2026-08-${String(index + 3).padStart(2, '0')}`,
   dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index % 7],
   peopleCount: index < 2 ? 4 : index < 9 ? 6 : 3,
 }))
-const days = dates.flatMap((date, index) => (date.dayOfWeek === 'Saturday' || date.dayOfWeek === 'Sunday' ? ['lunch', 'dinner'] : ['dinner']).map(mealType => ({
-  ...date, mealType: mealType as 'lunch' | 'dinner',
-  mealId: mealType === 'lunch' ? 'pancakes' : index % 2 ? 'soup' : 'pasta',
-  mealName: mealType === 'lunch' ? 'Pannkakor' : index % 2 ? 'Soppa' : 'Pasta pesto', tagSummary: [], isManuallyReplaced: false,
-})))
-const baseSchedule = { id: 'schedule', startDate: '2026-08-03', endDate: '2026-08-16', createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z', days, title: 'Familjens veckor', generationVersion: 2 }
+const days = dates.flatMap((date, index) =>
+  (date.dayOfWeek === 'Saturday' || date.dayOfWeek === 'Sunday' ? ['lunch', 'dinner'] : ['dinner']).map(mealType => ({
+    ...date,
+    mealType: mealType as 'lunch' | 'dinner',
+    mealId: mealType === 'lunch' ? 'pancakes' : index % 2 ? 'soup' : 'pasta',
+    mealName: mealType === 'lunch' ? 'Pannkakor' : index % 2 ? 'Soppa' : 'Pasta pesto',
+    tagSummary: [],
+    isManuallyReplaced: false,
+  })),
+)
+const baseSchedule = {
+  id: 'schedule',
+  startDate: '2026-08-03',
+  endDate: '2026-08-16',
+  createdAtUtc: '2026-08-01T00:00:00Z',
+  updatedAtUtc: '2026-08-01T00:00:00Z',
+  days,
+  title: 'Familjens veckor',
+  generationVersion: 2,
+}
 
 let tags = [...initialTags]
 let meals = [...initialMeals]
 let schedules = [baseSchedule]
-function response(body: unknown, status = 200) { return { ok: status < 400, status, json: async () => body } }
+function response(body: unknown, status = 200) {
+  return { ok: status < 400, status, json: async () => body }
+}
 
 beforeEach(() => {
-  tags = [...initialTags]; meals = [...initialMeals]; schedules = [baseSchedule]
-  vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = String(input); const method = init?.method ?? 'GET'
-    if (url.endsWith('/tags') && method === 'GET') return response(tags)
-    if (url.endsWith('/meals') && method === 'GET') return response(meals)
-    if (url.endsWith('/schedules') && method === 'GET') return response(schedules)
-    if (url.endsWith('/meals/seed-examples') && method === 'POST') {
-      const examples = [
-        { id: 'tacos', name: 'Tacos', tagIds: ['easy'], createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' },
-        { id: 'pizza', name: 'Hemmagjord pizza', tagIds: [], createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' },
-      ]
-      meals = [...meals, ...examples]; return response({ createdCount: examples.length, ignoredCount: 0 })
-    }
-    if (url.endsWith('/meals') && method === 'POST') {
-      const body = JSON.parse(String(init?.body)) as { name: string; tagIds: string[] }
-      const created = { id: 'new', ...body, createdAtUtc: '2026-08-01T00:00:00Z', updatedAtUtc: '2026-08-01T00:00:00Z' }
-      meals = [...meals, created]; return response(created, 201)
-    }
-    if (url.includes('/schedules/') && method === 'PUT' && url.endsWith('/meal')) {
-      const body = JSON.parse(String(init?.body)) as { mealId: string }
-      const chosen = meals.find(meal => meal.id === body.mealId)!
-      const [date, mealType] = url.split('/days/')[1].split('/')
-      const updated = { ...schedules[0], days: schedules[0].days.map(day => day.date === date && day.mealType === mealType ? { ...day, mealId: chosen.id, mealName: chosen.name, isManuallyReplaced: true } : day) }
-      schedules = [updated]; return response(updated)
-    }
-    if (url.includes('/meals/') && method === 'PUT') {
-      const body = JSON.parse(String(init?.body)) as { name: string; tagIds: string[] }
-      meals = meals.map(meal => url.endsWith(meal.id) ? { ...meal, ...body } : meal); return response(meals.find(meal => url.endsWith(meal.id)))
-    }
-    if (url.endsWith('/tags') && method === 'POST') {
-      const body = JSON.parse(String(init?.body)) as { name: string; category: 'portion' | 'occasion' | 'mealType' | 'custom' }
-      const created = { id: 'new-tag', ...body, createdAtUtc: '2026-08-01T00:00:00Z', isProtected: false }
-      tags = [...tags, created]; return response(created, 201)
-    }
-    if (url.includes('/tags/') && method === 'DELETE') { tags = tags.filter(tag => !url.endsWith(tag.id)); return response(null, 204) }
-    if (url.includes('/meals/') && method === 'DELETE') { meals = meals.filter(meal => !url.endsWith(meal.id)); return response(null, 204) }
-    if (url.endsWith('/schedules/generate') && method === 'POST') {
-      const generated = { ...baseSchedule, id: 'generated', title: 'Ny matsedel' }
-      schedules = [generated, ...schedules]; return response(generated, 201)
-    }
-    if (url.includes('/replace') && method === 'PUT') {
-      const [date, mealType] = url.split('/days/')[1].split('/')
-      const updated = { ...schedules[0], days: schedules[0].days.map(day => day.date === date && day.mealType === mealType ? { ...day, mealId: 'soup', mealName: 'Soppa', isManuallyReplaced: true } : day) }
-      schedules = [updated]; return response(updated)
-    }
-    if (url.includes('/schedules/') && method === 'DELETE') { schedules = schedules.filter(schedule => !url.endsWith(schedule.id)); return response(null, 204) }
-    return response({ detail: 'Unexpected request' }, 500)
-  }))
+  tags = [...initialTags]
+  meals = [...initialMeals]
+  schedules = [baseSchedule]
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+      const method = init?.method ?? 'GET'
+      if (url.endsWith('/tags') && method === 'GET') return response(tags)
+      if (url.endsWith('/meals') && method === 'GET') return response(meals)
+      if (url.endsWith('/schedules') && method === 'GET') return response(schedules)
+      if (url.endsWith('/meals/seed-examples') && method === 'POST') {
+        const examples = [
+          {
+            id: 'tacos',
+            name: 'Tacos',
+            tagIds: ['easy'],
+            createdAtUtc: '2026-08-01T00:00:00Z',
+            updatedAtUtc: '2026-08-01T00:00:00Z',
+          },
+          {
+            id: 'pizza',
+            name: 'Hemmagjord pizza',
+            tagIds: [],
+            createdAtUtc: '2026-08-01T00:00:00Z',
+            updatedAtUtc: '2026-08-01T00:00:00Z',
+          },
+        ]
+        meals = [...meals, ...examples]
+        return response({ createdCount: examples.length, ignoredCount: 0 })
+      }
+      if (url.endsWith('/meals') && method === 'POST') {
+        const body = JSON.parse(String(init?.body)) as { name: string; tagIds: string[] }
+        const created = {
+          id: 'new',
+          ...body,
+          createdAtUtc: '2026-08-01T00:00:00Z',
+          updatedAtUtc: '2026-08-01T00:00:00Z',
+        }
+        meals = [...meals, created]
+        return response(created, 201)
+      }
+      if (url.includes('/schedules/') && method === 'PUT' && url.endsWith('/meal')) {
+        const body = JSON.parse(String(init?.body)) as { mealId: string }
+        const chosen = meals.find(meal => meal.id === body.mealId)!
+        const [date, mealType] = url.split('/days/')[1].split('/')
+        const updated = {
+          ...schedules[0],
+          days: schedules[0].days.map(day =>
+            day.date === date && day.mealType === mealType
+              ? { ...day, mealId: chosen.id, mealName: chosen.name, isManuallyReplaced: true }
+              : day,
+          ),
+        }
+        schedules = [updated]
+        return response(updated)
+      }
+      if (url.includes('/meals/') && method === 'PUT') {
+        const body = JSON.parse(String(init?.body)) as { name: string; tagIds: string[] }
+        meals = meals.map(meal => (url.endsWith(meal.id) ? { ...meal, ...body } : meal))
+        return response(meals.find(meal => url.endsWith(meal.id)))
+      }
+      if (url.endsWith('/tags') && method === 'POST') {
+        const body = JSON.parse(String(init?.body)) as {
+          name: string
+          category: 'portion' | 'occasion' | 'mealType' | 'custom'
+        }
+        const created = { id: 'new-tag', ...body, createdAtUtc: '2026-08-01T00:00:00Z', isProtected: false }
+        tags = [...tags, created]
+        return response(created, 201)
+      }
+      if (url.includes('/tags/') && method === 'DELETE') {
+        tags = tags.filter(tag => !url.endsWith(tag.id))
+        return response(null, 204)
+      }
+      if (url.includes('/meals/') && method === 'DELETE') {
+        meals = meals.filter(meal => !url.endsWith(meal.id))
+        return response(null, 204)
+      }
+      if (url.endsWith('/schedules/generate') && method === 'POST') {
+        const generated = { ...baseSchedule, id: 'generated', title: 'Ny matsedel' }
+        schedules = [generated, ...schedules]
+        return response(generated, 201)
+      }
+      if (url.includes('/replace') && method === 'PUT') {
+        const [date, mealType] = url.split('/days/')[1].split('/')
+        const updated = {
+          ...schedules[0],
+          days: schedules[0].days.map(day =>
+            day.date === date && day.mealType === mealType
+              ? { ...day, mealId: 'soup', mealName: 'Soppa', isManuallyReplaced: true }
+              : day,
+          ),
+        }
+        schedules = [updated]
+        return response(updated)
+      }
+      if (url.includes('/schedules/') && method === 'DELETE') {
+        schedules = schedules.filter(schedule => !url.endsWith(schedule.id))
+        return response(null, 204)
+      }
+      return response({ detail: 'Unexpected request' }, 500)
+    }),
+  )
   vi.stubGlobal('print', vi.fn())
-  vi.stubGlobal('confirm', vi.fn(() => true))
+  vi.stubGlobal(
+    'confirm',
+    vi.fn(() => true),
+  )
 })
 
-afterEach(() => { cleanup(); vi.unstubAllGlobals() })
+afterEach(() => {
+  cleanup()
+  vi.unstubAllGlobals()
+})
 
 async function openTab(name: string) {
   fireEvent.click(await screen.findByRole('tab', { name }))
@@ -103,7 +205,9 @@ describe('Matlista UX', () => {
     schedules = []
     render(<MealPlanner expanded={false} />)
     await screen.findByRole('button', { name: 'Expandera Matlista' })
-    await waitFor(() => expect(document.querySelector('.dashboard-module__summary')).toHaveTextContent('Ingen matsedel skapad'))
+    await waitFor(() =>
+      expect(document.querySelector('.dashboard-module__summary')).toHaveTextContent('Ingen matsedel skapad'),
+    )
   })
 
   test('collapsed weekend summary shows lunch and dinner with the same people count', async () => {
@@ -123,8 +227,10 @@ describe('Matlista UX', () => {
     expect(screen.getByRole('tab', { name: 'Maträtter' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('tabpanel', { name: 'Maträtter' })).toBeVisible()
     expect(screen.queryByRole('heading', { name: /Vecka 1/ })).not.toBeInTheDocument()
-    await openTab('Generera'); expect(screen.getByRole('heading', { name: 'Generera matsedel' })).toBeVisible()
-    await openTab('Sparade'); expect(screen.getByRole('heading', { name: 'Sparade matsedlar' })).toBeVisible()
+    await openTab('Generera')
+    expect(screen.getByRole('heading', { name: 'Generera matsedel' })).toBeVisible()
+    await openTab('Sparade')
+    expect(screen.getByRole('heading', { name: 'Sparade matsedlar' })).toBeVisible()
   })
 
   test('week view shows seven compact rows, today and bounded navigation without permanent select', async () => {
@@ -173,7 +279,8 @@ describe('Matlista UX', () => {
   })
 
   test('meal library combines text search and tags, reports matches and keeps actions compact', async () => {
-    render(<MealPlanner />); await openTab('Maträtter')
+    render(<MealPlanner />)
+    await openTab('Maträtter')
     const library = screen.getByRole('tabpanel', { name: 'Maträtter' })
     expect(screen.getByText('3 av 3 maträtter')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Sök maträtt'), { target: { value: 'pasta' } })
@@ -192,7 +299,8 @@ describe('Matlista UX', () => {
   })
 
   test('meal editing and confirmed deletion are opened from the row action menu', async () => {
-    render(<MealPlanner />); await openTab('Maträtter')
+    render(<MealPlanner />)
+    await openTab('Maträtter')
     const library = screen.getByRole('tabpanel', { name: 'Maträtter' })
     const soupRow = within(library).getByText('Soppa').closest('li')!
     fireEvent.click(within(soupRow).getByLabelText('Åtgärder för Soppa'))
@@ -211,7 +319,8 @@ describe('Matlista UX', () => {
 
   test('empty library can seed examples only after confirmation', async () => {
     meals = []
-    render(<MealPlanner />); await openTab('Maträtter')
+    render(<MealPlanner />)
+    await openTab('Maträtter')
     fireEvent.click(screen.getByRole('button', { name: 'Lägg in exempelrätter' }))
     expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('24 exempelrätter'))
     expect(await screen.findByText('2 exempelrätter lades till.')).toBeInTheDocument()
@@ -219,7 +328,8 @@ describe('Matlista UX', () => {
   })
 
   test('tag management starts closed and supports custom tag deletion with confirmation', async () => {
-    render(<MealPlanner />); await openTab('Maträtter')
+    render(<MealPlanner />)
+    await openTab('Maträtter')
     const manager = screen.getByText('Hantera taggar').closest('details')!
     expect(manager).not.toHaveAttribute('open')
     fireEvent.click(screen.getByText('Hantera taggar'))
@@ -230,7 +340,8 @@ describe('Matlista UX', () => {
   })
 
   test('successful generation activates the new schedule and returns to schedule tab', async () => {
-    render(<MealPlanner />); await openTab('Generera')
+    render(<MealPlanner />)
+    await openTab('Generera')
     fireEvent.change(screen.getByLabelText('Antal veckor'), { target: { value: '2' } })
     fireEvent.click(screen.getByRole('button', { name: 'Generera matsedel' }))
     expect(await screen.findByText('Matsedeln skapades och sparades.')).toBeInTheDocument()
@@ -240,7 +351,8 @@ describe('Matlista UX', () => {
   })
 
   test('saved schedules are compact, open in schedule view, print and require delete confirmation', async () => {
-    render(<MealPlanner />); await openTab('Sparade')
+    render(<MealPlanner />)
+    await openTab('Sparade')
     expect(screen.getByText(/3 aug.*16 aug.*2 veckor/)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Öppna' }))
     expect(screen.getByRole('tab', { name: 'Matsedel' })).toHaveAttribute('aria-selected', 'true')

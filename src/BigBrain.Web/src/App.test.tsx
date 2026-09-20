@@ -4,20 +4,82 @@ import App from './App'
 import { DASHBOARD_PREFERENCES_STORAGE_KEY } from './dashboard/widgetFramework'
 
 const modules = [
-  { id: 'media', name: 'Media', description: '', route: '/#media', status: 'NotConfigured', dashboardWidgets: [], capabilities: [] },
-  { id: 'system', name: 'System', description: '', route: '/', status: 'Available', dashboardWidgets: [], capabilities: [] },
+  {
+    id: 'media',
+    name: 'Media',
+    description: '',
+    route: '/#media',
+    status: 'NotConfigured',
+    dashboardWidgets: [],
+    capabilities: [],
+  },
+  {
+    id: 'system',
+    name: 'System',
+    description: '',
+    route: '/',
+    status: 'Available',
+    dashboardWidgets: [],
+    capabilities: [],
+  },
 ]
 const overview = {
-  hostname: 'bigbrain-host', operatingSystem: 'Linux', architecture: 'X64', uptimeSeconds: 310_920,
+  hostname: 'bigbrain-host',
+  operatingSystem: 'Linux',
+  architecture: 'X64',
+  uptimeSeconds: 310_920,
   cpu: { usagePercent: 23.5, logicalProcessorCount: 8 },
   memory: { totalBytes: 17_179_869_184, usedBytes: 8_589_934_592, availableBytes: 8_589_934_592, usagePercent: 50 },
-  disks: [{ filesystemId: 'system', displayName: 'System Storage', totalBytes: 1_000_000_000_000, usedBytes: 400_000_000_000, availableBytes: 600_000_000_000, usagePercent: 40 }],
-  temperatureCelsius: null, collectedAtUtc: '2026-07-23T10:00:00Z', status: 'Degraded', warnings: ['Temperature is unavailable.'],
+  disks: [
+    {
+      filesystemId: 'system',
+      displayName: 'System Storage',
+      totalBytes: 1_000_000_000_000,
+      usedBytes: 400_000_000_000,
+      availableBytes: 600_000_000_000,
+      usagePercent: 40,
+    },
+  ],
+  temperatureCelsius: null,
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  status: 'Degraded',
+  warnings: ['Temperature is unavailable.'],
 }
-const dockerUnavailable = { availability: { available: false, reason: 'Docker inventory requires Sentinel integration.' }, collectedAtUtc: '2026-07-23T10:00:00Z', containers: [] }
-const recovery = { overall: 'healthy', bootId: '12345678-abcd', bootedAtUtc: '2026-08-12T10:00:00Z', previousShutdown: 'clean', recoveryCompleted: true, clockSynchronized: true, clockSource: 'systemd-timesync-marker', availableBytes: 100_000_000_000, lowDisk: false, lastCleanShutdownUtc: '2026-08-12T09:59:00Z', lastIntegrityCheckUtc: '2026-08-12T10:00:01Z', interruptedJobs: 0, operatingMode: 'RESEARCH', components: [{ id: 'finance-memory', state: 'healthy', critical: false, summary: 'Fast open/write check passed.', checkedAtUtc: '2026-08-12T10:00:01Z' }], recoveryActions: [], scheduledJobs: [] }
+const dockerUnavailable = {
+  availability: { available: false, reason: 'Docker inventory requires Sentinel integration.' },
+  collectedAtUtc: '2026-07-23T10:00:00Z',
+  containers: [],
+}
+const recovery = {
+  overall: 'healthy',
+  bootId: '12345678-abcd',
+  bootedAtUtc: '2026-08-12T10:00:00Z',
+  previousShutdown: 'clean',
+  recoveryCompleted: true,
+  clockSynchronized: true,
+  clockSource: 'systemd-timesync-marker',
+  availableBytes: 100_000_000_000,
+  lowDisk: false,
+  lastCleanShutdownUtc: '2026-08-12T09:59:00Z',
+  lastIntegrityCheckUtc: '2026-08-12T10:00:01Z',
+  interruptedJobs: 0,
+  operatingMode: 'RESEARCH',
+  components: [
+    {
+      id: 'finance-memory',
+      state: 'healthy',
+      critical: false,
+      summary: 'Fast open/write check passed.',
+      checkedAtUtc: '2026-08-12T10:00:01Z',
+    },
+  ],
+  recoveryActions: [],
+  scheduledJobs: [],
+}
 
-function response(body: unknown) { return { ok: true, json: async () => body } }
+function response(body: unknown) {
+  return { ok: true, json: async () => body }
+}
 function successfulFetch() {
   return vi.fn((input: RequestInfo | URL) => {
     const url = String(input)
@@ -25,14 +87,82 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
     if (url.endsWith('/api/v1/system/recovery')) return Promise.resolve(response(recovery))
-    if (url.endsWith('/api/v1/modules/meal-planner/schedules')) return Promise.resolve(response([{ id: 'week', startDate: '2026-08-17', endDate: '2026-08-23', createdAtUtc: '', updatedAtUtc: '', title: null, generationVersion: 1, days: [{ date: new Date().toLocaleDateString('sv-SE'), mealType: 'dinner', dayOfWeek: 'Sunday', peopleCount: 4, mealId: 'meal', mealName: 'Pappas soppa', tagSummary: [], isManuallyReplaced: false }] }]))
-    if (url.endsWith('/api/v1/modules/calendar/week')) return Promise.resolve(response({ from: '2026-08-17', to: '2026-08-23', events: [] }))
-    if (url.endsWith('/api/v1/modules/shopping-list/items')) return Promise.resolve(response({ sessionId: 'active', items: [{ id: 'item', name: 'Mjölk', normalizedName: 'mjölk', quantity: 1, purchased: false, createdAtUtc: '', updatedAtUtc: '', sortOrdinal: 1 }] }))
-    if (url.endsWith('/api/v1/modules/media')) return Promise.resolve(response({ healthSummary: 'Allt lugnt', insights: [], qBittorrent: { activeCount: 0 } }))
-    if (url.endsWith('/api/v1/modules/finance/overview')) return Promise.resolve(response({ marketSummary: 'Marknaden är blandad', signals: [], prospective: { curve: [] } }))
-    if (url.endsWith('/api/v1/modules/media/audiobooks/overview')) return Promise.resolve(response({ state:'configuredHealthy',message:null,continueListening:null,library:[],recent:[],acquisition:{state:'notConfigured',canSearch:false,canRequest:false,message:null} }))
-    if (url.endsWith('/api/v1/modules/media/audiobooks/acquisition/provider-status')) return Promise.resolve(response({ state:'notConfigured',provider:'none',canSearch:false,canRequest:false,canCancel:false,message:null }))
-    if (url.includes('/api/v1/modules/media/audiobooks/acquisition/jobs')) return Promise.resolve(response({items:[],offset:0,limit:25,total:0}))
+    if (url.endsWith('/api/v1/modules/meal-planner/schedules'))
+      return Promise.resolve(
+        response([
+          {
+            id: 'week',
+            startDate: '2026-08-17',
+            endDate: '2026-08-23',
+            createdAtUtc: '',
+            updatedAtUtc: '',
+            title: null,
+            generationVersion: 1,
+            days: [
+              {
+                date: new Date().toLocaleDateString('sv-SE'),
+                mealType: 'dinner',
+                dayOfWeek: 'Sunday',
+                peopleCount: 4,
+                mealId: 'meal',
+                mealName: 'Pappas soppa',
+                tagSummary: [],
+                isManuallyReplaced: false,
+              },
+            ],
+          },
+        ]),
+      )
+    if (url.endsWith('/api/v1/modules/calendar/week'))
+      return Promise.resolve(response({ from: '2026-08-17', to: '2026-08-23', events: [] }))
+    if (url.endsWith('/api/v1/modules/shopping-list/items'))
+      return Promise.resolve(
+        response({
+          sessionId: 'active',
+          items: [
+            {
+              id: 'item',
+              name: 'Mjölk',
+              normalizedName: 'mjölk',
+              quantity: 1,
+              purchased: false,
+              createdAtUtc: '',
+              updatedAtUtc: '',
+              sortOrdinal: 1,
+            },
+          ],
+        }),
+      )
+    if (url.endsWith('/api/v1/modules/media'))
+      return Promise.resolve(response({ healthSummary: 'Allt lugnt', insights: [], qBittorrent: { activeCount: 0 } }))
+    if (url.endsWith('/api/v1/modules/finance/overview'))
+      return Promise.resolve(
+        response({ marketSummary: 'Marknaden är blandad', signals: [], prospective: { curve: [] } }),
+      )
+    if (url.endsWith('/api/v1/modules/media/audiobooks/overview'))
+      return Promise.resolve(
+        response({
+          state: 'configuredHealthy',
+          message: null,
+          continueListening: null,
+          library: [],
+          recent: [],
+          acquisition: { state: 'notConfigured', canSearch: false, canRequest: false, message: null },
+        }),
+      )
+    if (url.endsWith('/api/v1/modules/media/audiobooks/acquisition/provider-status'))
+      return Promise.resolve(
+        response({
+          state: 'notConfigured',
+          provider: 'none',
+          canSearch: false,
+          canRequest: false,
+          canCancel: false,
+          message: null,
+        }),
+      )
+    if (url.includes('/api/v1/modules/media/audiobooks/acquisition/jobs'))
+      return Promise.resolve(response({ items: [], offset: 0, limit: 25, total: 0 }))
     return Promise.reject(new Error('Unexpected URL'))
   })
 }
@@ -46,15 +176,27 @@ function switchView(name: string) {
   }
 }
 
-beforeEach(() => { window.localStorage.clear(); vi.stubGlobal('fetch', successfulFetch()) })
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); window.history.replaceState({}, '', '/') })
+beforeEach(() => {
+  window.localStorage.clear()
+  vi.stubGlobal('fetch', successfulFetch())
+})
+afterEach(() => {
+  cleanup()
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
+  window.history.replaceState({}, '', '/')
+})
 
 test('starts on the calm Home launcher and keeps family tools in Family', async () => {
   const { container } = render(<App />)
   expect(screen.getByRole('heading', { level: 1, name: 'Hem' })).toBeInTheDocument()
-  expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['home-launcher'])
+  expect(
+    [...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')),
+  ).toEqual(['home-launcher'])
   switchView('Familj')
-  expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id'))).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
+  expect(
+    [...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')),
+  ).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
   expect(container.querySelector('#family')).toHaveClass('family-experience')
   expect(container.querySelector('#family .dashboard-widget')).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
@@ -80,15 +222,20 @@ test('switches dashboard without reload and remembers the active view', () => {
   switchView('Media')
   expect(screen.getByRole('heading', { level: 1, name: 'Media' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Mediesökning' })).toBeInTheDocument()
-  expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({ activeView: 'media', version: 2 })
+  expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+    activeView: 'media',
+    version: 2,
+  })
 })
 
 test('opens the audiobook collection as a real deep-linked Media route', async () => {
   window.history.replaceState({}, '', '/media/audiobooks')
   render(<App />)
-  expect(await screen.findByRole('heading',{name:'Ljudböcker',level:1})).toBeInTheDocument()
-  expect(screen.queryByRole('heading',{name:'Mediesökning'})).not.toBeInTheDocument()
-  expect(screen.getAllByRole('button',{name:/Media/}).some(button=>button.getAttribute('aria-current')==='page')).toBe(true)
+  expect(await screen.findByRole('heading', { name: 'Ljudböcker', level: 1 })).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Mediesökning' })).not.toBeInTheDocument()
+  expect(
+    screen.getAllByRole('button', { name: /Media/ }).some(button => button.getAttribute('aria-current') === 'page'),
+  ).toBe(true)
 })
 
 test('opens the UX/UI Lab from Admin and supports browser history', async () => {
@@ -111,7 +258,10 @@ test('Media keeps technical integrations progressively disclosed', () => {
 })
 
 test('restores the last selected dashboard and falls back from invalid storage', () => {
-  window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'ai', views: {} }))
+  window.localStorage.setItem(
+    DASHBOARD_PREFERENCES_STORAGE_KEY,
+    JSON.stringify({ version: 2, activeView: 'ai', views: {} }),
+  )
   const { unmount } = render(<App />)
   expect(screen.getByRole('heading', { level: 1, name: 'BigBrain AI' })).toBeInTheDocument()
   unmount()
@@ -129,7 +279,9 @@ test('widget library hides a widget without deleting data and persists visibilit
   fireEvent.click(within(dialog).getByRole('checkbox', { name: /Kalender/ }))
   fireEvent.click(within(dialog).getByRole('button', { name: 'Klar' }))
   expect(screen.queryByRole('heading', { name: 'Kalender' })).not.toBeInTheDocument()
-  expect(JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}').views.family.hidden).toContain('calendar')
+  expect(
+    JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}').views.family.hidden,
+  ).toContain('calendar')
 })
 
 test('edit mode reorders widgets and collapsed state is persisted', () => {
@@ -138,7 +290,11 @@ test('edit mode reorders widgets and collapsed state is persisted', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Dashboardinställningar' }))
   fireEvent.click(screen.getByRole('button', { name: 'Aktivera redigeringsläge' }))
   fireEvent.click(screen.getByRole('button', { name: 'Flytta Inköpslista upp' }))
-  expect([...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')).slice(0, 2)).toEqual(['shopping-list', 'meal-plan'])
+  expect(
+    [...container.querySelectorAll('[data-widget-id]')]
+      .map(element => element.getAttribute('data-widget-id'))
+      .slice(0, 2),
+  ).toEqual(['shopping-list', 'meal-plan'])
   const shoppingWidget = container.querySelector('[data-widget-id="shopping-list"]') as HTMLElement
   fireEvent.click(within(shoppingWidget).getAllByRole('button', { name: 'Minimera Inköpslista' })[0])
   const stored = JSON.parse(window.localStorage.getItem(DASHBOARD_PREFERENCES_STORAGE_KEY) ?? '{}')
@@ -169,7 +325,10 @@ test('dashboard settings groups theme, editing and widget library with keyboard 
 })
 
 test('shows loading and safe errors in Admin', async () => {
-  vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('Network unavailable'))))
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.reject(new Error('Network unavailable'))),
+  )
   render(<App />)
   switchView('Admin')
   expect(await screen.findByText('System metrics could not be refreshed.')).toBeInTheDocument()
@@ -182,28 +341,45 @@ test('polls system overview without overlapping the dashboard navigation state',
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
   switchView('Admin')
-  await act(async () => { await Promise.resolve(); await Promise.resolve() })
+  await act(async () => {
+    await Promise.resolve()
+    await Promise.resolve()
+  })
   expect(screen.getByText('bigbrain-host')).toBeInTheDocument()
-  await act(async () => { await vi.advanceTimersByTimeAsync(5_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(5_000)
+  })
   expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/api/v1/system/overview'))).toHaveLength(2)
   expect(screen.getByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument()
 })
 
 test('cold Finance requests no inactive global data and no system polling', async () => {
   vi.useFakeTimers()
-  window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'finance', views: {} }))
+  window.localStorage.setItem(
+    DASHBOARD_PREFERENCES_STORAGE_KEY,
+    JSON.stringify({ version: 2, activeView: 'finance', views: {} }),
+  )
   const fetchMock = vi.fn(() => new Promise<Response>(() => {}))
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
-  await act(async () => { await vi.advanceTimersByTimeAsync(15_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(15_000)
+  })
   expect(fetchMock.mock.calls.map(call => String((call as unknown[])[0])).sort()).toEqual([
-    '/api/v1/modules/finance/observation', '/api/v1/settings/theme',
+    '/api/v1/modules/finance/observation',
+    '/api/v1/settings/theme',
   ])
 })
 
 test('cold Media starts eight visible-view reads with technical administration deferred', () => {
-  window.localStorage.setItem(DASHBOARD_PREFERENCES_STORAGE_KEY, JSON.stringify({ version: 2, activeView: 'media', views: {} }))
-  const fetchMock = vi.fn((url: string) => { void url; return new Promise<Response>(() => {}) })
+  window.localStorage.setItem(
+    DASHBOARD_PREFERENCES_STORAGE_KEY,
+    JSON.stringify({ version: 2, activeView: 'media', views: {} }),
+  )
+  const fetchMock = vi.fn((url: string) => {
+    void url
+    return new Promise<Response>(() => {})
+  })
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
   expect(fetchMock.mock.calls.map(([url]) => url).sort()).toEqual([
@@ -211,23 +387,33 @@ test('cold Media starts eight visible-view reads with technical administration d
     '/api/v1/modules/media/audiobooks/acquisition/provider-status',
     '/api/v1/modules/media/audiobooks/overview',
     '/api/v1/modules/media/audiobooks/playback/availability',
-    '/api/v1/modules/media/downloads', '/api/v1/modules/media/jobs?limit=50',
-    '/api/v1/modules/media/smart-shuffle/options', '/api/v1/settings/theme',
+    '/api/v1/modules/media/downloads',
+    '/api/v1/modules/media/jobs?limit=50',
+    '/api/v1/modules/media/smart-shuffle/options',
+    '/api/v1/settings/theme',
   ])
 })
 
 test('Home starts core reads first, hydrates secondary reads within the bound and aborts on navigation', async () => {
   const pending = new Map<string, { resolve: (value: unknown) => void; signal?: AbortSignal }>()
-  const fetchMock = vi.fn((url: string, init?: RequestInit) => new Promise(resolve => {
-    pending.set(url, { resolve, signal: init?.signal ?? undefined })
-  }))
+  const fetchMock = vi.fn(
+    (url: string, init?: RequestInit) =>
+      new Promise(resolve => {
+        pending.set(url, { resolve, signal: init?.signal ?? undefined })
+      }),
+  )
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
   expect([...pending.keys()].sort()).toEqual([
-    '/api/v1/modules/calendar/week', '/api/v1/modules/meal-planner/schedules', '/api/v1/modules/shopping-list/items',
-    '/api/v1/settings/theme', '/api/v1/system/recovery',
+    '/api/v1/modules/calendar/week',
+    '/api/v1/modules/meal-planner/schedules',
+    '/api/v1/modules/shopping-list/items',
+    '/api/v1/settings/theme',
+    '/api/v1/system/recovery',
   ])
-  await act(async () => { pending.get('/api/v1/modules/meal-planner/schedules')!.resolve(response([])) })
+  await act(async () => {
+    pending.get('/api/v1/modules/meal-planner/schedules')!.resolve(response([]))
+  })
   expect(pending.has('/api/v1/modules/media')).toBe(true)
   expect(pending.has('/api/v1/modules/finance/overview')).toBe(false)
   const calendar = pending.get('/api/v1/modules/calendar/week')!
@@ -235,7 +421,9 @@ test('Home starts core reads first, hydrates secondary reads within the bound an
   expect(calendar.signal?.aborted).toBe(true)
   expect(pending.get('/api/v1/modules/media')!.signal?.aborted).toBe(true)
   expect(pending.get('/api/v1/modules/shopping-list/items')!.signal?.aborted).toBe(true)
-  await act(async () => { calendar.resolve(response({ events: [] })) })
+  await act(async () => {
+    calendar.resolve(response({ events: [] }))
+  })
   expect(pending.has('/api/v1/modules/finance/overview')).toBe(false)
 })
 
@@ -245,25 +433,37 @@ test('Admin polling has one in-flight read, pauses when hidden and stops on exit
   let resolveSystem: (value: unknown) => void = () => {}
   let signal: AbortSignal | undefined
   const fetchMock = vi.fn((url: RequestInfo | URL, init?: RequestInit) => {
-    if (String(url).endsWith('/system/overview')) return new Promise(resolve => { resolveSystem = resolve; signal = init?.signal ?? undefined })
+    if (String(url).endsWith('/system/overview'))
+      return new Promise(resolve => {
+        resolveSystem = resolve
+        signal = init?.signal ?? undefined
+      })
     return normal(url)
   })
   vi.stubGlobal('fetch', fetchMock)
   const calls = () => fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/system/overview')).length
   render(<App />)
   switchView('Admin')
-  await act(async () => { await vi.advanceTimersByTimeAsync(15_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(15_000)
+  })
   expect(calls()).toBe(1)
-  await act(async () => { resolveSystem(response(overview)) })
+  await act(async () => {
+    resolveSystem(response(overview))
+  })
   const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
-  await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10_000)
+  })
   expect(calls()).toBe(1)
   visibility.mockReturnValue('visible')
   fireEvent(document, new Event('visibilitychange'))
   expect(calls()).toBe(2)
   switchView('Hem')
   expect(signal?.aborted).toBe(true)
-  await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(10_000)
+  })
   expect(calls()).toBe(2)
   visibility.mockRestore()
 })

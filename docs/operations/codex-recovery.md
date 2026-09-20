@@ -19,6 +19,82 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-130D2 frontend formatter cleanup — REVIEW CANDIDATE — 2026-09-20
+
+```text
+Status: REVIEW CANDIDATE ONLY — NOT MERGED (no interrupted work remains)
+Task: BB-130D2 — Frontend Formatter Cleanup, bounded formatter-only cleanup of the accepted
+      83-file TS/TSX scope. Agent handoff: Codex → Claude; the Codex session ended because its
+      weekly usage limit was exhausted. Claude recovered and completed the checkpoint.
+Baseline/source-of-truth SHA: 5cb179d2558fb9bddc8f256d0fcc06251826a1f5
+      Verified equal to origin/main by git ls-remote at start, before documentation and again
+      immediately before publication.
+Branch: bb-130d/frontend-formatter-cleanup. Candidate SHA and remote branch SHA are recorded
+      in STATUS, the report and Git history; resolve with
+      git log -1 --format=%H --grep='^style: apply BB-130D2 frontend formatter cleanup$'
+      bb-130d/frontend-formatter-cleanup, and compare with
+      git ls-remote origin refs/heads/bb-130d/frontend-formatter-cleanup.
+      The candidate's own SHA is not embedded recursively in itself.
+Git status: one bounded candidate commit on the branch; no merge, no push to main, no force
+      operation. Unrelated untracked design mockups and unpublished ADR 0006-0009 preserved
+      and excluded from the commit.
+Changed files: exactly the 80 characterized nonconforming files under
+      src/BigBrain.Web/src/**/*.{ts,tsx} (15 .ts, 65 .tsx), 12,873 insertions and 2,498
+      deletions, plus seven documentation files: this note, the cleanup report, STATUS,
+      BACKLOG, the BB-130 stabilization plan, TESTING and the report catalog.
+Completed and valid: recovery reconstruction from Git; formatter contract reproduced;
+      baseline; formatter write mode; scope verification; semantic/AST/literal/JSX
+      verification; production artifact comparison; Finance verification; regression;
+      owner decision applied; documentation; publication gates; candidate commit and push.
+Remaining: architect review of the exact candidate SHA, then owner approval before any merge.
+Tests/builds already run and results (all reproduced by Claude, not inherited):
+      pre  - npm ci 0; tests 199/199 in 26 files; build 0 with 70 modules; audit 0;
+             format:check exit 1 with 80 nonconforming of 83 selected.
+      post - format:check exit 0 with 83/83; a further npm run format is a no-op; tests
+             199/199; focused Finance 46/46; build 0 with 70 modules; audit 0.
+      Production artifacts: CSS, icons and manifest byte-identical; index.html differs only in
+      the content-hashed JS filename; JS bundle +81 bytes, proven to be adjacent JSX text-child
+      splits only (concatenated literals byte-identical at 82,558 bytes; literal-elided code
+      skeletons byte-identical at 332,891 bytes after collapsing adjacent-literal runs).
+      Gates: documentation verifier 0; git diff --check and --cached --check 0;
+      Gitleaks 8.28.0 full history 0 and candidate-file scan 0.
+Blockers/assumptions: DISCOVERED DEVIATION, owner-accepted, deliberately preserved.
+      src/ThemeControl.test.tsx is not a Prettier 3.9.6 fixed point after one write pass; a
+      second pass converges and a third is a no-op. An in-memory sweep shows exactly 82 of 83
+      files reach a fixed point on pass 1. The pass-1 to pass-2 change is member-chain line
+      breaking inside a test setup block, with no token, argument or literal change. The owner
+      approved option (a) on 2026-09-20: accept the converged two-pass result as the cleanup
+      candidate baseline with the deviation documented, explicitly NOT establishing "run
+      Prettier twice" as the normal workflow. The committed source is at the stable fixed
+      point; future formatter CI must verify that committed source is already conforming and
+      must NOT depend on a second write pass. This is a presentation-level formatter defect,
+      not a correctness, security or scientific defect, so blocker handoff does not apply.
+      Verification limitation: semantic equivalence was proven with Prettier 3.9.6's own
+      bundled TypeScript parser, because TypeScript 7.0.2 here is the native port and exposes
+      no JavaScript compiler API; the proof binds this pinned parser, version and file set.
+Exact next action: STOP for architect review and owner acceptance of the exact candidate SHA.
+```
+
+Evidence, method and limitations:
+[BB-130D2 frontend formatter cleanup](../reports/features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md).
+
+Evidence Claude independently reproduced: every command, count, SHA and comparison above.
+Historical evidence reported by Codex but NOT independently reproduced, and not relied upon:
+that Codex had read the documentation, verified main, inspected Finance frontend code and
+begun parser/AST tooling before its usage limit ended. Git evidence proves Codex created the
+branch and made **no** tracked change; formatter write mode had not run before this session.
+
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1, backend cleanup and the backend
+format gate remain accepted and enabled; D2 characterization, triage, dependency maintenance
+and formatter tooling remain accepted. **Frontend formatter cleanup is IMPLEMENTED / TESTED /
+REVIEW CANDIDATE ONLY — not accepted, not merged, not deployed.** No frontend formatter CI
+gate exists and lint remains deferred. Finance RESEARCH / 0 SEK / NONE; no provider, broker,
+orders, PAPER, LIVE, AUTO, capital, scientific, runtime, deployment or device change occurred.
+
+The next agent is NOT authorized to: merge this branch, enable a frontend formatter CI gate,
+deploy, force push, rebase, hand-edit application source, start another checkpoint, begin the
+agent-workflow/recovery redesign, or perform Finance feature or Research Learning work.
+
 ## BB-130D2 formatter tooling accepted publication — 2026-09-17
 
 Status: ACCEPTED / MERGED / CI VERIFIED; no interrupted implementation.

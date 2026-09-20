@@ -1,24 +1,201 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup,fireEvent,render,screen,waitFor } from '@testing-library/react'
-import { afterEach,beforeEach,expect,test,vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { ShoppingList } from './ShoppingList'
 
-const items=[{id:'1',name:'Bananer',normalizedName:'BANANER',quantity:3,purchased:false,createdAtUtc:'2026-08-02T00:00:00Z',updatedAtUtc:'2026-08-02T00:00:00Z',sortOrdinal:1},{id:'2',name:'Mjölk',normalizedName:'MJÖLK',quantity:1,purchased:true,createdAtUtc:'2026-08-02T00:00:00Z',updatedAtUtc:'2026-08-02T00:00:00Z',sortOrdinal:2}]
-beforeEach(()=>{vi.restoreAllMocks();vi.spyOn(window,'confirm').mockReturnValue(true);globalThis.fetch=vi.fn(async(input,init)=>{const url=String(input);if(url.endsWith('/items')&&init?.method==='GET')return new Response(JSON.stringify({items,sessionId:null}));if(url.endsWith('/frequent'))return new Response(JSON.stringify([{name:'Kaffe',purchaseCount:3,lastPurchasedAtUtc:null}]));if(url.includes('/suggestions'))return new Response(JSON.stringify([{name:'Bananer',source:'historik'}]));if(init?.method==='DELETE')return new Response(null,{status:204});return new Response(JSON.stringify(url.includes('finish')?{archivedCount:1,remainingCount:1}:items[0]))}) as typeof fetch})
-afterEach(()=>{cleanup();document.body.classList.remove('shopping-mode-open')})
+const items = [
+  {
+    id: '1',
+    name: 'Bananer',
+    normalizedName: 'BANANER',
+    quantity: 3,
+    purchased: false,
+    createdAtUtc: '2026-08-02T00:00:00Z',
+    updatedAtUtc: '2026-08-02T00:00:00Z',
+    sortOrdinal: 1,
+  },
+  {
+    id: '2',
+    name: 'Mjölk',
+    normalizedName: 'MJÖLK',
+    quantity: 1,
+    purchased: true,
+    createdAtUtc: '2026-08-02T00:00:00Z',
+    updatedAtUtc: '2026-08-02T00:00:00Z',
+    sortOrdinal: 2,
+  },
+]
+beforeEach(() => {
+  vi.restoreAllMocks()
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  globalThis.fetch = vi.fn(async (input, init) => {
+    const url = String(input)
+    if (url.endsWith('/items') && init?.method === 'GET')
+      return new Response(JSON.stringify({ items, sessionId: null }))
+    if (url.endsWith('/frequent'))
+      return new Response(JSON.stringify([{ name: 'Kaffe', purchaseCount: 3, lastPurchasedAtUtc: null }]))
+    if (url.includes('/suggestions')) return new Response(JSON.stringify([{ name: 'Bananer', source: 'historik' }]))
+    if (init?.method === 'DELETE') return new Response(null, { status: 204 })
+    return new Response(JSON.stringify(url.includes('finish') ? { archivedCount: 1, remainingCount: 1 } : items[0]))
+  }) as typeof fetch
+})
+afterEach(() => {
+  cleanup()
+  document.body.classList.remove('shopping-mode-open')
+})
 
-test('compact summary adds directly and opens an isolated accessible shopping mode',async()=>{render(<ShoppingList expanded={false} onToggle={()=>{}} status="Available"/>);expect((await screen.findAllByText('1 kvar')).length).toBeGreaterThan(0);expect(screen.getByText('Bananer × 3')).toBeInTheDocument();fireEvent.change(screen.getAllByPlaceholderText('Lägg till vara')[0],{target:{value:'Bröd'}});fireEvent.click(screen.getAllByRole('button',{name:'+ Lägg till vara'})[0]);await waitFor(()=>expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/items'),expect.objectContaining({method:'POST'})));fireEvent.click(screen.getByRole('button',{name:'Öppna inköpslistan'}));expect(screen.getByRole('dialog',{name:'Inköpslista'})).toHaveAttribute('aria-modal','true');expect(document.body).toHaveClass('shopping-mode-open');expect(screen.getByRole('checkbox',{name:'Markera som köpt Bananer'})).toBeInTheDocument();expect(screen.getByText('Köpta (1)')).toBeInTheDocument();})
+test('compact summary adds directly and opens an isolated accessible shopping mode', async () => {
+  render(<ShoppingList expanded={false} onToggle={() => {}} status="Available" />)
+  expect((await screen.findAllByText('1 kvar')).length).toBeGreaterThan(0)
+  expect(screen.getByText('Bananer × 3')).toBeInTheDocument()
+  fireEvent.change(screen.getAllByPlaceholderText('Lägg till vara')[0], { target: { value: 'Bröd' } })
+  fireEvent.click(screen.getAllByRole('button', { name: '+ Lägg till vara' })[0])
+  await waitFor(() =>
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/items'), expect.objectContaining({ method: 'POST' })),
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna inköpslistan' }))
+  expect(screen.getByRole('dialog', { name: 'Inköpslista' })).toHaveAttribute('aria-modal', 'true')
+  expect(document.body).toHaveClass('shopping-mode-open')
+  expect(screen.getByRole('checkbox', { name: 'Markera som köpt Bananer' })).toBeInTheDocument()
+  expect(screen.getByText('Köpta (1)')).toBeInTheDocument()
+})
 
-test('autocomplete is keyboard reachable and Escape closes suggestions then mode',async()=>{render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const input=screen.getByRole('combobox');fireEvent.change(input,{target:{value:'ban'}});expect(await screen.findByRole('option',{name:/Bananer/})).toBeInTheDocument();fireEvent.keyDown(input,{key:'ArrowDown'});expect(screen.getByRole('option',{name:/Bananer/})).toHaveAttribute('aria-selected','true');fireEvent.keyDown(input,{key:'Escape'});await waitFor(()=>expect(screen.queryByRole('listbox')).not.toBeInTheDocument());fireEvent.keyDown(document,{key:'Escape'});await waitFor(()=>expect(screen.queryByRole('dialog',{name:'Inköpslista'})).not.toBeInTheDocument());expect(document.body).not.toHaveClass('shopping-mode-open')})
+test('autocomplete is keyboard reachable and Escape closes suggestions then mode', async () => {
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'ban' } })
+  expect(await screen.findByRole('option', { name: /Bananer/ })).toBeInTheDocument()
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  expect(screen.getByRole('option', { name: /Bananer/ })).toHaveAttribute('aria-selected', 'true')
+  fireEvent.keyDown(input, { key: 'Escape' })
+  await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument())
+  fireEvent.keyDown(document, { key: 'Escape' })
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Inköpslista' })).not.toBeInTheDocument())
+  expect(document.body).not.toHaveClass('shopping-mode-open')
+})
 
-test('duplicate offers increase quantity without creating another row',async()=>{const fetchMock=globalThis.fetch as ReturnType<typeof vi.fn>;fetchMock.mockImplementation(async(input:RequestInfo|URL,init?:RequestInit)=>{const url=String(input);if(url.endsWith('/items')&&init?.method==='GET')return new Response(JSON.stringify({items,sessionId:null}));if(url.endsWith('/frequent'))return new Response(JSON.stringify([]));if(init?.method==='POST'&&url.endsWith('/items'))return new Response(JSON.stringify({code:'shoppingListDuplicate',detail:'Bananer finns redan på listan.'}),{status:409});return new Response(JSON.stringify({items,sessionId:null}))});render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));fireEvent.change(screen.getByRole('combobox'),{target:{value:'  bananer  '}});fireEvent.click(screen.getByRole('button',{name:'Lägg till'}));expect(await screen.findByRole('alertdialog',{name:/Bananer finns redan/})).toBeInTheDocument();fireEvent.click(screen.getByRole('button',{name:'Öka antal'}));await waitFor(()=>expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/items/1/increase'),expect.objectContaining({method:'POST'})))})
+test('duplicate offers increase quantity without creating another row', async () => {
+  const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>
+  fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input)
+    if (url.endsWith('/items') && init?.method === 'GET')
+      return new Response(JSON.stringify({ items, sessionId: null }))
+    if (url.endsWith('/frequent')) return new Response(JSON.stringify([]))
+    if (init?.method === 'POST' && url.endsWith('/items'))
+      return new Response(JSON.stringify({ code: 'shoppingListDuplicate', detail: 'Bananer finns redan på listan.' }), {
+        status: 409,
+      })
+    return new Response(JSON.stringify({ items, sessionId: null }))
+  })
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: '  bananer  ' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lägg till' }))
+  expect(await screen.findByRole('alertdialog', { name: /Bananer finns redan/ })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Öka antal' }))
+  await waitFor(() =>
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/items/1/increase'),
+      expect.objectContaining({ method: 'POST' }),
+    ),
+  )
+})
 
-test('keeps focus and clears the field across consecutive Enter and button additions',async()=>{render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const input=screen.getByRole('combobox');const form=input.closest('form')!;expect(input).toHaveFocus();fireEvent.change(input,{target:{value:'Bröd'}});fireEvent.submit(form);await waitFor(()=>expect(input).toHaveValue(''));expect(input).toHaveFocus();fireEvent.change(input,{target:{value:'Smör'}});fireEvent.click(screen.getByRole('button',{name:'Lägg till'}));await waitFor(()=>expect(input).toHaveValue(''));expect(input).toHaveFocus();fireEvent.change(input,{target:{value:'Ägg'}});fireEvent.submit(form);await waitFor(()=>expect(input).toHaveValue(''));expect(input).toHaveFocus();expect((globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(([url,options])=>String(url).endsWith('/items')&&(options as RequestInit)?.method==='POST')).toHaveLength(3)})
+test('keeps focus and clears the field across consecutive Enter and button additions', async () => {
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const input = screen.getByRole('combobox')
+  const form = input.closest('form')!
+  expect(input).toHaveFocus()
+  fireEvent.change(input, { target: { value: 'Bröd' } })
+  fireEvent.submit(form)
+  await waitFor(() => expect(input).toHaveValue(''))
+  expect(input).toHaveFocus()
+  fireEvent.change(input, { target: { value: 'Smör' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lägg till' }))
+  await waitFor(() => expect(input).toHaveValue(''))
+  expect(input).toHaveFocus()
+  fireEvent.change(input, { target: { value: 'Ägg' } })
+  fireEvent.submit(form)
+  await waitFor(() => expect(input).toHaveValue(''))
+  expect(input).toHaveFocus()
+  expect(
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
+      ([url, options]) => String(url).endsWith('/items') && (options as RequestInit)?.method === 'POST',
+    ),
+  ).toHaveLength(3)
+})
 
-test('duplicate dialog owns focus and cancel returns it to entry',async()=>{render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const input=screen.getByRole('combobox');fireEvent.change(input,{target:{value:'Bananer'}});fireEvent.submit(input.closest('form')!);const increase=await screen.findByRole('button',{name:'Öka antal'});expect(increase).toHaveFocus();fireEvent.click(screen.getByRole('button',{name:'Avbryt'}));expect(input).toHaveFocus()})
+test('duplicate dialog owns focus and cancel returns it to entry', async () => {
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'Bananer' } })
+  fireEvent.submit(input.closest('form')!)
+  const increase = await screen.findByRole('button', { name: 'Öka antal' })
+  expect(increase).toHaveFocus()
+  fireEvent.click(screen.getByRole('button', { name: 'Avbryt' }))
+  expect(input).toHaveFocus()
+})
 
-test('server failure leaves Enter focus in a recoverable field',async()=>{const fetchMock=globalThis.fetch as ReturnType<typeof vi.fn>;fetchMock.mockImplementation(async(input:RequestInfo|URL,init?:RequestInit)=>{const url=String(input);if(url.endsWith('/items')&&init?.method==='GET')return new Response(JSON.stringify({items,sessionId:null}));if(url.endsWith('/frequent'))return new Response(JSON.stringify([]));if(init?.method==='POST')return new Response(JSON.stringify({detail:'Tillfälligt fel'}),{status:500});return new Response(JSON.stringify([]))});render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const input=screen.getByRole('combobox');fireEvent.change(input,{target:{value:'Kaffe'}});fireEvent.submit(input.closest('form')!);expect(await screen.findByText('Tillfälligt fel')).toBeInTheDocument();expect(input).toHaveValue('Kaffe');expect(input).toHaveFocus()})
+test('server failure leaves Enter focus in a recoverable field', async () => {
+  const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>
+  fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input)
+    if (url.endsWith('/items') && init?.method === 'GET')
+      return new Response(JSON.stringify({ items, sessionId: null }))
+    if (url.endsWith('/frequent')) return new Response(JSON.stringify([]))
+    if (init?.method === 'POST') return new Response(JSON.stringify({ detail: 'Tillfälligt fel' }), { status: 500 })
+    return new Response(JSON.stringify([]))
+  })
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: 'Kaffe' } })
+  fireEvent.submit(input.closest('form')!)
+  expect(await screen.findByText('Tillfälligt fel')).toBeInTheDocument()
+  expect(input).toHaveValue('Kaffe')
+  expect(input).toHaveFocus()
+})
 
-test('validation failure from the button returns focus to the field',async()=>{const fetchMock=globalThis.fetch as ReturnType<typeof vi.fn>;fetchMock.mockImplementation(async(input:RequestInfo|URL,init?:RequestInit)=>{const url=String(input);if(url.endsWith('/items')&&init?.method==='GET')return new Response(JSON.stringify({items,sessionId:null}));if(url.endsWith('/frequent'))return new Response(JSON.stringify([]));if(init?.method==='POST')return new Response(JSON.stringify({code:'shoppingListInvalidRequest',detail:'Ange ett varunamn.'}),{status:400});return new Response(JSON.stringify([]))});render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const input=screen.getByRole('combobox');fireEvent.change(input,{target:{value:' '}});fireEvent.click(screen.getByRole('button',{name:'Lägg till'}));expect(await screen.findByText('Ange ett varunamn.')).toBeInTheDocument();expect(input).toHaveFocus()})
+test('validation failure from the button returns focus to the field', async () => {
+  const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>
+  fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input)
+    if (url.endsWith('/items') && init?.method === 'GET')
+      return new Response(JSON.stringify({ items, sessionId: null }))
+    if (url.endsWith('/frequent')) return new Response(JSON.stringify([]))
+    if (init?.method === 'POST')
+      return new Response(JSON.stringify({ code: 'shoppingListInvalidRequest', detail: 'Ange ett varunamn.' }), {
+        status: 400,
+      })
+    return new Response(JSON.stringify([]))
+  })
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const input = screen.getByRole('combobox')
+  fireEvent.change(input, { target: { value: ' ' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lägg till' }))
+  expect(await screen.findByText('Ange ett varunamn.')).toBeInTheDocument()
+  expect(input).toHaveFocus()
+})
 
-test('row action menu is exclusive and Escape restores its trigger',async()=>{render(<ShoppingList expanded onToggle={()=>{}} status="Available"/>);await screen.findAllByText('1 kvar');fireEvent.click(screen.getByRole('button',{name:'Öppna handlingsläge'}));const first=screen.getByRole('button',{name:'Åtgärder för Bananer'});fireEvent.click(first);expect(screen.getByRole('menu',{name:'Åtgärder för Bananer'})).toBeInTheDocument();expect(screen.getByRole('menuitem',{name:'Redigera vara'})).toHaveFocus();fireEvent.keyDown(document,{key:'Escape'});expect(screen.queryByRole('menu')).not.toBeInTheDocument();expect(first).toHaveFocus()})
+test('row action menu is exclusive and Escape restores its trigger', async () => {
+  render(<ShoppingList expanded onToggle={() => {}} status="Available" />)
+  await screen.findAllByText('1 kvar')
+  fireEvent.click(screen.getByRole('button', { name: 'Öppna handlingsläge' }))
+  const first = screen.getByRole('button', { name: 'Åtgärder för Bananer' })
+  fireEvent.click(first)
+  expect(screen.getByRole('menu', { name: 'Åtgärder för Bananer' })).toBeInTheDocument()
+  expect(screen.getByRole('menuitem', { name: 'Redigera vara' })).toHaveFocus()
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  expect(first).toHaveFocus()
+})

@@ -10,10 +10,23 @@ describe('theme contract', () => {
     localStorage.clear()
     delete document.documentElement.dataset.theme
     vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ theme: 'obsidian-gold', configured: true }), { status: 200, headers: { 'Content-Type': 'application/json' } })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ theme: 'obsidian-gold', configured: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    )
   })
 
-  const renderControl = () => render(<ThemeProvider><ThemeControl /></ThemeProvider>)
+  const renderControl = () =>
+    render(
+      <ThemeProvider>
+        <ThemeControl />
+      </ThemeProvider>,
+    )
 
   it('uses and applies the default theme without stored state', () => {
     expect(resolveInitialTheme()).toBe(DEFAULT_THEME)
@@ -61,12 +74,25 @@ describe('theme contract', () => {
 
   it('seeds an unconfigured shared setting from the existing browser theme', async () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'arctic-wind')
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'obsidian-gold', configured: false }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ theme: 'arctic-wind', configured: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ theme: 'obsidian-gold', configured: false }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ theme: 'arctic-wind', configured: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
     vi.stubGlobal('fetch', fetchMock)
     renderControl()
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/v1/settings/theme', expect.objectContaining({ method: 'PUT' })))
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/settings/theme', expect.objectContaining({ method: 'PUT' })),
+    )
     expect(document.documentElement.dataset.theme).toBe('arctic-wind')
   })
 })

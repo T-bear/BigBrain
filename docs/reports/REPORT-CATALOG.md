@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130D2 cleanup, 2026-09-20` — [Frontend formatter cleanup — IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY](features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md). Codex → Claude handoff. 80 of 83 files formatted, exactly the characterized set; all semantic, literal, JSX and Finance invariants verified unchanged and the production bundle proven rendering-equivalent. Owner-accepted deviation preserved: one file needed two write passes to reach the Prettier fixed point. Not accepted, not merged, not deployed; no frontend CI gate.
+
 - `BB-130D2 formatter tooling, 2026-09-17` — [Pinned formatter contract — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-tooling-20260917.md). 83 files / 80 existing format differences; no write formatting or frontend CI gate; 199 tests/build pass, audit zero. Merge CI 35190196135 SUCCESS.
 
 - `BB-130D2 maintenance, 2026-09-16` — [Minimal dependency patches — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md). Four targets plus Vitest alignment; eight prior GHSAs outside affected installed ranges on accepted main, post-merge audit zero, 199 Web tests pass. Merge CI 35124925562 SUCCESS. No source/CI/deployment changes.

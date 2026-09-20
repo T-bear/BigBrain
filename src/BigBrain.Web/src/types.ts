@@ -21,8 +21,20 @@ export interface SystemOverview {
   architecture: string
   uptimeSeconds: number | null
   cpu: { usagePercent: number | null; logicalProcessorCount: number }
-  memory: { totalBytes: number | null; usedBytes: number | null; availableBytes: number | null; usagePercent: number | null }
-  disks: Array<{ filesystemId: string; displayName: string; totalBytes: number | null; usedBytes: number | null; availableBytes: number | null; usagePercent: number | null }>
+  memory: {
+    totalBytes: number | null
+    usedBytes: number | null
+    availableBytes: number | null
+    usagePercent: number | null
+  }
+  disks: Array<{
+    filesystemId: string
+    displayName: string
+    totalBytes: number | null
+    usedBytes: number | null
+    availableBytes: number | null
+    usagePercent: number | null
+  }>
   temperatureCelsius: number | null
   collectedAtUtc: string
   status: string
@@ -31,10 +43,25 @@ export interface SystemOverview {
 
 export interface SystemRecoverySnapshot {
   overall: 'starting' | 'recovering' | 'healthy' | 'degraded' | 'quiescing' | 'stopping' | 'recoveryRequired'
-  bootId: string; bootedAtUtc: string; previousShutdown: 'unknown' | 'clean' | 'unclean'; recoveryCompleted: boolean
-  clockSynchronized: boolean; clockSource: string; availableBytes: number | null; lowDisk: boolean
-  lastCleanShutdownUtc: string | null; lastIntegrityCheckUtc: string | null; interruptedJobs: number; operatingMode: 'RESEARCH'
-  components: Array<{ id: string; state: 'healthy' | 'degraded' | 'recovering' | 'unavailable'; critical: boolean; summary: string; checkedAtUtc: string }>
+  bootId: string
+  bootedAtUtc: string
+  previousShutdown: 'unknown' | 'clean' | 'unclean'
+  recoveryCompleted: boolean
+  clockSynchronized: boolean
+  clockSource: string
+  availableBytes: number | null
+  lowDisk: boolean
+  lastCleanShutdownUtc: string | null
+  lastIntegrityCheckUtc: string | null
+  interruptedJobs: number
+  operatingMode: 'RESEARCH'
+  components: Array<{
+    id: string
+    state: 'healthy' | 'degraded' | 'recovering' | 'unavailable'
+    critical: boolean
+    summary: string
+    checkedAtUtc: string
+  }>
   recoveryActions: Array<{ code: string; outcome: string; atUtc: string }>
   scheduledJobs: Array<{ job: string; policy: string; reason: string }>
 }
@@ -68,13 +95,74 @@ export type FinanceQuality = 'unknown' | 'good' | 'warning' | 'gap' | 'error'
 
 export interface FinanceObservationSnapshot {
   generatedAtUtc: string
-  safety: { mode: 'unknown' | 'research'; liveTradingEnabled: boolean; paperTradingEnabled: boolean; brokerConnected: boolean; ingestionAllowed: boolean; realProviderStorageAllowed: boolean }
-  provider: { state: 'unknown' | 'noneAuthorized' | 'candidate' | 'authorized' | 'unavailable'; displayName: string; entitlement: 'unknown' | 'pendingWrittenConfirmation' | 'authorized' | 'denied' | 'expired'; entitlementGate: string; reason: string; evidenceClass?: string }
+  safety: {
+    mode: 'unknown' | 'research'
+    liveTradingEnabled: boolean
+    paperTradingEnabled: boolean
+    brokerConnected: boolean
+    ingestionAllowed: boolean
+    realProviderStorageAllowed: boolean
+  }
+  provider: {
+    state: 'unknown' | 'noneAuthorized' | 'candidate' | 'authorized' | 'unavailable'
+    displayName: string
+    entitlement: 'unknown' | 'pendingWrittenConfirmation' | 'authorized' | 'denied' | 'expired'
+    entitlementGate: string
+    reason: string
+    evidenceClass?: string
+  }
   latestMarketDataUpdateUtc: string | null
   dataKind: FinanceDataKind
-  watchlist: Array<{ instrumentId: string; symbol: string; displayName: string; price: number | null; currency: string | null; dailyChangePercent: number | null; observedAtUtc: string | null; freshness: FinanceFreshness; session: FinanceSession; quality: FinanceQuality; dataKind: FinanceDataKind; history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }> }>
-  historicalMemory: { observationCount: number; activeRevisionId: string | null; parentRevisionId: string | null; coverageFrom: string | null; coverageTo: string | null; lastAcquiredAtUtc: string | null; gapCount: number; correctionCount: number; persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'; provider: string; product: string; policy: string; provenance: string }
-  retention?: { state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'; entitlementEndsAtUtc: string | null; deletionDeadlineUtc: string | null; coveredObservationCount: number; coveredRevisionCount: number; coveredPayloadCount: number; deletionScope: string; lastReceiptId: string | null; coveredFeatureValueCount?: number; coveredFeatureRevisionCount?: number; coveredBacktestRunCount?:number; coveredBacktestEventCount?:number; coveredBacktestFillCount?:number; coveredBacktestEquityPointCount?:number; coveredRobustnessEvaluationCount?:number; coveredRobustnessWindowCount?:number; coveredRobustnessParameterPointCount?:number; coveredRobustnessCostPointCount?:number; coveredRobustnessRunReferenceCount?:number } | null
+  watchlist: Array<{
+    instrumentId: string
+    symbol: string
+    displayName: string
+    price: number | null
+    currency: string | null
+    dailyChangePercent: number | null
+    observedAtUtc: string | null
+    freshness: FinanceFreshness
+    session: FinanceSession
+    quality: FinanceQuality
+    dataKind: FinanceDataKind
+    history: Array<{ observedAtUtc: string; value: number | null; beginsAfterGap: boolean }>
+  }>
+  historicalMemory: {
+    observationCount: number
+    activeRevisionId: string | null
+    parentRevisionId: string | null
+    coverageFrom: string | null
+    coverageTo: string | null
+    lastAcquiredAtUtc: string | null
+    gapCount: number
+    correctionCount: number
+    persistence: 'unknown' | 'notConfigured' | 'fixtureMemory' | 'durable'
+    provider: string
+    product: string
+    policy: string
+    provenance: string
+  }
+  retention?: {
+    state: 'unknown' | 'active' | 'deletionRequired' | 'expiredBlocked' | 'deletionComplete'
+    entitlementEndsAtUtc: string | null
+    deletionDeadlineUtc: string | null
+    coveredObservationCount: number
+    coveredRevisionCount: number
+    coveredPayloadCount: number
+    deletionScope: string
+    lastReceiptId: string | null
+    coveredFeatureValueCount?: number
+    coveredFeatureRevisionCount?: number
+    coveredBacktestRunCount?: number
+    coveredBacktestEventCount?: number
+    coveredBacktestFillCount?: number
+    coveredBacktestEquityPointCount?: number
+    coveredRobustnessEvaluationCount?: number
+    coveredRobustnessWindowCount?: number
+    coveredRobustnessParameterPointCount?: number
+    coveredRobustnessCostPointCount?: number
+    coveredRobustnessRunReferenceCount?: number
+  } | null
 }
 
 export type FinanceFeatureState = 'unknown' | 'available' | 'warmup' | 'unavailable'
@@ -84,33 +172,523 @@ export interface FinanceFeatureSnapshot {
   operatingMode: 'research'
   featureSetId: string
   instrumentId: string
-  definitions: Array<{ id: string; name: string; version: string; kind: string; period: number; requiredInputs: string[]; requiredLookback: number; warmupBehavior: string; outputType: string; missingDataBehavior: string; gapBehavior: string; calculationMethod: string; priceBasis: string; fingerprint: string }>
-  revision: null | { revisionId: string; featureSetId: string; featureSetFingerprint: string; engineVersion: string; sourceMarketRevisions: string[]; coverageFrom: string | null; coverageTo: string | null; valueCount: number; availableCount: number; warmupCount: number; qualityIssueCount: number; checksum: string; createdAtUtc: string; buildElapsedMilliseconds: number; priceBasis: string; persistence: string }
-  latest: Array<{ definitionId: string; name: string; period: number; value: number | null; sessionDate: string | null; state: FinanceFeatureState; quality: FinanceFeatureQuality; knowledgeTimeUtc: string | null }>
+  definitions: Array<{
+    id: string
+    name: string
+    version: string
+    kind: string
+    period: number
+    requiredInputs: string[]
+    requiredLookback: number
+    warmupBehavior: string
+    outputType: string
+    missingDataBehavior: string
+    gapBehavior: string
+    calculationMethod: string
+    priceBasis: string
+    fingerprint: string
+  }>
+  revision: null | {
+    revisionId: string
+    featureSetId: string
+    featureSetFingerprint: string
+    engineVersion: string
+    sourceMarketRevisions: string[]
+    coverageFrom: string | null
+    coverageTo: string | null
+    valueCount: number
+    availableCount: number
+    warmupCount: number
+    qualityIssueCount: number
+    checksum: string
+    createdAtUtc: string
+    buildElapsedMilliseconds: number
+    priceBasis: string
+    persistence: string
+  }
+  latest: Array<{
+    definitionId: string
+    name: string
+    period: number
+    value: number | null
+    sessionDate: string | null
+    state: FinanceFeatureState
+    quality: FinanceFeatureQuality
+    knowledgeTimeUtc: string | null
+  }>
   historyDefinitionId: string
-  history: Array<{ sessionDate: string; value: number | null; state: FinanceFeatureState; quality: FinanceFeatureQuality; knowledgeTimeUtc: string }>
+  history: Array<{
+    sessionDate: string
+    value: number | null
+    state: FinanceFeatureState
+    quality: FinanceFeatureQuality
+    knowledgeTimeUtc: string
+  }>
 }
 
 export interface FinanceBacktestRunSummary {
-  runId:string; checksum:string; strategyId:string; strategyVersion:string; parameters:Record<string,number>; costModel:string; from:string; to:string;
-  initialEquity:number; finalEquity:number; grossReturn:number; netReturn:number; maxDrawdown:number; trades:number; costImpact:number;
-  benchmarkReturn:number|null; excessReturn:number|null; marketRevisionIds:string[]; featureRevisionId:string; simulationModel:string; sizingPolicy:string; status:string; limitations:string[]
+  runId: string
+  checksum: string
+  strategyId: string
+  strategyVersion: string
+  parameters: Record<string, number>
+  costModel: string
+  from: string
+  to: string
+  initialEquity: number
+  finalEquity: number
+  grossReturn: number
+  netReturn: number
+  maxDrawdown: number
+  trades: number
+  costImpact: number
+  benchmarkReturn: number | null
+  excessReturn: number | null
+  marketRevisionIds: string[]
+  featureRevisionId: string
+  simulationModel: string
+  sizingPolicy: string
+  status: string
+  limitations: string[]
 }
-export interface FinanceBacktestCatalog { generatedAtUtc:string; operatingMode:string; strategies:Array<{id:string;version:string;name:string;defaultParameters:Record<string,number>}>; runs:FinanceBacktestRunSummary[] }
-export interface FinanceBacktestResult { runId:string; checksum:string; equityCurve:Array<{session:string;cash:number;holdingsValue:number;totalEquity:number;drawdown:number}>; fills:Array<unknown>; events:Array<unknown>; metrics:Record<string,number|null> }
-export interface FinanceRobustnessSummary { evaluationId:string;checksum:string;planId:string;planVersion:string;strategyId:string;strategyVersion:string;verdict:string;score:number;evidenceLabel:string;trainSessions:number;testSessions:number;embargoSessions:number;walkForwardWindows:number;parameterVariants:number;costVariants:number;featureRevisionId:string;marketRevisionIds:string[];limitations:string[] }
-export interface FinanceRobustnessCatalog {generatedAtUtc:string;operatingMode:string;plans:Array<unknown>;evaluations:FinanceRobustnessSummary[]}
-export interface FinanceDatasetCatalog { generatedAtUtc:string; operatingMode:'RESEARCH'; datasets:Array<{candidateId:string;source:string;sourceUrl:string;hostingPlatform:string;status:string;licenseClass:string;provenanceResult:string;artifactSha256:string;artifactBytes:number;coverageFrom:string|null;coverageTo:string|null;observationCount:number;instrumentCount:number;priceBasis:string;survivorshipBias:string;validationResult:string;promotionDecision:string;canonicalRevisionId:string|null;promotedObservationCount:number;promotedSymbols:string[];limitations:string[];cleanupEligible:boolean;cleanupState:string;manifestRetained:boolean}> }
-export interface FinanceBackupInventory { generatedAtUtc:string;operatingMode:'RESEARCH';backups:Array<{backupId:string;createdAtUtc:string;schemaVersion:string;bigBrainVersion:string;status:string;sources:Array<{provider:string;product:string;rightsClass:string;retentionClass:string;deletionRequirement:string;deletionDeadlineUtc:string|null;backupEligibility:string;restoreEligible:boolean;reason:string}>;revisions:Array<{revisionId:string;provider:string;product:string;policy:string;checksum:string;observationCount:number;coverageFrom:string|null;coverageTo:string|null}>;featureRevisionIds:string[];backtestRunIds:string[];robustnessEvaluationIds:string[];artifacts:Array<{path:string;bytes:number;sha256:string}>;contentFingerprint:string}>;sourcePolicies:Array<{provider:string;product:string;rightsClass:string;retentionClass:string;deletionRequirement:string;deletionDeadlineUtc:string|null;backupEligibility:string;restoreEligible:boolean;reason:string}> }
-export interface FinanceShadowCatalog { generatedAtUtc:string;operatingMode:'RESEARCH';observationClass:string;predictions:Array<{predictionId:string;instrumentId:string;symbol:string;sessionDate:string;provider:string;sourceRevisionId:string;observationKnowledgeUtc:string;knowledgeCutoffUtc:string;featureRevisionId:string;strategyId:string;strategyVersion:string;parameterFingerprint:string;signal:string;horizon:string;createdAtUtc:string;state:'pending'|'evaluated'|'insufficientData'|'missedProspectiveWindow'|'invalidated';operatingMode:'RESEARCH';reasonCodes:string[]}>;total:number;pending:number;evaluated:number;insufficient:number;missed:number;evidenceMaturity:string }
-export interface FinanceOverview { generatedAtUtc:string;mode:'RESEARCH';provider:string;observationClass:string;latestSession:string|null;freshness:string;tracked:number;up:number;down:number;unchanged:number;marketSummary:string;signals:Array<{instrumentId:string;symbol:string;name:string;state:'POSITIVE'|'NEUTRAL'|'NEGATIVE'|'INSUFFICIENT';sessionChangePercent:number|null;positiveStrategies:number;neutralStrategies:number;negativeStrategies:number;strategyCount:number;agreement:string;freshness:string;predictionIds?:string[]}>;prospective:{valid:number;pending:number;evaluated:number;invalidated:number;correct:number;incorrect:number;directionalAccuracy:number|null;meanRealizedReturn:number|null;evidenceMaturity:string;curve:Array<{session:string;cumulativeReturn:number}>};cadence:{enabled:boolean;provider:string;observationClass:string;health:string;lastProviderCheckUtc:string|null;lastSuccessfulAcquisitionUtc:string|null;latestCanonicalSession:string|null;lastPredictionUtc:string|null;lastOutcomeUtc:string|null;pending:number;evaluated:number;invalidated:number;clockIntegrity:boolean;nextAction:string;pollingPolicy:string;operatingMode:'RESEARCH'};disclaimer:string;evidenceSeparation:string }
-export interface FinanceRiskStatus { policyVersion:string;operatingMode:'RESEARCH';engineHealth:string;safetyState:string;activeHalt:boolean;haltScope:string;haltReason:string|null;haltedAtUtc:string|null;evaluationCount:number;lastEvaluationUtc:string|null;executionAuthority:string }
-export interface FinanceRiskEvaluation { evaluationId:string;policyVersion:string;proposalId:string;instrumentId:string;strategyId:string;strategyVersion:string;parameterFingerprint:string;shadowPredictionId:string|null;sourceRevisionId:string;featureRevisionId:string;knowledgeCutoffUtc:string;evaluatedAtUtc:string;operatingMode:'RESEARCH';direction:string;researchCapital:number;requestedExposure:number;allowedExposure:number;riskAdjustedExposure:number;verdict:'allow'|'reduce'|'deny'|'halt'|'insufficientData';reasonCodes:string[];rules:Array<{ruleId:string;state:'pass'|'fail'|'notEvaluable';reasonCode:string;explanation:string;evidence:string}>;evidenceLineage:string }
-export interface FinanceAutonomousResearch { generatedAtUtc:string;operatingMode:'RESEARCH';budgetSek:0;engineVersion:string;featureLibraryVersion:string;totalExperiments:number;rejectedCount:number;inconclusiveCount:number;notEvaluableCount:number;promisingCount:number;challengerCount:number;status:string;executionAuthority:'NONE';features:Array<{id:string;version:string;category:string;description:string;sourceDefinitionId:string;complexityCost:number}>;hypotheses:Array<{hypothesisId:string;explanation:string;featureIds:string[];target:string;horizonSessions:number;familyId:string}>;latestRun:null|{runId:string;state:string;experimentCount:number;rejectedCount:number;inconclusiveCount:number;notEvaluableCount:number;promisingCount:number;challengerCount:number;failureReason:string|null;recoveryStatus:string;experiments:Array<{experimentId:string;familyId:string;familyAttemptCount:number;attemptCount:number|null;runId:string|null;runIds:string[]|null;verdict:string;rejectionReason:string|null;outOfSampleNetReturn:number|null;costModel:string;featureRevisionId:string;marketRevisionIds:string[];knowledgeCutoffUtc:string;complexity:{score:number};integrity:{state:string;checks:Array<{id:string;state:string;evidence:string}>}}>}}
-export interface FinanceResearchSchedulerStatus {currentUtc:string;enabled:boolean;schedulerVersion:string;nextDueUtc:string|null;lastOpportunity:null|{opportunityId:string;researchDate:string;dueAtUtc:string;attemptedAtUtc:string|null;completedAtUtc:string|null;state:string;researchRunId:string|null;reason:string|null;nextEligibilityUtc:string|null};lastResearchRunId:string|null;lastOutcome:string;lastReason:string|null;researchCurrentlyRunning:boolean;operatingMode:'RESEARCH';budgetSek:0;executionAuthority:'NONE';historicalEvidenceAvailable:boolean;currentSessionRequired:boolean;requiredResearchDate:string|null;currentSessionReadiness:string;featureLineageReadiness:string;dataReady:boolean;readinessReason:string;currentInstrumentCount:number|null;expectedInstrumentCount:number}
-export interface FinanceResearchResourceDecision {decision:'allow'|'defer'|'block';evaluatedAtUtc:string;governorVersion:string;reasonCodes:string[];evidence:{cpuUsagePercent:number|null;memoryUsagePercent:number|null;availableMemoryBytes:number|null;minimumAvailableDiskBytes:number|null;availableDiskCount:number;temperatureCelsius:number|null;temperatureSupported:false;metricsStatus:string;collectedAtUtc:string|null};operatingMode:'RESEARCH';budgetSek:0;executionAuthority:'NONE'}
-export interface FinanceResearchOperationsStatus {operationsVersion:string;evaluatedAtUtc:string;state:'disabled'|'maintenance'|'waiting'|'ready'|'running'|'deferred'|'degraded'|'attentionRequired';requiresAttention:boolean;currentActivity:string;schedulerEnabled:boolean;maintenancePaused:boolean;lastSchedulerEvaluationUtc:string|null;lastSuccessfulResearchUtc:string|null;lastOperationalFailureUtc:string|null;consecutiveOperationalFailures:number;lastFailureReason:string|null;lastSuccessfulEvidenceRefreshUtc:string|null;historicalEvidenceAvailable:boolean;currentSessionRequired:boolean;requiredResearchDate:string|null;dataReadiness:string;featureLineageReadiness:string;resourceDecision:string|null;activeResearchRunId:string|null;operatingMode:'RESEARCH';budgetSek:0;executionAuthority:'NONE'}
-export interface FinanceRobustnessEvaluation {evaluationId:string;checksum:string;verdict:string;verdictReasons:string[];trainSessions:number;testSessions:number;primarySplit:{train:Record<string,number|null>;test:Record<string,number|null>;netReturnDegradation:number;drawdownDegradation:number;sharpeDegradation:number|null;benchmarkRelativeDegradation:number|null};parameterSensitivity:{variantsEvaluated:number;medianNetReturn:number;minimumNetReturn:number;maximumNetReturn:number;returnStandardDeviation:number;medianDrawdown:number;worstDrawdown:number;percentBeatingBenchmark:number;percentPositive:number;verdict:string;points:Array<{parameters:Record<string,number>;testNetReturn:number}>};costSensitivity:{points:Array<{costModel:string;netReturn:number;degradation:number;costBurdenOfGrossPnl:number;trades:number;averageHoldingSessions:number}>;estimatedBreakEvenSlippageBps:number|null;rankingStable:boolean};walkForwardWindows:Array<{id:string;trainFrom:string;trainTo:string;testFrom:string;testTo:string}>;walkForwardPositivePercent:number;score:{total:number;label:string;components:Array<{id:string;weight:number;score:number;reason:string}>};limitations:string[]}
+export interface FinanceBacktestCatalog {
+  generatedAtUtc: string
+  operatingMode: string
+  strategies: Array<{ id: string; version: string; name: string; defaultParameters: Record<string, number> }>
+  runs: FinanceBacktestRunSummary[]
+}
+export interface FinanceBacktestResult {
+  runId: string
+  checksum: string
+  equityCurve: Array<{ session: string; cash: number; holdingsValue: number; totalEquity: number; drawdown: number }>
+  fills: Array<unknown>
+  events: Array<unknown>
+  metrics: Record<string, number | null>
+}
+export interface FinanceRobustnessSummary {
+  evaluationId: string
+  checksum: string
+  planId: string
+  planVersion: string
+  strategyId: string
+  strategyVersion: string
+  verdict: string
+  score: number
+  evidenceLabel: string
+  trainSessions: number
+  testSessions: number
+  embargoSessions: number
+  walkForwardWindows: number
+  parameterVariants: number
+  costVariants: number
+  featureRevisionId: string
+  marketRevisionIds: string[]
+  limitations: string[]
+}
+export interface FinanceRobustnessCatalog {
+  generatedAtUtc: string
+  operatingMode: string
+  plans: Array<unknown>
+  evaluations: FinanceRobustnessSummary[]
+}
+export interface FinanceDatasetCatalog {
+  generatedAtUtc: string
+  operatingMode: 'RESEARCH'
+  datasets: Array<{
+    candidateId: string
+    source: string
+    sourceUrl: string
+    hostingPlatform: string
+    status: string
+    licenseClass: string
+    provenanceResult: string
+    artifactSha256: string
+    artifactBytes: number
+    coverageFrom: string | null
+    coverageTo: string | null
+    observationCount: number
+    instrumentCount: number
+    priceBasis: string
+    survivorshipBias: string
+    validationResult: string
+    promotionDecision: string
+    canonicalRevisionId: string | null
+    promotedObservationCount: number
+    promotedSymbols: string[]
+    limitations: string[]
+    cleanupEligible: boolean
+    cleanupState: string
+    manifestRetained: boolean
+  }>
+}
+export interface FinanceBackupInventory {
+  generatedAtUtc: string
+  operatingMode: 'RESEARCH'
+  backups: Array<{
+    backupId: string
+    createdAtUtc: string
+    schemaVersion: string
+    bigBrainVersion: string
+    status: string
+    sources: Array<{
+      provider: string
+      product: string
+      rightsClass: string
+      retentionClass: string
+      deletionRequirement: string
+      deletionDeadlineUtc: string | null
+      backupEligibility: string
+      restoreEligible: boolean
+      reason: string
+    }>
+    revisions: Array<{
+      revisionId: string
+      provider: string
+      product: string
+      policy: string
+      checksum: string
+      observationCount: number
+      coverageFrom: string | null
+      coverageTo: string | null
+    }>
+    featureRevisionIds: string[]
+    backtestRunIds: string[]
+    robustnessEvaluationIds: string[]
+    artifacts: Array<{ path: string; bytes: number; sha256: string }>
+    contentFingerprint: string
+  }>
+  sourcePolicies: Array<{
+    provider: string
+    product: string
+    rightsClass: string
+    retentionClass: string
+    deletionRequirement: string
+    deletionDeadlineUtc: string | null
+    backupEligibility: string
+    restoreEligible: boolean
+    reason: string
+  }>
+}
+export interface FinanceShadowCatalog {
+  generatedAtUtc: string
+  operatingMode: 'RESEARCH'
+  observationClass: string
+  predictions: Array<{
+    predictionId: string
+    instrumentId: string
+    symbol: string
+    sessionDate: string
+    provider: string
+    sourceRevisionId: string
+    observationKnowledgeUtc: string
+    knowledgeCutoffUtc: string
+    featureRevisionId: string
+    strategyId: string
+    strategyVersion: string
+    parameterFingerprint: string
+    signal: string
+    horizon: string
+    createdAtUtc: string
+    state: 'pending' | 'evaluated' | 'insufficientData' | 'missedProspectiveWindow' | 'invalidated'
+    operatingMode: 'RESEARCH'
+    reasonCodes: string[]
+  }>
+  total: number
+  pending: number
+  evaluated: number
+  insufficient: number
+  missed: number
+  evidenceMaturity: string
+}
+export interface FinanceOverview {
+  generatedAtUtc: string
+  mode: 'RESEARCH'
+  provider: string
+  observationClass: string
+  latestSession: string | null
+  freshness: string
+  tracked: number
+  up: number
+  down: number
+  unchanged: number
+  marketSummary: string
+  signals: Array<{
+    instrumentId: string
+    symbol: string
+    name: string
+    state: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | 'INSUFFICIENT'
+    sessionChangePercent: number | null
+    positiveStrategies: number
+    neutralStrategies: number
+    negativeStrategies: number
+    strategyCount: number
+    agreement: string
+    freshness: string
+    predictionIds?: string[]
+  }>
+  prospective: {
+    valid: number
+    pending: number
+    evaluated: number
+    invalidated: number
+    correct: number
+    incorrect: number
+    directionalAccuracy: number | null
+    meanRealizedReturn: number | null
+    evidenceMaturity: string
+    curve: Array<{ session: string; cumulativeReturn: number }>
+  }
+  cadence: {
+    enabled: boolean
+    provider: string
+    observationClass: string
+    health: string
+    lastProviderCheckUtc: string | null
+    lastSuccessfulAcquisitionUtc: string | null
+    latestCanonicalSession: string | null
+    lastPredictionUtc: string | null
+    lastOutcomeUtc: string | null
+    pending: number
+    evaluated: number
+    invalidated: number
+    clockIntegrity: boolean
+    nextAction: string
+    pollingPolicy: string
+    operatingMode: 'RESEARCH'
+  }
+  disclaimer: string
+  evidenceSeparation: string
+}
+export interface FinanceRiskStatus {
+  policyVersion: string
+  operatingMode: 'RESEARCH'
+  engineHealth: string
+  safetyState: string
+  activeHalt: boolean
+  haltScope: string
+  haltReason: string | null
+  haltedAtUtc: string | null
+  evaluationCount: number
+  lastEvaluationUtc: string | null
+  executionAuthority: string
+}
+export interface FinanceRiskEvaluation {
+  evaluationId: string
+  policyVersion: string
+  proposalId: string
+  instrumentId: string
+  strategyId: string
+  strategyVersion: string
+  parameterFingerprint: string
+  shadowPredictionId: string | null
+  sourceRevisionId: string
+  featureRevisionId: string
+  knowledgeCutoffUtc: string
+  evaluatedAtUtc: string
+  operatingMode: 'RESEARCH'
+  direction: string
+  researchCapital: number
+  requestedExposure: number
+  allowedExposure: number
+  riskAdjustedExposure: number
+  verdict: 'allow' | 'reduce' | 'deny' | 'halt' | 'insufficientData'
+  reasonCodes: string[]
+  rules: Array<{
+    ruleId: string
+    state: 'pass' | 'fail' | 'notEvaluable'
+    reasonCode: string
+    explanation: string
+    evidence: string
+  }>
+  evidenceLineage: string
+}
+export interface FinanceAutonomousResearch {
+  generatedAtUtc: string
+  operatingMode: 'RESEARCH'
+  budgetSek: 0
+  engineVersion: string
+  featureLibraryVersion: string
+  totalExperiments: number
+  rejectedCount: number
+  inconclusiveCount: number
+  notEvaluableCount: number
+  promisingCount: number
+  challengerCount: number
+  status: string
+  executionAuthority: 'NONE'
+  features: Array<{
+    id: string
+    version: string
+    category: string
+    description: string
+    sourceDefinitionId: string
+    complexityCost: number
+  }>
+  hypotheses: Array<{
+    hypothesisId: string
+    explanation: string
+    featureIds: string[]
+    target: string
+    horizonSessions: number
+    familyId: string
+  }>
+  latestRun: null | {
+    runId: string
+    state: string
+    experimentCount: number
+    rejectedCount: number
+    inconclusiveCount: number
+    notEvaluableCount: number
+    promisingCount: number
+    challengerCount: number
+    failureReason: string | null
+    recoveryStatus: string
+    experiments: Array<{
+      experimentId: string
+      familyId: string
+      familyAttemptCount: number
+      attemptCount: number | null
+      runId: string | null
+      runIds: string[] | null
+      verdict: string
+      rejectionReason: string | null
+      outOfSampleNetReturn: number | null
+      costModel: string
+      featureRevisionId: string
+      marketRevisionIds: string[]
+      knowledgeCutoffUtc: string
+      complexity: { score: number }
+      integrity: { state: string; checks: Array<{ id: string; state: string; evidence: string }> }
+    }>
+  }
+}
+export interface FinanceResearchSchedulerStatus {
+  currentUtc: string
+  enabled: boolean
+  schedulerVersion: string
+  nextDueUtc: string | null
+  lastOpportunity: null | {
+    opportunityId: string
+    researchDate: string
+    dueAtUtc: string
+    attemptedAtUtc: string | null
+    completedAtUtc: string | null
+    state: string
+    researchRunId: string | null
+    reason: string | null
+    nextEligibilityUtc: string | null
+  }
+  lastResearchRunId: string | null
+  lastOutcome: string
+  lastReason: string | null
+  researchCurrentlyRunning: boolean
+  operatingMode: 'RESEARCH'
+  budgetSek: 0
+  executionAuthority: 'NONE'
+  historicalEvidenceAvailable: boolean
+  currentSessionRequired: boolean
+  requiredResearchDate: string | null
+  currentSessionReadiness: string
+  featureLineageReadiness: string
+  dataReady: boolean
+  readinessReason: string
+  currentInstrumentCount: number | null
+  expectedInstrumentCount: number
+}
+export interface FinanceResearchResourceDecision {
+  decision: 'allow' | 'defer' | 'block'
+  evaluatedAtUtc: string
+  governorVersion: string
+  reasonCodes: string[]
+  evidence: {
+    cpuUsagePercent: number | null
+    memoryUsagePercent: number | null
+    availableMemoryBytes: number | null
+    minimumAvailableDiskBytes: number | null
+    availableDiskCount: number
+    temperatureCelsius: number | null
+    temperatureSupported: false
+    metricsStatus: string
+    collectedAtUtc: string | null
+  }
+  operatingMode: 'RESEARCH'
+  budgetSek: 0
+  executionAuthority: 'NONE'
+}
+export interface FinanceResearchOperationsStatus {
+  operationsVersion: string
+  evaluatedAtUtc: string
+  state: 'disabled' | 'maintenance' | 'waiting' | 'ready' | 'running' | 'deferred' | 'degraded' | 'attentionRequired'
+  requiresAttention: boolean
+  currentActivity: string
+  schedulerEnabled: boolean
+  maintenancePaused: boolean
+  lastSchedulerEvaluationUtc: string | null
+  lastSuccessfulResearchUtc: string | null
+  lastOperationalFailureUtc: string | null
+  consecutiveOperationalFailures: number
+  lastFailureReason: string | null
+  lastSuccessfulEvidenceRefreshUtc: string | null
+  historicalEvidenceAvailable: boolean
+  currentSessionRequired: boolean
+  requiredResearchDate: string | null
+  dataReadiness: string
+  featureLineageReadiness: string
+  resourceDecision: string | null
+  activeResearchRunId: string | null
+  operatingMode: 'RESEARCH'
+  budgetSek: 0
+  executionAuthority: 'NONE'
+}
+export interface FinanceRobustnessEvaluation {
+  evaluationId: string
+  checksum: string
+  verdict: string
+  verdictReasons: string[]
+  trainSessions: number
+  testSessions: number
+  primarySplit: {
+    train: Record<string, number | null>
+    test: Record<string, number | null>
+    netReturnDegradation: number
+    drawdownDegradation: number
+    sharpeDegradation: number | null
+    benchmarkRelativeDegradation: number | null
+  }
+  parameterSensitivity: {
+    variantsEvaluated: number
+    medianNetReturn: number
+    minimumNetReturn: number
+    maximumNetReturn: number
+    returnStandardDeviation: number
+    medianDrawdown: number
+    worstDrawdown: number
+    percentBeatingBenchmark: number
+    percentPositive: number
+    verdict: string
+    points: Array<{ parameters: Record<string, number>; testNetReturn: number }>
+  }
+  costSensitivity: {
+    points: Array<{
+      costModel: string
+      netReturn: number
+      degradation: number
+      costBurdenOfGrossPnl: number
+      trades: number
+      averageHoldingSessions: number
+    }>
+    estimatedBreakEvenSlippageBps: number | null
+    rankingStable: boolean
+  }
+  walkForwardWindows: Array<{ id: string; trainFrom: string; trainTo: string; testFrom: string; testTo: string }>
+  walkForwardPositivePercent: number
+  score: {
+    total: number
+    label: string
+    components: Array<{ id: string; weight: number; score: number; reason: string }>
+  }
+  limitations: string[]
+}
 
 export interface MediaServiceStatus {
   serviceName: string
@@ -283,8 +861,16 @@ export interface MediaSearchResponse {
 }
 
 export type MediaJobStatus =
-  'requested' | 'searching' | 'queued' | 'downloading' | 'stalled' |
-  'completed' | 'importing' | 'available' | 'failed' | 'unknown'
+  | 'requested'
+  | 'searching'
+  | 'queued'
+  | 'downloading'
+  | 'stalled'
+  | 'completed'
+  | 'importing'
+  | 'available'
+  | 'failed'
+  | 'unknown'
 
 export interface MediaJob {
   id: string
@@ -385,20 +971,132 @@ export interface MediaServiceLink {
   enabled: boolean
 }
 
-export interface AudiobookItem { id:string; title:string; author:string|null; series:string|null; narrator:string|null; language:string; languageLabel:string; durationSeconds:number|null; progressPercent:number|null; description:string|null; coverUrl:string|null; publishedYear:string|null; isAbridged:boolean|null; playbackUrl:string|null }
-export interface AudiobookAcquisitionCapabilities { state:string; canSearch:boolean; canRequest:boolean; message:string|null }
-export interface AudiobookOverview { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'; message:string|null; continueListening:AudiobookItem|null; library:AudiobookItem[]; recent:AudiobookItem[]; acquisition:AudiobookAcquisitionCapabilities }
-export interface AudiobookLibraryPage { items:AudiobookItem[]; page:number; pageSize:number; total:number }
-export interface AudiobookAcquisitionProviderStatus extends AudiobookAcquisitionCapabilities { provider:string; canCancel:boolean }
-export interface AudiobookAcquisitionCandidate { workId:string; editionId:string; title:string; author:string|null; narrator:string|null; language:string; languageLabel:string; edition:string|null; durationSeconds:number|null; publicationYear:number|null; coverUrl:string|null; source:string; availability:string; languageConfidence:string; provenance?:string|null; metadataWorkId?:string|null; matchEvidence?:string|null }
-export interface AudiobookAcquisitionJob { id:string; providerJobId:string|null; candidate:AudiobookAcquisitionCandidate; status:string; createdAtUtc:string; updatedAtUtc:string; message:string|null }
-export interface AudiobookAcquisitionJobPage { items:AudiobookAcquisitionJob[]; offset:number; limit:number; total:number }
-export interface AudiobookMetadataWork { workId:string; editionIds:string[]; canonicalTitle:string; alternateTitles:string[]; authors:string[]; series:string|null; seriesNumber:string|null; narrators:string[]; isbn10:string|null; isbn13:string|null; asin:string|null; language:string; publicationYear:number|null; coverUrl:string|null; provider:string }
-export interface AudiobookMetadataResolution { query:{original:string;normalized:string;kind:'isbn10'|'isbn13'|'probableAsin'|'freeText'}; state:'resolved'|'notFound'|'unavailable'; works:AudiobookMetadataWork[]; narratorSearchSupported:boolean; message:string|null }
-export interface AudiobookSearchResponse { library:AudiobookItem[]; metadata:AudiobookMetadataResolution; discovery:AudiobookAcquisitionCandidate[]; acquisition:AudiobookAcquisitionProviderStatus }
-export interface AudiobookPlaybackTrack { index:number; startOffset:number; duration:number; title:string|null; mimeType:string; streamUrl:string }
-export interface AudiobookPlaybackSession { id:string; itemId:string; currentTime:number; duration:number; tracks:AudiobookPlaybackTrack[]; expiresAtUtc:string }
-export interface AudiobookPlaybackAvailability { state:'configuredHealthy'|'configuredUnavailable'|'notConfigured'|'rejected'; message:string|null; separateIdentity:boolean; hasProgress:boolean }
+export interface AudiobookItem {
+  id: string
+  title: string
+  author: string | null
+  series: string | null
+  narrator: string | null
+  language: string
+  languageLabel: string
+  durationSeconds: number | null
+  progressPercent: number | null
+  description: string | null
+  coverUrl: string | null
+  publishedYear: string | null
+  isAbridged: boolean | null
+  playbackUrl: string | null
+}
+export interface AudiobookAcquisitionCapabilities {
+  state: string
+  canSearch: boolean
+  canRequest: boolean
+  message: string | null
+}
+export interface AudiobookOverview {
+  state: 'configuredHealthy' | 'configuredUnavailable' | 'notConfigured'
+  message: string | null
+  continueListening: AudiobookItem | null
+  library: AudiobookItem[]
+  recent: AudiobookItem[]
+  acquisition: AudiobookAcquisitionCapabilities
+}
+export interface AudiobookLibraryPage {
+  items: AudiobookItem[]
+  page: number
+  pageSize: number
+  total: number
+}
+export interface AudiobookAcquisitionProviderStatus extends AudiobookAcquisitionCapabilities {
+  provider: string
+  canCancel: boolean
+}
+export interface AudiobookAcquisitionCandidate {
+  workId: string
+  editionId: string
+  title: string
+  author: string | null
+  narrator: string | null
+  language: string
+  languageLabel: string
+  edition: string | null
+  durationSeconds: number | null
+  publicationYear: number | null
+  coverUrl: string | null
+  source: string
+  availability: string
+  languageConfidence: string
+  provenance?: string | null
+  metadataWorkId?: string | null
+  matchEvidence?: string | null
+}
+export interface AudiobookAcquisitionJob {
+  id: string
+  providerJobId: string | null
+  candidate: AudiobookAcquisitionCandidate
+  status: string
+  createdAtUtc: string
+  updatedAtUtc: string
+  message: string | null
+}
+export interface AudiobookAcquisitionJobPage {
+  items: AudiobookAcquisitionJob[]
+  offset: number
+  limit: number
+  total: number
+}
+export interface AudiobookMetadataWork {
+  workId: string
+  editionIds: string[]
+  canonicalTitle: string
+  alternateTitles: string[]
+  authors: string[]
+  series: string | null
+  seriesNumber: string | null
+  narrators: string[]
+  isbn10: string | null
+  isbn13: string | null
+  asin: string | null
+  language: string
+  publicationYear: number | null
+  coverUrl: string | null
+  provider: string
+}
+export interface AudiobookMetadataResolution {
+  query: { original: string; normalized: string; kind: 'isbn10' | 'isbn13' | 'probableAsin' | 'freeText' }
+  state: 'resolved' | 'notFound' | 'unavailable'
+  works: AudiobookMetadataWork[]
+  narratorSearchSupported: boolean
+  message: string | null
+}
+export interface AudiobookSearchResponse {
+  library: AudiobookItem[]
+  metadata: AudiobookMetadataResolution
+  discovery: AudiobookAcquisitionCandidate[]
+  acquisition: AudiobookAcquisitionProviderStatus
+}
+export interface AudiobookPlaybackTrack {
+  index: number
+  startOffset: number
+  duration: number
+  title: string | null
+  mimeType: string
+  streamUrl: string
+}
+export interface AudiobookPlaybackSession {
+  id: string
+  itemId: string
+  currentTime: number
+  duration: number
+  tracks: AudiobookPlaybackTrack[]
+  expiresAtUtc: string
+}
+export interface AudiobookPlaybackAvailability {
+  state: 'configuredHealthy' | 'configuredUnavailable' | 'notConfigured' | 'rejected'
+  message: string | null
+  separateIdentity: boolean
+  hasProgress: boolean
+}
 
 export interface MediaAddOption {
   id: string
@@ -446,10 +1144,31 @@ export interface MediaRequestConfirmResponse {
   title: string
 }
 
-export interface SmartShuffleSeries { id: string; name: string; hasPlayableEpisode: boolean }
-export interface SmartShuffleDevice { id: string; displayName: string; clientType: string; available: boolean; isPlaying: boolean }
-export interface SmartShuffleEpisode { id: string; seriesId: string; seriesName: string; title: string; seasonNumber: number; episodeNumber: number; playbackPositionTicks: number | null }
-export interface SmartShuffleOptions { enabled: boolean; series: SmartShuffleSeries[] }
+export interface SmartShuffleSeries {
+  id: string
+  name: string
+  hasPlayableEpisode: boolean
+}
+export interface SmartShuffleDevice {
+  id: string
+  displayName: string
+  clientType: string
+  available: boolean
+  isPlaying: boolean
+}
+export interface SmartShuffleEpisode {
+  id: string
+  seriesId: string
+  seriesName: string
+  title: string
+  seasonNumber: number
+  episodeNumber: number
+  playbackPositionTicks: number | null
+}
+export interface SmartShuffleOptions {
+  enabled: boolean
+  series: SmartShuffleSeries[]
+}
 export interface SmartShuffleSession {
   id: string
   status: 'starting' | 'awaitingPlaybackConfirmation' | 'active' | 'failed' | 'stopped' | 'completed'
@@ -463,8 +1182,19 @@ export interface SmartShuffleSession {
 
 export type DownloadStatus = 'active' | 'queued' | 'paused' | 'error' | 'completed' | 'unknown'
 export type DownloadOperation = 'pause' | 'resume' | 'retry'
-export interface DownloadCapabilities { canPause: boolean; canResume: boolean; canRetry: boolean; canRemove: boolean }
-export interface DownloadDiagnosis { code: string; severity: 'info' | 'warning' | 'error'; explanation: string; verifiedObservations: string[]; availableSafeActions: string[] }
+export interface DownloadCapabilities {
+  canPause: boolean
+  canResume: boolean
+  canRetry: boolean
+  canRemove: boolean
+}
+export interface DownloadDiagnosis {
+  code: string
+  severity: 'info' | 'warning' | 'error'
+  explanation: string
+  verifiedObservations: string[]
+  availableSafeActions: string[]
+}
 export interface DownloadSummary {
   id: string
   name: string
@@ -483,7 +1213,10 @@ export interface DownloadSummary {
   capabilities: DownloadCapabilities
   diagnosis: DownloadDiagnosis
 }
-export interface DownloadsResponse { collectedAtUtc: string; downloads: DownloadSummary[] }
+export interface DownloadsResponse {
+  collectedAtUtc: string
+  downloads: DownloadSummary[]
+}
 export interface DownloadRemovalPreview {
   confirmationToken: string
   expiresAtUtc: string
@@ -504,6 +1237,23 @@ export interface DownloadRemovalResult {
   ownership: DownloadSummary['ownership']
   errorCode: string | null
 }
-export interface DownloadOperationResult { id: string; operation: DownloadOperation; status: 'succeeded' | 'alreadyInDesiredState'; download: DownloadSummary | null }
-export type DownloadBatchStatus = 'succeeded' | 'alreadyInDesiredState' | 'notFound' | 'identityChanged' | 'operationNotAllowed' | 'providerUnavailable' | 'providerTimeout' | 'rejected'
-export interface DownloadBatchResult { operation: DownloadOperation; partial: true; results: Array<{ id: string; status: DownloadBatchStatus; download: DownloadSummary | null }> }
+export interface DownloadOperationResult {
+  id: string
+  operation: DownloadOperation
+  status: 'succeeded' | 'alreadyInDesiredState'
+  download: DownloadSummary | null
+}
+export type DownloadBatchStatus =
+  | 'succeeded'
+  | 'alreadyInDesiredState'
+  | 'notFound'
+  | 'identityChanged'
+  | 'operationNotAllowed'
+  | 'providerUnavailable'
+  | 'providerTimeout'
+  | 'rejected'
+export interface DownloadBatchResult {
+  operation: DownloadOperation
+  partial: true
+  results: Array<{ id: string; status: DownloadBatchStatus; download: DownloadSummary | null }>
+}

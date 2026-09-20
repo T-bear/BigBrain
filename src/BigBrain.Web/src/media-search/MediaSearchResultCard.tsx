@@ -12,13 +12,24 @@ function metadataLines(result: MediaSearchResult) {
 
 export function MediaSearchResultCard({ result }: { result: MediaSearchResult }) {
   const details = metadataLines(result)
-  return <article className="media-search-result-card">
-    <MediaPoster title={result.title} url={result.posterUrl} />
-    <div className="media-search-result-copy">
-      <h5 title={result.title}>{result.title}</h5>
-      <p>{result.mediaType}{result.year !== null ? ` · ${result.year}` : ''}</p>
-      <strong className={`media-search-state media-search-state--${result.state}`}>{result.state}</strong>
-      {details.length > 0 && <ul>{details.map(detail => <li key={detail}>{detail}</li>)}</ul>}
-    </div>
-  </article>
+  return (
+    <article className="media-search-result-card">
+      <MediaPoster title={result.title} url={result.posterUrl} />
+      <div className="media-search-result-copy">
+        <h5 title={result.title}>{result.title}</h5>
+        <p>
+          {result.mediaType}
+          {result.year !== null ? ` · ${result.year}` : ''}
+        </p>
+        <strong className={`media-search-state media-search-state--${result.state}`}>{result.state}</strong>
+        {details.length > 0 && (
+          <ul>
+            {details.map(detail => (
+              <li key={detail}>{detail}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </article>
+  )
 }
