@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130D2, 2026-09-21` — [Frontend formatter CI gate — IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY](features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md). One check-only CI step; positive 83/83, negative exit 1 and exact restoration exit 0; tests 199/199, build PASS, audit zero. Not enabled on main.
+
 - `BB-130D2 cleanup, 2026-09-20` — [Frontend formatter cleanup — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md). Codex → Claude handoff. 80 of 83 files formatted, exactly the characterized set; all semantic, literal, JSX and Finance invariants verified unchanged and the production bundle proven rendering-equivalent. Owner-accepted deviation preserved: one file needed two write passes to reach the Prettier fixed point. Merge CI 35540892280 SUCCESS; post-merge 83/83 check, 199/199 tests, build PASS, audit zero. No deployment or frontend CI gate.
 
 - `BB-130D2 formatter tooling, 2026-09-17` — [Pinned formatter contract — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-tooling-20260917.md). 83 files / 80 existing format differences; no write formatting or frontend CI gate; 199 tests/build pass, audit zero. Merge CI 35190196135 SUCCESS.

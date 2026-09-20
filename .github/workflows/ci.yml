@@ -34,6 +34,7 @@ jobs:
           cache: npm
           cache-dependency-path: src/BigBrain.Web/package-lock.json
       - run: npm ci
+      - run: npm run format:check
       - run: npm test -- --run
       - run: npm run build
 
