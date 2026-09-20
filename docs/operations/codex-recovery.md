@@ -19,6 +19,31 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-130D2 frontend formatter CI gate candidate — 2026-09-21
+
+Status: IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY; no interrupted implementation.
+Task: BB-130D2 — Frontend Formatter CI Gate.
+Baseline/source-of-truth SHA: `1e3552c5142ee3360e6a96036e8f7ed86b4f4d57`.
+Branch: `bb-130d/frontend-formatter-ci-gate`.
+Changed files: `.github/workflows/ci.yml` plus STATUS, BACKLOG, TESTING, stabilization plan,
+this recovery note, report catalog and the new frontend-formatter-ci-gate-20260921 report.
+Completed: baseline reproduction; one-line CI step; negative check (exit 1), exact byte
+restoration, positive check (exit 0); post-edit regression and source-boundary verification.
+Tests: baseline and post-edit npm ci/format:check/test/build/audit all exit 0; 83/83,
+199/199 in 26 files, build PASS, audit zero. Full-history Gitleaks passed, 279 commits.
+Publication checks: documentation verifier PASS (244 Markdown files, 90 backlog IDs),
+working/staged diff checks PASS, staged Gitleaks PASS with no leaks.
+Remaining: exact candidate architect review and owner approval before merge; hosted CI
+verification belongs to that later publication. No merge or deployment in this checkpoint.
+Unrelated untracked mockups and ADR 0006–0009 preserved. No source/package/config/backend/
+runtime change, no temporary violation remains. Finance RESEARCH / 0 SEK / NONE.
+Resolve candidate SHA with `git log -1 --format=%H --grep='^ci: enforce BB-130D2 frontend formatter gate$'
+origin/bb-130d/frontend-formatter-ci-gate`; compare with the remote branch before review.
+Next exact action after branch publication: STOP. No BB-130D exit, lint or next checkpoint.
+Prior cleanup publication is complete: final main CI
+[35541197094](https://github.com/T-bear/BigBrain/actions/runs/35541197094) passed all four jobs
+on the baseline SHA, with backend formatter success and frontend install/test/build only.
+
 ## BB-130D2 frontend formatter cleanup accepted publication — 2026-09-21
 
 Status: ACCEPTED / MERGED / CI VERIFIED. No interrupted cleanup implementation remains.

@@ -1,5 +1,20 @@
 # BigBrain Status
 
+## BB-130D2 frontend formatter CI gate — 2026-09-21
+
+**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.** Baseline
+`1e3552c5142ee3360e6a96036e8f7ed86b4f4d57`; branch `bb-130d/frontend-formatter-ci-gate`.
+One frontend CI step adds `npm run format:check` after npm ci, before tests/build.
+Pinned Prettier 3.9.6, accepted config/scripts and scope remain unchanged. Positive checks
+pass 83/83; temporary whitespace violation exits 1, exact restoration exits 0. Baseline
+and post-edit npm ci, 199/199 tests in 26 files, build and audit zero pass.
+Application/test/backend/package/runtime files unchanged; backend/docs/secrets CI unchanged.
+[Commands, negative characterization and limitations](reports/features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md).
+A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. Earlier cleanup/tooling remain
+accepted; this gate is not yet accepted or enabled on main. No lint, deployment or next
+checkpoint. Finance RESEARCH / 0 SEK / NONE. Next: review exact candidate SHA before merge.
+
+
 ## BB-130D2 frontend formatter cleanup — 2026-09-20
 
 **ACCEPTED / MERGED / CI VERIFIED — not deployed.**
