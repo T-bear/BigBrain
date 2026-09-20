@@ -2,7 +2,7 @@
 
 ## BB-130D2 frontend formatter cleanup — 2026-09-20
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY — not accepted, not merged, not deployed.**
+**ACCEPTED / MERGED / CI VERIFIED — not deployed.**
 Baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`, verified equal to `origin/main` before
 and immediately before publication; branch `bb-130d/frontend-formatter-cleanup`.
 Agent handoff **Codex → Claude**: the Codex session was interrupted by an exhausted usage
@@ -52,8 +52,36 @@ A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1, backend cleanup and
 format gate remain accepted and enabled; D2 characterization, triage, dependency maintenance
 and formatter tooling remain accepted. The **frontend formatter CI gate remains NOT STARTED /
 NOT ENABLED** and lint remains deferred. No deployment, runtime, device or owner UX approval
-is claimed. Merge requires explicit owner approval of the exact reviewed branch SHA after
-verifying that SHA is unchanged and that `origin/main` has not advanced unexpectedly.
+is claimed. The exact candidate was subsequently owner/architect-approved and published as
+recorded below.
+
+### Accepted publication — 2026-09-21
+
+Owner/architect approved candidate `b547219473c7ef12cec81b6778bd454a2ce33058`,
+exactly one commit above baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`.
+Codex merged it unchanged as `8e966404b2b7055acf21ccedabaa883ecaf225ca`; the merge
+file tree equals the approved candidate. Claude implemented the cleanup; Codex performed
+only this approved merge/publication, without formatter write mode.
+[Merge CI 35540892280](https://github.com/T-bear/BigBrain/actions/runs/35540892280):
+SUCCESS for backend, frontend, documentation and secrets. Backend restore → actual
+`dotnet format BigBrain.slnx --verify-no-changes --no-restore` → Release build → tests
+all passed. Frontend ran only `npm ci`, `npm test -- --run`, `npm run build`.
+
+Fresh post-merge local commands: `npm ci`, `npm run format:check`, `npm test -- --run`,
+`npm run build`, `npm audit --json` all exit 0: 83/83 conforming, 199/199 tests in 26 files,
+production build PASS (70 modules), zero audit findings. Prettier remains exactly 3.9.6,
+dev-only. Scope comparison confirms exactly the accepted 80-file debt set; the three
+already-clean files, package/lock, formatter config/scripts, CI, backend, CSS, excluded JS
+and runtime/deployment configuration are unchanged. The focused Finance 46/46 and semantic/
+artifact comparisons above remain evidence from Claude's reviewed candidate, not new runs.
+The owner-approved ThemeControl.test.tsx historical two-pass convergence remains documented;
+the committed source is already conforming and no write-mode operation was run for publication.
+
+Cleanup is ACCEPTED / MERGED / CI VERIFIED. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS. Frontend formatter CI gate NOT STARTED / NOT ENABLED; lint deferred.
+Finance RESEARCH / 0 SEK / NONE. No deployment, runtime, device, UX or scientific behavior
+change. Next proposed checkpoint: **BB-130D2 — Frontend Formatter CI Gate**, separately
+authorized; neither it nor the agent-neutral workflow/recovery improvement starts here.
 
 ## BB-130D2 formatter tooling — 2026-09-17
 

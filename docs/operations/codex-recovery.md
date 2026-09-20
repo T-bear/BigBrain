@@ -19,7 +19,50 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-130D2 frontend formatter cleanup — REVIEW CANDIDATE — 2026-09-20
+## BB-130D2 frontend formatter cleanup accepted publication — 2026-09-21
+
+Status: ACCEPTED / MERGED / CI VERIFIED. No interrupted cleanup implementation remains.
+
+### Accepted publication — 2026-09-21
+
+Owner/architect approved candidate `b547219473c7ef12cec81b6778bd454a2ce33058`,
+exactly one commit above baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`.
+Codex merged it unchanged as `8e966404b2b7055acf21ccedabaa883ecaf225ca`; the merge
+file tree equals the approved candidate. Claude implemented the cleanup; Codex performed
+only this approved merge/publication, without formatter write mode.
+[Merge CI 35540892280](https://github.com/T-bear/BigBrain/actions/runs/35540892280):
+SUCCESS for backend, frontend, documentation and secrets. Backend restore → actual
+`dotnet format BigBrain.slnx --verify-no-changes --no-restore` → Release build → tests
+all passed. Frontend ran only `npm ci`, `npm test -- --run`, `npm run build`.
+
+Fresh post-merge local commands: `npm ci`, `npm run format:check`, `npm test -- --run`,
+`npm run build`, `npm audit --json` all exit 0: 83/83 conforming, 199/199 tests in 26 files,
+production build PASS (70 modules), zero audit findings. Prettier remains exactly 3.9.6,
+dev-only. Scope comparison confirms exactly the accepted 80-file debt set; the three
+already-clean files, package/lock, formatter config/scripts, CI, backend, CSS, excluded JS
+and runtime/deployment configuration are unchanged. The focused Finance 46/46 and semantic/
+artifact comparisons above remain evidence from Claude's reviewed candidate, not new runs.
+The owner-approved ThemeControl.test.tsx historical two-pass convergence remains documented;
+the committed source is already conforming and no write-mode operation was run for publication.
+
+Cleanup is ACCEPTED / MERGED / CI VERIFIED. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS. Frontend formatter CI gate NOT STARTED / NOT ENABLED; lint deferred.
+Finance RESEARCH / 0 SEK / NONE. No deployment, runtime, device, UX or scientific behavior
+change. Next proposed checkpoint: **BB-130D2 — Frontend Formatter CI Gate**, separately
+authorized; neither it nor the agent-neutral workflow/recovery improvement starts here.
+
+Reconciliation changes only STATUS, BACKLOG, TESTING, the stabilization plan, this recovery
+note, the report catalog and the existing cleanup report. Its exact SHA is resolved from
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-130D2 formatter cleanup$' main`;
+the matching GitHub Actions run must use that exact head SHA and show all four jobs SUCCESS.
+Publication completion requires this final CI check, including actual backend format success
+and frontend install/test/build only. Do not infer final CI from the earlier merge run.
+Unrelated untracked design mockups and ADR 0006–0009 remain preserved and excluded.
+Next safe action after final CI: STOP and return to architect review; no next checkpoint
+is authorized. The historical handoff below records Claude's implementation and is retained
+as evidence, not current merge instructions.
+
+## Historical pre-merge handoff — 2026-09-20
 
 ```text
 Status: REVIEW CANDIDATE ONLY — NOT MERGED (no interrupted work remains)

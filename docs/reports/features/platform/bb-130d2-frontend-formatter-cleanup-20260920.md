@@ -6,7 +6,7 @@
   `20260917` suffix before the interruption.
 - Baseline / checkpoint source: `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`, verified equal to
   `origin/main` by `git ls-remote` at start and unchanged throughout.
-- Branch: `bb-130d/frontend-formatter-cleanup` (local only; never pushed).
+- Branch: `bb-130d/frontend-formatter-cleanup` (approved candidate subsequently merged; publication below).
 - Agent handoff: **Codex → Claude**. The Codex session was interrupted by an exhausted weekly
   usage limit. Repository and Git evidence, not the previous transcript, established the state.
 - Contract: [accepted characterization](bb-130d2-frontend-quality-characterization-20260914.md)
@@ -16,10 +16,38 @@
 
 ## Status
 
-**IMPLEMENTED / TESTED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 
-NOT accepted, NOT merged, NOT deployed. No frontend formatter CI gate was added and none is
+Accepted and merged; NOT deployed. No frontend formatter CI gate was added and none is
 authorized. Finance remains `RESEARCH / 0 SEK / NONE`.
+
+### Accepted publication — 2026-09-21
+
+Owner/architect approved candidate `b547219473c7ef12cec81b6778bd454a2ce33058`,
+exactly one commit above baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`.
+Codex merged it unchanged as `8e966404b2b7055acf21ccedabaa883ecaf225ca`; the merge
+file tree equals the approved candidate. Claude implemented the cleanup; Codex performed
+only this approved merge/publication, without formatter write mode.
+[Merge CI 35540892280](https://github.com/T-bear/BigBrain/actions/runs/35540892280):
+SUCCESS for backend, frontend, documentation and secrets. Backend restore → actual
+`dotnet format BigBrain.slnx --verify-no-changes --no-restore` → Release build → tests
+all passed. Frontend ran only `npm ci`, `npm test -- --run`, `npm run build`.
+
+Fresh post-merge local commands: `npm ci`, `npm run format:check`, `npm test -- --run`,
+`npm run build`, `npm audit --json` all exit 0: 83/83 conforming, 199/199 tests in 26 files,
+production build PASS (70 modules), zero audit findings. Prettier remains exactly 3.9.6,
+dev-only. Scope comparison confirms exactly the accepted 80-file debt set; the three
+already-clean files, package/lock, formatter config/scripts, CI, backend, CSS, excluded JS
+and runtime/deployment configuration are unchanged. The focused Finance 46/46 and semantic/
+artifact comparisons above remain evidence from Claude's reviewed candidate, not new runs.
+The owner-approved ThemeControl.test.tsx historical two-pass convergence remains documented;
+the committed source is already conforming and no write-mode operation was run for publication.
+
+Cleanup is ACCEPTED / MERGED / CI VERIFIED. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
+D IN PROGRESS. Frontend formatter CI gate NOT STARTED / NOT ENABLED; lint deferred.
+Finance RESEARCH / 0 SEK / NONE. No deployment, runtime, device, UX or scientific behavior
+change. Next proposed checkpoint: **BB-130D2 — Frontend Formatter CI Gate**, separately
+authorized; neither it nor the agent-neutral workflow/recovery improvement starts here.
 
 ### Discovered deviation and the owner decision that resolves it
 
@@ -257,7 +285,7 @@ manifest, all backend source, backend tests and tools, and everything under `dep
 
 ## Changes
 
-Working tree only; nothing is committed. Exactly 80 tracked TypeScript/TSX source files under
+Historical implementation inventory (now committed and merged): exactly 80 tracked TypeScript/TSX source files under
 `src/BigBrain.Web/src` were rewritten by the accepted formatter command. No application source
 was edited by hand, no expression simplified, no logic reordered, no variable renamed, no
 import manually reorganized, no component extracted, no unrelated warning or test touched and
@@ -289,17 +317,10 @@ feature work was performed. The Sentinel boundary was not touched. Finance remai
 
 ## Remaining work
 
-1. **Architect review and owner acceptance of this exact candidate SHA.** The branch is a
-   review candidate only. Merge to main requires explicit owner approval of the reviewed SHA
-   after verifying the branch SHA is unchanged and that `origin/main` has not advanced.
-2. **Consequence for the later CI gate — must be honoured when that checkpoint is designed.**
-   A future check-only frontend gate passes on this converged tree, and that is the correct
-   design: CI verifies that committed source is already conforming. The original assumption
-   that `npm run format` reaches a fixed point in one pass is now known to be false for this
-   repository, Prettier version and configuration, and CI must never depend on a second
-   write pass. This deviation is preserved deliberately.
-3. No merge, no deployment, no CI activation and no further checkpoint is authorized here.
-4. Lint remains deferred; CSS and the three JS asset/layout tests remain out of scope.
+The cleanup is accepted and merged. Next is **BB-130D2 — Frontend Formatter CI Gate**,
+requiring separate authorization. It must check committed conformance and must not depend
+on two formatter write passes. Lint, CSS and excluded JS tests remain outside this scope.
+No deployment or agent-workflow redesign is authorized.
 
 ### Publication checks — 2026-09-20
 
@@ -329,9 +350,9 @@ Publication pushes only `bb-130d/frontend-formatter-cleanup` as REVIEW CANDIDATE
 merge, no force operation, no push to main, no CI gate change and no deployment. The remote
 branch SHA is verified to equal the local candidate SHA after the push.
 
-Rollback: the candidate is one bounded commit on a branch that is not merged. Discarding the
-branch restores the accepted baseline exactly; no source, package, configuration or runtime
-rollback is required, and nothing on `main` changed.
+Historical pre-merge rollback was to leave the candidate unmerged. After acceptance, any
+rollback requires a separately approved normal revert and verification; never reset or
+rewrite published history. No runtime rollback is needed because nothing was deployed.
 
 ## Resumption
 
@@ -343,5 +364,5 @@ Repository and Git state take precedence over any agent summary. Preserve the un
 untracked design mockups and unpublished ADR 0006–0009. Do not re-run the formatter expecting a different
 result; the tree is already at the stable fixed point. Do not merge, deploy, enable a
 frontend formatter CI gate or start another checkpoint without explicit owner authorization.
-Merge requires the owner to approve the exact reviewed branch SHA, with the branch SHA
-verified unchanged and `origin/main` verified not to have advanced unexpectedly.
+This exact candidate has already been approved and merged; do not merge it again.
+The current publication evidence above supersedes historical pre-merge instructions.
