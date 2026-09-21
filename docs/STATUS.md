@@ -1,5 +1,23 @@
 # BigBrain Status
 
+## BB-131A Research Learning architecture — 2026-09-21
+
+**ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY.** Baseline
+`7747b8f715204dc3ccf753f170238b40238d1b11`; branch `bb-131a/research-learning-architecture`.
+Recovered existing branch with no prior tracked BB-131A changes/commit/remote publication.
+[Contract](architecture/finance/research-learning-contract.md) and
+[report](reports/features/finance/bb-131a-research-learning-architecture-20260921.md) map existing
+Finance engines and propose bounded admission, family/holdout governance and replayable evidence.
+[ADR 0038](adr/0038-finance-research-learning-authority-contract.md) is **Proposed**, not accepted.
+AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.
+
+BB-130 remains closed: A/B COMPLETE, C/D and overall COMPLETE / EXIT APPROVED.
+BB-131B is proposed synthetic fixture work only, NOT STARTED and requires separate authorization.
+No Research Learning production code, AI/provider integration, schema, source/test/package/CI or
+runtime change; Finance **RESEARCH / 0 SEK / NONE**. No deployment or new scientific result.
+The historical BB-130 stop/next-action entries below remain accurate for their dates; this
+owner-authorized documentation checkpoint does not reopen stabilization or authorize future work.
+
 ## BB-130 final exit assessment — 2026-09-21
 
 **COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED — no exit blocker.**
