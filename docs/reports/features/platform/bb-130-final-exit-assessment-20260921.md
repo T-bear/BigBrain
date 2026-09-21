@@ -11,13 +11,24 @@
 
 ## Status
 
-**ASSESSMENT COMPLETE / REVIEW CANDIDATE ONLY. No exit blocker identified.**
-The accepted stabilization scope can close without additional implementation. The conclusion
-recorded by this candidate is A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
-D COMPLETE / EXIT APPROVED; BB-130 COMPLETE / EXIT APPROVED. D/overall closure is the
-exit recommendation submitted for exact-SHA owner/architect review, not a claim this branch
-has already been accepted or merged. Accepted main remains the baseline until publication.
-Completion means the accepted stabilization scope, not zero technical debt or production release.
+**COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED. No exit blocker.**
+A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED; D COMPLETE / EXIT APPROVED;
+BB-130 COMPLETE / EXIT APPROVED. Owner/architect approved the exact candidate and it is
+now closed on main. Completion means accepted stabilization scope, not zero debt or release.
+
+### Accepted publication — 2026-09-21
+
+Approved candidate `672d121a14024b485233448ab792870297328514` was exactly one commit ahead,
+zero behind baseline `f941f4553fabaffcea8736ccd7f0e5d22233a976`, with only the eight reviewed
+documents. Merge `dfce6575d3c05d078b61b30d06a0dd12413099e4` has baseline as first parent
+and approved candidate as second parent. Candidate and merge share tree
+`84e695cf26b1bece686d0070e2710198964f66f0`; content is identical.
+[Merge CI 35607620156](https://github.com/T-bear/BigBrain/actions/runs/35607620156)
+completed SUCCESS on that exact merge SHA. Backend/frontend/documentation/secrets all
+executed and passed. Backend restore → dotnet-format verify → Release build → tests and
+frontend npm ci → npm run format:check → tests → build all have actual SUCCESS step results.
+No implementation, package, CI, formatter configuration, test or runtime change; no deployment.
+Only pending-candidate wording required this separate documentation reconciliation.
 
 ## Sprint objective and accepted scope
 
@@ -37,7 +48,7 @@ it does not retroactively claim composition/schema/reader work was implemented.
 | A — reconstructable source of truth | START-HERE, authority/read order, continuity fields, AGENTS recovery/checkpoint workflow, architecture current/historical distinction, report catalog and roadmap ownership | A commit `58563475bfed7bdddece87d11895adeec83d9c30`, historical CI 33982397667; [A report](../../documentation/bb-130-architecture-code-review-20260905.md). COMPLETE. Current docs preserve GitHub main authority and exact-SHA approvals; no interrupted implementation remains. |
 | B — measure and improve request ownership | App view-owned Family/Home/Admin reads; hidden/one-in-flight Admin system polling; Home three-slot core-first queue; Finance secondaries wait for renderable observation; Media technical reads wait for open Administration | B `b8bb896aba88faba00c5fde46ffd947d847c63c0`, historical CI 34030095008; [B report and graphs](bb-130b-loading-20260906.md). Source and retained regression tests inspected on baseline. COMPLETE, no unresolved required B blocker. |
 | C — bounded behavior-preserving code health and reviewed defect handling | Observation/cache lifecycle hook, selected-backtest identity hook, safe quarantine/payload boundary, CSV tokenizer, shared immutable four-table writer, persistence/reader maps; separately approved identity/column-zero corrections; E1 robustness display identity and E2 SQLite campaign replay | Accepted C ledger below, [reader decision/deferrals](../finance/bb-130c-backtest-reader-exit-assessment-20260908.md), E1/E2 and explicit C exit. COMPLETE / EXIT APPROVED. Historical blocker branches remain outside main ancestry. |
-| D — deterministic gates and final reconciliation | Backend nullable/warnings-as-errors/latest-recommended unchanged; backend whitespace baseline cleaned and check-only CI enabled. Frontend advisories triaged/patched; Prettier 3.9.6 dev-only, 83-file contract cleaned and check-only CI enabled. This report reconciles A–D, debt/security/roadmap/recovery | Exact baseline CI #223 / 35542340223 reverified independently; all four jobs and actual formatter steps SUCCESS. No exit implementation outstanding; COMPLETE / EXIT APPROVED is the candidate conclusion, pending exact review. |
+| D — deterministic gates and final reconciliation | Backend nullable/warnings-as-errors/latest-recommended unchanged; backend whitespace baseline cleaned and check-only CI enabled. Frontend advisories triaged/patched; Prettier 3.9.6 dev-only, 83-file contract cleaned and check-only CI enabled. This report reconciles A–D, debt/security/roadmap/recovery | Exact baseline CI #223 / 35542340223 reverified independently; all four jobs and actual formatter steps SUCCESS. No exit implementation outstanding; COMPLETE / EXIT APPROVED, accepted and merged. |
 
 ### B measurement interpretation
 
@@ -98,7 +109,7 @@ sprint had no semantic correction. It adds no scientific change and preserves ac
 | Preserve research/rights/lineage and no new execution authority | Existing ADR 0021/23/24/25 and accepted correction/evidence chain; no new source/config/data changes; current regression gates | No contradiction found |
 | D: clean deterministic backend/frontend formatter checks | Actual backend dotnet-format and frontend npm format:check steps SUCCESS on exact main; frontend 83/83 independently checked | No |
 | Preserve full build/test/docs/secrets gates and analyzer policy | Exact-main CI all four jobs SUCCESS, unchanged nullable/warnings-as-errors/latest-recommended; normal failing-step semantics | No |
-| Final phase/debt/security/roadmap/report reconciliation | This documentation-only candidate and linked matrix; exact review remains the publication gate | No implementation blocker; owner review remains |
+| Final phase/debt/security/roadmap/report reconciliation | Accepted documentation assessment and linked matrix; exact review and merge CI completed | No |
 | Deployment/runtime/device/owner UX | Not required by accepted A–D DoD; separate deployment and release-specific review only | No; not performed or implied |
 | Dedicated lint rules | Accepted D2 formatter-first policy explicitly defers lint; D says lint/format, not mandatory ESLint | No; deferred |
 
@@ -173,7 +184,7 @@ or database verification. No production data was read or changed.
 
 Documentation only: STATUS, BACKLOG, BB-130 plan, TESTING, recovery, report catalog, this
 report and a small roadmap continuity amendment. Historical checkpoint reports remain intact.
-Current headers explicitly distinguish the exit candidate from accepted main; dated old
+Current headers record accepted closure on main; dated old
 NOT STARTED/IN PROGRESS text is historical and cannot override the current assessment.
 The stale canonical BB-130 backlog status/next action is reconciled; no unrelated priority moves.
 Architecture/ADRs, modules, knowledge/indexes, README and runbooks were assessed: accepted
@@ -182,9 +193,8 @@ Rollback of this assessment is a separately approved documentation revert; no ru
 
 ## Resumption and final conclusion
 
-No EXIT BLOCKER. Accepted stabilization scope satisfies A–D; no additional implementation is
-needed for closure. This is a **REVIEW CANDIDATE ONLY**, not already accepted main closure.
-No interrupted implementation remains. GitHub main remains technical source of truth.
-Next action is only **owner/architect review of the exact exit candidate**. Do not merge,
-deploy or start another sprint/checkpoint. The canonical recovery entry records review state;
-future work requires new explicit authorization, not an implication from this assessment.
+No EXIT BLOCKER. Accepted stabilization scope satisfies A–D and is closed on main.
+No interrupted BB-130 work remains. GitHub main remains technical source of truth.
+**STOP — BB-130 is closed.** Return to the owner/architect for selection and authorization
+of the next BigBrain sprint. Do not start it. Deferred debt and future safety prerequisites
+remain unchanged; this publication grants no implementation or deployment authority.

@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-130 exit, 2026-09-21` — [Final A–D reconciliation and exit assessment — REVIEW CANDIDATE ONLY](features/platform/bb-130-final-exit-assessment-20260921.md). No exit blocker; accepted scope can close without implementation. Exact-main CI #223 verified; deferred debt/security prerequisites remain, no deployment or next-sprint authority.
+- `BB-130 exit, 2026-09-21` — [Final A–D reconciliation and exit assessment — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130-final-exit-assessment-20260921.md). BB-130 COMPLETE / EXIT APPROVED; merge CI 35607620156 SUCCESS including both formatter gates. Deferred debt/security prerequisites remain; no deployment or next-sprint authority.
 
 - `BB-130D2, 2026-09-21` — [Frontend formatter CI gate — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md). One check-only CI step; positive 83/83, negative exit 1 and exact restoration exit 0; tests 199/199, build PASS, audit zero. Enabled on main; merge CI 35542112456 confirms actual frontend format:check SUCCESS alongside all four jobs.
 

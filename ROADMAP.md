@@ -1,10 +1,10 @@
 # BigBrain Roadmap
 
-## BB-130 exit assessment candidate — 2026-09-21
+## BB-130 accepted closure — 2026-09-21
 
 The [final stabilization assessment](docs/reports/features/platform/bb-130-final-exit-assessment-20260921.md)
-finds no exit blocker and recommends closing the accepted A–D scope. REVIEW CANDIDATE ONLY;
-exact owner/architect review and merge remain. This does not select or authorize the next
+records COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED for the accepted A–D
+scope, with no exit blocker. BB-130 is closed on main. This does not select or authorize the next
 product sprint. Existing security/authentication/rights prerequisites and Finance
 RESEARCH / 0 SEK / NONE remain unchanged. Historical direction below is retained.
 
