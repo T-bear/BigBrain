@@ -19,6 +19,31 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131A accepted publication
+
+Status: ACCEPTED / MERGED / CI VERIFIED — architecture only; ADR 0038 Accepted.
+Baseline: `7747b8f715204dc3ccf753f170238b40238d1b11`.
+Approved candidate: `1eb50979a7923f115b4b182fbee15de735ea1f7e`.
+Merge: `5c5557297aa121acbcde2b7e6adcd6b32eae2e8d`, parents baseline and candidate.
+Candidate and merge content are identical. Exact merge CI
+[35641586823](https://github.com/T-bear/BigBrain/actions/runs/35641586823) SUCCESS:
+backend/frontend/documentation/secrets and actual formatter/build/test/install/doc/secret steps.
+
+No interrupted BB-131A implementation remains. Main is accepted source of truth. BB-130 remains
+closed; BB-131B is NOT STARTED / NOT AUTHORIZED. No fake/real reasoner, provider/SDK/model,
+source/test/package/schema/CI/runtime change or experiment. No deployment. Finance RESEARCH / 0 SEK / NONE.
+Only status/publication documentation is reconciled; accepted architecture is unchanged.
+Resolve final reconciliation SHA using
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131A architecture$' main`.
+Completion requires all four jobs and actual backend/frontend formatter checks SUCCESS for
+that exact final SHA. Do not substitute merge CI. Unrelated mockups and ADR 0006–0009 remain excluded.
+Next: STOP — return published main to owner/architect for independent verification.
+BB-131B requires a new separately authorized checkpoint.
+
+### Historical BB-131A recovery/candidate evidence
+
+The following records the pre-acceptance state and is superseded only in publication status.
+
 ## BB-131A recovered architecture checkpoint — 2026-09-21
 
 Status: ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY (not merged).

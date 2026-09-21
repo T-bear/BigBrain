@@ -2,13 +2,13 @@
 
 ## BB-131A Research Learning architecture — 2026-09-21
 
-**ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY.** Baseline
+**ACCEPTED / MERGED / CI VERIFIED — architecture only.** Baseline
 `7747b8f715204dc3ccf753f170238b40238d1b11`; branch `bb-131a/research-learning-architecture`.
 Recovered existing branch with no prior tracked BB-131A changes/commit/remote publication.
 [Contract](architecture/finance/research-learning-contract.md) and
 [report](reports/features/finance/bb-131a-research-learning-architecture-20260921.md) map existing
 Finance engines and propose bounded admission, family/holdout governance and replayable evidence.
-[ADR 0038](adr/0038-finance-research-learning-authority-contract.md) is **Proposed**, not accepted.
+[ADR 0038](adr/0038-finance-research-learning-authority-contract.md) is **Accepted**; no implementation authority follows.
 AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.
 
 BB-130 remains closed: A/B COMPLETE, C/D and overall COMPLETE / EXIT APPROVED.

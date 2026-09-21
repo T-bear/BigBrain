@@ -4,8 +4,8 @@
 
 After accepted BB-130 closure, the owner authorized **analysis/documentation only** for
 [Finance Research Learning](docs/architecture/finance/research-learning-contract.md).
-A is PROPOSED / REVIEW CANDIDATE ONLY; [ADR 0038](docs/adr/0038-finance-research-learning-authority-contract.md)
-is not accepted. A fake-reasoner synthetic contract/replay proof is the proposed first B slice,
+A is ACCEPTED / MERGED / CI VERIFIED; [ADR 0038](docs/adr/0038-finance-research-learning-authority-contract.md)
+is accepted as architecture only; implementation remains unauthorized. A fake-reasoner synthetic contract/replay proof is the proposed first B slice,
 not authorization to implement it. Real adaptive research requires additional governance,
 rights and authentication/security review. All existing PAPER/LIVE/AUTO gates remain unchanged.
 Finance **RESEARCH / 0 SEK / NONE**. BB-130 is closed; no deployment or provider activation.

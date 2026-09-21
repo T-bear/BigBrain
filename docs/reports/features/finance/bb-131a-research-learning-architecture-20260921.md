@@ -10,15 +10,39 @@ payloads, raw market rows or production database contents are included.
 - Branch: `bb-131a/research-learning-architecture`
 - Scope: recovered read-only source analysis plus documentation; no implementation
 - Contract: [Research Learning](../../../architecture/finance/research-learning-contract.md)
-- Decision: [ADR 0038 — Proposed](../../../adr/0038-finance-research-learning-authority-contract.md)
+- Decision: [ADR 0038 — Accepted](../../../adr/0038-finance-research-learning-authority-contract.md)
 - Finance: **RESEARCH / 0 SEK / NONE**
 
 ## Status
 
-**ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY.** New architecture is not accepted,
-merged, implemented, deployed or runtime/security/owner verified. BB-131B is NOT STARTED.
+**ACCEPTED / MERGED / CI VERIFIED — architecture only.** Explicit owner/architect approval
+applies to the exact candidate below. No implementation, deployment, runtime/security or owner UX
+verification is claimed. BB-131B is NOT STARTED / NOT AUTHORIZED.
 BB-130 remains COMPLETE / EXIT APPROVED on accepted main. This candidate neither reopens
 stabilization nor accepts previously proposed trading ADRs.
+
+## Accepted publication
+
+- Original baseline: `7747b8f715204dc3ccf753f170238b40238d1b11`.
+- Approved candidate: `1eb50979a7923f115b4b182fbee15de735ea1f7e`; one commit ahead, zero behind.
+- Merge: `5c5557297aa121acbcde2b7e6adcd6b32eae2e8d`; parents are baseline and approved candidate.
+- Candidate and merge trees identical: `bef025f159e8fe478f1dc191cd6e122e362b728d`.
+- [Merge CI 35641586823](https://github.com/T-bear/BigBrain/actions/runs/35641586823): SUCCESS
+  for backend, frontend, documentation and secrets on that exact merge SHA. Actual backend
+  restore, dotnet format verification, Release build/tests and frontend npm ci, format:check,
+  tests/build all executed successfully. Documentation verifier and Gitleaks also passed.
+- Reconciliation checks: documentation/link verifier PASS (248 Markdown files / 91 backlog IDs),
+  working/staged diff checks PASS, Gitleaks 8.28.0 full-history (284 commits) and staged scans
+  PASS with no leaks. Source/test/package/CI/runtime diff is empty.
+- ADR 0038 is Accepted as architecture only. Publication reconciliation changes status/evidence
+  in the same 12 documents; it does not alter the accepted design or authorize BB-131B.
+- No deployment, provider/SDK/model integration, schema/source/test/package/CI/runtime change,
+  Finance experiment or scientific/trading authority change. Finance RESEARCH / 0 SEK / NONE.
+- Final reconciliation SHA is resolved by the main commit titled
+  `docs: reconcile accepted BB-131A architecture`. Publication completion requires exact-final-SHA
+  CI success, including both actual formatter steps; merge CI is not substituted for it.
+
+The candidate analysis and recovery observations below retain their original scope/date.
 
 ## Recovery reconstruction
 
@@ -189,16 +213,16 @@ unchanged. No deployment, provider activation or Research Learning production im
 
 ## Remaining work
 
-Independent review of exact candidate and Proposed ADR 0038. Review initial budget/allowlist,
-fixture-only B and production prerequisites. Open future questions include production journal
+Independent owner/architect review of the exact candidate and ADR 0038 is complete.
+BB-131B implementation and all production prerequisites still need separate authorization. Open future questions include production journal
 schema/recovery/retention, cross-cohort overlap decisions, real-data feature lineage, model-export
 rights, stronger auth and statistically justified confirmation for adaptive research. None is
-silently implemented or waived. No architecture acceptance or BB-131B authorization is implied.
+silently implemented or waived. Architecture acceptance does not authorize BB-131B.
 
 ## Resumption
 
 Use current GitHub main, this branch's exact remote commit, canonical recovery and the contract.
 No interrupted BB-130 work remains. Resolve candidate identity from
 `origin/bb-131a/research-learning-architecture`; its parent must be the baseline above.
-STOP — return the exact BB-131A review candidate SHA to owner/architect for independent review.
-Do not merge, deploy, start BB-131B, select a provider or perform another checkpoint.
+STOP — return published main to owner/architect for independent verification.
+Do not deploy, start BB-131B, select a provider or perform another checkpoint.

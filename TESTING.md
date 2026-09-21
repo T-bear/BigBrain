@@ -2,7 +2,10 @@
 
 ## BB-131A architecture/recovery verification — 2026-09-21
 
-Documentation-only candidate from `7747b8f715204dc3ccf753f170238b40238d1b11`.
+Documentation-only architecture accepted from baseline `7747b8f715204dc3ccf753f170238b40238d1b11`.
+Merge CI [35641586823](https://github.com/T-bear/BigBrain/actions/runs/35641586823) passed
+on `5c5557297aa121acbcde2b7e6adcd6b32eae2e8d`: all four jobs and actual backend/frontend
+formatter, build/test, frontend install, documentation and Gitleaks steps succeeded.
 Existing Finance test source was reviewed, not rerun: deterministic backtest/robustness,
 autonomous history/recovery, campaign replay, immutable writer/readers, eligibility and risk.
 No production database, scientific experiment, provider or runtime endpoint was invoked.

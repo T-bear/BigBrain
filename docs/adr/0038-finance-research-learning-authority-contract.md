@@ -1,10 +1,10 @@
 # ADR 0038: Finance Research Learning proposal and evidence authority
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-21
-- Checkpoint: BB-131A — documentation-only review candidate
+- Checkpoint: BB-131A — accepted documentation-only architecture
 - Baseline: `7747b8f715204dc3ccf753f170238b40238d1b11`
-- Acceptance: pending independent owner/architect review; no implementation authorization
+- Acceptance: explicit owner/architect approval of candidate `1eb50979a7923f115b4b182fbee15de735ea1f7e`; no implementation authorization
 
 ## Context
 
@@ -14,7 +14,7 @@ could generate hypotheses adaptively; the current fixed-population controls and 
 holdout lookup do not by themselves govern an unbounded adaptive loop. A second engine or an
 AI-authored scientific verdict would bypass accepted responsibilities.
 
-## Proposed decision
+## Decision
 
 **AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.** Finance owns typed proposal admission,
 identity, eligibility, budgets, exposure history, existing deterministic engines and results.
@@ -22,7 +22,7 @@ The reasoner receives only an authorized bounded evidence projection and returns
 suggestion or no useful proposal. Free-form explanations are untrusted metadata. Existing
 ResearchHypothesis and scientific result vocabulary are reused, not replaced.
 
-[The proposed contract](../architecture/finance/research-learning-contract.md) defines frozen
+[The accepted architecture contract](../architecture/finance/research-learning-contract.md) defines frozen
 exact input/plan identities, family/program budgets that cannot reset through wording or new
 keys, all-trial/negative history and single-use protected holdout. Existing results remain
 immutable. Missing evidence remains missing; limited private research entitlement does not
@@ -53,6 +53,6 @@ real-market holdout, adaptive statistical validity or production crash atomicity
 A new proposal envelope and future atomic admission/exposure journal are justified responsibilities,
 not implemented capabilities. Current calculations, dataset identities, policy versions and
 historical evidence are untouched. Source rights may limit retention/replay; no indefinite retention
-exception is created. This ADR remains Proposed alongside accepted ADR 0021–0025/0030/0033–0036;
+exception is created. This ADR is accepted alongside ADR 0021–0025/0030/0033–0036;
 it does not silently accept proposed trading ADRs 0017–0020 or authorize any next checkpoint.
 Finance remains **RESEARCH / 0 SEK / NONE**. No deployment.

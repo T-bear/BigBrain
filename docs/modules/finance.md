@@ -4,7 +4,7 @@
 
 BB-130 remains closed on main. The [BB-131A contract](../architecture/finance/research-learning-contract.md)
 and [source-backed report](../reports/features/finance/bb-131a-research-learning-architecture-20260921.md)
-are **PROPOSED / REVIEW CANDIDATE ONLY**; no module implementation changes.
+are **ACCEPTED / MERGED / CI VERIFIED** as architecture; no module implementation changes.
 Existing ResearchHypothesis, dataset/feature/backtest/robustness/campaign/risk identities remain
 Finance-owned. Future reasoning receives a bounded authorized evidence projection and cannot see
 active protected holdout, override classifications/policies or obtain execution authority.

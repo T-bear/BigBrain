@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-131A, 2026-09-21` — [Research Learning architecture and contract — PROPOSED / REVIEW CANDIDATE ONLY](features/finance/bb-131a-research-learning-architecture-20260921.md). Recovered unchanged local branch; Finance reuse/authority map, bounded proposals, adaptive-testing/holdout governance, security limits and synthetic fixture-first B proposal. ADR 0038 remains Proposed; no implementation/provider/schema/deployment; BB-130 stays closed.
+- `BB-131A, 2026-09-21` — [Research Learning architecture and contract — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131a-research-learning-architecture-20260921.md). Recovered unchanged local branch; Finance reuse/authority map, bounded proposals, adaptive-testing/holdout governance, security limits and synthetic fixture-first B proposal. ADR 0038 Accepted as architecture only; merge CI 35641586823 SUCCESS; no implementation/provider/schema/deployment; BB-130 stays closed.
 
 - `BB-130 exit, 2026-09-21` — [Final A–D reconciliation and exit assessment — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130-final-exit-assessment-20260921.md). BB-130 COMPLETE / EXIT APPROVED; merge CI 35607620156 SUCCESS including both formatter gates. Deferred debt/security prerequisites remain; no deployment or next-sprint authority.
 

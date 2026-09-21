@@ -5,20 +5,20 @@
 ### BB-131 – Finance Research Learning foundation
 
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
-- Status: **A ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY**; no implementation accepted.
+- Status: **A ACCEPTED / MERGED / CI VERIFIED**; no implementation accepted.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
 - [Contract and A DoD](architecture/finance/research-learning-contract.md);
   [evidence/report](reports/features/finance/bb-131a-research-learning-architecture-20260921.md);
-  [ADR 0038 — Proposed](adr/0038-finance-research-learning-authority-contract.md).
+  [ADR 0038 — Accepted](adr/0038-finance-research-learning-authority-contract.md).
 - Proposed B: synthetic fake reasoner, pure validation, existing deterministic evaluator and isolated
   persistence/replay tests. **NOT STARTED / NOT AUTHORIZED** until separate reviewed checkpoint.
 - Future prerequisites: reviewed production admission/exposure ledger, source/holdout independence,
   retained negative history, rights/export decision and application authentication/security. Existing
   data-bound/DSR/PBO limitations remain; no new performance/significance claim.
 - No provider/SDK/key/network integration, schema change, trading, capital, deployment or next sprint.
-- Next: STOP — return the exact BB-131A candidate to owner/architect for independent review.
+- Next: STOP — return published main to owner/architect for independent verification. BB-131B requires new authorization.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

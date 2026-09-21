@@ -1,15 +1,16 @@
 # BB-131A — Finance Research Learning contract
 
 - Date: 2026-09-21
-- Status: **PROPOSED / ANALYSIS COMPLETE / REVIEW CANDIDATE ONLY**
+- Status: **ACCEPTED / MERGED / CI VERIFIED — architecture only**
 - Baseline: `7747b8f715204dc3ccf753f170238b40238d1b11`
 - Branch: `bb-131a/research-learning-architecture`
-- Decision: [ADR 0038 — Proposed](../../adr/0038-finance-research-learning-authority-contract.md)
+- Decision: [ADR 0038 — Accepted](../../adr/0038-finance-research-learning-authority-contract.md)
 - Assessment/recovery/verification: [BB-131A report](../../reports/features/finance/bb-131a-research-learning-architecture-20260921.md)
 
 BB-130 remains COMPLETE / EXIT APPROVED. BB-131A authorizes analysis and documentation,
-not implementation. Everything described below as new is a proposal requiring independent
-review. Existing accepted ADRs remain authoritative; this document accepts no new ADR.
+not implementation. Owner/architect accepted the exact reviewed architecture candidate;
+ADR 0038 is now Accepted. The original proposed contract/slice wording below describes future
+implementation, not shipped capability. Existing accepted ADRs remain authoritative.
 Finance remains **RESEARCH / 0 SEK / NONE**.
 
 ## Objective and Definition of Done
@@ -418,8 +419,8 @@ expand it. No campaign success, feature-lineage repair or statistical method is 
 
 ## Review questions and limits
 
-Owner/architect must review ADR 0038 (still Proposed), the conservative one-invocation initial
-protocol, synthetic-only B and the explicit real-data/security prerequisites. Open future choices:
+Owner/architect approved ADR 0038, the conservative one-invocation initial protocol, synthetic-only
+B proposal and explicit real-data/security prerequisites as architecture, not implementation authority. Open future choices:
 production journal schema and crash atomicity; protocol/cohort overlap adjudication; data rights
 for any future provider; statistical power/confirmation procedure for genuinely adaptive research.
 These block production expansion, not documentation publication. No newly reproduced current

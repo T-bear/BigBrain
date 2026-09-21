@@ -4,8 +4,8 @@
 
 BB-130 is COMPLETE / EXIT APPROVED on accepted main. The owner has authorized only BB-131A
 architecture analysis. [Research Learning contract](research-learning-contract.md) is
-**PROPOSED / REVIEW CANDIDATE ONLY**, with [ADR 0038](../../adr/0038-finance-research-learning-authority-contract.md)
-still Proposed. Reuse existing Finance engines; AI proposes and never owns scientific/risk truth.
+**ACCEPTED / MERGED / CI VERIFIED**, architecture only, with [ADR 0038](../../adr/0038-finance-research-learning-authority-contract.md)
+now Accepted without implementation authorization. Reuse existing Finance engines; AI proposes and never owns scientific/risk truth.
 The proposed BB-131B synthetic fixture/replay proof is NOT STARTED; real-data adaptive iteration,
 production admission/holdout accounting and AI integration require separate reviews/authorization.
 Application auth, source/export rights and the existing security/promotion gates are not waived.
