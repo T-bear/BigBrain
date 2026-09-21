@@ -1,5 +1,19 @@
 # Finance module
 
+## BB-131A proposed Research Learning boundary — 2026-09-21
+
+BB-130 remains closed on main. The [BB-131A contract](../architecture/finance/research-learning-contract.md)
+and [source-backed report](../reports/features/finance/bb-131a-research-learning-architecture-20260921.md)
+are **PROPOSED / REVIEW CANDIDATE ONLY**; no module implementation changes.
+Existing ResearchHypothesis, dataset/feature/backtest/robustness/campaign/risk identities remain
+Finance-owned. Future reasoning receives a bounded authorized evidence projection and cannot see
+active protected holdout, override classifications/policies or obtain execution authority.
+BB-092 and BB-129 are fixed bounded mechanisms, not generic AI experiment APIs. The proposed
+fixture-first B uses synthetic data and existing engines, with no provider or runtime endpoint.
+Production adaptive accounting/auth/export/retention gaps remain prerequisites, not capabilities.
+BB-127 limitations, BB-128B/C cache/loading and BB-123/124/129 scientific evidence remain unchanged.
+Finance **RESEARCH / 0 SEK / NONE**; no deployment, new data or scientific result.
+
 ## BB-130C exit approved — 2026-09-09
 
 Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**

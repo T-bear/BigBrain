@@ -19,6 +19,41 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131A recovered architecture checkpoint — 2026-09-21
+
+Status: ANALYSIS COMPLETE / PROPOSED / REVIEW CANDIDATE ONLY (not merged).
+Task: BB-131A — Finance Research Learning Architecture & Contract.
+Baseline/source of truth: `7747b8f715204dc3ccf753f170238b40238d1b11`.
+Current branch: `bb-131a/research-learning-architecture`.
+
+Recovery reconstructed from Git/GitHub: local branch and HEAD were exactly baseline, no
+staged or unstaged tracked diff, no BB-131A commits or remote branch, no BB-131A artifact
+and no filled interrupted-run note. Only prior branch creation was durable BB-131A work.
+Earlier source reading was reused; no prior unrecorded validation was treated as passing.
+Unrelated untracked design mockups and ADR 0006–0009 remain preserved/excluded.
+No branch reset/recreation, stash, rebase or unrelated file change occurred.
+
+Completed: current Finance source/ADRs/reports/tests inspected; bounded architecture contract,
+Proposed ADR 0038, assessment report and canonical planning/recovery updates prepared.
+Verification: documentation/link verifier PASS (248 Markdown files / 91 unique backlog IDs),
+working/staged diff checks PASS, Gitleaks 8.28.0 full history (283 commits) and staged scan PASS.
+Only documentation changes (12 Markdown files). Exact files and source/authority limits are in
+[the report](../reports/features/finance/bb-131a-research-learning-architecture-20260921.md).
+No new current defect requiring blocker handoff was established; production adaptive governance,
+auth/export rights and persistence integration remain future prerequisites, not waived gaps.
+
+Publication is one bounded candidate commit; resolve its exact SHA from
+`origin/bb-131a/research-learning-architecture` and verify its parent equals the baseline above.
+Git history/remote ref are the authoritative candidate identity; no self-referential SHA is stored.
+After push, no interrupted implementation remains. Independent architecture/ADR review is pending;
+BB-131B remains NOT STARTED and requires separate authorization. No production test/build rerun,
+provider call, scientific calculation, schema change or deployment. Finance RESEARCH / 0 SEK / NONE.
+Exact next action: STOP — return the exact BB-131A review candidate SHA to owner/architect for
+independent review. Do not merge or start BB-131B.
+
+BB-130 remains closed; its final accepted main is the baseline above. Historical BB-130 recovery
+records below do not describe unfinished BB-131A work or authorize new implementation.
+
 ## BB-130 accepted closure — 2026-09-21
 
 Status: COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED.

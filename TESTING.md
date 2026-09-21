@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-131A architecture/recovery verification — 2026-09-21
+
+Documentation-only candidate from `7747b8f715204dc3ccf753f170238b40238d1b11`.
+Existing Finance test source was reviewed, not rerun: deterministic backtest/robustness,
+autonomous history/recovery, campaign replay, immutable writer/readers, eligibility and risk.
+No production database, scientific experiment, provider or runtime endpoint was invoked.
+[Assessment report](docs/reports/features/finance/bb-131a-research-learning-architecture-20260921.md)
+records exact documentation/link/diff/secret checks and recovery evidence. Proposed BB-131B
+positive/negative/holdout/normalization/persistence/replay tests are specified in the
+[contract](docs/architecture/finance/research-learning-contract.md); they are not implemented
+or claimed passing. Existing build/test/formatter CI configuration is unchanged.
+No expensive unchanged implementation suites are rerun for this docs-only checkpoint.
+Finance **RESEARCH / 0 SEK / NONE**. No deployment or scientific validation claim.
+
 ## BB-130 final exit assessment — 2026-09-21
 
 **COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED — no exit blocker.**
