@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-130 exit, 2026-09-21` — [Final A–D reconciliation and exit assessment — REVIEW CANDIDATE ONLY](features/platform/bb-130-final-exit-assessment-20260921.md). No exit blocker; accepted scope can close without implementation. Exact-main CI #223 verified; deferred debt/security prerequisites remain, no deployment or next-sprint authority.
+
 - `BB-130D2, 2026-09-21` — [Frontend formatter CI gate — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md). One check-only CI step; positive 83/83, negative exit 1 and exact restoration exit 0; tests 199/199, build PASS, audit zero. Enabled on main; merge CI 35542112456 confirms actual frontend format:check SUCCESS alongside all four jobs.
 
 - `BB-130D2 cleanup, 2026-09-20` — [Frontend formatter cleanup — ACCEPTED / MERGED / CI VERIFIED](features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md). Codex → Claude handoff. 80 of 83 files formatted, exactly the characterized set; all semantic, literal, JSX and Finance invariants verified unchanged and the production bundle proven rendering-equivalent. Owner-accepted deviation preserved: one file needed two write passes to reach the Prettier fixed point. Merge CI 35540892280 SUCCESS; post-merge 83/83 check, 199/199 tests, build PASS, audit zero. No deployment or frontend CI gate.

@@ -1,5 +1,26 @@
 # BB-130 — platform stabilization, performance and continuity
 
+## BB-130 final exit assessment — 2026-09-21
+
+**ASSESSMENT COMPLETE / REVIEW CANDIDATE ONLY — no exit blocker identified.**
+Baseline `f941f4553fabaffcea8736ccd7f0e5d22233a976`; branch `bb-130d/final-exit-assessment`.
+Candidate conclusion: **A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
+D COMPLETE / EXIT APPROVED; BB-130 COMPLETE / EXIT APPROVED** for the accepted stabilization
+scope. D/overall closure remains subject to exact-candidate owner/architect review and merge;
+this is not a claim the exit candidate is already accepted on main or that all debt is solved.
+Exact-main CI #223 / 35542340223 reverified SUCCESS for all four jobs, including actual
+backend and frontend formatter steps. Prettier 3.9.6; 83/83 conform; current audit zero.
+B latency/fan-out and C's explicitly accepted refactor/schema/reader debt remain deferred.
+Lint, security/auth/Sentinel prerequisites and release/device work remain separately scoped;
+no deployment or new scientific/Finance authority. Finance **RESEARCH / 0 SEK / NONE**.
+No interrupted implementation remains. Next: **owner/architect review of the exact exit candidate**
+only; no next sprint, implementation or deployment is authorized.
+[A–D criteria matrix, accepted evidence and debt classification](../reports/features/platform/bb-130-final-exit-assessment-20260921.md).
+
+The dated checkpoint ledger below preserves historical states. Older NOT STARTED, pending
+maintenance/cleanup/gate and D IN PROGRESS text describes its date, not a competing current state.
+
+
 ## BB-130D2 frontend formatter CI gate — 2026-09-21
 
 **ACCEPTED / MERGED / CI VERIFIED.** Baseline

@@ -1,5 +1,26 @@
 # BigBrain Backlog
 
+## BB-130 final exit assessment — 2026-09-21
+
+**ASSESSMENT COMPLETE / REVIEW CANDIDATE ONLY — no exit blocker identified.**
+Baseline `f941f4553fabaffcea8736ccd7f0e5d22233a976`; branch `bb-130d/final-exit-assessment`.
+Candidate conclusion: **A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
+D COMPLETE / EXIT APPROVED; BB-130 COMPLETE / EXIT APPROVED** for the accepted stabilization
+scope. D/overall closure remains subject to exact-candidate owner/architect review and merge;
+this is not a claim the exit candidate is already accepted on main or that all debt is solved.
+Exact-main CI #223 / 35542340223 reverified SUCCESS for all four jobs, including actual
+backend and frontend formatter steps. Prettier 3.9.6; 83/83 conform; current audit zero.
+B latency/fan-out and C's explicitly accepted refactor/schema/reader debt remain deferred.
+Lint, security/auth/Sentinel prerequisites and release/device work remain separately scoped;
+no deployment or new scientific/Finance authority. Finance **RESEARCH / 0 SEK / NONE**.
+No interrupted implementation remains. Next: **owner/architect review of the exact exit candidate**
+only; no next sprint, implementation or deployment is authorized.
+[A–D criteria matrix, accepted evidence and debt classification](reports/features/platform/bb-130-final-exit-assessment-20260921.md).
+
+The dated checkpoint ledger below preserves historical states. Older NOT STARTED, pending
+maintenance/cleanup/gate and D IN PROGRESS text describes its date, not a competing current state.
+
+
 ## BB-130D2 frontend formatter CI gate — 2026-09-21
 
 **ACCEPTED / MERGED / CI VERIFIED.** Baseline
@@ -477,7 +498,7 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 ### BB-130 – Platform stabilization, performance and continuity
 
 - Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-14: D1 evidence checkpoint is ACCEPTED / MERGED / CI VERIFIED; D IN PROGRESS / D1 ACCEPTED. Backend whitespace cleanup is ACCEPTED / MERGED / CI VERIFIED; accepted main format baseline CLEAN; formatter CI gate IMPLEMENTED / LOCALLY VERIFIED / REVIEW CANDIDATE ONLY, not enabled on main. Frontend D2 not started. A/B complete/published/CI verified; accepted C lifecycle, identity corrections, intake boundaries and immutable writer are recorded above. C is complete / exit approved on 2026-09-09. The accepted reader/exit plan defers non-blocking debt beyond BB-130. E1 and E2 are accepted; no currently-known C blocking checkpoint remains.
+- Status 2026-09-21: A/B COMPLETE; C COMPLETE / EXIT APPROVED; D and BB-130 COMPLETE / EXIT APPROVED as the documentation-only exit candidate conclusion, pending exact owner/architect review and merge. No exit blocker; accepted deferred debt is not claimed delivered.
 - Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
 - A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
 - B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
@@ -487,10 +508,11 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 - C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
 - Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
 - Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: separately authorize BB-130D2 — Minimal Frontend Dependency Maintenance from accepted triage above. Maintenance and formatter implementation are NOT STARTED / NOT COMPLETE.
+- Next: owner/architect review of the exact exit candidate only. Dependency maintenance, cleanup and both formatter gates are already accepted/merged/CI verified; no subsequent implementation is authorized.
 - B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
 - B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
 - Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
+
 
 ## BB-128C — Finance Design-System Conformance for Async & Degraded States
 

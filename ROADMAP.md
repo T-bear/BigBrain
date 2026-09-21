@@ -1,5 +1,14 @@
 # BigBrain Roadmap
 
+## BB-130 exit assessment candidate — 2026-09-21
+
+The [final stabilization assessment](docs/reports/features/platform/bb-130-final-exit-assessment-20260921.md)
+finds no exit blocker and recommends closing the accepted A–D scope. REVIEW CANDIDATE ONLY;
+exact owner/architect review and merge remain. This does not select or authorize the next
+product sprint. Existing security/authentication/rights prerequisites and Finance
+RESEARCH / 0 SEK / NONE remain unchanged. Historical direction below is retained.
+
+
 ## Authority and current direction — BB-130A, 2026-09-05
 
 Owner: product owner. This is the canonical product-direction map; detailed Finance
