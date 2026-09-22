@@ -1,5 +1,15 @@
 # BigBrain Roadmap
 
+## BB-131C bounded persistent governance — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** The owner separately authorized Finance-owned persistence
+for the synthetic B protocol: durable history, atomic budget/exposure reservation and crash/reopen proof.
+[Scope and limits](docs/reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
+No production learner, real model/provider or execution authority. Multi-protocol adaptation, overlap,
+auth/security/export rights remain separately reviewed future work. Finance RESEARCH / 0 SEK / NONE.
+BB-130 stays closed; A/B accepted; no BB-131D or deployment authority. Older entries are historical.
+
+
 ## BB-131B authorized synthetic proof — 2026-09-22
 
 The separately owner-authorized B checkpoint implements only the accepted synthetic contract/replay

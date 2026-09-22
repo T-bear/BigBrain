@@ -1,5 +1,20 @@
 # Finance module
 
+## BB-131C persistent governance addendum — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Separately owner-authorized from `cb520994f3ae4222bab1ba31d8cc683abbc28991`.
+[Implementation, ownership and limitations](../reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md). Existing EodhdMarketMemory and FinanceSchemaMigrator
+own additive migration 94 and one bounded synthetic ledger; no second database or scientific engine.
+The fixed B protocol reserves invocation, complete plan, three trials and exposure durably before
+computation. Immediate SQLite transactions protect concurrent requests; failures retain spent authority.
+Existing result stores remain scientific truth; ledger binds checked IDs/checksums and native verdicts.
+No production reasoner, endpoint, new provider, autonomous loop, statistical or execution claim.
+Future real-model access still needs auth/scoped authorization, audit, resource/egress limits,
+export/retention rights and security review. Unknown real-data cohort relationships fail closed.
+ADR 0038 stays Accepted. A/B evidence below is historical; no accepted decision is rewritten.
+Finance **RESEARCH / 0 SEK / NONE**; no deployment. BB-131D NOT STARTED / NOT AUTHORIZED.
+
+
 ## BB-131B synthetic contract boundary — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED**.

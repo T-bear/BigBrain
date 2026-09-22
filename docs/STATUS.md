@@ -1,5 +1,19 @@
 # BigBrain Status
 
+## BB-131C persistent learning ledger — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Baseline `cb520994f3ae4222bab1ba31d8cc683abbc28991`;
+branch `bb-131c/persistent-learning-ledger`. Owner-authorized local implementation, not accepted/main/deployed.
+Existing Finance ownership now has additive migration 94 and one bounded synthetic governance ledger.
+Atomic invocation/proposal/budget/exposure reservation precedes computation; one start grant,
+negative history, immutable result references and fail-closed crash/reopen/concurrency are verified.
+[Evidence, recovery, exact commands and limits](reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
+No existing scientific engine/identity, B contract, Web, package, CI or runtime endpoint change.
+Finance **RESEARCH / 0 SEK / NONE**. BB-130 stays closed; A/B stay accepted; ADR 0038 Accepted.
+BB-131D is NOT STARTED / NOT AUTHORIZED. General adaptive protocols/overlap/auth/rights remain future work.
+Older B/A authorization/status statements below describe their historical checkpoint, not current C authority.
+
+
 ## BB-131B synthetic contract/replay proof — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.**
