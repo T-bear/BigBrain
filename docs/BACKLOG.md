@@ -5,20 +5,25 @@
 ### BB-131 – Finance Research Learning foundation
 
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
-- Status: **A ACCEPTED / MERGED / CI VERIFIED**; no implementation accepted.
+- Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
 - [Contract and A DoD](architecture/finance/research-learning-contract.md);
   [evidence/report](reports/features/finance/bb-131a-research-learning-architecture-20260921.md);
   [ADR 0038 — Accepted](adr/0038-finance-research-learning-authority-contract.md).
-- Proposed B: synthetic fake reasoner, pure validation, existing deterministic evaluator and isolated
-  persistence/replay tests. **NOT STARTED / NOT AUTHORIZED** until separate reviewed checkpoint.
+- B separately owner-authorized from `b0459b1e09be777f2ce11dd33a570af8a06c447a`; recovery reconciled.
+  Synthetic fake reasoner, pure validation, three-trial momentum20 plan, bounded budget/exposure,
+  existing deterministic evaluator and isolated immutable persistence/replay proof.
+  [B DoD evidence/limits](reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+- B DoD: strict typed admission; canonical fingerprint; development-only input; 5/10/20 accounting;
+  duplicate/exposure/risk/degradation proofs; existing SQLite reopen/replay; complete backend checks.
+  Production adaptive ledger/auth/rights are excluded, not implicitly completed.
 - Future prerequisites: reviewed production admission/exposure ledger, source/holdout independence,
   retained negative history, rights/export decision and application authentication/security. Existing
   data-bound/DSR/PBO limitations remain; no new performance/significance claim.
 - No provider/SDK/key/network integration, schema change, trading, capital, deployment or next sprint.
-- Next: STOP — return published main to owner/architect for independent verification. BB-131B requires new authorization.
+- Next: STOP — return the exact B candidate to owner/architect for independent review. No merge or BB-131C authorization.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

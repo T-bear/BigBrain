@@ -19,6 +19,47 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131B completed candidate — 2026-09-22
+
+Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY — not accepted/merged.
+Task: BB-131B — Synthetic Research Learning Contract & Replay Proof.
+Baseline/source-of-truth SHA: `b0459b1e09be777f2ce11dd33a570af8a06c447a`.
+Branch: `bb-131b/synthetic-contract-replay-proof`; one bounded candidate based on exact main.
+
+Recovery resolved: owner/architect confirmed that prior durable work was only branch creation
+and source inspection. No missing implementation/tests/commit existed. This session reused the
+branch and implemented the authorized proof. No MANUAL REVIEW REQUIRED condition remains.
+Unrelated untracked design mockups and ADR 0006–0009 are preserved and excluded.
+
+At the final publication resumption, the complete implementation and final passing test evidence
+already existed locally: 14 intended staged files, with only the report's final hygiene-result
+paragraph unstaged; no candidate commit or remote branch yet. Baseline/branch remained exact.
+That valid implementation/evidence was reused. Remaining work was documentation hygiene and
+commit/push only; no completed code or expensive test suite was recreated.
+
+Changed files: two new module contract/admission files, two new test fixture/proof files and
+relevant canonical Markdown documentation (10 files), enumerated in the candidate diff and
+[BB-131B report](../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+No existing production/test source, Web, runtime, schema, package, CI or accepted ADR decision changed.
+
+Completed and valid: closed fail-closed admission, frozen momentum20 plan, explicit three effective
+trials, bounded development-only input, full fingerprints, budget/duplicate/exposure/concurrency
+proof, test-only reasoner/manifest, unchanged evaluator and existing SQLite persistence/reopen/replay,
+negative/risk/failure paths. No real data/model/provider or production learning integration.
+Tests/builds: SDK 10.0.302; restore PASS; Release zero warnings/errors; focused 56/56;
+Finance regressions 74/74; full API 720/720 and Sentinel 32/32 PASS; full format check exit 0.
+Publication hygiene and command details are in the report. No deployment or runtime approval.
+
+Remaining: independent owner/architect review of exact candidate only; production adaptive ledger,
+auth/rights/cross-cohort governance remain outside B. No pre-existing blocker was established.
+Resolve the published candidate identity from `origin/bb-131b/synthetic-contract-replay-proof`
+and verify its parent equals the baseline above. Git/remote history, not a self-referential SHA
+inside this commit, owns final candidate identity. No interrupted implementation remains after
+candidate publication. BB-131C is NOT STARTED / NOT AUTHORIZED; do not merge or deploy.
+Exact next action: STOP — return the exact BB-131B review candidate SHA to owner/architect for
+independent review. Finance RESEARCH / 0 SEK / NONE. A's NOT AUTHORIZED statements below are dated
+history, superseded only by the separate B authorization, not permission for future work.
+
 ## BB-131A accepted publication
 
 Status: ACCEPTED / MERGED / CI VERIFIED — architecture only; ADR 0038 Accepted.

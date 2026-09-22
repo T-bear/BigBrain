@@ -1,5 +1,19 @@
 # BigBrain Status
 
+## BB-131B synthetic contract/replay proof — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY — not accepted or merged.**
+Baseline `b0459b1e09be777f2ce11dd33a570af8a06c447a`; branch `bb-131b/synthetic-contract-replay-proof`.
+The owner resolved recovery: only prior branch creation/source inspection existed; no missing implementation.
+Two additive Finance contract/admission files and two test-only fixture/proof files implement the
+bounded momentum20 protocol under accepted ADR 0038. Development-only input, three effective
+5/10/20 trials, fail-closed admission, normalized identities, consumed exposure, existing evaluator,
+immutable SQLite reload/replay and risk veto are exercised without runtime integration.
+[Exact evidence and limits](reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+No existing source/test/schema/package/CI/Web/runtime change; no real reasoner/provider or deployment.
+Finance **RESEARCH / 0 SEK / NONE**. BB-130 stays closed; B requires exact-candidate review;
+BB-131C is NOT STARTED / NOT AUTHORIZED. Earlier A statements describe their historical date.
+
 ## BB-131A Research Learning architecture — 2026-09-21
 
 **ACCEPTED / MERGED / CI VERIFIED — architecture only.** Baseline
