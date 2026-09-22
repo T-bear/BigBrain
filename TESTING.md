@@ -1,5 +1,17 @@
 # Testa BigBrain
 
+## BB-131B synthetic contract/replay verification — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+[Durable commands, assertions and limitations](docs/reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+New `ResearchLearningContractTests` and test-only `ResearchLearningFixture` cover strict admission,
+normalization/projection, all three momentum trials, budget/duplicates/concurrency/exposure, native
+risk veto, reasoner failures, frozen commitment and existing SQLite writer/reader/replay/conflicts.
+No existing tests changed. SDK 10.0.302; focused 56/56, Finance regressions 74/74, full API
+720/720 and Sentinel 32/32 PASS. Release build zero warnings/errors; full format verification PASS.
+Exact commands and publication-check results belong in the report. No frontend or runtime verification
+claim; no deployment. Synthetic results are engineering evidence only. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-131A architecture/recovery verification — 2026-09-21
 
 Documentation-only architecture accepted from baseline `7747b8f715204dc3ccf753f170238b40238d1b11`.

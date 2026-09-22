@@ -1,5 +1,13 @@
 # BigBrain Roadmap
 
+## BB-131B authorized synthetic proof — 2026-09-22
+
+The separately owner-authorized B checkpoint implements only the accepted synthetic contract/replay
+proof: **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, awaiting exact-candidate review.
+[Evidence and limitations](docs/reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+BB-130 remains closed. No autonomous production learning, provider integration, deployment or
+BB-131C authorization. Finance **RESEARCH / 0 SEK / NONE**; existing security and promotion gates remain.
+
 ## BB-131A owner-authorized architecture checkpoint — 2026-09-21
 
 After accepted BB-130 closure, the owner authorized **analysis/documentation only** for

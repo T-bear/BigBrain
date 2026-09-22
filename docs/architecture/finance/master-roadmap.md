@@ -1,5 +1,15 @@
 # BigBrain Finance – master roadmap
 
+## BB-131B separately authorized engineering proof — 2026-09-22
+
+The owner authorized the synthetic contract/replay slice after accepting A and resolving recovery.
+B is **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted/merged or a production learner.
+[Implementation and limits](../../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
+No future milestone is promoted: real adaptive research, production exposure/admission persistence,
+model/export rights, auth and security remain separately reviewed prerequisites. BB-130 stays closed.
+Finance **RESEARCH / 0 SEK / NONE**. No deployment/provider/execution capability; no BB-131C authority.
+The dated A-only authorization below is historical and does not revoke the separately authorized B slice.
+
 ## BB-131A current research direction — 2026-09-21
 
 BB-130 is COMPLETE / EXIT APPROVED on accepted main. The owner has authorized only BB-131A

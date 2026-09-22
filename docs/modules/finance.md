@@ -1,5 +1,15 @@
 # Finance module
 
+## BB-131B synthetic contract boundary — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
+[BB-131B report](../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md) records the additive typed Finance
+contracts/pure admission and test-only reasoner, ledger and replay proof. Existing strategies,
+costs, OOS/holdout, risk, classifications, persistence/schema and historical evidence are unchanged.
+No runtime API/DI/worker/Brain/provider integration. Only the initial synthetic momentum20 protocol
+is offered; three internal trials are counted. Production adaptive accounting/auth/rights/journal
+remain prerequisites. Finance **RESEARCH / 0 SEK / NONE**; no deployment. BB-131C is unauthorized.
+
 ## BB-131A proposed Research Learning boundary — 2026-09-21
 
 BB-130 remains closed on main. The [BB-131A contract](../architecture/finance/research-learning-contract.md)

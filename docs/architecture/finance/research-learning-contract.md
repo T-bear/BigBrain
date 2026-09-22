@@ -13,6 +13,21 @@ ADR 0038 is now Accepted. The original proposed contract/slice wording below des
 implementation, not shipped capability. Existing accepted ADRs remain authoritative.
 Finance remains **RESEARCH / 0 SEK / NONE**.
 
+## BB-131B implementation addendum — 2026-09-22
+
+Separately owner-authorized B is **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
+[Implementation evidence](../../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md) maps the minimal typed
+boundary to this accepted decision. Two additive module files provide immutable synthetic scope,
+closed JSON admission, full new identities and existing result references. Reasoner/orchestration,
+cohort ledger, commitment/result manifests and SQLite replay are test-only. No accepted ADR decision
+or existing engine changes. The initial projection supports only empty pre-invocation history;
+no general adaptive projection or production ledger is claimed. Preflight conservatively counts
+all engine calls (including duplicates), rejecting excessive plans without shrinking them.
+Replay is reproduction of consumed engineering evidence, not fresh statistical confirmation.
+Future real-data/auth/rights/retention/cross-cohort requirements below remain binding.
+Historical A wording describes architecture acceptance, not a prohibition on the separately authorized B.
+Finance RESEARCH / 0 SEK / NONE; no deployment or BB-131C authority.
+
 ## Objective and Definition of Done
 
 Define the smallest extension through which a research reasoner can suggest a bounded
