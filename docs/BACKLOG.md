@@ -5,7 +5,7 @@
 ### BB-131 – Finance Research Learning foundation
 
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
-- Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
+- Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B ACCEPTED / MERGED / CI VERIFIED**.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
@@ -23,7 +23,7 @@
   retained negative history, rights/export decision and application authentication/security. Existing
   data-bound/DSR/PBO limitations remain; no new performance/significance claim.
 - No provider/SDK/key/network integration, schema change, trading, capital, deployment or next sprint.
-- Next: STOP — return the exact B candidate to owner/architect for independent review. No merge or BB-131C authorization.
+- Next: STOP — return published main to owner/architect for independent verification. BB-131C remains NOT STARTED / NOT AUTHORIZED.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

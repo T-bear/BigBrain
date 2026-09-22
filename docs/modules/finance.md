@@ -2,7 +2,7 @@
 
 ## BB-131B synthetic contract boundary — 2026-09-22
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
+**ACCEPTED / MERGED / CI VERIFIED**.
 [BB-131B report](../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md) records the additive typed Finance
 contracts/pure admission and test-only reasoner, ledger and replay proof. Existing strategies,
 costs, OOS/holdout, risk, classifications, persistence/schema and historical evidence are unchanged.

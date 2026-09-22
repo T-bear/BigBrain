@@ -3,7 +3,7 @@
 ## BB-131B separately authorized engineering proof — 2026-09-22
 
 The owner authorized the synthetic contract/replay slice after accepting A and resolving recovery.
-B is **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted/merged or a production learner.
+B is **ACCEPTED / MERGED / CI VERIFIED** as an engineering proof, not a production learner.
 [Implementation and limits](../../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
 No future milestone is promoted: real adaptive research, production exposure/admission persistence,
 model/export rights, auth and security remain separately reviewed prerequisites. BB-130 stays closed.

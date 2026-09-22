@@ -15,7 +15,7 @@ Finance remains **RESEARCH / 0 SEK / NONE**.
 
 ## BB-131B implementation addendum — 2026-09-22
 
-Separately owner-authorized B is **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted on main.
+Separately owner-authorized B is **ACCEPTED / MERGED / CI VERIFIED**.
 [Implementation evidence](../../reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md) maps the minimal typed
 boundary to this accepted decision. Two additive module files provide immutable synthetic scope,
 closed JSON admission, full new identities and existing result references. Reasoner/orchestration,

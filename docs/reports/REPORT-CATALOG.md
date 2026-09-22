@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-131B, 2026-09-22` — [Synthetic contract/replay proof — review candidate](features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md). Additive typed admission/identity with test-only reasoner/ledger; existing evaluator and SQLite persistence reused; no runtime/provider/schema/deployment. Finance RESEARCH / 0 SEK / NONE.
+- `BB-131B, 2026-09-22` — [Synthetic contract/replay proof — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md). Owner-approved candidate `56ad7fd0290471bec926b2008384951a9bb8286a`; merge CI 35730956813 SUCCESS including both formatter gates. Additive typed admission/identity with test-only reasoner/ledger; existing evaluator and SQLite persistence reused; no runtime/provider/schema/deployment. Finance RESEARCH / 0 SEK / NONE.
 
 - `BB-131A, 2026-09-21` — [Research Learning architecture and contract — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131a-research-learning-architecture-20260921.md). Recovered unchanged local branch; Finance reuse/authority map, bounded proposals, adaptive-testing/holdout governance, security limits and synthetic fixture-first B proposal. ADR 0038 Accepted as architecture only; merge CI 35641586823 SUCCESS; no implementation/provider/schema/deployment; BB-130 stays closed.
 

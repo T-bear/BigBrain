@@ -19,9 +19,43 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-131B completed candidate — 2026-09-22
+## BB-131B accepted publication — 2026-09-22
 
-Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY — not accepted/merged.
+Status: ACCEPTED / MERGED / CI VERIFIED — bounded synthetic contract/replay engineering proof only.
+
+Owner/architect explicitly approved candidate `56ad7fd0290471bec926b2008384951a9bb8286a` from baseline
+`b0459b1e09be777f2ce11dd33a570af8a06c447a`. Exact pre-merge checks found one commit ahead,
+zero behind, matching parent/merge-base and the unchanged 14-file reviewed candidate.
+Merge `4810af5f7050361b3071befdccb4caafa84902b4` has baseline as first parent and candidate as second parent.
+Candidate and merge share tree `e7988a8f2b88a64fcb403142d9da1c0214e604d5`; content is identical.
+[Exact merge CI 35730956813](https://github.com/T-bear/BigBrain/actions/runs/35730956813): **SUCCESS**.
+Backend, frontend, documentation and secrets jobs all completed successfully. Actual steps passed:
+backend checkout/setup -> restore -> dotnet format verify -> Release build -> tests;
+frontend checkout/setup -> npm ci -> npm run format:check -> tests -> production build;
+documentation verifier and Gitleaks. Historical local test results are not substituted for this run.
+
+Publication reconciliation changes documentation only. No accepted implementation, source/test,
+package/CI/schema/runtime configuration or ADR decision is altered. ADR 0038 remains Accepted;
+BB-131A remains accepted architecture and BB-130 closed. BB-131C is NOT STARTED / NOT AUTHORIZED.
+No deployment, real provider/model/AI integration or new scientific/trading authority occurred.
+Finance **RESEARCH / 0 SEK / NONE**. Production autonomous learning, real-market learning,
+adaptive-search journal/cross-cohort accounting, auth/security, export/data rights and statistical
+profitability are not established; no PAPER/LIVE eligibility or execution authority follows.
+
+Resolve the final reconciliation SHA from main using
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131B contract proof$' main`.
+The final commit's GitHub Actions run must independently pass all four jobs and both actual
+formatter checks; merge CI does not substitute for final reconciliation CI. Exact final SHA/run
+are recorded in GitHub commit/Actions history and the publication handoff, avoiding a self-referential
+commit hash inside its own content. No subsequent checkpoint is authorized.
+
+No interrupted BB-131B implementation remains. Reconciliation does not authorize B expansion,
+BB-131C, production learning, provider activation or deployment. After exact-final-main CI succeeds,
+STOP — return control to owner/architect for independent verification of published main.
+
+### Historical BB-131B candidate/recovery evidence — 2026-09-22
+
+Historical status before acceptance: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.
 Task: BB-131B — Synthetic Research Learning Contract & Replay Proof.
 Baseline/source-of-truth SHA: `b0459b1e09be777f2ce11dd33a570af8a06c447a`.
 Branch: `bb-131b/synthetic-contract-replay-proof`; one bounded candidate based on exact main.
@@ -50,15 +84,9 @@ Tests/builds: SDK 10.0.302; restore PASS; Release zero warnings/errors; focused 
 Finance regressions 74/74; full API 720/720 and Sentinel 32/32 PASS; full format check exit 0.
 Publication hygiene and command details are in the report. No deployment or runtime approval.
 
-Remaining: independent owner/architect review of exact candidate only; production adaptive ledger,
-auth/rights/cross-cohort governance remain outside B. No pre-existing blocker was established.
-Resolve the published candidate identity from `origin/bb-131b/synthetic-contract-replay-proof`
-and verify its parent equals the baseline above. Git/remote history, not a self-referential SHA
-inside this commit, owns final candidate identity. No interrupted implementation remains after
-candidate publication. BB-131C is NOT STARTED / NOT AUTHORIZED; do not merge or deploy.
-Exact next action: STOP — return the exact BB-131B review candidate SHA to owner/architect for
-independent review. Finance RESEARCH / 0 SEK / NONE. A's NOT AUTHORIZED statements below are dated
-history, superseded only by the separate B authorization, not permission for future work.
+The candidate's independent review and exact-SHA approval are now complete. Current accepted
+publication state above supersedes its former review/push/stop instructions. No interrupted
+implementation remains; unrelated mockups and unpublished ADRs stay preserved.
 
 ## BB-131A accepted publication
 
