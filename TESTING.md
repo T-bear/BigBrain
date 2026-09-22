@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-131C ledger verification — 2026-09-22
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** [Commands and assertion matrix](docs/reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
+Final Release build: zero warnings/errors. Combined targeted suite 168/168: C 34, B 56,
+existing Finance regressions 74 and schema/closure 4. Full backend API 754/754 and Sentinel 32/32.
+Tests use isolated SQLite and synthetic inputs; no deployment/runtime/owner UX verification.
+C covers immediate transaction rollback/commit, distinct connections contending for authority,
+lost start response, result-before-completion recovery, corruption/schema mismatch, negative history,
+consumed/unknown exposure and native immutable reference verification. B tests remain unchanged.
+No scientific math/identity change. Web is byte-identical to baseline; no frontend suite rerun needed.
+Finance RESEARCH / 0 SEK / NONE. General real-data overlap and storage-hardware/backup-rollback
+safety are not established by these deterministic process-interruption fixtures.
+
+
 ## BB-131B synthetic contract/replay verification — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.**

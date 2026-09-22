@@ -19,6 +19,48 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131C completed review candidate — 2026-09-22
+
+Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.
+Task: BB-131C — Persistent Research Learning Ledger & Iteration Governance.
+Baseline/source-of-truth SHA: `cb520994f3ae4222bab1ba31d8cc683abbc28991`.
+Branch: `bb-131c/persistent-learning-ledger`. The exact published branch commit owns candidate
+identity; parent must equal baseline. This is not accepted main or deployment authority.
+
+Recovered valid work: existing branch at baseline; no C commit/staged/remote candidate; one migration
+edit, new ledger/test files and characterization report. No recovery note had been written before
+the interruption. The resumed session recorded SAFE TO RESUME before continuing. Earlier build
+passed; 24 focused tests passed before pending integrity additions. Those additions passed 24/24
+again, then remaining integrity/crash/concurrency/risk coverage reached 34/34. Nothing was recreated.
+
+Completed: characterized existing Finance ownership first; migration 94 in existing migrator;
+one bounded synthetic governance snapshot in the same DB; durable invocation/proposal/budget/exposure
+and single start grants; retained negative history; explicit failed/indeterminate state; native
+result-reference validation, reopen/replay and concurrency protection using SQLite transactions.
+New ledger-only InstrumentId serialization preserves frozen inputs without changing existing types.
+No parallel DB/engine, real model/provider, endpoint, worker, scientific identity/calculation change.
+[Full report and exact command evidence](../reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
+
+Changed files: three C# files (FinanceLearningLedger, FinanceSchemaMigrations, FinanceLearningLedgerTests)
+and ten Markdown files shown by the bounded commit. Unrelated mockups and unpublished ADR 0006–0009
+remain excluded and untouched. Web, B tests/contracts, existing scientific stores/engines, packages,
+CI, accepted ADR decision and runtime/deployment configuration remain unchanged.
+
+Final verification: restore PASS; Release zero warnings/errors; targeted 168/168 including C 34,
+B 56, Finance 74 and schema/closure 4; full API 754/754 and Sentinel 32/32; full format exit 0.
+Documentation verifier PASS (250 Markdown files, 91 unique backlog IDs); diff/history Gitleaks PASS.
+Staged diff/secrets checks PASS (no leaks); final pre-publication fetch retained the exact baseline.
+Only the 13 intended files are included; no unrelated files are staged.
+No pre-existing scientific/security/lineage blocker was established. No deployment/runtime approval.
+
+Remaining: exact-candidate independent owner/architect review only after publication. Fixed synthetic
+protocol only; real overlap/multi-protocol adaptation, history projection, auth/security/export/
+retention and backup-rollback adjudication remain separately reviewed prerequisites, not solved.
+No interrupted implementation remains. A/B accepted; BB-130 closed; ADR 0038 Accepted.
+Finance RESEARCH / 0 SEK / NONE. BB-131D NOT STARTED / NOT AUTHORIZED.
+Exact next action: STOP — return the exact published BB-131C candidate SHA to owner/architect for
+independent review. Do not merge, deploy, integrate providers or start BB-131D.
+
 ## BB-131B accepted publication — 2026-09-22
 
 Status: ACCEPTED / MERGED / CI VERIFIED — bounded synthetic contract/replay engineering proof only.
