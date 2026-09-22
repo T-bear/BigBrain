@@ -11,7 +11,38 @@ Detta är en sanerad GitHub-version.
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**. Not accepted, merged or deployed.
+**ACCEPTED / MERGED / CI VERIFIED**. Owner/architect-approved implementation merged unchanged. No deployment.
+
+
+### Accepted publication evidence — 2026-09-22
+
+Baseline / first merge parent: `cb520994f3ae4222bab1ba31d8cc683abbc28991`.
+Approved candidate / second merge parent: `55a05bf967044f16aeb8d5482f0c158c09b2883f`.
+Merge: `49072ea5832e0909e0ed9c77bc3ae9c98eee6b89`.
+Candidate and merge tree: `c0942e47946c9572015e1d1320a25be0c6de6406` — identical content.
+Pre-merge verification: exact remote SHAs, one ahead/zero behind, matching parent/merge-base,
+and unchanged reviewed 13-file candidate. No implementation modification during publication.
+
+[Exact merge CI 35767267447](https://github.com/T-bear/BigBrain/actions/runs/35767267447): **SUCCESS**.
+All four jobs and their actual required steps completed successfully:
+
+- Backend: checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend: checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+Reconciliation changes documentation only; accepted source/tests/schema/package/CI/runtime content
+is unchanged. No deployment or real AI/provider integration occurred; scientific results and trading
+authority are unchanged. Finance **RESEARCH / 0 SEK / NONE**. ADR 0038 remains Accepted;
+BB-130 closed; A/B accepted; BB-131D **NOT STARTED / NOT AUTHORIZED**.
+
+The separate reconciliation commit is identified from main by:
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131C persistent learning ledger$' main`.
+Its exact final-SHA Actions run must also pass before publication handoff; GitHub commit/run history
+and the final handoff identify that SHA and run without a self-referential documentation commit.
 
 ## Persistence characterization
 
@@ -59,11 +90,11 @@ security review. No deployment. Finance RESEARCH / 0 SEK / NONE.
 
 ## Remaining work
 
-Independent owner/architect review of the exact published candidate is required. No C merge or BB-131D authority. General real-market overlap adjudication and multi-protocol expansion remain deferred.
+Independent post-merge verification and next-checkpoint planning remain. BB-131D is NOT STARTED / NOT AUTHORIZED. General real-market overlap adjudication and multi-protocol expansion remain deferred.
 
 ## Resumption
 
-Resolve the exact candidate from `origin/bb-131c/persistent-learning-ledger`; its parent must equal the baseline. No interrupted implementation remains. STOP — return the exact BB-131C review candidate SHA to owner/architect for independent review. No merge, deployment or BB-131D.
+The exact approved candidate and merge identities are recorded above. No interrupted C implementation remains. STOP — return accepted BB-131C main to owner/architect for independent post-merge verification and next-checkpoint planning. No deployment or BB-131D.
 
 ## Implementation and authority
 

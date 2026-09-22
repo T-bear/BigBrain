@@ -2,8 +2,8 @@
 
 ## BB-131C persistent learning ledger — 2026-09-22
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Baseline `cb520994f3ae4222bab1ba31d8cc683abbc28991`;
-branch `bb-131c/persistent-learning-ledger`. Owner-authorized local implementation, not accepted/main/deployed.
+**ACCEPTED / MERGED / CI VERIFIED.** Baseline `cb520994f3ae4222bab1ba31d8cc683abbc28991`;
+branch `bb-131c/persistent-learning-ledger`. Owner/architect-approved and merged unchanged; no deployment.
 Existing Finance ownership now has additive migration 94 and one bounded synthetic governance ledger.
 Atomic invocation/proposal/budget/exposure reservation precedes computation; one start grant,
 negative history, immutable result references and fail-closed crash/reopen/concurrency are verified.
@@ -13,6 +13,11 @@ Finance **RESEARCH / 0 SEK / NONE**. BB-130 stays closed; A/B stay accepted; ADR
 BB-131D is NOT STARTED / NOT AUTHORIZED. General adaptive protocols/overlap/auth/rights remain future work.
 Older B/A authorization/status statements below describe their historical checkpoint, not current C authority.
 
+
+Approved candidate `55a05bf967044f16aeb8d5482f0c158c09b2883f` merged unchanged as
+`49072ea5832e0909e0ed9c77bc3ae9c98eee6b89`. [Merge CI 35767267447](https://github.com/T-bear/BigBrain/actions/runs/35767267447)
+SUCCESS: all four jobs and actual backend/frontend formatter/build/test, install, docs and secrets steps.
+Exact parent/tree identities and final reconciliation SHA resolution are in the report/recovery note.
 
 ## BB-131B synthetic contract/replay proof — 2026-09-22
 

@@ -2,7 +2,7 @@
 
 ## BB-131C bounded persistent governance — 2026-09-22
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** The owner separately authorized Finance-owned persistence
+**ACCEPTED / MERGED / CI VERIFIED.** The owner separately authorized Finance-owned persistence
 for the synthetic B protocol: durable history, atomic budget/exposure reservation and crash/reopen proof.
 [Scope and limits](docs/reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
 No production learner, real model/provider or execution authority. Multi-protocol adaptation, overlap,

@@ -6,7 +6,7 @@
 
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
 - Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B ACCEPTED / MERGED / CI VERIFIED**;
-  **C IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**.
+  **C ACCEPTED / MERGED / CI VERIFIED**.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
@@ -25,12 +25,12 @@
   retained negative history and exact result-reference recovery. [C evidence/DoD](reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
   DoD verified locally: migration/reopen/rollback, persisted budget/exposure, concurrency, no retry/refund,
   unchanged B/scientific machinery, native result binding/replay, backend and publication checks.
-  C is a bounded review candidate, not a general real-data/adaptive ledger or deployed service.
+  C is accepted on main as bounded synthetic governance, not a general real-data/adaptive ledger or deployed service.
 - Future prerequisites: multi-protocol/adaptive admission review, source/holdout independence,
   retained negative history, rights/export decision and application authentication/security. Existing
   data-bound/DSR/PBO limitations remain; no new performance/significance claim.
 - C changes only the bounded Finance governance schema; no provider/SDK/key/network integration, trading, capital, deployment or next sprint.
-- Next: STOP — return the exact published C candidate to owner/architect for independent review. No merge; BB-131D NOT STARTED / NOT AUTHORIZED.
+- Next: STOP — return accepted C main to owner/architect for independent post-merge verification and next-checkpoint planning. BB-131D NOT STARTED / NOT AUTHORIZED.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

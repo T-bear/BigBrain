@@ -19,13 +19,13 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-131C completed review candidate — 2026-09-22
+## BB-131C accepted publication — 2026-09-22
 
-Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.
+Status: ACCEPTED / MERGED / CI VERIFIED.
 Task: BB-131C — Persistent Research Learning Ledger & Iteration Governance.
 Baseline/source-of-truth SHA: `cb520994f3ae4222bab1ba31d8cc683abbc28991`.
-Branch: `bb-131c/persistent-learning-ledger`. The exact published branch commit owns candidate
-identity; parent must equal baseline. This is not accepted main or deployment authority.
+Branch: `bb-131c/persistent-learning-ledger`. Exact approved candidate is recorded below.
+Accepted main includes the unchanged candidate; no deployment authority follows.
 
 Recovered valid work: existing branch at baseline; no C commit/staged/remote candidate; one migration
 edit, new ledger/test files and characterization report. No recovery note had been written before
@@ -53,13 +53,44 @@ Staged diff/secrets checks PASS (no leaks); final pre-publication fetch retained
 Only the 13 intended files are included; no unrelated files are staged.
 No pre-existing scientific/security/lineage blocker was established. No deployment/runtime approval.
 
-Remaining: exact-candidate independent owner/architect review only after publication. Fixed synthetic
+Remaining: independent post-merge verification and next-checkpoint planning only. Fixed synthetic
 protocol only; real overlap/multi-protocol adaptation, history projection, auth/security/export/
 retention and backup-rollback adjudication remain separately reviewed prerequisites, not solved.
 No interrupted implementation remains. A/B accepted; BB-130 closed; ADR 0038 Accepted.
 Finance RESEARCH / 0 SEK / NONE. BB-131D NOT STARTED / NOT AUTHORIZED.
-Exact next action: STOP — return the exact published BB-131C candidate SHA to owner/architect for
-independent review. Do not merge, deploy, integrate providers or start BB-131D.
+Exact next action: STOP — return accepted BB-131C main to owner/architect for independent
+post-merge verification and next-checkpoint planning. Do not deploy, integrate providers or start BB-131D.
+
+
+### Accepted publication evidence — 2026-09-22
+
+Baseline / first merge parent: `cb520994f3ae4222bab1ba31d8cc683abbc28991`.
+Approved candidate / second merge parent: `55a05bf967044f16aeb8d5482f0c158c09b2883f`.
+Merge: `49072ea5832e0909e0ed9c77bc3ae9c98eee6b89`.
+Candidate and merge tree: `c0942e47946c9572015e1d1320a25be0c6de6406` — identical content.
+Pre-merge verification: exact remote SHAs, one ahead/zero behind, matching parent/merge-base,
+and unchanged reviewed 13-file candidate. No implementation modification during publication.
+
+[Exact merge CI 35767267447](https://github.com/T-bear/BigBrain/actions/runs/35767267447): **SUCCESS**.
+All four jobs and their actual required steps completed successfully:
+
+- Backend: checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend: checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+Reconciliation changes documentation only; accepted source/tests/schema/package/CI/runtime content
+is unchanged. No deployment or real AI/provider integration occurred; scientific results and trading
+authority are unchanged. Finance **RESEARCH / 0 SEK / NONE**. ADR 0038 remains Accepted;
+BB-130 closed; A/B accepted; BB-131D **NOT STARTED / NOT AUTHORIZED**.
+
+The separate reconciliation commit is identified from main by:
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131C persistent learning ledger$' main`.
+Its exact final-SHA Actions run must also pass before publication handoff; GitHub commit/run history
+and the final handoff identify that SHA and run without a self-referential documentation commit.
 
 ## BB-131B accepted publication — 2026-09-22
 
