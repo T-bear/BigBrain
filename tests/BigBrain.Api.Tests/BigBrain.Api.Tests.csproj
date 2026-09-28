@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/BigBrain.Api/BigBrain.Api.csproj" />
+    <ProjectReference Include="../../src/BigBrain.Brain/BigBrain.Brain.csproj" />
     <ProjectReference Include="../../src/BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
 </Project>
