@@ -10,15 +10,48 @@ payloads or host inventory identifiers are published.
 - Branch: `bb-131d/local-first-reasoner-boundary`.
 - Scope: architecture/security design and documentation only.
 - [Detailed contract](../../../architecture/finance/local-first-reasoner-boundary.md).
-- [ADR 0039 — Proposed](../../../adr/0039-local-first-research-reasoner-boundary.md);
+- [ADR 0039 — Accepted](../../../adr/0039-local-first-research-reasoner-boundary.md);
   [ADR 0038 — Accepted, unchanged](../../../adr/0038-finance-research-learning-authority-contract.md).
 
 ## Status
 
-**DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY** upon the verification below.
-Not accepted/merged, implemented, deployed, runtime tested or owner UX verified.
+**ACCEPTED / MERGED / CI VERIFIED — architecture only**.
+Not implemented, deployed, runtime tested or owner UX verified.
 Finance **RESEARCH / 0 SEK / NONE**. AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.
 A/B/C remain accepted; BB-130 remains closed. BB-131E NOT STARTED / NOT AUTHORIZED.
+
+
+### Accepted publication — 2026-09-28
+
+Explicit owner approval applies to exact reviewed candidate `8fbf1f497b7dc3b2cdceca7a02b752a8d7ce58e7`.
+Pre-merge origin/main, candidate parent and merge-base were `269fbd7e786a09ba2bf39fe77492d62d8056a52a`;
+one ahead/zero behind and exactly the reviewed 16 Markdown files, no implementation/config changes.
+Merge `aad0e63718571e6a214b4de6d8e16a95b0bbf860` has baseline as first parent and candidate as second.
+Candidate and merge share tree `0781add2bdb3756941a6ce5c824f247d713247d9`; exact content is preserved.
+
+[Exact merge CI 36374731050](https://github.com/T-bear/BigBrain/actions/runs/36374731050): **SUCCESS**.
+Actual jobs/steps inspected, all successful:
+
+- Backend: checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend: checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+BB-131D **ACCEPTED / MERGED / CI VERIFIED**; ADR 0039 **Accepted**. The architecture itself is
+unchanged by this documentation-only reconciliation. Local-first/no-required-paid-AI is accepted;
+reasoner DESIGN ACCEPTED / NOT IMPLEMENTED / NOT INVOKED. Local model NOT SELECTED / NOT INSTALLED /
+NOT INVOKED. External AI OPTIONAL FUTURE ONLY / DISABLED / NOT CONFIGURED. No deployment or scientific/
+trading authority change. Finance **RESEARCH / 0 SEK / NONE**. BB-131E **NOT STARTED / NOT AUTHORIZED**.
+All first-local/first-external implementation, rights/auth/isolation/resource/audit/testing gates remain.
+
+No interrupted D work remains. Historical candidate/recovery observations retain their original scope.
+The final documentation-only reconciliation SHA is resolved from main by
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131D reasoner boundary$' main`.
+Its own exact-SHA CI must also pass before handoff; GitHub commit/Actions history and the final handoff
+record that SHA/run without embedding a commit's own hash inside itself.
 
 ## Recovered work
 
@@ -90,7 +123,7 @@ AI API was invoked. No external product, model, price or legal entitlement was s
 | Scientific authority | No new result vocabulary, identity, engine, risk grant, PAPER/LIVE/AUTO/broker/order/capital path |
 
 Consistency review compared this design with ADR 0038, accepted B/C source and the logical Brain/
-Sentinel boundaries. No accepted decision changed. ADR 0039 is Proposed. There is no dedicated
+Sentinel boundaries. No accepted decision changed. ADR 0039 was Proposed at candidate review; it is now Accepted as design only. There is no dedicated
 reasoner architecture checker in this repository; manual source/ADR mapping and documentation gates
 are the D evidence. Future adversarial tests are explicitly not claimed as executed.
 
@@ -135,7 +168,7 @@ Source review is not a penetration test; no reproducible new product defect was 
 
 ## Remaining work
 
-Independent owner/architect review of exact candidate. Before any real local invocation: separately
+Independent post-merge verification and next-checkpoint planning. Before any real local invocation: separately
 authorized implementation, hardware/runtime/model provenance and capacity evidence, approved projection/
 use rights, scoped identity/audit, isolation/limits/cancellation/kill behavior and adversarial tests.
 Optional cloud additionally requires explicit export/provider/privacy/egress/cost approval. General
@@ -146,6 +179,6 @@ remain limitations. No capability needs to be relaxed because a local model is w
 
 The [single recovery state](../../../operations/codex-recovery.md) and branch commit are authoritative.
 Resolve exact candidate from `origin/bb-131d/local-first-reasoner-boundary`; parent must equal baseline.
-STOP — return the exact BB-131D architecture review candidate SHA to owner/architect for independent
-review. Do not merge, install/invoke a model, start BB-131E or deploy. Approval of design alone must
+STOP — return accepted BB-131D main to owner/architect for independent post-merge verification
+and next-checkpoint planning. Do not install/invoke a model, start BB-131E or deploy. Approval of design alone must
 not be interpreted as permission for a later runtime checkpoint.

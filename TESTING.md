@@ -2,9 +2,9 @@
 
 ## BB-131D architecture verification — 2026-09-28
 
-Documentation-only **REVIEW CANDIDATE ONLY**. [Report and DoD matrix](docs/reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md)
+Documentation-only **ACCEPTED / MERGED / CI VERIFIED**. [Report and DoD matrix](docs/reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md)
 record source/ADR consistency review, relative-link/index verification, diff inventory and Gitleaks.
-No unchanged backend/frontend suites or model benchmarks rerun; no runtime security claim.
+No unchanged backend/frontend suites rerun locally and no model benchmarks run; exact merge CI executed the backend/frontend gates successfully. No runtime security claim.
 The [abuse-case matrix and first-invocation gates](docs/architecture/finance/local-first-reasoner-boundary.md)
 are required FUTURE tests, not executed D tests: protected-data noninterference, closed output,
 auth/revocation, resource/cancellation, injection, no tools, no cloud fallback, durable audit and

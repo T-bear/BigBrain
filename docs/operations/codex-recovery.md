@@ -19,13 +19,13 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-131D completed architecture review candidate — 2026-09-28
+## BB-131D accepted architecture publication — 2026-09-28
 
-Status: DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY.
+Status: ACCEPTED / MERGED / CI VERIFIED.
 Task: BB-131D — Local-First Reasoner Boundary & Security Contract; no implementation.
 Baseline/source-of-truth SHA: `269fbd7e786a09ba2bf39fe77492d62d8056a52a`.
 Branch: `bb-131d/local-first-reasoner-boundary`; exact published commit is the branch tip,
-whose parent must equal baseline. No main merge or first-model invocation authority follows.
+whose parent equals baseline. It is now merged unchanged; no first-model invocation authority follows.
 
 Recovery: first interruption left preflight only. The second session created the branch and wrote
 local-first design plus Proposed ADR 0039 after source inspection. This continuation preserved those
@@ -48,16 +48,49 @@ Verification: documentation/relative-link/index checks PASS (253 Markdown files 
 working/staged diff PASS; Gitleaks history 289 commits and staged D files PASS/no leaks. Source/ADR
 consistency and DoD matrix reviewed. No unrelated expensive suites or model benchmarks rerun.
 
-Remaining: independent review of the exact architecture candidate. Hardware class is owner-reported,
+Remaining: independent post-merge verification and next-checkpoint planning. Hardware class is owner-reported,
 not measured. Runtime/model provenance/capacity, actual auth/audit/isolation/resource/projection
 implementation and adversarial acceptance tests remain prerequisites for any later real invocation.
 Optional external provider/export/retention/egress/cost approval is separate and not required for
 qualified local inference. No current blocker defect was reproduced. No runtime/security certification.
-A/B/C remain accepted; BB-130 closed; ADR 0038 Accepted; ADR 0039 Proposed.
+A/B/C remain accepted; BB-130 closed; ADR 0038 Accepted; ADR 0039 Accepted as design only.
 Finance RESEARCH / 0 SEK / NONE. BB-131E NOT STARTED / NOT AUTHORIZED. No deployment.
-Exact next action: STOP — return the exact BB-131D architecture review candidate SHA to
-owner/architect for independent review. Do not merge, implement/invoke models or start BB-131E.
+Exact next action: STOP — return accepted BB-131D main to owner/architect for independent
+post-merge verification and next-checkpoint planning. Do not implement/invoke models or start BB-131E.
 Historical C/A/B authorization statements below retain their original dates and do not override D.
+
+
+### Accepted publication — 2026-09-28
+
+Explicit owner approval applies to exact reviewed candidate `8fbf1f497b7dc3b2cdceca7a02b752a8d7ce58e7`.
+Pre-merge origin/main, candidate parent and merge-base were `269fbd7e786a09ba2bf39fe77492d62d8056a52a`;
+one ahead/zero behind and exactly the reviewed 16 Markdown files, no implementation/config changes.
+Merge `aad0e63718571e6a214b4de6d8e16a95b0bbf860` has baseline as first parent and candidate as second.
+Candidate and merge share tree `0781add2bdb3756941a6ce5c824f247d713247d9`; exact content is preserved.
+
+[Exact merge CI 36374731050](https://github.com/T-bear/BigBrain/actions/runs/36374731050): **SUCCESS**.
+Actual jobs/steps inspected, all successful:
+
+- Backend: checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend: checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+BB-131D **ACCEPTED / MERGED / CI VERIFIED**; ADR 0039 **Accepted**. The architecture itself is
+unchanged by this documentation-only reconciliation. Local-first/no-required-paid-AI is accepted;
+reasoner DESIGN ACCEPTED / NOT IMPLEMENTED / NOT INVOKED. Local model NOT SELECTED / NOT INSTALLED /
+NOT INVOKED. External AI OPTIONAL FUTURE ONLY / DISABLED / NOT CONFIGURED. No deployment or scientific/
+trading authority change. Finance **RESEARCH / 0 SEK / NONE**. BB-131E **NOT STARTED / NOT AUTHORIZED**.
+All first-local/first-external implementation, rights/auth/isolation/resource/audit/testing gates remain.
+
+No interrupted D work remains. Historical candidate/recovery observations retain their original scope.
+The final documentation-only reconciliation SHA is resolved from main by
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131D reasoner boundary$' main`.
+Its own exact-SHA CI must also pass before handoff; GitHub commit/Actions history and the final handoff
+record that SHA/run without embedding a commit's own hash inside itself.
 
 ## BB-131C accepted publication — 2026-09-22
 

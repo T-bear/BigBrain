@@ -2,10 +2,10 @@
 
 ## BB-131D local-first reasoner boundary — 2026-09-28
 
-**DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY**; no implementation.
+**ACCEPTED / MERGED / CI VERIFIED**; no implementation.
 Baseline `269fbd7e786a09ba2bf39fe77492d62d8056a52a`; branch `bb-131d/local-first-reasoner-boundary`.
 [Contract/security design](architecture/finance/local-first-reasoner-boundary.md),
-[Proposed ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
+[Accepted ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
 [recovery/evidence report](reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
 Owner requires a viable 0-SEK local-model path; cloud is optional, separately gated, never fallback.
 Finance owns science/admission/history; Brain owns only bounded orchestration; all model output is untrusted.
@@ -13,7 +13,12 @@ Hardware is owner-reported, not measured; application auth and real-model runtim
 No model/runtime install, inference, SDK, provider, code/schema/package/CI change or deployment.
 Finance **RESEARCH / 0 SEK / NONE**. A/B/C accepted, BB-130 closed, ADR 0038 Accepted.
 Older C/A/B next-step statements are dated history; only D design is now authorized.
-BB-131E NOT STARTED / NOT AUTHORIZED. Next: independent review of exact D candidate; no merge/inference.
+BB-131E NOT STARTED / NOT AUTHORIZED. Next: independent post-merge verification and next-checkpoint planning; no inference.
+
+Approved candidate `8fbf1f497b7dc3b2cdceca7a02b752a8d7ce58e7` merged unchanged as
+`aad0e63718571e6a214b4de6d8e16a95b0bbf860`. [Merge CI 36374731050](https://github.com/T-bear/BigBrain/actions/runs/36374731050)
+passed all four jobs and actual formatter/build/test/docs/secrets steps. Report/recovery records
+exact parent/tree identity and final reconciliation SHA resolution. Architecture accepted only.
 
 ## BB-131C persistent learning ledger — 2026-09-22
 

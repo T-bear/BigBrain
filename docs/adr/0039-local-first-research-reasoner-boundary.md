@@ -1,6 +1,7 @@
 # ADR 0039: Local-first Research Learning reasoner boundary
 
-- Status: Proposed
+- Status: Accepted
+- Accepted: 2026-09-28, explicit owner approval of exact candidate `8fbf1f497b7dc3b2cdceca7a02b752a8d7ce58e7`; design only.
 - Date: 2026-09-23
 - Checkpoint: BB-131D — architecture/security design only
 - Baseline: `269fbd7e786a09ba2bf39fe77492d62d8056a52a`
@@ -12,7 +13,7 @@ contract and persistent governance. The owner now requires a viable local-AI pat
 API dependency. Current application auth, model isolation and operational audit are not complete.
 A local model is still untrusted; private local research permission does not imply cloud export.
 
-## Proposed decision
+## Decision
 
 Use a provider-neutral one-request/one-response reasoner port logically owned by Brain. Its primary
 adapter targets an isolated on-host runtime, with no model tools, arbitrary files, shell, database,
@@ -24,7 +25,7 @@ needs explicit export rights, provider/owner authorization, security/retention r
 External defaults disabled. Local failure never triggers cloud fallback. Provider/model identity is
 audit metadata and cannot renew scientific opportunity. Weak-model quality affects usefulness only.
 
-[The proposed detailed contract](../architecture/finance/local-first-reasoner-boundary.md) defines
+[The accepted detailed contract](../architecture/finance/local-first-reasoner-boundary.md) defines
 source evidence, locality axes, auth, parsing, injection containment, limits, audit, failure/disable
 behavior, abuse tests and distinct first-local/first-external invocation gates. Numeric runtime
 capacity and model choice await evidence; no compatibility/performance claim is made.
@@ -38,8 +39,8 @@ capacity and model choice await evidence; no compatibility/performance claim is 
 
 ## Consequences
 
-ADR 0038 remains Accepted and unchanged. This proposed decision adds no project, code, schema,
+ADR 0038 remains Accepted and unchanged. This accepted decision adds no project, code, schema,
 runtime, provider, credentials, model installation/inference or deployment. Runtime provisioning
 must respect existing Sentinel/host boundaries. Broader auth/adaptive-research/rights gaps remain.
 Finance RESEARCH / 0 SEK / NONE; no PAPER/LIVE/AUTO/broker/orders/capital. Acceptance of this ADR
-would accept design only, not authorize implementation or first model invocation.
+accepts design only and does not authorize implementation or first model invocation.

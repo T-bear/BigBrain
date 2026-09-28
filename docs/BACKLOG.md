@@ -6,7 +6,7 @@
 
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
 - Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B ACCEPTED / MERGED / CI VERIFIED**;
-  **C ACCEPTED / MERGED / CI VERIFIED**; **D DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY**.
+  **C ACCEPTED / MERGED / CI VERIFIED**; **D ACCEPTED / MERGED / CI VERIFIED**.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
@@ -32,7 +32,7 @@
 - C changes only the bounded Finance governance schema; no provider/SDK/key/network integration, trading, capital, deployment or next sprint.
 - D owner-authorized design only from `269fbd7e786a09ba2bf39fe77492d62d8056a52a`.
   [D contract](architecture/finance/local-first-reasoner-boundary.md),
-  [Proposed ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
+  [Accepted ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
   [DoD/evidence](reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
   D DoD: source-backed local-first ownership, projection/locality/auth/output/injection/resource/audit/
   failure/disable design, threat matrix and separate local/external invocation gates. No runtime implementation.
@@ -40,8 +40,8 @@
   authorized projection/use rights, scoped principal/audit, limits/cancellation and adversarial tests.
   Optional external export/terms/credentials/cost review must not block qualified local-only use.
   No paid API dependency, automatic cloud fallback or relaxation for weak model output.
-- Next: STOP — return exact D architecture candidate to owner/architect for independent review.
-  No merge or model invocation. BB-131E NOT STARTED / NOT AUTHORIZED.
+- Next: STOP — return accepted D main to owner/architect for independent post-merge verification
+  and next-checkpoint planning. No model invocation. BB-131E NOT STARTED / NOT AUTHORIZED.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

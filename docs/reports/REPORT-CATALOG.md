@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-131D, 2026-09-23–28` — [Local-first reasoner boundary — REVIEW CANDIDATE ONLY](features/finance/bb-131d-local-first-reasoner-boundary-20260923.md). Recovered design drafts; Proposed ADR 0039; 0-SEK local path, separate external-export/cost gates, no cloud fallback, untrusted model and Finance authority. No implementation/model/inference/deployment.
+- `BB-131D, 2026-09-23–28` — [Local-first reasoner boundary — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131d-local-first-reasoner-boundary-20260923.md). Recovered design drafts; Accepted ADR 0039; 0-SEK local path, separate external-export/cost gates, no cloud fallback, untrusted model and Finance authority. No implementation/model/inference/deployment.
 
 - `BB-131C, 2026-09-22` — [Persistent learning ledger — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131c-persistent-learning-ledger-20260922.md). Existing Finance migration 94; atomic synthetic governance, retained history, crash/reopen/concurrency and immutable result references; no real AI/provider/deployment/trading. Finance RESEARCH / 0 SEK / NONE.
 

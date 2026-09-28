@@ -2,12 +2,12 @@
 
 - Drafted: 2026-09-23; resumed/reviewed: 2026-09-28.
 - Baseline: `269fbd7e786a09ba2bf39fe77492d62d8056a52a`.
-- Status: **DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY** after the report's checks.
-- Decision: [ADR 0039 — Proposed](../../adr/0039-local-first-research-reasoner-boundary.md).
+- Status: **ACCEPTED / MERGED / CI VERIFIED**.
+- Decision: [ADR 0039 — Accepted](../../adr/0039-local-first-research-reasoner-boundary.md).
 - Parent authority: [ADR 0038 — Accepted](../../adr/0038-finance-research-learning-authority-contract.md).
 - [Assessment, recovery and verification](../../reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
 
-This is a proposed security contract, not implemented controls or permission to invoke a model.
+This is an accepted security design contract, not implemented controls or permission to invoke a model.
 BB-130 stays closed; A/B/C stay accepted. BB-131E is NOT STARTED / NOT AUTHORIZED.
 **AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.** Finance **RESEARCH / 0 SEK / NONE**.
 

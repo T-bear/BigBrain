@@ -4,12 +4,12 @@
 **Målgrupp:** Arkitekter, utvecklare, DevOps och produktansvariga  
 **Tidshorisont:** Flerårig utveckling
 
-## BB-131D proposed local-first refinement — 2026-09-28
+## BB-131D accepted local-first refinement — 2026-09-28
 
 The owner requires Research Learning without a paid AI prerequisite. The
 [local-first boundary](docs/architecture/finance/local-first-reasoner-boundary.md) and
-[ADR 0039 — Proposed](docs/adr/0039-local-first-research-reasoner-boundary.md) are a documentation-only
-review candidate, not accepted runtime architecture or model authorization. They retain Brain's
+[ADR 0039 — Accepted](docs/adr/0039-local-first-research-reasoner-boundary.md) are accepted design only,
+not implemented runtime controls or model authorization. They retain Brain's
 orchestration-only responsibility and Finance's ADR 0038 scientific authority. Optional external
 inference needs separate export/security/cost approval; local failure never falls back to cloud.
 No source/config/deployment change. Existing accepted boundaries below continue to govern.

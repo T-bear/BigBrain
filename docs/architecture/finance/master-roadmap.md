@@ -2,7 +2,7 @@
 
 ## BB-131D local-first design addendum — 2026-09-28
 
-**DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 [Local-first reasoner and security contract](local-first-reasoner-boundary.md) separates on-host use from optional external export.
 Finance owns projections/science/admission/ledger/risk; Brain is orchestration only, models untrusted.
 No paid cloud prerequisite or automatic fallback. B/C's synthetic protocol and accepted ADR 0038

@@ -1,9 +1,9 @@
 # Finance threat model
 
-## BB-131D proposed reasoner threat boundary — 2026-09-28
+## BB-131D accepted reasoner threat design — 2026-09-28
 
 The [local-first reasoner contract](../architecture/finance/local-first-reasoner-boundary.md) adds a
-**design-only review candidate** threat matrix for both local and future external models: prompt
+**accepted design-only** threat matrix for both local and future external models: prompt
 injection, protected-data leakage, unsafe tools, malformed output, identity/authority confusion,
 resource exhaustion, crash/audit failures and accidental paid-cloud fallback. These are future
 acceptance tests, not a security certification. Models get no dangerous generic tools; independent
