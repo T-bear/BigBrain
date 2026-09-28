@@ -19,6 +19,44 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131E completed review candidate — 2026-09-28
+
+Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.
+Task: Local Reasoner Contract & Isolation Foundation.
+Baseline/source-of-truth: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
+Branch: `bb-131e/local-reasoner-contract`; exact candidate is its published tip, parent baseline.
+Main must remain at baseline. No acceptance/merge, runtime invocation or deployment is implied.
+
+Recovered: existing branch/source inspection and baseline B/C 90/90 PASS; no prior E implementation,
+commit or remote candidate. This continuation reused that valid work and updated the recovery note.
+Completed: one minimal Brain contract library; Finance-owned shared B parser/closed reply union;
+46 new tests with deterministic test-only fake and C reservation/engine/result proof. Existing
+B/C tests, C ledger/schema, scientific calculations/identities and API composition are unchanged.
+[Report, exact commands and limitations](../reports/features/finance/bb-131e-local-reasoner-contract-20260928.md).
+
+Verification: focused E/B/C 136/136; full API 800/800 + Sentinel 32/32; relevant scientific subset
+74/74 within full run; restore PASS, Release zero warnings/errors, full formatter verify exit 0.
+Documentation/link/index verifier 254 Markdown / 91 IDs PASS, history Gitleaks 291 commits/no leaks;
+working/staged diff and staged Gitleaks PASS/no leaks; exact 19-file inventory checked. No failed/skipped final tests.
+Development test-declaration and fixture-assumption failures are documented and resolved; no
+pre-existing correctness/scientific/security/lineage blocker was reproduced.
+
+Changed: seven solution/project/source/test files plus twelve canonical Markdown/report files.
+Exact inventory is the single bounded branch commit. Unrelated mockups and unpublished ADR 0006–0009
+remain untouched/untracked/excluded. No reset, clean, stash, rebase or force push.
+No interrupted E implementation remains. Publication is authorized; acceptance is not.
+
+Remaining: independent review of exact remote candidate; real runtime/native isolation, scoped
+auth/use rights, operational audit, resource/receive limits, cancellation/kill enforcement and
+model provenance/capacity remain future separately authorized gates. Parser success is not admission.
+The test harness uses C's existing coarse operational failure codes; it is not production orchestration.
+No paid AI dependency, SDK, provider, model installation/download/inference or external data export.
+Finance RESEARCH / 0 SEK / NONE; no PAPER/LIVE/AUTO/broker/orders/capital; no deployment.
+ADR 0038/0039 Accepted; A/B/C/D accepted; BB-130 closed. No subsequent checkpoint is authorized.
+Exact next action: STOP — return the exact BB-131E review candidate SHA to owner/architect
+for independent review. Do not merge, install/invoke a model, start the next checkpoint or deploy.
+Older D/A/B/C authorization statements below are historical and do not override E's bounded scope.
+
 ## BB-131D accepted architecture publication — 2026-09-28
 
 Status: ACCEPTED / MERGED / CI VERIFIED.

@@ -1,5 +1,27 @@
 # Testa BigBrain
 
+## BB-131E local reasoner contract — 2026-09-28
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Owner-authorized from `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f` on
+`bb-131e/local-reasoner-contract`. [Implementation and evidence](docs/reports/features/finance/bb-131e-local-reasoner-contract-20260928.md).
+A minimal Brain contract library references Finance's existing development input and closed reply.
+Finance owns the shared B parser and unchanged scientific admission; C still reserves invocation,
+trials/exposure and execution. Only test code implements the reasoner and orchestration.
+No API registration/reference to Brain, model, inference, external SDK/provider/export or deployment.
+Finance **RESEARCH / 0 SEK / NONE**. ADR 0038/0039 remain Accepted; BB-130 closed; A/B/C/D accepted.
+E is not accepted/merged or runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
+model provenance/capacity and first-invocation review remain prerequisites. No paid AI dependency
+or cloud fallback. No subsequent checkpoint is authorized. Older D authorization statements below
+are dated history and do not override this separately authorized E scope.
+
+New `ResearchReasonerContractTests` exercise strict wire parsing, inert prose, closed port shape,
+development-only projection, test-only cancellation/late-response handling and C-governed synthetic
+execution/persistence. Existing B/C tests remain unchanged. These tests do not sandbox a native
+runtime or implement production authentication, watchdogs or audit. Exact commands/results are in
+the report; frontend remains untouched.
+
+
 ## BB-131D architecture verification — 2026-09-28
 
 Documentation-only **ACCEPTED / MERGED / CI VERIFIED**. [Report and DoD matrix](docs/reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md)
