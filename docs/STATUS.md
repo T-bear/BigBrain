@@ -2,7 +2,7 @@
 
 ## BB-131E local reasoner contract — 2026-09-28
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 Owner-authorized from `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f` on
 `bb-131e/local-reasoner-contract`. [Implementation and evidence](reports/features/finance/bb-131e-local-reasoner-contract-20260928.md).
 A minimal Brain contract library references Finance's existing development input and closed reply.
@@ -10,11 +10,16 @@ Finance owns the shared B parser and unchanged scientific admission; C still res
 trials/exposure and execution. Only test code implements the reasoner and orchestration.
 No API registration/reference to Brain, model, inference, external SDK/provider/export or deployment.
 Finance **RESEARCH / 0 SEK / NONE**. ADR 0038/0039 remain Accepted; BB-130 closed; A/B/C/D accepted.
-E is not accepted/merged or runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
+E is accepted and merged as a contract foundation, not runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
 model provenance/capacity and first-invocation review remain prerequisites. No paid AI dependency
 or cloud fallback. No subsequent checkpoint is authorized. Older D authorization statements below
 are dated history and do not override this separately authorized E scope.
 
+
+Approved candidate `b7e3d226644576e84b59135f285bccdc36626c52` merged unchanged as
+`a020dbac0899f3db663644c038d116e9b012f081`; [merge CI 36466024491](https://github.com/T-bear/BigBrain/actions/runs/36466024491)
+passed all four jobs and actual required steps. Exact trees/parents and remaining gates are in the
+report/recovery record. Next: independent post-merge verification/planning only.
 
 ## BB-131D local-first reasoner boundary — 2026-09-28
 

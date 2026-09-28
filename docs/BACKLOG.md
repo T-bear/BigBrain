@@ -2,7 +2,7 @@
 
 ## BB-131E local reasoner contract — 2026-09-28
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 Owner-authorized from `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f` on
 `bb-131e/local-reasoner-contract`. [Implementation and evidence](reports/features/finance/bb-131e-local-reasoner-contract-20260928.md).
 A minimal Brain contract library references Finance's existing development input and closed reply.
@@ -10,7 +10,7 @@ Finance owns the shared B parser and unchanged scientific admission; C still res
 trials/exposure and execution. Only test code implements the reasoner and orchestration.
 No API registration/reference to Brain, model, inference, external SDK/provider/export or deployment.
 Finance **RESEARCH / 0 SEK / NONE**. ADR 0038/0039 remain Accepted; BB-130 closed; A/B/C/D accepted.
-E is not accepted/merged or runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
+E is accepted and merged as a contract foundation, not runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
 model provenance/capacity and first-invocation review remain prerequisites. No paid AI dependency
 or cloud fallback. No subsequent checkpoint is authorized. Older D authorization statements below
 are dated history and do not override this separately authorized E scope.
@@ -23,7 +23,7 @@ are dated history and do not override this separately authorized E scope.
 - Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
 - Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B ACCEPTED / MERGED / CI VERIFIED**;
   **C ACCEPTED / MERGED / CI VERIFIED**; **D ACCEPTED / MERGED / CI VERIFIED**;
-  **E IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**.
+  **E ACCEPTED / MERGED / CI VERIFIED**.
 - Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
 - A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
   input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
@@ -57,8 +57,8 @@ are dated history and do not override this separately authorized E scope.
   authorized projection/use rights, scoped principal/audit, limits/cancellation and adversarial tests.
   Optional external export/terms/credentials/cost review must not block qualified local-only use.
   No paid API dependency, automatic cloud fallback or relaxation for weak model output.
-- Next: STOP — return the exact E candidate SHA to owner/architect for independent review.
-  No merge/model invocation; no subsequent checkpoint authorized.
+- Next: STOP — return accepted E main to owner/architect for independent post-merge verification
+  and planning of the next bounded checkpoint. No model invocation; no subsequent checkpoint authorized.
 - Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
   existing deferred debt and unrelated backlog priorities remain unchanged.
 

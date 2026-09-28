@@ -19,13 +19,13 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-131E completed review candidate — 2026-09-28
+## BB-131E accepted publication — 2026-09-28
 
-Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.
+Status: ACCEPTED / MERGED / CI VERIFIED.
 Task: Local Reasoner Contract & Isolation Foundation.
 Baseline/source-of-truth: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
 Branch: `bb-131e/local-reasoner-contract`; exact candidate is its published tip, parent baseline.
-Main must remain at baseline. No acceptance/merge, runtime invocation or deployment is implied.
+Approved candidate is merged unchanged; no runtime invocation or deployment is authorized.
 
 Recovered: existing branch/source inspection and baseline B/C 90/90 PASS; no prior E implementation,
 commit or remote candidate. This continuation reused that valid work and updated the recovery note.
@@ -44,18 +44,56 @@ pre-existing correctness/scientific/security/lineage blocker was reproduced.
 Changed: seven solution/project/source/test files plus twelve canonical Markdown/report files.
 Exact inventory is the single bounded branch commit. Unrelated mockups and unpublished ADR 0006–0009
 remain untouched/untracked/excluded. No reset, clean, stash, rebase or force push.
-No interrupted E implementation remains. Publication is authorized; acceptance is not.
+No interrupted E implementation remains. Exact owner-approved publication is recorded below.
 
-Remaining: independent review of exact remote candidate; real runtime/native isolation, scoped
+Remaining: independent post-merge verification/planning; real runtime/native isolation, scoped
 auth/use rights, operational audit, resource/receive limits, cancellation/kill enforcement and
 model provenance/capacity remain future separately authorized gates. Parser success is not admission.
 The test harness uses C's existing coarse operational failure codes; it is not production orchestration.
 No paid AI dependency, SDK, provider, model installation/download/inference or external data export.
 Finance RESEARCH / 0 SEK / NONE; no PAPER/LIVE/AUTO/broker/orders/capital; no deployment.
 ADR 0038/0039 Accepted; A/B/C/D accepted; BB-130 closed. No subsequent checkpoint is authorized.
-Exact next action: STOP — return the exact BB-131E review candidate SHA to owner/architect
-for independent review. Do not merge, install/invoke a model, start the next checkpoint or deploy.
+Exact next action: STOP — return accepted BB-131E main to owner/architect for independent
+post-merge verification and planning of the next bounded checkpoint. Do not install/invoke a model,
+start the next checkpoint or deploy.
 Older D/A/B/C authorization statements below are historical and do not override E's bounded scope.
+
+### Accepted publication — 2026-09-28
+
+Explicit owner approval applies to exact reviewed candidate `b7e3d226644576e84b59135f285bccdc36626c52`.
+Pre-merge main, candidate parent and merge-base: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
+Remote SHA resolved directly; one commit ahead/zero behind, exactly the reviewed 19 paths and unchanged
+contract-only semantics. No unrelated local work entered the merge.
+Merge: `a020dbac0899f3db663644c038d116e9b012f081`.
+First parent: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
+Second parent: `b7e3d226644576e84b59135f285bccdc36626c52`.
+Candidate tree and merge tree: `bbe3f43e4da91fb36654c615274f48f4dbae1631` — identical.
+
+[Exact merge CI 36466024491](https://github.com/T-bear/BigBrain/actions/runs/36466024491): **SUCCESS**.
+Actual required jobs and steps inspected, all SUCCESS:
+
+- Backend checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+BB-131E **ACCEPTED / MERGED / CI VERIFIED**. Reasoner contract IMPLEMENTED AND AUTOMATICALLY
+VERIFIED; production reasoner NOT IMPLEMENTED. Local model NOT SELECTED / NOT INSTALLED /
+NOT DOWNLOADED / NOT INVOKED. External AI OPTIONAL FUTURE ONLY / NOT CONFIGURED / NO CLOUD FALLBACK.
+No required paid AI. ADR 0038/0039 remain Accepted. Finance **RESEARCH / 0 SEK / NONE**;
+PAPER not authorized or implemented by E; LIVE/AUTO not authorized; broker/orders/capital NONE.
+No deployment authorized or performed. No next checkpoint started or authorized.
+
+Acceptance covers only the reviewed contract/parser/test foundation; no implementation change is
+made during publication. First-real-model auth/use-rights, audit, native isolation/transport,
+resource/receive limits, cancellation/kill enforcement and provenance/capacity gates remain.
+No interrupted E work remains. Final documentation-only reconciliation is identified by
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131E reasoner contract$' main`.
+Its own exact-SHA CI must pass before handoff; GitHub commit/Actions history and the final handoff
+identify that SHA/run without embedding a commit's own hash in its contents.
 
 ## BB-131D accepted architecture publication — 2026-09-28
 

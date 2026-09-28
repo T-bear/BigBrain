@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-131E, 2026-09-28` — [Local Reasoner Contract & Isolation Foundation](features/finance/bb-131e-local-reasoner-contract-20260928.md). IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY; minimal Brain port, Finance-owned shared parsing, synthetic test-only orchestration using C governance. No model/runtime/provider/deployment.
+- `BB-131E, 2026-09-28` — [Local Reasoner Contract & Isolation Foundation](features/finance/bb-131e-local-reasoner-contract-20260928.md). ACCEPTED / MERGED / CI VERIFIED; minimal Brain port, Finance-owned shared parsing, synthetic test-only orchestration using C governance. No model/runtime/provider/deployment.
 
 - `BB-131D, 2026-09-23–28` — [Local-first reasoner boundary — ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-131d-local-first-reasoner-boundary-20260923.md). Recovered design drafts; Accepted ADR 0039; 0-SEK local path, separate external-export/cost gates, no cloud fallback, untrusted model and Finance authority. No implementation/model/inference/deployment.
 

@@ -8,14 +8,51 @@ or sensitive host identifiers are included. All new scientific test data are det
 - Date: 2026-09-28.
 - Baseline: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
 - Branch: `bb-131e/local-reasoner-contract`.
-- State: **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**.
+- State: **ACCEPTED / MERGED / CI VERIFIED**.
 - Authority: accepted ADR 0038/0039 and owner-authorized E; no first-model invocation authorization.
 - Finance: **RESEARCH / 0 SEK / NONE**. AI MAY PROPOSE. DATA MUST PROVE. RISK MAY VETO.
-- No merge, deployment, runtime verification or owner acceptance claimed.
+- Explicit owner/architect acceptance and unchanged merge; no deployment/runtime verification.
 
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**. No deployment or owner acceptance.
+**ACCEPTED / MERGED / CI VERIFIED**. No deployment.
+
+### Accepted publication — 2026-09-28
+
+Explicit owner approval applies to exact reviewed candidate `b7e3d226644576e84b59135f285bccdc36626c52`.
+Pre-merge main, candidate parent and merge-base: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
+Remote SHA resolved directly; one commit ahead/zero behind, exactly the reviewed 19 paths and unchanged
+contract-only semantics. No unrelated local work entered the merge.
+Merge: `a020dbac0899f3db663644c038d116e9b012f081`.
+First parent: `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`.
+Second parent: `b7e3d226644576e84b59135f285bccdc36626c52`.
+Candidate tree and merge tree: `bbe3f43e4da91fb36654c615274f48f4dbae1631` — identical.
+
+[Exact merge CI 36466024491](https://github.com/T-bear/BigBrain/actions/runs/36466024491): **SUCCESS**.
+Actual required jobs and steps inspected, all SUCCESS:
+
+- Backend checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation: `node scripts/verify-documentation.mjs`.
+- Secrets: `gitleaks/gitleaks-action@v2`.
+
+BB-131E **ACCEPTED / MERGED / CI VERIFIED**. Reasoner contract IMPLEMENTED AND AUTOMATICALLY
+VERIFIED; production reasoner NOT IMPLEMENTED. Local model NOT SELECTED / NOT INSTALLED /
+NOT DOWNLOADED / NOT INVOKED. External AI OPTIONAL FUTURE ONLY / NOT CONFIGURED / NO CLOUD FALLBACK.
+No required paid AI. ADR 0038/0039 remain Accepted. Finance **RESEARCH / 0 SEK / NONE**;
+PAPER not authorized or implemented by E; LIVE/AUTO not authorized; broker/orders/capital NONE.
+No deployment authorized or performed. No next checkpoint started or authorized.
+
+Acceptance covers only the reviewed contract/parser/test foundation; no implementation change is
+made during publication. First-real-model auth/use-rights, audit, native isolation/transport,
+resource/receive limits, cancellation/kill enforcement and provenance/capacity gates remain.
+No interrupted E work remains. Final documentation-only reconciliation is identified by
+`git log -1 --format=%H --grep='^docs: reconcile accepted BB-131E reasoner contract$' main`.
+Its own exact-SHA CI must pass before handoff; GitHub commit/Actions history and the final handoff
+identify that SHA/run without embedding a commit's own hash in its contents.
 
 ## Recovery and characterization
 
@@ -170,8 +207,8 @@ remain. No subsequent checkpoint is authorized.
 The candidate is identified by the exact remote tip of `bb-131e/local-reasoner-contract` with
 parent `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f`; the single canonical recovery note and this
 report provide review evidence without terminal history. No interrupted implementation remains.
-Rollback, if later accepted, is a reviewed revert of E's contract/extraction and solution references;
+Rollback is a separately reviewed revert of E's contract/extraction and solution references;
 there is no database migration or runtime deployment to undo. Existing B/C persistence is untouched.
 
-STOP — return the exact BB-131E review candidate SHA to owner/architect for independent review.
-No merge, model installation/invocation, next checkpoint or deployment.
+STOP — return accepted BB-131E main to owner/architect for independent post-merge verification
+and planning of the next bounded checkpoint. No model installation/invocation, next checkpoint or deployment.
