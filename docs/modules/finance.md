@@ -1,5 +1,16 @@
 # Finance module
 
+## BB-131D local-first design addendum — 2026-09-28
+
+**DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY.**
+[Local-first reasoner and security contract](../architecture/finance/local-first-reasoner-boundary.md) separates on-host use from optional external export.
+Finance owns projections/science/admission/ledger/risk; Brain is orchestration only, models untrusted.
+No paid cloud prerequisite or automatic fallback. B/C's synthetic protocol and accepted ADR 0038
+remain unchanged; generalized history projection and real-model/auth/resource controls remain future.
+Only D design is authorized. A/B/C are accepted; their earlier next-step wording below is historical.
+No implementation, inference, model/provider installation or deployment. BB-131E NOT STARTED / NOT AUTHORIZED.
+Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-131C persistent governance addendum — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.** Separately owner-authorized from `cb520994f3ae4222bab1ba31d8cc683abbc28991`.

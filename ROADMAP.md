@@ -1,5 +1,15 @@
 # BigBrain Roadmap
 
+## BB-131D local-first product direction — 2026-09-28
+
+Research Learning must have a viable 0-SEK local-AI path without a paid API dependency.
+The [reasoner boundary](docs/architecture/finance/local-first-reasoner-boundary.md) is a
+**REVIEW CANDIDATE ONLY**, design/security scope. Local inference is primary; external adapters are
+future optional capabilities with separate export/security/cost approval and no automatic fallback.
+Quality affects usefulness, never Finance scientific/risk authority. No model is selected or invoked.
+A/B/C remain accepted; BB-130 closed. Historical authorization statements below remain historical.
+No deployment or BB-131E authority. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-131C bounded persistent governance — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.** The owner separately authorized Finance-owned persistence

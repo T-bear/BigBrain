@@ -1,5 +1,20 @@
 # BigBrain Status
 
+## BB-131D local-first reasoner boundary — 2026-09-28
+
+**DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY**; no implementation.
+Baseline `269fbd7e786a09ba2bf39fe77492d62d8056a52a`; branch `bb-131d/local-first-reasoner-boundary`.
+[Contract/security design](architecture/finance/local-first-reasoner-boundary.md),
+[Proposed ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
+[recovery/evidence report](reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
+Owner requires a viable 0-SEK local-model path; cloud is optional, separately gated, never fallback.
+Finance owns science/admission/history; Brain owns only bounded orchestration; all model output is untrusted.
+Hardware is owner-reported, not measured; application auth and real-model runtime controls remain prerequisites.
+No model/runtime install, inference, SDK, provider, code/schema/package/CI change or deployment.
+Finance **RESEARCH / 0 SEK / NONE**. A/B/C accepted, BB-130 closed, ADR 0038 Accepted.
+Older C/A/B next-step statements are dated history; only D design is now authorized.
+BB-131E NOT STARTED / NOT AUTHORIZED. Next: independent review of exact D candidate; no merge/inference.
+
 ## BB-131C persistent learning ledger — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.** Baseline `cb520994f3ae4222bab1ba31d8cc683abbc28991`;

@@ -19,6 +19,46 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131D completed architecture review candidate — 2026-09-28
+
+Status: DESIGNED / DOCUMENTATION VERIFIED / REVIEW CANDIDATE ONLY.
+Task: BB-131D — Local-First Reasoner Boundary & Security Contract; no implementation.
+Baseline/source-of-truth SHA: `269fbd7e786a09ba2bf39fe77492d62d8056a52a`.
+Branch: `bb-131d/local-first-reasoner-boundary`; exact published commit is the branch tip,
+whose parent must equal baseline. No main merge or first-model invocation authority follows.
+
+Recovery: first interruption left preflight only. The second session created the branch and wrote
+local-first design plus Proposed ADR 0039 after source inspection. This continuation preserved those
+drafts and prior analysis; no D commit/remote or final verification existed. The earlier note was
+an initial snapshot before the known draft creation, not unexplained conflicting implementation.
+No reset/clean/stash/rebase/recreation. Unrelated deisgnMockups/ and unpublished ADR 0006–0009 remain
+untouched/excluded. No interrupted D implementation remains; D is design only.
+
+Completed: provider-neutral local-first/no-paid-fallback contract, Finance/Brain ownership, evidence
+projection, independent locality/export decisions, auth/output/injection/resource/audit/failure/kill
+boundaries, threat matrix, separate invocation gates and Proposed ADR 0039. Report and canonical
+references/status/indexes reconciled. No model selection, runtime install, download, inference, SDK,
+external AI call, provider integration, production code, schema, tests, package, CI or deployment change.
+[Report, exact commands and limits](../reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
+
+Changed files: 16 Markdown files only: ARCHITECTURE, ROADMAP, TESTING, STATUS, BACKLOG; Finance module,
+master/research/local-first contracts; Proposed ADR 0039, ADR/documentation indexes; Finance threat
+model; report/catalog; this single recovery document. The bounded commit provides exact paths.
+Verification: documentation/relative-link/index checks PASS (253 Markdown files / 91 backlog IDs);
+working/staged diff PASS; Gitleaks history 289 commits and staged D files PASS/no leaks. Source/ADR
+consistency and DoD matrix reviewed. No unrelated expensive suites or model benchmarks rerun.
+
+Remaining: independent review of the exact architecture candidate. Hardware class is owner-reported,
+not measured. Runtime/model provenance/capacity, actual auth/audit/isolation/resource/projection
+implementation and adversarial acceptance tests remain prerequisites for any later real invocation.
+Optional external provider/export/retention/egress/cost approval is separate and not required for
+qualified local inference. No current blocker defect was reproduced. No runtime/security certification.
+A/B/C remain accepted; BB-130 closed; ADR 0038 Accepted; ADR 0039 Proposed.
+Finance RESEARCH / 0 SEK / NONE. BB-131E NOT STARTED / NOT AUTHORIZED. No deployment.
+Exact next action: STOP — return the exact BB-131D architecture review candidate SHA to
+owner/architect for independent review. Do not merge, implement/invoke models or start BB-131E.
+Historical C/A/B authorization statements below retain their original dates and do not override D.
+
 ## BB-131C accepted publication — 2026-09-22
 
 Status: ACCEPTED / MERGED / CI VERIFIED.

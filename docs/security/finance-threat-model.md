@@ -1,5 +1,15 @@
 # Finance threat model
 
+## BB-131D proposed reasoner threat boundary — 2026-09-28
+
+The [local-first reasoner contract](../architecture/finance/local-first-reasoner-boundary.md) adds a
+**design-only review candidate** threat matrix for both local and future external models: prompt
+injection, protected-data leakage, unsafe tools, malformed output, identity/authority confusion,
+resource exhaustion, crash/audit failures and accidental paid-cloud fallback. These are future
+acceptance tests, not a security certification. Models get no dangerous generic tools; independent
+Finance admission and existing risk remain authoritative. Local use and external export are separate
+rights; no broad auth, provider, runtime, execution or deployment authorization follows.
+
 The approved future BigBrain security/pentest milestone is a mandatory pre-LIVE gate and a strong
 pre-PAPER/execution gate. Continuous secret/dependency/SAST/container/API/header/supply-chain and
 unsafe-configuration checks are paired with controlled black-/grey-box testing. Scope includes

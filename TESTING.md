@@ -1,5 +1,15 @@
 # Testa BigBrain
 
+## BB-131D architecture verification — 2026-09-28
+
+Documentation-only **REVIEW CANDIDATE ONLY**. [Report and DoD matrix](docs/reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md)
+record source/ADR consistency review, relative-link/index verification, diff inventory and Gitleaks.
+No unchanged backend/frontend suites or model benchmarks rerun; no runtime security claim.
+The [abuse-case matrix and first-invocation gates](docs/architecture/finance/local-first-reasoner-boundary.md)
+are required FUTURE tests, not executed D tests: protected-data noninterference, closed output,
+auth/revocation, resource/cancellation, injection, no tools, no cloud fallback, durable audit and
+unchanged Finance admission/budget/exposure/risk. Finance RESEARCH / 0 SEK / NONE; no deployment.
+
 ## BB-131C ledger verification — 2026-09-22
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Commands and assertion matrix](docs/reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
