@@ -11,14 +11,14 @@ namespace BigBrain.Api.Tests;
 public sealed class ResearchReasonerContractTests
 {
     [Fact]
-    public void PortExposesOnlyProjectionAndCancellationAndNoRuntimeImplementation()
+    public void PortStillExposesOnlyProjectionAndCancellation()
     {
         var method = Assert.Single(typeof(IResearchReasoner).GetMethods());
         Assert.Equal(nameof(IResearchReasoner.ReasonAsync), method.Name);
         Assert.Equal(new[] { typeof(LearningDevelopmentInput), typeof(CancellationToken) },
             method.GetParameters().Select(x => x.ParameterType));
         Assert.Equal(typeof(Task<LearningReasonerReply>), method.ReturnType);
-        Assert.Equal(typeof(IResearchReasoner), Assert.Single(typeof(IResearchReasoner).Assembly.GetExportedTypes()));
+        Assert.Contains(typeof(IResearchReasoner), typeof(IResearchReasoner).Assembly.GetExportedTypes()); // F adds bounded runtime controls; port is unchanged.
         Assert.DoesNotContain(typeof(IResearchReasoner).Assembly.GetReferencedAssemblies(),
             x => x.Name is "BigBrain.Api" or "Microsoft.Data.Sqlite" or "System.Net.Http");
         Assert.DoesNotContain(typeof(Program).Assembly.GetReferencedAssemblies(), x => x.Name == "BigBrain.Brain");
@@ -300,7 +300,7 @@ public sealed class ResearchReasonerContractTests
     { internal LearningAdmissionReason Reason { get; } = reason; }
 
     // Explicit test orchestration, not shipped auth, audit, watchdog or runtime integration.
-    private sealed class TestOnlyInvocation(EodhdMarketMemory memory, SyntheticLearningScope scope)
+    internal sealed class TestOnlyInvocation(EodhdMarketMemory memory, SyntheticLearningScope scope)
     {
         internal int EngineCalls { get; private set; }
         internal RobustnessEvaluationBuild? Build { get; private set; }
@@ -323,9 +323,9 @@ public sealed class ResearchReasonerContractTests
                 // Existing C failure taxonomy is deliberately not expanded for a test harness.
                 memory.FailLearningIteration(LearningFailure.ReasonerUnavailable); return null;
             }
-            catch (Exception error) when (error is OperationCanceledException or TimeoutException or InvalidOperationException)
+            catch (Exception error) when (error is OperationCanceledException or TimeoutException or InvalidOperationException or LocalReasonerException)
             {
-                memory.FailLearningIteration(error is TimeoutException ? LearningFailure.ReasonerTimeout : LearningFailure.ReasonerUnavailable);
+                memory.FailLearningIteration(error is TimeoutException or LocalReasonerException { Failure: LocalReasonerFailure.Timeout } ? LearningFailure.ReasonerTimeout : LearningFailure.ReasonerUnavailable);
                 return null;
             }
             var reservation = memory.ReserveLearningProposal(reply.ResponseJson, scope);
@@ -344,7 +344,7 @@ public sealed class ResearchReasonerContractTests
         }
     }
 
-    private sealed class Database : IDisposable
+    internal sealed class Database : IDisposable
     {
         private readonly string _root = Path.Combine(Path.GetTempPath(), "bb131e", Guid.NewGuid().ToString("N"));
         internal EodhdMarketMemory Memory() => new(new EodhdFinanceOptions

@@ -19,6 +19,50 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
+## BB-131F completed review candidate — 2026-09-29
+
+Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**.
+Task: Local Reasoner Runtime Isolation & Control Foundation.
+Baseline/source-of-truth: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
+Branch: `bb-131f/local-reasoner-runtime-isolation`. Exact candidate is the published branch tip;
+its parent is the baseline. Final handoff verifies remote tip/main after the authorized branch push.
+No interrupted implementation remains. No main merge or next checkpoint is authorized.
+
+Recovered: preflight-only interruption, then five valid local architecture-stop documents and
+B/C/E characterization 136/136 PASS. The owner/architect explicitly resolved owned-child lifecycle;
+that same branch/work was preserved and continued. [Historical stop and resolution](../reports/features/finance/bb-131f-runtime-ownership-assessment-20260929.md).
+No reset/clean/stash/rebase. Unrelated mockups and unpublished Sentinel ADR 0006–0009 remain untouched,
+untracked and excluded. Only intended F files are committed; exact inventory is in the report/commit.
+
+Completed: narrow Brain local controller, framed inherited pipes, receive limits, persistent
+single-flight reservation, default disable, deadlines/cancellation, retained-pidfd owned-child
+termination and sanitized operational records; deterministic test-only executable and security/
+C-integration proofs. Proposed ADR0040 is included for independent acceptance, NOT marked Accepted.
+[Implementation, exact commands, file inventory and limits](../reports/features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md).
+
+Final verification: F/B/C/E 193/193 PASS; full API 857/857 and Sentinel32/32 PASS, zero failures/skips.
+Solution restore PASS, Release0 warnings/errors, full format verify exit0. Existing scientific
+subset74/74 inside full run confirmed from TRX. Docs257 Markdown/91 IDs and diff checks PASS.
+History Gitleaks293 commits/no leaks; exact staged candidate scan PASS/no leaks.
+Final-publication resume confirmed all eight candidate C# files against SHA-256 source checksums
+in the verified Release PDBs; preserved test evidence was reused without implementation changes. No Web/API/Finance/Sentinel/schema/package/CI/deployment composition changes.
+Development analyzer/test declaration errors and final late-cancellation checks are resolved.
+No pre-existing correctness/security/scientific/lineage defect was reproduced.
+
+Limitations: no OS/native sandbox, hard CPU/RAM/GPU limit, authenticated public caller or durable
+audit integration. These remain first-model gates, not implied by a process/pipe boundary.
+Trusted configuration/artifact directory and shared private coordination directory are prerequisites;
+uncertain worker/audit/crash leaves reservation occupied, never auto-cleared. No generic PID recovery.
+Finance scientific reservations remain unchanged and never refunded by this runtime.
+No model selected/installed/downloaded/benchmarked/invoked, external SDK/provider/export or deployment.
+Finance RESEARCH / 0 SEK / NONE; no PAPER/LIVE/AUTO/broker/orders/capital. A–E remain accepted;
+ADR0038/0039 Accepted; BB-130 closed. No real-model or next-checkpoint authorization.
+
+Exact next action: STOP — return the exact BB-131F candidate SHA, including the Proposed owned-worker
+lifecycle ADR, to owner/architect for independent review. Do not merge, deploy, install/invoke a model
+or start another checkpoint. Before branch publication completes, only finish its explicit pending
+publication gates; do not recreate the implementation or commit unrelated work.
+
 ## BB-131E accepted publication — 2026-09-28
 
 Status: ACCEPTED / MERGED / CI VERIFIED.
