@@ -3,6 +3,8 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="BigBrain.Api.Tests" />
+    <InternalsVisibleTo Include="BigBrain.Reasoner.ProofWorker" />
     <ProjectReference Include="../BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
 </Project>

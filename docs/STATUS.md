@@ -1,5 +1,21 @@
 # BigBrain Status
 
+## BB-131F local runtime control — 2026-09-29
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted.
+Owner-authorized from `ddcf8011aefae4bd6df708421f02d6ede293fdcc`; the explicit architecture
+clarification permits only the runtime's owned child lifecycle. ADR 0040 is **Proposed**, not Accepted.
+[Implementation, exact evidence and limitations](reports/features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md).
+The Brain library adds disabled-by-default local control, inherited framed pipes, receive limits,
+exclusive reservation, cancellation/deadline and retained-pidfd termination of its own proof child.
+No generic process authority, Sentinel change, API registration, Finance engine/ledger/schema change,
+model/provider/SDK, external export or deployment. The deterministic executable exists only in tests.
+Operational records are sanitized; durable audit integration and hard CPU/RAM/GPU/native sandboxing
+remain first-model gates. Finance **RESEARCH / 0 SEK / NONE**. No paid AI dependency or cloud fallback.
+A–E remain accepted, BB-130 closed. No model or next-checkpoint authority follows from publication.
+Earlier authorization/status statements below retain their dated scope.
+
+
 ## BB-131E local reasoner contract — 2026-09-28
 
 **ACCEPTED / MERGED / CI VERIFIED.**

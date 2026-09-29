@@ -38,6 +38,8 @@ are not repository authority. Only reviewed, sanitized knowledge is published un
 
 ## Product and architecture
 
+- [BB-131F owned-worker lifecycle — Proposed ADR 0040](../adr/0040-local-reasoner-owned-worker-lifecycle.md)
+
 - [BB-131D local-first reasoner/security contract — accepted design](../architecture/finance/local-first-reasoner-boundary.md)
 
 - [Family View & Family Coordination epic](../architecture/family-view-family-coordination.md)

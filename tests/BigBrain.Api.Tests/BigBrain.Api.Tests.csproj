@@ -12,8 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/BigBrain.Api/BigBrain.Api.csproj" />
+    <ProjectReference Include="../BigBrain.Reasoner.ProofWorker/BigBrain.Reasoner.ProofWorker.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="../../src/BigBrain.Brain/BigBrain.Brain.csproj" />
     <ProjectReference Include="../../src/BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
+  <Target Name="CopyReasonerProofWorker" AfterTargets="Build">
+    <ItemGroup>
+      <ProofWorkerFiles Include="../BigBrain.Reasoner.ProofWorker/bin/$(Configuration)/net10.0/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ProofWorkerFiles)" DestinationFolder="$(OutDir)reasoner-proof" />
+  </Target>
 </Project>
 
