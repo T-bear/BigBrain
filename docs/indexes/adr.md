@@ -37,7 +37,7 @@ Proposed records are not accepted authority merely because related code exists.
 | [0037](../adr/0037-native-audiobook-playback-boundary.md) | Accepted | Native Audiobook playback identity, Range and session boundary |
 | [0038](../adr/0038-finance-research-learning-authority-contract.md) | Accepted | Finance Research Learning proposal and evidence authority (BB-131A) |
 | [0039](../adr/0039-local-first-research-reasoner-boundary.md) | Accepted | Local-first Research Learning reasoner boundary (BB-131D, design only) |
-| [0040](../adr/0040-local-reasoner-owned-worker-lifecycle.md) | Proposed | Local reasoner owned-worker lifecycle boundary (BB-131F) |
+| [0040](../adr/0040-local-reasoner-owned-worker-lifecycle.md) | Accepted | Local reasoner owned-worker lifecycle boundary (BB-131F) |
 
 ADR numbers 0006–0009 are intentionally outside the published baseline while local
 Sentinel proposals remain under review.

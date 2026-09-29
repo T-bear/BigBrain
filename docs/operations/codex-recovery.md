@@ -19,49 +19,39 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
 
-## BB-131F completed review candidate — 2026-09-29
+## Accepted publication — 2026-09-29
 
-Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**.
-Task: Local Reasoner Runtime Isolation & Control Foundation.
-Baseline/source-of-truth: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
-Branch: `bb-131f/local-reasoner-runtime-isolation`. Exact candidate is the published branch tip;
-its parent is the baseline. Final handoff verifies remote tip/main after the authorized branch push.
-No interrupted implementation remains. No main merge or next checkpoint is authorized.
+Status: **ACCEPTED / MERGED / CI VERIFIED**. Explicit owner approval applies only to
+reviewed candidate `1e003705c08000f33b97f3d0d5dc7f35546e4d1e`, including ADR 0040, now Accepted.
+Baseline, candidate parent and merge-base: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
+Candidate was exactly one commit ahead / zero behind; all 28 reviewed files were preserved.
+Merge: `8ca4dcf1d2024a607465ec0ce5679dcbc6a1193b`.
+First parent: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
+Second parent: `1e003705c08000f33b97f3d0d5dc7f35546e4d1e`.
+Candidate tree = merge tree: `a129504ad121f8ad695ce18cc74aecc66dbac415`.
+No implementation changes were made during merge or documentation reconciliation.
 
-Recovered: preflight-only interruption, then five valid local architecture-stop documents and
-B/C/E characterization 136/136 PASS. The owner/architect explicitly resolved owned-child lifecycle;
-that same branch/work was preserved and continued. [Historical stop and resolution](../reports/features/finance/bb-131f-runtime-ownership-assessment-20260929.md).
-No reset/clean/stash/rebase. Unrelated mockups and unpublished Sentinel ADR 0006–0009 remain untouched,
-untracked and excluded. Only intended F files are committed; exact inventory is in the report/commit.
+[Exact merge CI 36572508366](https://github.com/T-bear/BigBrain/actions/runs/36572508366):
+**SUCCESS**. Actual jobs and required steps inspected, all SUCCESS:
 
-Completed: narrow Brain local controller, framed inherited pipes, receive limits, persistent
-single-flight reservation, default disable, deadlines/cancellation, retained-pidfd owned-child
-termination and sanitized operational records; deterministic test-only executable and security/
-C-integration proofs. Proposed ADR0040 is included for independent acceptance, NOT marked Accepted.
-[Implementation, exact commands, file inventory and limits](../reports/features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md).
+- Backend checkout/setup, restore, `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  Release build and `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation checkout/setup and `node scripts/verify-documentation.mjs`.
+- Secrets checkout and `gitleaks/gitleaks-action@v2`.
 
-Final verification: F/B/C/E 193/193 PASS; full API 857/857 and Sentinel32/32 PASS, zero failures/skips.
-Solution restore PASS, Release0 warnings/errors, full format verify exit0. Existing scientific
-subset74/74 inside full run confirmed from TRX. Docs257 Markdown/91 IDs and diff checks PASS.
-History Gitleaks293 commits/no leaks; exact staged candidate scan PASS/no leaks.
-Final-publication resume confirmed all eight candidate C# files against SHA-256 source checksums
-in the verified Release PDBs; preserved test evidence was reused without implementation changes. No Web/API/Finance/Sentinel/schema/package/CI/deployment composition changes.
-Development analyzer/test declaration errors and final late-cancellation checks are resolved.
-No pre-existing correctness/security/scientific/lineage defect was reproduced.
-
-Limitations: no OS/native sandbox, hard CPU/RAM/GPU limit, authenticated public caller or durable
-audit integration. These remain first-model gates, not implied by a process/pipe boundary.
-Trusted configuration/artifact directory and shared private coordination directory are prerequisites;
-uncertain worker/audit/crash leaves reservation occupied, never auto-cleared. No generic PID recovery.
-Finance scientific reservations remain unchanged and never refunded by this runtime.
-No model selected/installed/downloaded/benchmarked/invoked, external SDK/provider/export or deployment.
-Finance RESEARCH / 0 SEK / NONE; no PAPER/LIVE/AUTO/broker/orders/capital. A–E remain accepted;
-ADR0038/0039 Accepted; BB-130 closed. No real-model or next-checkpoint authorization.
-
-Exact next action: STOP — return the exact BB-131F candidate SHA, including the Proposed owned-worker
-lifecycle ADR, to owner/architect for independent review. Do not merge, deploy, install/invoke a model
-or start another checkpoint. Before branch publication completes, only finish its explicit pending
-publication gates; do not recreate the implementation or commit unrelated work.
+This evidence is main CI, separate from the candidate-local tests below. The documentation-only
+reconciliation commit is a direct child of the merge; its exact SHA and its own CI are verified in
+the final handoff and GitHub Actions, without substituting merge CI for later history.
+No interrupted F implementation remains. Unrelated local mockups/ADRs remain excluded and preserved.
+ADR 0038/0039 remain Accepted, A–E remain accepted and BB-130 remains closed.
+Finance **RESEARCH / 0 SEK / NONE**. No model selected/installed/downloaded/invoked, provider,
+credentials, external AI, deployment, PAPER/LIVE/AUTO, broker/orders/capital enabled.
+Hard OS/resource isolation, durable audit integration, authenticated invocation, data rights and
+model provenance remain separately authorized first-model gates. Application tests are not OS sandbox proof.
+Next checkpoint: **NOT STARTED / NOT AUTHORIZED**.
+Exact next action: STOP — return accepted BB-131F main to owner/architect for independent
+post-merge verification and product-level planning. Do not start another checkpoint.
 
 ## BB-131E accepted publication — 2026-09-28
 

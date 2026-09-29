@@ -3,6 +3,44 @@
 Detta är en sanerad GitHub-version. Synthetic engineering proof only; no raw prompts/provider
 payloads, credentials, private host identifiers or production research data are published.
 
+## Accepted publication — 2026-09-29
+
+Status: **ACCEPTED / MERGED / CI VERIFIED**. Explicit owner approval applies only to
+reviewed candidate `1e003705c08000f33b97f3d0d5dc7f35546e4d1e`, including ADR 0040, now Accepted.
+Baseline, candidate parent and merge-base: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
+Candidate was exactly one commit ahead / zero behind; all 28 reviewed files were preserved.
+Merge: `8ca4dcf1d2024a607465ec0ce5679dcbc6a1193b`.
+First parent: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`.
+Second parent: `1e003705c08000f33b97f3d0d5dc7f35546e4d1e`.
+Candidate tree = merge tree: `a129504ad121f8ad695ce18cc74aecc66dbac415`.
+No implementation changes were made during merge or documentation reconciliation.
+
+[Exact merge CI 36572508366](https://github.com/T-bear/BigBrain/actions/runs/36572508366):
+**SUCCESS**. Actual jobs and required steps inspected, all SUCCESS:
+
+- Backend checkout/setup, restore, `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  Release build and `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation checkout/setup and `node scripts/verify-documentation.mjs`.
+- Secrets checkout and `gitleaks/gitleaks-action@v2`.
+
+This evidence is main CI, separate from the candidate-local tests below. The documentation-only
+reconciliation commit is a direct child of the merge; its exact SHA and its own CI are verified in
+the final handoff and GitHub Actions, without substituting merge CI for later history.
+No interrupted F implementation remains. Unrelated local mockups/ADRs remain excluded and preserved.
+ADR 0038/0039 remain Accepted, A–E remain accepted and BB-130 remains closed.
+Finance **RESEARCH / 0 SEK / NONE**. No model selected/installed/downloaded/invoked, provider,
+credentials, external AI, deployment, PAPER/LIVE/AUTO, broker/orders/capital enabled.
+Hard OS/resource isolation, durable audit integration, authenticated invocation, data rights and
+model provenance remain separately authorized first-model gates. Application tests are not OS sandbox proof.
+Next checkpoint: **NOT STARTED / NOT AUTHORIZED**.
+Exact next action: STOP — return accepted BB-131F main to owner/architect for independent
+post-merge verification and product-level planning. Do not start another checkpoint.
+
+## Historical reviewed candidate evidence
+
+The following sections retain their pre-acceptance scope; current publication state is above.
+
 ## Metadata
 
 - Date: 2026-09-29.

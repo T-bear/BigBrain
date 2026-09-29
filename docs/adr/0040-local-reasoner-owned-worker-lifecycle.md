@@ -1,11 +1,11 @@
 # ADR 0040: Local Reasoner Owned-Worker Lifecycle Boundary
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-09-29
 - Checkpoint: BB-131F
 - Baseline: `ddcf8011aefae4bd6df708421f02d6ede293fdcc`
-- Authority: explicit owner/architect clarification permits implementation for review; acceptance
-  of the F candidate would include acceptance of this bounded clarification. Not Accepted yet.
+- Authority: explicit owner approval of reviewed candidate `1e003705c08000f33b97f3d0d5dc7f35546e4d1e`
+  includes this bounded clarification; merged unchanged with green main CI on 2026-09-29.
 
 ## Context
 
@@ -14,7 +14,7 @@ while Sentinel v1 remains read-only. F needs to stop exactly its own determinist
 The [assessment](../reports/features/finance/bb-131f-runtime-ownership-assessment-20260929.md)
 records the original stop. The owner/architect resolved it without granting generic host control.
 
-## Decision proposed for acceptance with F
+## Accepted decision
 
 The local reasoner runtime may own a narrowly scoped child-worker lifecycle. It starts only its
 configured executable with fixed trusted arguments, retains the internally created child identity,

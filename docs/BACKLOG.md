@@ -2,9 +2,9 @@
 
 ## BB-131F local runtime control — 2026-09-29
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY**, not accepted.
+**ACCEPTED / MERGED / CI VERIFIED**.
 Owner-authorized from `ddcf8011aefae4bd6df708421f02d6ede293fdcc`; the explicit architecture
-clarification permits only the runtime's owned child lifecycle. ADR 0040 is **Proposed**, not Accepted.
+clarification permits only the runtime's owned child lifecycle. ADR 0040 is **Accepted**.
 [Implementation, exact evidence and limitations](reports/features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md).
 The Brain library adds disabled-by-default local control, inherited framed pipes, receive limits,
 exclusive reservation, cancellation/deadline and retained-pidfd termination of its own proof child.
@@ -15,7 +15,7 @@ remain first-model gates. Finance **RESEARCH / 0 SEK / NONE**. No paid AI depend
 A–E remain accepted, BB-130 closed. No model or next-checkpoint authority follows from publication.
 Earlier authorization/status statements below retain their dated scope.
 
-F completion requires independent review of the exact branch SHA including Proposed ADR0040.
+F was independently reviewed and explicitly owner-approved at the exact candidate SHA recorded in the report.
 Deferred: durable authenticated audit, deployment/native sandbox/resource policy, first-model
 provenance/selection/use rights and explicit invocation approval. No other priority is changed.
 

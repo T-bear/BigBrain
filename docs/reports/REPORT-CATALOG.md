@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-131F, 2026-09-29` — [Local runtime isolation/control foundation](features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md). REVIEW CANDIDATE ONLY; Proposed ADR0040, owned-child pidfd lifecycle, framed local pipes, bounded control and model-free proof worker. Final F/B/C/E 193 PASS, full API 857 + Sentinel 32 PASS; restore/Release/format/docs/secrets PASS. No model/deployment.
+- `BB-131F, 2026-09-29` — [Local runtime isolation/control foundation](features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md). ACCEPTED / MERGED / CI VERIFIED; Accepted ADR0040, owned-child pidfd lifecycle, framed local pipes, bounded control and model-free proof worker. Final F/B/C/E 193 PASS, full API 857 + Sentinel 32 PASS; restore/Release/format/docs/secrets PASS. No model/deployment.
 
 - `BB-131F, 2026-09-29` — [Runtime ownership assessment](features/finance/bb-131f-runtime-ownership-assessment-20260929.md). Historical architecture stop, resolved by explicit owner/architect clarification; preserved characterization evidence. Current implementation is linked above.
 
