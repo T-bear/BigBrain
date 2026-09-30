@@ -35,8 +35,11 @@ public sealed class LocalModelAcceptanceTests
         // Preserve all prior evidence: no overwrites or automatic retry after an interrupted proof.
         using var audit = new FileStream(auditPath, new FileStreamOptions
         {
-            Mode = FileMode.CreateNew, Access = FileAccess.Write, Share = FileShare.Read,
-            Options = FileOptions.WriteThrough, UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite
+            Mode = FileMode.CreateNew,
+            Access = FileAccess.Write,
+            Share = FileShare.Read,
+            Options = FileOptions.WriteThrough,
+            UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite
         });
         var scope = ResearchLearningFixture.Scope();
         var memory = new EodhdMarketMemory(new EodhdFinanceOptions
@@ -153,8 +156,11 @@ public sealed class LocalModelAcceptanceTests
         Assert.Equal(0, new FileInfo(Path.Combine(previous, "finance.db-wal")).Length);
         // Frozen prior database: immutable read avoids even updating WAL shared-memory read marks.
         using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
-        { DataSource = new Uri(Path.Combine(previous, "finance.db")).AbsoluteUri + "?immutable=1",
-            Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
+        {
+            DataSource = new Uri(Path.Combine(previous, "finance.db")).AbsoluteUri + "?immutable=1",
+            Mode = SqliteOpenMode.ReadOnly,
+            Pooling = false
+        }.ToString());
         connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT snapshot_json FROM learning_governance WHERE singleton=1";
@@ -173,20 +179,34 @@ public sealed class LocalModelAcceptanceTests
         Directory.CreateDirectory(directory);
         File.SetUnixFileMode(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         using var audit = new FileStream(Path.Combine(directory, "invocation.jsonl"), new FileStreamOptions
-        { Mode = FileMode.CreateNew, Access = FileAccess.Write, Share = FileShare.Read, Options = FileOptions.WriteThrough,
-            UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite });
+        {
+            Mode = FileMode.CreateNew,
+            Access = FileAccess.Write,
+            Share = FileShare.Read,
+            Options = FileOptions.WriteThrough,
+            UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite
+        });
         void Record(object value) { JsonSerializer.Serialize(audit, value); audit.WriteByte((byte)'\n'); audit.Flush(true); }
-        Record(new { Authorization = corrected ? "BB-132A-owner-one-corrected-1.7B-acceptance" : diagnostic ? "BB-132A-owner-bounded-WorkerFailed-diagnosis" : qwen17 ? "BB-132A-owner-Qwen3-1.7B-separate-180s" : "BB-132A-owner-separate-invocation-180s",
-            Model = qwen17 ? "Qwen3-1.7B-Q4_K_M" : "Qwen3-4B-Q4_K_M", MaximumSeconds = 180,
-            PreviousLedgerSha256 = priorHashes[Path.Combine(previous, "finance.db")], PriorInvocationCount = 1,
-            ScientificBudgetRefund = false, EngineExecutionAuthorized = false });
+        Record(new
+        {
+            Authorization = corrected ? "BB-132A-owner-one-corrected-1.7B-acceptance" : diagnostic ? "BB-132A-owner-bounded-WorkerFailed-diagnosis" : qwen17 ? "BB-132A-owner-Qwen3-1.7B-separate-180s" : "BB-132A-owner-separate-invocation-180s",
+            Model = qwen17 ? "Qwen3-1.7B-Q4_K_M" : "Qwen3-4B-Q4_K_M",
+            MaximumSeconds = 180,
+            PreviousLedgerSha256 = priorHashes[Path.Combine(previous, "finance.db")],
+            PriorInvocationCount = 1,
+            ScientificBudgetRefund = false,
+            EngineExecutionAuthorized = false
+        });
         var scope = ResearchLearningFixture.Scope();
         await using var runtime = new LocalReasonerRuntime(new()
         {
-            Enabled = true, ControlledRealModelAcceptance = true, InvocationTimeout = TimeSpan.FromSeconds(180),
+            Enabled = true,
+            ControlledRealModelAcceptance = true,
+            InvocationTimeout = TimeSpan.FromSeconds(180),
             WorkerExecutable = Path.Combine(root, corrected ? "native-worker-corrected" : diagnostic ? "native-worker-diagnostic" : "native-worker-180"),
             WorkerArguments = [Path.Combine(root, "runtime"), model,
-                File.ReadAllText(Path.Combine(root, "cgroup-path.private")).Trim()], CoordinationDirectory = directory
+                File.ReadAllText(Path.Combine(root, "cgroup-path.private")).Trim()],
+            CoordinationDirectory = directory
         }, record => Record(record));
         var watch = Stopwatch.StartNew();
         try
@@ -199,23 +219,38 @@ public sealed class LocalModelAcceptanceTests
             }
             // Synthetic acceptance evidence, separate from operational audit. Never executed or repaired.
             using (var evidence = new FileStream(Path.Combine(directory, "parsed-model-response.json"), new FileStreamOptions
-            { Mode = FileMode.CreateNew, Access = FileAccess.Write, Options = FileOptions.WriteThrough,
-                UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite }))
+            {
+                Mode = FileMode.CreateNew,
+                Access = FileAccess.Write,
+                Options = FileOptions.WriteThrough,
+                UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite
+            }))
             {
                 evidence.Write(System.Text.Encoding.UTF8.GetBytes(reply.ResponseJson));
                 evidence.Flush(true);
             }
             // Pure Finance admission only, against retained scientific counters. Never revive the failed C iteration.
             var admission = LearningAdmissionPolicy.Admit(reply.ResponseJson, scope, admissionState);
-            Record(new { Disposition = admission.Reason.ToString(), ElapsedMilliseconds = watch.ElapsedMilliseconds,
-                ProposalId = admission.Proposal?.ProposalId, ExecutionFingerprint = admission.Proposal?.ExecutionFingerprint,
-                EngineCalls = 0 });
+            Record(new
+            {
+                Disposition = admission.Reason.ToString(),
+                ElapsedMilliseconds = watch.ElapsedMilliseconds,
+                ProposalId = admission.Proposal?.ProposalId,
+                ExecutionFingerprint = admission.Proposal?.ExecutionFingerprint,
+                EngineCalls = 0
+            });
             Assert.IsType<LearningReasonerReply.Proposal>(reply);
             Assert.Equal(LearningAdmissionReason.Admitted, admission.Reason);
         }
         catch (LocalReasonerException error)
         {
-            Record(new { Failure = error.Failure.ToString(), ElapsedMilliseconds = watch.ElapsedMilliseconds, EngineCalls = 0 });
+            Record(new
+            {
+                Failure = error.Failure.ToString(),
+                ReplyRejection = error.ReplyRejection?.ToString(),
+                ElapsedMilliseconds = watch.ElapsedMilliseconds,
+                EngineCalls = 0
+            });
             throw;
         }
         finally

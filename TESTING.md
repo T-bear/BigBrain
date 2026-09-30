@@ -1,5 +1,17 @@
 # Testa BigBrain
 
+## BB-132A RC02 diagnostic verification — 2026-09-30
+
+[RC02 report](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30)
+records exact commands/scope. Release test-project build PASS (zero warnings/errors),196 focused
+B/C/E/F/configuration tests PASS and5 intentional model skips. Eighteen existing invalid-reply cases
+now assert exact closed Finance rejection propagation; success/transport failures assert null.
+Finance parser/rules and native worker unchanged. No real inference in RC02. Prior model failures are
+not converted to successes; absent historical response prevents exact retrospective diagnosis.
+Scoped formatter verification of all four changed C# files PASS after whitespace-only formatting
+of the acceptance harness; docs/index/link258Markdown/91IDs, diff and exact-file Gitleaks PASS.
+Full final checkpoint matrix remains incomplete. REVIEW CHECKPOINT, not Merge Candidate.
+
 ## BB-132A RC01 verification state — 2026-09-30
 
 **REVIEW CHECKPOINT, not a Merge Candidate.** Failed acceptance may be published for independent

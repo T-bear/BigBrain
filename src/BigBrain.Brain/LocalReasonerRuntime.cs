@@ -52,6 +52,7 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
         var outcome = LocalReasonerOutcome.Failed; LocalReasonerFailure? failure = null;
         var inputHash = ""; string? responseHash = null;
         int? workerExitCode = null; bool? workerCleanupRequired = null;
+        LearningAdmissionReason? replyRejection = null;
         FileStream? reservation = null; OwnedReasonerWorker? worker = null;
         var path = Path.Combine(_options.CoordinationDirectory, ".local-reasoner-reservation");
         var stopped = true; var audited = false;
@@ -89,7 +90,11 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
             deadline.Token.ThrowIfCancellationRequested();
             var bytes = await response.ConfigureAwait(false);
             var parsed = LearningReplyParser.Parse(LocalReasonerProtocol.Decode(bytes), input);
-            if (parsed.Reply is null) throw new LocalReasonerException(LocalReasonerFailure.InvalidReply);
+            if (parsed.Reply is null)
+            {
+                replyRejection = parsed.Rejection;
+                throw new LocalReasonerException(LocalReasonerFailure.InvalidReply) { ReplyRejection = replyRejection };
+            }
             responseHash = Hash(bytes);
             deadline.Token.ThrowIfCancellationRequested(); // Disable/cancellation never admits a late reply.
             outcome = parsed.Reply is LearningReasonerReply.Proposal ? LocalReasonerOutcome.Proposal : LocalReasonerOutcome.NoUsefulProposal;
@@ -178,7 +183,7 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
             try
             {
                 _audit(new(id, phase, result, failure, DateTimeOffset.UtcNow, watch.ElapsedMilliseconds, inputHash, _workerHash, responseHash)
-                { WorkerExitCode = workerExitCode, WorkerCleanupRequired = workerCleanupRequired });
+                { WorkerExitCode = workerExitCode, WorkerCleanupRequired = workerCleanupRequired, ReplyRejection = replyRejection });
             }
             catch (Exception) { failure = LocalReasonerFailure.AuditFailed; throw new LocalReasonerException(failure.Value); }
         }

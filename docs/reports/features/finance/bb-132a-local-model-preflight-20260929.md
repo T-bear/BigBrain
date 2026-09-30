@@ -1,5 +1,103 @@
 # BB-132A — local-model acceptance evidence and bounded stops
 
+## Review Checkpoint RC02 — 2026-09-30
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Goal remains BB-132A: real local research proposals with deterministic Finance authority.
+Accepted main baseline: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+Branch: `bb-132a/first-local-language-model`.
+Parent RC01: `0788e14a297c238f1eff6d3a622fd96a9978c25d`, tree
+`3be7d6c2a12cd7a9fcdde9e637ed54eb08d22ca2`. Owner reports independent RC01 review and authorizes
+same-branch continuation; RC01 is not accepted for merge. Existing review history remains intact.
+RC02 publication subject: `review: publish BB-132A RC02 sanitized reply diagnostics`.
+Exact RC02 SHA/tree are resolved from the containing publication commit, including after later reviews:
+
+```sh
+git log -1 --format='%H %T' --grep='^review: publish BB-132A RC02 sanitized reply diagnostics$' origin/bb-132a/first-local-language-model
+```
+
+### Minimal diagnostic implementation
+
+Finance already returns a closed `LearningAdmissionReason? Rejection` from `LearningReplyParser`.
+The runtime previously replaced every rejected parse with generic InvalidReply. RC02 passes that
+existing value through as nullable `ReplyRejection` in the runtime exception and terminal audit.
+The test-only acceptance journal also records the enum name when present. No parallel parser,
+new verdict taxonomy, model-provided path/value or exception text is logged. No raw output is stored.
+Parser acceptance, validation order and all scientific rules are unchanged. A null reason remains
+unknown/not-applicable; transport/crash/cancellation failures never manufacture a Finance rejection.
+The reason is precisely the existing Finance category, not a guessed field-level diagnosis.
+
+Model-free real-pipe tests assert these existing categories survive unchanged:
+
+| Fixture mutation | Finance reason retained |
+| --- | --- |
+| Unsupported version | UnsupportedContract |
+| Invented evidence checksum | EvidenceMismatch |
+| Unsupported strategy | UnsupportedStrategy |
+| Unsupported period | UnsupportedParameter |
+| Multiple variants | InvalidVariantCount |
+| Malformed/duplicate/deep/null/missing/Markdown/trailing/tool/PID/executable/signal/risk/PAPER input | Malformed |
+
+Eighteen invalid-reply fixtures also assert the same runtime InvalidReply failure, no response hash,
+no inner exception/raw message and no reason on preterminal audit events. Valid reply and eight
+transport-failure fixtures assert no invented parser reason. Existing C-ledger/science/no-retry
+regressions remain unchanged. This proves diagnostic propagation, not historical model causality.
+
+### Concrete evidence blocker — no model invocation in RC02
+
+The earlier corrected real run produced a complete BRF1 response, exited0 and was rejected by Finance
+as InvalidReply. Only `invocation.jsonl` exists in that attempt directory. It contains the generic
+failure and no inner rejection or response hash. The retained test log likewise contains only the
+runtime exception. The harness saves response JSON only after successful strict parsing, which did
+not occur. No retained response exists to reparse with the new diagnostics.
+
+All 13 previously pinned evidence files remain byte-identical. The exact historical parser reason
+cannot be reconstructed from those records. Source comparison of prompt/grammar and Finance rules
+does not establish which response the model emitted; synthetic counterexamples are not a substitute.
+No reason/field is guessed, no integration correction is claimed and no historical evidence is rewritten.
+
+The owner's last acceptance invocation is conditional on identifying and correcting the cause first.
+That condition is not met. No new inference, diagnostic reproduction or acceptance invocation was run;
+the conditional allowance remains unused. No model download/selection/change, GPU/CUDA or cloud work.
+This is an evidence/authorization dependency, not an asserted pre-existing scientific/security defect
+or a request to redesign the architecture. A new bounded owner/architect decision is needed to permit
+obtaining diagnostic evidence from a fresh invocation, or to conclude this checkpoint without it.
+No such permission is inferred from the conditional final-acceptance grant.
+
+### Verification and exact RC02 scope
+
+Commands/results for the new diagnostic source:
+
+- `dotnet build tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore`:
+  PASS, zero warnings/errors.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build`
+  with filter `FullyQualifiedName~LocalReasonerRuntimeTests|FullyQualifiedName~LocalModelAcceptanceTests|FullyQualifiedName~ResearchReasonerContractTests|FullyQualifiedName~ResearchLearningContractTests|FullyQualifiedName~FinanceLearningLedgerTests`:
+  **196 PASS / 0 FAIL / 5 intentional real-model skips**. No model artifact is loaded by those tests.
+- `dotnet format BigBrain.slnx --verify-no-changes --no-restore --include` followed by the four
+  changed C# paths: PASS. Initial acceptance-harness check found WHITESPACE errors; scoped
+  `dotnet format whitespace` corrected only that file. No model/test behavior changed by formatting.
+  Full final checkpoint verification is not claimed.
+- `node scripts/verify-documentation.mjs`: PASS,258 Markdown /91 unique backlog IDs.
+- `git diff --check`: PASS; Gitleaks exact13 intended files: PASS/no leaks. All13 prior local evidence
+  hashes verified unchanged; staged inventory/secrets checked again before commit.
+- Current workflow triggers pushes only on main or pull_request; no publication-CI result is claimed
+  for this branch-only handoff. No full backend/restore matrix or real-model success is claimed.
+
+Four changed implementation/test files relative to RC01:
+`src/BigBrain.Brain/LocalReasonerRuntime.cs`, `src/BigBrain.Brain/LocalReasonerRuntimeOptions.cs`,
+`tests/BigBrain.Api.Tests/LocalReasonerRuntimeTests.cs`, `tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs`.
+Nine documentation files: ROADMAP.md, TESTING.md, docs/STATUS.md, docs/BACKLOG.md,
+docs/modules/finance.md, docs/architecture/finance/master-roadmap.md, docs/operations/codex-recovery.md,
+docs/reports/REPORT-CATALOG.md and this report. Exact RC02 delta: **13 files**.
+No changes to Finance parser/admission/ledger/schema/engines/risk, native worker/prompt/grammar,
+resource/isolation policy, Sentinel, Web, packages, CI or deployment. Unrelated local material excluded.
+
+Finance **RESEARCH / 0 SEK / NONE**. No scientific engine or trading call in the new diagnostic work;
+no budget/exposure reset, raw-data export, model-generated executable behavior or additional authority.
+Next: publish RC02 then **STOP** for independent owner/architect review of the missing-evidence
+blocker and a bounded next decision. No merge, deployment, PAPER/LIVE/AUTO, broker/orders/capital or BB-132B.
+RC01 and earlier evidence below remain historical, unchanged in meaning.
+
 ## Review Checkpoint RC01 — 2026-09-30
 
 **REVIEW CHECKPOINT — INCOMPLETE / NOT A MERGE CANDIDATE / NOT ACCEPTED.**

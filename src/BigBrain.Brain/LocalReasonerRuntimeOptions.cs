@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using BigBrain.Modules.Finance;
 
 namespace BigBrain.Brain;
 
@@ -45,6 +46,8 @@ public enum LocalReasonerFailure
 public sealed class LocalReasonerException(LocalReasonerFailure failure) : Exception($"Local reasoner: {failure}.")
 {
     public LocalReasonerFailure Failure { get; } = failure;
+    // Finance's existing closed reason only. Never attach JSON, exception text or model values.
+    public LearningAdmissionReason? ReplyRejection { get; internal init; }
 }
 
 public enum LocalReasonerAuditPhase { Started, ResponseStarted, Completed }
@@ -64,4 +67,5 @@ public sealed record LocalReasonerAudit(Guid InvocationId, LocalReasonerAuditPha
     // Exit codes are diagnostics, not scientific evidence or proof of OOM/signal cause.
     public int? WorkerExitCode { get; init; }
     public bool? WorkerCleanupRequired { get; init; }
+    public LearningAdmissionReason? ReplyRejection { get; init; }
 }

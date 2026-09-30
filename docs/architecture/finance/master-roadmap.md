@@ -13,6 +13,9 @@ existing Finance parser. No accepted proposal or engine call. Current state is a
 not a Merge Candidate. Next bounded scope: sanitized rejection diagnostics; at most one further1.7B
 acceptance is conditional on identifying/correcting an in-scope cause. No automatic retry, refund,
 weakened control, cloud, deployment or trading authority. Stop after publication for independent review.
+RC02 adds only sanitized existing-reason propagation. The old reply/reason is absent, so historical
+causality remains unknown. No new invocation or corrected acceptance; the conditional grant is unused.
+Stop for a bounded evidence decision, not a new architecture/hardening checkpoint.
 
 ## BB-131F local runtime control — 2026-09-29
 

@@ -19,6 +19,44 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132A Review Checkpoint RC02 handoff — 2026-09-30
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner reports independent RC01 review and authorizes same-branch bounded continuation, not merge.
+Baseline/main739beab55a494068edcf23d3c905aa6601b99dc0; parent RC01
+0788e14a297c238f1eff6d3a622fd96a9978c25d. Branch bb-132a/first-local-language-model.
+Publication subject `review: publish BB-132A RC02 sanitized reply diagnostics` uniquely resolves
+exact SHA/tree from Git metadata, using the [report's RC02 command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30).
+No history rewrite. Report carries full13-file RC02 inventory and cumulative model/runtime provenance.
+
+Completed: existing Finance Rejection enum forwarded as nullable ReplyRejection in runtime exception,
+terminal audit and controlled acceptance journal. Eighteen model-free invalid-reply cases assert the
+exact existing code and unchanged failure; success/transport paths assert no fabricated reason.
+No Finance parser/admission/science/ledger changes. Native worker/prompt/grammar/containment unchanged.
+Only runtime/options and two tests change, plus nine docs listed in report. Acceptance-test whitespace
+formatted after its check identified whitespace-only failures. No test semantics changed by formatting.
+Release build PASS0warnings/errors;196 focused B/C/E/F/configuration tests PASS/5 model skips.
+Formatter verification of all4 changed C# files PASS. Documentation/index/link verifier PASS
+(258Markdown/91uniqueIDs); diff --check PASS; Gitleaks exact13files PASS/no leaks. Staged inventory/
+secrets rechecked before commit. Publication CI not claimed; full acceptance matrix remains incomplete.
+
+Concrete blocker: the previous corrected1.7B response and inner reason were never persisted. Its
+directory has only invocation.jsonl, with InvalidReply/no response hash; test log likewise generic.
+No exact old reason/field can be reconstructed. Thirteen prior evidence hashes unchanged; no old audit
+rewritten. Synthetic tests prove propagation, not historical model causality. No guessed integration
+fix, no new inference, no diagnostic reproduction, no model change. Last conditional acceptance remains
+UNUSED: its cause-identification/correction prerequisite is not satisfied. Do not invent authorization
+for diagnostic inference or repeat a consumed test journal. No final full-candidate matrix claim.
+
+If publication is interrupted: inspect local/remote commit subject/SHA, do not duplicate/amend RC02;
+finish only its pending gates/push. Verify baseline before/after push and exact remote branch/tree.
+Unrelated mockups/ADR0006–0009 remain excluded and untouched. Ignored model binaries/evidence remain
+local. After push no unpublished diagnostic implementation remains; incomplete state is in GitHub.
+Exact next action: STOP — independent review of RC02 and owner/architect decision on a bounded way
+to obtain the missing runtime evidence, or conclude A. No extra invocation has been authorized here.
+Finance RESEARCH / 0 SEK / NONE. No merge/deployment/PAPER/LIVE/AUTO/broker/orders/capital or BB-132B.
+Earlier entries are historical, not current instructions to rerun an experiment.
+
 ## BB-132A Review Checkpoint RC01 handoff — 2026-09-30
 
 Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.

@@ -14,6 +14,8 @@ Owner direction, implementation authorization currently limited to BB-132A:
    All history retained in a REVIEW CHECKPOINT, not a Merge Candidate. Next bounded work is
    sanitized InvalidReply diagnosis; at most one further1.7B attempt is conditionally authorized
    after an in-scope cause/correction. Publication stops for review; cloud never required.
+   RC02 implements sanitized rejection propagation, but the historical reply/reason was not retained.
+   No new inference or correction; the conditional allowance is unused pending a bounded evidence decision.
 2. Persistent research loop/history, building on existing ledger governance; no recurring loop yet.
 3. Prospective validation.
 4. Future PAPER concepts: Long-term portfolio and Active/high-risk portfolio.

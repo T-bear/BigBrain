@@ -1,5 +1,22 @@
 # BigBrain Status
 
+## BB-132A RC02 — sanitized rejection diagnostics, 2026-09-30
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Same branch/baseline; RC01 `0788e14a297c238f1eff6d3a622fd96a9978c25d` remains preserved.
+[RC02 exact SHA/tree resolution, scope and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30).
+Implemented: existing Finance rejection enum now survives runtime InvalidReply in exception/audit and
+controlled acceptance journal. No parser/admission/worker/rules relaxation or raw reply logging.
+Release build PASS/0warnings/errors;196 model-free focused tests PASS/5 model skips.
+Blocker: previous complete reply and inner parser reason were never retained. Historical exact reason
+remains UNKNOWN; new diagnostics cannot reconstruct absent data. No cause-specific fix or model run.
+All13 prior evidence hashes unchanged; the conditional last acceptance allowance remains UNUSED.
+Next: publish RC02 and STOP for review/decision on obtaining missing diagnostic evidence within
+bounded scope. No implicit diagnostic inference authorization. Full BB-132A acceptance remains incomplete.
+Finance RESEARCH / 0 SEK / NONE. No merge, deployment, cloud, trading, capital or BB-132B.
+Earlier entries retain their dated scope.
+
+
 ## BB-132A Review Checkpoint RC01 — 2026-09-30
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
