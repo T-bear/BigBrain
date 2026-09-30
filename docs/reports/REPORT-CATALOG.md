@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-132A RC01, 2026-09-30` — [Review Checkpoint: local-model evidence and workflow](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Preserved implementation and five real runs; latest complete1.7B reply rejected InvalidReply. Exact SHA/tree resolution, provenance, tests, failures and conditional next diagnostic scope in report; no new inference during publication.
+
 - `BB-131F, 2026-09-29` — [Local runtime isolation/control foundation](features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md). ACCEPTED / MERGED / CI VERIFIED; Accepted ADR0040, owned-child pidfd lifecycle, framed local pipes, bounded control and model-free proof worker. Final F/B/C/E 193 PASS, full API 857 + Sentinel 32 PASS; restore/Release/format/docs/secrets PASS. No model/deployment.
 
 - `BB-131F, 2026-09-29` — [Runtime ownership assessment](features/finance/bb-131f-runtime-ownership-assessment-20260929.md). Historical architecture stop, resolved by explicit owner/architect clarification; preserved characterization evidence. Current implementation is linked above.

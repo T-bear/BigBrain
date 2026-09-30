@@ -62,18 +62,18 @@
 
 ### Systemarkitektens review-trigger
 
-När ägaren säger **"Codex är klar"** ska ChatGPT behandla det som en review-trigger, inte som tillräcklig färdigevidens. ChatGPT ska läsa senaste publicerade GitHub source of truth, granska relevanta commits samt status-, backlog-, test- och rapportunderlag och därefter ge ägaren en förenklad systemarkitektgranskning: vad som gjorts, vad som är partiellt eller återstår, problem/risker, vad ägaren bör verifiera manuellt och rekommenderat nästa steg. Owner UX approval får endast registreras efter ägarens uttryckliga godkännande.
+När ägaren säger **"Codex är klar"** ska ChatGPT behandla det som en review-trigger, inte som tillräcklig färdigevidens. ChatGPT ska själv hämta den aktiva checkpoint-branchens exakta Review Checkpoint SHA och tree, jämföra med rätt accepterad main-baseline och läsa rapport, diff, evidens, status, backlog och testunderlag från GitHub och därefter ge ägaren en förenklad systemarkitektgranskning: vad som gjorts, vad som är partiellt eller återstår, problem/risker, vad ägaren bör verifiera manuellt och rekommenderat nästa steg. Owner UX approval får endast registreras efter ägarens uttryckliga godkännande.
 
 ## Git
 
-- Gör aldrig commit, push, reset, rebase, force push eller annan force-operation utan uttryckligt godkännande.
+- Ägarens permanenta Review Checkpoint-auktorisering nedan tillåter commit/push av sammanhängande arbete inom en redan auktoriserad checkpoint. Merge kräver separat explicit godkännande av exakt SHA. Ingen reset, rebase, force push eller historieskrivning; orelaterat arbete bevaras.
 - Skriv inte över eller återställ användarens befintliga ändringar.
 
 ## Interrupted-run recovery
 
-Om en körning avbryts innan avgränsat arbete är klart ska giltiga working-tree-ändringar bevaras och inte göras om eller kastas. Ofullständigt arbete får inte committas utan uttryckligt godkännande. Skriv när möjligt en sanerad återhämtningsnot enligt `docs/operations/codex-recovery.md` med baseline/source-of-truth-SHA, git status, ändrade filer, exakt klart/återstående arbete, körda test/build-resultat, blockerare/antaganden och nästa exakta åtgärd. Använd endast denna enda plats och statusen `INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
+Om en körning avbryts innan avgränsat arbete är klart ska giltiga working-tree-ändringar bevaras och inte göras om eller kastas. Sammanhängande ofullständigt arbete får publiceras som REVIEW CHECKPOINT enligt den permanenta auktoriseringen nedan; det får inte kallas MERGE CANDIDATE utan uppfyllda acceptance criteria och full verifiering. Skriv när möjligt en sanerad återhämtningsnot enligt `docs/operations/codex-recovery.md` med baseline/source-of-truth-SHA, git status, ändrade filer, exakt klart/återstående arbete, körda test/build-resultat, blockerare/antaganden och nästa exakta åtgärd. Använd endast denna enda plats och statusen `INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
 
-En senare Codex-session ska läsa `AGENTS.md`, synka/verifiera GitHub, inspektera working tree och återhämtningsnoten, säkerställa att orelaterade ändringar bevaras och fortsätta giltigt verifierat arbete utan onödig omkörning. Slutför ursprunglig scope före nytt arbete. Om repositoryt och noten motsäger varandra: stoppa och rapportera konflikten i stället för att gissa. Återhämtningsnoten får aldrig innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. GitHub är source of truth mellan färdiga sessioner; working tree och återhämtningsnoten beskriver uttryckligen ofärdigt lokalt arbete.
+En senare Codex-session ska läsa `AGENTS.md`, synka/verifiera GitHub, inspektera working tree och återhämtningsnoten, säkerställa att orelaterade ändringar bevaras och fortsätta giltigt verifierat arbete utan onödig omkörning. Slutför ursprunglig scope före nytt arbete. Om repositoryt och noten motsäger varandra: stoppa och rapportera konflikten i stället för att gissa. Återhämtningsnoten får aldrig innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. GitHub main är source of truth för accepterat arbete; den aktiva checkpoint-branchens publicerade Review Checkpoints är source of truth för pågående, ännu ej accepterat arbete. Working tree och återhämtningsnoten beskriver uttryckligen opublicerade avvikelser och avbrott.
 
 ## Documentation and publication completion rule
 
@@ -99,7 +99,7 @@ När ett uppdrag tillför långsiktigt relevant kunskap ska Codex skapa eller up
 
 - Repositoryts publicerade dokumentation och Git-historik är source of truth mellan agentsessioner; en ny agent ska kunna återskapa aktuell status utan terminalhistorik.
 - Dokumentationspublicering innebär aldrig deployment eller runtimeändring. Sådana åtgärder kräver separat uttrycklig auktorisering.
-- När ett uppdrag är verifierat och användaren har godkänt push ska kod, tester och tillhörande dokumentation committas och pushas tillsammans i en eller flera tydliga commits.
+- Kod, tester och tillhörande dokumentation publiceras tillsammans vid en sammanhängande reviewpunkt, även vid misslyckad acceptance eller blocker. Klassificera REVIEW CHECKPOINT eller, först efter full verifiering och uppfyllda acceptance criteria, MERGE CANDIDATE. Publication är aldrig acceptance.
 - Om endast dokumentation ändrats ska den verifieras, få en separat dokumentationscommit och pushas. Dokumentation får inte lämnas lokalt enbart för att ingen kod ändrades.
 - Om kod inte får pushas ska relevant dokumentation ändå uppdateras lokalt och samtliga väntande filer redovisas.
 - Inga orelaterade ändringar får följa med. Ingen force push. `origin/main` ska verifieras före och efter push.
@@ -123,22 +123,50 @@ push och inget deployment-tillstånd följer av detta undantag. Orelaterat arbet
 
 ### Permanent checkpoint-branch workflow
 
-`main` är endast owner/architect-accepted, merged source of truth. Varje bounded
-implementation checkpoint arbetar på en separat branch skapad från verifierad
-`origin/main`, till exempel `bb-130c/backtest-result-identity`.
+`main` är source of truth för owner/architect-accepterat, mergat arbete. Den aktiva
+bounded checkpoint-branchen är dessutom source of truth för publicerat pågående,
+ännu ej accepterat arbete. En branch per checkpoint från verifierad `origin/main`;
+fortsätt samma branch genom reviewvarv, skapa ingen parallell implementation.
 
-En komplett, testad branch får pushas som **REVIEW CANDIDATE ONLY**. Det är inte
-acceptans i main, deployment, runtime approval eller tillstånd att fortsätta med
-nästa checkpoint. Codex stoppar efter branch-push. Merge till main får ske endast
-efter explicit owner approval av exakt granskad branch-SHA. Före merge verifieras
-att branch-SHA är oförändrad och att origin/main inte avancerat oväntat; annars
-stoppas arbetet för re-review. Efter merge pushas main, CI väntas in och verifieras,
-och status/recovery avstäms mot slut-SHA innan nästa branch skapas.
+- **REVIEW CHECKPOINT:** commit/push av aktuellt sammanhängande checkpoint-tillstånd
+  för oberoende review. Får vara ofullständigt, blockerat eller ha misslyckade experiment.
+  Naturlig reviewpunkt, experimentfel, blocker, beslut eller STOP får inte lämna ägaren
+  beroende av terminalutskrift. Ägaren auktoriserar sådan commit/push inom befintlig scope.
+- **MERGE CANDIDATE:** en Review Checkpoint där full checkpoint-verifiering genomförts
+  och acceptance criteria bedöms uppfyllda. Publication innebär fortfarande inte acceptance.
+- **ACCEPTED SHA:** exakt Merge Candidate SHA som ChatGPT granskat mot rätt main-baseline,
+  ägaren uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
 
-Ingen force push används. En branch per checkpoint gäller; inga långlivade
-utvecklingsbrancher. GitHub-branch, kanonisk dokumentation och recovery-note ska
-räcka för arkitektgranskning utan terminalhistorik. Befintliga krav på separat
-deployment-, konto-, credential-, provider- och high-authority-godkännande gäller.
+Review-loop: bounded arbete → scope-/secrets-kontroll → commit/push med kod, tester,
+rapport och handoff → rapportera branch, exakt remote SHA, tree, baseline, reviewstatus
+samt kort granskningsorsak → **STOP**. Ägaren behöver bara skriva **"Codex är klar"**;
+ChatGPT hämtar själv GitHub-underlaget. Misslyckade eller ej körda checks redovisas exakt,
+aldrig som gröna. Hemligheter, rå känslig data och orelaterat arbete får aldrig publiceras.
+
+Vid continue-beslut: fortsätt auktoriserat arbete på SAMMA branch, lägg nya commits ovanpå
+publicerad historik och publicera nästa exakta Review Checkpoint. Ingen amend, squash,
+rebase eller force push av reviewhistorik. Loopen pågår tills Merge Candidate, explicit
+avslut eller ersättande owner/architect-beslut. Granskning ändrar inte scope automatiskt.
+
+Före merge: verifiera exakt godkänd branch-SHA, oförändrad förväntad main och relevanta
+required checks. Avvikelse kräver STOP/re-review. Efter kontrollerad merge pushas main,
+main-CI verifieras för exakt SHA och dokumentation/recovery avstäms, inklusive separat
+reconciliation-CI där sådan körs. Ingen automatisk nästa checkpoint.
+
+GitHub ska självt räcka för att fastställa checkpoint-ID/mål, baseline, branch, review-SHA,
+tree, reviewstatus, aktuellt implementationstillstånd, ändrade filer, tester/resultat,
+experiment, konkreta fel/blockers, artefakt-/runtime-/modellprovenance, invariants,
+dokumentationsstatus, uttryckliga non-goals och nästa beslut/arbete. Checkpointens rapport
+bär specifik evidens/historik; `docs/operations/codex-recovery.md` stöder avbrott och
+opublicerad delta. Commit/tree-identiteter hämtas ur Git/GitHub-metadata för rapportens
+publiceringscommit (ingen omöjlig självrefererande SHA i dess eget innehåll); rapporten
+ska ge en entydig identifierare/resolution även efter senare reviewcommits.
+
+REVIEW CHECKPOINT ger inte merge approval, acceptance, deployment-, scope-, nästa
+checkpoint- eller tradingbehörighet. Säkerhets-, science-, risk-, provider- och
+kapitalgränser gäller oförändrat. Regeln om pre-existing blocker handoff ovan gäller
+fortsatt dess snäva felkategori; vanlig ofullständig implementation får publiceras som
+Review Checkpoint utan att felaktigt klassificeras som en befintlig defekt.
 
 När fortsatt arbete kräver ägarens godkännande ska det granskningsbara underlaget först
 vara färdigt och full teknisk återhämtningsstatus finnas i `docs/operations/codex-recovery.md`.

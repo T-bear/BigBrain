@@ -12,3 +12,11 @@ A sanitized report must contain:
 
 Reports must never contain secrets, raw identifiers, private addresses, raw logs,
 private media names or machine-specific sensitive paths.
+
+For a Review Checkpoint, additionally identify checkpoint ID/goal, accepted baseline, branch,
+publication identifier and how to resolve its exact commit/tree after subsequent commits,
+REVIEW CHECKPOINT or MERGE CANDIDATE status, changed files, actual test/experiment outcomes,
+concrete failure reasons and uncertainties, relevant artifact/runtime/model provenance, security/
+science/Finance invariants, documentation state, explicit non-actions and next decision or bounded work.
+The report is the authoritative checkpoint handoff; terminal text is only a short navigation aid.
+Exact commit/tree identity is Git metadata, not a recursively embedded hash of the document itself.

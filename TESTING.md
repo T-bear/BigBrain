@@ -1,5 +1,20 @@
 # Testa BigBrain
 
+## BB-132A RC01 verification state — 2026-09-30
+
+**REVIEW CHECKPOINT, not a Merge Candidate.** Failed acceptance may be published for independent
+review under [AGENTS](AGENTS.md#permanent-checkpoint-branch-workflow); this does not waive full
+verification before Merge Candidate/acceptance. [Checkpoint evidence](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30)
+records exact baseline, publication identity resolution and scope.
+Preserved native compilation and Release test-project build passed;196 focused B/C/E/F/configuration
+tests passed with5 explicit model skips. Real attempts remain failed:4B30s/180s timeouts,1.7B
+WorkerFailed, diagnostic exit40, corrected complete reply rejected InvalidReply. No new inference
+or repeated expensive suites during RC01's documentation/publication step. Final full test/restore/
+format matrix and accepted proposal evidence remain unfinished, not implicitly green.
+Ordinary CI must not download/run a model. Consumed opt-in journals must never be deleted to rerun.
+Publication checks cover docs/links, exact diff/staged inventory, secrets and prior-evidence hashes.
+Any publication CI result belongs to that exact commit and is separate from retained local test evidence.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

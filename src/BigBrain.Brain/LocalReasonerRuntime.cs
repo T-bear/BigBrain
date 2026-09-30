@@ -51,6 +51,7 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
         var id = Guid.NewGuid(); var watch = Stopwatch.StartNew();
         var outcome = LocalReasonerOutcome.Failed; LocalReasonerFailure? failure = null;
         var inputHash = ""; string? responseHash = null;
+        int? workerExitCode = null; bool? workerCleanupRequired = null;
         FileStream? reservation = null; OwnedReasonerWorker? worker = null;
         var path = Path.Combine(_options.CoordinationDirectory, ".local-reasoner-reservation");
         var stopped = true; var audited = false;
@@ -108,7 +109,12 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
         {
             try
             {
-                if (worker is not null) stopped = await worker.StopAsync(_options.GracePeriod, _options.ReapTimeout).ConfigureAwait(false);
+                if (worker is not null)
+                {
+                    workerCleanupRequired = !worker.Exited;
+                    stopped = await worker.StopAsync(_options.GracePeriod, _options.ReapTimeout).ConfigureAwait(false);
+                    if (stopped && worker.Exited) workerExitCode = worker.ExitCode;
+                }
                 if (!stopped) { failure = LocalReasonerFailure.StopUnconfirmed; outcome = LocalReasonerOutcome.Failed; }
                 ObserveLateCancellation();
                 Audit(LocalReasonerAuditPhase.Completed, outcome); audited = true;
@@ -169,7 +175,11 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
 
         void Audit(LocalReasonerAuditPhase phase, LocalReasonerOutcome result)
         {
-            try { _audit(new(id, phase, result, failure, DateTimeOffset.UtcNow, watch.ElapsedMilliseconds, inputHash, _workerHash, responseHash)); }
+            try
+            {
+                _audit(new(id, phase, result, failure, DateTimeOffset.UtcNow, watch.ElapsedMilliseconds, inputHash, _workerHash, responseHash)
+                { WorkerExitCode = workerExitCode, WorkerCleanupRequired = workerCleanupRequired });
+            }
             catch (Exception) { failure = LocalReasonerFailure.AuditFailed; throw new LocalReasonerException(failure.Value); }
         }
     }

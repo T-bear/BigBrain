@@ -1,5 +1,27 @@
 # BigBrain Status
 
+## BB-132A Review Checkpoint RC01 — 2026-09-30
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Baseline `739beab55a494068edcf23d3c905aa6601b99dc0`; branch `bb-132a/first-local-language-model`.
+[Authoritative report, exact commit/tree resolution, inventory and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30).
+RC01 publishes preserved BB-132A work plus the owner-authorized Review Checkpoint workflow.
+Main remains accepted source of truth; the branch records ongoing, unaccepted work.
+
+Real Qwen3-1.7B produced a complete BRF1 response in30.2s, native exit0, no OOM. The unchanged
+Finance reply parser rejected it as InvalidReply; exact inner rejection reason was not retained.
+Admission/engine were not reached. Earlier4B failures and1.7B failure/diagnostic evidence remain
+unchanged; no ledger refund/reset. Preserved196 focused tests PASS,5 intentional model skips;
+Release build PASS/0warnings/errors. Real corrected acceptance failed; full final gates unfinished.
+No new model invocation or source/test change during this publication step.
+
+Next: RC01 publication then STOP for independent review. Authorized next bounded work on this SAME
+branch: sanitized rejection diagnostics, exact cause identification, in-scope correction only, then
+at mostONE further1.7B acceptance<=180s only if its conditions are met. Not an automatic retry.
+No4B, model swap, GPU/CUDA, weaker parser/isolation or cloud fallback. Finance RESEARCH /0 SEK /NONE.
+No merge/deployment/PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Acceptance remains incomplete.
+Earlier entries below are historical evidence, not current publication restrictions.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

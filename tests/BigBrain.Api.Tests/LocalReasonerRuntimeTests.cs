@@ -12,6 +12,22 @@ namespace BigBrain.Api.Tests;
 
 public sealed class LocalReasonerRuntimeTests
 {
+    [Theory]
+    [InlineData("exit", 3)]
+    [InlineData("truncated-header", 0)]
+    public async Task TerminalAuditRetainsOwnedExitCodeEvenWhenFrameIsIncomplete(string mode, int expectedExit)
+    {
+        using var fixture = new RuntimeFixture();
+        await using var runtime = fixture.Runtime(mode);
+        await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None));
+        var terminal = fixture.Events.Last();
+        Assert.Equal(LocalReasonerAuditPhase.Completed, terminal.Phase);
+        Assert.Equal(expectedExit, terminal.WorkerExitCode);
+        Assert.Null(terminal.ResponseHash);
+        Assert.Null(fixture.Events.First().WorkerExitCode);
+        Assert.DoesNotContain("UNTRUSTED", JsonSerializer.Serialize(terminal), StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task DisabledAndPreCancelledNeverStartWorker()
     {
@@ -256,6 +272,9 @@ public sealed class LocalReasonerRuntimeTests
         Assert.Equal(LocalReasonerFailure.Timeout,
             (await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None))).Failure);
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(7));
+        Assert.True(fixture.Events.Last().WorkerCleanupRequired);
+        Assert.NotNull(fixture.Events.Last().WorkerExitCode);
+        Assert.Null(fixture.Events.Last().ResponseHash);
         Assert.False(File.Exists(fixture.Reservation));
         Assert.Equal(LocalReasonerFailure.Disabled,
             (await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None))).Failure);
