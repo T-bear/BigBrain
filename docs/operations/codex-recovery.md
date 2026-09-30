@@ -19,6 +19,37 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132A Review Checkpoint RC04 handoff — 2026-10-01
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner/architect authorizes model-free analysis/characterization only after independent RC03 review.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; branch bb-132a/first-local-language-model;
+parent RC03 e4f96a0dd952857aa3af87344b86f52d4d1fda0f, tree772602dcd223f5b3ee794b25c70fe57606c5da28.
+Publication subject `review: publish BB-132A RC04 model-free contract characterization` resolves
+exact SHA/tree via [report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+
+Proven static gap: Finance exact version finance-research-learning-v1 versus native GBNF identity
+nonterminal on both reply branches. Correct value supplied by Finance/protocol and requested by
+prompt; not enforced by generation grammar. Correct AND wrong versions are possible. Discriminator
+is fixed by grammar. Wrong bounded versions can produce UnsupportedContract; RC03 raw value unknown.
+Fourteen new tests expand actual source terminals/references with synthetic fixtures, then use real
+BRF1/Finance parser/pure admission. They do not run native grammar/token sampling or a model.
+No production change, correction, inference or consumption of final acceptance; all15 old evidence
+hashes unchanged. New test file and test csproj source-text copy plus9docs;11 intended files.
+Initial build analyzer CA1861 corrected only in new test; final Release build PASS0warnings/errors.
+14 focused tests PASS; combined B/C/E/F/RC04 suite210 PASS/6 real-model skips. Scoped formatter PASS.
+Documentation/link/index verification PASS258Markdown/91IDs; diff --check and exact11-file Gitleaks
+PASS/no leaks. Staged content/scope/secrets rechecked before commit.
+Unrelated mockups/ADR0006–0009 preserved/excluded; models/raw artifacts remain ignored locally.
+
+If interrupted before publication, finish only remaining verification/docs/commit/push. Check exact
+local/remote publication subject to avoid duplicate commit; no amend/force/rebase. Verify main before/
+after push. Never run a model in RC04. No active interrupted implementation remains after publication.
+Next: STOP for independent RC04 review and explicit bounded decision on proposed future producer-only
+version binding and, separately, final acceptance. Neither is implemented/executed here. Finance
+RESEARCH /0 SEK /NONE; no merge/deploy/GPU/cloud/PAPER/LIVE/AUTO/broker/orders/capital/BB-132B.
+Previous handoffs below are preserved dated history.
+
 ## BB-132A Review Checkpoint RC03 handoff — 2026-10-01
 
 Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.

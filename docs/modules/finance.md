@@ -19,6 +19,9 @@ Owner direction, implementation authorization currently limited to BB-132A:
    RC03 (2026-10-01) separately authorized one diagnostic invocation: complete reply rejected
    InvalidReply / UnsupportedContract. No field inferred, correction or further run. Prior evidence
    unchanged; final acceptance remains unused. STOP for independent RC03 review before more work.
+   RC04 model-free analysis proves GBNF permits wrong contract versions; Finance's exact version is
+   available and the prompt correctly requests it. No correction/inference; proposed producer-only
+   version binding awaits independent review. Historical raw value unknown; final acceptance unused.
 2. Persistent research loop/history, building on existing ledger governance; no recurring loop yet.
 3. Prospective validation.
 4. Future PAPER concepts: Long-term portfolio and Active/high-risk portfolio.

@@ -1,5 +1,20 @@
 # BigBrain Status
 
+## BB-132A RC04 — model-free contract characterization, 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Proven static gap: Finance requires exact finance-research-learning-v1; worker prompt correctly says
+copy it, but both GBNF branches leave version as a broad identity string. Grammar permits wrong
+versions yielding UnsupportedContract; it also permits the correct version. No wrong value is forced.
+RC03 raw value remains unknown; synthetic witnesses do not reconstruct it. Fourteen new model-free
+cases traverse actual source grammar terminals and .NET BRF1/parser/pure admission, with no engine.
+[RC04 exact SHA/tree resolution, proof and limitations](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+No production correction, worker rebuild, inference, ledger rewrite or consumption of final acceptance.
+Next: publish RC04 and STOP for independent review; proposed future grammar-only version binding
+requires a new bounded decision before implementation/inference. Finance RESEARCH /0 SEK /NONE.
+Earlier entries retain their dated scope. No merge, deployment, trading, cloud or BB-132B.
+
+
 ## BB-132A RC03 — real diagnostic evidence, 2026-10-01
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**

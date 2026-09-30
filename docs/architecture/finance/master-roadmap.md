@@ -19,6 +19,9 @@ Stop for a bounded evidence decision, not a new architecture/hardening checkpoin
 RC03 (2026-10-01) obtained the authorized fresh diagnostic category: InvalidReply / UnsupportedContract,
 complete reply/native exit0. No field-level claim, correction, admission/engine or second run.
 Prior history unchanged, separate final acceptance unused. STOP for RC03 review; still not mergeable.
+RC04 model-free characterization proves the producer grammar permits wrong versions despite correct
+copy instructions; Finance's exact contract is unchanged. No model invocation or production fix.
+Review the proposed grammar-only version binding before any correction/last acceptance; A remains incomplete.
 
 ## BB-131F local runtime control — 2026-09-29
 

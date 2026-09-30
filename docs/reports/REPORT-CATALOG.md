@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-132A RC04, 2026-10-01` — [Model-free producer/Finance contract characterization](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. GBNF permits incorrect contract versions rejected by Finance; correct version also allowed.14 source-driven witnesses PASS; no historical raw value inferred, production correction or inference.
+
 - `BB-132A RC03, 2026-10-01` — [One real diagnostic invocation: UnsupportedContract](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Complete native reply rejected InvalidReply; existing enum captured, no correction or further inference.196 model-free PASS/6 model skips; real diagnostic0 PASS/1 FAIL. Prior evidence preserved; separate final acceptance unused.
 
 - `BB-132A RC02, 2026-09-30` — [Sanitized reply diagnostics and missing-evidence blocker](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Existing Finance rejection enum retained;196 model-free tests PASS. Historical response/reason absent; no new inference, conditional final allowance unused.

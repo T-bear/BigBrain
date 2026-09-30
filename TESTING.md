@@ -1,5 +1,20 @@
 # Testa BigBrain
 
+## BB-132A RC04 model-free characterization — 2026-10-01
+
+Fourteen new tests read the actual native worker source as text and construct witnesses from its
+current GBNF literal/identity/text rules. Real .NET BRF1 and Finance parser/pure admission prove
+correct-version positives and grammar-permitted wrong-version UnsupportedContract negatives.
+No libllama/native worker/model artifact/inference required. No response from RC03 is reconstructed.
+[Exact commands, results and helper limitations](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+14 focused PASS; combined B/C/E/F/RC04 suite210 PASS/6 intentional model skips.
+Final Release build PASS0warnings/errors after test-only CA1861 correction; scoped formatter PASS.
+Full model acceptance is not claimed. Final acceptance allowance remains UNUSED; all15 prior
+local evidence hashes remain unchanged. Production source/grammar/prompt/parser are unchanged.
+Documentation/link/index verifier PASS258Markdown/91IDs; diff --check and exact11-file Gitleaks PASS.
+No full acceptance suite or publication CI result is claimed for this analysis Review Checkpoint.
+
+
 ## BB-132A RC03 verification — 2026-10-01
 
 Same-branch diagnostic-only review round. Release test-project build PASS0warnings/errors;

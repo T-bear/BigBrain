@@ -1,6 +1,135 @@
 # BB-132A — local-model acceptance evidence and bounded stops
 
 
+
+## Review Checkpoint RC04 — 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE. Model-free characterization only.**
+Owner/architect independently reviewed RC03 and authorized static contract comparison and safe tests,
+not production correction or inference. No Qwen/libllama invocation, artifact acquisition, worker run,
+new experiment or consumption of the separate final acceptance allowance in RC04.
+Baseline/main: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+Branch: `bb-132a/first-local-language-model`.
+Parent RC03: `e4f96a0dd952857aa3af87344b86f52d4d1fda0f`, tree
+`772602dcd223f5b3ee794b25c70fe57606c5da28`. Exact RC04 publication commit/tree:
+
+```sh
+git log -1 --format='%H %T' --grep='^review: publish BB-132A RC04 model-free contract characterization$' origin/bb-132a/first-local-language-model
+```
+
+### Proven static producer/consumer gap
+
+Finance accepts exactly **`finance-research-learning-v1`**, case-sensitive. This value is owned by
+[LearningAdmissionPolicy.Version](../../../../src/BigBrain.Modules/Finance/ResearchLearningAdmission.cs),
+and [SyntheticLearningScope](../../../../src/BigBrain.Modules/Finance/ResearchLearningContracts.cs)
+places the same value in LearningDevelopmentInput.Version. ProjectionVersion=`development-only-v1`
+and strategy version=`v1` identify different things; neither is the reply contract version.
+
+[LearningReplyParser](../../../../src/BigBrain.Modules/Finance/ResearchLearningReply.cs) has exactly
+two UnsupportedContract return sites: an unknown nonempty bounded discriminator, or a supported
+shape with a nonempty bounded version unequal to LearningAdmissionPolicy.Version. Missing, null,
+oversized or malformed fields may instead return Malformed. Classification/order stay unchanged.
+
+| Boundary | Current source behavior | Finding |
+| --- | --- | --- |
+| Finance input | Version populated from LearningAdmissionPolicy.Version | Correct authoritative value already available |
+| IResearchReasoner / LearningReasonerReply | Typed input/cancellation; Finance-constructed Proposal or NoUsefulProposal | No adapter-defined version or execution authority |
+| LocalReasonerProtocol | Canonical camelCase JSON; BRF1 magic/length, strict UTF-8 and frame checks | Preserves `version`; BRF1 is transport identity, not reply contract version |
+| Native prompt | Says copy version/inputChecksum/scopeHandle/targetId exactly; example uses version COPY | Correct copy instruction, not an enforced binding |
+| Native GBNF | Both proposal and decline start with version followed by the `identity` nonterminal | Correct and incorrect versions remain legal generated strings |
+| GBNF discriminator | Fixed literal Proposal or NoUsefulProposal in the two alternatives | Unknown discriminator is not a production of this grammar |
+| Finance parser/admission | Exact singleton contract version before evidence/strategy checks | Rejects grammar-permitted wrong version; no aliases or coercion |
+| Accepted synthetic fixtures | Use LearningAdmissionPolicy.Version and valid context bindings | Both Proposal and NoUsefulProposal are representable by the current grammar |
+
+The producer's exact current GBNF identity rule is:
+
+```gbnf
+identity ::= "\"" [a-zA-Z0-9_./:-]{1,128} "\""
+```
+
+It permits the correct identifier AND, for example, `v1`, `development-only-v1`, `COPY`,
+`finance-research-learning-v2`, and `FINANCE-RESEARCH-LEARNING-V1`. With all other fields valid,
+those five synthetic values yield UnsupportedContract through the real Finance parser on both
+reply branches. This is a proven excess in the producer's permitted language, not a claim that the
+prompt requires a wrong version or that no valid reply is possible. The contractual version should
+be a deterministic producer binding to Finance's existing value rather than an open model choice.
+
+For a response conforming to this exact grammar, the unsupported-discriminator route is excluded;
+a wrong bounded version can therefore explain UnsupportedContract statically. **RC03's raw value
+is not retained and is NOT reconstructed or guessed here.** Grammar source analysis is not proof
+of what the native sampler actually emitted in that past invocation. No claim that it was COPY,
+v1, a projection version, or any other particular string. The observed runtime enum remains the
+only historical rejection detail. This is an unaccepted BB-132A producer integration gap; no accepted
+main parser/scientific/security defect or fail-open behavior was found or repaired.
+
+### Model-free characterization and limits
+
+[LocalModelContractCharacterizationTests](../../../../tests/BigBrain.Api.Tests/LocalModelContractCharacterizationTests.cs)
+reads the actual `worker.cpp` copied as text by the test project. It extracts the current response_grammar
+rules; a test-only witness expander handles their literal terminals plus identity/text references.
+The five-rule shape and exact character classes/bounds are pinned, unknown expression syntax fails
+the helper, and no runtime grammar library is loaded. It is deliberately not a general GBNF parser,
+production adapter, proposal repair mechanism or model simulator.
+
+Fourteen cases:
+
+- Two positive controls serialize the real Finance projection through LocalReasonerProtocol.Request,
+  WriteAsync/ReadAsync and ReadRequest, check exact version identity, expand actual grammar terminals
+  using accepted fixture bindings/prose, and show JSON equality with the existing fixtures.
+  The reply then traverses actual BRF1 WriteAsync/ReadAsync/Decode, strict Finance parser and pure
+  admission: Proposal=>Admitted, decline=>NoUsefulProposal. No ledger mutation/reservation or engine.
+- Ten negative controls use the five wrong versions above on both grammar alternatives. Each is a
+  derivable source-grammar witness, not edited real output. BRF1 accepts the framing, Finance returns
+  UnsupportedContract with no typed reply, and pure admission agrees without changing policy.
+- Two controls demonstrate the parser's independent unknown-discriminator rejection and that the
+  unchanged grammar branches themselves produce only their fixed allowed discriminators.
+
+Ordinary CI needs only repository source and existing .NET dependencies: no model, libllama,
+compiler for native worker, download, network, GPU or inference. This proves static derivability
+and .NET protocol/parser behavior; it does not re-execute the native GBNF/token sampler. Prior B/C/E/F
+model-free tests continue to cover admission/ledger/runtime invariants separately.
+
+### Smallest future correction for independent review — NOT implemented
+
+Constrain only the producer grammar's reply version on BOTH alternatives to the exact existing
+Finance contract literal `finance-research-learning-v1`, instead of the broad identity nonterminal.
+Keep a model-free cross-boundary test tied to LearningAdmissionPolicy.Version to catch future drift.
+The existing prompt already instructs exact copying; no expanded vocabulary or parser relaxation
+is required to close this proven version-choice gap. Do not rewrite/repair a completed model response
+in an adapter. Do not change BRF1, Finance version, scientific identity or any admission/risk rule.
+
+This proposed producer-only correction would exclude the demonstrated counterexamples; it does not
+guarantee that a model will satisfy evidence bindings or every later Finance check. No such correction,
+worker rebuild or inference is implemented in RC04. Independent review and an explicit bounded decision
+must precede any correction and any use of the separate final acceptance invocation (still UNUSED).
+
+### Verification, invariants and publication scope
+
+- `dotnet build tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore`:
+  initial new-test analyzer failure CA1861 (two constant arrays); resolved
+  only in the new test helper with static readonly arrays. Final build PASS, zero warnings/errors.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build --filter 'FullyQualifiedName~LocalModelContractCharacterizationTests'`: **14 PASS / 0 FAIL**.
+- Same dotnet test command with filter `FullyQualifiedName~LocalModelContractCharacterizationTests|FullyQualifiedName~LocalReasonerRuntimeTests|FullyQualifiedName~LocalModelAcceptanceTests|FullyQualifiedName~ResearchReasonerContractTests|FullyQualifiedName~ResearchLearningContractTests|FullyQualifiedName~FinanceLearningLedgerTests`:
+  **210 PASS / 0 FAIL / 6 intentional real-model skips**,32s. No model opt-in enabled.
+- `dotnet format BigBrain.slnx --verify-no-changes --no-restore --include tests/BigBrain.Api.Tests/LocalModelContractCharacterizationTests.cs`: PASS, no changes.
+- `node scripts/verify-documentation.mjs`: PASS258 Markdown/91 unique backlog IDs including links/indexes.
+  `git diff --check`: PASS. Gitleaks exact11 intended files: PASS/no leaks; staged-content check repeated
+  before commit. Scope check confirms no production source or prior evidence changed.
+- All15 existing evidence hashes remain unchanged; no model/artifact/ledger/audit content rewritten.
+  Original failures and spent invocations remain spent. No inference or acceptance attempt in RC04.
+
+RC04 intended files: new LocalModelContractCharacterizationTests.cs plus its existing test csproj
+(source-as-text copy only; no dependency change), and nine documentation files: ROADMAP.md, TESTING.md,
+docs/STATUS.md, docs/BACKLOG.md, docs/modules/finance.md, docs/architecture/finance/master-roadmap.md,
+docs/operations/codex-recovery.md, docs/reports/REPORT-CATALOG.md and this report. Total **11 files**.
+Production source including native worker/prompt/grammar, Finance parser/admission/science/risk/ledger,
+protocol, runtime/isolation/resource controls, model provenance, Sentinel, Web, packages, schema,
+CI and deployment are unchanged. Unrelated mockups/ADR0006–0009 remain excluded and untouched.
+No full checkpoint acceptance or branch/main CI success is inferred from these model-free checks.
+Finance **RESEARCH / 0 SEK / NONE**. No PAPER/LIVE/AUTO, broker/orders/capital, model switch, GPU/CUDA,
+cloud, deployment, merge or BB-132B. **STOP after RC04 push** for independent review of this proven
+static gap and the proposed future producer-only correction. Earlier reports remain dated history.
+
 ## Review Checkpoint RC03 — 2026-10-01
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
