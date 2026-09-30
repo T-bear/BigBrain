@@ -16,6 +16,9 @@ weakened control, cloud, deployment or trading authority. Stop after publication
 RC02 adds only sanitized existing-reason propagation. The old reply/reason is absent, so historical
 causality remains unknown. No new invocation or corrected acceptance; the conditional grant is unused.
 Stop for a bounded evidence decision, not a new architecture/hardening checkpoint.
+RC03 (2026-10-01) obtained the authorized fresh diagnostic category: InvalidReply / UnsupportedContract,
+complete reply/native exit0. No field-level claim, correction, admission/engine or second run.
+Prior history unchanged, separate final acceptance unused. STOP for RC03 review; still not mergeable.
 
 ## BB-131F local runtime control — 2026-09-29
 

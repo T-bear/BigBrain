@@ -19,6 +19,41 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132A Review Checkpoint RC03 handoff — 2026-10-01
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner/architect separately authorized exactly ONE diagnostic1.7B invocation<=180s after RC02 review.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; same branch bb-132a/first-local-language-model;
+parent RC02 5ea876da539ecdf94b1f86733721088c65427b87, tree dcc0e155c970c27a5ee05753b0a40d1360b095cf.
+Publication subject `review: publish BB-132A RC03 real reply rejection evidence` uniquely resolves
+exact SHA/tree from Git metadata using the [report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+
+The sole RC03 invocation is CONSUMED: complete BRF1 reply, native exit0, InvalidReply,
+ReplyRejection=UnsupportedContract. Terminal30,820ms; caller30,875ms; command37,078ms;
+RSS/HWM1,683,868KiB, no OOM, group empty, no controller cleanup. No field-level cause inferred.
+New diagnostic-17b-rc03 CreateNew journal and rc03-measurements-17b.json persist locally ignored;
+report carries their sanitized results/hashes. No raw reply retained, admission/engine call or refund.
+Prior13 evidence hashes unchanged; rc03-final-evidence-manifest.json pins all15 local evidence files.
+DO NOT RERUN RC03. The separate conditionally reserved final acceptance remains UNUSED.
+No correction or second invocation is authorized in RC03, even if a cause appears obvious.
+
+Only one test file changed: explicit opt-in using same pinned native-worker-corrected, full prior
+manifest and diagnostic return before raw storage/admission. Nine docs updated, exact10-file scope
+in report. All production source/native worker/prompt/grammar/parser/vocabulary/controls unchanged.
+Release build PASS0warnings/errors, scoped formatter PASS, focused tests196 PASS/6 model skips.
+Real diagnostic test0 PASS/1 FAIL (InvalidReply), not accepted research. No full acceptance/CI claim.
+Documentation/link/index verification PASS258Markdown/91IDs, diff --check PASS; exact10-file scope
+and Gitleaks PASS/no leaks. Staged scope/secrets rechecked before commit.
+Unrelated mockups/ADR0006–0009 untouched/excluded; no models/raw artifacts staged.
+
+If publication is interrupted, inspect local/remote publication subject/SHA first; finish only pending
+documentation/scope/secrets checks and commit/push, never duplicate/amend the review commit.
+Verify unchanged main before/after push. After push no active interrupted implementation remains.
+Next: STOP for independent RC03 review and owner/architect decision on minimal correction plus last
+acceptance, other bounded work or ending A. No further work inferred from the diagnostic result.
+Finance RESEARCH /0 SEK /NONE. No merge/deploy/cloud/GPU/PAPER/LIVE/AUTO/broker/orders/capital/BB-132B.
+Previous notes below are historical, superseded only regarding this separately authorized diagnostic.
+
 ## BB-132A Review Checkpoint RC02 handoff — 2026-09-30
 
 Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.

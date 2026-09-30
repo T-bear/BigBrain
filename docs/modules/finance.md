@@ -16,6 +16,9 @@ Owner direction, implementation authorization currently limited to BB-132A:
    after an in-scope cause/correction. Publication stops for review; cloud never required.
    RC02 implements sanitized rejection propagation, but the historical reply/reason was not retained.
    No new inference or correction; the conditional allowance is unused pending a bounded evidence decision.
+   RC03 (2026-10-01) separately authorized one diagnostic invocation: complete reply rejected
+   InvalidReply / UnsupportedContract. No field inferred, correction or further run. Prior evidence
+   unchanged; final acceptance remains unused. STOP for independent RC03 review before more work.
 2. Persistent research loop/history, building on existing ledger governance; no recurring loop yet.
 3. Prospective validation.
 4. Future PAPER concepts: Long-term portfolio and Active/high-risk portfolio.

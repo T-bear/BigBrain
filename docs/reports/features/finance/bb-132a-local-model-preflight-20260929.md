@@ -1,5 +1,119 @@
 # BB-132A — local-model acceptance evidence and bounded stops
 
+
+## Review Checkpoint RC03 — 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Owner/architect independently reviewed RC02 and explicitly authorized exactly ONE new diagnostic
+Qwen3-1.7B invocation, max180s, solely to obtain the existing Finance ReplyRejection category.
+No integration correction, second invocation, acceptance invocation or scientific engine is authorized
+in this review round. The separate conditionally reserved final acceptance remains **UNUSED**.
+Baseline: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+Branch: `bb-132a/first-local-language-model`.
+Parent RC02: `5ea876da539ecdf94b1f86733721088c65427b87`, tree
+`dcc0e155c970c27a5ee05753b0a40d1360b095cf`.
+Exact RC03 commit/tree resolution from GitHub publication history:
+
+```sh
+git log -1 --format='%H %T' --grep='^review: publish BB-132A RC03 real reply rejection evidence$' origin/bb-132a/first-local-language-model
+```
+
+### Actual diagnostic result
+
+Exactly one invocation ran. A complete BRF1 response reached the unchanged Finance reply parser.
+The actual sanitized result is **InvalidReply / ReplyRejection: UnsupportedContract**.
+No raw model response was saved or published; no field/value is inferred beyond that existing enum.
+This is fresh runtime evidence, not proof of the unrecorded RC01 historical rejection cause.
+The opt-in test reports **0 PASS / 1 FAIL**, process exit1, because it preserves the runtime's
+InvalidReply exception. Diagnostic evidence was obtained; this is not a successful accepted proposal.
+No post-result correction or second invocation was performed.
+
+| Observation | Actual evidence |
+| --- | --- |
+| Maximum runtime deadline | 180 seconds, unchanged |
+| Response header observed | 30,773 ms from runtime start |
+| Terminal audit / caller elapsed | 30,820 / 30,875 ms |
+| Whole dotnet test command wall time | 37,078 ms including setup/hash/test overhead |
+| Native worker exit | 0; WorkerCleanupRequired=false |
+| Finance parser rejection | UnsupportedContract (existing enum; no field diagnosis) |
+| Response hash / raw response | null / not retained |
+| Sampled process RSS/HWM maximum | 1,683,868 KiB, approximately 1.606 GiB |
+| Sampled cgroup memory maximum | 620,052,480 bytes; separate accounting, not total process RSS |
+| Cgroup CPU usage delta | 59.296984 CPU-seconds |
+| Sampling / peak tasks | 148 samples at nominal250ms / 2 tasks |
+| OOM / OOM kill / group kill | 0 before and after; dedicated group empty after exit |
+| Host available memory before / after | 5,521,488 / 5,503,448 KiB |
+| Admission / scientific engine calls | 0 / 0 |
+| Scientific budget refund/reset | none |
+
+No separate load/prefill/generation timing or tokens/sec is instrumented; no precision is claimed
+for those phases. Lower cgroup memory than prior attempts does not establish lower model RSS:
+shared page-cache accounting can differ. Native exit0 plus complete framing and Finance rejection
+are the observed outcome, not timeout, crash or OOM.
+
+### Unchanged artifacts, controls and history
+
+- Model: `unsloth/Qwen3-1.7B-GGUF`, revision `d7f544eead698dbd1f15126ef60b45a1e1933222`,
+  `Qwen3-1.7B-Q4_K_M.gguf`, 1,107,409,472 bytes; SHA-256
+  `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897` reverified before invocation.
+  Previously verified Apache-2.0 provenance retained; no acquisition or model substitution.
+- Same native worker binary SHA-256
+  `44bbeca4bca8103299fbd8201c2df5fb8d9133411c9544492493ef91b45a1011`;
+  same pinned libllama b11146 / commit `7fe450e19305b828c199d602c23a8337aaa1f03b` CPU runtime.
+  Existing library manifest hashes reverified. No worker rebuild, prompt/grammar or inference change.
+- Same direct owned child, BRF1 inherited pipes, Landlock/seccomp, no listener/descendants/tools;
+  4GiB memory.max/RLIMIT_AS, swap.max0, memory.oom.group1, CPU quota200000/100000,
+  pids.max32, two inference threads, 4096 context, 3072 input cap, 512 generated-token cap.
+  Dedicated group existed, empty, with exact controls before run; no host/service/deployment change.
+- All13 prior evidence files, including original SQLite/WAL/SHM and all prior attempts, verified
+  byte-identical before and after. Immutable read only; no ledger writes, budget refund or exposure reset.
+  New separate CreateNew journal pins this invocation as consumed; never repeat it on resume.
+- New sanitized local journal SHA-256:
+  `344c9207d826b94c17ead99c86cfc82487da1e80a89637772340c4282359685d`.
+  Measurement artifact SHA-256:
+  `f06d9a9ede15c5d4352a88f032325dc2500a35fba553e32c0d5438b7dadeed91`.
+  Ignored local15-file manifest extends the preserved13; artifacts/model/paths/raw logs are not committed.
+  This report is the sanitized durable GitHub evidence, not a raw audit export.
+
+### Harness delta and verification
+
+Only `tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs` changes executable test code:
+a distinct opt-in `BB132A_LOCAL_ACCEPTANCE=1.7b-rc03`, test
+`Qwen17Rc03DiagnosticRecordsSanitizedReplyRejectionOnly`, fresh `diagnostic-17b-rc03` journal,
+full prior13-file manifest, pinned unchanged worker and immediate diagnostic return after valid parsing.
+Invalid parsing retains RC02's exception/audit enum. Neither path stores raw output, calls admission
+or starts science. All prior opt-ins/journals remain untouched. Ordinary CI skips the new real test.
+
+Commands/results:
+
+- `dotnet build tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore`:
+  PASS, zero warnings/errors.
+- `dotnet format BigBrain.slnx --verify-no-changes --no-restore --include tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs`:
+  PASS, no changes.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build --filter 'FullyQualifiedName~LocalReasonerRuntimeTests|FullyQualifiedName~LocalModelAcceptanceTests|FullyQualifiedName~ResearchReasonerContractTests|FullyQualifiedName~ResearchLearningContractTests|FullyQualifiedName~FinanceLearningLedgerTests'`:
+  **196 PASS / 0 FAIL / 6 intentional real-model skips**.
+- Real diagnostic: same dotnet test command with filter
+  `FullyQualifiedName~Qwen17Rc03DiagnosticRecordsSanitizedReplyRejectionOnly`, opt-in above and trusted
+  local artifact root. **0 PASS / 1 FAIL / 0 SKIP: InvalidReply**, exact category UnsupportedContract
+  persisted in audit/journal. One invocation only; no auto retry or fallback.
+- `node scripts/verify-documentation.mjs`: PASS,258 Markdown /91 unique backlog IDs, including
+  links/indexes. `git diff --check`: PASS. Exact10-file scope verified; Gitleaks intended content:
+  PASS/no leaks, repeated against exact staged content before commit. Production source diff empty.
+  Full acceptance matrix/main CI not claimed for this incomplete Review Checkpoint.
+
+Nine documentation updates: ROADMAP.md, TESTING.md, docs/STATUS.md, docs/BACKLOG.md,
+docs/modules/finance.md, docs/architecture/finance/master-roadmap.md, docs/operations/codex-recovery.md,
+docs/reports/REPORT-CATALOG.md and this report. RC03 delta: **10 files** including the one test file.
+No production source, model/runtime/native worker/prompt/grammar, Finance parser/admission/vocabulary,
+ledger/scientific calculations/risk, Sentinel, Web, package, schema, CI or deployment changes.
+Unrelated mockups/ADR0006–0009 excluded and preserved. Review histories remain additive.
+
+Finance **RESEARCH / 0 SEK / NONE**. No acceptance claim, raw model publication, code execution,
+PAPER/LIVE/AUTO, broker/order/capital, GPU/CUDA, cloud, deployment, merge or BB-132B.
+**STOP after RC03 push.** Independent architect review must decide whether this observed category
+justifies a minimal correction plus the separate last acceptance, other bounded work, or ending A.
+No such follow-up is performed in RC03. Historical sections below retain their dated scope.
+
 ## Review Checkpoint RC02 — 2026-09-30
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**

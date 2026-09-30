@@ -1,5 +1,20 @@
 # BigBrain Backlog
 
+## BB-132A RC03 — real diagnostic evidence, 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Owner-authorized single diagnostic1.7B invocation completed: **InvalidReply / UnsupportedContract**.
+Complete BRF1 reply, native exit0, terminal30,820ms, no OOM or controller cleanup; engine/admission0.
+No raw reply retained/published or field-level cause guessed. Prompt/grammar/artifact/parser/controls
+unchanged. All13 earlier evidence files remain byte-identical; no ledger refund/reset.
+One test-only opt-in added; build/format PASS,196 model-free tests PASS/6 model skips.
+Actual real diagnostic test:0 PASS/1 FAIL; diagnostic category captured, no proposal acceptance.
+No correction/retry/second invocation. Separate conditional final acceptance remains UNUSED.
+[Exact RC03 SHA/tree resolution, measurements and provenance](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+Next: RC03 publication then STOP for independent review and a bounded continuation/end decision.
+Finance RESEARCH /0 SEK /NONE. No merge/deploy/trading/cloud/BB-132B. Earlier entries are history.
+
+
 ## BB-132A RC02 — sanitized rejection diagnostics, 2026-09-30
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**

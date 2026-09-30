@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-132A RC03, 2026-10-01` — [One real diagnostic invocation: UnsupportedContract](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Complete native reply rejected InvalidReply; existing enum captured, no correction or further inference.196 model-free PASS/6 model skips; real diagnostic0 PASS/1 FAIL. Prior evidence preserved; separate final acceptance unused.
+
 - `BB-132A RC02, 2026-09-30` — [Sanitized reply diagnostics and missing-evidence blocker](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Existing Finance rejection enum retained;196 model-free tests PASS. Historical response/reason absent; no new inference, conditional final allowance unused.
 
 - `BB-132A RC01, 2026-09-30` — [Review Checkpoint: local-model evidence and workflow](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Preserved implementation and five real runs; latest complete1.7B reply rejected InvalidReply. Exact SHA/tree resolution, provenance, tests, failures and conditional next diagnostic scope in report; no new inference during publication.

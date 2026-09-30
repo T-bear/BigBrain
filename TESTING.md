@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-132A RC03 verification — 2026-10-01
+
+Same-branch diagnostic-only review round. Release test-project build PASS0warnings/errors;
+scoped dotnet format verification PASS. Focused B/C/E/F/configuration tests196 PASS/6 intentional
+model skips. Exact commands and scope in the [RC03 report](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+Exactly one opt-in Qwen17Rc03DiagnosticRecordsSanitizedReplyRejectionOnly ran:0 PASS/1 FAIL,
+InvalidReply / UnsupportedContract. Complete reply/native exit0; no OOM; no engine/admission.
+This is diagnostic evidence, not green model acceptance. No correction/second run or conditional
+final acceptance. Never rerun the consumed RC03 CreateNew journal. Ordinary CI skips all model tests.
+Full checkpoint verification is not claimed. Prior13 evidence hashes unchanged before/after.
+Documentation/link/index verifier PASS258Markdown/91IDs; diff --check and intended-content Gitleaks
+PASS. Exact10-file delta, only one test file plus9docs; production source unchanged.
+
+
 ## BB-132A RC02 diagnostic verification — 2026-09-30
 
 [RC02 report](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30)
