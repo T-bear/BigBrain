@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BigBrain.Modules.Finance;
 
@@ -35,8 +36,17 @@ public sealed record LearningDevelopmentInput(string Version, string ProjectionV
     string AllowedStrategy, int AllowedPeriod, int EffectiveScientificTrials, string HistoryChecksum,
     string InputChecksum)
 {
-    public LearningProtocolLimits Limits { get; } = new(1, 1, 1, 1, 3, 1, 64, 1, 0, 30, 300);
-    public LearningHistorySummary History { get; } = new(0, 0, 0, 0, LearningExposure.Unexposed);
+    // Optional additive Finance projection; absent v1 serialization and identities are unchanged.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public FiniteResearchHistory? FiniteHistory { get; init; }
+    public LearningProtocolLimits Limits => FiniteHistory is null
+        ? new(1, 1, 1, 1, 3, 1, 64, 1, 0, 30, 300)
+        : new(2, 2, 1, 1, 3, 1, 64, 1, 0, 30, 300);
+    public LearningHistorySummary History => FiniteHistory is null
+        ? new(0, 0, 0, 0, LearningExposure.Unexposed)
+        : new(1, FiniteHistory.PreviousOutcome == LearningAdmissionReason.Admitted ? 3 : 0,
+            FiniteHistory.PreviousOutcome == LearningAdmissionReason.Admitted ? 1 : 0, 0,
+            FiniteHistory.PreviousOutcome == LearningAdmissionReason.Admitted ? LearningExposure.Consumed : LearningExposure.Unexposed);
 }
 // Finance-owned snapshot, never accepted from the reasoner. B supplies this from its test-only ledger.
 public sealed record LearningAdmissionState(int SubmittedProposals, int AdmittedTrials, int Evaluations,

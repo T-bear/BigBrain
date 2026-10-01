@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-132B, 2026-10-01` — [Persistent loop boundary characterization](features/finance/bb-132b-research-loop-boundary-20261001.md). REVIEW CHECKPOINT / INCOMPLETE, not a Merge Candidate. Five model-free tests characterize the accepted one-invocation/empty-history boundary; N persists, N+1 cannot run. No production change or model invocation; explicit finite-protocol/projection decision required.
+- `BB-132B, 2026-10-01` — [Finite model-free research session and retained boundary characterization](features/finance/bb-132b-research-loop-boundary-20261001.md). IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE, not accepted. Explicit two-invocation/one-evaluation grant; same Finance store, no old-v1 conversion; bounded development history, restart/replay/concurrency and holdout noninterference. No model or deployment; not accepted.
 
 - `BB-132A final, 2026-10-01` — [Version-bound local model proposal admitted by Finance](features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01). ACCEPTED / MERGED / CI VERIFIED; unchanged merge4c0e451cc3af0de23ddbf5edd6336e9cc7589f37, CI36818875959 all four jobs/steps SUCCESS. [Publication identities](features/finance/bb-132a-local-model-preflight-20260929.md#accepted-publication--2026-10-01). Historical candidate-local: API874 PASS/7 model skips; Sentinel32 PASS; full restore/build/format PASS. Minimal grammar version fix; last1.7B real invocation1 PASS/Finance Admitted. No engine/trading call, prior evidence unchanged, no more inference authorized.
 

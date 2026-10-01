@@ -1,5 +1,25 @@
 # BigBrain – architecture baseline and future direction
 
+## BB-132B finite research session — review candidate, 2026-10-01
+
+Owner/architect authorizes a new explicit two-invocation/one-evaluation finite protocol after
+reviewing the v1 characterization. Candidate implementation keeps the existing Finance SQLite
+owner and scientific slot; migration95 adds only an empty session envelope table. No conversion,
+refund or reopening of old v1 grants. The initial reasoner call and v1 invocation are atomically
+reserved; native admission/evaluator/persistence remain unchanged.
+
+Finance owns finite orchestration, history selection and knowledge cutoff. Its internal narrow
+async delegate is bound to IResearchReasoner.ReasonAsync in model-free proof; no API-to-Brain
+assembly reference, DI/runtime endpoint or dependency reversal is added. Brain does not read SQL.
+The additive bounded FiniteResearchHistory field is absent from v1 JSON/identity. Only the fixed
+momentum20 validation return and sanitized prior outcome/availability are projected; full result
+and holdout/selection identities never cross. N+1 cannot obtain scientific execution authority.
+[Canonical projection/continuation policy](docs/architecture/finance/research-learning-contract.md)
+and [evidence](docs/reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+No new ADR decision beyond the explicit finite-grant authorization; ADR0038/0039/0040 stay Accepted.
+Implementation remains unaccepted until exact-SHA review/approval. No model, endpoint or deployment.
+Finance RESEARCH / 0 SEK / NONE; no BB-132C. Earlier entries retain their dated accepted scope.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

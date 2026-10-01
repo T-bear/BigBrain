@@ -141,11 +141,17 @@ separate authorization, and its one-proposal v1 output. It offers version/projec
 opaque scope and target, development cutoff/count/checksum, momentum/v1 + period20, three effective
 trials, input/history digests and fixed protocol limits. Development here includes the existing
 training/validation segment and excludes protected holdout, matching B's source definition.
-It has **empty initial history only**; C's durable history does not make an adaptive projector exist.
-No supported current path feeds completed C history to another invocation.
+That v1 proof has **empty initial history only**; opening C history grants no second invocation.
+BB-132B's separately authorized model-free candidate adds an explicit finite session and bounded
+versioned history field. It never upgrades an existing enrolled/spent C program. Its N+1 projection
+contains only the fixed-reference validation excess return, previous bounded outcome and explicit
+availability/knowledge cutoff; no selected/holdout IDs, classifications, raw rows or complete results.
+[Finite grant, eligibility, replay and noninterference evidence](../../reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+This does not authorize sending the new projection to a real model. Runtime prompt/grammar/native
+worker are unchanged; real-model compatibility/validation requires separate future authorization.
 
-Future history-aware projection requires separately reviewed versioned implementation. Finance
-would select canonical structured facts, not Brain SQL or arbitrary serialization:
+Broader history-aware projection still requires separately reviewed versioned implementation.
+Finance selects canonical structured facts, never Brain SQL or arbitrary serialization:
 
 | Data | Proposed rule |
 | --- | --- |

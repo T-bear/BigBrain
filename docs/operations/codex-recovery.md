@@ -19,6 +19,47 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132B finite-session Merge Candidate handoff — 2026-10-01
+
+Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.
+Task: explicit finite model-free research session following owner/architect review of initial B.
+Baseline/source-of-truth: `2caf2eb898acaafa759c6287d02442a90bb666db`; same branch
+`bb-132b/persistent-research-loop`, parent review `3d5cc19903223027de6559d98ebce785b92032bf`.
+Exact new SHA/tree resolve from subject `review: implement BB-132B finite research session`
+using the [report commands](../reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+No interrupted implementation remains after successful publication. Initial review below is history.
+
+Completed: explicit durable2invocation/1evaluation/3trial/64call/concurrency1/zero-retry grant;
+additive empty table migration95, no conversion of enrolled/spent v1; atomic initial dual reservation;
+existing scientific admission/evaluator/persistence; N+1 real fake invocation with bounded versioned
+reference-validation/operational history; no second evaluation; immutable replay/reopen; failure/
+uncertainty nonrefundable; history mismatch/temporal/concurrency/holdout-noninterference evidence.
+Five production C# files and two tests plus twelve docs change in this continuation (19files).
+Cumulative20-file inventory and exact implementation/limitations are in the report. Existing initial
+five characterization tests are unchanged. Parser/admission/scientific engines/native stores/Brain/
+runtime/model/proofworker/Web/Sentinel/packages/CI/deployment remain unchanged; C only allows known
+schema95 in its reader guard. No new API-to-Brain reference or public/runtime registration.
+
+Verification: focused227 PASS/0FAIL/0SKIP, including27 new finite-session cases. Full solution API906
+PASS/0FAIL/7 real-model skips; Sentinel32 PASS/0FAIL. Explicit BB132A_LOCAL_ACCEPTANCE=disabled.
+Restore PASS; Release build0warnings/errors; full format --verify-no-changes PASS. Docs259Markdown/
+91IDs and links/indexes PASS; diff/scope PASS; Gitleaks8.28.0 history302commits and exact20-file
+content PASS/no leaks. Final documentation/staged scope/secrets rechecked before commit.
+Initial sandbox failures were retried with required permission; new-code analyzer fixes precede
+passing evidence. No pre-existing defect discovered or opportunistically corrected.
+
+Remaining: exact-SHA independent review/owner acceptance. Only one explicit synthetic session,
+evaluation at N only; failure stops progression; no old-v1 upgrade/general overlap/adaptive model
+history/real-market/runtime-auth/audit/daemon/deployment claim. Baseline CI's historical Gitleaks
+lookup/license failure remains separately recorded; local checks are not branch/main CI evidence.
+No Qwen/inference/download/tuning/cloud/GPU/provider work. A's consumed journals/evidence remain
+untouched; unrelated mockups/ADR0006–0009 preserved/excluded. Finance RESEARCH / 0 SEK / NONE.
+No PAPER/LIVE/AUTO, broker/orders/capital, deployment or BB-132C.
+
+If interrupted during publication: verify local/remote subject/SHA and unchanged main; finish only
+pending documentation/scope/secrets/commit/push, never duplicate/amend or recreate branch. After push
+STOP for independent review; no merge without explicit owner approval of the exact reviewed SHA.
+
 ## BB-132B Review Checkpoint handoff — 2026-10-01
 
 Status: REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE — protocol decision required.
