@@ -2,7 +2,7 @@
 
 ## BB-132B — finite model-free research session, 2026-10-01
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 Baseline `2caf2eb898acaafa759c6287d02442a90bb666db`; same branch `bb-132b/persistent-research-loop`.
 The owner/architect resolved the first review's intentional v1 boundary: a separate explicitly
 created finite grant permits two reasoner invocations and at most one evaluation (N only),
@@ -24,6 +24,14 @@ real-model integration. General adaptive history/overlap, real-market eligibilit
 validation remain future work. No Qwen, tuning/download/cloud/GPU/provider/trading/deployment/BB-132C.
 Finance **RESEARCH / 0 SEK / NONE**. Earlier A-era B-not-authorized statements are dated history;
 this authorization is model-free only and does not revive consumed inference allowances.
+
+Owner explicitly approved independently reviewed candidate `8df4541fdcd300b0d334d519c221e4189dd32084`.
+Merged unchanged as `b2da9e7ee46b2722fc9f696fbdfe9097afa0caab`; candidate/merge tree identical.
+[Accepted identities and merge CI36918069527](../reports/features/finance/bb-132b-research-loop-boundary-20261001.md#accepted-publication--2026-10-01):
+backend restore/format/Release build/tests, frontend install/format/tests/build, documentation and
+Gitleaks jobs/actual steps SUCCESS. Final docs reconciliation is verified by its own exact-SHA CI;
+its identity is resolved in the report. No implementation or model invocation during publication.
+**BB-132C NOT STARTED / NOT AUTHORIZED.** Next: STOP for independent post-merge review/planning.
 
 ## BB-132A accepted state — 2026-10-01
 

@@ -142,11 +142,13 @@ opaque scope and target, development cutoff/count/checksum, momentum/v1 + period
 trials, input/history digests and fixed protocol limits. Development here includes the existing
 training/validation segment and excludes protected holdout, matching B's source definition.
 That v1 proof has **empty initial history only**; opening C history grants no second invocation.
-BB-132B's separately authorized model-free candidate adds an explicit finite session and bounded
+BB-132B's accepted model-free implementation adds an explicit finite session and bounded
 versioned history field. It never upgrades an existing enrolled/spent C program. Its N+1 projection
 contains only the fixed-reference validation excess return, previous bounded outcome and explicit
 availability/knowledge cutoff; no selected/holdout IDs, classifications, raw rows or complete results.
 [Finite grant, eligibility, replay and noninterference evidence](../../reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+BB-132B was accepted at exact candidate `8df4541fdcd300b0d334d519c221e4189dd32084`, merged
+unchanged and verified by merge CI36918069527; publication evidence is in the linked report.
 This does not authorize sending the new projection to a real model. Runtime prompt/grammar/native
 worker are unchanged; real-model compatibility/validation requires separate future authorization.
 

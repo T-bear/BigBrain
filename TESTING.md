@@ -15,6 +15,14 @@ real-model opt-in; ordinary tests need no model/download/native inference. No Qw
 Synthetic evidence proves bounded orchestration and governance, never profitability or native OS isolation.
 
 
+BB-132B is **ACCEPTED / MERGED / CI VERIFIED**. Exact merge
+`b2da9e7ee46b2722fc9f696fbdfe9097afa0caab` passed
+[CI36918069527](https://github.com/T-bear/BigBrain/actions/runs/36918069527): all backend,
+frontend, documentation and Gitleaks jobs plus actual restore/formatter/build/test steps SUCCESS.
+These are main-CI results, separate from the candidate-local counts above. The final docs-only
+reconciliation requires its own exact-SHA CI; [identity resolution and evidence](docs/reports/features/finance/bb-132b-research-loop-boundary-20261001.md#accepted-publication--2026-10-01).
+No Qwen invocation or implementation change during merge/reconciliation. No next checkpoint.
+
 ## BB-132A final version-bound acceptance — 2026-10-01
 
 Minimal producer-only version correction; cross-boundary tests fail on drift from Finance's exact

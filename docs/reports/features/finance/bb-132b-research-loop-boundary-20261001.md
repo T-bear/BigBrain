@@ -18,9 +18,70 @@ git log -1 --format='%H %T %P' --grep='^review: implement BB-132B finite researc
 git diff --name-only 2caf2eb898acaafa759c6287d02442a90bb666db origin/bb-132b/persistent-research-loop
 ```
 
+## Accepted publication — 2026-10-01
+
+The owner explicitly approved independently reviewed candidate
+`8df4541fdcd300b0d334d519c221e4189dd32084`. Two earlier approval tree transcriptions did not
+match Git, and correctly caused read-only stops. The final corrected authorization matched every
+identity after a fresh fetch; no candidate content or review history was changed.
+
+- Baseline / pre-merge main / merge-base: `2caf2eb898acaafa759c6287d02442a90bb666db`.
+- Approved candidate / unchanged checkpoint branch tip: `8df4541fdcd300b0d334d519c221e4189dd32084`.
+- Candidate parent: `3d5cc19903223027de6559d98ebce785b92032bf`.
+- Candidate relation: two ahead / zero behind; exact reviewed publication subject.
+- Merge: `b2da9e7ee46b2722fc9f696fbdfe9097afa0caab`.
+- Merge first parent: `2caf2eb898acaafa759c6287d02442a90bb666db`.
+- Merge second parent: `8df4541fdcd300b0d334d519c221e4189dd32084`.
+- Candidate tree = merge tree: `ca278b2a34095abd72feccaaf02e73474355bece`.
+- Candidate-to-merge content diff empty. No amend/rebase/squash/force push or implementation change.
+
+[Merge CI36918069527](https://github.com/T-bear/BigBrain/actions/runs/36918069527), push on exactly
+`b2da9e7ee46b2722fc9f696fbdfe9097afa0caab`: **SUCCESS**. Actual jobs and all steps inspected:
+
+| Job | Verified successful steps |
+| --- | --- |
+| backend | checkout; setup-dotnet; restore; `dotnet format --verify-no-changes --no-restore`; Release build; solution tests; cleanup |
+| frontend | checkout; setup-node; `npm ci`; `npm run format:check`; `npm test -- --run`; `npm run build`; cleanup |
+| documentation | checkout; setup-node; `node scripts/verify-documentation.mjs`; cleanup |
+| secrets | checkout; `gitleaks/gitleaks-action@v2`; cleanup |
+
+This main-CI evidence does not reuse candidate-local test results. Baseline's previously documented
+CI failure remains historical; the new merge's Gitleaks job passed. No CI configuration repair.
+
+Only twelve existing Markdown files are reconciled after green merge CI: ARCHITECTURE.md,
+ROADMAP.md, TESTING.md, docs/STATUS.md, docs/BACKLOG.md, docs/modules/finance.md,
+docs/architecture/finance/master-roadmap.md, docs/architecture/finance/research-learning-contract.md,
+docs/architecture/finance/local-first-reasoner-boundary.md, docs/operations/codex-recovery.md,
+docs/reports/REPORT-CATALOG.md and this report. No source/test/schema/package/runtime/CI/deployment
+change. ADR0038/0039/0040 remain Accepted. A's evidence and B's earlier review history remain intact.
+
+Reconciliation checks PASS: documentation/link/index verifier (259 Markdown files / 91 unique
+backlog IDs), diff check, exact twelve-Markdown-only scope and Gitleaks8.28.0 over those twelve
+files (no leaks). Source/test/schema/config diff against merge is empty. Staged content is checked
+again before commit. Resolve the separate final
+reconciliation SHA/tree (no self-referential hash in its own file) with:
+
+```sh
+git log -1 --format='%H %T %P' --grep='^docs: reconcile accepted BB-132B finite research session$' origin/main
+```
+
+The Actions run whose head_sha equals that reconciliation SHA is the final-main verification.
+Its required jobs/steps must also pass; merge CI is not substituted. GitHub commit/Actions metadata
+and the final publication report provide the exact final SHA/run/result after it is available.
+If final CI fails, stop/report without claiming fully reconciled publication or making repairs.
+
+Acceptance covers only the bounded finite synthetic model-free N-to-N+1 research proof described
+below. It grants no real-model validation, authenticated production invocation, broader adaptive
+history/cohort authority, recurring operation, profitability or deployment. No Qwen or other model
+was invoked; consumed A allowances remain consumed. No provider/cloud/PAPER/LIVE/AUTO/broker/
+orders/capital. Finance **RESEARCH / 0 SEK / NONE**. **BB-132C NOT STARTED / NOT AUTHORIZED.**
+After exact final-main verification STOP and return control for independent post-merge review and
+product-level planning. Earlier review statuses below are dated historical evidence, not current
+merge/deployment authority.
+
 ## Status
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 The owner/architect independently reviewed the first checkpoint and explicitly authorized the
 smallest new finite protocol: two invocations, at most one evaluation, three trials/64 underlying
 calls, concurrency one, no retries/refunds. This resolves the earlier intentional architectural
@@ -228,8 +289,8 @@ repair/rerun/license change is undertaken and no green branch/main CI is inferre
 
 ## Remaining work
 
-Independent exact-SHA review and explicit owner acceptance/merge remain required. This candidate
-is only the finite synthetic/model-free proof. No existing spent v1 database conversion, arbitrary
+Independent exact-SHA review and explicit owner approval are complete; accepted merge evidence is
+recorded above. The implementation is only the finite synthetic/model-free proof. No existing spent v1 database conversion, arbitrary
 new sessions, second evaluated experiment, general adaptive cohort/overlap accounting, evolving
 strategy vocabulary, arbitrary history pagination, real-market eligibility or profit evidence.
 Real-model testing of the new history projection, authenticated invocation/audit integration,
@@ -243,7 +304,7 @@ F's runtime owns such worker lifecycle enforcement when separately authorized.
 Do not recreate the branch or rewrite the first review. This report's publication subject resolves
 the new exact SHA/tree; canonical recovery records final verification/publication state. If interrupted,
 inspect Git/working tree before completing remaining gates/publication. No model invocation.
-After publication STOP for independent ChatGPT review. Do not merge or start BB-132C.
+After accepted publication STOP for independent post-merge ChatGPT review. Do not start BB-132C.
 
 ## Historical first Review Checkpoint
 

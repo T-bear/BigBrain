@@ -19,6 +19,44 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132B accepted publication — 2026-10-01
+
+Status: **ACCEPTED / MERGED / CI VERIFIED** for the exact merge below. No interrupted B implementation.
+Owner explicitly approved independently reviewed candidate `8df4541fdcd300b0d334d519c221e4189dd32084`.
+Final corrected tree matched Git after fresh fetch; earlier transcription mismatches caused no mutation.
+Baseline/pre-merge main/merge-base: `2caf2eb898acaafa759c6287d02442a90bb666db`.
+Candidate parent: `3d5cc19903223027de6559d98ebce785b92032bf`; two ahead/zero behind; subject verified.
+Merge: `b2da9e7ee46b2722fc9f696fbdfe9097afa0caab`.
+First parent: `2caf2eb898acaafa759c6287d02442a90bb666db`.
+Second parent: `8df4541fdcd300b0d334d519c221e4189dd32084`.
+Candidate tree = merge tree: `ca278b2a34095abd72feccaaf02e73474355bece`; content diff empty.
+Main push was normal; checkpoint branch/history unchanged, no rewrite or force push.
+
+Merge [CI36918069527](https://github.com/T-bear/BigBrain/actions/runs/36918069527) for exactly the
+merge SHA SUCCESS. Actual jobs and steps verified: backend checkout/setup/restore/format/Release
+build/tests; frontend checkout/setup/npm ci/format:check/tests/build; documentation verifier; Gitleaks.
+All successful, including cleanup. This is new main-CI evidence, not reused candidate-local results.
+
+Post-merge reconciliation changes only twelve existing Markdown documents listed in the
+[accepted report](../reports/features/finance/bb-132b-research-loop-boundary-20261001.md#accepted-publication--2026-10-01).
+No implementation/test/schema/runtime/model/provider/CI/deployment changes. Local checks PASS:
+documentation links/indexes259Markdown/91IDs, diff check, exact twelve-Markdown-only scope and
+Gitleaks8.28.0 no leaks. Staged content is rechecked before its separate commit.
+Resolve final SHA/tree via subject `docs: reconcile accepted BB-132B finite research session` on
+origin/main. Verify Actions for that exact final SHA separately; do not substitute merge CI.
+GitHub commit/Actions metadata and final handoff record the exact final identity/run without an
+impossible self-referential SHA. If interrupted, resume pending reconciliation/publication/CI only;
+do not merge twice or alter the accepted candidate. If final CI fails, STOP without repair.
+
+Finite synthetic/model-free grant remains two reasoner calls/one evaluation; v1 spent authority,
+holdout protection and native scientific ownership unchanged. No real-model authorization, no
+refund of A inference allowances, no authenticated runtime/daemon/profitability claim. ADR0038/0039/
+0040 remain Accepted. Unrelated mockups/ADR0006–0009 preserved/excluded. Finance RESEARCH / 0 SEK / NONE.
+No Qwen/other model/provider/cloud/PAPER/LIVE/AUTO/broker/orders/capital/deployment.
+**BB-132C NOT STARTED / NOT AUTHORIZED.** After exact final-main CI verification STOP and return
+control to owner/architect for independent post-merge review/product planning. Following candidate
+and review handoffs are preserved historical evidence, not active incomplete implementation.
+
 ## BB-132B finite-session Merge Candidate handoff — 2026-10-01
 
 Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.
