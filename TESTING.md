@@ -1,5 +1,20 @@
 # Testa BigBrain
 
+## BB-132B — finite model-free research session, 2026-10-01
+
+[Exact commands, publication identity, acceptance matrix and limitations](docs/reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+FiniteResearchSessionTests adds 27 model-free cases: explicit grant, N evaluation/native persistence,
+reopen/history/N+1 invocation, decline or exhausted proposal, v1 incompatibility, migration rollback,
+crash boundaries, concurrency on independent SQLite connections, cancellation/late reply, corrupt
+history/schema and protected-holdout noninterference. The initial five v1 characterization tests
+remain unchanged and green. Combined B/C/E/F/new session suite: 227 PASS, zero failures/skips.
+Full solution: API906 PASS/0 FAIL/7 model skips; Sentinel32 PASS. Restore/Release build
+(0 warnings/errors), full formatter, docs259Markdown/91IDs, diff/scope and Gitleaks PASS.
+BB132A_LOCAL_ACCEPTANCE=disabled explicitly prevents
+real-model opt-in; ordinary tests need no model/download/native inference. No Qwen invocation.
+Synthetic evidence proves bounded orchestration and governance, never profitability or native OS isolation.
+
+
 ## BB-132A final version-bound acceptance — 2026-10-01
 
 Minimal producer-only version correction; cross-boundary tests fail on drift from Finance's exact

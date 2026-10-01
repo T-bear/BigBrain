@@ -1,5 +1,30 @@
 # BigBrain Backlog
 
+## BB-132B — finite model-free research session, 2026-10-01
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+Baseline `2caf2eb898acaafa759c6287d02442a90bb666db`; same branch `bb-132b/persistent-research-loop`.
+The owner/architect resolved the first review's intentional v1 boundary: a separate explicitly
+created finite grant permits two reasoner invocations and at most one evaluation (N only),
+three trials/64 underlying calls, concurrency one and no retries/refunds.
+[Ownership, exact publication identity, projection policy and evidence](reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+
+Finance migration95 adds an empty session table in the existing database; it does not seed a grant
+or convert old v1 state. Explicit creation requires an uninitialized v1 scientific slot. Existing
+enrolled/spent v1 rows cannot acquire this grant. First invocation reservations commit together;
+existing admission/evaluator/result stores and scientific ledger remain authoritative.
+N+1 receives only a versioned, bounded reference-validation outcome and sanitized operational
+history. Protected holdout/selection/classifications/IDs are excluded. A second proposal fails
+BudgetExceeded; NoUsefulProposal is normal. Failure/uncertainty never refunds or permits retry.
+Focused model-free B/C/E/F/B-session suite: **227 PASS**. Full API906 PASS/7 model skips;
+Sentinel32 PASS; restore/Release build/format/docs/scope/secrets PASS. No model was invoked.
+
+This is an internal synthetic, finite API: no runtime registration/public endpoint, daemon or
+real-model integration. General adaptive history/overlap, real-market eligibility and runtime
+validation remain future work. No Qwen, tuning/download/cloud/GPU/provider/trading/deployment/BB-132C.
+Finance **RESEARCH / 0 SEK / NONE**. Earlier A-era B-not-authorized statements are dated history;
+this authorization is model-free only and does not revive consumed inference allowances.
+
 ## BB-132A final local-model result — 2026-10-01
 
 **ACCEPTED / MERGED / CI VERIFIED.**
