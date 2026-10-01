@@ -19,6 +19,46 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132C Review Checkpoint handoff — 2026-10-01
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**; compatibility decision required.
+Task: first real local-model persistent research sequence. No interrupted production implementation.
+Freshly fetched baseline/main `cab482c49d2187a3f39c13528a5fb88d899f6b8f`,
+tree `0b2b3edfdef25b32290754fa9aae364045c66c89`.
+Branch `bb-132c/local-model-research-sequence`; exact review SHA/tree resolve from unique subject
+`review: characterize BB-132C local session compatibility` using the
+[checkpoint report](../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md).
+
+Completed: mandatory authority/source review, existing session-to-IResearchReasoner runtime binding
+proven with actual deterministic proof child/BRF1/parser/admission/evaluator/native stores. N persists,
+reopen yields permitted N+1 history, second call declines or is BudgetExceeded, no second evaluation.
+Failure/replay/no-retry and actual shorter-parent-deadline/owned-child cleanup characterized.
+No production edits; one new test file plus10docs (exact inventory in report). All prior A/B history,
+model artifacts/journals and unrelated mockups/ADR0006–0009 remain untouched/excluded.
+
+Compatibility stop: B enforces30s even with A's controlled180s runtime. A's accepted historical
+success took50,458ms (not a prediction of future latency). Native prompt unconditionally asserts
+empty history, contradicting evaluated N+1's accepted Finance projection. No deadline, prompt,
+projection, grammar/parser, science/ledger/schema, isolation/resource, model or config change.
+This is accepted-policy compatibility, not an asserted pre-existing correctness/security defect.
+No Qwen/libllama/native invocation or rebuild; real C session NOT CREATED, invocations0/2.
+Do not consume the conditional real allowance before the boundary is resolved independently.
+
+Verification PASS: focused48 (7 new,27 finite-session,14 grammar cases); full API913/0FAIL/7 explicit
+real-model skips; Sentinel32/0FAIL. Restore, Release build0warnings/errors, full format verification,
+docs260Markdown/91IDs, diff/scope and Gitleaks8.28.0 history304commits/exact11files all PASS/no leaks.
+Initial sandbox IPC denial retried with permission; new-test analyzer assertion fixed before PASS.
+Final staged docs/scope/secrets rechecked before publication; local checks are not branch/main CI.
+
+Remaining: exact-SHA independent review of bounded deadline/prompt compatibility decision, then
+explicitly resolved composition/journal/provenance/isolation checks and original bounded real session.
+No alternative orchestration, general hardening platform or new model grant is proposed.
+If interrupted during publication, verify branch/main/subject, preserve work and finish only the
+remaining staging/commit/push/remote-identity steps. Never recreate branch or repeat real attempts.
+After push STOP; this cannot be a Merge Candidate. No merge, model/provider/cloud/GPU, trading,
+broker/orders/capital/deployment or BB-132D. Finance **RESEARCH / 0 SEK / NONE**.
+Earlier entries retain their historical authorization scope; C is now authorized but incomplete.
+
 ## BB-132B accepted publication — 2026-10-01
 
 Status: **ACCEPTED / MERGED / CI VERIFIED** for the exact merge below. No interrupted B implementation.
