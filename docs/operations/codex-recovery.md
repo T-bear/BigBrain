@@ -19,6 +19,65 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132A accepted publication — 2026-10-01
+
+Status: **ACCEPTED / MERGED / CI VERIFIED**. ChatGPT independently reviewed the final
+Merge Candidate and the owner explicitly approved exactly `960a12ddb04349fd54b5b90a550b9e1e4be9419c`.
+Pre-merge fetch verified baseline/main `739beab55a494068edcf23d3c905aa6601b99dc0`,
+candidate parent `6a57c9eedc3e3a81412e64cceee58f814afc83ab`, merge-base equal to baseline,
+and 5 ahead / 0 behind. All five published review commits remain intact.
+
+- Approved candidate: `960a12ddb04349fd54b5b90a550b9e1e4be9419c`.
+- Merge: `4c0e451cc3af0de23ddbf5edd6336e9cc7589f37`.
+- First parent: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+- Second parent: `960a12ddb04349fd54b5b90a550b9e1e4be9419c`.
+- Candidate tree = merge tree: `9cc93f14f4b80cc9dafcd027d7c80833626059bc`.
+- Candidate-to-merge content diff: empty; implementation/tests/configuration unchanged.
+
+[Merge CI 36818875959](https://github.com/T-bear/BigBrain/actions/runs/36818875959)
+for exactly the merge SHA: **SUCCESS**. Actual jobs and steps inspected, all SUCCESS:
+
+- Backend checkout/setup, `dotnet restore BigBrain.slnx`,
+  `dotnet format BigBrain.slnx --verify-no-changes --no-restore`,
+  `dotnet build BigBrain.slnx --configuration Release --no-restore`,
+  `dotnet test BigBrain.slnx --configuration Release --no-build`.
+- Frontend checkout/setup, `npm ci`, `npm run format:check`, `npm test -- --run`, `npm run build`.
+- Documentation checkout/setup and `node scripts/verify-documentation.mjs`.
+- Secrets checkout and `gitleaks/gitleaks-action@v2`.
+
+Main CI is distinct from the candidate-local results below. No Qwen invocation occurred during
+merge/publication. Acceptance covers the bounded synthetic local-model proposal path: the historical
+final Qwen3-1.7B reply was parsed and admitted by Finance, with zero scientific engine/trading calls.
+It does not establish profitability, repeatable model quality, production operation or autonomous research.
+All failed/diagnostic attempts remain spent and preserved; no ledger/evidence rewrite or budget refund.
+ADR 0038/0039/0040 remain Accepted; no new architectural decision was made during publication.
+
+Only nine existing Markdown documents are reconciled: ROADMAP, TESTING, STATUS, BACKLOG,
+Finance module, Finance master roadmap, recovery, report catalog and this report.
+Local checks PASS: `node scripts/verify-documentation.mjs` (258 Markdown files / 91 unique backlog
+IDs), `git diff --check`, exact nine-Markdown-file scope, and Gitleaks on the exact reconciliation
+documents (no leaks). The documentation verifier required a rerun outside the development sandbox
+after its Git child was denied with EPERM; the unchanged verifier then exited 0. Its unambiguous identity is resolved with:
+
+```sh
+git log -1 --format='%H %T' --grep='^docs: reconcile accepted BB-132A local model$' origin/main
+```
+
+The final reconciliation commit's own Actions run must pass all four jobs and actual steps before
+publication is complete; do not substitute merge CI. GitHub commit/Actions metadata and the final
+handoff record that exact final SHA/run without embedding a commit's own SHA recursively.
+No interrupted implementation remains. Unrelated untracked mockups/ADR 0006–0009 are preserved/excluded.
+README, architecture/ADRs, indexes, security/runbooks and other reports were assessed: no changes
+needed for this unchanged implementation and bounded acceptance reconciliation.
+
+Finance **RESEARCH / 0 SEK / NONE**. No additional inference allowance, deployment, provider/cloud
+fallback, PAPER/LIVE/AUTO, broker/orders/capital or BB-132B implementation is authorized.
+Production authenticated invocation/audit integration, recurring research, prospective validation,
+real-market rights and deployment remain separate future gates. **BB-132B NOT STARTED / NOT AUTHORIZED.**
+Next: STOP — return accepted BB-132A main to owner/architect for independent post-merge review and
+product-level planning. All following candidate/RC entries retain their historical scope; their old
+continuation permissions are not current invocation authority.
+
 ## BB-132A final Merge Candidate handoff — 2026-10-01
 
 Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED**.

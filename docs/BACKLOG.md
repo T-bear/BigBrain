@@ -2,7 +2,7 @@
 
 ## BB-132A final local-model result — 2026-10-01
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 Owner-authorized minimal producer correction pins finance-research-learning-v1 in BOTH grammar
 alternatives. No Finance parser/admission/vocabulary, prompt, other field or isolation change.
 The LAST1.7B acceptance invocation completed: **Proposal / Finance Admitted,1 PASS/0 FAIL**.
@@ -10,9 +10,14 @@ Runtime50,458ms, native exit0, no OOM/cleanup, zero scientific engine calls. Mod
 unproven metadata, not evidence. All15 prior evidence files unchanged; no ledger refund/reset.
 No model allowance remains. [Exact SHA/tree resolution, provenance, measurements and verification](reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
 Final solution restore/build/format PASS; API874 PASS/7 model skips, Sentinel32 PASS.
-Next: publish exact candidate then STOP for independent review/acceptance-or-closure.
-No further model trimming/retry series. Finance RESEARCH /0 SEK /NONE. No merge/deployment/cloud/
-PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Earlier entries are dated historical states.
+Owner explicitly approved independently reviewed candidate `960a12ddb04349fd54b5b90a550b9e1e4be9419c`.
+Merged unchanged as `4c0e451cc3af0de23ddbf5edd6336e9cc7589f37` from baseline
+`739beab55a494068edcf23d3c905aa6601b99dc0`; candidate/merge tree identical.
+[Exact identities, green merge CI 36818875959 and final reconciliation resolution](reports/features/finance/bb-132a-local-model-preflight-20260929.md#accepted-publication--2026-10-01).
+Backend/frontend/documentation/secrets jobs and actual formatter/build/test steps SUCCESS.
+No inference or implementation change during publication. Next: STOP for post-merge review/planning.
+Finance RESEARCH / 0 SEK / NONE. No deployment/cloud/PAPER/LIVE/AUTO/broker/orders/capital.
+BB-132B NOT STARTED / NOT AUTHORIZED. Earlier entries are historical; no old invocation grant revives.
 
 
 ## BB-132A RC04 — model-free contract characterization, 2026-10-01

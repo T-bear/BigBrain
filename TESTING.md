@@ -11,7 +11,13 @@ Ordinary CI skips all real-model tests, requires no model/download/native runtim
 Solution restore/Release build/full formatter PASS; native compilation and existing isolation probe PASS.
 Full API874 PASS/7 intentional real-model skips; Sentinel32 PASS. Gitleaks history299commits/no leaks;
 all24 cumulative candidate files PASS/no leaks. Documentation258Markdown/91IDs, diff/scope checks PASS.
-MERGE CANDIDATE only, not accepted/merged or production-deployed; no publication-CI claim.
+**ACCEPTED / MERGED / CI VERIFIED**. Merge `4c0e451cc3af0de23ddbf5edd6336e9cc7589f37`
+CI [36818875959](https://github.com/T-bear/BigBrain/actions/runs/36818875959) SUCCESS: backend
+restore/format/Release build/tests, frontend install/format/tests/build, documentation and Gitleaks;
+actual jobs/steps inspected. These are main-CI results, separate from the candidate-local counts above.
+No real-model invocation during publication. Final docs-only reconciliation requires its own exact-SHA
+CI; [identity resolution and publication evidence](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#accepted-publication--2026-10-01).
+No deployment or additional inference is authorized.
 Earlier failed real tests remain historical failures; they are not recast as successful experiments.
 
 

@@ -1,5 +1,18 @@
 # BigBrain Roadmap
 
+## BB-132A accepted state — 2026-10-01
+
+**ACCEPTED / MERGED / CI VERIFIED** after independent review and explicit owner approval of
+`960a12ddb04349fd54b5b90a550b9e1e4be9419c`. Unchanged merge
+`4c0e451cc3af0de23ddbf5edd6336e9cc7589f37`; all four merge-CI jobs/steps SUCCESS.
+[Exact publication identities and evidence](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#accepted-publication--2026-10-01).
+The bounded synthetic Qwen3-1.7B proposal path is accepted; Finance retains strict admission and
+scientific/risk authority. No inference during publication. Production auth/audit integration,
+recurring research, prospective validation, real-market rights and deployment remain future gates.
+Finance **RESEARCH / 0 SEK / NONE**. **BB-132B NOT STARTED / NOT AUTHORIZED**; no further model
+invocation, cloud fallback, PAPER/LIVE/AUTO, broker/orders/capital or deployment is authorized.
+The dated product/review sequence below is history, not an active continuation instruction.
+
 ## Finance product direction — owner instruction, 2026-09-29
 
 Permanent principle: **“Finance may be creative with hypotheses, but conservative with its own construction.”**
