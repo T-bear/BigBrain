@@ -1,5 +1,19 @@
 # Testa BigBrain
 
+## BB-132B — model-free boundary characterization, 2026-10-01
+
+[Review evidence and commands](docs/reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+New ResearchLearningIterationBoundaryTests reuse E's fake invocation harness and real C SQLite/result
+stores/evaluator. Five cases prove N persistence/reopen, refusal of a second reasoner invocation,
+nonempty-history scope rejection, wire rejection of invented history/larger invocation budget, and
+no replacement enrollment after failure. They characterize a missing multi-iteration contract;
+they do NOT prove a completed research loop, history-aware selection or new temporal policy.
+Initial existing B/C/E136 PASS; new cases5 PASS. No real model/runtime artifact is needed.
+All BB-132A inference allowances remain consumed. Model-free full-suite commands explicitly set
+BB132A_LOCAL_ACCEPTANCE=disabled; no model test may run under this checkpoint.
+Production source/schema/engines/risk/runtime/Sentinel/Web unchanged. Final results in the report.
+
+
 ## BB-132A final version-bound acceptance — 2026-10-01
 
 Minimal producer-only version correction; cross-boundary tests fail on drift from Finance's exact

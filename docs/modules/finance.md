@@ -1,5 +1,21 @@
 # Finance module
 
+## BB-132B — model-free iteration boundary, 2026-10-01
+
+**AUTHORIZED / REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Owner authorizes a bounded persistent research loop from accepted main
+`2caf2eb898acaafa759c6287d02442a90bb666db`; branch `bb-132b/persistent-research-loop`.
+[Source findings, five model-free characterization cases and required decision](../reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
+Existing C governance permits one invocation/evaluation and refuses N+1 after completion/reopen.
+The accepted projection has empty initial history only; no outcome/history selector exists.
+Production loop NOT IMPLEMENTED: preserving those existing ceilings conflicts with the requested
+second reasoner invocation. No limit reset, new protocol namespace or silent migration is introduced.
+Review must resolve a versioned finite invocation grant and safe history projection before continuation.
+Finance owns all scientific state; protected holdout/proxies and private C snapshots stay hidden.
+No Qwen or other inference, runtime/provider changes, trading, deployment or BB-132C.
+Finance **RESEARCH / 0 SEK / NONE**. Earlier BB-132B-not-authorized entries are dated A history,
+superseded only by this model-free task authorization, not by new inference/trading authority.
+
 ## BB-132A accepted state — 2026-10-01
 
 **ACCEPTED / MERGED / CI VERIFIED** after independent review and explicit owner approval of
