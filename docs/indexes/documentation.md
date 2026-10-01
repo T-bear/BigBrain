@@ -33,8 +33,11 @@ When sources disagree, use this order and resolve the inconsistency explicitly:
 - [ADR index](adr.md), [knowledge index](knowledge.md), [operations index](operations.md) and [reports index](reports.md).
 
 Local reports under `/home/enigma/BigBrain/reports/` are fuller internal evidence and
-are not repository authority. Only reviewed, sanitized knowledge is published under
-`docs/reports/`.
+are not repository authority. Sanitized knowledge is published under
+`docs/reports/`, including incomplete Review Checkpoints awaiting independent review. Main records
+accepted work; the active checkpoint branch records ongoing unaccepted work. Publication never
+promotes branch code or a proposed decision above accepted architecture. See the
+[permanent workflow](../../AGENTS.md#permanent-checkpoint-branch-workflow).
 
 ## Product and architecture
 

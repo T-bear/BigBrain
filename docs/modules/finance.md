@@ -1,5 +1,45 @@
 # Finance module
 
+## Finance product direction — owner instruction, 2026-09-29
+
+Permanent principle: **“Finance may be creative with hypotheses, but conservative with its own construction.”**
+The model may invent hypotheses only within Finance-owned validated capabilities; it cannot generate
+executable code, plugins, execution mechanisms, risk/science policy or authority.
+
+Owner direction, implementation authorization currently limited to BB-132A:
+
+1. Local language-model researcher: 4B timeouts and initial1.7B WorkerFailed are preserved.
+   Diagnostic reproduction identified512-token exhaustion; one bounded configuration correction
+   produced a complete reply in30.2s, rejected by Finance as InvalidReply. A remains incomplete.
+   All history retained in a REVIEW CHECKPOINT, not a Merge Candidate. Next bounded work is
+   sanitized InvalidReply diagnosis; at most one further1.7B attempt is conditionally authorized
+   after an in-scope cause/correction. Publication stops for review; cloud never required.
+   RC02 implements sanitized rejection propagation, but the historical reply/reason was not retained.
+   No new inference or correction; the conditional allowance is unused pending a bounded evidence decision.
+   RC03 (2026-10-01) separately authorized one diagnostic invocation: complete reply rejected
+   InvalidReply / UnsupportedContract. No field inferred, correction or further run. Prior evidence
+   unchanged; final acceptance remains unused. STOP for independent RC03 review before more work.
+   RC04 model-free analysis proves GBNF permits wrong contract versions; Finance's exact version is
+   available and the prompt correctly requests it. No correction/inference; proposed producer-only
+   version binding awaits independent review. Historical raw value unknown; final acceptance unused.
+   Final owner-authorized round (2026-10-01): only both grammar version literals fixed; LAST1.7B
+   invocation produced Proposal / Finance Admitted. Full backend/build/format verified; MERGE CANDIDATE
+   for independent review only. No additional inference allowance, engine/trading call or deployment.
+2. Persistent research loop/history, building on existing ledger governance; no recurring loop yet.
+3. Prospective validation.
+4. Future PAPER concepts: Long-term portfolio and Active/high-risk portfolio.
+5. Unattended Finance dashboard/operation.
+
+Active/high-risk research may examine intraday-to-several-day opportunities, continuous visibility,
+an initial meaningful review around one month and prospective evaluation up to roughly one year.
+Compounding is an eventual research objective, not a promised return or forced trade frequency.
+Seek small repeatable statistical edges net of realistic spread, fees, slippage and losses.
+**Zero trades is valid.** No PAPER portfolios, simulated orders, compounding, P&L dashboard, LIVE/AUTO,
+broker/order/capital, provider access or deployment is authorized by A.
+Finance remains **RESEARCH / 0 SEK / NONE**. B–F historical results are not profitability evidence.
+
+[BB-132A preflight](../reports/features/finance/bb-132a-local-model-preflight-20260929.md).
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

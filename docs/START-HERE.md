@@ -10,7 +10,8 @@ reviews architecture independently; Codex implements and maintains evidence.
 1. Read [AGENTS.md](../AGENTS.md) fully: working rules, safety, documentation and publication.
 2. Fetch GitHub, inspect `origin/main`, HEAD and the working tree, then read the
    [canonical recovery note](operations/codex-recovery.md). GitHub main is the
-   technical source of truth between completed sessions. Preserve unpublished work;
+   source of truth for accepted work; the active checkpoint branch is source of truth
+   for published, ongoing unaccepted work. Preserve unpublished work;
    compare it with the note before resuming. If an expected baseline moved, assess
    the delta before using an old plan. Never reset another person's work.
 3. Read [ARCHITECTURE](../ARCHITECTURE.md) and applicable [ADRs](indexes/adr.md):
@@ -54,12 +55,19 @@ and lessons. It must not exist only in chat or terminal history. Publish sanitiz
 durable knowledge with the relevant code/tests; no credentials, private identities,
 private addresses or raw sensitive logs belong in reports.
 
-Completed work belongs in published history and authoritative documents. Interrupted
-or unpublished work belongs temporarily in `docs/operations/codex-recovery.md`, the
-only recovery-note location. Preserve valid work and record exact remaining steps.
-Once a checkpoint is complete and published, remove its temporary state; if later
-work is interrupted, record only that outstanding work against the new source SHA.
-Publication never implies deployment authorization.
+Follow the [permanent Review Checkpoint workflow](../AGENTS.md#permanent-checkpoint-branch-workflow):
+publish coherent in-progress work, failed experiments and blockers as **REVIEW CHECKPOINT**,
+then stop for independent review. **MERGE CANDIDATE** additionally requires completed acceptance
+and full verification. Only an independently reviewed, explicitly owner-approved exact SHA may
+merge after pre-merge identity/check verification. Publication never implies acceptance or deployment.
+Continue on the same branch with additive commits; preserve prior review SHAs without force push.
+
+The checkpoint report carries durable evidence/history and an unambiguous GitHub commit/tree
+identity resolution. The owner need not transfer terminal output. Recovery remains the single
+location for interruption state and unpublished delta; preserve valid work and exact remaining
+steps. A published Review Checkpoint can be incomplete without being an interrupted local session.
+When publication completes, reconcile the active recovery entry against that review state; do not
+leave a false active interruption or claim the entire checkpoint is accepted.
 
 The [BB-130 plan](architecture/bb-130-stabilization.md) applies this contract to the
 current stabilization sprint; current progress belongs in STATUS and BACKLOG.

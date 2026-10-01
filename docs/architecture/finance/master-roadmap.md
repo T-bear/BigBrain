@@ -1,5 +1,32 @@
 # BigBrain Finance – master roadmap
 
+## BB-132A product direction — 2026-09-29
+
+The [owner Finance product roadmap](../../../ROADMAP.md) now prioritizes a local language-model researcher,
+then persistent iteration, prospective validation, two future PAPER portfolio concepts and unattended
+operation. Only A is authorized. The permanent research-freedom principle permits hypothesis
+creativity, never model-created execution/code/policy. Zero justified trades is valid.
+[BB-132A acceptance evidence](../../reports/features/finance/bb-132a-local-model-preflight-20260929.md)
+records preserved4B timeouts and initial1.7B WorkerFailed. Bounded diagnosis reproduced512-token
+exhaustion; one corrected1.7B run delivered a complete reply in30.2s, rejected as InvalidReply by the
+existing Finance parser. No accepted proposal or engine call. Current state is a REVIEW CHECKPOINT,
+not a Merge Candidate. Next bounded scope: sanitized rejection diagnostics; at most one further1.7B
+acceptance is conditional on identifying/correcting an in-scope cause. No automatic retry, refund,
+weakened control, cloud, deployment or trading authority. Stop after publication for independent review.
+RC02 adds only sanitized existing-reason propagation. The old reply/reason is absent, so historical
+causality remains unknown. No new invocation or corrected acceptance; the conditional grant is unused.
+Stop for a bounded evidence decision, not a new architecture/hardening checkpoint.
+RC03 (2026-10-01) obtained the authorized fresh diagnostic category: InvalidReply / UnsupportedContract,
+complete reply/native exit0. No field-level claim, correction, admission/engine or second run.
+Prior history unchanged, separate final acceptance unused. STOP for RC03 review; still not mergeable.
+RC04 model-free characterization proves the producer grammar permits wrong versions despite correct
+copy instructions; Finance's exact contract is unchanged. No model invocation or production fix.
+Review the proposed grammar-only version binding before any correction/last acceptance; A remains incomplete.
+Final authorized round (2026-10-01) implemented only both version literals, then consumed the LAST
+acceptance: real1.7B Proposal / Finance Admitted, zero engine/trading calls. Full backend/build/format
+verified; MERGE CANDIDATE for review only. No more model runs or next checkpoint. Independent acceptance
+is still required. Earlier failed attempts and scientific history remain unchanged.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

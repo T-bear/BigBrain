@@ -16,6 +16,10 @@
     <ProjectReference Include="../../src/BigBrain.Brain/BigBrain.Brain.csproj" />
     <ProjectReference Include="../../src/BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Model-free characterization reads the actual producer configuration, never a model artifact. -->
+    <None Include="../../src/BigBrain.LocalReasoner.Worker/worker.cpp" Link="contract-characterization/worker.cpp" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
   <Target Name="CopyReasonerProofWorker" AfterTargets="Build">
     <ItemGroup>
       <ProofWorkerFiles Include="../BigBrain.Reasoner.ProofWorker/bin/$(Configuration)/net10.0/*" />

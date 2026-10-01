@@ -12,6 +12,22 @@ namespace BigBrain.Api.Tests;
 
 public sealed class LocalReasonerRuntimeTests
 {
+    [Theory]
+    [InlineData("exit", 3)]
+    [InlineData("truncated-header", 0)]
+    public async Task TerminalAuditRetainsOwnedExitCodeEvenWhenFrameIsIncomplete(string mode, int expectedExit)
+    {
+        using var fixture = new RuntimeFixture();
+        await using var runtime = fixture.Runtime(mode);
+        await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None));
+        var terminal = fixture.Events.Last();
+        Assert.Equal(LocalReasonerAuditPhase.Completed, terminal.Phase);
+        Assert.Equal(expectedExit, terminal.WorkerExitCode);
+        Assert.Null(terminal.ResponseHash);
+        Assert.Null(fixture.Events.First().WorkerExitCode);
+        Assert.DoesNotContain("UNTRUSTED", JsonSerializer.Serialize(terminal), StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task DisabledAndPreCancelledNeverStartWorker()
     {
@@ -38,6 +54,7 @@ public sealed class LocalReasonerRuntimeTests
         Assert.Equal("RESEARCH", state.Result!.OperatingMode); Assert.Equal("NONE", state.Result.ExecutionAuthority);
         Assert.Equal(run.Build!.Evaluation.Checksum, state.Result.Checksum);
         Assert.Equal(LocalReasonerOutcome.Proposal, fixture.Events.Last().Outcome);
+        Assert.All(fixture.Events, x => Assert.Null(x.ReplyRejection));
         Assert.False(File.Exists(fixture.Reservation));
         Assert.Equal(LearningAdmissionReason.BudgetExceeded, await run.Invoke(runtime, CancellationToken.None));
         Assert.Equal(3, fixture.Events.Count); // No retry or second invocation.
@@ -116,29 +133,34 @@ public sealed class LocalReasonerRuntimeTests
     }
 
     [Theory]
-    [InlineData("malformed")]
-    [InlineData("duplicate")]
-    [InlineData("fence")]
-    [InlineData("trailing-json")]
-    [InlineData("depth")]
-    [InlineData("null")]
-    [InlineData("tool")]
-    [InlineData("pid")]
-    [InlineData("executable")]
-    [InlineData("signal")]
-    [InlineData("risk")]
-    [InlineData("PAPER")]
-    [InlineData("version")]
-    [InlineData("evidence")]
-    [InlineData("strategy")]
-    [InlineData("parameter")]
-    [InlineData("multiple")]
-    [InlineData("missing")]
-    public async Task RealPipeReplyUsesExistingFinanceParserAndNeverRepairs(string mode)
+    [InlineData("malformed", LearningAdmissionReason.Malformed)]
+    [InlineData("duplicate", LearningAdmissionReason.Malformed)]
+    [InlineData("fence", LearningAdmissionReason.Malformed)]
+    [InlineData("trailing-json", LearningAdmissionReason.Malformed)]
+    [InlineData("depth", LearningAdmissionReason.Malformed)]
+    [InlineData("null", LearningAdmissionReason.Malformed)]
+    [InlineData("tool", LearningAdmissionReason.Malformed)]
+    [InlineData("pid", LearningAdmissionReason.Malformed)]
+    [InlineData("executable", LearningAdmissionReason.Malformed)]
+    [InlineData("signal", LearningAdmissionReason.Malformed)]
+    [InlineData("risk", LearningAdmissionReason.Malformed)]
+    [InlineData("PAPER", LearningAdmissionReason.Malformed)]
+    [InlineData("version", LearningAdmissionReason.UnsupportedContract)]
+    [InlineData("evidence", LearningAdmissionReason.EvidenceMismatch)]
+    [InlineData("strategy", LearningAdmissionReason.UnsupportedStrategy)]
+    [InlineData("parameter", LearningAdmissionReason.UnsupportedParameter)]
+    [InlineData("multiple", LearningAdmissionReason.InvalidVariantCount)]
+    [InlineData("missing", LearningAdmissionReason.Malformed)]
+    public async Task RealPipeReplyUsesExistingFinanceParserAndNeverRepairs(string mode, LearningAdmissionReason expectedRejection)
     {
         using var fixture = new RuntimeFixture(); await using var runtime = fixture.Runtime(mode);
         var failure = await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None));
         Assert.Equal(LocalReasonerFailure.InvalidReply, failure.Failure);
+        Assert.Equal(expectedRejection, failure.ReplyRejection);
+        Assert.Equal(expectedRejection, fixture.Events.Last().ReplyRejection);
+        Assert.All(fixture.Events.Where(x => x.Phase != LocalReasonerAuditPhase.Completed), x => Assert.Null(x.ReplyRejection));
+        Assert.Null(failure.InnerException);
+        Assert.Equal("Local reasoner: InvalidReply.", failure.Message);
         Assert.Null(fixture.Events.Last().ResponseHash);
         Assert.False(File.Exists(fixture.Reservation));
     }
@@ -157,6 +179,8 @@ public sealed class LocalReasonerRuntimeTests
         using var fixture = new RuntimeFixture(); await using var runtime = fixture.Runtime(mode);
         var failure = await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None));
         Assert.Contains(failure.Failure, new[] { LocalReasonerFailure.InvalidTransport, LocalReasonerFailure.WorkerFailed });
+        Assert.Null(failure.ReplyRejection);
+        Assert.All(fixture.Events, x => Assert.Null(x.ReplyRejection));
         Assert.DoesNotContain("UNTRUSTED", JsonSerializer.Serialize(fixture.Events), StringComparison.Ordinal);
         Assert.InRange(fixture.Events.Count, 2, 3); Assert.False(File.Exists(fixture.Reservation));
     }
@@ -256,6 +280,9 @@ public sealed class LocalReasonerRuntimeTests
         Assert.Equal(LocalReasonerFailure.Timeout,
             (await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None))).Failure);
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(7));
+        Assert.True(fixture.Events.Last().WorkerCleanupRequired);
+        Assert.NotNull(fixture.Events.Last().WorkerExitCode);
+        Assert.Null(fixture.Events.Last().ResponseHash);
         Assert.False(File.Exists(fixture.Reservation));
         Assert.Equal(LocalReasonerFailure.Disabled,
             (await Assert.ThrowsAsync<LocalReasonerException>(() => runtime.ReasonAsync(fixture.Input, CancellationToken.None))).Failure);

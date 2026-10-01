@@ -1,5 +1,89 @@
 # BigBrain Backlog
 
+## BB-132A final local-model result — 2026-10-01
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+Owner-authorized minimal producer correction pins finance-research-learning-v1 in BOTH grammar
+alternatives. No Finance parser/admission/vocabulary, prompt, other field or isolation change.
+The LAST1.7B acceptance invocation completed: **Proposal / Finance Admitted,1 PASS/0 FAIL**.
+Runtime50,458ms, native exit0, no OOM/cleanup, zero scientific engine calls. Model rationale remains
+unproven metadata, not evidence. All15 prior evidence files unchanged; no ledger refund/reset.
+No model allowance remains. [Exact SHA/tree resolution, provenance, measurements and verification](reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+Final solution restore/build/format PASS; API874 PASS/7 model skips, Sentinel32 PASS.
+Next: publish exact candidate then STOP for independent review/acceptance-or-closure.
+No further model trimming/retry series. Finance RESEARCH /0 SEK /NONE. No merge/deployment/cloud/
+PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Earlier entries are dated historical states.
+
+
+## BB-132A RC04 — model-free contract characterization, 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Proven static gap: Finance requires exact finance-research-learning-v1; worker prompt correctly says
+copy it, but both GBNF branches leave version as a broad identity string. Grammar permits wrong
+versions yielding UnsupportedContract; it also permits the correct version. No wrong value is forced.
+RC03 raw value remains unknown; synthetic witnesses do not reconstruct it. Fourteen new model-free
+cases traverse actual source grammar terminals and .NET BRF1/parser/pure admission, with no engine.
+[RC04 exact SHA/tree resolution, proof and limitations](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+No production correction, worker rebuild, inference, ledger rewrite or consumption of final acceptance.
+Next: publish RC04 and STOP for independent review; proposed future grammar-only version binding
+requires a new bounded decision before implementation/inference. Finance RESEARCH /0 SEK /NONE.
+Earlier entries retain their dated scope. No merge, deployment, trading, cloud or BB-132B.
+
+
+## BB-132A RC03 — real diagnostic evidence, 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Owner-authorized single diagnostic1.7B invocation completed: **InvalidReply / UnsupportedContract**.
+Complete BRF1 reply, native exit0, terminal30,820ms, no OOM or controller cleanup; engine/admission0.
+No raw reply retained/published or field-level cause guessed. Prompt/grammar/artifact/parser/controls
+unchanged. All13 earlier evidence files remain byte-identical; no ledger refund/reset.
+One test-only opt-in added; build/format PASS,196 model-free tests PASS/6 model skips.
+Actual real diagnostic test:0 PASS/1 FAIL; diagnostic category captured, no proposal acceptance.
+No correction/retry/second invocation. Separate conditional final acceptance remains UNUSED.
+[Exact RC03 SHA/tree resolution, measurements and provenance](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+Next: RC03 publication then STOP for independent review and a bounded continuation/end decision.
+Finance RESEARCH /0 SEK /NONE. No merge/deploy/trading/cloud/BB-132B. Earlier entries are history.
+
+
+## BB-132A RC02 — sanitized rejection diagnostics, 2026-09-30
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Same branch/baseline; RC01 `0788e14a297c238f1eff6d3a622fd96a9978c25d` remains preserved.
+[RC02 exact SHA/tree resolution, scope and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30).
+Implemented: existing Finance rejection enum now survives runtime InvalidReply in exception/audit and
+controlled acceptance journal. No parser/admission/worker/rules relaxation or raw reply logging.
+Release build PASS/0warnings/errors;196 model-free focused tests PASS/5 model skips.
+Blocker: previous complete reply and inner parser reason were never retained. Historical exact reason
+remains UNKNOWN; new diagnostics cannot reconstruct absent data. No cause-specific fix or model run.
+All13 prior evidence hashes unchanged; the conditional last acceptance allowance remains UNUSED.
+Next: publish RC02 and STOP for review/decision on obtaining missing diagnostic evidence within
+bounded scope. No implicit diagnostic inference authorization. Full BB-132A acceptance remains incomplete.
+Finance RESEARCH / 0 SEK / NONE. No merge, deployment, cloud, trading, capital or BB-132B.
+Earlier entries retain their dated scope.
+
+
+## BB-132A Review Checkpoint RC01 — 2026-09-30
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
+Baseline `739beab55a494068edcf23d3c905aa6601b99dc0`; branch `bb-132a/first-local-language-model`.
+[Authoritative report, exact commit/tree resolution, inventory and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30).
+RC01 publishes preserved BB-132A work plus the owner-authorized Review Checkpoint workflow.
+Main remains accepted source of truth; the branch records ongoing, unaccepted work.
+
+Real Qwen3-1.7B produced a complete BRF1 response in30.2s, native exit0, no OOM. The unchanged
+Finance reply parser rejected it as InvalidReply; exact inner rejection reason was not retained.
+Admission/engine were not reached. Earlier4B failures and1.7B failure/diagnostic evidence remain
+unchanged; no ledger refund/reset. Preserved196 focused tests PASS,5 intentional model skips;
+Release build PASS/0warnings/errors. Real corrected acceptance failed; full final gates unfinished.
+No new model invocation or source/test change during this publication step.
+
+Next: RC01 publication then STOP for independent review. Authorized next bounded work on this SAME
+branch: sanitized rejection diagnostics, exact cause identification, in-scope correction only, then
+at mostONE further1.7B acceptance<=180s only if its conditions are met. Not an automatic retry.
+No4B, model swap, GPU/CUDA, weaker parser/isolation or cloud fallback. Finance RESEARCH /0 SEK /NONE.
+No merge/deployment/PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Acceptance remains incomplete.
+Earlier entries below are historical evidence, not current publication restrictions.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

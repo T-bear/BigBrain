@@ -1,6 +1,6 @@
 # Codex interrupted-run recovery
 
-Den här filen är den enda kanoniska platsen för en tillfällig, sanerad överlämning när en Codex-körning faktiskt avbryts. Lämna mallen orörd under slutförda uppdrag. Vid återupptagning ska `AGENTS.md` följas först; synka GitHub, jämför repositoryt med noten och stoppa vid konflikt.
+Den här filen är den enda kanoniska återhämtningsplatsen för avbrott och opublicerad delta. Checkpointens egen rapport bär bestående checkpoint-evidens och reviewhistorik. Vid återupptagning ska `AGENTS.md` följas först; verifiera accepterad main, senaste publicerade Review Checkpoint, working tree och noten. Stoppa vid konflikt. Lämna mallen orörd och markera inte publicerat ofullständigt arbete som en aktiv lokal avbrottskörning.
 
 ## Recovery note template
 
@@ -17,7 +17,436 @@ Blockers/assumptions:
 Exact next action:
 ```
 
-Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras; ofullständigt arbete får inte committas utan uttryckligt godkännande. Ta bort ifylld avbrottsstatus när originaluppdraget är färdigt och publicerad GitHub-historik åter är fullständig source of truth.
+Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
+
+## BB-132A final Merge Candidate handoff — 2026-10-01
+
+Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED**.
+Owner reviewed RC04 and authorized only two producer grammar version literals plus model-free checks
+and ONE LAST1.7B acceptance<=180s. This final allowance is **CONSUMED**. NO more inference/fix-loop.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; branch bb-132a/first-local-language-model;
+parent RC04 6a57c9eedc3e3a81412e64cceee58f814afc83ab, treedff305c76d04390de2b1fa228a4aaa9508b3533a.
+Publication subject `review: publish BB-132A final local-model merge candidate` resolves exact
+candidate SHA/tree via the [final report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+
+Native worker changed only reply version literals on BOTH grammar alternatives. Prompt/other fields,
+Finance parser/admission/vocabulary/BRF1/science/risk/ledger/runtime/resource controls unchanged.
+Cross-boundary tests now enforce exact Finance version binding. New native-worker-final-version
+SHA256631deb1ccfece198309c0485ada2d5eae62ecd3b146c1efc945078e97dd2eb1b; old binaries preserved.
+Model/runtime/license checks and unchanged existing containment probe PASS before inference.
+Separate opt-in1.7b-final journal is spent: **1 PASS /0 FAIL, Proposal / Finance Admitted**.
+Runtime50,458ms, caller50,559ms, command57,853ms; native exit0/no cleanup, OOM0, group empty.
+No engine/scientific result or trading action. Rationale's outperformance assertion is unproven
+metadata, never evidence/authority. All15 prior evidence hashes unchanged, no budget/exposure refund.
+Ignored final-evidence-manifest.json pins18files, including successful response retained privately.
+Never rerun acceptance-17b-final or any earlier CreateNew journal. Raw response/logs/artifacts not published.
+
+Pre-inference210 model-free PASS/6 skips; final harness15 PASS/7 skips. Final solution restore, Release
+build0warnings/errors and full formatter PASS. Full API874 PASS/7 real-model skips; Sentinel32 PASS.
+History Gitleaks299commits/no leaks; all24 candidate files Gitleaks PASS/no leaks. Documentation/
+index/link PASS258Markdown/91IDs; diff --check PASS; intended12/24file scope verified and staged
+content rechecked before commit. No branch/main CI success is inferred.
+Current delta12files (worker,two tests,nine docs); cumulative baseline24files enumerated in report.
+Unrelated mockups/ADR0006–0009 untouched/excluded. Model/runtime/evidence remain ignored local files.
+
+If publication is interrupted, inspect local/remote subject/SHA first; finish only pending publication
+checks/commit/push, never duplicate/amend or rerun model. Verify unchanged main before/after push.
+After push no unpublished implementation remains. STOP: owner/architect independently reviews exact
+candidate for acceptance or closure. No merge without explicit owner approval of that exact SHA.
+Remaining limits: single admitted run not model-quality/reliability/performance-profit evidence;
+production auth/audit/deployment/autonomous loop/prospective validation/data rights remain later work.
+Finance RESEARCH /0 SEK /NONE. No PAPER/LIVE/AUTO, broker/orders/capital/cloud/GPU/deploy/BB-132B.
+Earlier entries below are historical and do not permit reusing old attempts or additional trimming.
+
+## BB-132A Review Checkpoint RC04 handoff — 2026-10-01
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner/architect authorizes model-free analysis/characterization only after independent RC03 review.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; branch bb-132a/first-local-language-model;
+parent RC03 e4f96a0dd952857aa3af87344b86f52d4d1fda0f, tree772602dcd223f5b3ee794b25c70fe57606c5da28.
+Publication subject `review: publish BB-132A RC04 model-free contract characterization` resolves
+exact SHA/tree via [report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+
+Proven static gap: Finance exact version finance-research-learning-v1 versus native GBNF identity
+nonterminal on both reply branches. Correct value supplied by Finance/protocol and requested by
+prompt; not enforced by generation grammar. Correct AND wrong versions are possible. Discriminator
+is fixed by grammar. Wrong bounded versions can produce UnsupportedContract; RC03 raw value unknown.
+Fourteen new tests expand actual source terminals/references with synthetic fixtures, then use real
+BRF1/Finance parser/pure admission. They do not run native grammar/token sampling or a model.
+No production change, correction, inference or consumption of final acceptance; all15 old evidence
+hashes unchanged. New test file and test csproj source-text copy plus9docs;11 intended files.
+Initial build analyzer CA1861 corrected only in new test; final Release build PASS0warnings/errors.
+14 focused tests PASS; combined B/C/E/F/RC04 suite210 PASS/6 real-model skips. Scoped formatter PASS.
+Documentation/link/index verification PASS258Markdown/91IDs; diff --check and exact11-file Gitleaks
+PASS/no leaks. Staged content/scope/secrets rechecked before commit.
+Unrelated mockups/ADR0006–0009 preserved/excluded; models/raw artifacts remain ignored locally.
+
+If interrupted before publication, finish only remaining verification/docs/commit/push. Check exact
+local/remote publication subject to avoid duplicate commit; no amend/force/rebase. Verify main before/
+after push. Never run a model in RC04. No active interrupted implementation remains after publication.
+Next: STOP for independent RC04 review and explicit bounded decision on proposed future producer-only
+version binding and, separately, final acceptance. Neither is implemented/executed here. Finance
+RESEARCH /0 SEK /NONE; no merge/deploy/GPU/cloud/PAPER/LIVE/AUTO/broker/orders/capital/BB-132B.
+Previous handoffs below are preserved dated history.
+
+## BB-132A Review Checkpoint RC03 handoff — 2026-10-01
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner/architect separately authorized exactly ONE diagnostic1.7B invocation<=180s after RC02 review.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; same branch bb-132a/first-local-language-model;
+parent RC02 5ea876da539ecdf94b1f86733721088c65427b87, tree dcc0e155c970c27a5ee05753b0a40d1360b095cf.
+Publication subject `review: publish BB-132A RC03 real reply rejection evidence` uniquely resolves
+exact SHA/tree from Git metadata using the [report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+
+The sole RC03 invocation is CONSUMED: complete BRF1 reply, native exit0, InvalidReply,
+ReplyRejection=UnsupportedContract. Terminal30,820ms; caller30,875ms; command37,078ms;
+RSS/HWM1,683,868KiB, no OOM, group empty, no controller cleanup. No field-level cause inferred.
+New diagnostic-17b-rc03 CreateNew journal and rc03-measurements-17b.json persist locally ignored;
+report carries their sanitized results/hashes. No raw reply retained, admission/engine call or refund.
+Prior13 evidence hashes unchanged; rc03-final-evidence-manifest.json pins all15 local evidence files.
+DO NOT RERUN RC03. The separate conditionally reserved final acceptance remains UNUSED.
+No correction or second invocation is authorized in RC03, even if a cause appears obvious.
+
+Only one test file changed: explicit opt-in using same pinned native-worker-corrected, full prior
+manifest and diagnostic return before raw storage/admission. Nine docs updated, exact10-file scope
+in report. All production source/native worker/prompt/grammar/parser/vocabulary/controls unchanged.
+Release build PASS0warnings/errors, scoped formatter PASS, focused tests196 PASS/6 model skips.
+Real diagnostic test0 PASS/1 FAIL (InvalidReply), not accepted research. No full acceptance/CI claim.
+Documentation/link/index verification PASS258Markdown/91IDs, diff --check PASS; exact10-file scope
+and Gitleaks PASS/no leaks. Staged scope/secrets rechecked before commit.
+Unrelated mockups/ADR0006–0009 untouched/excluded; no models/raw artifacts staged.
+
+If publication is interrupted, inspect local/remote publication subject/SHA first; finish only pending
+documentation/scope/secrets checks and commit/push, never duplicate/amend the review commit.
+Verify unchanged main before/after push. After push no active interrupted implementation remains.
+Next: STOP for independent RC03 review and owner/architect decision on minimal correction plus last
+acceptance, other bounded work or ending A. No further work inferred from the diagnostic result.
+Finance RESEARCH /0 SEK /NONE. No merge/deploy/cloud/GPU/PAPER/LIVE/AUTO/broker/orders/capital/BB-132B.
+Previous notes below are historical, superseded only regarding this separately authorized diagnostic.
+
+## BB-132A Review Checkpoint RC02 handoff — 2026-09-30
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner reports independent RC01 review and authorizes same-branch bounded continuation, not merge.
+Baseline/main739beab55a494068edcf23d3c905aa6601b99dc0; parent RC01
+0788e14a297c238f1eff6d3a622fd96a9978c25d. Branch bb-132a/first-local-language-model.
+Publication subject `review: publish BB-132A RC02 sanitized reply diagnostics` uniquely resolves
+exact SHA/tree from Git metadata, using the [report's RC02 command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30).
+No history rewrite. Report carries full13-file RC02 inventory and cumulative model/runtime provenance.
+
+Completed: existing Finance Rejection enum forwarded as nullable ReplyRejection in runtime exception,
+terminal audit and controlled acceptance journal. Eighteen model-free invalid-reply cases assert the
+exact existing code and unchanged failure; success/transport paths assert no fabricated reason.
+No Finance parser/admission/science/ledger changes. Native worker/prompt/grammar/containment unchanged.
+Only runtime/options and two tests change, plus nine docs listed in report. Acceptance-test whitespace
+formatted after its check identified whitespace-only failures. No test semantics changed by formatting.
+Release build PASS0warnings/errors;196 focused B/C/E/F/configuration tests PASS/5 model skips.
+Formatter verification of all4 changed C# files PASS. Documentation/index/link verifier PASS
+(258Markdown/91uniqueIDs); diff --check PASS; Gitleaks exact13files PASS/no leaks. Staged inventory/
+secrets rechecked before commit. Publication CI not claimed; full acceptance matrix remains incomplete.
+
+Concrete blocker: the previous corrected1.7B response and inner reason were never persisted. Its
+directory has only invocation.jsonl, with InvalidReply/no response hash; test log likewise generic.
+No exact old reason/field can be reconstructed. Thirteen prior evidence hashes unchanged; no old audit
+rewritten. Synthetic tests prove propagation, not historical model causality. No guessed integration
+fix, no new inference, no diagnostic reproduction, no model change. Last conditional acceptance remains
+UNUSED: its cause-identification/correction prerequisite is not satisfied. Do not invent authorization
+for diagnostic inference or repeat a consumed test journal. No final full-candidate matrix claim.
+
+If publication is interrupted: inspect local/remote commit subject/SHA, do not duplicate/amend RC02;
+finish only its pending gates/push. Verify baseline before/after push and exact remote branch/tree.
+Unrelated mockups/ADR0006–0009 remain excluded and untouched. Ignored model binaries/evidence remain
+local. After push no unpublished diagnostic implementation remains; incomplete state is in GitHub.
+Exact next action: STOP — independent review of RC02 and owner/architect decision on a bounded way
+to obtain the missing runtime evidence, or conclude A. No extra invocation has been authorized here.
+Finance RESEARCH / 0 SEK / NONE. No merge/deployment/PAPER/LIVE/AUTO/broker/orders/capital or BB-132B.
+Earlier entries are historical, not current instructions to rerun an experiment.
+
+## BB-132A Review Checkpoint RC01 handoff — 2026-09-30
+
+Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.
+Owner explicitly authorizes publishing the preserved incomplete BB-132A tree with the new permanent
+Review Checkpoint workflow. No new implementation/model invocation in this publication step.
+Baseline/main739beab55a494068edcf23d3c905aa6601b99dc0; branch bb-132a/first-local-language-model.
+Publication subject `review: publish BB-132A RC01 and checkpoint workflow` uniquely resolves exact
+SHA/tree from GitHub metadata using the command in the [authoritative checkpoint report](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30).
+Report contains current state,22-file inventory, retained checks, all five real outcomes, provenance,
+measurements, missing parser reason and conditional next scope. It is the review handoff, not terminal text.
+
+The15 preserved files plus7 relevant workflow/testing documents are included. Native/runtime/test
+content is unchanged from the previous stopped tree. Unrelated mockups/ADR0006–0009 and ignored
+model/runtime/SQLite/raw audit artifacts are excluded. No staging of unrelated data. All13 local
+historical evidence hashes are verified unchanged against diagnostic-final-evidence-manifest.json.
+Old4B timeouts/1.7B failures remain spent. No reset/refund/rewrite, new database or engine call.
+Latest complete reply: native exit0,30,215ms, InvalidReply; exact inner rejection remains UNKNOWN.
+
+Publication checks PASS: exact baseline and22-file scope, all13 preserved evidence hashes,
+all7 source/test files byte-identical to previous verified state, documentation/links258Markdown/
+91IDs, git diff --check and Gitleaks22files/no leaks. Staged inventory/secrets and remote identity
+are additionally checked during publication; no publication-CI success is inferred.
+Retained Release build and196 focused PASS/5 model skips are source verification, not new CI.
+Full acceptance/final matrix remain incomplete. No model invocation, deployment, merge or BB-132B.
+If publication is interrupted, inspect whether the uniquely named commit exists locally/remotely;
+do not duplicate it. Push only this branch and verify its exact remote SHA/tree and unchanged main.
+After successful push there is no unpublished BB-132A implementation delta from RC01; incomplete
+work remains explicitly published for review. Earlier interrupted records below are HISTORY only.
+
+Exact next action after push: STOP — independent ChatGPT review of BB-132A-RC01 from GitHub.
+Already authorized next bounded work on the same branch: minimal sanitized InvalidReply diagnostics;
+identify cause, correct only in-scope integration/format errors without loosening Finance/isolation,
+then at mostONE final1.7B acceptance<=180s if those conditions hold. Not started in RC01. Do not infer
+permission for an additional diagnostic inference or repeat any consumed CreateNew journal.
+This continuation authorization does not bypass the reviewpoint STOP or permit merge/next checkpoint.
+Finance RESEARCH /0 SEK /NONE; no cloud, PAPER/LIVE/AUTO, broker/orders/capital or deployment.
+
+## Historical recovery records — superseded by RC01 handoff above
+
+Earlier publication prohibitions and approval states below describe their dates. The owner's new
+Review Checkpoint authorization supersedes publication-only restrictions, never the preserved results.
+
+## BB-132A diagnostic/corrected-attempt stop — 2026-09-30
+
+Status: **INTERRUPTED — MANUAL REVIEW REQUIRED**.
+Task: BB-132A bounded WorkerFailed diagnosis and at mostONE conditional corrected1.7B acceptance.
+Baseline/source-of-truth/HEAD/origin/main739beab55a494068edcf23d3c905aa6601b99dc0 verified by fetch.
+Branch bb-132a/first-local-language-model. No staged files, commit, push, main modification or merge.
+Original4B30s/180s failures and1.7B79s WorkerFailed remain unchanged/spent. No rerun of4B.
+
+### Completed in this continuation
+
+Minimal native stage exit codes and terminal audit WorkerExitCode/WorkerCleanupRequired through the
+existing owned handle; no new PID/attach/stdio protocol, stderr text, prompt/response logging or powers.
+One explicitly bounded diagnostic reproduction with same model/input/prompt/settings: WorkerFailed,
+exit40, no cleanup required,72,602ms. Exactly512 generated-token iterations without EOG. No OOM or
+Timeout; load/context/prefill/decode passed. Historical uninstrumented exit remains unavailable;
+this is reproduced-cause evidence, not retroactively invented data. All nine previous files unchanged.
+
+Conditional local correction: libllama grammar for existing Proposal/NoUsefulProposal shape and
+<=96-character ASCII question/rationale. The model still generates bindings/prose. Finance parser
+unchanged. No output repair, token increase or loosened isolation/resource/deadline. Same512 output
+cap/4096 context/3072 prompt cap/65536 wire bytes/180s/twoCPUthreads/4GiB/swap0/noGPU.
+ONE corrected acceptance then ran. Complete BRF1 response at30,169ms; native exit0, no cleanup;
+existing Finance parser **InvalidReply**, terminal30,215ms/caller30,269ms. No admitted proposal,
+scientific engine or risk/trade authority. Exact inner parser rejection enum/raw output NOT retained;
+do not infer the bad field or claim valid research. Owner's second-failure STOP condition now applies.
+No more model invocation or correction. No full-candidate publication authorization is satisfied.
+
+Corrected measurements: whole command36,312ms, CPU58.753418s,145samples/max2tasks, RSS/HWM1,683,792KiB,
+peak sampled cgroup1,077,678,080bytes, OOM0/group empty. Load/token rate not instrumented.
+Diagnostic: command79,455ms, CPU142.985559s, RSS/HWM1,609,016KiB, peak cgroup1,031,168,000bytes.
+Eleven prior files verified byte-identical after corrected test; final ignored
+`diagnostic-final-evidence-manifest.json` pins13 evidence files across all five runs. Ledger unchanged.
+No refund, second database, raw sensitive data or provider export. No retry/model/GPU/cloud work.
+
+### Exact preserved scope / artifacts
+
+15 intended files (no staging):
+- ROADMAP.md
+- docs/BACKLOG.md
+- docs/STATUS.md
+- docs/architecture/finance/master-roadmap.md
+- docs/modules/finance.md
+- docs/operations/codex-recovery.md
+- docs/reports/REPORT-CATALOG.md
+- docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md
+- src/BigBrain.Brain/LocalReasonerRuntime.cs
+- src/BigBrain.Brain/LocalReasonerRuntimeOptions.cs
+- src/BigBrain.LocalReasoner.Worker/containment.h
+- src/BigBrain.LocalReasoner.Worker/worker.cpp
+- src/BigBrain.LocalReasoner.Worker/containment-probe.cpp
+- tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs
+- tests/BigBrain.Api.Tests/LocalReasonerRuntimeTests.cs
+
+Unrelated mockups and unpublished ADR0006–0009 remain untouched/excluded. Never reset/clean/stash.
+Ignored data/bb132a preserves all old artifacts plus native-worker-diagnostic, worker-diagnostic.cpp,
+native-worker-corrected, diagnostic-17b/invocation.jsonl, diagnostic-measurements-17b.json,
+acceptance-17b-corrected/invocation.jsonl, corrected-measurements-17b.json and additional manifests.
+No parsed-model-response artifact exists. Never delete CreateNew journals to re-enable a run.
+Monitor scripts /tmp/bb132a-monitor-diagnostic.py and /tmp/bb132a-monitor-corrected.py; logs
+/tmp/bb132a-diagnostic-17b.log and /tmp/bb132a-corrected-17b.log. Do NOT rerun either.
+Binary hashes and sanitized provenance/results are in the report. Existing compiled old binaries preserved.
+
+### Verification / remaining
+
+Native diagnostic/corrected compile PASS, Release test-project build PASS0warnings/errors.
+Focused B/C/E/F/configuration suite196 PASS/0FAIL/5 intentional model skips. Earlier diagnostic-focused
+selection60PASS/4skips is development evidence. Diagnostic and corrected real selections each0PASS/1FAIL
+as above; not green acceptance. Two new model-free tests retain exit codes for exit/truncated frames;
+timeout checks confirm cleanup metadata. No existing scientific engine/parser/ledger/Sentinel changes.
+Full final backend/restore/format matrix NOT run: candidate incomplete, stop condition takes precedence.
+Handoff checks PASS: documentation/index/link verifier258Markdown/91unique backlogIDs;
+git diff --check; Gitleaks exact15 intended files/no leaks. No publication. Development sandbox
+initially denied verifier spawnSyncgit; identical verifier outside sandbox passed. Scope check confirms
+Finance engine/parser/ledger/API, Sentinel, Web, solution, CI and deployment files unchanged.
+Remaining: detailed Finance rejection is unknown, no admitted real proposal, no acceptance/repeatability
+completion, no final candidate gates. Architecture/isolation not weakened to compensate.
+Exact next action: STOP — return failure evidence to owner/architect. Further diagnostics/model runs,
+configuration changes or partial-work publication require a new explicit decision; do not start BB-132B.
+Finance RESEARCH /0 SEK /NONE; no deployment/cloud/PAPER/LIVE/AUTO/broker/orders/capital or merge.
+Earlier sections are dated history, not current authorization to repeat an invocation.
+
+## BB-132A 1.7B WorkerFailed stop — 2026-09-30
+
+Status: **INTERRUPTED — MANUAL REVIEW REQUIRED**.
+The one separately owner-authorized Qwen3-1.7B Q4_K_M invocation was run and ended WorkerFailed,
+NOT Timeout, at 78,988ms (caller 79,054ms). No complete BRF1 header/reply and no Finance admission.
+No additional invocation/model/timeout/GPU work is authorized. Same BB-132A branch/baseline below;
+no staging/commit/push/main changes. Do not repeat any real-model test or delete its CreateNew journal.
+
+Selected quantizer unsloth/Qwen3-1.7B-GGUF, revision d7f544eead698dbd1f15126ef60b45a1e1933222;
+standard Q4_K_M file 1,107,409,472 bytes, actual SHA256
+b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897 verified after acquisition and
+before invocation. Quantizer card declares Qwen/Qwen3-1.7B and Apache-2.0; exact base licence inspected
+at 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e. No model/runtime binary goes in Git. No download needed again.
+Same native-worker-180 binary SHA a88c7a31b6e92dcb3b3b5d6c1b456d2f71c79e5c3c516ecd1f1afb11ea8e4b95.
+Native/F/C implementation and controls unchanged for 1.7B; test helper adds a separately opt-in artifact
+and journal. One runtime instance only; prior C scientific counters are read immutably, never reset.
+
+Seven prior evidence files verified byte-identical before/after (prior-4b-evidence-manifest.json).
+Prior 4B 30s/180s failures remain spent and immutable. No new Finance database or engine calls.
+New ignored artifacts/evidence: Qwen3-1.7B-Q4_K_M.gguf and acquisition segments, Qwen3-1.7B-LICENSE,
+Qwen3-1.7B-quantizer-README.md, acceptance-17b-180/invocation.jsonl, real-model-measurements-17b.json.
+No parsed-model-response artifact exists. Local monitor /tmp/bb132a-monitor-17b.py; test log
+/tmp/bb132a-real-model-17b.log. Native binary is unchanged, with no new process/listener/adapter path.
+
+Measurements: total command 87,181ms including hashing/startup; 348 samples; CPU 144.041513s;
+observed VmHWM/VmRSS 1,608,304KiB (1.534 GiB), VmSize 1,734,240KiB; peak cgroup 1,619,570,688bytes;
+maximum 2 tasks, OOM 0, group empty. Load completion/token count/rate not instrumented. Read-only RSS
+monitor looked only at the dedicated cgroup's sole owned process; no process control was added.
+Current native failure reporting is coarse; do NOT infer 512-token exhaustion, decode failure or OOM.
+No assertion that 1.7B cannot run or that a smaller model/longer deadline is needed follows from this.
+
+Verification: Release test-project build PASS/zero warnings/errors; ordinary acceptance-test selection
+1 PASS/3 intentional model skips. Earlier 194 B/C/E/F/configuration tests still apply; no native/runtime
+production changes for this swap. Real 1.7B 0 PASS/ 1 FAIL WorkerFailed. Full final matrix remains undone.
+Handoff checks PASS: documentation/index/link verifier258 Markdown /91 unique backlog IDs;
+git diff --check; Gitleaks exact13 intended files/no leaks. Full candidate gates remain unfinished.
+Scope remains 13 intended files enumerated below (eight documents, runtime-options file, three native
+files, one test file); unrelated mockups/ADRs remain preserved/excluded. No model files enter Git.
+Next: STOP — owner/architect reviews WorkerFailed and incomplete diagnostics before authorizing
+any additional bounded 1.7B investigation. No automatic retry, new model, deadline increase or GPU work.
+Finance RESEARCH / 0 SEK / NONE; no deployment/cloud/export/trading/broker/orders/capital or BB-132B.
+Historical sections below are retained evidence; their earlier decisions/results are not undone.
+
+## BB-132A 180-second invocation stop — 2026-09-30
+
+Status: **INTERRUPTED — MANUAL REVIEW REQUIRED**.
+The explicitly owner-authorized separate 180s invocation was executed once and timed out.
+No more model invocation, timeout increase or model change is authorized. This is the explicit
+owner stop condition, not an interruption from usage exhaustion. Baseline/HEAD/origin/main remains
+`739beab55a494068edcf23d3c905aa6601b99dc0`; same branch bb-132a/first-local-language-model.
+No commit/push/staging. Preserve all local work, artifacts and unrelated material.
+
+The prior 30s database/WAL/SHM/audit are byte-identical to their manifest; prior Failed invocation
+remains spent. New test-only journal links the previous ledger hash and records the separate owner
+grant. No new database, C mutation, refund or scientific invocation. The integration was prepared to
+call pure Finance admission with retained scientific counters, never to resurrect C's failed iteration.
+No complete response arrived, so scientific admission/engine were not reached.
+
+Current local scope is 13 intended files: eight documents and four new files enumerated below,
+PLUS src/BigBrain.Brain/LocalReasonerRuntimeOptions.cs. Internal controlled-acceptance option permits
+exactly 180s only; ordinary/public timeout remains<=30s. Finance projection unchanged. Native CPU
+limit 360s applies only to real worker; model-free probe default 60s. New test verifies this isolation.
+Native-worker-180 is a separate compiled binary; original30s binary remains preserved.
+
+Results: 194 focused B/C/E/F/configuration tests PASS; Release test-project build PASS/zero warnings/errors.
+Real180s test 0 PASS / 1 FAIL (Timeout). Audit 180,120ms; caller 180,187ms; whole command 203,620ms including
+model hash/startup. 809 samples: peak cgroup memory 1,188,593,664 bytes (not RSS), CPU 267.795s,
+maximum 2 tasks, OOM 0, cgroup empty. Load/first-token/throughput not independently observable.
+Native180s binary SHA `a88c7a31b6e92dcb3b3b5d6c1b456d2f71c79e5c3c516ecd1f1afb11ea8e4b95`.
+No response artifact exists. No further inference occurred after Timeout.
+
+Preserved ignored evidence: data/bb132a/acceptance (unchanged old ledger/audit),
+prior-30s-evidence-manifest.json, acceptance-180/invocation.jsonl, real-model-measurements-180.json,
+native-worker-180 and the prior artifacts listed below. Monitor /tmp/bb132a-monitor-180.py and test log
+/tmp/bb132a-real-model-180.log are supplementary local evidence; sanitized conclusions are in the report.
+Do not rerun the opt-in model tests or delete their CreateNew journals. No automatic retry exists.
+
+Remaining: owner/architect model/configuration decision, valid proposal/admission and repeatability,
+completed native test/build tooling, final full verification and completed candidate publication.
+No full final backend/format claim; explicit stop takes precedence over publishing incomplete work.
+Handoff verification: documentation/index/link verifier PASS (258 Markdown /91 unique backlog IDs);
+git diff --check PASS; Gitleaks exact13 intended files PASS/no leaks. No files staged/committed/pushed.
+Finance RESEARCH / 0 SEK / NONE; no deployment/provider/cloud/trading/capital/next checkpoint.
+Exact next action: STOP — return measured180s failure for owner/architect product/model decision.
+Historical30s recovery below remains evidence; its old pending180s decision is superseded by this result.
+
+## BB-132A native-model deadline stop — 2026-09-29
+
+Status: **INTERRUPTED — MANUAL REVIEW REQUIRED**.
+Task: first local Qwen researcher; bounded stop after real native-worker Timeout, not usage exhaustion.
+Baseline/source-of-truth/HEAD: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+Branch: `bb-132a/first-local-language-model`. No candidate commit/push, staged work or main change.
+Owner/architect's native BRF1 → libllama decision resolves the earlier CLI/listener conflict.
+Do not restart that analysis or recreate/discard the preserved implementation.
+
+### Exact local scope
+
+Eight intended documents: ROADMAP.md; docs/STATUS.md; docs/BACKLOG.md; docs/modules/finance.md;
+docs/architecture/finance/master-roadmap.md; this recovery note; docs/reports/REPORT-CATALOG.md;
+docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md.
+Four new implementation/probe/test files:
+- src/BigBrain.LocalReasoner.Worker/containment.h
+- src/BigBrain.LocalReasoner.Worker/worker.cpp
+- src/BigBrain.LocalReasoner.Worker/containment-probe.cpp
+- tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs
+
+Unrelated untracked mockups and Sentinel ADR0006–0009 remain untouched/excluded. No reset/clean/stash.
+Artifacts under ignored data/bb132a are preserved, not candidate files: pinned GGUF, partial download
+segments, selected runtime libraries/headers/licenses, compiled probes/worker, manifest, private
+cgroup locator, acceptance SQLite ledger/JSONL audit and real-model-measurements-2.json.
+Do not delete the acceptance directory or overwrite/reset the ledger/audit to rerun the model.
+The completed model is checksum-verified; do not download it again. Private cgroup locator is not
+publishable; the temporary operator-created group is empty after termination. No services deployed.
+
+### Completed / valid evidence
+
+Baseline B/C/E/F characterization 193 PASS. Pinned source/runtime/licences/hardware inspected.
+One direct native child, CPU-only libllama; no CLI child/listener. Landlock read-only artifact scope,
+seccomp no network/process creation/exec/signals, dedicated memory4 GiB/swap0/CPU2/pids32 cgroup,
+AS4 GiB/CPU60s limits before model access. Model-free restrictions, allowed threads/read and contained
+libllama bootstrap PASS. Separate 64MiB OOM probe killed owned probe only; empty group afterwards.
+Release test-project build PASS (zero warnings/errors). One early conditional-skip harness error
+occurred before any model/ledger invocation and was corrected; no claim that it was inference.
+
+Actual model SHA-256 `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5`,
+2,497,280,256 bytes. Native worker binary SHA recorded in report. First real opt-in test:
+**0 PASS / 1 FAIL**, Timeout observed at 30,741ms; terminal audit at 30,130ms. No response header.
+Sampled cgroup peak 2,312,208,384 bytes; CPU delta24.944s; zero OOM events; owned group empty.
+No proof of model-load completion, first-token time, throughput, valid proposal or repeatability.
+Reopened ledger: Failed, invocations1, submissions/trials/reservedRuns/engineStarts/reusedResults0,
+no commitment/result. ReasonerTimeout + denied subsequent invocation reservation retained.
+No invocation refund, retry, new scientific experiment, protected evaluation or risk approval.
+[Sanitized hardware/provenance/measurement and historical preflight](../reports/features/finance/bb-132a-local-model-preflight-20260929.md).
+
+Handoff checks: documentation verifier PASS (258 Markdown / 91 unique backlog IDs);
+git diff --check PASS; Gitleaks exact 12 intended files PASS/no leaks. Normal test opt-out verified:
+0 failed / 0 passed / 1 intentional skip, no model invocation. Documentation subprocess and VSTest
+communication initially hit sandbox restrictions; reruns outside the development sandbox passed.
+No final full-suite/formatter run: checkpoint stopped before a stable complete candidate.
+
+### Reproduce evidence / remaining work
+
+Model-free compiler command: g++ C++20 -O2 -Wall -Wextra -Werror, local pinned headers/library paths,
+link libgomp (no-as-needed), libllama, libggml and libggml-base; executable RPATH $ORIGIN/runtime.
+Probe additionally uses -pthread and BB132A_LIBLLAMA_PROBE. No model in normal build/CI.
+Controlled test requires BB132A_LOCAL_ACCEPTANCE=1 and trusted BB132A_ARTIFACT_ROOT; normal test skips.
+Existing opt-in invocation intentionally uses CreateNew audit + persistent C ledger; it cannot silently
+rerun. Local monitor retained as /tmp/bb132a-monitor-acceptance.py, measurements/audit/ledger as above;
+no repeat invocation authorized by this stop. Monitoring samples dedicated counters every250ms.
+
+The concrete unresolved question is the accepted first-model time/repeatability budget:
+LocalReasonerRuntimeOptions and LearningDevelopmentInput both cap30s; C forbids invocation renewal.
+This run does not establish that the model is too heavy or a larger architecture is required.
+Do not silently lengthen the deadline, replace model, reset history or bypass Finance. Owner/architect
+must resolve any different bounded first-model profile within A before further inference.
+Remaining: successful real proposal/admission, bounded repeatability with retained history, native
+adversarial tests/reproducible build/run tooling, full final backend/format/docs/secrets gates and
+completed candidate publication. No final full-suite/format claim. No pre-existing science defect found.
+Exact next action: STOP — owner/architect reviews measured deadline evidence and a bounded A-only
+continuation policy. Preserve these files/artifacts. No BB-132B or generic hardening checkpoint.
+Finance RESEARCH / 0 SEK / NONE; no external AI/provider export/PAPER/LIVE/AUTO/broker/orders/capital,
+deployment or merge. Accepted B/C/E/F, parser, identities, risk, schema and Sentinel remain unchanged.
 
 ## Accepted publication — 2026-09-29
 

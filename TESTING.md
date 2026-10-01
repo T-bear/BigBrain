@@ -1,5 +1,76 @@
 # Testa BigBrain
 
+## BB-132A final version-bound acceptance — 2026-10-01
+
+Minimal producer-only version correction; cross-boundary tests fail on drift from Finance's exact
+version in either grammar alternative. Relevant model-free suite210 PASS/6 skips; after final
+opt-in wiring,15 targeted PASS/7 model skips. Exactly ONE final1.7B real invocation:1 PASS/0 FAIL,
+Proposal parsed and Finance Admitted, zero engine calls. That allowance is consumed; NEVER rerun.
+Ordinary CI skips all real-model tests, requires no model/download/native runtime. No retry/fallback.
+[Exact commands, final full-suite results and limitations](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+Solution restore/Release build/full formatter PASS; native compilation and existing isolation probe PASS.
+Full API874 PASS/7 intentional real-model skips; Sentinel32 PASS. Gitleaks history299commits/no leaks;
+all24 cumulative candidate files PASS/no leaks. Documentation258Markdown/91IDs, diff/scope checks PASS.
+MERGE CANDIDATE only, not accepted/merged or production-deployed; no publication-CI claim.
+Earlier failed real tests remain historical failures; they are not recast as successful experiments.
+
+
+## BB-132A RC04 model-free characterization — 2026-10-01
+
+Fourteen new tests read the actual native worker source as text and construct witnesses from its
+current GBNF literal/identity/text rules. Real .NET BRF1 and Finance parser/pure admission prove
+correct-version positives and grammar-permitted wrong-version UnsupportedContract negatives.
+No libllama/native worker/model artifact/inference required. No response from RC03 is reconstructed.
+[Exact commands, results and helper limitations](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
+14 focused PASS; combined B/C/E/F/RC04 suite210 PASS/6 intentional model skips.
+Final Release build PASS0warnings/errors after test-only CA1861 correction; scoped formatter PASS.
+Full model acceptance is not claimed. Final acceptance allowance remains UNUSED; all15 prior
+local evidence hashes remain unchanged. Production source/grammar/prompt/parser are unchanged.
+Documentation/link/index verifier PASS258Markdown/91IDs; diff --check and exact11-file Gitleaks PASS.
+No full acceptance suite or publication CI result is claimed for this analysis Review Checkpoint.
+
+
+## BB-132A RC03 verification — 2026-10-01
+
+Same-branch diagnostic-only review round. Release test-project build PASS0warnings/errors;
+scoped dotnet format verification PASS. Focused B/C/E/F/configuration tests196 PASS/6 intentional
+model skips. Exact commands and scope in the [RC03 report](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
+Exactly one opt-in Qwen17Rc03DiagnosticRecordsSanitizedReplyRejectionOnly ran:0 PASS/1 FAIL,
+InvalidReply / UnsupportedContract. Complete reply/native exit0; no OOM; no engine/admission.
+This is diagnostic evidence, not green model acceptance. No correction/second run or conditional
+final acceptance. Never rerun the consumed RC03 CreateNew journal. Ordinary CI skips all model tests.
+Full checkpoint verification is not claimed. Prior13 evidence hashes unchanged before/after.
+Documentation/link/index verifier PASS258Markdown/91IDs; diff --check and intended-content Gitleaks
+PASS. Exact10-file delta, only one test file plus9docs; production source unchanged.
+
+
+## BB-132A RC02 diagnostic verification — 2026-09-30
+
+[RC02 report](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30)
+records exact commands/scope. Release test-project build PASS (zero warnings/errors),196 focused
+B/C/E/F/configuration tests PASS and5 intentional model skips. Eighteen existing invalid-reply cases
+now assert exact closed Finance rejection propagation; success/transport failures assert null.
+Finance parser/rules and native worker unchanged. No real inference in RC02. Prior model failures are
+not converted to successes; absent historical response prevents exact retrospective diagnosis.
+Scoped formatter verification of all four changed C# files PASS after whitespace-only formatting
+of the acceptance harness; docs/index/link258Markdown/91IDs, diff and exact-file Gitleaks PASS.
+Full final checkpoint matrix remains incomplete. REVIEW CHECKPOINT, not Merge Candidate.
+
+## BB-132A RC01 verification state — 2026-09-30
+
+**REVIEW CHECKPOINT, not a Merge Candidate.** Failed acceptance may be published for independent
+review under [AGENTS](AGENTS.md#permanent-checkpoint-branch-workflow); this does not waive full
+verification before Merge Candidate/acceptance. [Checkpoint evidence](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30)
+records exact baseline, publication identity resolution and scope.
+Preserved native compilation and Release test-project build passed;196 focused B/C/E/F/configuration
+tests passed with5 explicit model skips. Real attempts remain failed:4B30s/180s timeouts,1.7B
+WorkerFailed, diagnostic exit40, corrected complete reply rejected InvalidReply. No new inference
+or repeated expensive suites during RC01's documentation/publication step. Final full test/restore/
+format matrix and accepted proposal evidence remain unfinished, not implicitly green.
+Ordinary CI must not download/run a model. Consumed opt-in journals must never be deleted to rerun.
+Publication checks cover docs/links, exact diff/staged inventory, secrets and prior-evidence hashes.
+Any publication CI result belongs to that exact commit and is separate from retained local test evidence.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.
