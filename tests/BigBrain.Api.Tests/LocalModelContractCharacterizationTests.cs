@@ -7,11 +7,11 @@ using BigBrain.Modules.Finance;
 
 namespace BigBrain.Api.Tests;
 
-// RC04: source-driven witnesses, not inference or a replacement GBNF/Finance parser.
+// Source-driven version-binding regressions, not inference or a replacement GBNF/Finance parser.
 // Only the current literal + identity/text subset is expanded; changed syntax fails this test helper.
 public sealed class LocalModelContractCharacterizationTests
 {
-    private static readonly string[] IdentityFields = ["version", "inputChecksum", "scopeHandle"];
+    private static readonly string[] IdentityFields = ["inputChecksum", "scopeHandle"];
     private static readonly string[] DeclineTextFields = ["explanation"];
     private static readonly string[] ProposalTextFields = ["question", "rationale"];
     private static string WorkerSource => File.ReadAllText(Path.Combine(AppContext.BaseDirectory,
@@ -56,12 +56,17 @@ public sealed class LocalModelContractCharacterizationTests
     [InlineData(true, "finance-research-learning-v2")]
     [InlineData(false, "FINANCE-RESEARCH-LEARNING-V1")]
     [InlineData(true, "FINANCE-RESEARCH-LEARNING-V1")]
-    public async Task GrammarPermitsWrongVersionButFinanceRejectsItWithoutCoercion(bool decline, string version)
+    public async Task GrammarPinsFinanceVersionAndFinanceStillRejectsWrongVersionsWithoutCoercion(bool decline, string version)
     {
         var scope = ResearchLearningFixture.Scope();
         var node = JsonNode.Parse(Fixture(scope, decline))!.AsObject();
         node["version"] = version; // Deliberate synthetic witness, NOT a reconstructed RC03 response.
-        var wire = GrammarWitness(node.ToJsonString(), decline);
+        var generated = GrammarWitness(node.ToJsonString(), decline);
+        using var output = JsonDocument.Parse(generated);
+        Assert.Equal(LearningAdmissionPolicy.Version, output.RootElement.GetProperty("version").GetString());
+        Assert.NotEqual(version, output.RootElement.GetProperty("version").GetString());
+        // Synthetic wrong-version wire bypasses grammar for the negative Finance control only.
+        var wire = node.ToJsonString();
         var parsed = await ParseFramed(wire, scope.Input);
         Assert.Equal(LearningAdmissionReason.UnsupportedContract, parsed.Rejection);
         Assert.Null(parsed.Reply);

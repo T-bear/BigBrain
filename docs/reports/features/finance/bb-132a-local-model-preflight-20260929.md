@@ -2,6 +2,191 @@
 
 
 
+
+## Final BB-132A — 2026-10-01
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+Owner independently reviewed RC04 and authorized one minimal producer correction followed, only
+after green model-free checks, by the LAST Qwen3-1.7B acceptance invocation<=180s. No more inference
+or tuning review rounds are authorized. That allowance is now **CONSUMED**. This final state is
+published for independent exact-SHA review; publication does not authorize merge or deployment.
+Baseline/main: `739beab55a494068edcf23d3c905aa6601b99dc0`.
+Branch: `bb-132a/first-local-language-model`.
+Parent RC04: `6a57c9eedc3e3a81412e64cceee58f814afc83ab`, tree
+`dff305c76d04390de2b1fa228a4aaa9508b3533a`.
+Resolve exact final candidate SHA/tree from GitHub history (no recursive self-SHA embedding):
+
+```sh
+git log -1 --format='%H %T' --grep='^review: publish BB-132A final local-model merge candidate$' origin/bb-132a/first-local-language-model
+```
+
+### Implemented correction and real end-to-end outcome
+
+Exactly TWO native GBNF lines changed relative to RC04. Proposal and NoUsefulProposal now begin
+with the literal reply version `finance-research-learning-v1`; it is no longer generated through
+`identity`. Prompt/copy instructions and EVERY other rule/field remain unchanged. Finance parser,
+LearningAdmissionPolicy.Version, admission, vocabulary, BRF1 and all scientific/risk/ledger and
+isolation/resource policies are unchanged. No JSON repair, aliases, coercion or post-generation edit.
+
+The model-free cross-boundary tests now assert that BOTH branches emit LearningAdmissionPolicy.Version
+regardless of synthetic wrong-version suggestions. Positive fixtures still pass real .NET BRF1,
+Finance parsing and pure admission; direct wrong-version input still fails UnsupportedContract.
+A drift back to free identity or to a different literal fails the tests. The historical RC04 proof
+remains in Git/report history, not rewritten to suggest that the old grammar was already fixed.
+
+After green model-free checks and a separate pinned native rebuild, exactly ONE real invocation ran:
+**1 PASS / 0 FAIL. Typed reply: Proposal. Deterministic Finance disposition: Admitted.**
+Path: Finance synthetic development projection -> IResearchReasoner/LocalReasonerRuntime -> internally
+owned native BRF1 child -> pinned libllama -> Qwen3-1.7B -> unchanged strict Finance parser/admission.
+No CLI subprocess, server, listener, external model or alternative scientific path.
+
+The model's bounded question concerned whether momentum period20 outperforms other strategies.
+Its rationale asserted outperformance without proof. Both are untrusted metadata: that broad
+comparison/assertion grants no strategy beyond the single allowed momentum/v1 period20 variant.
+The actual structured plan/falsification remains Finance's existing validation.excessReturn<=0 in
+fractional-return units with its existing sample policy and engine-owned5/10/20 trials. No claim of
+profitability, demonstrated edge, completed scientific evaluation or risk approval follows.
+The successful reply was not hand-edited. Raw synthetic response is retained privately for exact
+replay verification, not copied into this report or published as general audit data.
+
+| Observation | Final real invocation |
+| --- | --- |
+| Maximum wall deadline | 180 seconds, unchanged controlled-acceptance ceiling |
+| First complete-frame header observed | 50,408 ms from runtime start |
+| Terminal runtime audit / caller admission | 50,458 / 50,559 ms |
+| Whole test-command wall time | 57,853 ms including hashing/setup/test overhead |
+| Native exit / cleanup | 0 / WorkerCleanupRequired=false |
+| Finance result | Proposal parsed; Admitted; no ReplyRejection |
+| Response SHA-256 | 9d370b40df3e867b3873e94dbe23a0449b9b10ec3da1b0342055b62748fea084 |
+| Proposal ID | sha256:c3500fed9c0adc063395d7d4b9d5c7d70b7c115a1b643777144553071c659a01 |
+| Execution fingerprint | sha256:56e86e64d6319283e84cb81255fa3d3acf810ed46da3dcb2d7a7abdfc41f986e |
+| Sampled RSS / VmHWM peak | 1,663,620 / 1,676,920 KiB; HWM approximately1.599GiB |
+| Sampled cgroup memory peak | 599,310,336 bytes, not total process RSS/shared cache |
+| Cgroup CPU usage | 96.505611 CPU-seconds |
+| Samples / peak tasks | 231 at nominal250ms / 2 tasks |
+| OOM / OOM kill / group kill | 0 before/after; owned group empty afterwards |
+| Host available memory before / after | 5,611,644 / 5,591,876 KiB |
+| Scientific engine calls / trading actions | 0 / 0 |
+
+No separate model-load/prefill/generation timings, first-token latency or throughput are instrumented.
+The worker emits only a complete response, so header timing is not first-token timing. Sampled HWM
+is an observation, not a precision claim about every instant. Shared page-cache accounting explains
+why cgroup totals must not be equated with process RSS. One admitted result is not a reliability or
+model-quality benchmark; the preceding failures remain material limitations/evidence.
+
+### Artifact/build/isolation identity and retained history
+
+- Same model: `unsloth/Qwen3-1.7B-GGUF`, revision `d7f544eead698dbd1f15126ef60b45a1e1933222`,
+  Qwen3-1.7B-Q4_K_M.gguf,1,107,409,472bytes, SHA-256
+  `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897` verified before invocation.
+  Previously verified Apache-2.0 model/license/provenance retained. No download, substitution or GPU.
+- Same pinned CPU libllama b11146 / commit `7fe450e19305b828c199d602c23a8337aaa1f03b`, MIT runtime.
+  Runtime/license hashes rechecked against existing manifest; existing local headers used unchanged.
+  New native-worker-final-version SHA-256:
+  `631deb1ccfece198309c0485ada2d5eae62ecd3b146c1efc945078e97dd2eb1b`.
+  Old binaries were not overwritten. GCC14.2.0, same trusted local CLI build pattern:
+
+```sh
+g++ -std=c++20 -O2 -Wall -Wextra -Werror -I data/bb132a/include src/BigBrain.LocalReasoner.Worker/worker.cpp -L data/bb132a/runtime -Wl,--no-as-needed -lgomp -lllama -lggml -lggml-base -Wl,--as-needed '-Wl,-rpath,$ORIGIN/runtime' -o data/bb132a/native-worker-final-version
+```
+
+- Dynamic RUNPATH remains $ORIGIN/runtime; no runtime fetch/latest resolution. Model/runtime binaries
+  and local operator paths are ignored, never added to Git. The one-off acceptance test pins the new
+  executable hash in trusted test configuration; request/model output cannot select it.
+- Same CPU-only greedy generation,4096context/3072input/512output-token bounds,2threads,65,536-byte
+  BRF1 caps. Same4GiB cgroup/RLIMIT_AS, zero swap, CPU quota200000/100000,pids.max32,
+  memory.oom.group1, Landlock/seccomp and owned-child lifecycle. No GPU, worker descendants or tools.
+  Pre-existing dedicated cgroup was empty with exact controls before start; no service/config change.
+- Existing model-free containment probe PASS: network/process creation/exec/foreign read/write/signals
+  denied, permitted thread/read work; group empty afterwards. No model loaded by probe.
+- Same trusted local operator opt-in and fsynced CreateNew sanitized journal, no public invocation
+  endpoint or fabricated authenticated user. Production user-facing auth/authorization/audit-service
+  integration remains outside this controlled local acceptance scope.
+- All15 earlier evidence files, including original immutable-read SQLite/WAL/SHM and every failed/
+  diagnostic journal/measurement, remain byte-identical. No budget/exposure reset or refund.
+  Final pure Finance admission uses retained counters; it does not revive the failed C iteration,
+  reserve a fresh scientific execution, persist a new scientific result or grant trading authority.
+- New journal SHA-256 `081e185f5cd2fcebe0dffcae20f9490abf09acec8f2026ed01f5a84f0d4a8ace`;
+  measurements SHA-256 `ec9f8a46b08c7955c6ef1a7f3751ae0ba95dc42721ec02e166dad3c48e52fd04`.
+  Private final-evidence-manifest.json pins all18 evidence files including the successful response hash.
+  All earlier4B timeouts/1.7B failures/RC03 rejection remain retained and spent.
+
+### Final verification
+
+- Before native rebuild/inference: relevant B/C/E/F/version-bound tests **210 PASS /6 model skips**;
+  final harness/configuration/version tests **15 PASS /7 model skips**. Build/formatter PASS.
+- Controlled real test, exactly once: `BB132A_LOCAL_ACCEPTANCE=1.7b-final` and trusted artifact root;
+  `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build --filter 'FullyQualifiedName~Qwen17FinalVersionBoundAcceptanceRequiresFinanceAdmission'`:
+  **1 PASS /0 FAIL /0 SKIP**. Audit confirms one invocation, Proposal/Admitted, zero engine calls.
+- `dotnet restore BigBrain.slnx`: PASS, all projects up to date.
+- `dotnet build BigBrain.slnx --configuration Release --no-restore`: PASS, zero warnings/errors.
+- `dotnet format BigBrain.slnx --verify-no-changes --no-restore`: PASS, no changes.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build`:
+  **874 PASS /0 FAIL /7 intentional real-model skips**,71s; includes relevant Finance science,
+  risk, B/C/E/F persistence/ledger/runtime regressions. No real-model opt-in in ordinary full suite.
+- `dotnet test tests/BigBrain.Sentinel.Tests/BigBrain.Sentinel.Tests.csproj --configuration Release --no-build`:
+  **32 PASS /0 FAIL /0 SKIP**.
+- `gitleaks git . --redact --no-banner`: PASS,299 commits scanned/no leaks. Exact candidate/staged
+  secrets scan PASS on all24 cumulative candidate files, no leaks; exact staged content rechecked
+  before commit. `node scripts/verify-documentation.mjs`: PASS258 Markdown/91unique backlog IDs.
+  `git diff --check`: PASS; intended12-file delta/24-file cumulative scope verified.
+- Web and deployment/CI configuration diff against baseline is empty; no unrelated frontend tests
+  or changes introduced. Branch publication CI is not claimed; current push workflow runs on main/PR.
+
+The final delta from RC04 is twelve files: native worker's two grammar lines; LocalModelAcceptanceTests.cs
+(new explicit final opt-in/hash/separate CreateNew journal, no retries); LocalModelContractCharacterizationTests.cs
+(version-binding regressions); nine docs ROADMAP.md, TESTING.md, docs/STATUS.md, docs/BACKLOG.md,
+docs/modules/finance.md, docs/architecture/finance/master-roadmap.md, docs/operations/codex-recovery.md,
+docs/reports/REPORT-CATALOG.md and this report. Cumulative baseline inventory is listed below.
+All unrelated local mockups/unpublished ADR0006–0009 remain excluded and preserved. No force/history rewrite.
+
+### Scientific assessment, limits and stop
+
+Diff against accepted baseline confirms Finance Modules/API calculations, ledger/result persistence,
+no-lookahead/holdout separation, risk veto, provider entitlements, historical identities/evidence,
+Sentinel, Web, packages, schema, CI and deployment configuration unchanged. Current round changes
+only producer version binding and tests/docs. No model rationale becomes executable behavior.
+
+This demonstrates one actual local researcher proposal accepted for deterministic testing on measured
+hardware through the accepted boundary. It does not implement a recurring research loop, production
+principal/auth/audit integration, unattended runtime deployment, general model quality, adaptive-market
+search approval, prospective validation, real-provider data rights/export or profitability. CPU-only
+capacity observed on this host is not a guarantee for other machines/workloads. Every future invocation
+requires a separately authorized bounded context and governance; no further BB-132A inference is allowed.
+Future persistent iteration, prospective validation, two PAPER portfolio concepts and dashboard work
+remain product direction only. **Finance RESEARCH /0 SEK /NONE.** No PAPER/LIVE/AUTO/broker/orders/
+capital, cloud fallback, arbitrary generated code, deployment, merge or BB-132B.
+**STOP after publishing the exact final candidate.** Owner/architect independently reviews and decides
+acceptance or closure. No subsequent trimming/retry review series is started. Earlier sections below
+are dated history and do not authorize replaying spent attempts.
+
+Cumulative changed files against accepted baseline (24):
+
+- `AGENTS.md`
+- `ROADMAP.md`
+- `TESTING.md`
+- `docs/BACKLOG.md`
+- `docs/START-HERE.md`
+- `docs/STATUS.md`
+- `docs/architecture/finance/master-roadmap.md`
+- `docs/indexes/documentation.md`
+- `docs/modules/finance.md`
+- `docs/operations/codex-recovery.md`
+- `docs/reports/README.md`
+- `docs/reports/REPORT-CATALOG.md`
+- `docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md`
+- `docs/reports/publication-policy.md`
+- `docs/reports/report-schema.md`
+- `src/BigBrain.Brain/LocalReasonerRuntime.cs`
+- `src/BigBrain.Brain/LocalReasonerRuntimeOptions.cs`
+- `src/BigBrain.LocalReasoner.Worker/containment-probe.cpp`
+- `src/BigBrain.LocalReasoner.Worker/containment.h`
+- `src/BigBrain.LocalReasoner.Worker/worker.cpp`
+- `tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj`
+- `tests/BigBrain.Api.Tests/LocalModelAcceptanceTests.cs`
+- `tests/BigBrain.Api.Tests/LocalModelContractCharacterizationTests.cs`
+- `tests/BigBrain.Api.Tests/LocalReasonerRuntimeTests.cs`
+
 ## Review Checkpoint RC04 — 2026-10-01
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE. Model-free characterization only.**

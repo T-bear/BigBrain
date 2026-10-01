@@ -22,6 +22,9 @@ Owner direction, implementation authorization currently limited to BB-132A:
    RC04 model-free analysis proves GBNF permits wrong contract versions; Finance's exact version is
    available and the prompt correctly requests it. No correction/inference; proposed producer-only
    version binding awaits independent review. Historical raw value unknown; final acceptance unused.
+   Final owner-authorized round (2026-10-01): only both grammar version literals fixed; LAST1.7B
+   invocation produced Proposal / Finance Admitted. Full backend/build/format verified; MERGE CANDIDATE
+   for independent review only. No additional inference allowance, engine/trading call or deployment.
 2. Persistent research loop/history, building on existing ledger governance; no recurring loop yet.
 3. Prospective validation.
 4. Future PAPER concepts: Long-term portfolio and Active/high-risk portfolio.

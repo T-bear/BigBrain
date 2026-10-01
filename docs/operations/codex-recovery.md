@@ -19,6 +19,45 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132A final Merge Candidate handoff — 2026-10-01
+
+Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED**.
+Owner reviewed RC04 and authorized only two producer grammar version literals plus model-free checks
+and ONE LAST1.7B acceptance<=180s. This final allowance is **CONSUMED**. NO more inference/fix-loop.
+Baseline739beab55a494068edcf23d3c905aa6601b99dc0; branch bb-132a/first-local-language-model;
+parent RC04 6a57c9eedc3e3a81412e64cceee58f814afc83ab, treedff305c76d04390de2b1fa228a4aaa9508b3533a.
+Publication subject `review: publish BB-132A final local-model merge candidate` resolves exact
+candidate SHA/tree via the [final report command](../reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+
+Native worker changed only reply version literals on BOTH grammar alternatives. Prompt/other fields,
+Finance parser/admission/vocabulary/BRF1/science/risk/ledger/runtime/resource controls unchanged.
+Cross-boundary tests now enforce exact Finance version binding. New native-worker-final-version
+SHA256631deb1ccfece198309c0485ada2d5eae62ecd3b146c1efc945078e97dd2eb1b; old binaries preserved.
+Model/runtime/license checks and unchanged existing containment probe PASS before inference.
+Separate opt-in1.7b-final journal is spent: **1 PASS /0 FAIL, Proposal / Finance Admitted**.
+Runtime50,458ms, caller50,559ms, command57,853ms; native exit0/no cleanup, OOM0, group empty.
+No engine/scientific result or trading action. Rationale's outperformance assertion is unproven
+metadata, never evidence/authority. All15 prior evidence hashes unchanged, no budget/exposure refund.
+Ignored final-evidence-manifest.json pins18files, including successful response retained privately.
+Never rerun acceptance-17b-final or any earlier CreateNew journal. Raw response/logs/artifacts not published.
+
+Pre-inference210 model-free PASS/6 skips; final harness15 PASS/7 skips. Final solution restore, Release
+build0warnings/errors and full formatter PASS. Full API874 PASS/7 real-model skips; Sentinel32 PASS.
+History Gitleaks299commits/no leaks; all24 candidate files Gitleaks PASS/no leaks. Documentation/
+index/link PASS258Markdown/91IDs; diff --check PASS; intended12/24file scope verified and staged
+content rechecked before commit. No branch/main CI success is inferred.
+Current delta12files (worker,two tests,nine docs); cumulative baseline24files enumerated in report.
+Unrelated mockups/ADR0006–0009 untouched/excluded. Model/runtime/evidence remain ignored local files.
+
+If publication is interrupted, inspect local/remote subject/SHA first; finish only pending publication
+checks/commit/push, never duplicate/amend or rerun model. Verify unchanged main before/after push.
+After push no unpublished implementation remains. STOP: owner/architect independently reviews exact
+candidate for acceptance or closure. No merge without explicit owner approval of that exact SHA.
+Remaining limits: single admitted run not model-quality/reliability/performance-profit evidence;
+production auth/audit/deployment/autonomous loop/prospective validation/data rights remain later work.
+Finance RESEARCH /0 SEK /NONE. No PAPER/LIVE/AUTO, broker/orders/capital/cloud/GPU/deploy/BB-132B.
+Earlier entries below are historical and do not permit reusing old attempts or additional trimming.
+
 ## BB-132A Review Checkpoint RC04 handoff — 2026-10-01
 
 Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**.

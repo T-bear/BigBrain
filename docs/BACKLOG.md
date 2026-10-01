@@ -1,5 +1,20 @@
 # BigBrain Backlog
 
+## BB-132A final local-model result — 2026-10-01
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED OR MERGED.**
+Owner-authorized minimal producer correction pins finance-research-learning-v1 in BOTH grammar
+alternatives. No Finance parser/admission/vocabulary, prompt, other field or isolation change.
+The LAST1.7B acceptance invocation completed: **Proposal / Finance Admitted,1 PASS/0 FAIL**.
+Runtime50,458ms, native exit0, no OOM/cleanup, zero scientific engine calls. Model rationale remains
+unproven metadata, not evidence. All15 prior evidence files unchanged; no ledger refund/reset.
+No model allowance remains. [Exact SHA/tree resolution, provenance, measurements and verification](reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+Final solution restore/build/format PASS; API874 PASS/7 model skips, Sentinel32 PASS.
+Next: publish exact candidate then STOP for independent review/acceptance-or-closure.
+No further model trimming/retry series. Finance RESEARCH /0 SEK /NONE. No merge/deployment/cloud/
+PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Earlier entries are dated historical states.
+
+
 ## BB-132A RC04 — model-free contract characterization, 2026-10-01
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**

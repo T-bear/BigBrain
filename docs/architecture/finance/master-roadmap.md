@@ -22,6 +22,10 @@ Prior history unchanged, separate final acceptance unused. STOP for RC03 review;
 RC04 model-free characterization proves the producer grammar permits wrong versions despite correct
 copy instructions; Finance's exact contract is unchanged. No model invocation or production fix.
 Review the proposed grammar-only version binding before any correction/last acceptance; A remains incomplete.
+Final authorized round (2026-10-01) implemented only both version literals, then consumed the LAST
+acceptance: real1.7B Proposal / Finance Admitted, zero engine/trading calls. Full backend/build/format
+verified; MERGE CANDIDATE for review only. No more model runs or next checkpoint. Independent acceptance
+is still required. Earlier failed attempts and scientific history remain unchanged.
 
 ## BB-131F local runtime control — 2026-09-29
 

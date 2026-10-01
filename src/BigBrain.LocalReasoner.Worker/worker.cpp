@@ -59,8 +59,8 @@ static constexpr const char *response_grammar=R"gbnf(
 root ::= proposal | decline
 identity ::= "\"" [a-zA-Z0-9_./:-]{1,128} "\""
 text ::= "\"" [a-zA-Z0-9 .,?;:()-]{1,96} "\""
-proposal ::= "{\"version\":" identity ",\"discriminator\":\"Proposal\",\"inputChecksum\":" identity ",\"scopeHandle\":" identity ",\"targetId\":" identity ",\"question\":" text ",\"rationale\":" text ",\"parentHypothesisRef\":null,\"variants\":[{\"strategy\":{\"id\":\"momentum\",\"version\":\"v1\"},\"parameters\":{\"period\":20},\"bindingHandle\":" identity "}],\"falsificationCriteria\":[{\"metric\":\"validation.excessReturn\",\"phase\":\"validation\",\"comparison\":\"LessThanOrEqual\",\"threshold\":0,\"unit\":\"fraction\",\"samplePolicy\":\"anti-overfitting-governance-v1\"}]}"
-decline ::= "{\"version\":" identity ",\"discriminator\":\"NoUsefulProposal\",\"inputChecksum\":" identity ",\"scopeHandle\":" identity ",\"reasonCode\":\"NoSupportedQuestion\",\"explanation\":" text "}"
+proposal ::= "{\"version\":\"finance-research-learning-v1\",\"discriminator\":\"Proposal\",\"inputChecksum\":" identity ",\"scopeHandle\":" identity ",\"targetId\":" identity ",\"question\":" text ",\"rationale\":" text ",\"parentHypothesisRef\":null,\"variants\":[{\"strategy\":{\"id\":\"momentum\",\"version\":\"v1\"},\"parameters\":{\"period\":20},\"bindingHandle\":" identity "}],\"falsificationCriteria\":[{\"metric\":\"validation.excessReturn\",\"phase\":\"validation\",\"comparison\":\"LessThanOrEqual\",\"threshold\":0,\"unit\":\"fraction\",\"samplePolicy\":\"anti-overfitting-governance-v1\"}]}"
+decline ::= "{\"version\":\"finance-research-learning-v1\",\"discriminator\":\"NoUsefulProposal\",\"inputChecksum\":" identity ",\"scopeHandle\":" identity ",\"reasonCode\":\"NoSupportedQuestion\",\"explanation\":" text "}"
 )gbnf";
 int main(int argc,char **argv) {
     if(argc!=4) return 2;

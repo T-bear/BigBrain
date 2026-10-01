@@ -131,7 +131,13 @@ public sealed class LocalModelAcceptanceTests
     [Trait("Category", "ControlledLocalModel")]
     public async Task Qwen17Rc03DiagnosticRecordsSanitizedReplyRejectionOnly() => await RunControlledAcceptance(true, rc03: true);
 
-    private static async Task RunControlledAcceptance(bool qwen17, bool diagnostic = false, bool corrected = false, bool rc03 = false)
+    public static bool FinalAcceptanceEnabled => Environment.GetEnvironmentVariable("BB132A_LOCAL_ACCEPTANCE") == "1.7b-final";
+
+    [Fact(Skip = "Exactly one final owner-authorized BB-132A acceptance invocation only.", SkipUnless = nameof(FinalAcceptanceEnabled))]
+    [Trait("Category", "ControlledLocalModel")]
+    public async Task Qwen17FinalVersionBoundAcceptanceRequiresFinanceAdmission() => await RunControlledAcceptance(true, finalAcceptance: true);
+
+    private static async Task RunControlledAcceptance(bool qwen17, bool diagnostic = false, bool corrected = false, bool rc03 = false, bool finalAcceptance = false)
     {
         if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException();
         var token = TestContext.Current.CancellationToken;
@@ -149,7 +155,7 @@ public sealed class LocalModelAcceptanceTests
         if (qwen17)
         {
             var manifest = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                File.ReadAllText(Path.Combine(root, rc03 ? "diagnostic-final-evidence-manifest.json" : corrected ? "prior-corrected-evidence-manifest.json" : diagnostic ? "prior-diagnostic-evidence-manifest.json" : "prior-4b-evidence-manifest.json")))!;
+                File.ReadAllText(Path.Combine(root, finalAcceptance ? "rc03-final-evidence-manifest.json" : rc03 ? "diagnostic-final-evidence-manifest.json" : corrected ? "prior-corrected-evidence-manifest.json" : diagnostic ? "prior-diagnostic-evidence-manifest.json" : "prior-4b-evidence-manifest.json")))!;
             foreach (var (relativePath, hash) in manifest)
             {
                 var file = Path.Combine(root, relativePath);
@@ -162,6 +168,9 @@ public sealed class LocalModelAcceptanceTests
         if (rc03)
             Assert.Equal("44bbeca4bca8103299fbd8201c2df5fb8d9133411c9544492493ef91b45a1011",
                 Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(Path.Combine(root, "native-worker-corrected")))));
+        if (finalAcceptance)
+            Assert.Equal("631deb1ccfece198309c0485ada2d5eae62ecd3b146c1efc945078e97dd2eb1b",
+                Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(Path.Combine(root, "native-worker-final-version")))));
         Assert.Equal(0, new FileInfo(Path.Combine(previous, "finance.db-wal")).Length);
         // Frozen prior database: immutable read avoids even updating WAL shared-memory read marks.
         using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
@@ -184,7 +193,7 @@ public sealed class LocalModelAcceptanceTests
         Assert.Null(state.GetProperty("commitment").Deserialize<LearningCommitment>());
         connection.Close();
 
-        var directory = Path.Combine(root, rc03 ? "diagnostic-17b-rc03" : corrected ? "acceptance-17b-corrected" : diagnostic ? "diagnostic-17b" : qwen17 ? "acceptance-17b-180" : "acceptance-180");
+        var directory = Path.Combine(root, finalAcceptance ? "acceptance-17b-final" : rc03 ? "diagnostic-17b-rc03" : corrected ? "acceptance-17b-corrected" : diagnostic ? "diagnostic-17b" : qwen17 ? "acceptance-17b-180" : "acceptance-180");
         Directory.CreateDirectory(directory);
         File.SetUnixFileMode(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
         using var audit = new FileStream(Path.Combine(directory, "invocation.jsonl"), new FileStreamOptions
@@ -198,7 +207,7 @@ public sealed class LocalModelAcceptanceTests
         void Record(object value) { JsonSerializer.Serialize(audit, value); audit.WriteByte((byte)'\n'); audit.Flush(true); }
         Record(new
         {
-            Authorization = rc03 ? "BB-132A-RC03-owner-one-ReplyRejection-diagnostic" : corrected ? "BB-132A-owner-one-corrected-1.7B-acceptance" : diagnostic ? "BB-132A-owner-bounded-WorkerFailed-diagnosis" : qwen17 ? "BB-132A-owner-Qwen3-1.7B-separate-180s" : "BB-132A-owner-separate-invocation-180s",
+            Authorization = finalAcceptance ? "BB-132A-owner-final-version-bound-1.7B-acceptance" : rc03 ? "BB-132A-RC03-owner-one-ReplyRejection-diagnostic" : corrected ? "BB-132A-owner-one-corrected-1.7B-acceptance" : diagnostic ? "BB-132A-owner-bounded-WorkerFailed-diagnosis" : qwen17 ? "BB-132A-owner-Qwen3-1.7B-separate-180s" : "BB-132A-owner-separate-invocation-180s",
             Model = qwen17 ? "Qwen3-1.7B-Q4_K_M" : "Qwen3-4B-Q4_K_M",
             MaximumSeconds = 180,
             PreviousLedgerSha256 = priorHashes[Path.Combine(previous, "finance.db")],
@@ -212,7 +221,7 @@ public sealed class LocalModelAcceptanceTests
             Enabled = true,
             ControlledRealModelAcceptance = true,
             InvocationTimeout = TimeSpan.FromSeconds(180),
-            WorkerExecutable = Path.Combine(root, rc03 || corrected ? "native-worker-corrected" : diagnostic ? "native-worker-diagnostic" : "native-worker-180"),
+            WorkerExecutable = Path.Combine(root, finalAcceptance ? "native-worker-final-version" : rc03 || corrected ? "native-worker-corrected" : diagnostic ? "native-worker-diagnostic" : "native-worker-180"),
             WorkerArguments = [Path.Combine(root, "runtime"), model,
                 File.ReadAllText(Path.Combine(root, "cgroup-path.private")).Trim()],
             CoordinationDirectory = directory

@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-132A final, 2026-10-01` — [Version-bound local model proposal admitted by Finance](features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01). MERGE CANDIDATE, not accepted/merged. API874 PASS/7 model skips; Sentinel32 PASS; full restore/build/format PASS. Minimal grammar version fix; last1.7B real invocation1 PASS/Finance Admitted. No engine/trading call, prior evidence unchanged, no more inference authorized.
+
 - `BB-132A RC04, 2026-10-01` — [Model-free producer/Finance contract characterization](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. GBNF permits incorrect contract versions rejected by Finance; correct version also allowed.14 source-driven witnesses PASS; no historical raw value inferred, production correction or inference.
 
 - `BB-132A RC03, 2026-10-01` — [One real diagnostic invocation: UnsupportedContract](features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01). REVIEW CHECKPOINT, NOT MERGE CANDIDATE. Complete native reply rejected InvalidReply; existing enum captured, no correction or further inference.196 model-free PASS/6 model skips; real diagnostic0 PASS/1 FAIL. Prior evidence preserved; separate final acceptance unused.

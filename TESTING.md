@@ -1,5 +1,20 @@
 # Testa BigBrain
 
+## BB-132A final version-bound acceptance — 2026-10-01
+
+Minimal producer-only version correction; cross-boundary tests fail on drift from Finance's exact
+version in either grammar alternative. Relevant model-free suite210 PASS/6 skips; after final
+opt-in wiring,15 targeted PASS/7 model skips. Exactly ONE final1.7B real invocation:1 PASS/0 FAIL,
+Proposal parsed and Finance Admitted, zero engine calls. That allowance is consumed; NEVER rerun.
+Ordinary CI skips all real-model tests, requires no model/download/native runtime. No retry/fallback.
+[Exact commands, final full-suite results and limitations](docs/reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
+Solution restore/Release build/full formatter PASS; native compilation and existing isolation probe PASS.
+Full API874 PASS/7 intentional real-model skips; Sentinel32 PASS. Gitleaks history299commits/no leaks;
+all24 cumulative candidate files PASS/no leaks. Documentation258Markdown/91IDs, diff/scope checks PASS.
+MERGE CANDIDATE only, not accepted/merged or production-deployed; no publication-CI claim.
+Earlier failed real tests remain historical failures; they are not recast as successful experiments.
+
+
 ## BB-132A RC04 model-free characterization — 2026-10-01
 
 Fourteen new tests read the actual native worker source as text and construct witnesses from its
