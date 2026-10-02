@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-132E Review Checkpoint handoff — 2026-10-02
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Architecture review stop, not an
+interrupted implementation. Baseline `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree
+`69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`; branch `bb-132e/prospective-shadow-evaluation`.
+Resolve publication subject `review: characterize BB-132E prospective shadow compatibility`
+for exact remote commit/tree and six-file inventory. [Canonical findings, checks and remaining
+work](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md).
+Completed: existing D/daily-science/shadow ownership and semantic characterization, model-free
+witness tests, sanitized report/status/backlog. No production correction, schema change or new engine.
+Remaining: owner/architect decision on compatible observation finality/session/outcome semantics,
+then separately authorized continuation of the same branch. Do not treat test-only daily relabelling
+as an adapter. Prior experiments, grants and evidence remain untouched. No model/provider calls.
+Unrelated mockups and unpublished ADR0006–0009 preserved/excluded. No tracked pre-existing changes.
+Finance RESEARCH / 0 SEK / NONE. No trading, scheduler, deployment or BB-132F.
+Next: STOP after publication for independent review; do not implement either proposed semantic route.
+
 Den här filen är den enda kanoniska återhämtningsplatsen för avbrott och opublicerad delta. Checkpointens egen rapport bär bestående checkpoint-evidens och reviewhistorik. Vid återupptagning ska `AGENTS.md` följas först; verifiera accepterad main, senaste publicerade Review Checkpoint, working tree och noten. Stoppa vid konflikt. Lämna mallen orörd och markera inte publicerat ofullständigt arbete som en aktiv lokal avbrottskörning.
 
 ## Recovery note template

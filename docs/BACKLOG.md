@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-132E — prospective shadow evaluation
+
+**REVIEW CHECKPOINT / BLOCKED ON SEMANTIC COMPATIBILITY / NOT A MERGE CANDIDATE.**
+Characterization complete; candidate freezing and shadow evaluation/result persistence are NOT
+implemented. Before continuation, owner/architect must select an explicit scientifically valid
+observation-to-outcome contract: finalized daily evidence compatible with existing strategies,
+or a separately reviewed snapshot-specific outcome meaning. Neither option is implemented or
+automatically authorized. [Exact boundary, tests and remaining acceptance](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md).
+DoD remains the owner's immutable freeze → future-only sealed projection → deterministic persisted
+shadow result/reopen/noninterference proof, without trading, renewed research grants or inference.
+
 ## BB-132D — real market observation foundation, 2026-10-02
 
 **MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** D ends at immutable acquired evidence
