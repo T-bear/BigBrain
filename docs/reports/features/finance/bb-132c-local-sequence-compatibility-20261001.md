@@ -1,7 +1,221 @@
-# BB-132C — Local-model finite-session compatibility review
+# BB-132C — Real local-model finite research sequence and compatibility history
 
-Detta är en sanerad GitHub-version. Model-free integration evidence only; no raw model context,
+Detta är en sanerad GitHub-version. Sanitized model-free and controlled real-session evidence; no raw model context,
 responses, private runtime paths, production data or credentials are published.
+
+## Authorized compatibility correction — 2026-10-02
+
+Current status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED**.
+Prior Review Checkpoint `c970b4d4cc64dcde39a032661dab266f75885404`, tree
+`0a45c911605d007fcf348d9afa2ef7bcc511c836`, remains unchanged in history. The owner/architect
+accepted its findings and authorized only the deadline/prompt corrections plus the conditional
+single real C session. That session is now complete:2/2 invocations,1/1 scientific evaluation.
+No retry/refund/replacement or further real invocation is authorized.
+
+- Baseline/main: `cab482c49d2187a3f39c13528a5fb88d899f6b8f`.
+- Baseline tree: `0b2b3edfdef25b32290754fa9aae364045c66c89`.
+- Same branch: `bb-132c/local-model-research-sequence`.
+- Current publication subject: `review: prove BB-132C real local research sequence`.
+- Resolve exact candidate/tree/parent from Git metadata, avoiding a self-referential commit SHA:
+
+```sh
+git log -1 --format='%H %T %P' --grep='^review: prove BB-132C real local research sequence$' origin/bb-132c/local-model-research-sequence
+git diff cab482c49d2187a3f39c13528a5fb88d899f6b8f <resolved-candidate-SHA> --stat
+```
+
+### Corrected integration
+
+- `LocalReasonerRuntime.CompletionTimeout` derives from validated InvocationTimeout + GracePeriod +
+  ReapTimeout. Controlled real configuration remains180s +250ms +2s =182.25s total completion bound;
+  inference itself remains180s. Ordinary runtime defaults and validation are unchanged.
+- Finance's internal `RunFiniteResearchIterationAsync` accepts this trusted completion bound. It
+  validates positive/finite <= the existing projected300s iteration ceiling BEFORE spending any
+  authority. Reservation still revalidates atomically. Existing callers without an explicit policy
+  retain the projected30s default. No persisted input, grant, schema or identity is rewritten.
+- Finance's deadline uses the existing supplied TimeProvider for deterministic virtual-time tests.
+  It is linked with caller cancellation; timeout/cancellation/uncertainty still spends the invocation,
+  discards late replies and never authorizes retry, refund or further evaluation. Runtime still owns
+  the actual inference deadline and pidfd-bound cleanup. Trusted caller disposal awaits cleanup.
+- Native prompt describes history/optional finiteHistory in the exact Finance JSON. Absence means
+  empty initial history; presence means only the supplied bounded prior outcome, availability/cutoff
+  and optional reference validation return, never holdout/profitability/new authority. No additional
+  history representation, query or model field. Both source literal strings plus exact serialized
+  input are tested; grammar, all other prompt instructions and inference parameters remain unchanged.
+- No new API/Brain reference, endpoint, scheduler, adapter framework or alternate orchestration.
+  Controlled acceptance binds the existing IResearchReasoner runtime method to Finance's existing
+  narrow delegate and supplies the runtime-derived bound.
+
+Model-free virtual-time tests cover legitimate completion at51s, expiry of the composed bound,
+cancellation, late reply/replay/no-refund and invalid/unbounded configuration before reservation.
+Actual proof-child cancellation awaits owned cleanup. Prior N/evaluator/persistence/reopen/N+1 tests
+remain; both empty and nonempty prompt cases use actual Finance projection with no protected IDs.
+
+### Controlled acceptance preparation
+
+`FiniteLocalModelAcceptanceTests.OneRealFiniteSessionPersistsNAndReopensHistoryForNPlusOne` is skipped
+unless BB132C_LOCAL_ACCEPTANCE=one-session. BB132A_LOCAL_ACCEPTANCE remains disabled. A separate
+private C session.jsonl is CreateNew/WriteThrough/fsync, and an existing C finance.db rejects rerun.
+Preflight verifies exact model/native hash, runtime manifest and all18 prior A evidence hashes.
+The C session explicitly freezes B's existing2invocation/1evaluation/3trial/64call grant. N must be
+Completed/Admitted with native persisted result before reopen and N+1. Otherwise test records the
+actual sanitized outcome and stops. No replacement/repair/retry. N+1 can decline or be BudgetExceeded;
+unchanged scientific ledger identity and EngineStarts1 prove no second evaluation.
+Operational audit binds iteration number, input/history checksums, runtime invocation and outcome;
+scientific native references remain private authoritative ledger data, never projected to Qwen.
+No new raw model prompt/response log is added. Existing Finance commitment retains native scientific
+metadata under its existing policy; no rationale is promoted to evidence.
+
+Native rebuild (no model execution) reuses pinned A headers/libraries. New C native binary SHA-256:
+`783737a2c7b93fa1d165c0f011757b9a13576730a72301a206da1462039ad188`.
+Exact build from repository root, ignored local artifacts only:
+
+```sh
+g++ -std=c++17 -O2 -fopenmp -Wl,--no-as-needed -I data/bb132a/include src/BigBrain.LocalReasoner.Worker/worker.cpp -L data/bb132a/runtime -lllama -lggml -lggml-base -Wl,-rpath,'$ORIGIN/../bb132a/runtime' -o data/bb132c/native-worker
+```
+
+This changes the fixed executable's relative library location only to reuse the same pinned runtime
+from C's separate directory. Model/libllama/CPU-only configuration, cgroup, Landlock, seccomp, RLIMITs,
+pidfd and process topology remain unchanged. Source/header/binary hashes are retained privately.
+Unchanged containment source rebuilt model-free: network/process/exec/foreign read/write/signals
+rejected; allowed thread/read passed; dedicated group empty before/after; safe probe file unchanged.
+The probe did not load a model. Runtime manifest and18 prior A evidence files verify unchanged.
+
+### Verification and real-session evidence
+
+All model-free gates passed BEFORE creating the real C session (2026-10-02):
+
+| Command / scope | Result |
+| --- | --- |
+| `dotnet restore BigBrain.slnx` | PASS |
+| `BB132A_LOCAL_ACCEPTANCE=disabled BB132C_LOCAL_ACCEPTANCE=disabled dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore --filter 'FullyQualifiedName~FiniteLocalReasonerIntegrationTests\|FullyQualifiedName~FiniteResearchSessionTests\|FullyQualifiedName~LocalModelContractCharacterizationTests'` | 55 PASS:14 integration,27 session,14 grammar |
+| Same test command with filter `FullyQualifiedName~FiniteLocal\|FullyQualifiedName~FiniteResearchSessionTests\|FullyQualifiedName~LocalModelContractCharacterizationTests\|FullyQualifiedName~LocalReasonerRuntimeTests\|FullyQualifiedName~ResearchReasonerContractTests\|FullyQualifiedName~FinanceLearningLedgerTests\|FullyQualifiedName~ResearchLearning` | 255 PASS /1 controlled-model SKIP |
+| `dotnet build BigBrain.slnx --configuration Release --no-restore` | PASS,0 warnings/errors |
+| `dotnet format BigBrain.slnx --verify-no-changes --no-restore` | PASS after scoped new-test whitespace correction; no semantic change |
+| `BB132A_LOCAL_ACCEPTANCE=disabled BB132C_LOCAL_ACCEPTANCE=disabled dotnet test BigBrain.slnx --configuration Release --no-build` | API920 PASS/8 controlled-model SKIP; Sentinel32 PASS |
+| `node scripts/verify-documentation.mjs` | PASS260 Markdown/91 IDs; sandbox Git EPERM required authorized unsandboxed verifier |
+| `git diff --check`; Gitleaks8.28.0 exact16-file scan | PASS, no leaks |
+
+Controlled local acceptance (NOT ordinary CI):
+`dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build --filter FullyQualifiedName~OneRealFiniteSessionPersistsNAndReopensHistoryForNPlusOne`,
+with A opt-in disabled, C opt-in `one-session` and explicit private artifact/evidence roots.
+A create-new/fsynced attempt marker preceded the command; the harness separately creates its journal
+exclusively and refuses an existing C database. One test PASS/0 FAIL, exactly one session and two
+runtime starts. No test rerun. The measurement wrapper sampled only this owned cgroup/process,
+created no model subprocess beyond the accepted directly owned native worker, and did not alter limits.
+
+| Actual controlled result | N | N+1 |
+| --- | --- | --- |
+| Runtime result / owned exit | Proposal /0, no cleanup required | Proposal /0, no cleanup required |
+| Finance terminal result | Completed / Admitted | Completed / BudgetExceeded |
+| Complete response observed | 52,090ms | 58,146ms |
+| Runtime terminal duration | 52,134ms | 58,201ms |
+| Whole Finance iteration | 56,962ms | 59,746ms |
+| Evaluator starts cumulative | 1 | 1 |
+| Trials / underlying native runs cumulative | 3 /36 | 3 /36 |
+| History-bearing input | no, initial development projection | yes, finance-finite-history-v1 |
+
+The unmodified parser accepted both structured proposals. N+1 was blocked by Finance governance,
+not counted as a successful second experiment. Exactly one robustness evaluation and36 immutable
+native backtest rows/reference rows persist. Reopen through the native Finance reader verified
+result checksum before N+1. A separate read-only SQLite check confirmed the two completed session
+records and native row counts afterward; no response was hand-edited or replayed into another grant.
+The scientific ledger checksum was unchanged across N+1. Its v1 invocation counter remains1 as
+accepted B semantics require; the finite session and runtime audits record2. No legacy authority reset.
+
+N+1 received only B's existing previous outcome Admitted, remainingScientificEvaluations0,
+previousIteration1, explicit availability/cutoff and fixed-reference development validation excess
+return -0.0878316. Availability `2026-10-02T01:50:31.7888985Z` preceded cutoff
+`2026-10-02T01:50:32.4391673Z`. This negative synthetic development fact is NOT a profitability claim.
+No protected selection/holdout outcome or native result ID/checksum is in the model projection.
+Source-driven prompt tests and unchanged B noninterference tests prove visibility boundaries;
+actual runtime audit input hashes equal the exact serialized Finance projections used in both calls.
+That proves delivery/binding, not psychological understanding by Qwen.
+
+| Sanitized identity | Value |
+| --- | --- |
+| N projection checksum | `sha256:8b616751c16b67350989d3f8ba3998ea4cf0c4e05a9b8dc9fbc88b575bdf1fcd` |
+| N transport input SHA-256 | `9ef79b1b212627e5f1024a0dd1cc4170ed6b402a7dbf05f54cc211b673dc67fe` |
+| N+1 projection checksum | `sha256:c26ec17f91128fb4639334585bbb41b2e2b0f1a60d89ddd15550b40980728b84` |
+| N+1 permitted history checksum | `sha256:ded64786055900f1ed9a5462ba25d9bd6c6546589a6ee8669b55f5b19b489faa` |
+| N+1 transport input SHA-256 | `b3001992aa09ef1a0e9b93e57ae4b92b9b1f34014907d5d0872adb335674d81d` |
+| Final finite session checksum | `sha256:5e1468372787b3635ba04d99b282f20d0d19372045c3739622c7773878a9febe` |
+
+Whole acceptance command wall time133,523ms includes test initialization, artifact hashing, two
+invocations and persistence. Dedicated cgroup CPU delta213.390 CPU-seconds; max sampled owned
+processes1/tasks2. Sampled worker RSS peak1,672,908KiB; observed VmHWM peak1,679,484KiB.
+Sampled cgroup charged memory peak606,531,584bytes differs from RSS because shared/file-backed
+pages can be charged elsewhere; neither is a universal host peak or a precise model-only footprint.
+Host MemAvailable before/after5,114,968/5,125,396KiB of8,052,580KiB total. No increase in OOM,
+OOM-kill or memory-max events; cgroup empty after completion. Limits remained RAM4GiB, swap0,
+CPU2 cores quota, tasks32; Landlock/seccomp/pidfd unchanged. No GPU offload. Load-only time,
+first-token time and generation throughput were not separately instrumented; response timing
+measures the complete buffered BRF1 frame, not first token.
+
+Pinned model remains unsloth/Qwen3-1.7B-GGUF revision
+`d7f544eead698dbd1f15126ef60b45a1e1933222`, Q4_K_M, Apache-2.0,
+1,107,409,472bytes, SHA-256 `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897`.
+Pinned llama.cpp b11146 commit `7fe450e19305b828c199d602c23a8337aaa1f03b`, MIT, unchanged
+runtime libraries verified against A's manifest. No download/model/parameter change.
+All18 prior A evidence-file hashes remain unchanged. All six pre-inference code/test hashes remain
+unchanged after the real sequence. Separate C operational journal, measurements, DB and evidence
+manifest are preserved privately; no raw model prompt/reply, protected result references or private
+runtime path is published. No trading capability, provider, Sentinel mutation or deployed service
+participated. Caller remains InternalWorkloadUnattested, an explicit controlled local acceptance
+workload, not a fabricated authenticated production principal.
+
+Post-session verification: the same full solution model-free command passed again: API920 PASS /
+8 intentional model SKIP; Sentinel32 PASS/0 FAIL. No real inference repeated. Source/test hashes
+matched the pre-inference manifest, so the green Release build/format evidence applies unchanged.
+Final `node scripts/verify-documentation.mjs` PASS260 Markdown/91 IDs;
+`git diff --cached --check` PASS; exact staged16-file inventory and all six source/test hashes PASS.
+`/tmp/bb130d1-tools/gitleaks git --staged --redact --no-banner .` PASS/no leaks;
+`/tmp/bb130d1-tools/gitleaks git --redact --no-banner .` PASS305 existing commits/no leaks.
+Final documentation changes are rescanned before commit. GitHub CI is not claimed by local tests. Frontend, CI, package, schema, deployment and Sentinel implementation are untouched.
+
+### Remaining limitations and next action
+
+This is one bounded synthetic real sequence, not a market-edge claim, autonomous daemon,
+production auth/audit rollout or deployment. Broader operational use and any further inference
+require separate owner/architect authorization. BB-132D remains NOT STARTED / NOT AUTHORIZED.
+The protected scientific engines, result identities, v1/B grants, history projection, admission,
+risk veto, provider isolation and Sentinel read-only boundary are unchanged. No general new
+architecture decision or ADR is introduced. STOP after publishing this exact Merge Candidate for
+independent review; no merge approval is inferred.
+
+### Current changed surfaces and remaining work
+
+Exact16 changed files against accepted baseline:
+
+- `ROADMAP.md`
+- `TESTING.md`
+- `docs/BACKLOG.md`
+- `docs/STATUS.md`
+- `docs/architecture/finance/local-first-reasoner-boundary.md`
+- `docs/architecture/finance/master-roadmap.md`
+- `docs/modules/finance.md`
+- `docs/operations/codex-recovery.md`
+- `docs/reports/REPORT-CATALOG.md`
+- `docs/reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md`
+- `src/BigBrain.Api/Finance/FinanceFiniteResearchSession.cs`
+- `src/BigBrain.Brain/LocalReasonerRuntime.cs`
+- `src/BigBrain.Brain/LocalReasonerRuntimeOptions.cs`
+- `src/BigBrain.LocalReasoner.Worker/worker.cpp`
+- `tests/BigBrain.Api.Tests/FiniteLocalModelAcceptanceTests.cs`
+- `tests/BigBrain.Api.Tests/FiniteLocalReasonerIntegrationTests.cs`
+
+Four production files: FinanceFiniteResearchSession.cs (bounded deadline composition only),
+LocalReasonerRuntime.cs (derived completion policy only), LocalReasonerRuntimeOptions.cs (comment
+scope only), worker.cpp (history instructions only). Existing integration tests updated; one new
+controlled opt-in acceptance test. Ten canonical docs carry current status/evidence. No scientific
+parser/admission/evaluator/history projection/ledger/schema change, model/package/provider/CI/Web/
+Sentinel/deployment configuration change. Original characterization remains in prior review Git history.
+The single real session is complete; no further inference. Publish after final model-free verification.
+No merge/BB-132D. Finance RESEARCH / 0 SEK / NONE.
+
+## Historical Review Checkpoint — 2026-10-01
+
+All sections below preserve the pre-correction review evidence and its then-current stop/next action.
+They do not supersede the current 2026-10-02 result above.
 
 ## Metadata
 

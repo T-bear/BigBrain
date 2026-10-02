@@ -94,16 +94,23 @@ internal sealed partial class EodhdMarketMemory
     internal async Task<FiniteResearchIteration> RunFiniteResearchIterationAsync(string sessionId, int iteration,
         string expectedInputChecksum, DateTimeOffset cutoff, TimeProvider clock,
         Func<LearningDevelopmentInput, CancellationToken, Task<LearningReasonerReply>> reason,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, TimeSpan? reasonerCompletionTimeout = null)
     {
         ArgumentNullException.ThrowIfNull(reason);
         cancellationToken.ThrowIfCancellationRequested();
+        // Trusted composition supplies the actual reasoner deadline plus its bounded cleanup.
+        // Model-free callers retain the projected default; neither duration grants more science.
+        // Validate before spending authority. Reservation rechecks the projection atomically.
+        var preview = PreviewFiniteResearchInput(sessionId, iteration, cutoff);
+        var completionTimeout = reasonerCompletionTimeout ?? TimeSpan.FromSeconds(preview.Limits.ReasonerDeadlineSeconds);
+        if (completionTimeout <= TimeSpan.Zero || completionTimeout > TimeSpan.FromSeconds(preview.Limits.IterationCapSeconds))
+            throw new ArgumentOutOfRangeException(nameof(reasonerCompletionTimeout));
         var reserved = ReserveFiniteIteration(sessionId, iteration, expectedInputChecksum, cutoff, clock.GetUtcNow(), out var replay);
         if (replay) return reserved;
         FiniteSessionTestHook?.Invoke("after-invocation-commit");
         LearningReasonerReply reply;
-        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        deadline.CancelAfter(TimeSpan.FromSeconds(30));
+        using var expiry = new CancellationTokenSource(completionTimeout, clock);
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, expiry.Token);
         try
         {
             reply = await reason(reserved.Input, deadline.Token).WaitAsync(deadline.Token).ConfigureAwait(false);

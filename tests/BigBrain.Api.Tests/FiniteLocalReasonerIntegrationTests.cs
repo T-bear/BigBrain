@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
 using BigBrain.Api.Finance;
@@ -49,7 +49,7 @@ public sealed class FiniteLocalReasonerIntegrationTests
         await using var runtime = worker.Create(secondMode);
         IResearchReasoner port = runtime;
         var next = await reopened.RunFiniteResearchIterationAsync(session.SessionId, 2, input.InputChecksum,
-            cutoff, clock, port.ReasonAsync, TestContext.Current.CancellationToken);
+            cutoff, clock, port.ReasonAsync, TestContext.Current.CancellationToken, runtime.CompletionTimeout);
         Assert.Equal(secondOutcome, next.Outcome);
         var started = worker.Events.Where(x => x.Phase == LocalReasonerAuditPhase.Started).ToArray();
         Assert.Equal(2, started.Length);
@@ -89,49 +89,152 @@ public sealed class FiniteLocalReasonerIntegrationTests
     }
 
     [Fact]
-    public async Task FiniteSessionThirtySecondDeadlineStillCancelsAControlled180SecondRuntime()
+    public async Task RuntimeDerivedBudgetAllowsLegitimateReplyBeyondThirtySecondsWithoutWallClockSleep()
     {
-        using var db = new ResearchReasonerContractTests.Database();
-        using var worker = new ProofRuntime();
-        var memory = db.Memory();
-        var scope = ResearchLearningFixture.Scope();
-        var clock = TimeProvider.System;
+        using var db = new ResearchReasonerContractTests.Database(); using var worker = new ProofRuntime();
+        await using var runtime = worker.Create("valid", controlled180: true); // Policy only; no worker start.
+        var clock = new ManualClock(); var memory = db.Memory(); var scope = ResearchLearningFixture.Scope();
         var session = memory.CreateFiniteResearchSession(scope, clock);
-        Assert.Equal(30, scope.Input.Limits.ReasonerDeadlineSeconds);
-        var runtime = worker.Create("hang", controlled180: true);
-        var watch = Stopwatch.StartNew();
-        FiniteResearchIteration n;
-        try
-        {
-            IResearchReasoner port = runtime;
-            n = await memory.RunFiniteResearchIterationAsync(session.SessionId, 1, scope.Input.InputChecksum,
-                clock.GetUtcNow(), clock, port.ReasonAsync, TestContext.Current.CancellationToken);
-        }
-        finally { await runtime.DisposeAsync(); } // Wait for actual owned-child cleanup, not just the session's WaitAsync.
-        Assert.Equal(FiniteIterationFailure.TimedOut, n.Failure);
-        Assert.InRange(watch.Elapsed.TotalSeconds, 29, 60);
-        var terminal = worker.Events.Last();
-        Assert.Equal(LocalReasonerOutcome.Cancelled, terminal.Outcome); // Parent's shorter token wins.
-        Assert.True(terminal.WorkerCleanupRequired);
-        Assert.NotNull(terminal.WorkerExitCode);
-        Assert.Equal(0, db.Memory().ReadLearningLedger().EngineStarts);
-        Assert.Single(db.Memory().ReadFiniteResearchSession()!.Iterations);
+        var complete = new TaskCompletionSource<LearningReasonerReply>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = 0; CancellationToken received = default;
+        Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken token)
+        { calls++; received = token; return complete.Task; }
+        var run = memory.RunFiniteResearchIterationAsync(session.SessionId, 1, scope.Input.InputChecksum,
+            clock.GetUtcNow(), clock, Reason, CancellationToken.None, runtime.CompletionTimeout);
+        Assert.Equal(TimeSpan.FromSeconds(182.25), runtime.CompletionTimeout);
+        clock.Advance(TimeSpan.FromSeconds(51));
+        Assert.False(received.IsCancellationRequested); Assert.False(run.IsCompleted);
+        complete.SetResult(LearningReplyParser.Parse(ResearchLearningFixture.NoUseful(scope), scope.Input).Reply!);
+        var result = await run;
+        Assert.Equal(LearningAdmissionReason.NoUsefulProposal, result.Outcome);
+        Assert.Equal(result, await memory.RunFiniteResearchIterationAsync(session.SessionId, 1,
+            scope.Input.InputChecksum, clock.GetUtcNow(), clock, Reason, CancellationToken.None, runtime.CompletionTimeout));
+        Assert.Equal(1, calls); Assert.Equal(0, memory.ReadLearningLedger().EngineStarts); Assert.Empty(worker.Events);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task HungOrCancelledReasonerRetainsSpentAuthorityAndDiscardsLateReply(bool cancel)
+    {
+        using var db = new ResearchReasonerContractTests.Database(); using var worker = new ProofRuntime();
+        await using var runtime = worker.Create("valid", controlled180: true);
+        var clock = new ManualClock(); var memory = db.Memory(); var scope = ResearchLearningFixture.Scope();
+        var session = memory.CreateFiniteResearchSession(scope, clock);
+        using var caller = new CancellationTokenSource();
+        var complete = new TaskCompletionSource<LearningReasonerReply>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = 0; CancellationToken received = default;
+        Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken token)
+        { calls++; received = token; return complete.Task; }
+        var run = memory.RunFiniteResearchIterationAsync(session.SessionId, 1, scope.Input.InputChecksum,
+            clock.GetUtcNow(), clock, Reason, caller.Token, runtime.CompletionTimeout);
+        if (cancel) caller.Cancel(); else clock.Advance(runtime.CompletionTimeout);
+        var result = await run;
+        Assert.True(received.IsCancellationRequested);
+        Assert.Equal(cancel ? FiniteIterationFailure.Cancelled : FiniteIterationFailure.TimedOut, result.Failure);
+        complete.SetResult(LearningReplyParser.Parse(ResearchLearningFixture.Proposal(scope), scope.Input).Reply!);
+        Assert.Equal(result, await memory.RunFiniteResearchIterationAsync(session.SessionId, 1,
+            scope.Input.InputChecksum, clock.GetUtcNow(), clock, Reason, CancellationToken.None, runtime.CompletionTimeout));
+        Assert.Equal(1, calls); Assert.Equal(1, memory.ReadLearningLedger().Invocations);
+        Assert.Equal(0, memory.ReadLearningLedger().EngineStarts);
         Assert.Throws<InvalidOperationException>(() => db.Memory().PreviewFiniteResearchInput(session.SessionId, 2, clock.GetUtcNow()));
     }
 
     [Fact]
-    public void AcceptedNativePromptAssertsEmptyHistoryUnconditionally()
+    public async Task CallerCancellationReapsActualOwnedProofChildWithoutRefund()
     {
+        using var db = new ResearchReasonerContractTests.Database(); using var worker = new ProofRuntime();
+        var memory = db.Memory(); var scope = ResearchLearningFixture.Scope();
+        var session = memory.CreateFiniteResearchSession(scope, TimeProvider.System);
+        using var caller = new CancellationTokenSource();
+        var runtime = worker.Create("hang", controlled180: true);
+        try
+        {
+            var run = memory.RunFiniteResearchIterationAsync(session.SessionId, 1, scope.Input.InputChecksum,
+                DateTimeOffset.UtcNow, TimeProvider.System, runtime.ReasonAsync, caller.Token, runtime.CompletionTimeout);
+            await worker.ResponseStarted.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+            caller.Cancel();
+            Assert.Equal(FiniteIterationFailure.Cancelled, (await run).Failure);
+        }
+        finally { await runtime.DisposeAsync(); }
+        Assert.True(worker.Events.Last().WorkerCleanupRequired);
+        Assert.NotNull(worker.Events.Last().WorkerExitCode);
+        Assert.Equal(0, db.Memory().ReadLearningLedger().EngineStarts);
+        Assert.Equal(1, db.Memory().ReadLearningLedger().Invocations);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(301)]
+    public async Task InvalidOrUnboundedCompletionPolicyRejectsBeforeReservation(int seconds)
+    {
+        using var db = new ResearchReasonerContractTests.Database();
+        var memory = db.Memory(); var scope = ResearchLearningFixture.Scope();
+        var session = memory.CreateFiniteResearchSession(scope, TimeProvider.System);
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => memory.RunFiniteResearchIterationAsync(
+            session.SessionId, 1, scope.Input.InputChecksum, DateTimeOffset.UtcNow, TimeProvider.System,
+            (_, _) => throw new InvalidOperationException("Must not invoke"), CancellationToken.None, TimeSpan.FromSeconds(seconds)));
+        Assert.Empty(memory.ReadFiniteResearchSession()!.Iterations); Assert.Equal(0, memory.ReadLearningLedger().Invocations);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task NativePromptRendersOnlyExactFinanceProjectionWithCorrectHistorySemantics(bool hasHistory)
+    {
+        using var db = new ResearchReasonerContractTests.Database(); using var worker = new ProofRuntime();
+        var memory = db.Memory(); var scope = ResearchLearningFixture.Scope();
+        var session = memory.CreateFiniteResearchSession(scope, TimeProvider.System);
+        if (hasHistory) await Invoke(memory, session.SessionId, 1, worker, "valid");
+        var input = db.Memory().PreviewFiniteResearchInput(session.SessionId, hasHistory ? 2 : 1, DateTimeOffset.UtcNow);
+        var json = Encoding.UTF8.GetString(LocalReasonerProtocol.Request(input));
         var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "contract-characterization", "worker.cpp"));
         var start = source.IndexOf("static std::string prompt(", StringComparison.Ordinal);
         var end = source.IndexOf("// Generation constraint", start, StringComparison.Ordinal);
-        Assert.True(start >= 0 && end > start);
-        var prompt = source[start..end];
-        Assert.Contains("Initial history is empty: no previous\nexperiments/results exist in this projection.", prompt, StringComparison.Ordinal);
-        Assert.DoesNotContain("finiteHistory", prompt, StringComparison.Ordinal);
-        Assert.DoesNotContain("if(", prompt, StringComparison.Ordinal);
-        Assert.Contains(")\"+input+R\"(", prompt, StringComparison.Ordinal);
-        // Source evidence only: no claim about how Qwen would resolve contradictory instructions.
+        var body = source[start..end];
+        // Evaluate only the actual two literal strings + exact input expression, no parallel template.
+        var match = Regex.Match(body, "return R\"\\((.*?)\\)\"\\+input\\+R\"\\((.*?)\\)\";", RegexOptions.Singleline);
+        Assert.True(match.Success);
+        var prompt = match.Groups[1].Value + json + match.Groups[2].Value;
+        Assert.Contains("Absent finiteHistory means empty initial research history.", prompt, StringComparison.Ordinal);
+        Assert.Contains("Present finiteHistory contains only Finance-authorized prior outcome", prompt, StringComparison.Ordinal);
+        Assert.DoesNotContain("Initial history is empty: no previous", prompt, StringComparison.Ordinal);
+        Assert.Contains(json, prompt, StringComparison.Ordinal);
+        Assert.Equal(hasHistory, input.FiniteHistory is not null);
+        if (hasHistory)
+        {
+            Assert.Equal(LearningAdmissionReason.Admitted, input.FiniteHistory!.PreviousOutcome);
+            Assert.Equal(0, input.FiniteHistory.RemainingScientificEvaluations);
+            var native = memory.ReadLearningLedger().Result!;
+            Assert.DoesNotContain(native.EvaluationId, prompt, StringComparison.Ordinal);
+            Assert.DoesNotContain(native.Checksum, prompt, StringComparison.Ordinal);
+            Assert.DoesNotContain("holdout", json, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("selection", json, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private sealed class ManualClock : TimeProvider
+    {
+        private DateTimeOffset _now = new(2026, 10, 2, 0, 0, 0, TimeSpan.Zero);
+        private readonly List<ManualTimer> _timers = [];
+        public override DateTimeOffset GetUtcNow() => _now;
+        public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            Assert.Equal(Timeout.InfiniteTimeSpan, period);
+            var timer = new ManualTimer(this, callback, state); timer.Change(dueTime, period); _timers.Add(timer); return timer;
+        }
+        internal void Advance(TimeSpan delta)
+        { _now += delta; foreach (var timer in _timers.ToArray()) timer.Fire(); }
+        private sealed class ManualTimer(ManualClock clock, TimerCallback callback, object? state) : ITimer
+        {
+            private DateTimeOffset? _due;
+            public bool Change(TimeSpan dueTime, TimeSpan period)
+            { _due = dueTime == Timeout.InfiniteTimeSpan ? null : clock._now + dueTime; return true; }
+            internal void Fire() { if (_due is { } due && due <= clock._now) { _due = null; callback(state); } }
+            public void Dispose() => _due = null;
+            public ValueTask DisposeAsync() { Dispose(); return ValueTask.CompletedTask; }
+        }
     }
 
     private static async Task<FiniteResearchIteration> Invoke(EodhdMarketMemory memory, string sessionId,
@@ -143,13 +246,14 @@ public sealed class FiniteLocalReasonerIntegrationTests
         await using var runtime = worker.Create(mode);
         IResearchReasoner port = runtime;
         return await memory.RunFiniteResearchIterationAsync(sessionId, iteration, input.InputChecksum,
-            cutoff, clock, port.ReasonAsync, TestContext.Current.CancellationToken);
+            cutoff, clock, port.ReasonAsync, TestContext.Current.CancellationToken, runtime.CompletionTimeout);
     }
 
     private sealed class ProofRuntime : IDisposable
     {
         private readonly string _root = Path.Combine(Path.GetTempPath(), "bb132c-proof-" + Guid.NewGuid().ToString("N"));
         internal ConcurrentQueue<LocalReasonerAudit> Events { get; } = new();
+        internal TaskCompletionSource ResponseStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         internal ProofRuntime()
         {
             if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException();
@@ -163,7 +267,7 @@ public sealed class FiniteLocalReasonerIntegrationTests
             CoordinationDirectory = _root,
             ControlledRealModelAcceptance = controlled180,
             InvocationTimeout = TimeSpan.FromSeconds(controlled180 ? 180 : mode == "hang" ? 2 : 10)
-        }, Events.Enqueue);
+        }, record => { Events.Enqueue(record); if (record.Phase == LocalReasonerAuditPhase.ResponseStarted) ResponseStarted.TrySetResult(); });
         public void Dispose() => Directory.Delete(_root, true);
     }
 }

@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-132C, 2026-10-01` — [Local-model finite-session compatibility review](features/finance/bb-132c-local-sequence-compatibility-20261001.md). REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE. Model-free actual session/runtime/BRF1/evaluator/reopen evidence; fixed30s session versus controlled180s runtime and unconditional empty-history native prompt need a bounded compatibility decision. No production change or real invocation; C allowance unused.
+- `BB-132C, 2026-10-02` — [Real local-model finite research sequence and compatibility history](features/finance/bb-132c-local-sequence-compatibility-20261001.md). MERGE CANDIDATE / NOT ACCEPTED. Authorized deadline/prompt corrections; real Qwen N Admitted, native evaluation/persistence/reopen, history-aware Qwen N+1 BudgetExceeded.2 invocations/1 evaluation, no retry/OOM; prior review and A evidence preserved. Exact identity, gates, sanitized resource evidence and limitations in report; no further inference authorized.
 
 - `BB-132B, 2026-10-01` — [Finite model-free research session and retained boundary characterization](features/finance/bb-132b-research-loop-boundary-20261001.md). ACCEPTED / MERGED / CI VERIFIED; exact approved candidate8df4541, unchanged mergeb2da9e7, main CI36918069527 all jobs/steps SUCCESS. Explicit two-invocation/one-evaluation grant; same Finance store, no old-v1 conversion; bounded development history, restart/replay/concurrency and holdout noninterference. No model or deployment; BB-132C not started/authorized.
 

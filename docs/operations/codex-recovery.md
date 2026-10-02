@@ -19,6 +19,27 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132C real sequence — final publication handoff, 2026-10-02
+
+Status: MERGE CANDIDATE / NOT ACCEPTED; real session COMPLETE; publication handoff.
+Baseline/main `cab482c49d2187a3f39c13528a5fb88d899f6b8f`, tree
+`0b2b3edfdef25b32290754fa9aae364045c66c89`; same branch `bb-132c/local-model-research-sequence`.
+Prior published review `c970b4d4cc64dcde39a032661dab266f75885404` is preserved.16 intended files:
+four production files for only deadline composition/history prompt, two test files and ten docs;
+exact inventory in report/diff. No code/test changes after real inference; private hashes verify this.
+N Completed/Admitted, native evidence persisted, reopened; N+1 Completed/BudgetExceeded.
+Exactly2 real invocations,1 evaluator start,3 trials,36 underlying runs, both workers exit0, no OOM.
+C allowance CONSUMED. DO NOT rerun controlled acceptance, restart a new session or reuse A grants.
+Separate C create-new journal/attempt marker/DB/resource evidence preserved; A18 hashes unchanged.
+Pre-inference: focus55 and expanded255/1SKIP; API920/8SKIP; Sentinel32; restore/build/format/docs/secrets green.
+Post-session API920/8SKIP and Sentinel32 PASS again; source/test hashes and frozen C evidence unchanged.
+Final docs260/91, staged/diff/scope and Gitleaks staged/history305 commits PASS.
+Publication subject: `review: prove BB-132C real local research sequence`; resolve exact SHA/tree
+from Git as documented in the [report](../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md).
+At publication this is the complete handoff; no interrupted implementation remains. Exact SHA/tree
+come from the published commit metadata. STOP for independent review. No merge, next checkpoint or further inference. Finance RESEARCH /
+0 SEK / NONE. Unrelated mockups/unpublished ADR0006–0009 remain untouched and excluded.
+
 ## BB-132C Review Checkpoint handoff — 2026-10-01
 
 Status: **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE**; compatibility decision required.

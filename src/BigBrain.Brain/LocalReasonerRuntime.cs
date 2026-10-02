@@ -28,6 +28,10 @@ public sealed class LocalReasonerRuntime : IResearchReasoner, IAsyncDisposable
         _workerHash = Hash(Encoding.UTF8.GetBytes(options.WorkerExecutable + "\0" + string.Join('\0', options.WorkerArguments)));
     }
 
+    // Trusted composition uses the validated runtime policy, including owned-child cleanup.
+    // Not model input, scientific authority or an additional inference allowance.
+    public TimeSpan CompletionTimeout => _options.InvocationTimeout + _options.GracePeriod + _options.ReapTimeout;
+
     // One-way kill switch. Re-enabling requires new explicit trusted composition, never automatic retry.
     public void Disable()
     {
