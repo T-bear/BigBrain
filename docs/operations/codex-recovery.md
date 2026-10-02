@@ -19,26 +19,25 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
-## BB-132C real sequence — final publication handoff, 2026-10-02
+## BB-132C accepted publication handoff — 2026-10-02
 
-Status: MERGE CANDIDATE / NOT ACCEPTED; real session COMPLETE; publication handoff.
-Baseline/main `cab482c49d2187a3f39c13528a5fb88d899f6b8f`, tree
-`0b2b3edfdef25b32290754fa9aae364045c66c89`; same branch `bb-132c/local-model-research-sequence`.
-Prior published review `c970b4d4cc64dcde39a032661dab266f75885404` is preserved.16 intended files:
-four production files for only deadline composition/history prompt, two test files and ten docs;
-exact inventory in report/diff. No code/test changes after real inference; private hashes verify this.
-N Completed/Admitted, native evidence persisted, reopened; N+1 Completed/BudgetExceeded.
-Exactly2 real invocations,1 evaluator start,3 trials,36 underlying runs, both workers exit0, no OOM.
-C allowance CONSUMED. DO NOT rerun controlled acceptance, restart a new session or reuse A grants.
-Separate C create-new journal/attempt marker/DB/resource evidence preserved; A18 hashes unchanged.
-Pre-inference: focus55 and expanded255/1SKIP; API920/8SKIP; Sentinel32; restore/build/format/docs/secrets green.
-Post-session API920/8SKIP and Sentinel32 PASS again; source/test hashes and frozen C evidence unchanged.
-Final docs260/91, staged/diff/scope and Gitleaks staged/history305 commits PASS.
-Publication subject: `review: prove BB-132C real local research sequence`; resolve exact SHA/tree
-from Git as documented in the [report](../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md).
-At publication this is the complete handoff; no interrupted implementation remains. Exact SHA/tree
-come from the published commit metadata. STOP for independent review. No merge, next checkpoint or further inference. Finance RESEARCH /
-0 SEK / NONE. Unrelated mockups/unpublished ADR0006–0009 remain untouched and excluded.
+Status: **ACCEPTED / MERGED / CI VERIFIED** on exact merge CI; documentation reconciliation
+is separately verified on its own final-main CI before completion. No interrupted implementation.
+Baseline `cab482c49d2187a3f39c13528a5fb88d899f6b8f`; approved candidate `78517da41e8d4e7642029daebde544a951da092d`;
+merge `2ff64718b561c9520ab1d3568649f10ec7f70596`; first parent baseline, second parent exact candidate;
+candidate/merge tree `d2c0222122e9dcaa5f4f216e5983e85ddc3798dc`. Preserved review parent `c970b4d4cc64dcde39a032661dab266f75885404`.
+Merge CI[36954159147](https://github.com/T-bear/BigBrain/actions/runs/36954159147) SUCCESS: all backend,
+frontend, documentation and secrets jobs/actual steps, including both formatter gates.
+Only12 canonical Markdown files reconciled; no implementation or historical evidence alteration.
+Final SHA/tree resolve from subject `docs: reconcile accepted BB-132C real research sequence`
+on origin/main. Final Actions run must match that SHA and pass independently; see
+[publication evidence](../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).
+No additional inference. A18/C11 preserved evidence hashes verified; C real allowance2/2 consumed,
+1 evaluator start,3 trials,36 runs. N Admitted; N+1 BudgetExceeded after native persistence/reopen.
+No new session/retry/refund. Finance RESEARCH / 0 SEK / NONE; no trading, broker/orders/capital,
+cloud, scheduler or deployment. BB-132D NOT STARTED / NOT AUTHORIZED.
+Exact next action after final-main CI: STOP and return control for independent post-merge review.
+Unrelated mockups and unpublished ADR0006–0009 remain untouched. Earlier entries below are history.
 
 ## BB-132C Review Checkpoint handoff — 2026-10-01
 

@@ -3,9 +3,72 @@
 Detta är en sanerad GitHub-version. Sanitized model-free and controlled real-session evidence; no raw model context,
 responses, private runtime paths, production data or credentials are published.
 
+## Accepted publication — 2026-10-02
+
+**ACCEPTED / MERGED / CI VERIFIED.** Owner explicitly approved the independently reviewed
+remote-tip commit identified by exact subject `review: prove BB-132C real local research sequence`.
+Identities below were freshly derived from fetched Git objects, not transcribed from chat.
+
+- Accepted BB-132B reconciliation baseline/main and merge-base: `cab482c49d2187a3f39c13528a5fb88d899f6b8f`.
+- Baseline tree: `0b2b3edfdef25b32290754fa9aae364045c66c89`.
+- Approved candidate/unchanged checkpoint branch tip: `78517da41e8d4e7642029daebde544a951da092d`.
+- Candidate parent/preserved compatibility Review Checkpoint: `c970b4d4cc64dcde39a032661dab266f75885404`.
+- Pre-merge relation: exactly2 ahead/0 behind; first commit directly parents baseline; second
+  commit is the reviewed candidate. Exact16 reviewed files; clean tracked working tree.
+- Merge: `2ff64718b561c9520ab1d3568649f10ec7f70596`.
+- Merge first parent: `cab482c49d2187a3f39c13528a5fb88d899f6b8f`.
+- Merge second parent: `78517da41e8d4e7642029daebde544a951da092d`.
+- Candidate tree = merge tree: `d2c0222122e9dcaa5f4f216e5983e85ddc3798dc`. Candidate-to-merge diff empty.
+- No amend/rebase/squash/history rewrite/implementation edit. Normal push to main.
+
+[Merge CI36954159147](https://github.com/T-bear/BigBrain/actions/runs/36954159147) for exactly the merge above:
+**SUCCESS**. Actual four jobs and all their steps inspected, not inferred from local candidate tests:
+
+| Job | Successful actual required steps |
+| --- | --- |
+| backend | checkout; setup-dotnet; restore; dotnet format verify-no-changes; Release build; solution tests; cleanup |
+| frontend | checkout; setup-node; npm ci; npm run format:check; npm test -- --run; npm run build; cleanup |
+| documentation | checkout; setup-node; documentation verifier; cleanup |
+| secrets | full-history checkout; gitleaks/gitleaks-action@v2; cleanup |
+
+Merge job logs additionally confirm Release build0 warnings/errors, API920 PASS/8 model SKIP,
+Sentinel32 PASS. The controlled C real-session test explicitly SKIPPED; no inference in CI.
+
+The separate reconciliation changes only12 Markdown files: ARCHITECTURE.md, ROADMAP.md,
+TESTING.md, docs/STATUS.md, docs/BACKLOG.md, docs/modules/finance.md,
+docs/architecture/finance/master-roadmap.md, docs/architecture/finance/research-learning-contract.md,
+docs/architecture/finance/local-first-reasoner-boundary.md, docs/operations/codex-recovery.md,
+docs/reports/REPORT-CATALOG.md and this report. Historical A/B/C evidence remains dated history.
+No source/test/schema/package/CI/runtime/provider/deployment change. ADR0038/0039/0040 stay Accepted.
+
+Local reconciliation checks PASS: `node scripts/verify-documentation.mjs` (260 Markdown/91 IDs),
+`git diff --check`, exact12 Markdown-only inventory, and Gitleaks8.28.0 directory scan of those
+12 files (no leaks). Exact staged patch is scanned again before commit. No runtime/model test run.
+
+Final reconciliation identity is resolved without a self-referential hash:
+
+```sh
+git log -1 --format='%H %T %P' --grep='^docs: reconcile accepted BB-132C real research sequence$' origin/main
+```
+
+The Actions run whose head_sha equals that exact reconciliation SHA is final-main verification.
+It must also pass the actual required jobs/steps; merge CI is not substituted for it. GitHub commit
+and Actions metadata plus the final publication report carry its exact SHA/tree/run/result once
+available. Failure means STOP/report without repairs or a fully-reconciled claim.
+
+Frozen18 A and11 C evidence-file hashes matched before merge. C journal still records exactly2
+runtime starts,1 scientific evaluation and the same completed sequence. No Qwen/model invocation,
+new session, refund or allowance reuse occurred during merge/reconciliation. Ordinary CI is model-free.
+Acceptance covers only the documented bounded synthetic real N → persisted native result → reopen
+→ history-aware real N+1 → exhausted-authority rejection proof. It does not prove market edge,
+broader autonomous research, production authenticated invocation or deployment readiness.
+Finance **RESEARCH / 0 SEK / NONE**; no PAPER/LIVE/AUTO, broker/orders/capital, provider/cloud,
+scheduler/daemon or deployment. **BB-132D NOT STARTED / NOT AUTHORIZED.** Further inference is
+not authorized; consumed C allowance remains2/2. STOP after exact final-main CI verification.
+
 ## Authorized compatibility correction — 2026-10-02
 
-Current status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED**.
+Implementation publication status at independent review: **MERGE CANDIDATE**. Current acceptance is recorded above.
 Prior Review Checkpoint `c970b4d4cc64dcde39a032661dab266f75885404`, tree
 `0a45c911605d007fcf348d9afa2ef7bcc511c836`, remains unchanged in history. The owner/architect
 accepted its findings and authorized only the deadline/prompt corrections plus the conditional
@@ -179,8 +242,8 @@ production auth/audit rollout or deployment. Broader operational use and any fur
 require separate owner/architect authorization. BB-132D remains NOT STARTED / NOT AUTHORIZED.
 The protected scientific engines, result identities, v1/B grants, history projection, admission,
 risk veto, provider isolation and Sentinel read-only boundary are unchanged. No general new
-architecture decision or ADR is introduced. STOP after publishing this exact Merge Candidate for
-independent review; no merge approval is inferred.
+architecture decision or ADR is introduced. The independently reviewed exact candidate is now
+owner-approved and merged as recorded above; no further execution authority follows.
 
 ### Current changed surfaces and remaining work
 
@@ -209,7 +272,7 @@ scope only), worker.cpp (history instructions only). Existing integration tests 
 controlled opt-in acceptance test. Ten canonical docs carry current status/evidence. No scientific
 parser/admission/evaluator/history projection/ledger/schema change, model/package/provider/CI/Web/
 Sentinel/deployment configuration change. Original characterization remains in prior review Git history.
-The single real session is complete; no further inference. Publish after final model-free verification.
+The single real session is complete; no further inference. The reviewed implementation is now accepted as recorded above.
 No merge/BB-132D. Finance RESEARCH / 0 SEK / NONE.
 
 ## Historical Review Checkpoint — 2026-10-01

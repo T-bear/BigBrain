@@ -1,5 +1,16 @@
 # BB-131A — Finance Research Learning contract
 
+## BB-132C accepted integration — 2026-10-02
+
+**ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](../../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).
+The accepted local runtime now composes its bounded completion deadline with the finite session;
+the native prompt describes exactly the existing Finance-owned sanitized history. Scientific
+projection/admission/grants/engine/isolation remain unchanged. Real N evaluated once, native evidence
+persisted/reopened, real history-bearing N+1 rejected BudgetExceeded;2/2 inference allowance consumed.
+No additional inference during publication. ADR0038/0039/0040 remain Accepted. No new architecture
+decision, deployment or runtime endpoint. Finance RESEARCH / 0 SEK / NONE; BB-132D NOT STARTED /
+NOT AUTHORIZED. Earlier B-era C-not-started statements below describe their historical date.
+
 ## BB-132B — finite model-free research session, 2026-10-01
 
 **ACCEPTED / MERGED / CI VERIFIED.**

@@ -2,7 +2,7 @@
 
 ## BB-132C real finite research sequence — 2026-10-02
 
-**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED.** The two
+**ACCEPTED / MERGED / CI VERIFIED.** The two
 owner-authorized compatibility corrections compose the runtime deadline with bounded cleanup and
 describe only the existing supplied Finance history. No parser/admission/grammar, projected history,
 scientific grant, model parameters or isolation change.
@@ -14,7 +14,11 @@ Model-free gates before inference: API920 PASS/8 controlled-model SKIP, Sentinel
 PASS/1 SKIP; Release build/format/docs/secrets PASS. Post-session API920/8 SKIP and Sentinel32
 PASS again; exact commands and sanitized real evidence are in the checkpoint report below. Earlier dated compatibility-stop statements are historical.
 Finance RESEARCH / 0 SEK / NONE. No deployment, trading, cloud, scheduler, public endpoint or BB-132D.
-Next: independent exact-SHA review; no merge without explicit owner approval.
+Owner approved exact candidate `78517da41e8d4e7642029daebde544a951da092d`; unchanged merge `2ff64718b561c9520ab1d3568649f10ec7f70596`.
+Merge CI[36954159147](https://github.com/T-bear/BigBrain/actions/runs/36954159147) passed backend, frontend,
+documentation and secrets, including both formatter steps. Exact identities and final-main CI
+resolution are in the checkpoint report. No new inference during publication.
+Next: STOP for independent post-merge review. BB-132D NOT STARTED / NOT AUTHORIZED.
 
 ## BB-132C — local-session compatibility review, 2026-10-01
 
