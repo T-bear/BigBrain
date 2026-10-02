@@ -3,6 +3,9 @@
 Detta är en sanerad GitHub-version. Synthetic fixtures only; no credentials, provider payloads,
 private runtime paths or model content.
 
+Current continuation: [finalized-daily prerequisite](#finalized-daily-continuation--2026-10-02).
+The initial characterization and its verification below are retained as reviewed history.
+
 ## Metadata
 
 Date: 2026-10-02. **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
@@ -153,3 +156,132 @@ Resolve exact SHA/tree from the publication subject, compare against the baselin
 the four tests. Owner/architect must approve a bounded semantic direction before production work.
 Continue additively on this same branch only after that decision; do not merge this incomplete
 checkpoint, redesign science opportunistically or start the next checkpoint.
+
+## Finalized-daily continuation — 2026-10-02
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Owner/architect independently
+reviewed `d058d674f0e2403c1015a44b1176d3bfc0449284` (tree
+`109154ad1c43bbd7569909c85d516c21926a2636`) and selected direction1: finalized daily evidence
+compatible with existing daily science. Direction2/intraday science is excluded. This resolves
+the choice in the initial report; it does not supply the missing source facts described here.
+Baseline/main and branch remain those above. The new additive publication subject is
+`review: characterize BB-132E daily finality prerequisite`; derive its exact SHA/tree from Git.
+
+### Inspected responsibility and the precise missing fact
+
+`ProviderObservation` and `MarketObservationReceipt` retain identity, one-minute interval opening,
+OHLCV snapshot, nullable provider availability, trusted acquisition/ingestion and revision lineage.
+They contain no assertion that a minute is complete, that a session is complete, or that a chosen
+set covers the provider's complete session. A known provider availability timestamp, if present,
+would date availability of the snapshot; it would not assert finality.
+
+`TwelveDataMarketObservations` requests one `/quote` with `interval=1min`, `prepost=false`,
+`eod=false`. Its validated `timestamp`/`last_quote_at`/datetime identify the interval opening.
+It returns no completion manifest or finality evidence; unused bounded provider fields are not
+interpreted as authority. An `is_market_open=false` hint cannot prove which session/minutes/values
+are complete. These are findings about the accepted code, **not claims that Twelve Data lacks
+other products or currently guarantees some new field**. No network/source-policy change is made.
+
+`UsMarketCalendar` provides a versioned nominal New York schedule, dates/holidays and fixed local
+09:30–16:00 bounds. Its interface takes only a date, not a source/MIC completeness assertion;
+there is no per-session early-close/halt/exception evidence input. Passing scheduled close is not
+provider delivery completion. This is a limitation for the new proof, not a repaired calendar defect.
+
+`HistoricalDataAcquisitionBatch.Completeness` classifies supplied historical acquisition batches.
+Its daily request/normalizer consumes already-described daily bars and received-time/provenance;
+it does not establish completed minute/session coverage for D's live snapshot receipt set. Neither
+that enum nor a daily DTO constructor can retroactively attest a D session. Existing canonical
+instrument/mapping and daily feature/strategy/outcome contracts remain reusable after eligibility,
+not substitutes for it. No historical bar is imported as prospectively acquired evidence.
+
+**Smallest missing primitive:** an explicitly trusted, versioned **source/session completion
+commitment**, acquired and persisted by Finance, binding canonical instrument/MIC, source/product,
+session date and actual bounds, and the exact finalized constituent observation revisions whose
+coverage/value semantics it attests. A bare `complete=true`, a closed-market hint or a calendar
+timeout is insufficient. For the chosen minute-to-daily route this must establish both completed
+constituent bars and complete session coverage (including explicit treatment of no-trade/gap/closure
+intervals), with compatible raw OHLCV/volume semantics. No such fact exists in the inspected D path.
+
+An explicit source-guaranteed finalized daily bar is a possible *alternative evidence route* for
+owner/architect assessment; it must carry its own complete-session meaning and trusted receipt,
+and cannot be fabricated from or silently substituted for current snapshots. No new provider,
+endpoint, field, price-basis policy, entitlement or live acquisition is authorized/implemented here.
+
+### Minimum finalized-daily contract requirements
+
+This is a characterization of necessary facts, **not an implemented or accepted new protocol**.
+The missing completion commitment prevents proving the positive eligibility path. Fail closed
+before constructing a daily science input; do not publish a misleading always-ineligible finalizer.
+
+| Requirement | Minimum meaning / proof obligation |
+| --- | --- |
+| Version, instrument, venue/session | Version derivation/eligibility policy; reuse exact canonical instrument, effective mapping, MIC, currency, provider/product and raw price basis. Bind session date, timezone/calendar version and attested actual bounds; no ticker-only or UTC-date guessing |
+| Source granularity | D receipts remain immutable raw one-minute snapshots. Aggregation requires affirmative finalized interval semantics for the selected revisions; changing the label is not evidence |
+| Completeness/finality | Bind the source completion commitment to every selected constituent and whole actual session. Missing minute, unknown gap/no-trade classification, missing close/open coverage or unknown source finality is ineligible. No invented values or silence-based completion |
+| OHLCV derivation | Only after coverage and compatible interval definitions are proven: first completed interval open, maximum high, minimum low, last completed interval close; volume sum only for proven non-overlapping interval volumes with identical units/session scope (not cumulative snapshots). No implicit carry-forward, aggregation of revisions twice or missing-minute zero fill |
+| Revision choice | Choose only exact revisions affirmatively bound by completion evidence and knowable at sealed cutoff. D returns all revisions. Latest receipt alone is not proof of finality. Later corrections create new immutable daily evidence/lineage, never alter an earlier result |
+| Trusted daily knowledge | Cannot precede knowledge of any selected receipt or completion/session fact. Finance must validate and persist finalization at trusted local time; an old event/provider date cannot backdate it. Preserve source-availability and derived-persistence times distinctly; never infer an unknown publication time |
+| Provenance and canonical identity | Bind policy/version, instrument/session/source scope, sorted constituent receipt IDs/checksums, explicit revision selection, completion evidence identity/checksum/time, normalized values, bounds/price semantics and trusted derived receipt time. Reuse canonical hashing/persistence patterns; no hash of values alone |
+| Restart and duplicate | Persist exact inputs/commitment and verified daily identity under existing Finance ownership, not a second store. Reopen validates all dependencies. Duplicate identity reuses original times; missing/conflicting evidence fails closed |
+| Cutoff/noninterference | E must be <= trusted now. Every dependency must be knowable by E, including completion. Later receipt/completion/correction must not enter or alter a sealed earlier projection/result; a new daily revision becomes eligible only at its own legitimate knowledge time |
+| Downstream compatibility | Only eligible daily evidence may feed existing daily features/frozen supported strategy and next-source-session outcome semantics. No change to periods, research grants, risk, backtest simulation or trading authority follows |
+
+The existing D receipt owner/watermark can support source dependency replay; it currently has
+no completion-evidence representation. Exact additive persistence/concurrency design for a new
+completion fact is deferred until its trust/source meaning is reviewed. No speculative migration.
+
+### New deterministic witnesses
+
+Two additive tests, leaving the initial four unchanged:
+
+- `FullScheduledMinuteCoverageAndElapsedCloseDoNotEstablishFinality`: ingests a fixture snapshot
+  ten seconds into **every** nominal minute (390 for the selected ordinary session) using D's real
+  acquisition/persistence API. After scheduled close and reopen, all390 remain snapshots acquired
+  inside their intervals. Silence and an exact duplicate do not refresh the receipt. A permitted
+  post-cutoff revision of the last interval preserves the original and byte-identical earlier
+  projection. This witnesses that interval-key coverage plus elapsed close is weaker than completed
+  interval coverage. A later correction alone is **not** claimed to disprove finality: finalized
+  evidence can also be corrected, but needs an affirmative source commitment at each revision.
+- `MarketClosedHintAndLaterAcquisitionStillProduceOnlyMinuteSnapshot`: runs the existing Twelve
+  Data adapter with deterministic HTTP transport and a synthetic closed-market hint, received on
+  the next day. The persisted/reopened result is still a one-minute snapshot, publication unknown,
+  knowledge equal to actual trusted ingestion. No network or credential is used.
+
+These tests exercise actual boundaries and demonstrate missing semantics; they do not implement
+or claim passing E's candidate freeze, finalized daily identity/result or shadow acceptance cases.
+
+### Continuation verification and scope
+
+Delta: the two test files above plus the same five
+canonical documents (report/catalog/status/backlog/recovery). Production, calendar, adapter,
+daily engine, previous four tests, schema, runtime and grants remain unchanged.
+The initial27 daily-feature/backtest/robustness regression results remain applicable: those exact
+sources/tests and scientific assumptions did not change. No reason to rerun full suites solely
+for this additive characterization. Focused D/adapter/characterization tests, Release test build,
+changed-file format, docs/diff/secrets checks verify this delta. Full API/migration/Sentinel/frontend
+and real-provider/model tests are not run; no corresponding production surface changed.
+
+| Exact command/check (2026-10-02) | Result |
+| --- | --- |
+| `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore --filter 'FullyQualifiedName~ProspectiveShadowCompatibilityTests\|FullyQualifiedName~FinanceMarketObservationTests\|FullyQualifiedName~TwelveDataMarketObservationTests'` | PASS61,0 failures/0 skips; Release test/dependency compilation passed; both new witnesses included |
+| `dotnet format tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --verify-no-changes --no-restore --include tests/BigBrain.Api.Tests/ProspectiveShadowCompatibilityTests.cs tests/BigBrain.Api.Tests/TwelveDataMarketObservationTests.cs` | PASS, exit0/no changes |
+| `node scripts/verify-documentation.mjs` | PASS,262 Markdown/91 unique backlog IDs |
+| Production and daily-feature/backtest/robustness test diff against reviewed parent | Empty; prior27 PASS explicitly reused, not rerun |
+| `git diff --cached --check`; exact seven-file staged inventory and unchanged reviewed parent | PASS; unrelated files excluded, no unstaged tracked delta |
+| Gitleaks8.28.0 `git . --pre-commit --staged --redact --no-banner` | PASS, no leaks |
+
+No GitHub CI or full-repository green result is inferred. Prior scientific/model journals were not
+opened or mutated. No source compilation fix or formatting write was needed in this continuation.
+
+### Remaining decision and stop
+
+Direction1 is retained. Owner/architect must now decide the bounded trustworthy source/session
+completion fact and acquisition contract, with sufficient evidence for finalized constituents and
+session coverage. **No permission is requested again for the already selected daily direction.**
+No daily finalizer, candidate freeze, prospective evaluator/result or schema is implemented.
+This is the prompt's explicit missing-primitive stop, not a demonstrated pre-existing defect or a
+Merge Candidate. Preserve prior review history and continue the same branch only after that decision.
+
+Finance **RESEARCH / 0 SEK / NONE**; no Qwen, live provider, grant reset/refund, PAPER/LIVE/AUTO,
+broker/orders/positions/capital, scheduler, automatic promotion, deployment or BB-132F.
+STOP after publication for independent architect review; no merge.

@@ -10,6 +10,46 @@ public sealed class ProspectiveShadowCompatibilityTests
     private static readonly string FixturePayloadChecksum = MarketObservationIntegrity.Hash(["bb132e-fixture-only"]);
 
     [Fact]
+    public async Task FullScheduledMinuteCoverageAndElapsedCloseDoNotEstablishFinality()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var session = Assert.IsType<UsEquitySession>(UsMarketCalendar.Session(new(2026, 10, 1)));
+        var minuteCount = checked((int)(session.CloseUtc - session.OpenUtc).TotalMinutes);
+        var clock = new FinanceMarketObservationTests.Clock(session.OpenUtc);
+        MarketObservationReceipt? last = null;
+        for (var minute = 0; minute < minuteCount; minute++)
+        {
+            var eventTime = session.OpenUtc.AddMinutes(minute);
+            clock.Now = eventTime.AddSeconds(10); // Still inside each minute: a valid partial snapshot.
+            last = await Acquire(db, clock, Value(eventTime));
+        }
+        clock.Now = session.CloseUtc.AddSeconds(1);
+        var cutoff = clock.Now;
+        var afterClose = db.Memory().MarketKnowledgeAt(cutoff, clock);
+        Assert.Equal(minuteCount, afterClose.Observations.Length);
+        Assert.Equal(Enumerable.Range(0, minuteCount).Select(i => session.OpenUtc.AddMinutes(i)),
+            afterClose.Observations.Select(row => row.Value.EventTimeUtc));
+        Assert.All(afterClose.Observations, row =>
+        {
+            Assert.Equal(LiveObservationGranularity.Snapshot, row.Granularity);
+            Assert.True(row.KnowledgeTimeUtc < row.Value.EventTimeUtc.AddMinutes(1));
+        });
+        Assert.NotNull(last);
+        // Silence after the scheduled close does not refresh the old receipt or assert finality.
+        Assert.Equal(last, await Acquire(db, clock, last.Value));
+        clock.Now = cutoff.AddSeconds(1);
+        var revised = await Acquire(db, clock, last.Value with { High = 150, Close = 125, Volume = 20000 }, last.Id);
+        Assert.Equal(last.Id, revised.CorrectsId);
+        Assert.Equal(LiveObservationGranularity.Snapshot, revised.Granularity);
+        Assert.True(revised.KnowledgeTimeUtc > cutoff);
+        Assert.Equal(JsonSerializer.Serialize(afterClose),
+            JsonSerializer.Serialize(db.Memory().MarketKnowledgeAt(cutoff, clock)));
+        Assert.Equal(minuteCount + 1, db.Memory().MarketKnowledgeAt(clock.Now, clock).Observations.Length);
+        // A later correction alone does not disprove finality: the missing fact is the
+        // explicit completed-session/selected-minute commitment, absent from this contract.
+    }
+
+    [Fact]
     public async Task PersistedMinuteSnapshotsCannotBeRelabelledAsDailyFeatureObservations()
     {
         using var db = new FinanceMarketObservationTests.Database();

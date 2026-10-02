@@ -2,14 +2,15 @@
 
 ## BB-132E — prospective shadow evaluation
 
-**REVIEW CHECKPOINT / BLOCKED ON SEMANTIC COMPATIBILITY / NOT A MERGE CANDIDATE.**
-Characterization complete; candidate freezing and shadow evaluation/result persistence are NOT
-implemented. Before continuation, owner/architect must select an explicit scientifically valid
-observation-to-outcome contract: finalized daily evidence compatible with existing strategies,
-or a separately reviewed snapshot-specific outcome meaning. Neither option is implemented or
-automatically authorized. [Exact boundary, tests and remaining acceptance](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md).
-DoD remains the owner's immutable freeze → future-only sealed projection → deterministic persisted
-shadow result/reopen/noninterference proof, without trading, renewed research grants or inference.
+**REVIEW CHECKPOINT / BLOCKED ON SOURCE FINALITY / NOT A MERGE CANDIDATE.**
+Owner/architect selected finalized daily evidence; snapshot-specific intraday science is excluded.
+Current D snapshots do not establish complete final session constituents. The remaining decision is
+how to acquire and trust a bounded completed-session fact tied to exact finalized source evidence;
+it is not permission to invent missing bars or infer finality from elapsed time.
+[Minimum contract and exact missing primitive](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
+Candidate freezing and shadow-result persistence remain NOT IMPLEMENTED. Original DoD remains
+immutable freeze → future-only sealed daily projection → deterministic prospective result/reopen/
+noninterference, without trading, renewed research grants or inference.
 
 ## BB-132D — real market observation foundation, 2026-10-02
 

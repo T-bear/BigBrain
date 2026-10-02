@@ -1,9 +1,9 @@
 # Project Report Catalog
 
-- `BB-132E, 2026-10-02` — [Prospective shadow compatibility characterization](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md).
-  REVIEW CHECKPOINT, not Merge Candidate: one-minute raw snapshots cannot be relabelled as daily
-  scientific evidence or use the test-only snapshot strategy. Existing temporal receipts remain
-  reusable; owner/architect decision required before production implementation. No model/trading/deployment.
+- `BB-132E continuation, 2026-10-02` — [Finalized-daily prerequisite characterization](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
+  REVIEW CHECKPOINT, not Merge Candidate: daily direction selected; trusted source/session completion
+  bound to exact finalized constituents is missing. Full scheduled-minute coverage and market-closed
+  hint tests preserve the snapshot boundary. Initial characterization/evidence retained in the report.
 
 - `BB-132D, 2026-10-02` — [Real market observation foundation](features/finance/bb-132d-market-observation-foundation-20261002.md). MERGE CANDIDATE, not accepted: Finance-owned immutable receipts, conservative knowledge time, deterministic replay and disabled fixture-tested Twelve Data transport. Live rights/retention remain gated; no model/trading/deployment.
 

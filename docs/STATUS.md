@@ -1,14 +1,15 @@
 # BigBrain Status
 
-## BB-132E prospective shadow compatibility — 2026-10-02
+## BB-132E finalized-daily compatibility — 2026-10-02
 
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Characterization stops at the
-requested scientific compatibility gate: accepted D receipts are one-minute raw snapshots;
-accepted daily strategies/features and next-source-session shadow outcomes do not define their
-scientific consumption. No production implementation or migration. [Evidence and next bounded
-architecture decision](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md).
-Baseline is accepted main `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, containing owner-accepted D;
-earlier dated D review-state text below is publication history. Finance RESEARCH / 0 SEK / NONE.
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Owner/architect selected the
+finalized-daily direction after reviewing `d058d674f0e2403c1015a44b1176d3bfc0449284`.
+Further characterization identifies the smallest missing primitive: trusted source/session completion
+evidence binding the exact finalized constituent observations. Scheduled close, full minute-key
+coverage and market-closed hints do not supply that evidence. No production implementation or migration.
+[Daily-contract requirements, witnesses and next decision](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
+Baseline remains accepted main `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, containing accepted D;
+earlier D review wording is dated publication history. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-132D observation foundation — 2026-10-02
 
