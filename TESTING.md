@@ -1,5 +1,42 @@
 # Testa BigBrain
 
+## BB-132C real finite research sequence — 2026-10-02
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE — NOT ACCEPTED.** The two
+owner-authorized compatibility corrections compose the runtime deadline with bounded cleanup and
+describe only the existing supplied Finance history. No parser/admission/grammar, projected history,
+scientific grant, model parameters or isolation change.
+The single real C session completed: Qwen N → Admitted → one deterministic evaluation → native
+persistence → reopen → sanctioned history → real Qwen N+1 → BudgetExceeded. Exactly2 invocations,
+1 evaluator start,3 trials,36 underlying runs; zero second evaluation. Both owned workers exited0;
+no timeout/OOM/retry/refund. The real allowance is consumed; NO further inference is authorized.
+Model-free gates before inference: API920 PASS/8 controlled-model SKIP, Sentinel32 PASS; focused255
+PASS/1 SKIP; Release build/format/docs/secrets PASS. Post-session API920/8 SKIP and Sentinel32
+PASS again; exact commands and sanitized real evidence are in the checkpoint report below. Earlier dated compatibility-stop statements are historical.
+Finance RESEARCH / 0 SEK / NONE. No deployment, trading, cloud, scheduler, public endpoint or BB-132D.
+Next: independent exact-SHA review; no merge without explicit owner approval.
+
+## BB-132C — local-session compatibility review, 2026-10-01
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** C is now authorized from fetched
+main `cab482c49d2187a3f39c13528a5fb88d899f6b8f`; prior dated C-not-authorized entries are history.
+[Exact baseline/tree, model-free integration evidence and remaining decision](docs/reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md).
+Existing finite session can bind IResearchReasoner/LocalReasonerRuntime directly without a second
+orchestration path. Model-free proof connects owned BRF1 child, N evaluation/native persistence,
+reopen, N+1 bounded history and no second evaluation. Production implementation remains unchanged.
+
+Compatibility stop before inference: B's fixed30s parent deadline overrides A's controlled180s
+runtime; A's historical successful reply took50.458s. Native prompt still unconditionally asserts
+empty history, contradicting evaluated N+1's existing projection. No performance prediction or
+pre-existing science defect claimed. No deadline/prompt/history/parser fix made without review.
+Next: review narrowly scoped deadline/prompt compatibility before consuming the conditional real
+session. Real session NOT CREATED; real invocations0/2; A grants/journals untouched.
+Focused48 PASS (7 new cases); full API913 PASS/7 model skips; Sentinel32 PASS.
+Restore/Release build0warnings/errors/format/docs260Markdown91IDs/diff/secrets PASS.
+Exact commands and initial sandbox/analyzer corrections are in the report. Finance **RESEARCH / 0 SEK / NONE**.
+No inference/model/provider/cloud/GPU, trading/broker/orders/capital/deployment or BB-132D.
+
+
 ## BB-132B — finite model-free research session, 2026-10-01
 
 [Exact commands, publication identity, acceptance matrix and limitations](docs/reports/features/finance/bb-132b-research-loop-boundary-20261001.md).

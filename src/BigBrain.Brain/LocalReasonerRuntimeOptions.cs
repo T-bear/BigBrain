@@ -11,7 +11,7 @@ public sealed record LocalReasonerRuntimeOptions
     public ImmutableArray<string> WorkerArguments { get; init; } = [];
     public required string CoordinationDirectory { get; init; }
     public TimeSpan InvocationTimeout { get; init; } = TimeSpan.FromSeconds(30);
-    // Owner-authorized BB-132A acceptance harness only; no public/runtime configuration switch.
+    // Explicitly owner-authorized controlled real-model acceptance only; no public configuration switch.
     // Does not change Finance projection limits, ledger budget or ordinary proof-worker policy.
     internal bool ControlledRealModelAcceptance { get; init; }
     public TimeSpan GracePeriod { get; init; } = TimeSpan.FromMilliseconds(250);
