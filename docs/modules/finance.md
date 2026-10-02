@@ -1,5 +1,44 @@
 # Finance module
 
+## BB-132D market observation contract — review, 2026-10-02
+
+Finance owns a versioned one-minute **raw OHLCV snapshot** receipt. It reuses canonical instrument,
+effective-dated provider mapping, MIC/currency, decimal values, timeframe and policy references.
+`IMarketObservationSource` supplies untrusted values; provider DTOs/credentials do not cross it.
+Snapshots have no final-bar/last-trade guarantee and confer no scientific strategy eligibility.
+
+- Event time is interval opening. Optional provider publication time is explicitly unknown when
+  unestablished; known publication must lie between event and local acquisition.
+- Finance's trusted TimeProvider samples acquisition after the response and ingestion inside the
+  persistence transaction. Knowledge equals ingestion. All times are UTC; no timestamp inference.
+- Migration96 is additive under existing `EodhdMarketMemory`/FinanceSchemaMigrator ownership.
+  No historical backfill, ID rewrite, alternate ledger or result-store change. Existing learning
+  readers allow the new schema version without changing grants/history/admission/evaluation.
+- Cutoff queries and writes serialize through SQLite immediate transactions. A query seals T only
+  when T <= trusted now. New receipts must be strictly later than persisted prior-ingestion/sealed
+  cutoff watermark. Clock regression and same-tick new writes fail closed. Later acquisition cannot
+  alter earlier replay. Query is an intentional watermark write, not a read-only database operation.
+- Exact duplicate returns the original immutable receipt. Changed values or payload checksum require
+  explicit current predecessor identity to append a revision; originals survive. Query returns all
+  eligible revisions, not an automatically selected preferred truth. Projection/chain cap1000;
+  overflow fails closed. Canonical hashes bind source/content/metadata/rights references/time/lineage.
+- HistoricalImport/unknown origins are denied. Fixture receipts are labelled distinctly; an old event
+  acquired now is only known now. Existing historical backtests are not prospective observations.
+
+Twelve Data is a disabled internal adapter for fixed HTTPS `/quote`,1min,UTC,regular-session US
+MIC/USD; no arbitrary URL, redirect/proxy/retry, listener or scheduler. Timeout15s (bounded1–30),
+body64KiB, JSON depth8, strict identity/time/value checks. Source body is hashed, never persisted/logged.
+Secrets use the existing external configuration mechanism (`Finance:TwelveDataObservation`); no key,
+config activation or runtime registration exists in D. A complete adapter test is not a live grant.
+Existing per-use entitlement gates also require zero-cost long-term/no-deletion rights for this store.
+Twelve Data's general terms do not establish that retention grant: live ingestion remains disabled
+pending reviewed rights, lifecycle/deletion and backup handling. No entitlement or export expansion.
+
+[Characterization, official source review, tests and limitations](../reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+D does not connect receipts to Qwen or a scientific/shadow evaluator. A/B/C budgets remain spent;
+no model calls or trading authority. Finance RESEARCH / 0 SEK / NONE. BB-132E not authorized.
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

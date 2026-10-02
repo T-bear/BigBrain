@@ -10,7 +10,7 @@ internal sealed record FinanceSchemaState(int CurrentVersion, IReadOnlyList<int>
 
 internal static class FinanceSchemaMigrator
 {
-    internal const int LatestVersion = 95;
+    internal const int LatestVersion = 96;
     private sealed record Migration(int Version, string Name, string Sql);
     private static readonly Migration[] Migrations =
     [
@@ -36,6 +36,7 @@ internal static class FinanceSchemaMigrator
           """)
         ,new(94,"BB-131C bounded persistent learning governance", EodhdMarketMemory.LearningLedgerMigration)
         ,new(95,"BB-132B explicit finite research session", EodhdMarketMemory.FiniteSessionMigration)
+        ,new(96,"BB-132D immutable market observation receipts", EodhdMarketMemory.MarketObservationMigration)
     ];
 
     internal static FinanceSchemaState Migrate(string databasePath, Action<int>? beforeRecord = null)

@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## BB-132D observation foundation — 2026-10-02
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Provider-independent one-minute raw
+OHLCV receipt, Finance-owned UTC acquisition/ingestion, immutable migration96 and sealed-cutoff
+replay. Twelve Data adapter is disabled and fixture-tested; no live retention grant or credential
+is invented. No Qwen, evaluator/shadow/trading/scheduler/deployment. Finance RESEARCH / 0 SEK / NONE.
+Final local gates: focused56 PASS; Finance regression186 PASS; API975 PASS/8 real-model SKIP;
+Sentinel32 PASS; Release0warnings/errors and formatter PASS. Staged scope/secrets/docs/diff PASS.
+D is authorized now; older dated D-not-started statements describe their publication date.
+[Contract, characterization, official sources, exact checks and limitations](reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

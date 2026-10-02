@@ -377,7 +377,7 @@ internal sealed partial class EodhdMarketMemory
     private static void RequireFiniteSchema(SqliteConnection connection)
     {
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT CASE WHEN MAX(version)=95 AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
+        command.CommandText = "SELECT CASE WHEN MAX(version) IN (95,96) AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
         if (Convert.ToInt64(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) != 1)
             throw new InvalidOperationException("Unsupported finite session schema.");
     }

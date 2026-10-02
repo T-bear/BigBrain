@@ -1,5 +1,17 @@
 # BigBrain Backlog
 
+## BB-132D — real market observation foundation, 2026-10-02
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** D ends at immutable acquired evidence
+and deterministic point-in-time replay. Receipt/reopen/identity, duplicate/conflict, future noninterference, untrusted transport and full
+regression gates passed. Owner acceptance is pending; no live call is required.
+[Evidence and remaining gates](reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+Known limits:1000-receipt bounded projection; one-minute raw snapshots only; explicit revision lineage;
+no symbol master or final-bar guarantee. Twelve Data live rights, compatible retention/deletion and
+backup treatment remain unfulfilled activation gates. Prospective/shadow evaluation and BB-132E
+are NOT STARTED / NOT AUTHORIZED. Finance RESEARCH / 0 SEK / NONE.
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

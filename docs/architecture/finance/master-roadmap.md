@@ -1,5 +1,15 @@
 # BigBrain Finance – master roadmap
 
+## BB-132D observation substrate — 2026-10-02
+
+Current bounded checkpoint implements provider-independent immutable receipts and deterministic
+knowledge-cutoff replay in existing Finance persistence. It stops before prospective/shadow evaluation.
+Twelve Data is the planned first free US source, not a domain dependency; fixture-tested transport does
+not grant live retention rights. [Canonical contract](../../modules/finance.md#bb-132d-market-observation-contract--review-2026-10-02)
+and [evidence](../../reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+No new inference or refund of A/B/C grants. BB-132E NOT STARTED / NOT AUTHORIZED.
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

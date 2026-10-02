@@ -19,6 +19,31 @@ Exact next action:
 
 Noten får inte innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. Giltiga working-tree-ändringar ska bevaras. Ägarens permanenta Review Checkpoint-auktorisering tillåter publicering av sammanhängande ofullständigt arbete enligt AGENTS.md. Avstäm aktiv avbrottsstatus efter publicering; rapporten och GitHub-branchen bär då pågående ej accepterat arbete, medan main fortsatt är accepterad source of truth. Radera inte experimenthistorik när en ny reviewpunkt publiceras.
 
+## BB-132D publication handoff — 2026-10-02
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Publication handoff; no interrupted implementation remains. Baseline/main
+`17dc0ac0fba1869a14905acb2176669860cfac62`, tree `aab75e7776adfbd4e581dc4db1342e5bf155c339`.
+Branch `bb-132d/real-market-observation-foundation`; unique publication subject
+`review: implement BB-132D market observation foundation` resolves exact commit/tree in Git.
+[Canonical report, exact20-file inventory, sources, commands and limitations](../reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+
+Completed: ownership characterization, versioned observation contract, immutable migration96 under
+existing Finance owner, sealed-cutoff replay, explicit revisions, disabled bounded Twelve Data adapter,
+fixture tests and docs. Existing learning edits only allow schema96; grants/science/history unchanged.
+Verified: prior characterization122 PASS; final observation/provider56 PASS; Finance regressions186 PASS;
+full API975 PASS/8 real-model SKIP, Sentinel32 PASS; restore/Release0warnings-errors/format/docs PASS;
+history Gitleaks307 commits clean; exact staged20-file scope/secrets/docs/diff PASS.
+Git publication subject below identifies the committed review state; main remains accepted baseline.
+Private A18/C11 manifest entries unchanged. No model/provider live call or new grant/session.
+
+Remaining live gates: affirmative compatible source/retention/deletion/backup rights and secret-backed
+credential; not required for deterministic D acceptance. No production activation or scheduler/engine
+integration. Scope only1min raw snapshots,1000-receipt projections; future symbol-master/pagination/
+prospective consumer need separate scope. Finance RESEARCH / 0 SEK / NONE. No trading/deployment/BB-132E.
+Unrelated mockups and unpublished ADR0006–0009 preserved and excluded.
+Next: STOP after branch publication for independent architect review of exact remote SHA/tree. No merge.
+
 ## BB-132C accepted publication handoff — 2026-10-02
 
 Status: **ACCEPTED / MERGED / CI VERIFIED** on exact merge CI; documentation reconciliation

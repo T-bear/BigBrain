@@ -1,5 +1,22 @@
 # Testa BigBrain
 
+## BB-132D model-free observation checks — 2026-10-02
+
+`FinanceMarketObservationTests` and `TwelveDataMarketObservationTests` exercise temporary SQLite
+receipts/reopen, cutoff noninterference, explicit corrections, duplicate/concurrent writes, query/write
+ordering, crash boundaries, migration rollback, corrupt-state rejection, rights and bounded untrusted
+transport. No fixture makes a network call or requires a provider key/model. Run focused:
+
+```bash
+dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --filter 'FullyQualifiedName~MarketObservation'
+```
+
+[Exact checkpoint commands/results](docs/reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+Existing learning/scientific/lineage, full API and Sentinel regressions remain required. Controlled
+model acceptance tests remain opt-in and are not invoked by D. Live Twelve Data testing is not an
+ordinary CI or checkpoint acceptance dependency. Frontend has no D change.
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

@@ -1,5 +1,15 @@
 # BigBrain Roadmap
 
+## BB-132D current bounded direction — 2026-10-02
+
+The next substrate after accepted A/B/C is trustworthy market observation and knowledge-cutoff
+replay, currently implemented for review. Twelve Data is the planned first zero-cost US source;
+Finance remains provider-independent. Live activation still needs explicit rights/retention resolution.
+[Checkpoint evidence](docs/reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
+Future prospective/shadow consumption, strategy qualification and eventual PAPER concepts are not
+implemented or authorized by D. No scheduler/dashboard/deployment or BB-132E. Finance RESEARCH / 0 SEK / NONE.
+
+
 ## BB-132C real finite research sequence — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** The two

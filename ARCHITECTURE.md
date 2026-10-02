@@ -1,5 +1,16 @@
 # BigBrain – architecture baseline and future direction
 
+## BB-132D observation substrate — review implementation, 2026-10-02
+
+Finance retains existing SQLite/migration ownership. Additive migration96 stores immutable
+provider-independent receipts and a transactionally sealed knowledge watermark. Provider event time
+never becomes knowledge time; Finance samples local acquisition/ingestion. Existing scientific stores,
+learning contracts and grants are unchanged; schema compatibility lists explicitly include96.
+The narrow Twelve Data adapter remains external-service transport behind the domain port, disabled,
+with no new endpoint/service/SDK. No second database or engine. [Temporal/lineage/rights contract](docs/modules/finance.md#bb-132d-market-observation-contract--review-2026-10-02).
+Existing ADRs remain Accepted; this is not a new accepted architecture decision or deployment.
+
+
 ## BB-132C accepted integration — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](docs/reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).

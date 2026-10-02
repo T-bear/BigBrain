@@ -22,7 +22,7 @@ public sealed class FinanceLearningLedgerTests
             Execute(c, "INSERT INTO macro_revisions VALUES('synthetic-legacy','synthetic','hash','2026-01-01','synthetic','pass')");
         }
         var memory = db.Memory();
-        Assert.Equal(95, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
+        Assert.Equal(FinanceSchemaMigrator.LatestVersion, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
         Assert.Equal(LearningLifecycle.Uninitialized, memory.ReadLearningLedger().Lifecycle);
         var scope = ResearchLearningFixture.Scope();
         memory.EnrollSyntheticLearning(scope, LearningExposure.Unexposed);
@@ -319,7 +319,7 @@ public sealed class FinanceLearningLedgerTests
     }
 
     [Theory]
-    [InlineData("INSERT INTO finance_schema_migrations VALUES(96,'unknown','2026-01-01')")]
+    [InlineData("INSERT INTO finance_schema_migrations VALUES(999,'unknown','2026-01-01')")]
     [InlineData("UPDATE learning_governance SET snapshot_json=replace(snapshot_json,'\"invocations\":1','\"invocations\":\"1\"')")]
     [InlineData("UPDATE learning_governance SET snapshot_json=replace(snapshot_json,'\"invocations\":1','\"invocations\":1,\"invocations\":1')")]
     public void UnsupportedOrAmbiguousPersistedShapeFailsClosed(string mutation)

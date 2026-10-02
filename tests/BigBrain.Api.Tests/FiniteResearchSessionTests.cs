@@ -293,7 +293,7 @@ public sealed class FiniteResearchSessionTests
     [InlineData("UPDATE learning_finite_session SET version='unknown'")]
     [InlineData("UPDATE learning_finite_session SET checksum='bad'")]
     [InlineData("UPDATE learning_finite_session SET snapshot_json='{}'")]
-    [InlineData("INSERT INTO finance_schema_migrations VALUES(96,'unsupported','2026-01-01')")]
+    [InlineData("INSERT INTO finance_schema_migrations VALUES(999,'unsupported','2026-01-01')")]
     public void CorruptOrUnknownSessionFailsClosed(string sql)
     {
         using var db = new Database(); var memory = db.Memory();
