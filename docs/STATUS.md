@@ -1,15 +1,14 @@
 # BigBrain Status
 
-## BB-132E finalized-daily compatibility — 2026-10-02
+## BB-132E Alpaca daily evidence rights gate — 2026-10-03
 
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Owner/architect selected the
-finalized-daily direction after reviewing `d058d674f0e2403c1015a44b1176d3bfc0449284`.
-Further characterization identifies the smallest missing primitive: trusted source/session completion
-evidence binding the exact finalized constituent observations. Scheduled close, full minute-key
-coverage and market-closed hints do not supply that evidence. No production implementation or migration.
-[Daily-contract requirements, witnesses and next decision](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
-Baseline remains accepted main `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, containing accepted D;
-earlier D review wording is dated publication history. Finance RESEARCH / 0 SEK / NONE.
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Owner/architect selected Alpaca
+historical US equity `1Day` evidence; no minute aggregation. Existing support YES answers for private
+storage/revision history are preserved. Applicable post-termination retention/deletion and audit
+scope remain unresolved against D's long-term/no-deletion rights gate. No production change.
+[Official sources, precise rights gap and continuation](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
+Accepted main remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`; both reviewed E characterization
+commits preserved. Daily eligibility and shadow implementation remain pending. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-132D observation foundation — 2026-10-02
 

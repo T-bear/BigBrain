@@ -1,5 +1,23 @@
 # Codex interrupted-run recovery
 
+## BB-132E Alpaca rights Review Checkpoint handoff — 2026-10-03
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Deliberate rights-review stop;
+no interrupted implementation. Same branch `bb-132e/prospective-shadow-evaluation`, accepted main
+`8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree `69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`.
+Preserved parent `39b130fa34ba30b66558a6ceca5f1cb52b60cee1` and its reviewed parent `d058d674f0e2403c1015a44b1176d3bfc0449284`.
+Resolve unique subject `review: document BB-132E Alpaca daily evidence rights gate` for exact new SHA/tree.
+[Canonical evidence, exact five-file scope, verification and next prerequisite](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
+Completed: official historical daily-bar/terms inspection; existing owner support evidence preserved;
+precise lifecycle-rights gap documented. No source/test/schema/runtime changes or market-data calls.
+Next: STOP for review of applicable post-termination retention/deletion and audit rights. Do not infer
+`DeletionRequirement.None` or bypass D's immutable retention gate. Daily eligibility/adapter/shadow
+implementation remains pending; source selection itself is already authorized.
+Docs/diff/staged-secrets checks cover this delta; unchanged prior test evidence is not rerun or
+represented as implemented Alpaca acceptance. Unrelated mockups/ADR0006–0009 remain excluded.
+Finance RESEARCH / 0 SEK / NONE; no model, grant reset, trading, deployment or BB-132F.
+Earlier handoffs below are dated history, not current instructions to select a source again.
+
 ## BB-132E finalized-daily Review Checkpoint handoff — 2026-10-02
 
 **REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Deliberate architecture-review

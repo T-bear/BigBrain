@@ -3,7 +3,7 @@
 Detta är en sanerad GitHub-version. Synthetic fixtures only; no credentials, provider payloads,
 private runtime paths or model content.
 
-Current continuation: [finalized-daily prerequisite](#finalized-daily-continuation--2026-10-02).
+Current continuation: [Alpaca daily evidence and rights gate](#alpaca-daily-evidence-and-rights-gate--2026-10-03).
 The initial characterization and its verification below are retained as reviewed history.
 
 ## Metadata
@@ -285,3 +285,141 @@ Merge Candidate. Preserve prior review history and continue the same branch only
 Finance **RESEARCH / 0 SEK / NONE**; no Qwen, live provider, grant reset/refund, PAPER/LIVE/AUTO,
 broker/orders/positions/capital, scheduler, automatic promotion, deployment or BB-132F.
 STOP after publication for independent architect review; no merge.
+
+
+## Alpaca daily evidence and rights gate — 2026-10-03
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** This continuation stops at
+an unresolved provider-rights prerequisite, not a demonstrated defect in accepted Finance code.
+Owner/architect selected historical Alpaca US equity `1Day` observations. Do not aggregate D
+minute snapshots or use Twelve Data as fallback. Earlier completion-fact investigations remain
+historical evidence; this decision replaces their proposed minute-aggregation acquisition direction.
+
+### Exact scope and publication identity
+
+Accepted main remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree
+`69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`. Same branch
+`bb-132e/prospective-shadow-evaluation`; preserved parent
+`39b130fa34ba30b66558a6ceca5f1cb52b60cee1`, tree
+`c016239e60a77681fb92c9bdabf13504d2243c0f`, itself a child of reviewed
+`d058d674f0e2403c1015a44b1176d3bfc0449284`.
+New publication subject: `review: document BB-132E Alpaca daily evidence rights gate`.
+Resolve exact SHA/tree/parent using `git log --format='%H %T %P %s'` for that unique subject.
+
+Only five Markdown files change: this report, `docs/reports/REPORT-CATALOG.md`,
+`docs/STATUS.md`, `docs/BACKLOG.md`, `docs/operations/codex-recovery.md`.
+No production, test, schema, configuration, dependency or runtime changes. Existing reviewed
+characterization commits remain unchanged. Unrelated mockups and unpublished ADR0006–0009 excluded.
+
+### Reusable ownership and smallest prospective extension
+
+Inspected D's `MarketObservationEvidence.cs` and `FinanceMarketObservations.cs`, existing
+provider mappings/entitlements, accepted daily science and the preceding reviewed characterization.
+Finance's existing SQLite owner, trusted acquisition/ingestion clock, immutable revision checksums
+and sealed-cutoff watermark remain the intended home. A daily source needs an additive/versioned
+provider-observation and eligibility contract; it must not reinterpret existing Snapshot/OneMinute
+rows. No separate Alpaca database, independent evidence framework or strategy engine is justified.
+
+The prospective contract would bind explicit feed, raw adjustment, symbol/mapping policy,
+canonical instrument/currency, New York source date, provider daily values, source commitment,
+trusted acquisition/ingestion, revision lineage and eligibility version. IEX feed identity is not
+the listing venue and cannot establish an instrument MIC by itself. A provider date is not knowledge
+time. Exact re-observation must retain original knowledge; changed evidence needs a later immutable
+revision. These are requirements for the pending implementation, not implemented guarantees for
+Alpaca. Existing D receipts are not relabelled as daily evidence.
+
+### Official source characterization
+
+Public documentation/agreements retrieved **2026-10-03**; no market-data endpoint was called.
+
+| Official source | Bounded finding and consequence |
+| --- | --- |
+| [Historical stock bars](https://docs.alpaca.markets/us/reference/stockbars) | Native `1Day` bars are available. Bind explicit `feed=iex`, `adjustment=raw`, bounded date range and symbol/asof policy rather than account/time-dependent defaults. Exhaust pagination before claiming coverage. No live entitlement or instrument mapping is inferred from endpoint availability. |
+| [Market Data FAQ](https://docs.alpaca.markets/us/docs/market-data-faq) | Daily bars aggregate trades directly using New York day boundaries; daily and minute trade-condition rules differ. Daily volume can include extended-hours trades that do not update daily OHLC. Missing bars are not zero-valued sessions. IEX is one exchange, not consolidated US coverage. A native daily observation avoids inventing minute aggregation, but its source-day meaning must remain explicit. |
+| [Real-time stock data](https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data) | Daily bars can be emitted during the day with accumulated values; `1Day` alone does not prove a completed source day. Streaming/current-day evidence must not silently satisfy a historical completed-day eligibility rule. |
+
+The target is a revisable **provider/feed daily observation**, not an eternally final price or a
+claim of whole-market completeness. This review does not prove that Alpaca cannot support the
+required daily semantics. It also does not finish a completed-source-session eligibility policy:
+that implementation/scientific review remains pending behind the rights gate below. No elapsed-close
+heuristic, guessed publication time or claim that the last observed bar is final was introduced.
+
+### Storage evidence preserved; exact unresolved lifecycle question
+
+The accepted [owner-supplied support evidence](finance-alpaca-owner-support-evidence-20260906.md)
+records six explicit YES answers for private/non-commercial Basic/Free historical daily storage,
+normalized local database, backups, checksums/revisions, accumulating daily history and derived
+research results. Its publication was owner-approved. **These answers remain valid attributed
+evidence; this review does not reopen them or claim private storage is prohibited.** Raw support
+correspondence was not independently inspected and is not reproduced.
+
+That same accepted report explicitly leaves post-account termination retention, cancellation/deletion
+obligations and separate audit artifacts unresolved. Current public source inspection did not close
+those specific gaps or establish which account/feed agreements govern the planned historical IEX use.
+
+| Official agreement source | Relevant inspected scope; no broader inference |
+| --- | --- |
+| [Alpaca disclosure index](https://alpaca.markets/disclosures) | Current index links the Terms and the two subscriber agreements below. Being linked does not establish their applicability to an individual account/feed. |
+| [Terms and Conditions](https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf) | Personal/non-commercial and content provisions distinguish use restrictions; termination/modification and additional-policy provisions remain applicable questions. No explicit permission covering retained evidence/replay after termination, nor a definitive deletion scope, was identified. Silence is not converted to permission or prohibition. |
+| [NASDAQ OMX subscriber agreement](https://files.alpaca.markets/disclosures/library/NASDAQ+OMX+Global+Subscriber+Agreement.pdf) | Section 10 addresses termination and limits on receiving/using information. It does not resolve the planned IEX retention question; do not apply a different feed's subscriber obligations by assumption. |
+| [NYSE subscriber agreement](https://files.alpaca.markets/disclosures/library/NYSE+Market+Data+Display+Services+Agreement.pdf) | Section 7 addresses duration and surviving provisions. It does not establish a retained-IEX-evidence grant. No automatic SIP/NYSE applicability is asserted. |
+
+Exact downloaded PDF SHA-256 commitments (public sources only; PDFs not committed):
+
+- Terms: `2dc774d4aeeafbe4c7f0565e7842d932bc8bc10488af805fce43b8734e7b9859`.
+- NASDAQ: `54dc85b3e4a2a4d023a1de66373f0221f868ecfa8f7638ef122dade7e46a3b53`.
+- NYSE: `d5a672e2895c69398b3064e16719354940aa6f585f3c4f22e058ff0a778933e2`.
+
+Retrieval date, URLs, section names and file hashes pin the inspected evidence without asserting
+an unverified effective agreement date or that an owner signed these exact documents.
+
+**Concrete incompatibility with granting rights now:** existing
+`FinanceMarketObservations.RequireObservationRights` requires zero cost, affirmative
+HistoricalAnalysis/LongTermStorage entitlement, `RetentionClassification.LongTerm` and
+`DeletionRequirement.None`, supported by explicit provider or owner-accepted personal-research
+evidence. D cannot promise later subscription/deadline deletion of immutable receipts. The six YES
+answers do not settle the already-recorded termination/deletion lifecycle. Assigning `None` now
+would silently infer the missing fact; bypassing the guard or adding purge behavior would change
+accepted lineage. Neither is done. Existing live Alpaca readiness is a different product boundary,
+not a grant for this historical daily source.
+
+### Smallest next evidence and remaining work
+
+Owner/architect review should resolve the **applicable Basic historical IEX retention lifecycle**:
+may lawfully acquired daily OHLCV, normalized copies, backups, immutable revisions/provenance and
+associated scientific audit/results remain retained and replayable after account closure or data
+entitlement termination? If obligations differ, identify the exact affected artifacts and deadlines.
+Use applicable agreement/provider clarification or an explicit reviewed evidence interpretation;
+do not infer an unrestricted grant from API access. No provider message was sent on the owner's
+behalf and no credential is requested in chat. Alpaca selection and private storage's six answered
+uses do not need approval again.
+
+This is the user's explicit provider-rights STOP condition. Do not weaken immutable evidence,
+use a fallback source or start implementation on a fabricated retention policy. After this gap is
+resolved, completed-source-day eligibility, bounded adapter/fixtures, versioned additive persistence,
+frozen research candidate and prospective non-trading result/replay still require implementation
+and scientific verification. No E acceptance criterion is declared complete by this docs-only review.
+
+### Verification of this review delta
+
+Risk-based scope: public-contract/rights analysis and documentation only. Prior 61 focused
+D/adapter/compatibility PASS and 27 daily science PASS are retained as dated evidence of unchanged
+code/tests, not evidence that the new Alpaca/shadow capability exists. No API/Finance/Sentinel/frontend
+suite, model, provider-data call or build is rerun solely for this publication. No migration exists.
+Applicable publication results (2026-10-03):
+
+| Command/check | Result |
+| --- | --- |
+| `node scripts/verify-documentation.mjs` | PASS:262 Markdown files,91 unique backlog IDs |
+| `git diff --check`; `git diff --cached --check` | PASS |
+| `git diff --cached --name-only` | Exact five Markdown files listed above; no unrelated material |
+| `git diff --quiet HEAD -- src tests` | PASS: no production/test delta from the reviewed parent |
+| Gitleaks8.28.0 `git . --pre-commit --staged --redact --no-banner` | PASS: no leaks |
+
+No CI green is inferred. Public PDFs were inspected outside Git; only source links, sanitized
+findings and artifact hashes are published. No credentials or raw provider market payloads exist
+in this delta.
+
+Finance **RESEARCH / 0 SEK / NONE**. No provider activation, Qwen, grant reset/refund/renewal,
+PAPER/LIVE/AUTO, broker/orders/positions/capital, scheduler, automatic promotion, deployment or
+BB-132F. STOP after publication for independent architect review; no merge.

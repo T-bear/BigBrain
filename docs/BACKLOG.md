@@ -2,15 +2,14 @@
 
 ## BB-132E — prospective shadow evaluation
 
-**REVIEW CHECKPOINT / BLOCKED ON SOURCE FINALITY / NOT A MERGE CANDIDATE.**
-Owner/architect selected finalized daily evidence; snapshot-specific intraday science is excluded.
-Current D snapshots do not establish complete final session constituents. The remaining decision is
-how to acquire and trust a bounded completed-session fact tied to exact finalized source evidence;
-it is not permission to invent missing bars or infer finality from elapsed time.
-[Minimum contract and exact missing primitive](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
-Candidate freezing and shadow-result persistence remain NOT IMPLEMENTED. Original DoD remains
+**REVIEW CHECKPOINT / BLOCKED ON PROVIDER RETENTION LIFECYCLE / NOT A MERGE CANDIDATE.**
+Alpaca historical `1Day` selected; no minute aggregation or Twelve Data fallback. Preserve the six
+owner-supplied storage YES answers. Resolve the remaining applicable post-termination retention,
+deletion and audit scope before granting D-compatible long-term/no-deletion rights.
+[Exact missing evidence, official-source commitments and remaining work](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
+Then establish versioned completed-source-day eligibility and implement the original DoD:
 immutable freeze → future-only sealed daily projection → deterministic prospective result/reopen/
-noninterference, without trading, renewed research grants or inference.
+noninterference. Candidate/result persistence is NOT IMPLEMENTED. No trading, grant renewal or inference.
 
 ## BB-132D — real market observation foundation, 2026-10-02
 
