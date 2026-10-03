@@ -1,5 +1,61 @@
 # Codex interrupted-run recovery
 
+
+## BB-132E implementation publication handoff — 2026-10-03
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+No interrupted implementation. Same branch `bb-132e/prospective-shadow-evaluation`;
+accepted main `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree `69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`.
+Preserved parent `c114b60d1241623c0d91341d144b6963a599e6c3` and both earlier reviewed checkpoints.
+Resolve unique subject `review: implement BB-132E prospective daily shadow evaluation` for exact
+new commit/tree. [Canonical decision, contracts,19-file delta/21-file baseline inventory, commands,
+results and limitations](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+Owner-risk decision resolves the earlier lifecycle implementation stop; uncertainty remains explicit.
+Completed: daily source/policy, same-store immutable receipts, trusted freeze and sealed non-trading
+outcome/replay, migration97 and tests. Focused221/API1014 PASS,8 model SKIP; restore/Release/format
+PASS. Docs/scope/staged-secret results are in report. No live provider/model/host operation occurred.
+Next: STOP for exact-SHA independent review. No merge, deployment or BB-132F. No additional policy
+approval is requested for the already-authorized private use. Operator must fail closed/reconcile
+if concrete applicable retention/deletion obligations become known. No automatic purge or activation.
+Finance RESEARCH / 0 SEK / NONE; grants unchanged. Unrelated mockups/ADR0006–0009 excluded.
+Earlier handoffs below are dated history, not active blockers or permission requirements.
+
+## BB-132E Alpaca rights Review Checkpoint handoff — 2026-10-03
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Deliberate rights-review stop;
+no interrupted implementation. Same branch `bb-132e/prospective-shadow-evaluation`, accepted main
+`8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree `69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`.
+Preserved parent `39b130fa34ba30b66558a6ceca5f1cb52b60cee1` and its reviewed parent `d058d674f0e2403c1015a44b1176d3bfc0449284`.
+Resolve unique subject `review: document BB-132E Alpaca daily evidence rights gate` for exact new SHA/tree.
+[Canonical evidence, exact five-file scope, verification and next prerequisite](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
+Completed: official historical daily-bar/terms inspection; existing owner support evidence preserved;
+precise lifecycle-rights gap documented. No source/test/schema/runtime changes or market-data calls.
+Next: STOP for review of applicable post-termination retention/deletion and audit rights. Do not infer
+`DeletionRequirement.None` or bypass D's immutable retention gate. Daily eligibility/adapter/shadow
+implementation remains pending; source selection itself is already authorized.
+Docs/diff/staged-secrets checks cover this delta; unchanged prior test evidence is not rerun or
+represented as implemented Alpaca acceptance. Unrelated mockups/ADR0006–0009 remain excluded.
+Finance RESEARCH / 0 SEK / NONE; no model, grant reset, trading, deployment or BB-132F.
+Earlier handoffs below are dated history, not current instructions to select a source again.
+
+## BB-132E finalized-daily Review Checkpoint handoff — 2026-10-02
+
+**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Deliberate architecture-review
+stop; no interrupted implementation. Baseline `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree
+`69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`; branch `bb-132e/prospective-shadow-evaluation`.
+Preserved reviewed parent `d058d674f0e2403c1015a44b1176d3bfc0449284`, tree
+`109154ad1c43bbd7569909c85d516c21926a2636`. Direction1 is now owner-authorized; no intraday model.
+Resolve subject `review: characterize BB-132E daily finality prerequisite` for new exact SHA/tree.
+[Authoritative continuation evidence and verification](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#finalized-daily-continuation--2026-10-02).
+Completed: source/calendar/historical completeness inspection, minimum daily eligibility requirements,
+full-scheduled-minute snapshot and closed-market-hint witnesses. Prior four tests/evidence preserved.
+Missing: trusted completed-session evidence bound to exact finalized constituents; no source change,
+provider call, production finalizer, schema or shadow candidate/evaluator implemented.
+Next: STOP for independent review and a bounded source/session-fact decision. Do not infer finality,
+start acquisition, alter existing science or create a parallel implementation without that decision.
+All scientific/model grants untouched. Finance RESEARCH / 0 SEK / NONE; no model/trading/deployment/BB-132F.
+Unrelated mockups and unpublished ADR0006–0009 remain excluded; no other local tracked work existed.
+
 Den här filen är den enda kanoniska återhämtningsplatsen för avbrott och opublicerad delta. Checkpointens egen rapport bär bestående checkpoint-evidens och reviewhistorik. Vid återupptagning ska `AGENTS.md` följas först; verifiera accepterad main, senaste publicerade Review Checkpoint, working tree och noten. Stoppa vid konflikt. Lämna mallen orörd och markera inte publicerat ofullständigt arbete som en aktiv lokal avbrottskörning.
 
 ## Recovery note template

@@ -1,5 +1,15 @@
 # BigBrain – architecture baseline and future direction
 
+## BB-132E prospective daily evidence — review implementation, 2026-10-03
+
+The existing Finance observation owner supports a versioned provider daily receipt alongside
+unchanged minute evidence. Explicit internal freeze/evaluation reuses daily features and momentum
+without an engine/ledger fork or execution state. Migration97 adds immutable candidate/result
+records in the same Finance DB; trusted cutoffs, source revisions and current owner-risk policy
+remain mandatory. No endpoint, scheduler, model or deployment.
+[Canonical daily/source/rights/shadow contract](docs/architecture/finance/market-data-memory-and-provenance.md#bb-132e-daily-prospective-evidence--review-implementation-2026-10-03).
+Not yet accepted; Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-132D observation substrate — review implementation, 2026-10-02
 
 Finance retains existing SQLite/migration ownership. Additive migration96 stores immutable

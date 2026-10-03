@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## BB-132E — prospective shadow evaluation
+
+**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / OWNER REVIEW PENDING.**
+Owner explicitly accepted private Alpaca data-use/retention uncertainty; the prior implementation
+blocker is resolved without asserting a provider guarantee. Completed: native historical daily
+receipt, versioned eligibility, immutable trusted freeze, sealed future-only projection, close/direction
+result, restart/revisions/concurrency and no-lookahead checks. No acceptance/merge is inferred.
+[Evidence, exact limitations and current review identity](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+Live activation and any broader strategy/source/automation work remain outside this candidate.
+Known later deletion obligations require fail-closed reconciliation; no trading/grant renewal/inference.
+
 ## BB-132D — real market observation foundation, 2026-10-02
 
 **MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** D ends at immutable acquired evidence

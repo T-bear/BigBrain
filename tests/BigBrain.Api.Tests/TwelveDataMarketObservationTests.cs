@@ -18,6 +18,26 @@ public sealed class TwelveDataMarketObservationTests
     private static TwelveDataObservationOptions Options => new() { Enabled = true, ApiKey = "FixtureOnlyNotACredential" };
 
     [Fact]
+    public async Task MarketClosedHintAndLaterAcquisitionStillProduceOnlyMinuteSnapshot()
+    {
+        // A transport fixture, not a claim about a new provider guarantee or a live call.
+        var json = Fixture.Replace("{", "{\"is_market_open\":false,", StringComparison.Ordinal);
+        var handler = new Transport((_, _) => Task.FromResult(Response(json)));
+        using var adapter = new TwelveDataMarketObservations(Options, handler);
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(new(2026, 10, 2, 12, 0, 0, TimeSpan.Zero));
+        var receipt = await db.Memory().AcquireMarketObservationAsync(adapter, FinanceMarketObservationTests.Instrument,
+            Mapping, FinanceMarketObservationTests.Policy(mapping: Mapping), clock, TestContext.Current.CancellationToken);
+        Assert.Equal(1, handler.Calls);
+        Assert.Equal(Timeframe.OneMinute, receipt.Value.Interval);
+        Assert.Equal(LiveObservationGranularity.Snapshot, receipt.Granularity);
+        Assert.Null(receipt.Value.ProviderAvailableAtUtc);
+        Assert.Equal(clock.Now, receipt.KnowledgeTimeUtc);
+        Assert.Equal(new DateOnly(2026, 10, 1), DateOnly.FromDateTime(receipt.Value.EventTimeUtc.UtcDateTime));
+        Assert.Equal(receipt, Assert.Single(db.Memory().MarketKnowledgeAt(clock.Now, clock).Observations));
+    }
+
+    [Fact]
     public async Task FixedBoundedRequestNormalizesAndPersistsThroughFinance()
     {
         var handler = new Transport((request, _) =>

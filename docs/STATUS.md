@@ -1,5 +1,16 @@
 # BigBrain Status
 
+## BB-132E prospective daily shadow — 2026-10-03
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Owner-accepted Alpaca data-use risk is explicit; contractual lifecycle uncertainty remains and known
+obligations stop affected use. Existing market receipts now support native historical1Day evidence;
+trusted freeze, future-only knowledge, immutable result/reopen and revision noninterference are
+fixture-proven. No live acquisition, model, trading, grant renewal, scheduler or deployment.
+[Implementation, exact tests, scope and limitations](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+Accepted main remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`. Finance RESEARCH / 0 SEK / NONE.
+STOP for independent review; no merge approval or BB-132F follows.
+
 ## BB-132D observation foundation — 2026-10-02
 
 **MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Provider-independent one-minute raw

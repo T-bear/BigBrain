@@ -1,5 +1,10 @@
 # Project Report Catalog
 
+- `BB-132E implementation, 2026-10-03` — [Prospective daily shadow and owner data-use risk decision](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+  MERGE CANDIDATE, not accepted: existing Finance receipts/owner + historical Alpaca1Day fixture path,
+  trusted immutable freeze, future-only sealed outcome/replay. Focused221/API1014 PASS,8 model SKIP;
+  Release/format PASS. Earlier three Review Checkpoints preserved; no live call/model/trading/deployment.
+
 - `BB-132D, 2026-10-02` — [Real market observation foundation](features/finance/bb-132d-market-observation-foundation-20261002.md). MERGE CANDIDATE, not accepted: Finance-owned immutable receipts, conservative knowledge time, deterministic replay and disabled fixture-tested Twelve Data transport. Live rights/retention remain gated; no model/trading/deployment.
 
 - `BB-132C, 2026-10-02` — [Real local-model finite research sequence and compatibility history](features/finance/bb-132c-local-sequence-compatibility-20261001.md). ACCEPTED / MERGED / CI VERIFIED; exact owner-approved candidate78517da, unchanged merge2ff6471, CI36954159147 all four jobs/steps SUCCESS. Authorized deadline/prompt corrections; real Qwen N Admitted, native evaluation/persistence/reopen, history-aware Qwen N+1 BudgetExceeded.2 invocations/1 evaluation, no retry/OOM; prior review and A evidence preserved. Exact identity, gates, sanitized resource evidence and limitations in report; no further inference authorized.
