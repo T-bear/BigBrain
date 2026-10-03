@@ -2,14 +2,14 @@
 
 ## BB-132E — prospective shadow evaluation
 
-**REVIEW CHECKPOINT / BLOCKED ON PROVIDER RETENTION LIFECYCLE / NOT A MERGE CANDIDATE.**
-Alpaca historical `1Day` selected; no minute aggregation or Twelve Data fallback. Preserve the six
-owner-supplied storage YES answers. Resolve the remaining applicable post-termination retention,
-deletion and audit scope before granting D-compatible long-term/no-deletion rights.
-[Exact missing evidence, official-source commitments and remaining work](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
-Then establish versioned completed-source-day eligibility and implement the original DoD:
-immutable freeze → future-only sealed daily projection → deterministic prospective result/reopen/
-noninterference. Candidate/result persistence is NOT IMPLEMENTED. No trading, grant renewal or inference.
+**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / OWNER REVIEW PENDING.**
+Owner explicitly accepted private Alpaca data-use/retention uncertainty; the prior implementation
+blocker is resolved without asserting a provider guarantee. Completed: native historical daily
+receipt, versioned eligibility, immutable trusted freeze, sealed future-only projection, close/direction
+result, restart/revisions/concurrency and no-lookahead checks. No acceptance/merge is inferred.
+[Evidence, exact limitations and current review identity](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+Live activation and any broader strategy/source/automation work remain outside this candidate.
+Known later deletion obligations require fail-closed reconciliation; no trading/grant renewal/inference.
 
 ## BB-132D — real market observation foundation, 2026-10-02
 

@@ -1,5 +1,107 @@
 # Finance market-data memory, provenance and learning foundation
 
+
+## BB-132E daily prospective evidence — review implementation, 2026-10-03
+
+Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW CANDIDATE ONLY; independent acceptance pending.
+[Owner-accepted data-use/risk decision and checkpoint evidence](../../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+The owner decision supersedes the earlier lifecycle implementation stop **only for this private
+Alpaca research/evidence scope**. Contractual termination/deletion uncertainty remains. It is not
+an Alpaca guarantee, broker permission or automatic live-provider activation.
+
+### Daily source and eligibility
+
+`IMarketObservationSource` and the existing `market_observation_receipts` table now support the
+additive `finance-market-observation-daily-v1` envelope. Existing v1 minute receipts retain their
+identities/checksums and Snapshot meaning. No minute aggregation, separate Alpaca database or
+historical-import relabelling exists. `DailyObservationSemantics` binds eligibility/source version,
+New York source date/timezone and effective-symbol policy; the existing receipt binds instrument,
+listing MIC/currency/mapping, provider/feed, raw OHLCV, response commitment, acquisition, ingestion,
+rights evidence and predecessor. IEX is the feed, **not** the listing venue. Fixtures remain labelled.
+
+The narrow adapter requests one explicit symbol/day from Alpaca historical stock bars with
+`timeframe=1Day`, `feed=iex`, `adjustment=raw`, `asof=-`, explicit New York day boundaries and limit2.
+Exactly one matching bar and no continuation token are required; absence/ambiguity/incomplete
+pagination fail closed rather than invent a daily value. No implicit rename mapping or SIP fallback.
+Transport is explicit-construction only, disabled by default, fixed HTTPS authority, no redirects/
+proxy/cookies/retry,15-second default timeout (typed1–30),64KiB receive limit before deserialization.
+Keys use the existing configuration/secret pattern under `Finance:AlpacaDailyObservation`; no key
+or enabled configuration was added. There is no runtime registration, endpoint or schedule.
+
+Eligibility `alpaca-completed-ny-day-v1` requires a **direct historical provider daily observation**
+whose New York date is strictly before the trusted request-start date. Its timestamp must be the
+New York midnight boundary of that exact source date. Current-day bars are rejected even after
+regular market close. This is a completed **source-day observation as returned**, not a guarantee
+of final revision, all-market completeness or regular-session-only volume. DST boundaries use the
+IANA New York timezone. Provider publication stays unknown; trusted Finance ingestion is knowledge.
+Elapsed time alone cannot promote a minute snapshot; the native historical daily source contract
+is also mandatory. [Official semantics inspected](../../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#official-source-characterization).
+
+Exact duplicate evidence retains its original receipt/time. A changed payload/value requires the
+exact current predecessor, producing a new immutable revision at a strictly later trusted knowledge
+time. Same-tick/regressed writes fail closed. Point-in-time selection first limits receipts by sealed
+cutoff, then selects the last recorded revision per logical day **within that cutoff**. No refetch
+or present-day latest revision participates in old replay. All-revision projection cap remains1000.
+
+### Owner policy and future obligations
+
+`AlpacaDailyOwnerDecision` records version `bb132e-owner-data-use-risk-v1`, evidence class
+`OwnerAcceptedPersonalResearch` and explicit project risk acceptance. Contractual deletion and
+post-subscription retention remain Unknown; they are not falsely labelled provider-granted.
+This scoped daily policy is separate from unchanged minute-source and historical live readiness
+gates. Trusted callers must supply the current policy for acquisition, daily knowledge queries,
+freeze and evaluation, including replay. Known deletion obligations, expiry, denied use or revoked
+permission fail closed before continued affected use. Policy does not automatically discover future
+contract changes: the owner/operator must update the authoritative policy when a concrete applicable
+requirement becomes known and obtain reconciliation before further use. No automatic purge exists.
+
+### Freeze, measurement and persistence
+
+Internal `FreezeDailyShadow` takes a persisted native research run ID, effective source mapping,
+current policy and trusted TimeProvider; there is no caller freeze timestamp or supplied signal.
+The persisted research checksum and payload commitment are verified, and its recorded creation
+must be <= freeze. The bounded first supported strategy is existing momentum/v1 with existing
+core daily feature periods5/10/20. Other strategies/parameters fail closed; no vocabulary is added.
+The supporting native backtest is **identity evidence**, not prospective performance evidence.
+No backtest/robustness engine or research grant is invoked by freeze/evaluation.
+
+Known eligible daily receipts generate features through the existing deterministic daily feature
+engine and intent through `MomentumResearchStrategy`. Warmup/unavailable features fail closed.
+The existing US session calendar guards missing-session gaps; its known calendar scope remains
+an eligibility limitation, not evidence of whole-market coverage. The shared strategy context's
+portfolio slots are inert zeros; there are no positions/cash state or execution semantics.
+
+One immutable candidate per research run/instrument/provider/dataset binds trusted freeze and
+knowledge cutoff, research ID/checksum, source/mapping/origin, feature/projection commitments,
+exact receipt IDs, reference close/session, strategy/period/signal and existing
+`next-eligible-source-session-close-v1` horizon. Duplicate freeze returns the original; it cannot
+refresh an unfavorable hypothesis after new knowledge. Conflicting mapping fails closed.
+
+`EvaluateDailyShadow` requires explicit UTC E <= trusted now and E >= freeze. Only daily receipts
+with knowledge strictly after freeze and <= E, for a source session after the frozen reference,
+are outcome-eligible. The earliest eligible source day supplies the observed close; revisions are
+selected only inside E. Reference-session corrections never rewrite the frozen reference. An older
+market date acquired after freeze remains later knowledge; it is not claimed to have occurred later
+in wall-clock market time. Missing earlier source days are not fabricated; the horizon explicitly
+means next **eligible source** session, not guaranteed next exchange session.
+
+The bounded result records OBSERVED or INSUFFICIENT_DATA, exact candidate/source/projection/cutoff
+identities, observed close/reference-close minus1 and directional correspondence to the frozen
+intent. This reuses the existing shadow horizon/measurement semantics, not simulated trading.
+Raw price movement is not net return, executable profitability, corporate-action-neutral return or
+risk approval. IEX coverage and corporate actions limit interpretation. No costs/fills/positions/
+orders/cash/annualization/promotion are introduced.
+
+Additive migration97 adds only candidate/result tables under the same Finance SQLite owner;
+existing receipts and science stores are reused. SQLite immediate transactions serialize freeze,
+cutoff sealing and result publication. Candidate and per-candidate/per-cutoff result keys are unique;
+crashes roll back, duplicates validate immutable contents, corruption/missing dependency fails closed.
+Later receipts cannot enter a sealed boundary. Reopen reproduces the canonical projection/result.
+Old v1/finite research readers merely recognize schema97; spent grants and history are unchanged.
+
+Finance RESEARCH / 0 SEK / NONE. No live call, model, research-grant renewal, trading, broker,
+scheduler, public endpoint, deployment or next checkpoint is part of this capability.
+
 ## Current Alpaca evidence — 2026-09-06
 
 [Owner-supplied written support evidence](../../reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md)

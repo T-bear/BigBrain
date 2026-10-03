@@ -52,22 +52,25 @@ internal sealed partial class EodhdMarketMemory
     {
         ArgumentNullException.ThrowIfNull(source); ArgumentNullException.ThrowIfNull(clock);
         if (source.Provider != mapping.Provider || source.Dataset != mapping.ProviderDataset ||
-            source.Origin is not (MarketObservationOrigin.AcquiredProviderSnapshot or MarketObservationOrigin.DeterministicFixture))
+            !ValidObservationSource(source.ContractVersion, source.Origin))
             throw new InvalidDataException("Observation source scope is invalid.");
         MarketObservationIntegrity.Token(source.AdapterVersion);
         var started = clock.GetUtcNow();
-        RequireObservationRights(policy, mapping, started);
+        RequireReceiptRights(source.ContractVersion, policy, mapping, started);
         cancellationToken.ThrowIfCancellationRequested();
         var value = await source.ReadAsync(mapping, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         var acquired = clock.GetUtcNow();
         if (acquired < started) throw new InvalidDataException("Observation acquisition clock regressed.");
+        if ((value.Daily is null) != (source.ContractVersion == MarketObservationReceipt.Contract))
+            throw new InvalidDataException("Source contract mismatch.");
+        if (value.Daily is not null) DailyMarketEvidence.Validate(value, mapping, started);
         MarketObservationIntegrity.Validate(value, instrument, mapping, acquired);
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         using var transaction = connection.BeginTransaction(deferred: false);
         RequireObservationSchema(connection);
         var ingested = clock.GetUtcNow(); FinanceTime.RequireUtc(ingested, nameof(clock));
-        RequireObservationRights(policy, mapping, ingested);
+        RequireReceiptRights(source.ContractVersion, policy, mapping, ingested);
         if (ingested < acquired) throw new InvalidDataException("Observation clock regressed.");
         var logical = MarketObservationIntegrity.LogicalIdentity(instrument, source.Provider, source.Dataset, source.Origin, value);
         var content = MarketObservationIntegrity.ContentChecksum(value);
@@ -89,7 +92,7 @@ internal sealed partial class EodhdMarketMemory
         if (ingested.UtcTicks <= watermark)
             throw new InvalidDataException("Observation cannot enter a sealed or regressed knowledge boundary.");
         var id = MarketObservationIntegrity.Hash(new[] { logical, content, correctsId ?? "NONE" });
-        var receipt = new MarketObservationReceipt(MarketObservationReceipt.Contract, id, logical, content, "",
+        var receipt = new MarketObservationReceipt(source.ContractVersion, id, logical, content, "",
             instrument, mapping, source.Provider, source.Dataset, source.AdapterVersion, source.Origin, value, policy.Reference,
             policy.Evidence.Value, acquired, ingested, correctsId);
         receipt = receipt with { Checksum = MarketObservationIntegrity.Checksum(receipt) };
@@ -103,7 +106,7 @@ internal sealed partial class EodhdMarketMemory
         return receipt;
     }
 
-    internal MarketKnowledgeProjection MarketKnowledgeAt(DateTimeOffset cutoff, TimeProvider clock)
+    internal MarketKnowledgeProjection MarketKnowledgeAt(DateTimeOffset cutoff, TimeProvider clock, MarketDataEntitlementPolicy? dailyPolicy = null)
     {
         FinanceTime.RequireUtc(cutoff, nameof(cutoff));
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
@@ -112,12 +115,29 @@ internal sealed partial class EodhdMarketMemory
         var now = clock.GetUtcNow(); FinanceTime.RequireUtc(now, nameof(clock));
         if (cutoff == default || cutoff > now) throw new InvalidDataException("Cannot seal future knowledge.");
         var rows = ReadObservationReceipts(connection, "WHERE ingested_ticks<=$ticks ORDER BY ingested_ticks,id LIMIT 1001", ("$ticks", cutoff.UtcTicks));
+        if (rows.Any(x => x.Value.Daily is not null))
+            AlpacaDailyOwnerDecision.Require(dailyPolicy ?? throw new InvalidDataException("Daily use policy required."), now);
         if (rows.Length > 1000) throw new InvalidDataException("Knowledge projection exceeds bounded capacity.");
         var watermark = ObservationWatermark(connection);
         Execute(connection, transaction, "UPDATE market_observation_clock SET watermark_ticks=$ticks WHERE singleton=1", ("$ticks", Math.Max(watermark, cutoff.UtcTicks)));
         transaction.Commit();
         const string version = "finance-market-knowledge-v1";
         return new(version, cutoff, rows, MarketObservationIntegrity.Hash(new[] { version, MarketObservationIntegrity.Utc(cutoff) }.Concat(rows.Select(x => x.Checksum))));
+    }
+
+    private static bool ValidObservationSource(string version, MarketObservationOrigin origin) =>
+        version == MarketObservationReceipt.Contract && origin is MarketObservationOrigin.AcquiredProviderSnapshot or MarketObservationOrigin.DeterministicFixture ||
+        version == DailyMarketEvidence.Contract && origin is MarketObservationOrigin.AcquiredProviderDaily or MarketObservationOrigin.DeterministicFixture;
+
+    private static void RequireReceiptRights(string version, MarketDataEntitlementPolicy policy, ProviderInstrumentMapping mapping, DateTimeOffset now)
+    {
+        if (version == DailyMarketEvidence.Contract)
+        {
+            AlpacaDailyOwnerDecision.Require(policy, now);
+            if (mapping.Provider != policy.Provider || mapping.ProviderDataset != policy.ProviderDataset)
+                throw new InvalidDataException("Daily policy/source mismatch.");
+        }
+        else RequireObservationRights(policy, mapping, now);
     }
 
     private static void RequireObservationRights(MarketDataEntitlementPolicy policy, ProviderInstrumentMapping mapping, DateTimeOffset now)
@@ -168,8 +188,8 @@ internal sealed partial class EodhdMarketMemory
                 ?? throw new InvalidDataException("Observation record missing.");
             MarketObservationIntegrity.Validate(r.Value, r.Instrument, r.Mapping, r.AcquiredAtUtc);
             if (r.Provider != r.Mapping.Provider || r.Dataset != r.Mapping.ProviderDataset ||
-                r.Origin is not (MarketObservationOrigin.AcquiredProviderSnapshot or MarketObservationOrigin.DeterministicFixture) ||
-                r.Version != MarketObservationReceipt.Contract || r.Id != reader.GetString(0) || r.LogicalIdentity != reader.GetString(1) ||
+                !ValidObservationSource(r.Version, r.Origin) ||
+                (r.Value.Daily is null) != (r.Version == MarketObservationReceipt.Contract) || r.Id != reader.GetString(0) || r.LogicalIdentity != reader.GetString(1) ||
                 r.IngestedAtUtc.UtcTicks != reader.GetInt64(2) || r.Checksum != reader.GetString(3) ||
                 r.Checksum != MarketObservationIntegrity.Checksum(r) || r.ContentChecksum != MarketObservationIntegrity.ContentChecksum(r.Value) ||
                 r.LogicalIdentity != MarketObservationIntegrity.LogicalIdentity(r.Instrument, r.Provider, r.Dataset, r.Origin, r.Value) ||

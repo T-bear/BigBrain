@@ -1,5 +1,16 @@
 # Testa BigBrain
 
+## BB-132E model-free prospective verification — 2026-10-03
+
+`ProspectiveDailyShadowTests` uses deterministic Alpaca-shaped HTTP fixtures and the actual Finance
+receipt owner, feature/strategy path, native research writer and SQLite reopen. It covers daily/DST
+eligibility, trusted freeze/cutoffs, revision/noninterference, duplicate/concurrent publication,
+corruption, migration rollback, spent authority, cancellation and rights revocation. No credential,
+network or model is needed. Existing D/feature/backtest/research-ledger regressions and full API
+suite are required for this shared persistence delta. Release/format/docs/secrets checks apply;
+frontend/Sentinel test suites are excluded unless their unchanged surfaces become affected.
+[Exact current evidence and commands](docs/reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+
 ## BB-132D model-free observation checks — 2026-10-02
 
 `FinanceMarketObservationTests` and `TwelveDataMarketObservationTests` exercise temporary SQLite

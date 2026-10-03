@@ -1,14 +1,15 @@
 # BigBrain Status
 
-## BB-132E Alpaca daily evidence rights gate — 2026-10-03
+## BB-132E prospective daily shadow — 2026-10-03
 
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** Owner/architect selected Alpaca
-historical US equity `1Day` evidence; no minute aggregation. Existing support YES answers for private
-storage/revision history are preserved. Applicable post-termination retention/deletion and audit
-scope remain unresolved against D's long-term/no-deletion rights gate. No production change.
-[Official sources, precise rights gap and continuation](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
-Accepted main remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`; both reviewed E characterization
-commits preserved. Daily eligibility and shadow implementation remain pending. Finance RESEARCH / 0 SEK / NONE.
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Owner-accepted Alpaca data-use risk is explicit; contractual lifecycle uncertainty remains and known
+obligations stop affected use. Existing market receipts now support native historical1Day evidence;
+trusted freeze, future-only knowledge, immutable result/reopen and revision noninterference are
+fixture-proven. No live acquisition, model, trading, grant renewal, scheduler or deployment.
+[Implementation, exact tests, scope and limitations](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+Accepted main remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`. Finance RESEARCH / 0 SEK / NONE.
+STOP for independent review; no merge approval or BB-132F follows.
 
 ## BB-132D observation foundation — 2026-10-02
 

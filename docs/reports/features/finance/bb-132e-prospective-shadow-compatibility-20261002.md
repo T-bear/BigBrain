@@ -3,7 +3,7 @@
 Detta är en sanerad GitHub-version. Synthetic fixtures only; no credentials, provider payloads,
 private runtime paths or model content.
 
-Current continuation: [Alpaca daily evidence and rights gate](#alpaca-daily-evidence-and-rights-gate--2026-10-03).
+Current continuation: [Owner-accepted daily shadow implementation](#owner-accepted-daily-shadow-implementation--2026-10-03).
 The initial characterization and its verification below are retained as reviewed history.
 
 ## Metadata
@@ -423,3 +423,142 @@ in this delta.
 Finance **RESEARCH / 0 SEK / NONE**. No provider activation, Qwen, grant reset/refund/renewal,
 PAPER/LIVE/AUTO, broker/orders/positions/capital, scheduler, automatic promotion, deployment or
 BB-132F. STOP after publication for independent architect review; no merge.
+
+
+## Owner-accepted daily shadow implementation — 2026-10-03
+
+### OWNER-ACCEPTED DATA-USE/RISK DECISION
+
+The product owner explicitly authorizes this private, non-commercial BigBrain installation to
+retain lawfully acquired Alpaca evidence for local research, normalized market evidence,
+prospective SHADOW, deterministic replay, immutable provenance/checksums/revisions, required
+backups, derived scientific results and historical decision auditability. The owner accepts the
+currently documented account/entitlement-termination and possible deletion uncertainty. This is
+**owner risk acceptance, not an Alpaca contractual guarantee or legal finding**. The prior six
+support answers and the unresolved contractual facts above remain unchanged. The lifecycle question
+no longer blocks this authorized implementation.
+
+If a concrete applicable retention/deletion requirement becomes known, affected acquisition and use
+must fail closed until reconciled with immutable evidence architecture. No automatic deletion,
+lineage rewrite or assumption that owner acceptance overrides a provider obligation is authorized.
+The explicit internal policy uses `OwnerAcceptedPersonalResearch`, a versioned owner-evidence
+reference and **Unknown** contractual deletion/post-subscription status; it does not fabricate
+`ExplicitProviderGrant`. Current policy must be supplied again for daily projections/freezes/results.
+Known deletion obligations or revoked affected use are rejected, including replay. No provider
+activation, credential or trading grant follows from constructing this policy.
+
+### Publication identity and implemented result
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Accepted baseline remains `8c09fd4dce4147766b51979ecd2cacc21d87eb92`, tree
+`69ae54c5b3b2243c71bcbf9755a71383f31e1d8f`. Same branch
+`bb-132e/prospective-shadow-evaluation`, preserved parent
+`c114b60d1241623c0d91341d144b6963a599e6c3`, tree `a6596cb826f19e0847ec39747d84e393775eb42e`.
+Both earlier characterization commits remain ancestors, without rewriting.
+Unique publication subject: `review: implement BB-132E prospective daily shadow evaluation`.
+Resolve that exact SHA/tree/parent via `git log --format='%H %T %P %s'`; no self-referential hash.
+Earlier sections are dated reviewed history, not current blockers or approval requests.
+
+The implemented path reuses existing observation receipts/knowledge watermark, daily feature engine,
+momentum strategy, native research result reader/checksum, and accepted source-close shadow horizon.
+It adds a bounded historical Alpaca adapter, explicit owner-risk policy, versioned daily envelope,
+trusted immutable freeze and sealed-cutoff non-trading result. Migration97 adds only shadow
+candidate/result tables to the existing Finance DB. No second market store, evaluator/ledger fork,
+research grant, public endpoint or scheduler. [Canonical semantics and limitations](../../../architecture/finance/market-data-memory-and-provenance.md#bb-132e-daily-prospective-evidence--review-implementation-2026-10-03).
+
+The complete proof uses deterministic fixtures only. It establishes an acquired, persisted daily
+receipt; native supporting research; trusted freeze; a later-known source-day outcome; reopen;
+then a later revision/observation while the original sealed projection and result remain identical.
+The observed percentage is raw close movement, **not** net profitability or executable performance.
+The existing momentum strategy receives an inert portfolio view because of its accepted interface;
+this path never creates orders, positions, balances, fills or a backtest run.
+
+### Acceptance evidence
+
+| Required boundary | Model-free evidence |
+| --- | --- |
+| Native provider daily evidence | Alpaca-shaped transport fixture → existing Finance acquisition owner → v2 daily receipt; explicit IEX/raw/asof-disabled mapping, payload hash and UTC ingestion survive reopen |
+| Completed source day | Versioned historical1Day plus strictly earlier New York source date at trusted request start; current/future day, midday timestamp, invented publication, mismatched contract and malformed OHLC fail; DST boundary cases |
+| Trusted freeze/support | Freeze samples TimeProvider; persisted native research checksum/creation time and exact supported momentum parameters required; no caller timestamp/signal |
+| Prospective knowledge | Pre-freeze projection yields no outcome; old event acquired after freeze is later knowledge; E before freeze or after trusted now fails |
+| Revision/noninterference | Exact duplicate retains original identity/time; changed value without current predecessor fails; later revision/new day cannot alter serialized earlier knowledge projection or canonical result |
+| Restart/immutability | Reopened candidate has identical serialized content/identity; same candidate/E returns identical result; candidate/support/observation/result corruption or missing dependency fails |
+| Concurrency/crash | Concurrent freezes/results converge to one immutable row; competing revisions cannot fork; before-commit failure rolls back; migration97 rollback leaves96 and retry/reopen succeeds |
+| Rights lifecycle | Policy records OwnerAcceptedPersonalResearch plus Unknown contractual deletion; known deletion/revoked use rejects acquisition and further query/evaluation, with zero fixture-source calls |
+| Research/science isolation | Old spent v1 authority remains spent; B/C model-free regressions pass; shadow path does not call backtest/robustness/learning ledger/reasoner or existing scheduled shadow cycle |
+| No external activation | Disabled adapter does not call transport; fixtures reject incomplete pagination/oversize/duplicate JSON/wrong symbol/date/auth response; cancellation persists nothing; real-model opt-ins removed for full suite |
+
+### Verification — 2026-10-03
+
+During implementation, four initial focused failures were fixture expectations (immutable-array
+reference equality, exact exception subtype and schema96 expectation); these were corrected without
+relaxing production validation. The initial compilation also identified a return-type analyzer
+suggestion, corrected before final gates. No pre-existing correctness blocker was found.
+
+| Exact command/check | Final result |
+| --- | --- |
+| `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-restore --filter 'FullyQualifiedName~ProspectiveDailyShadowTests\|FullyQualifiedName~FinanceMarketObservationTests\|FullyQualifiedName~ProspectiveShadowCompatibilityTests\|FullyQualifiedName~TwelveDataMarketObservationTests\|FullyQualifiedName~FinanceFeature\|FullyQualifiedName~FinanceDeterministicBacktest\|FullyQualifiedName~ResearchLearningContract\|FullyQualifiedName~FinanceLearningLedger\|FullyQualifiedName~FiniteResearchSession'` | PASS221,0 fail/skip; includes33 new daily-shadow cases and existing temporal/science/governance regressions |
+| `dotnet restore BigBrain.slnx` | PASS, existing dependencies up to date |
+| `dotnet build BigBrain.slnx --configuration Release --no-restore` | PASS,0 warnings/errors |
+| `dotnet format BigBrain.slnx --verify-no-changes --no-restore` | PASS, exit0/no changes |
+| `env -u BB132A_LOCAL_ACCEPTANCE -u BB132C_LOCAL_ACCEPTANCE dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --configuration Release --no-build --no-restore` | PASS1014,0 fail;8 real-model cases SKIP; no inference |
+
+The sandbox blocked MSBuild named-pipe creation, so test/build gates ran with approved process
+permissions. No host services/configuration or deployment changed. Frontend/Sentinel suites were
+not run because their code/contracts are untouched; solution Release compilation includes their
+projects. No live Alpaca call, credential, new package or network-dependent test was introduced.
+Final publication checks (same implementation tree):
+
+- `node scripts/verify-documentation.mjs`: PASS,262 Markdown files/91 unique backlog IDs.
+- `git diff --check` and `git diff --cached --check`: PASS.
+- Exact staged scope:19 intended files; cumulative baseline scope21, including preserved prior
+  characterization tests. No unstaged tracked delta or unrelated untracked files included.
+- Gitleaks8.28.0 `git . --pre-commit --staged --redact --no-banner`: PASS, no leaks.
+- No package, deployment, model/grammar/runtime, frontend, Sentinel or CI configuration change.
+  No GitHub CI result is inferred from local verification.
+
+### Exact current delta and limitations
+
+Current delta:19 intended files, of which10 C#/test files and9 Markdown documents:
+
+- `src/BigBrain.Modules/Finance/DailyMarketEvidence.cs`
+- `src/BigBrain.Modules/Finance/MarketObservationEvidence.cs`
+- `src/BigBrain.Api/Finance/AlpacaDailyMarketObservations.cs`
+- `src/BigBrain.Api/Finance/FinanceProspectiveDailyShadow.cs`
+- `src/BigBrain.Api/Finance/FinanceMarketObservations.cs`
+- `src/BigBrain.Api/Finance/FinanceSchemaMigrations.cs`
+- `src/BigBrain.Api/Finance/FinanceLearningLedger.cs` — schema97 recognition only
+- `src/BigBrain.Api/Finance/FinanceFiniteResearchSession.cs` — schema97 recognition only
+- `tests/BigBrain.Api.Tests/ProspectiveDailyShadowTests.cs`
+- `tests/BigBrain.Api.Tests/FinanceMarketObservationTests.cs` — latest-schema expectation only
+- `ARCHITECTURE.md`
+- `TESTING.md`
+- `docs/STATUS.md`
+- `docs/BACKLOG.md`
+- `docs/modules/finance.md`
+- `docs/architecture/finance/market-data-memory-and-provenance.md`
+- `docs/operations/codex-recovery.md`
+- `docs/reports/REPORT-CATALOG.md`
+- `docs/reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md`
+
+The cumulative baseline diff also retains the earlier `ProspectiveShadowCompatibilityTests.cs`
+and `TwelveDataMarketObservationTests.cs` characterization additions:21 files total. Unrelated
+mockups and unpublished ADR0006–0009 remain untouched/excluded.
+
+Limits: first source IEX/raw1Day, one symbol/day per request, current-day bars denied, bounded1000
+receipt projection; existing mapping/calendar limits, no symbol master or global-market completeness;
+only supported momentum periods5/10/20; raw close/direction measurement, no costs/corporate-action
+normalization or profitability claim. Supporting backtest evidence is retained identity, not proof
+that its historical returns recur prospectively. Next eligible source day is not guaranteed next
+exchange session. A source day can predate freeze in market time while first becoming knowable
+later; evidence explicitly records both. Later revisions require a new cutoff/result; old evidence
+is preserved. Operator must update current policy if concrete obligations emerge. No live provider
+or deployed end-to-end runtime is claimed, and none is required for this fixture acceptance.
+
+### Final handoff
+
+STOP after publication of this exact Merge Candidate for independent architect review. Owner risk
+acceptance authorizes data use within scope, **not merge of this implementation**. No merge,
+deployment, provider activation, Qwen, scientific-grant renewal/reset/refund, PAPER/LIVE/AUTO,
+broker/orders/positions/capital, scheduler/daemon, automatic promotion, frontend or BB-132F.
+Finance remains **RESEARCH / 0 SEK / NONE**.

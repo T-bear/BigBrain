@@ -1,5 +1,14 @@
 # Finance module
 
+## BB-132E prospective daily shadow — review implementation, 2026-10-03
+
+Explicit internal daily acquisition → trusted immutable receipt → frozen persisted research identity
+→ future-knowledge close-outcome measurement → immutable cutoff result/reopen. Alpaca historical
+IEX1Day is the first narrow adapter; current-day bars are ineligible. Minute evidence is not
+aggregated. Owner-accepted retention uncertainty is explicit and later known obligations stop use.
+[Authoritative contract, limitations and policy](../architecture/finance/market-data-memory-and-provenance.md#bb-132e-daily-prospective-evidence--review-implementation-2026-10-03).
+No live acquisition, model, trading, grant renewal, scheduler or deployment. REVIEW CANDIDATE ONLY.
+
 ## BB-132D market observation contract — review, 2026-10-02
 
 Finance owns a versioned one-minute **raw OHLCV snapshot** receipt. It reuses canonical instrument,

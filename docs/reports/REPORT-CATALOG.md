@@ -1,9 +1,9 @@
 # Project Report Catalog
 
-- `BB-132E continuation, 2026-10-03` — [Alpaca daily evidence and retention lifecycle gate](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#alpaca-daily-evidence-and-rights-gate--2026-10-03).
-  REVIEW CHECKPOINT, not Merge Candidate: native historical `1Day` direction selected; existing storage
-  support evidence preserved, post-termination retention/deletion remains unresolved. Official sources
-  and PDF commitments recorded. Both earlier characterization reviews remain intact; no production change.
+- `BB-132E implementation, 2026-10-03` — [Prospective daily shadow and owner data-use risk decision](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
+  MERGE CANDIDATE, not accepted: existing Finance receipts/owner + historical Alpaca1Day fixture path,
+  trusted immutable freeze, future-only sealed outcome/replay. Focused221/API1014 PASS,8 model SKIP;
+  Release/format PASS. Earlier three Review Checkpoints preserved; no live call/model/trading/deployment.
 
 - `BB-132D, 2026-10-02` — [Real market observation foundation](features/finance/bb-132d-market-observation-foundation-20261002.md). MERGE CANDIDATE, not accepted: Finance-owned immutable receipts, conservative knowledge time, deterministic replay and disabled fixture-tested Twelve Data transport. Live rights/retention remain gated; no model/trading/deployment.
 
