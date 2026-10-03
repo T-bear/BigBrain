@@ -6,7 +6,7 @@ using BigBrain.Modules.Finance;
 
 namespace BigBrain.Api.Finance;
 
-// Explicit construction only; no API endpoint, DI registration, scheduler or default entitlement.
+// Transport credentials remain separate from the disabled-by-default observation runtime.
 internal sealed class AlpacaDailyObservationOptions
 {
     internal const string Section = "Finance:AlpacaDailyObservation";
@@ -104,7 +104,7 @@ internal sealed class AlpacaDailyMarketObservations : IMarketObservationSource, 
         catch (ArgumentException) { throw new InvalidDataException("Alpaca daily observation value rejected."); }
     }
 
-    private static bool ValidCredential(string value) => value.Length is > 0 and <= 128 && value.All(char.IsAsciiLetterOrDigit);
+    internal static bool ValidCredential(string? value) => value is not null && value.Length is > 0 and <= 128 && value.All(char.IsAsciiLetterOrDigit);
 
     private static ProviderObservation Parse(ReadOnlyMemory<byte> bytes, ProviderInstrumentMapping mapping, DateOnly day)
     {

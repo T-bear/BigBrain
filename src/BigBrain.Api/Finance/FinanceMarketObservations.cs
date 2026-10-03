@@ -50,6 +50,27 @@ internal sealed partial class EodhdMarketMemory
         CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
         TimeProvider clock, CancellationToken cancellationToken, string? correctsId = null)
     {
+        return (await AcquireObservationCoreAsync(source, instrument, mapping, policy, clock, correctsId, false, cancellationToken).ConfigureAwait(false)).Receipt;
+    }
+
+    // Finance alone selects the current predecessor under the existing immediate transaction.
+    internal Task<ObservationAcquisition> ReobserveDailyAsync(AlpacaDailyMarketObservations source,
+        CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
+        TimeProvider clock, CancellationToken cancellationToken) =>
+        AcquireObservationCoreAsync(source, instrument, mapping, policy, clock, null, true, cancellationToken);
+
+    internal void RequireObservationRuntimeReady(MarketDataEntitlementPolicy policy, DateTimeOffset now)
+    {
+        AlpacaDailyOwnerDecision.Require(policy, now);
+        using var connection = new SqliteConnection(ConnectionString); connection.Open();
+        RequireObservationSchema(connection);
+        if (now.UtcTicks < ObservationWatermark(connection)) throw new ObservationClockException();
+    }
+
+    private async Task<ObservationAcquisition> AcquireObservationCoreAsync(IMarketObservationSource source,
+        CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
+        TimeProvider clock, string? correctsId, bool reobserve, CancellationToken cancellationToken)
+    {
         ArgumentNullException.ThrowIfNull(source); ArgumentNullException.ThrowIfNull(clock);
         if (source.Provider != mapping.Provider || source.Dataset != mapping.ProviderDataset ||
             !ValidObservationSource(source.ContractVersion, source.Origin))
@@ -58,14 +79,23 @@ internal sealed partial class EodhdMarketMemory
         var started = clock.GetUtcNow();
         RequireReceiptRights(source.ContractVersion, policy, mapping, started);
         cancellationToken.ThrowIfCancellationRequested();
-        var value = await source.ReadAsync(mapping, cancellationToken).ConfigureAwait(false);
+        ProviderObservation value;
+        try { value = await source.ReadAsync(mapping, cancellationToken).ConfigureAwait(false); }
+        catch (Exception e) when (reobserve && !cancellationToken.IsCancellationRequested &&
+            e is TimeoutException or IOException or HttpRequestException or JsonException or InvalidDataException or ArgumentException or InvalidOperationException)
+        { throw new ObservationSourceException(FinanceObservationRuntime.Failure(e)); }
         cancellationToken.ThrowIfCancellationRequested();
         var acquired = clock.GetUtcNow();
         if (acquired < started) throw new InvalidDataException("Observation acquisition clock regressed.");
-        if ((value.Daily is null) != (source.ContractVersion == MarketObservationReceipt.Contract))
-            throw new InvalidDataException("Source contract mismatch.");
-        if (value.Daily is not null) DailyMarketEvidence.Validate(value, mapping, started);
-        MarketObservationIntegrity.Validate(value, instrument, mapping, acquired);
+        try
+        {
+            if ((value.Daily is null) != (source.ContractVersion == MarketObservationReceipt.Contract))
+                throw new InvalidDataException("Source contract mismatch.");
+            if (value.Daily is not null) DailyMarketEvidence.Validate(value, mapping, started);
+            MarketObservationIntegrity.Validate(value, instrument, mapping, acquired);
+        }
+        catch (Exception e) when (reobserve && e is InvalidDataException or ArgumentException)
+        { throw new ObservationSourceException(ObservationFailure.Rejected); }
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         using var transaction = connection.BeginTransaction(deferred: false);
         RequireObservationSchema(connection);
@@ -77,15 +107,23 @@ internal sealed partial class EodhdMarketMemory
         _ = ObservationWatermark(connection);
         var existing = ReadObservationReceipts(connection, "WHERE logical_identity=$key ORDER BY ingested_ticks,id LIMIT 1001", ("$key", logical));
         if (existing.Length > 1000) throw new InvalidDataException("Observation lineage exceeds bounded capacity.");
+        var last = existing.LastOrDefault();
+        if (reobserve)
+        {
+            if (ingested.UtcTicks < ObservationWatermark(connection)) throw new ObservationClockException();
+            if (last is not null && (last.Instrument != instrument || last.Mapping != mapping ||
+                last.AdapterVersion != source.AdapterVersion || last.Policy != policy.Reference || last.PolicyEvidence != policy.Evidence.Value))
+                throw new InvalidDataException("Observation runtime provenance conflicts.");
+            correctsId = last?.ContentChecksum == content ? last.CorrectsId : last?.Id;
+        }
         var same = existing.FirstOrDefault(x => x.ContentChecksum == content && x.CorrectsId == correctsId);
         if (same is not null)
         {
             if (same.Instrument != instrument || same.Mapping != mapping || same.AdapterVersion != source.AdapterVersion ||
                 same.Policy != policy.Reference || same.PolicyEvidence != policy.Evidence.Value)
                 throw new InvalidDataException("Observation duplicate provenance conflicts.");
-            return same; // Preserve first receipt/time; do not refresh known-at history.
+            return new(same, ObservationAcquisitionKind.Duplicate); // Preserve first receipt/time.
         }
-        var last = existing.LastOrDefault();
         if (last is null ? correctsId is not null : correctsId != last.Id)
             throw new InvalidDataException("Observation conflict requires exact preceding receipt lineage.");
         var watermark = ObservationWatermark(connection);
@@ -103,7 +141,7 @@ internal sealed partial class EodhdMarketMemory
         ObservationTestHook?.Invoke("before-observation-commit");
         cancellationToken.ThrowIfCancellationRequested(); transaction.Commit();
         ObservationTestHook?.Invoke("after-observation-commit");
-        return receipt;
+        return new(receipt, last is null ? ObservationAcquisitionKind.New : ObservationAcquisitionKind.Revision);
     }
 
     internal MarketKnowledgeProjection MarketKnowledgeAt(DateTimeOffset cutoff, TimeProvider clock, MarketDataEntitlementPolicy? dailyPolicy = null)
@@ -204,4 +242,12 @@ internal sealed partial class EodhdMarketMemory
         }
         return rows.ToImmutable();
     }
+}
+
+internal enum ObservationAcquisitionKind { New, Duplicate, Revision }
+internal sealed record ObservationAcquisition(MarketObservationReceipt Receipt, ObservationAcquisitionKind Kind);
+internal sealed class ObservationClockException : Exception;
+internal sealed class ObservationSourceException(ObservationFailure failure) : Exception
+{
+    internal ObservationFailure Failure { get; } = failure;
 }

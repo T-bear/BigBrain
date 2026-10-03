@@ -1,5 +1,13 @@
 # BigBrain – architecture baseline and future direction
 
+## BB-132F observation runtime — review implementation, 2026-10-03
+
+A disabled-by-default Finance hosted service composes existing recovery, Alpaca daily transport and
+immutable receipt ownership. It is a bounded single-flight collector, not a science/research scheduler.
+No new persistence owner, model, trading or public control surface.
+[Runtime/configuration/restart contract](docs/architecture/finance/market-data-memory-and-provenance.md#bb-132f-observation-runtime--review-implementation-2026-10-03).
+Publication is not activation, deployment or acceptance.
+
 ## BB-132E prospective daily evidence — review implementation, 2026-10-03
 
 The existing Finance observation owner supports a versioned provider daily receipt alongside

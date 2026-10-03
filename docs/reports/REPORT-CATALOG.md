@@ -1,5 +1,10 @@
 # Project Report Catalog
 
+- `BB-132F, 2026-10-03` — [Live market observation runtime](features/finance/bb-132f-live-market-observation-runtime-20261003.md).
+  Bounded hosted collection through existing Alpaca daily/evidence ownership; fixture-only verification,
+  no live activation or automatic science. Review status and exact publication identity in the report.
+
+
 - `BB-132E implementation, 2026-10-03` — [Prospective daily shadow and owner data-use risk decision](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
   [ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03): existing Finance receipts/owner + historical Alpaca1Day fixture path,
   trusted immutable freeze, future-only sealed outcome/replay. Focused221/API1014 PASS,8 model SKIP;
