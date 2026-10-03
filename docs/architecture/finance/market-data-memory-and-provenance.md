@@ -3,7 +3,7 @@
 
 ## BB-132E daily prospective evidence — review implementation, 2026-10-03
 
-Status: IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW CANDIDATE ONLY; independent acceptance pending.
+Status: [ACCEPTED / MERGED / CI VERIFIED](../../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).
 [Owner-accepted data-use/risk decision and checkpoint evidence](../../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
 The owner decision supersedes the earlier lifecycle implementation stop **only for this private
 Alpaca research/evidence scope**. Contractual termination/deletion uncertainty remains. It is not

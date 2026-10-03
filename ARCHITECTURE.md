@@ -8,7 +8,7 @@ without an engine/ledger fork or execution state. Migration97 adds immutable can
 records in the same Finance DB; trusted cutoffs, source revisions and current owner-risk policy
 remain mandatory. No endpoint, scheduler, model or deployment.
 [Canonical daily/source/rights/shadow contract](docs/architecture/finance/market-data-memory-and-provenance.md#bb-132e-daily-prospective-evidence--review-implementation-2026-10-03).
-Not yet accepted; Finance RESEARCH / 0 SEK / NONE.
+Accepted via the [exact BB-132E publication](docs/reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03); Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-132D observation substrate — review implementation, 2026-10-02
 

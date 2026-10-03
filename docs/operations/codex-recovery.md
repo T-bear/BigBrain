@@ -1,6 +1,19 @@
 # Codex interrupted-run recovery
 
 
+## BB-132E accepted publication handoff — 2026-10-03
+
+**ACCEPTED / MERGED / CI VERIFIED.** No interrupted implementation. Exact approved candidate
+`5e755c0c7e38c1e8843257b7222e3fe81b3c4f43` merged unchanged as
+`47d369870a8c043902f47b563144899aa54f8774`; merge CI37123692743 all jobs/steps SUCCESS.
+[Canonical parent/tree identities, evidence and final-main resolution](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).
+Only acceptance metadata is reconciled; implementation and prior evidence remain unchanged.
+Final docs commit resolves from `docs: record accepted BB-132E checkpoint`; verify its own CI.
+Next: STOP and return control to owner/architect. No Alpaca activation, model, runtime/scheduler,
+deployment or BB-132F. Finance RESEARCH / 0 SEK / NONE; unrelated local work remains excluded.
+Earlier review handoffs below are historical and do not leave an active pending merge or interruption.
+
+
 ## BB-132E implementation publication handoff — 2026-10-03
 
 **MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**

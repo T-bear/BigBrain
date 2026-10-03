@@ -7,7 +7,8 @@ Explicit internal daily acquisition → trusted immutable receipt → frozen per
 IEX1Day is the first narrow adapter; current-day bars are ineligible. Minute evidence is not
 aggregated. Owner-accepted retention uncertainty is explicit and later known obligations stop use.
 [Authoritative contract, limitations and policy](../architecture/finance/market-data-memory-and-provenance.md#bb-132e-daily-prospective-evidence--review-implementation-2026-10-03).
-No live acquisition, model, trading, grant renewal, scheduler or deployment. REVIEW CANDIDATE ONLY.
+No live acquisition, model, trading, grant renewal, scheduler or deployment.
+[ACCEPTED / MERGED / CI VERIFIED](../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).
 
 ## BB-132D market observation contract — review, 2026-10-02
 

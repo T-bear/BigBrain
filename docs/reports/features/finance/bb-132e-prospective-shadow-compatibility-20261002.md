@@ -3,7 +3,7 @@
 Detta är en sanerad GitHub-version. Synthetic fixtures only; no credentials, provider payloads,
 private runtime paths or model content.
 
-Current continuation: [Owner-accepted daily shadow implementation](#owner-accepted-daily-shadow-implementation--2026-10-03).
+Current state: [Accepted publication](#accepted-publication--2026-10-03).
 The initial characterization and its verification below are retained as reviewed history.
 
 ## Metadata
@@ -562,3 +562,43 @@ acceptance authorizes data use within scope, **not merge of this implementation*
 deployment, provider activation, Qwen, scientific-grant renewal/reset/refund, PAPER/LIVE/AUTO,
 broker/orders/positions/capital, scheduler/daemon, automatic promotion, frontend or BB-132F.
 Finance remains **RESEARCH / 0 SEK / NONE**.
+
+
+## Accepted publication — 2026-10-03
+
+**ACCEPTED / MERGED / CI VERIFIED.** Independent architect review and explicit owner approval
+apply to exact candidate `5e755c0c7e38c1e8843257b7222e3fe81b3c4f43`. The preceding Review Checkpoint
+and Merge Candidate sections remain dated history, not outstanding approval requests.
+
+- Verified baseline/first merge parent: `8c09fd4dce4147766b51979ecd2cacc21d87eb92`.
+- Approved candidate/second merge parent: `5e755c0c7e38c1e8843257b7222e3fe81b3c4f43`.
+- Merge: `47d369870a8c043902f47b563144899aa54f8774`.
+- Candidate and merge tree, exactly equal: `ddfdcfe5ea8f59504f9bf99371b50172d7e29d95`.
+- Pre-merge local/remote branch matched, merge-base equalled baseline,4 ahead/0 behind,
+  no tracked work affected publication; unrelated mockups/ADR0006–0009 preserved.
+- Normal non-rewriting merge/push; no candidate change, rebase, amend, squash or force push.
+
+[Merge Actions run37123692743](https://github.com/T-bear/BigBrain/actions/runs/37123692743)
+was independently checked as a completed SUCCESS push run on main for the exact merge SHA.
+Actual jobs and steps, not just an overall badge:
+
+| Job | Verified successful steps |
+| --- | --- |
+| backend | Checkout/setup-dotnet; solution restore; `dotnet format --verify-no-changes --no-restore`; Release build; solution tests |
+| frontend | Checkout/setup-node; `npm ci`; `npm run format:check`; `npm test -- --run`; production build |
+| documentation | Checkout/setup-node; `node scripts/verify-documentation.mjs` |
+| secrets | Checkout; `gitleaks/gitleaks-action@v2` |
+
+All jobs and their actual setup/verification/cleanup steps completed successfully. Unchanged
+candidate-local verification was not repeated. No additional model or provider invocation occurred.
+
+A separate minimal Markdown reconciliation records this durable acceptance and removes current
+pending-acceptance wording in existing canonical documents. No implementation, tests, schema,
+policy behavior or configuration changes. Exact reconciliation/final-main identity is resolved from
+subject `docs: record accepted BB-132E checkpoint`; its own push CI is checked separately for its
+SHA before handoff. Merge CI above is not substituted for that later commit's CI.
+
+Finance **RESEARCH / 0 SEK / NONE**. Alpaca is not activated; no deployment, runtime/scheduler
+start, Qwen, grant renewal, PAPER/LIVE/AUTO, broker/orders/capital or BB-132F. The owner-accepted
+retention uncertainty and known-obligation fail-closed requirements remain unchanged.
+STOP after accepted-main publication/verification; return control to owner/architect.

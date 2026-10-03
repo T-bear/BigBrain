@@ -2,11 +2,12 @@
 
 ## BB-132E — prospective shadow evaluation
 
-**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / OWNER REVIEW PENDING.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 Owner explicitly accepted private Alpaca data-use/retention uncertainty; the prior implementation
 blocker is resolved without asserting a provider guarantee. Completed: native historical daily
 receipt, versioned eligibility, immutable trusted freeze, sealed future-only projection, close/direction
-result, restart/revisions/concurrency and no-lookahead checks. No acceptance/merge is inferred.
+result, restart/revisions/concurrency and no-lookahead checks.
+[Exact acceptance and main-CI evidence](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).
 [Evidence, exact limitations and current review identity](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
 Live activation and any broader strategy/source/automation work remain outside this candidate.
 Known later deletion obligations require fail-closed reconciliation; no trading/grant renewal/inference.

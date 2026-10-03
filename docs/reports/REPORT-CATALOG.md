@@ -1,7 +1,7 @@
 # Project Report Catalog
 
 - `BB-132E implementation, 2026-10-03` — [Prospective daily shadow and owner data-use risk decision](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
-  MERGE CANDIDATE, not accepted: existing Finance receipts/owner + historical Alpaca1Day fixture path,
+  [ACCEPTED / MERGED / CI VERIFIED](features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03): existing Finance receipts/owner + historical Alpaca1Day fixture path,
   trusted immutable freeze, future-only sealed outcome/replay. Focused221/API1014 PASS,8 model SKIP;
   Release/format PASS. Earlier three Review Checkpoints preserved; no live call/model/trading/deployment.
 
