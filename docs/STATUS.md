@@ -2,10 +2,10 @@
 
 ## BB-132F live market observation runtime — 2026-10-03
 
-**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED.** NOT ACCEPTED / NOT DEPLOYED / NOT ENABLED.
+**ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ENABLED.
 Disabled-by-default hosted service reuses Alpaca daily transport and Finance immutable evidence.
 No model, automatic science/shadow evaluation or trading authority. Finance RESEARCH / 0 SEK / NONE.
-[Checkpoint evidence, exact verification and activation limits](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md).
+[Exact accepted candidate/merge/tree/CI evidence and activation limits](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md#accepted-publication--2026-10-03).
 Earlier E-era F-not-started statements below are dated history.
 
 ## BB-132E prospective daily shadow — 2026-10-03

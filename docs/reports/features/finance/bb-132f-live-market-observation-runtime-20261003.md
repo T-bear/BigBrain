@@ -1,7 +1,8 @@
 # BB-132F — Live market observation runtime
 
 Detta är en sanerad GitHub-version. Review evidence, 2026-10-03. Synthetic transport fixtures only; no credentials, raw
-provider payloads, private paths or model content. MERGE CANDIDATE / REVIEW CANDIDATE ONLY.
+provider payloads, private paths or model content. Current state: [ACCEPTED / MERGED / CI VERIFIED](#accepted-publication--2026-10-03).
+The candidate-state text and verification below are retained as dated review history.
 
 ## Metadata
 
@@ -169,3 +170,42 @@ Follow AGENTS.md and the canonical runtime contract linked above. Resolve this p
 SHA/tree through its unique subject and compare with the recorded baseline. Independent architect
 review and explicit owner approval of that exact SHA are required before merge. No further work,
 provider activation, deployment or next checkpoint follows from publication.
+
+
+## Accepted publication — 2026-10-03
+
+Owner explicitly approved exact independently reviewed candidate
+`a3ef3cd8a8ac5b1199a1cabc5001dc8d5ffff08c`. Pre-merge fetch verified local/remote candidate identity,
+expected unchanged main,1 ahead/0 behind, exact merge-base and no tracked local modifications.
+Unrelated mockups and ADR0006–0009 remain untouched and excluded.
+
+- Baseline / first merge parent: `c5fcd6712548c37f69453e237f17e6c0434b70ac`.
+- Approved candidate / second merge parent: `a3ef3cd8a8ac5b1199a1cabc5001dc8d5ffff08c`.
+- Merge: `bef153d9f28a084ff2e50ff5580649ae30b055f4`.
+- Candidate tree = merge tree: `1d121bb96f9fad8a097cf32655669d202c44af2a` (full-tree equality).
+- Normal non-rewriting merge and push; no amend/rebase/squash/force push or candidate modification.
+
+[Merge CI run37140171235](https://github.com/T-bear/BigBrain/actions/runs/37140171235)
+was independently verified as SUCCESS for a push on main at that exact merge SHA. Actual jobs/steps:
+
+| Job | Successful verification |
+| --- | --- |
+| backend | Restore, format verification, Release solution build, solution tests |
+| frontend | npm ci, format check, tests, production build |
+| documentation | node scripts/verify-documentation.mjs |
+| secrets | gitleaks/gitleaks-action@v2 |
+
+The reviewed implementation is unchanged; prior valid local test evidence is reused rather than
+repeated. Candidate branch had no separate Actions run (workflow triggers main pushes/PRs);
+the merge run above supplies exact-main CI evidence.
+
+Only four Markdown files reconcile durable acceptance: STATUS, BACKLOG, recovery and this report.
+No architecture/implementation/test/schema/runtime/provider configuration changes. The final docs
+commit is uniquely resolved by subject `docs: record accepted BB-132F checkpoint`; its own push
+CI must be verified for its exact SHA before final handoff. Merge CI is not evidence for that later SHA.
+
+**ACCEPTED / MERGED / CI VERIFIED; NOT DEPLOYED / NOT ENABLED.** No Finance observation runtime
+start, Alpaca credential/universe configuration or real request, automatic prospective evaluation,
+Qwen, grant reset/refund/renewal, PAPER/LIVE/AUTO, broker/Avanza, orders/positions/capital or next sprint.
+Finance **RESEARCH / 0 SEK / NONE**. STOP and return control to owner/architect; later live activation
+and all remaining operational gates still require separate authorization.

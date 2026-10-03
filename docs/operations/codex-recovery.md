@@ -2,7 +2,7 @@
 
 ## BB-132F publication handoff — 2026-10-03
 
-**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.**
 No interrupted implementation remains. Branch `bb-132f/live-market-observation-runtime`;
 baseline/main `c5fcd6712548c37f69453e237f17e6c0434b70ac`, tree
 `3f868fb933ea33e55d662b00a1c041ce74ce4ec4`. Unique publication subject
@@ -12,8 +12,11 @@ Focused101 PASS; final API1052 PASS/8 deliberate model SKIP; restore/Release/for
 secrets PASS. Earlier full API failure is retained in the report, isolated5 PASS and unchanged full
 confirmation green; no reasoner/test/deadline fix or inference occurred. No source/schema changes
 outside the recorded collection boundary. Unrelated mockups/ADR0006–0009 excluded and preserved.
-Next: STOP for independent architect review of the exact published candidate. No merge, live Alpaca
-activation, deployment, model, automatic science/trading or next sprint. RESEARCH / 0 SEK / NONE.
+Exact approved candidate merged unchanged; [candidate/merge parents/tree and successful main CI](../reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md#accepted-publication--2026-10-03).
+Final documentation-only main resolves from subject `docs: record accepted BB-132F checkpoint`;
+verify its own exact-SHA CI separately. No implementation change or repeated local suites.
+Next: STOP and return control to owner/architect. No live Alpaca/runtime activation, deployment,
+model, automatic science/trading or next sprint. RESEARCH / 0 SEK / NONE.
 
 ## BB-132E accepted publication handoff — 2026-10-03
 

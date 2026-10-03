@@ -2,9 +2,9 @@
 
 ## BB-132F — live market observation runtime
 
-**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / OWNER REVIEW PENDING.** Bounded, disabled-by-default unattended Alpaca daily
+**ACCEPTED / MERGED / CI VERIFIED.** Bounded, disabled-by-default unattended Alpaca daily
 collection through existing Finance receipts, with restart/revisions and trusted knowledge preserved.
-[Acceptance evidence and remaining operational limits](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md).
+[Exact acceptance evidence](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md#accepted-publication--2026-10-03) and remaining operational limits in that report.
 Live activation, owner-selected mappings/credentials, cross-host coordination, long-outage backfill,
 projection-capacity expansion and automatic scientific evaluation remain outside this checkpoint.
 No next sprint, trading, model or deployment authority.
