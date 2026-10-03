@@ -1,6 +1,87 @@
 # Finance market-data memory, provenance and learning foundation
 
 
+## BB-132F observation runtime — review implementation, 2026-10-03
+
+The API hosts one `FinanceObservationWorker` using the existing `BackgroundService` and
+`SystemRecoveryCoordinator` patterns. It waits for recovery/clock permission and drives only
+`FinanceObservationRuntime` → existing Alpaca daily adapter → existing Finance receipt owner.
+It does **not** call the older EODHD cadence (which also evaluates science), daily-shadow evaluator,
+research scheduler, model or trading functions. No new database, schema, cursor, generic scheduler,
+endpoint or provider is introduced. [Checkpoint evidence](../../reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md).
+
+### Configuration and activation boundary
+
+Nothing is enabled by this publication. Later live activation requires separate owner authorization,
+reviewed instrument mappings/current data-use policy and external credentials. No live call is part
+of automated acceptance. Configuration is read/frozen at process startup; disabling requires setting
+`Finance:ObservationRuntime:Enabled=false` and a separately authorized restart. Graceful shutdown
+cancels the active request/delay. No hot-control endpoint is provided.
+
+| Configuration | Contract |
+| --- | --- |
+| `Finance:ObservationRuntime:Enabled` | Default false; independent of EODHD/research settings |
+| `CadenceMinutes` in that section | Default360, allowed60–1440; delay after completion and on startup |
+| `LookbackDays` | Default3, allowed1–7 prior New York calendar days; oldest first |
+| `OwnerAcceptanceVersion` | Must explicitly equal `bb132e-owner-data-use-risk-v1` |
+| `PolicyRecordedAtUtc` | Nondefault UTC owner-policy recording instant, not future; never used as market knowledge time |
+| `AffectedUseEnabled` | Default false; explicit current permission required |
+| `CurrentDeletion` | Default Unknown; known deletion obligations block affected collection under unchanged E policy |
+| `Instruments` | Explicit1–4 unique instruments; empty by default; no supplied production universe |
+| `Finance:AlpacaDailyObservation:Enabled` | Separate existing adapter gate, default false |
+| Adapter `ApiKey` / `ApiSecret` | Existing external configuration/secret mechanism only; never examples with actual values |
+| Adapter `TimeoutSeconds` | Existing default15, allowed1–30 |
+
+Each allowlist entry supplies `InstrumentId`, `DisplayName`, `ProviderSymbol`, listing `Mic`,
+`VenueCode`, `VenueName`, `ValidFrom`, optional `ValidTo`, and `MappingEvidence`. These configuration
+fields construct the **existing** `CanonicalInstrument`/`ProviderInstrumentMapping`; they are not
+another symbol master. Owner/operator must review actual identity, venue and effective mapping.
+The narrow runtime fixes Equity/USD/Alpaca/IEX historical1Day/raw; listing MIC must be XNAS/XNYS/ARCX.
+IEX is the **feed**, not the listing venue. Duplicate IDs/symbols, missing/invalid mappings, invalid
+limits, missing/malformed credentials or revoked policy fail closed. Secret environment keys use
+ASP.NET's existing double-underscore mapping, e.g. `Finance__AlpacaDailyObservation__ApiKey` and
+`Finance__AlpacaDailyObservation__ApiSecret`; never put values into chat, repository or diagnostic logs.
+No endpoint URL, paid feed, alternative provider, proxy/redirect or runtime tool is configurable here.
+
+### Cadence, evidence and failures
+
+One singleton cycle is active at most; overlapping requests return its snapshot immediately with
+no queue. At most4×7=28 slots per cycle; the accepted US calendar skips non-session dates, while
+only the unchanged completed-prior-New-York-day/native-provider contract grants daily eligibility.
+DST/date conversion reuses `DailyMarketEvidence`. Five seconds separate request attempts, all serial;
+there is no retry in a cycle. Ordinary next-cycle reacquisition is bounded by the cadence. Startup
+also waits a complete cadence, preventing restart-triggered immediate request bursts. Long outages
+are **not** backfilled outside the configured window; missing evidence is never fabricated.
+
+The actual adapter still enforces fixed HTTPS authority, no proxy/cookies/redirects,64KiB bounded
+receive and cancellation/timeout. Its HTTP/format/network failures do not create receipts and do not
+prevent a separate eligible instrument from being attempted. Clock regression blocks the runtime
+until reviewed restart; SQLite/integrity/policy failures stop the cycle. Recovery permission and the
+persisted observation watermark are checked before collection. Existing commit checks remain final
+scientific authority, including same-tick/sealed-cutoff refusal. No invented timestamp/tick increment.
+
+Finance selects revisions under the same existing immediate SQLite transaction: identical current
+content returns the exact existing receipt/time; changed content records a new revision of the latest
+receipt. Reversion to an older value is still a new revision, never a reuse/backdate. Mapping/policy/
+adapter provenance conflicts fail closed. Explicit predecessor callers retain their existing behavior.
+No schema change is needed. A crash before commit rolls back; uncertain post-commit completion is
+not retried immediately and restart resolves through immutable evidence. A failed status never means
+permission to delete a possibly committed receipt. Earlier sealed knowledge projections remain exact.
+
+`Snapshot` and the existing `HealthCheckService` entry `finance-observation` expose only bounded,
+immutable operational data: enabled/state, cycle start/completion, next check, considered source days,
+attempted instrument/day, New/Duplicate/Revision receipt IDs and finite failure categories. Overall
+existing health endpoints see its health; no new detailed public endpoint is added. Cycle logs carry
+state only, never exception text/object or payload/credentials. Operational snapshots reset on restart;
+receipts and their original knowledge/provenance do not. Snapshots are not scientific evidence.
+
+This is a single-API-host runtime; cross-host distributed scheduling is not introduced. SQLite still
+serializes evidence writes from independent owners. Existing bounded projection/lineage capacities
+(including the1000-receipt knowledge projection) remain fail-closed limitations. Operator monitoring,
+backup retention, eventual capacity work and explicit live activation remain separate responsibilities.
+The model, grant counters, science/risk engines, shadow results and execution authority are untouched.
+Finance stays **RESEARCH / 0 SEK / NONE**.
+
 ## BB-132E daily prospective evidence — review implementation, 2026-10-03
 
 Status: [ACCEPTED / MERGED / CI VERIFIED](../../reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).

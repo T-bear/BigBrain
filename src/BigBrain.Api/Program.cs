@@ -230,6 +230,13 @@ public partial class Program
         builder.Services.AddHostedService<FinanceResearchOperationsWorker>();
         builder.Services.AddSingleton<FinanceResearchOrchestrator>();
         builder.Services.AddSingleton(TimeProvider.System);
+        var observationOptions = builder.Configuration.GetSection(FinanceObservationRuntimeOptions.Section).Get<FinanceObservationRuntimeOptions>() ?? new();
+        var alpacaDailyOptions = AlpacaDailyObservationOptions.FromConfiguration(builder.Configuration);
+        builder.Services.AddSingleton(serviceProvider => new FinanceObservationRuntime(observationOptions, alpacaDailyOptions,
+            serviceProvider.GetRequiredService<EodhdMarketMemory>(), serviceProvider.GetRequiredService<TimeProvider>(),
+            () => serviceProvider.GetRequiredService<SystemRecoveryCoordinator>().MayStartTimeSensitiveWork));
+        builder.Services.AddHostedService<FinanceObservationWorker>();
+        builder.Services.AddHealthChecks().AddCheck<FinanceObservationRuntime>("finance-observation");
         builder.Services.AddHostedService<FinanceResearchSchedulerWorker>();
         builder.Services.AddSingleton<IFinanceObservationReader, EodhdFinanceObservationReader>();
         builder.Services.AddSingleton<IFinanceFeatureReader, EodhdFinanceFeatureReader>();

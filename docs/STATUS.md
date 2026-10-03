@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## BB-132F live market observation runtime — 2026-10-03
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED.** NOT ACCEPTED / NOT DEPLOYED / NOT ENABLED.
+Disabled-by-default hosted service reuses Alpaca daily transport and Finance immutable evidence.
+No model, automatic science/shadow evaluation or trading authority. Finance RESEARCH / 0 SEK / NONE.
+[Checkpoint evidence, exact verification and activation limits](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md).
+Earlier E-era F-not-started statements below are dated history.
+
 ## BB-132E prospective daily shadow — 2026-10-03
 
 **ACCEPTED / MERGED / CI VERIFIED.**
