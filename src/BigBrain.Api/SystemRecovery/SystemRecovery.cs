@@ -113,6 +113,26 @@ public sealed class SystemRecoveryCoordinator : BackgroundService
         }
     }
 
+    // Standalone maintenance performs current local checks, never starts a second appliance
+    // lifecycle session or changes the running host's clean/unclean journal.
+    internal static void RequireMaintenancePrerequisites(SystemRecoveryOptions options, string financeDatabase)
+    {
+        if (!File.Exists(Path.Combine(options.ClockSyncDirectory, "synchronized")))
+            throw new InvalidDataException("Maintenance clock synchronization unavailable.");
+        foreach (var path in new[] { options.DatabasePath, financeDatabase })
+        {
+            if (!File.Exists(path)) throw new InvalidDataException("Maintenance store unavailable.");
+            if (options.LowDiskCriticalBytes <= 0 || new DriveInfo(Path.GetPathRoot(Path.GetFullPath(path))!).AvailableFreeSpace < options.LowDiskCriticalBytes)
+                throw new InvalidDataException("Maintenance disk unavailable.");
+            using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
+            { DataSource = path, Mode = SqliteOpenMode.ReadOnly }.ToString());
+            connection.Open();
+            using var command = connection.CreateCommand(); command.CommandText = "PRAGMA quick_check(1);";
+            if (!string.Equals(command.ExecuteScalar() as string, "ok", StringComparison.Ordinal))
+                throw new InvalidDataException("Maintenance store integrity rejected.");
+        }
+    }
+
     private void RunFastRecovery()
     {
         var now = DateTimeOffset.UtcNow;

@@ -33,6 +33,8 @@ services:
     build:
       context: .
       dockerfile: src/BigBrain.Api/Dockerfile
+      args:
+        BIGBRAIN_REVISION: ${BIGBRAIN_BUILD_REVISION:-UNKNOWN}
     depends_on:
       sentinel:
         condition: service_healthy
@@ -40,6 +42,18 @@ services:
       ASPNETCORE_HTTP_PORTS: 8080
       Calendar__DatabasePath: /calendar-data/calendar.db
       Settings__DatabasePath: /settings-data/settings.db
+      Finance__ObservationRuntime__Enabled: ${FINANCE__OBSERVATIONRUNTIME__ENABLED:-false}
+      Finance__ObservationRuntime__CadenceMinutes: ${FINANCE__OBSERVATIONRUNTIME__CADENCEMINUTES:-360}
+      Finance__ObservationRuntime__LookbackDays: ${FINANCE__OBSERVATIONRUNTIME__LOOKBACKDAYS:-3}
+      Finance__ObservationRuntime__OwnerAcceptanceVersion: ${FINANCE__OBSERVATIONRUNTIME__OWNERACCEPTANCEVERSION:-}
+      Finance__ObservationRuntime__PolicyRecordedAtUtc: ${FINANCE__OBSERVATIONRUNTIME__POLICYRECORDEDATUTC:-0001-01-01T00:00:00+00:00}
+      Finance__ObservationRuntime__AffectedUseEnabled: ${FINANCE__OBSERVATIONRUNTIME__AFFECTEDUSEENABLED:-false}
+      Finance__ObservationRuntime__CurrentDeletion: ${FINANCE__OBSERVATIONRUNTIME__CURRENTDELETION:-Unknown}
+      Finance__ObservationRuntime__InstrumentsJson: ${FINANCE__OBSERVATIONRUNTIME__INSTRUMENTSJSON:-}
+      Finance__AlpacaDailyObservation__Enabled: ${FINANCE__ALPACADAILYOBSERVATION__ENABLED:-false}
+      Finance__AlpacaDailyObservation__ApiKey: ${FINANCE__ALPACADAILYOBSERVATION__APIKEY:-}
+      Finance__AlpacaDailyObservation__ApiSecret: ${FINANCE__ALPACADAILYOBSERVATION__APISECRET:-}
+      Finance__AlpacaDailyObservation__TimeoutSeconds: ${FINANCE__ALPACADAILYOBSERVATION__TIMEOUTSECONDS:-15}
       Finance__Eodhd__Enabled: ${FINANCE__EODHD__ENABLED:-false}
       Finance__Eodhd__AccountActive: ${FINANCE__EODHD__ACCOUNTACTIVE:-false}
       Finance__Eodhd__ApiToken: ${FINANCE__EODHD__APITOKEN:-}

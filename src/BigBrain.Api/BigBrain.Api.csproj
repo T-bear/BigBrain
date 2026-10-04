@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <BigBrainBuildRevision Condition="'$(BigBrainBuildRevision)' == ''">UNKNOWN</BigBrainBuildRevision>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../BigBrain.Modules/BigBrain.Modules.csproj" />
@@ -13,5 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="BigBrain.Api.Tests" />
+    <AssemblyMetadata Include="GitRevision" Value="$(BigBrainBuildRevision)" />
   </ItemGroup>
 </Project>

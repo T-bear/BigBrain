@@ -19,3 +19,10 @@ real EODHD Free memory and must be preserved on recreation. Use the runbook's sa
 runtime-evidence command to verify counts/replay without printing the token or raw payloads.
 
 Grundstruktur. Ingen ny normativ deploymentprocedur införs i denna fas.
+
+## Controlled Finance daily acquisition / API revision
+
+[BB-132F1 operator gate](../runbooks/finance-controlled-acquisition.md) defines the exact-revision
+build helper, external Compose pass-through and maintenance-only single acquisition. UNKNOWN
+revision is honest and blocks acquisition. Credentials do not enable observation runtime.
+Publication is not permission to deploy, recreate services, configure keys or call Alpaca.

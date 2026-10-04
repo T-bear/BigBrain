@@ -1,5 +1,10 @@
 # BigBrain Backlog
 
+## BB-132F1 — controlled activation and deployment gate
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Bounded one-shot uses accepted Finance receipts while runtime remains disabled. Actual deployment/service readiness, reviewed mapping/credentials and first real request remain separate operational gates; no unattended activation.
+[Exact scope, verification and remaining operational gates](reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+
 ## BB-132F — live market observation runtime
 
 **ACCEPTED / MERGED / CI VERIFIED.** Bounded, disabled-by-default unattended Alpaca daily

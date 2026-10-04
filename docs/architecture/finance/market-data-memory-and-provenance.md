@@ -1,6 +1,16 @@
 # Finance market-data memory, provenance and learning foundation
 
 
+## BB-132F1 controlled activation gate — review implementation, 2026-10-04
+
+A finite maintenance entry can acquire one reviewed AAPL/MSFT daily observation while the
+unattended runtime remains disabled. It reuses the same adapter, receipt owner, validation and
+revision/knowledge semantics; no scientific or execution authority is added. Compose forwards
+external settings with no default universe; an immutable build archive supplies assembly/OCI
+revision identity. [Operator/configuration/revision contract](../../operations/runbooks/finance-controlled-acquisition.md)
+and [exact verification/publication evidence](../../reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+No deployment, restart, real request or credential configuration is part of this candidate.
+
 ## BB-132F observation runtime — review implementation, 2026-10-03
 
 The API hosts one `FinanceObservationWorker` using the existing `BackgroundService` and

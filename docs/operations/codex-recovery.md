@@ -1,5 +1,23 @@
 # Codex interrupted-run recovery
 
+## BB-132F1 controlled activation gate handoff — 2026-10-04
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+Branch `bb-132f1/controlled-activation-gate`; baseline
+`3a332c476ce6acf7007e463791ba416530c15302`, tree `43380caec0119a22652b07e0614ccc3eef328639`.
+The explicitly identified earlier unpublished52-line operationalization note was removed and its
+remainder checked byte-for-byte against accepted HEAD before this branch. It is not candidate input.
+Unrelated mockups/ADR0006–0009 remain untouched/excluded. No implementation interruption remains.
+[Canonical F1 scope, exact file inventory, test results and operational limitations](../reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+Unique publication subject `review: implement BB-132F1 controlled activation gate` resolves exact
+review commit/tree in Git after push. No deployment/restart/service repair, .env/credential change,
+real provider/model invocation, science/trading/grant mutation occurred. Finance RESEARCH / 0 SEK / NONE.
+Focused185 PASS, API1110 PASS/8 deliberate model SKIP, Release/format/restore/config checks PASS.
+Final documentation/staged-secrets/scope checks are recorded in the report.
+Next: STOP for independent exact-SHA review. This review does
+not activate Alpaca or unattended collection and does not authorize another sprint.
+
+
 ## BB-132F publication handoff — 2026-10-03
 
 **ACCEPTED / MERGED / CI VERIFIED.**

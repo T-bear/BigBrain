@@ -1,5 +1,10 @@
 # Project Report Catalog
 
+- `BB-132F1, 2026-10-04` — [Controlled activation and deployment gate](features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+  One-shot maintenance, external configuration and build identity; no activation or deployment.
+  Exact candidate status, scope and verification in the report.
+
+
 - `BB-132F, 2026-10-03` — [Live market observation runtime](features/finance/bb-132f-live-market-observation-runtime-20261003.md).
   Bounded hosted collection through existing Alpaca daily/evidence ownership; fixture-only verification,
   no live activation or automatic science. Review status and exact publication identity in the report.

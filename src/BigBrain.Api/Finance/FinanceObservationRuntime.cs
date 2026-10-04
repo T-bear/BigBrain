@@ -10,6 +10,8 @@ namespace BigBrain.Api.Finance;
 internal sealed class FinanceObservationRuntimeOptions
 {
     internal const string Section = "Finance:ObservationRuntime";
+    private static readonly JsonSerializerOptions InstrumentJson = new()
+    { UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow };
     public bool Enabled { get; set; }
     public int CadenceMinutes { get; set; } = 360;
     public int LookbackDays { get; set; } = 3;
@@ -18,6 +20,31 @@ internal sealed class FinanceObservationRuntimeOptions
     public bool AffectedUseEnabled { get; set; }
     public DeletionRequirement CurrentDeletion { get; set; } = DeletionRequirement.Unknown;
     public ObservationRuntimeInstrument[] Instruments { get; set; } = [];
+    public string InstrumentsJson { get; set; } = "";
+
+    internal static FinanceObservationRuntimeOptions FromConfiguration(IConfiguration configuration)
+    {
+        var options = configuration.GetSection(Section).Get<FinanceObservationRuntimeOptions>() ?? new();
+        if (string.IsNullOrEmpty(options.InstrumentsJson)) return options;
+        try
+        {
+            if (options.Instruments.Length != 0 || options.InstrumentsJson.Length > 16384) throw new InvalidDataException();
+            using var json = JsonDocument.Parse(options.InstrumentsJson, new JsonDocumentOptions { MaxDepth = 4 });
+            if (json.RootElement.ValueKind != JsonValueKind.Array || json.RootElement.GetArrayLength() is < 1 or > 4)
+                throw new InvalidDataException();
+            foreach (var entry in json.RootElement.EnumerateArray())
+            {
+                if (entry.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
+                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var property in entry.EnumerateObject())
+                    if (!names.Add(property.Name)) throw new InvalidDataException();
+            }
+            options.Instruments = JsonSerializer.Deserialize<ObservationRuntimeInstrument[]>(options.InstrumentsJson, InstrumentJson)!;
+        }
+        catch (Exception e) when (e is JsonException or InvalidDataException)
+        { options.Instruments = []; } // Invalid deployment input remains fail-closed, never partially binds.
+        return options;
+    }
 }
 
 // Reuse canonical instruments/effective mappings; no inferred or default production universe.
@@ -93,38 +120,45 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
         if (!options.Enabled) return;
         try
         {
-            if (options.CadenceMinutes is < 60 or > 1440 || options.LookbackDays is < 1 or > 7 ||
-                options.Instruments is not { Length: >= 1 and <= 4 } || !transport.Enabled || transport.TimeoutSeconds is < 1 or > 30 ||
-                !AlpacaDailyMarketObservations.ValidCredential(transport.ApiKey) || !AlpacaDailyMarketObservations.ValidCredential(transport.ApiSecret) ||
-                options.OwnerAcceptanceVersion != AlpacaDailyOwnerDecision.Version || options.PolicyRecordedAtUtc == default)
-                return;
-            _policy = AlpacaDailyOwnerDecision.Create(options.PolicyRecordedAtUtc, options.CurrentDeletion, options.AffectedUseEnabled);
-            AlpacaDailyOwnerDecision.Require(_policy, _trusted.GetUtcNow());
-            var entries = ImmutableArray.CreateBuilder<(CanonicalInstrument, ProviderInstrumentMapping)>();
-            foreach (var entry in options.Instruments)
-            {
-                var (instrument, mapping) = (entry ?? throw new InvalidDataException()).Canonical();
-                if (instrument.Type != InstrumentType.Equity || instrument.Lifecycle != InstrumentLifecycle.Active ||
-                    instrument.Currency.Code != "USD" || mapping.Provider.Value != "Alpaca" ||
-                    mapping.ProviderDataset.Value != DailyMarketEvidence.Dataset || mapping.Mic is not ("XNAS" or "XNYS" or "ARCX") ||
-                    mapping.InstrumentId != instrument.Id || mapping.Mic != instrument.Mic || mapping.Venue != instrument.Venue ||
-                    mapping.ProviderReference.Length is < 1 or > 16 ||
-                    mapping.ProviderReference.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '-')))
-                    throw new InvalidDataException();
-                MarketObservationIntegrity.Token(instrument.Id.Value); MarketObservationIntegrity.Token(mapping.Evidence.Value);
-                MarketObservationIntegrity.Token(instrument.Venue.Code);
-                if (instrument.DisplayName.Length > 128 || instrument.Venue.Name.Length > 128) throw new InvalidDataException();
-                entries.Add((instrument, mapping));
-            }
-            _instruments = entries.OrderBy(x => x.Item1.Id.Value, StringComparer.Ordinal).ToImmutableArray();
-            if (_instruments.Select(x => x.Instrument.Id).Distinct().Count() != entries.Count ||
-                _instruments.Select(x => x.Mapping.ProviderReference).Distinct(StringComparer.Ordinal).Count() != entries.Count)
-                throw new InvalidDataException();
+            (_policy, _instruments) = ValidateConfiguration(options, transport, _trusted.GetUtcNow());
             _lookback = options.LookbackDays;
             _snapshot = _snapshot with { State = ObservationRuntimeState.Waiting, NextCheckUtc = _trusted.GetUtcNow() + Cadence };
         }
         catch (Exception e) when (e is ArgumentException or InvalidDataException or ObservationClockException)
         { /* Invalid configuration never leaks values or grants network authority. */ }
+    }
+
+    internal static (MarketDataEntitlementPolicy Policy, ImmutableArray<(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping)> Instruments)
+        ValidateConfiguration(FinanceObservationRuntimeOptions options, AlpacaDailyObservationOptions transport, DateTimeOffset now)
+    {
+        if (options.CadenceMinutes is < 60 or > 1440 || options.LookbackDays is < 1 or > 7 ||
+            options.Instruments is not { Length: >= 1 and <= 4 } || !transport.Enabled || transport.TimeoutSeconds is < 1 or > 30 ||
+            !AlpacaDailyMarketObservations.ValidCredential(transport.ApiKey) || !AlpacaDailyMarketObservations.ValidCredential(transport.ApiSecret) ||
+            options.OwnerAcceptanceVersion != AlpacaDailyOwnerDecision.Version || options.PolicyRecordedAtUtc == default)
+            throw new InvalidDataException();
+        var policy = AlpacaDailyOwnerDecision.Create(options.PolicyRecordedAtUtc, options.CurrentDeletion, options.AffectedUseEnabled);
+        AlpacaDailyOwnerDecision.Require(policy, now);
+        var entries = ImmutableArray.CreateBuilder<(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping)>();
+        foreach (var entry in options.Instruments)
+        {
+            var (instrument, mapping) = (entry ?? throw new InvalidDataException()).Canonical();
+            if (instrument.Type != InstrumentType.Equity || instrument.Lifecycle != InstrumentLifecycle.Active ||
+                instrument.Currency.Code != "USD" || mapping.Provider.Value != "Alpaca" ||
+                mapping.ProviderDataset.Value != DailyMarketEvidence.Dataset || mapping.Mic is not ("XNAS" or "XNYS" or "ARCX") ||
+                mapping.InstrumentId != instrument.Id || mapping.Mic != instrument.Mic || mapping.Venue != instrument.Venue ||
+                mapping.ProviderReference.Length is < 1 or > 16 ||
+                mapping.ProviderReference.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '-')))
+                throw new InvalidDataException();
+            MarketObservationIntegrity.Token(instrument.Id.Value); MarketObservationIntegrity.Token(mapping.Evidence.Value);
+            MarketObservationIntegrity.Token(instrument.Venue.Code);
+            if (instrument.DisplayName.Length > 128 || instrument.Venue.Name.Length > 128) throw new InvalidDataException();
+            entries.Add((instrument, mapping));
+        }
+        var instruments = entries.OrderBy(x => x.Item1.Id.Value, StringComparer.Ordinal).ToImmutableArray();
+        if (instruments.Select(x => x.Instrument.Id).Distinct().Count() != entries.Count ||
+            instruments.Select(x => x.Mapping.ProviderReference).Distinct(StringComparer.Ordinal).Count() != entries.Count)
+            throw new InvalidDataException();
+        return (policy, instruments);
     }
 
     internal async Task<ObservationRuntimeSnapshot> RunCycleAsync(CancellationToken token)
@@ -230,7 +264,7 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
         return Task.FromResult(new HealthCheckResult(healthy ? HealthStatus.Healthy : HealthStatus.Degraded,
             "Finance observation: " + state.State, data: new Dictionary<string, object> { ["observation"] = state }));
     }
-    private sealed class GuardedClock(TimeProvider inner) : TimeProvider
+    internal sealed class GuardedClock(TimeProvider inner) : TimeProvider
     {
         private DateTimeOffset _last;
         public override DateTimeOffset GetUtcNow()
