@@ -67,6 +67,19 @@ internal sealed partial class EodhdMarketMemory
         if (now.UtcTicks < ObservationWatermark(connection)) throw new ObservationClockException();
     }
 
+    // Read-only preflight for maintenance: no cutoff sealing, migration, acquisition or repair.
+    internal static void RequireObservationMaintenanceEvidence(string databasePath, DateTimeOffset now)
+    {
+        using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
+        { DataSource = databasePath, Mode = SqliteOpenMode.ReadOnly }.ToString());
+        connection.Open();
+        using var transaction = connection.BeginTransaction(deferred: true);
+        RequireObservationSchema(connection);
+        if (now.UtcTicks < ObservationWatermark(connection)) throw new ObservationClockException();
+        var receipts = ReadObservationReceipts(connection, "ORDER BY ingested_ticks,id LIMIT 1001");
+        if (receipts.Length > 1000) throw new InvalidDataException();
+    }
+
     private async Task<ObservationAcquisition> AcquireObservationCoreAsync(IMarketObservationSource source,
         CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
         TimeProvider clock, string? correctsId, bool reobserve, CancellationToken cancellationToken)

@@ -10,9 +10,12 @@ RUN dotnet restore src/BigBrain.Api/BigBrain.Api.csproj
 COPY src/BigBrain.Modules/ src/BigBrain.Modules/
 COPY src/BigBrain.Sentinel.Contracts/ src/BigBrain.Sentinel.Contracts/
 COPY src/BigBrain.Api/ src/BigBrain.Api/
-RUN dotnet publish src/BigBrain.Api/BigBrain.Api.csproj --configuration Release --no-restore --output /app
+ARG BIGBRAIN_REVISION=UNKNOWN
+RUN printf '%s\n' "$BIGBRAIN_REVISION" | grep -Eq '^(UNKNOWN|[0-9a-f]{40})$' && dotnet publish src/BigBrain.Api/BigBrain.Api.csproj --configuration Release --no-restore --output /app -p:BigBrainBuildRevision="$BIGBRAIN_REVISION"
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+ARG BIGBRAIN_REVISION=UNKNOWN
+LABEL org.opencontainers.image.revision=$BIGBRAIN_REVISION
 WORKDIR /app
 COPY --from=build /app .
 RUN mkdir -p /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data && chown $APP_UID /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data

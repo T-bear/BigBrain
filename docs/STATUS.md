@@ -1,5 +1,10 @@
 # BigBrain Status
 
+## BB-132F1 controlled activation gate — 2026-10-04
+
+**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** One-shot maintenance, external Compose pass-through and compiled/OCI revision identity. No live activation/deployment/provider/model/science/trading. Finance RESEARCH / 0 SEK / NONE.
+[Exact scope, verification and remaining operational gates](reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+
 ## BB-132F live market observation runtime — 2026-10-03
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ENABLED.

@@ -27,7 +27,19 @@ public partial class Program
 
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        if (args.Length > 0 && args[0] == "system-build-identity")
+        {
+            if (args.Length != 1) { Environment.ExitCode = 2; return; }
+            Console.WriteLine("revision=" + BuildRevision.Current);
+            return;
+        }
+        var oneShot = FinanceObservationMaintenanceCommand.IsCommand(args);
+        var builder = WebApplication.CreateBuilder(oneShot ? [] : args);
+        if (oneShot)
+        {
+            Environment.ExitCode = FinanceObservationMaintenanceCommand.Run(args, builder.Configuration);
+            return;
+        }
 
         if (EodhdMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDatasetMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceDataProtectionMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceMacroMaintenanceCommand.TryRun(args, builder.Configuration) || FinanceClosureMaintenanceCommand.TryRun(args, builder.Configuration)) return;
 
@@ -230,7 +242,7 @@ public partial class Program
         builder.Services.AddHostedService<FinanceResearchOperationsWorker>();
         builder.Services.AddSingleton<FinanceResearchOrchestrator>();
         builder.Services.AddSingleton(TimeProvider.System);
-        var observationOptions = builder.Configuration.GetSection(FinanceObservationRuntimeOptions.Section).Get<FinanceObservationRuntimeOptions>() ?? new();
+        var observationOptions = FinanceObservationRuntimeOptions.FromConfiguration(builder.Configuration);
         var alpacaDailyOptions = AlpacaDailyObservationOptions.FromConfiguration(builder.Configuration);
         builder.Services.AddSingleton(serviceProvider => new FinanceObservationRuntime(observationOptions, alpacaDailyOptions,
             serviceProvider.GetRequiredService<EodhdMarketMemory>(), serviceProvider.GetRequiredService<TimeProvider>(),
