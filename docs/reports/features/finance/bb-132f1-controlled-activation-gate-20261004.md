@@ -1,6 +1,8 @@
 # BB-132F1 — Controlled Activation & Deployment Gate
 
 Detta är en sanerad GitHub-version. No credentials, raw provider payloads, private host paths or model content.
+Current state: [ACCEPTED / MERGED / CI VERIFIED](#accepted-publication--2026-10-04).
+The candidate-state text below is retained as dated review/publication history.
 
 ## Metadata
 
@@ -163,3 +165,46 @@ No operator may treat test fixtures as actual prospective market evidence or inf
 Next: STOP after publication for independent review of this exact candidate. Do not merge, deploy,
 restart, configure live keys/universe, call Alpaca/Qwen, activate unattended collection, run SHADOW,
 renew grants, trade or start another checkpoint.
+
+
+## Accepted publication — 2026-10-04
+
+**ACCEPTED / MERGED / CI VERIFIED. NOT DEPLOYED / NOT ACTIVATED.**
+The owner explicitly approved the independently reviewed exact candidate below, including its tree.
+Pre-merge fetch proved remote candidate unchanged, expected main/merge-base exact,1ahead/0behind,
+21 reviewed files and no tracked working-tree delta. Unrelated mockups/ADR0006–0009 remained untouched.
+
+| Identity | Exact Git value |
+| --- | --- |
+| Accepted baseline / first parent | `3a332c476ce6acf7007e463791ba416530c15302` |
+| Approved candidate / second parent | `999bc684076761b769f02d0b15a9b8cfa051210a` |
+| Approved candidate tree | `0206eb593c3fcd1493c71583b37316b4705b75c5` |
+| Normal merge commit | `9aeb6370409d7328ab663b1f9d9e7afbe61eddb4` |
+| Merge tree | `0206eb593c3fcd1493c71583b37316b4705b75c5` |
+
+`git merge --no-ff` preserved both parents in the required order. Full tree equality, not only source
+subsets, was verified before normal main push; candidate-to-merge diff is empty. No rebase/amend/
+squash/force push or candidate modification. Existing local acceptance tests were reused unchanged.
+
+Merge [CI run37182059976](https://github.com/T-bear/BigBrain/actions/runs/37182059976) belongs to
+exact merge SHA above, event push/main, completed SUCCESS. Actual jobs and every step inspected:
+
+| Job / ID | Verified successful steps |
+| --- | --- |
+| backend /111376442422 | checkout/setup, solution restore, format verify, Release solution build, solution tests, cleanup |
+| frontend /111376442517 | checkout/setup, npm ci, format check, tests, production build, cleanup |
+| documentation /111376442551 | checkout/setup, documentation verifier, cleanup |
+| secrets /111376442550 | checkout, Gitleaks action, cleanup |
+
+Only after that green exact-SHA CI, the durable acceptance/status fact was reconciled in five Markdown
+files: STATUS, BACKLOG, recovery, this report and the controlled-acquisition runbook. No implementation,
+test, package, schema, Compose, Dockerfile, runtime or provider configuration changed. The reconciliation
+commit resolves by unique subject `docs: record accepted BB-132F1 gate`; its resulting main SHA and
+own push-CI must be verified independently. Merge CI is not evidence for the later documentation SHA.
+Local documentation/diff/staged-secret validation applies; unchanged application suites are not rerun.
+
+Finance remains **RESEARCH / 0 SEK / NONE**. No deployment/build/recreation/restart of the live API,
+service repair, live environment/credentials/universe configuration, real Alpaca request or one-shot
+execution, Qwen, automatic SHADOW, research grant reset/refund/renewal, PAPER/LIVE/AUTO,
+broker/Avanza/orders/positions/capital or new checkpoint occurred. Acceptance is not activation.
+Next: STOP and return control to owner/architect; all later operational actions retain their explicit gates.

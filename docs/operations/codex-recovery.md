@@ -2,7 +2,7 @@
 
 ## BB-132F1 controlled activation gate handoff — 2026-10-04
 
-**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.**
+**ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED.
 Branch `bb-132f1/controlled-activation-gate`; baseline
 `3a332c476ce6acf7007e463791ba416530c15302`, tree `43380caec0119a22652b07e0614ccc3eef328639`.
 The explicitly identified earlier unpublished52-line operationalization note was removed and its
@@ -14,8 +14,13 @@ review commit/tree in Git after push. No deployment/restart/service repair, .env
 real provider/model invocation, science/trading/grant mutation occurred. Finance RESEARCH / 0 SEK / NONE.
 Focused185 PASS, API1110 PASS/8 deliberate model SKIP, Release/format/restore/config checks PASS.
 Final documentation/staged-secrets/scope checks are recorded in the report.
-Next: STOP for independent exact-SHA review. This review does
-not activate Alpaca or unattended collection and does not authorize another sprint.
+Owner explicitly approved exact candidate `999bc684076761b769f02d0b15a9b8cfa051210a`;
+[verified merge/tree/parents and green merge-CI37182059976](../reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md#accepted-publication--2026-10-04).
+Documentation-only reconciliation resolves by unique subject `docs: record accepted BB-132F1 gate`;
+verify its own push CI against its exact SHA, independently of merge CI.
+Next: STOP and return control to owner/architect. No deployment/restart/service repair,
+credential/universe configuration, provider/model call or unattended/scientific/trading activation.
+No new checkpoint is authorized.
 
 
 ## BB-132F publication handoff — 2026-10-03

@@ -1,7 +1,7 @@
 # Finance controlled Alpaca acquisition and build identity
 
-BB-132F1 provides a **review candidate**, not activation permission. Finance remains
-**RESEARCH / 0 SEK / NONE**. [Implementation/verification evidence](../../reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+BB-132F1 is **accepted / merged / CI verified**; acceptance grants no activation permission. Finance remains
+**RESEARCH / 0 SEK / NONE**. [Exact acceptance evidence](../../reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md#accepted-publication--2026-10-04).
 The [BB-132F configuration and receipt contract](../../architecture/finance/market-data-memory-and-provenance.md#configuration-and-activation-boundary)
 remains authoritative. No new scientific grant, market store, provider semantics or public endpoint.
 

@@ -2,8 +2,8 @@
 
 ## BB-132F1 — controlled activation and deployment gate
 
-**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** Bounded one-shot uses accepted Finance receipts while runtime remains disabled. Actual deployment/service readiness, reviewed mapping/credentials and first real request remain separate operational gates; no unattended activation.
-[Exact scope, verification and remaining operational gates](reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md).
+**ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED. Bounded one-shot uses accepted Finance receipts while runtime remains disabled. Actual deployment/service readiness, reviewed mapping/credentials and first real request remain separate operational gates; no unattended activation.
+[Exact acceptance/merge/CI evidence and remaining operational gates](reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md#accepted-publication--2026-10-04).
 
 ## BB-132F — live market observation runtime
 
