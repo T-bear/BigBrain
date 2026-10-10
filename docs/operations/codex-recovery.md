@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-132K Phase A review handoff — 2026-10-10
+
+**REVIEW CHECKPOINT / NO PHASE B EXECUTION AUTHORITY.** Baseline
+`618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+Branch `review/finance-bb132k-recovery-execution-preflight`; publication resolves by subject
+`review: publish BB-132K recovery execution preflight`.
+[Canonical report: observed facts, gates, proposed procedure and verification](../reports/features/finance/bb-132k-recovery-execution-preflight-20261010.md).
+Phase A complete; next action is independent architect review. No capture/drill directories,
+backup/restore, service/config/permission change, production data write or provider/model call.
+Unrelated untracked mockups/ADR0006–0009 and ignored local operational/diagnostic files preserved.
+Do not resume as execution: rights inventory, protection policy and explicit Phase B approval
+remain required. Finance RESEARCH / 0 SEK / NONE. No merge or next operational action.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created

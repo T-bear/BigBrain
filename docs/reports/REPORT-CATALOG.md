@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132K Phase A, 2026-10-10` — [Protected recovery execution preflight](features/finance/bb-132k-recovery-execution-preflight-20261010.md).
+  REVIEW CHECKPOINT: read-only destination/source inspection; Phase B NO-GO pending rights inventory,
+  copy/drill protection and explicit interruption/capture approval. No production changes.
+
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
   Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.
