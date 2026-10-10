@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-132I read-only readiness handoff — 2026-10-10
+
+**REVIEW CHECKPOINT / NOT A MERGE CANDIDATE.** Branch
+`review/finance-bb132i-operational-readiness`, exact accepted baseline
+`618f025a3cb72ee4513a9f14b713382e4a673a42`, tree
+`72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`. H is accepted in this baseline; the dated H
+candidate handoff below is historical. Publication resolves by unique subject
+`review: publish BB-132I Finance operational readiness`.
+[Readiness report: live facts, unknowns, integrity checks and proposed rollback gates](../reports/features/finance/bb-132i-operational-readiness-20261010.md).
+Only report/catalog/this pointer change; unrelated mockups and ADR drafts remain excluded.
+No interrupted implementation or operational mutation. STOP for architect review of missing inventory
+and recovery gates; no deployment, migration, provider request or mapping adoption is authorized.
+Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created

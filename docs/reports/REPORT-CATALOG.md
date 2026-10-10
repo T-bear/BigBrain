@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132I, 2026-10-10` — [Finance operational readiness review](features/finance/bb-132i-operational-readiness-20261010.md).
+  REVIEW CHECKPOINT: deployed pre-H/schema97; original receipt integrity verified, two retained receipts
+  with incomplete second-receipt inventory. STOP before deployment/adoption; no operational changes.
+
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
   Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.
