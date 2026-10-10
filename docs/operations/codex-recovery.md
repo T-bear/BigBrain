@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-132H publication handoff — 2026-10-10
+
+**MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created
+from verified accepted main `a2373f172600c7b45ce378c56aab1d7da2b9b242`, tree
+`fb41dea807053d7ef2c2219170f7a907e48ed146`. No previous review branch was merged.
+Original reviewed commit `e08eddb8e5ff3c81cb2d49c3b113e3bc2b9855fc` (tree
+`3e02fab5178c214acf25d629caae9d310ff9ba99`) remains unchanged in branch history.
+Review fix1 publication resolves by unique subject
+`review: separate BB-132H historical mapping validity from acquisition authority`.
+It corrects historical-currentness conflation without changing receipt, schema or SHADOW contracts. [Canonical report: scope, checks, limits and review inputs](../reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
+No interrupted implementation remains. Unrelated mockups and untracked ADR0006–0009 are preserved
+and excluded; no ignored operational files, credentials, production config or database were read/changed.
+Historical acquisition/activation evidence remains on `review/finance-live-observation-activation`;
+this implementation does not assert current deployment state or revalidate a live receipt.
+Next: independent architect review of the exact publication; no merge or operational adoption.
+Finance RESEARCH / 0 SEK / NONE. No provider/model call, runtime trigger, deployment or trading.
+
 ## BB-132F1 controlled activation gate handoff — 2026-10-04
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED.

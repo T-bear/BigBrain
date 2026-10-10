@@ -190,7 +190,7 @@ public sealed class FinanceObservationMaintenanceTests
         }
         var result = await fixture.Run(token: TestContext.Current.CancellationToken); Assert.Equal(1, result.Code);
         Assert.Equal(1L, fixture.Db.Scalar("SELECT COUNT(*) FROM market_observation_receipts"));
-        Assert.Equal(failure is "clock-during" or "mapping-change" ? 2 : 1, fixture.Calls);
+        Assert.Equal(failure == "clock-during" ? 2 : 1, fixture.Calls);
     }
 
     [Theory]
@@ -251,6 +251,28 @@ public sealed class FinanceObservationMaintenanceTests
     [InlineData("0000000000000000000000000000000000000000", "UNKNOWN")]
     [InlineData("SECRET-invalid-revision", "UNKNOWN")]
     public void BuildIdentityIsExactOrUnknown(string? supplied, string expected) => Assert.Equal(expected, BuildRevision.Normalize(supplied));
+
+    [Fact]
+    public async Task VersionedOneShotUsesSelectedSnapshotWithoutChangingMaintenanceAuthority()
+    {
+        using var fixture = new Fixture();
+        var old = Entry(); old.ValidTo = Day.AddDays(-1);
+        var current = Entry(); current.ValidFrom = Day; current.MappingEvidence = "fixture:next-mapping";
+        ObservationMappingVersionOptions Version(ObservationRuntimeInstrument snapshot) => new()
+        {
+            Snapshot = snapshot,
+            VerificationEvidence = "fixture:verified",
+            VerifiedAtUtc = At.AddHours(-1),
+            RevalidateByUtc = At.AddDays(1)
+        };
+        fixture.Entries(new ObservationRuntimeInstrument { InstrumentId = Id, MappingVersions = [Version(old), Version(current)] });
+        Assert.Equal(0, (await fixture.Run(token: TestContext.Current.CancellationToken)).Code);
+        Assert.Equal(1, fixture.Calls);
+        var receipt = Assert.Single(fixture.Db.Memory().MarketKnowledgeAt(At, fixture.Clock, Policy).Observations);
+        Assert.Equal(current.Canonical().Mapping, receipt.Mapping);
+        Assert.Equal(1L, fixture.Db.Scalar("SELECT COUNT(*) FROM observation_mapping_receipts"));
+        Assert.False(FinanceObservationRuntimeOptions.FromConfiguration(fixture.Configuration).Enabled);
+    }
 
     private static string[] Args() => [FinanceObservationMaintenanceCommand.Name, Id, "2027-02-01"];
     private static ObservationRuntimeInstrument Entry() => new()

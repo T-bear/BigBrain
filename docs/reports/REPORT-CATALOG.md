@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
+  Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
+  Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.
+
 - `BB-132F1, 2026-10-04` — [Controlled activation and deployment gate](features/finance/bb-132f1-controlled-activation-gate-20261004.md).
   One-shot maintenance, external configuration and build identity; no activation or deployment.
   Exact candidate status, scope and verification in the report.
