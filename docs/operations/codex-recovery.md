@@ -1,5 +1,21 @@
 # Codex interrupted-run recovery
 
+## BB-132K consolidated readiness handoff — 2026-10-10
+
+**REVIEW CHECKPOINT / PLANNING COMPLETE / NO OPERATIONAL AUTHORITY.** Baseline
+`618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+Branch `review/finance-bb132k-consolidated-readiness`; exact publication resolves by subject
+`review: consolidate BB-132K Finance deployment readiness`.
+[Single execution package and actual verification](../reports/features/finance/bb-132k-consolidated-readiness-20261010.md).
+I/J/K measurements reused; no new host survey or production action. GnuPG choice settled; owner-only
+local passphrase. Gate A needs actual EODHD status and unmatched artifact rights reconciliation;
+B–D approval must cover interruption, plaintext drill and retention. Separate E approval precedes
+H deployment/migration98; mapping/acquisition remain forbidden. No generic investigation loop proposed.
+Only report/catalog/this link changed. Unrelated untracked mockups/ADR0006–0009 and ignored private
+operational/diagnostic files preserved. No pending implementation; next is independent architect review.
+No production/config/service/data/permission change, encryption action, provider/model call or merge.
+Finance RESEARCH / 0 SEK / NONE. STOP; do not treat this handoff as execution approval.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created

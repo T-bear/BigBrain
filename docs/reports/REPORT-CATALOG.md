@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132K consolidated readiness, 2026-10-10` — [Final pre-execution package](features/finance/bb-132k-consolidated-readiness-20261010.md).
+  REVIEW CHECKPOINT: existing evidence consolidated into rights, GnuPG recovery/drill and separate
+  exact-H deployment gates. No execution; concrete owner evidence and B–D approval remain required.
+
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
   Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.
