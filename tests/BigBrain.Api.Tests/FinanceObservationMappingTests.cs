@@ -75,7 +75,6 @@ public sealed class FinanceObservationMappingTests
     [Theory]
     [InlineData("overlap")]
     [InlineData("ambiguous")]
-    [InlineData("stale")]
     [InlineData("future-verification")]
     [InlineData("unbounded-currentness")]
     [InlineData("missing-evidence")]
@@ -93,7 +92,6 @@ public sealed class FinanceObservationMappingTests
         {
             case "overlap": second.Snapshot.ValidFrom = OldDay; break;
             case "ambiguous": entry.MappingVersions[1] = entry.MappingVersions[0]; break;
-            case "stale": second.RevalidateByUtc = At; break;
             case "future-verification": second.VerifiedAtUtc = At.AddHours(1); break;
             case "unbounded-currentness": second.RevalidateByUtc = At.AddDays(8); break;
             case "missing-evidence": second.VerificationEvidence = ""; break;
@@ -109,6 +107,119 @@ public sealed class FinanceObservationMappingTests
         f.Clock.Now += TimeSpan.FromHours(1);
         Assert.Equal(ObservationRuntimeState.Misconfigured, (await runtime.RunCycleAsync(TestContext.Current.CancellationToken)).State);
         Assert.Equal(0, f.Calls); Assert.Equal(0L, f.Db.Scalar("SELECT COUNT(*) FROM market_observation_receipts"));
+    }
+
+    [Fact]
+    public async Task ExpiredHistoryCoexistsWithCurrentVersionWithoutReauthorizingOldRequests()
+    {
+        using var f = new Fixture(); var entry = Versioned();
+        var original = await f.Acquire(entry, OldDay);
+        var bytes = f.Db.Scalar("SELECT receipt_json FROM market_observation_receipts");
+        var binding = f.Db.Scalar("SELECT manifest_id FROM observation_mapping_receipts");
+        var cutoff = f.Clock.Now;
+        var projection = JsonSerializer.Serialize(f.Db.Memory().MarketKnowledgeAt(cutoff, f.Clock, Policy));
+        f.Clock.Now = At.AddDays(3);
+        entry.MappingVersions[1].VerifiedAtUtc = f.Clock.Now;
+        entry.MappingVersions[1].RevalidateByUtc = f.Clock.Now.AddDays(1);
+        var plan = new ObservationInstrumentPlan(entry, f.Clock.Now);
+        Assert.Equal(original.Receipt.Mapping, plan.ResolveHistorical(OldDay).Mapping);
+        var next = await f.Acquire(entry, NewDay);
+        Assert.Equal(ObservationAcquisitionKind.New, next.Kind);
+        Assert.Equal(Snapshot(false).Canonical().Mapping, next.Receipt.Mapping);
+        Assert.True(next.Receipt.KnowledgeTimeUtc > cutoff);
+        Assert.Equal(2, f.Calls);
+        await Assert.ThrowsAsync<InvalidDataException>(() => f.Acquire(entry, OldDay));
+        Assert.Equal(2, f.Calls); // Expired historical evidence is not permission to reacquire.
+        Assert.Equal(projection, JsonSerializer.Serialize(f.Db.Memory().MarketKnowledgeAt(cutoff, f.Clock, Policy)));
+        Assert.Equal(bytes, f.Db.Scalar("SELECT receipt_json FROM market_observation_receipts ORDER BY ingested_ticks LIMIT 1"));
+        Assert.Equal(2L, f.Db.Scalar("SELECT COUNT(*) FROM observation_mapping_manifests"));
+        // Fresh authorization for the exact same old snapshot permits duplicate/value revision only.
+        entry.MappingVersions[0].VerifiedAtUtc = f.Clock.Now;
+        entry.MappingVersions[0].RevalidateByUtc = f.Clock.Now.AddDays(1);
+        var duplicate = await f.Acquire(entry, OldDay);
+        Assert.Equal(ObservationAcquisitionKind.Duplicate, duplicate.Kind);
+        Assert.Equal(original.Receipt, duplicate.Receipt);
+        Assert.Equal(binding, f.Db.Scalar("SELECT manifest_id FROM observation_mapping_receipts ORDER BY rowid LIMIT 1"));
+        f.Clock.Now += TimeSpan.FromMinutes(1); f.Close++;
+        var revision = await f.Acquire(entry, OldDay);
+        Assert.Equal(ObservationAcquisitionKind.Revision, revision.Kind);
+        Assert.Equal(original.Receipt.Id, revision.Receipt.CorrectsId);
+        Assert.Equal(original.Receipt.Mapping, revision.Receipt.Mapping);
+        Assert.Equal(bytes, f.Db.Scalar("SELECT receipt_json FROM market_observation_receipts ORDER BY ingested_ticks LIMIT 1"));
+        Assert.Equal(projection, JsonSerializer.Serialize(f.Db.Memory().MarketKnowledgeAt(cutoff, f.Clock, Policy)));
+        f.AssertNoScience();
+    }
+
+    [Fact]
+    public async Task RuntimeRejectsOnlyExpiredSelectedVersionBeforeNetwork()
+    {
+        using var f = new Fixture(); var entry = Versioned();
+        entry.MappingVersions[0].RevalidateByUtc = At; // Already expired at plan construction.
+        var runtime = f.Runtime(entry);
+        f.Clock.Now += TimeSpan.FromHours(1);
+        var result = await runtime.RunCycleAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(ObservationRuntimeState.Degraded, result.State);
+        Assert.Equal(1, f.Calls);
+        Assert.Contains(result.Attempts, x => x.SourceDay == OldDay && x.Failure == ObservationFailure.Rejected);
+        Assert.Contains(result.Attempts, x => x.SourceDay == NewDay && x.Outcome == ObservationAcquisitionKind.New);
+    }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("changed")]
+    public async Task ExpiredHistoricalSnapshotStillCannotBeRemovedOrChanged(string defect)
+    {
+        using var f = new Fixture(); var entry = Versioned(); await f.Acquire(entry, OldDay);
+        f.Clock.Now = At.AddDays(3);
+        entry.MappingVersions[1].VerifiedAtUtc = f.Clock.Now;
+        entry.MappingVersions[1].RevalidateByUtc = f.Clock.Now.AddDays(1);
+        if (defect == "missing") entry.MappingVersions = [entry.MappingVersions[1]];
+        else entry.MappingVersions[0].Snapshot.MappingEvidence = "fixture:changed";
+        Assert.Throws<InvalidDataException>(() => f.Prepare(entry, NewDay));
+        Assert.Equal(1, f.Calls);
+    }
+
+    [Theory]
+    [InlineData("window")]
+    [InlineData("utc")]
+    [InlineData("order")]
+    [InlineData("evidence")]
+    public void ExpiredHistoricalAssertionsStillRequireValidStructure(string defect)
+    {
+        var entry = Versioned(); var old = entry.MappingVersions[0];
+        old.VerifiedAtUtc = At.AddDays(-3); old.RevalidateByUtc = At.AddDays(-1);
+        switch (defect)
+        {
+            case "window": old.VerifiedAtUtc = At.AddDays(-10); break;
+            case "utc": old.VerifiedAtUtc = old.VerifiedAtUtc.ToOffset(TimeSpan.FromHours(1)); break;
+            case "order": old.RevalidateByUtc = old.VerifiedAtUtc; break;
+            case "evidence": old.VerificationEvidence = ""; break;
+        }
+        Assert.Throws<InvalidDataException>(() => new ObservationInstrumentPlan(entry, At));
+    }
+
+    [Fact]
+    public async Task FutureVerificationAtOriginalRecordingIsNeverHealedByWaiting()
+    {
+        using var f = new Fixture(); await f.Acquire(Versioned(), OldDay);
+        var id = (string)f.Db.Scalar("SELECT id FROM observation_mapping_manifests")!;
+        // Corrupt only the recording chronology, with a consistent checksum so chronology is tested.
+        var recorded = At.AddHours(-2); // Verification was At - 1 hour.
+        using (var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = f.Db.Path }.ToString()))
+        {
+            connection.Open(); using var command = connection.CreateCommand();
+            command.CommandText = "UPDATE observation_mapping_manifests SET recorded_ticks=$ticks,checksum=$hash";
+            command.Parameters.AddWithValue("$ticks", recorded.UtcTicks);
+            command.Parameters.AddWithValue("$hash", MarketObservationIntegrity.Hash(new[] { id, MarketObservationIntegrity.Utc(recorded) }));
+            command.ExecuteNonQuery();
+        }
+        f.Clock.Now = At.AddDays(3);
+        Assert.Throws<InvalidDataException>(() => f.Db.Memory().MarketKnowledgeAt(At, f.Clock, Policy));
+        var entry = Versioned();
+        entry.MappingVersions[1].VerifiedAtUtc = f.Clock.Now;
+        entry.MappingVersions[1].RevalidateByUtc = f.Clock.Now.AddDays(1);
+        Assert.Throws<InvalidDataException>(() => f.Prepare(entry, NewDay));
+        Assert.Equal(1, f.Calls);
     }
 
     [Theory]

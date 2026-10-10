@@ -17,13 +17,20 @@ internal sealed class ObservationMappingVersionOptions
 internal sealed record ObservationMappingVersion(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping,
     string VerificationEvidence, DateTimeOffset VerifiedAtUtc, DateTimeOffset RevalidateByUtc)
 {
-    internal void RequireCurrent(DateTimeOffset now)
+    // Expiry ends acquisition authority, not the validity of retained assertion evidence.
+    internal void RequireHistorical(DateTimeOffset recorded)
     {
-        FinanceTime.RequireUtc(now, nameof(now));
+        FinanceTime.RequireUtc(recorded, nameof(recorded));
         MarketObservationIntegrity.Token(VerificationEvidence);
         if (VerifiedAtUtc == default || VerifiedAtUtc.Offset != TimeSpan.Zero || RevalidateByUtc.Offset != TimeSpan.Zero ||
-            VerifiedAtUtc > now || RevalidateByUtc <= VerifiedAtUtc || RevalidateByUtc - VerifiedAtUtc > TimeSpan.FromDays(7) || now >= RevalidateByUtc)
-            throw new InvalidDataException("Mapping verification is not current.");
+            VerifiedAtUtc > recorded || RevalidateByUtc <= VerifiedAtUtc || RevalidateByUtc - VerifiedAtUtc > TimeSpan.FromDays(7))
+            throw new InvalidDataException("Mapping assertion chronology is invalid.");
+    }
+
+    internal void RequireCurrent(DateTimeOffset now)
+    {
+        RequireHistorical(now);
+        if (now >= RevalidateByUtc) throw new InvalidDataException("Mapping verification is not current.");
     }
 }
 
@@ -55,7 +62,7 @@ internal sealed class ObservationInstrumentPlan
                 var snapshot = x.Snapshot.Canonical();
                 var version = new ObservationMappingVersion(snapshot.Instrument, snapshot.Mapping, x.VerificationEvidence,
                     x.VerifiedAtUtc, x.RevalidateByUtc);
-                version.RequireCurrent(now);
+                version.RequireHistorical(now);
                 if (snapshot.Instrument.Id.Value != entry.InstrumentId) throw new InvalidDataException();
                 return version;
             }).OrderBy(x => x.Mapping.ValidFrom).ToImmutableArray();
@@ -79,12 +86,19 @@ internal sealed class ObservationInstrumentPlan
 
     internal (CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping) Resolve(DateOnly day, DateTimeOffset now)
     {
+        var selected = ResolveHistorical(day);
+        Manifest?.Versions.Single(x => x.Mapping == selected.Mapping).RequireCurrent(now);
+        return selected;
+    }
+
+    // Provenance comparison only. This resolution cannot authorize a provider request.
+    internal (CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping) ResolveHistorical(DateOnly day)
+    {
         var first = Snapshots[0];
         var mapping = _catalog.ResolveProviderReference(first.Instrument.Id, first.Mapping.Provider,
             first.Mapping.ProviderDataset, first.Mapping.Mic, day);
         var selected = Snapshots.Single(x => x.Mapping == mapping);
         if (day < selected.Instrument.ValidFrom || day > selected.Instrument.ValidTo) throw new InvalidDataException();
-        Manifest?.Versions.Single(x => x.Mapping == mapping).RequireCurrent(now);
         return selected;
     }
 }
@@ -118,7 +132,7 @@ internal sealed partial class EodhdMarketMemory
         foreach (var receipt in receipts.Where(x => x.Value.Daily is not null && x.Instrument.Id.Value == plan.InstrumentId))
         {
             // No current config can reinterpret an already persisted daily identity before making a request.
-            var snapshot = plan.Resolve(receipt.Value.Daily!.SourceDate, now);
+            var snapshot = plan.ResolveHistorical(receipt.Value.Daily!.SourceDate);
             if (snapshot.Instrument != receipt.Instrument || snapshot.Mapping != receipt.Mapping)
                 throw new InvalidDataException("Retained receipt mapping conflicts with configuration.");
         }
@@ -158,7 +172,7 @@ internal sealed partial class EodhdMarketMemory
                 throw new InvalidDataException("Mapping manifest integrity mismatch.");
             foreach (var version in m.Versions)
             {
-                version.RequireCurrent(recorded); // Old expired evidence remains readable; it grants no current use.
+                version.RequireHistorical(recorded); // Validate original recording chronology, never today's time.
                 FinanceObservationRuntime.ValidateSnapshot(version.Instrument, version.Mapping);
                 if (version.Instrument.Id.Value != m.InstrumentId) throw new InvalidDataException();
             }

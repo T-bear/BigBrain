@@ -3,6 +3,8 @@
 ## BB-132H versioned observation mapping — 2026-10-10
 
 **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW ONLY.**
+Review fix1 separates expired historical assertions from selected current acquisition authority;
+[review finding/correction](reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md#review-fix-1--historical-validity-versus-current-authority).
 Bounded effective versions preserve exact historical receipt snapshots; additive assertion evidence
 has trusted recording time and explicit expiry. No deployment or operational adoption.
 [Scope, verification and remaining gates](reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).

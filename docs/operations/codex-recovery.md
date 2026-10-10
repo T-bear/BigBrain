@@ -5,8 +5,11 @@
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created
 from verified accepted main `a2373f172600c7b45ce378c56aab1d7da2b9b242`, tree
 `fb41dea807053d7ef2c2219170f7a907e48ed146`. No previous review branch was merged.
-Unique subject `review: implement BB-132H versioned observation mapping` resolves this publication's
-exact commit/tree. [Canonical report: scope, checks, limits and review inputs](../reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
+Original reviewed commit `e08eddb8e5ff3c81cb2d49c3b113e3bc2b9855fc` (tree
+`3e02fab5178c214acf25d629caae9d310ff9ba99`) remains unchanged in branch history.
+Review fix1 publication resolves by unique subject
+`review: separate BB-132H historical mapping validity from acquisition authority`.
+It corrects historical-currentness conflation without changing receipt, schema or SHADOW contracts. [Canonical report: scope, checks, limits and review inputs](../reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
 No interrupted implementation remains. Unrelated mockups and untracked ADR0006–0009 are preserved
 and excluded; no ignored operational files, credentials, production config or database were read/changed.
 Historical acquisition/activation evidence remains on `review/finance-live-observation-activation`;

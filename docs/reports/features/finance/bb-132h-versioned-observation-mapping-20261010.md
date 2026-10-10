@@ -8,7 +8,7 @@ No production mapping, credentials, provider payloads or host-private state.
 - Accepted baseline: `a2373f172600c7b45ce378c56aab1d7da2b9b242`.
 - Baseline tree: `fb41dea807053d7ef2c2219170f7a907e48ed146`.
 - Branch: `bb-132h/versioned-observation-mapping`, created directly from verified accepted main.
-- Unique publication subject: `review: implement BB-132H versioned observation mapping`.
+- Original publication subject: `review: implement BB-132H versioned observation mapping`.
   Resolve that publication's exact SHA/tree from Git metadata; no self-referential commit identity.
 - Architect-reviewed input: [BB-132G analysis at a31544e](https://github.com/T-bear/BigBrain/blob/a31544e708e3b059fd2ea8b62b74438085091193/docs/reports/features/finance/bb-132g-aapl-mapping-compatibility-20261010.md),
   tree `675edd2d8802a6ae3fad07017019145e373ffd5c`. Analysis is not accepted implementation.
@@ -20,6 +20,75 @@ No production mapping, credentials, provider payloads or host-private state.
 **MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW ONLY.**
 Publication is not acceptance, deployment or permission to extend the live AAPL mapping.
 Finance **RESEARCH / 0 SEK / NONE**. No operational acquisition or production-store access.
+
+## Review fix 1 — historical validity versus current authority
+
+Previous reviewed SHA `e08eddb8e5ff3c81cb2d49c3b113e3bc2b9855fc`, tree
+`3e02fab5178c214acf25d629caae9d310ff9ba99`, remains intact. Same branch and baseline;
+new publication subject `review: separate BB-132H historical mapping validity from acquisition authority`
+resolves this correction's exact commit/tree. The original scope/evidence below is preserved as
+initial-publication history; the correction and rerun evidence in this section supersede its
+all-versions-current assumption.
+
+Architect review correctly identified two conflated responsibilities: construction required every
+assertion to be current today, and retained-receipt comparison used acquisition resolution. Manifest
+reading also required all versions to be unexpired at recording, preventing a refreshed manifest
+from retaining an expired historical version.
+
+The correction adds historical assertion validation (bounded evidence, UTC timestamps, verification
+before deadline, maximum seven-day window, verification no later than trusted recording) and separate
+historical source-date resolution. Expiry does not invalidate historical evidence. Plan construction
+still rejects future verification; persisted manifests always validate against original recorded
+UTC, never today's clock. A future-at-recording assertion cannot become valid by waiting.
+
+Only the selected version must be current for a new request. Retained receipt checks compare exact
+full snapshots by effective source date without asking for present authorization. The unchanged
+acquisition-start/commit guards and original-ingestion receipt-binding validation still enforce
+currentness at the relevant acquisition time. Expired v1 can coexist with current v2; it cannot
+itself authorize an old-day duplicate/revision request. Fresh verification of the unchanged old
+snapshot permits that path, preserving original duplicate binding/time and revision provenance.
+
+No schema/migration/hash/binding format, receipt payload, catalog overlap rules, reobserve equality,
+SHADOW compatibility, runtime bounds, clock or transaction behavior changes. Exactly seven files
+change relative to the previous checkpoint: `FinanceObservationMappings.cs`,
+`FinanceObservationMappingTests.cs`, this report, canonical market-data architecture, controlled
+acquisition runbook, STATUS and recovery (full repository paths in the original inventory below).
+No unrelated files enter the correction.
+
+Regression evidence covers expired v1/current v2 coexistence and runtime selection; old receipt bytes,
+bindings and sealed projections after reopen/reverification; v2 acquisition; expired v1 zero network;
+fresh exact-old duplicate/revision; missing/changed historical snapshots; invalid expired timestamp,
+window/evidence structure; and a deliberately corrupted original-recording chronology with a valid
+checksum that still rejects after time passes. Existing mixed-provenance SHADOW and migration,
+concurrency/cancellation regressions remain in the targeted suite.
+
+Correction verification commands (2026-10-10):
+
+```bash
+dotnet test tests/BigBrain.Api.Tests -c Release --no-restore --filter 'FullyQualifiedName~FinanceObservationMappingTests|FullyQualifiedName~FinanceObservationRuntimeTests|FullyQualifiedName~FinanceObservationMaintenanceTests|FullyQualifiedName~FinanceMarketObservationTests|FullyQualifiedName~ProspectiveDailyShadowTests' --logger 'console;verbosity=normal'
+dotnet format BigBrain.slnx --verify-no-changes --no-restore
+dotnet build BigBrain.slnx -c Release --no-restore
+dotnet test tests/BigBrain.Api.Tests -c Release --no-build --no-restore --logger 'console;verbosity=normal'
+node scripts/verify-documentation.mjs
+git diff --check
+gitleaks git --pre-commit --staged --redact --no-banner
+```
+
+Targeted result: **201 passed, 0 failed, 0 skipped**. The first compile attempt caught a test
+assertion referencing `Kind` instead of the existing `ObservationAttempt.Outcome`; that test-only
+name was corrected before this green run. The old all-versions-stale/Misconfigured case is replaced
+by selected-expiry runtime coverage, preserving the expired-version zero-network assertion while
+allowing current versions to proceed. No production failure category is added.
+
+Final correction gates: formatter PASS; Release solution build PASS, **0 warnings / 0 errors**;
+full API **1152 passed, 0 failed, 8 deliberately skipped real-model tests** (1160 total).
+Documentation verifier PASS (266 Markdown files / 91 unique backlog IDs); diff/scope and staged
+Gitleaks8.28.0 PASS, no leaks. Classification: **MERGE CANDIDATE / REVIEW ONLY**. No unresolved
+blocker for this correction; the original operational and cross-version SHADOW limitations remain.
+No production data is opened or altered and no live provider/model call is used. Unchanged package restore evidence from the original
+checkpoint is reused; no project/package/schema changes require a new restore. Sentinel/frontend
+suites are excluded because their code/contracts remain untouched; Release builds the solution.
+Real-model opt-in tests remain skipped, and a branch push alone does not trigger GitHub main/PR CI.
 
 ## Changes
 
@@ -114,7 +183,7 @@ The real 2026-10-02 AAPL receipt was **not** opened, migrated or modified during
 Preserving it follows from no production operation and the additive implementation; fixture byte
 identity is tested. Live reopen/adoption verification remains a separately authorized operational gate.
 
-### Verification commands and results
+### Original checkpoint verification commands and results
 
 Focused command (Release, model-free):
 
@@ -184,7 +253,7 @@ blocked on mixed mapping provenance. No architecture/ADR is marked Accepted by t
 
 ## Resumption
 
-Resolve this report's unique publication subject against the stated baseline; inspect the17-file
+Resolve the latest review-fix publication subject above against the stated baseline; inspect the17-file
 diff and verification. Unrelated mockups and local ADR0006–0009 are excluded and preserved.
 No review history has been rewritten. STOP after publication for independent architect review.
 The owner only needs to say “Codex är klar”. Do not merge or adopt live mappings from this branch.

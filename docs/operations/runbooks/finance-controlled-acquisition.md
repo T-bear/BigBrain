@@ -86,14 +86,17 @@ A root `InstrumentsJson` entry may use either the existing flat form **or**:
 In versioned form other root legacy fields must remain absent/default. The same JSON variable,
 16384-character limit and 1–4 **instrument** limit apply; depth6 permits the bounded version nesting.
 Unknown/duplicate properties at every nesting level, overlaps, mixed forms, duplicate instruments,
-material identity/symbol differences and stale/future verification fail closed. No sample production
+material identity/symbol differences and future/invalid assertion chronology fail closed. No sample production
 universe or valid-from dates are installed. Current AAPL evidence must never be inferred from a fixture.
 
 For every version, provide reviewed evidence for the actual effective dates and an operator-attested
 UTC verification time. Set an explicit UTC revalidation deadline no more than seven days later.
 Null `ValidTo` is no known termination at verification, **not** endless unattended authority.
-Verification expiry blocks new use, including historical reacquisition; past receipts still replay.
-Review/revalidate all retained versions when adopting a refreshed manifest. Do not replace original
+Verification expiry blocks new acquisition under that version, including historical reacquisition;
+past receipts still replay. Expired historical versions may coexist with a current selected version.
+Do not refresh historical assertions merely to compare retained provenance. Revalidate only versions
+that will authorize new requests, while retaining every original snapshot. A separately current
+assertion for the exact old snapshot is required before duplicate/revision reacquisition. Do not replace original
 `MappingEvidence` merely to record a newer check: use the separate `VerificationEvidence` assertion.
 Finance records trusted adoption time itself and retains prior manifests in its existing database.
 

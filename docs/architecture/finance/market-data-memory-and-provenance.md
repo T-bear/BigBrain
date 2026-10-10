@@ -20,11 +20,22 @@ renames, venue changes or other material identity changes. IEX remains the feed,
 `finance-observation-mapping-v1` defines the currentness policy: each version has a bounded
 `VerificationEvidence` reference, operator-attested UTC `VerifiedAtUtc`, and explicit exclusive
 `RevalidateByUtc`, at most seven days after verification. Verification must not be future/default;
-use at/after the deadline rejects. These are trusted operator assertions, not automatic issuer
+a new acquisition at/after the selected assertion deadline rejects. These are trusted operator assertions, not automatic issuer
 checks or a provider warranty. Finance independently records the first adoption time from its
 trusted clock. Source-day validity is separate from both assertion times and market knowledge.
 A null effective end means no known termination **at verification**, never perpetual permission:
-the assertion deadline still applies, even when revisiting historical source days.
+the assertion deadline still applies to new acquisitions, even for historical source days.
+Expired assertions remain structurally valid historical evidence. Plan construction validates structure
+and verification chronology without requiring every version to authorize acquisition today.
+Historical receipt comparison resolves effective source date and exact snapshots without currentness.
+Only the selected acquisition version must be current; expired v1 and current v2 can coexist.
+
+Persisted assertions are validated against their original trusted manifest recording time:
+verification must have occurred by recording, and UTC/order/seven-day-window/evidence constraints
+still hold even after expiry. Recording can legitimately occur after a historical assertion expires;
+that records evidence, not acquisition permission. A verification later than original recording
+remains invalid forever, even if today's clock has passed it. Receipt bindings additionally require
+the selected assertion to have been current at the receipt's original ingestion time.
 
 Versions are frozen at process configuration, sorted by effective start, and uniquely selected
 before provider access. Currentness is rechecked after spacing and at acquisition start/commit;
