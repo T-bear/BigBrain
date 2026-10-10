@@ -1,5 +1,186 @@
 # Codex interrupted-run recovery
 
+## Finance live observation operational review — 2026-10-10
+
+**REVIEW CHECKPOINT / OPERATIONAL EVIDENCE ONLY / NOT A MERGE CANDIDATE.**
+Owner-authorized publication of the previously local, sanitized deployment, first-acquisition
+and activation records below. These are dated observations from **2026-10-04**, not a fresh
+inspection of the live system on the publication date. No new Finance operation or runtime
+verification is performed for this documentation checkpoint.
+
+- Accepted baseline: `a2373f172600c7b45ce378c56aab1d7da2b9b242`, verified against fetched origin/main.
+- Review branch: `review/finance-live-observation-activation`, created from that exact baseline.
+  Resolve commit/tree from the unique publication subject
+  `review: publish Finance live observation activation handoff` in this branch's Git metadata.
+- Scope: this handoff and the minimal operational-review clarification in `AGENTS.md` only.
+  Unrelated untracked work and ignored private operational files are excluded and preserved.
+- Earlier no-publication instructions below describe their original operational tasks; this owner
+  decision supersedes them only for sanitized review-branch publication. It grants no merge,
+  new acquisition, mapping correction or runtime change. Main remains accepted source of truth.
+- **Architect decision needed:** the reviewed AAPL mapping ends **2026-10-02**. Later source
+  dates fail validation before network acquisition. Enabling the runtime does not establish
+  ongoing mapping validity. No extension or substitute mapping is implemented here.
+- Verification is documentation-only: final diff/scope review, `git diff --check`,
+  `node scripts/verify-documentation.mjs` (**PASS: 265 Markdown files / 91 unique backlog IDs**),
+  and Gitleaks 8.28.0 `git --pre-commit --staged --redact --no-banner` (**PASS: no leaks**).
+  Diff/scope review passed: only the two documentation files above; no production, test,
+  configuration or runtime file changes. Backend/frontend tests and builds are not applicable
+  to this delta; dated operational evidence is preserved rather than rerun.
+- The [controlled-acquisition runbook](runbooks/finance-controlled-acquisition.md) remains the
+  accepted operational contract. No credentials, raw provider payloads, OHLCV or private paths
+  are included. Receipt/checksum identities below identify non-secret Finance evidence only.
+
+Next: **STOP after publication for independent ChatGPT/architect review.** The owner can say
+"Codex är klar"; review uses this branch, its exact Git identities and the dated evidence below.
+Any future mapping or operational work needs a separate owner/architect decision. No merge,
+provider/model call, cycle trigger, configuration change or service restart is part of this task.
+Finance remains **RESEARCH / 0 SEK / NONE**.
+
+## BB-132F unattended observation activation — 2026-10-04 18:08 UTC
+
+**OPERATIONALLY ENABLED / HEALTHY / INITIAL CADENCE WAIT.** This explicit owner-authorized
+activation supersedes prior disabled-runtime/non-activation statements below; their dated evidence
+and completed manual one-shot budget remain unchanged. No additional manual one-shot is authorized.
+
+- HEAD, fetched origin/main, running OCI revision and compiled system-build-identity all equal
+  `a2373f172600c7b45ce378c56aab1d7da2b9b242`. No product/source changes or rebuild.
+  Running image remains `sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a`.
+- Existing ignored external configuration was atomically updated, mode0600 preserved, with all
+  unrelated entries, credentials, owner policy and reviewed mapping unchanged. ObservationRuntime
+  Enabled=true, CadenceMinutes=360, LookbackDays=3; AlpacaDailyObservation Enabled=true.
+  EODHD, FRED and ResearchScheduler Enabled=false. Credential presence/accepted format verified
+  without recording values, hashes, prefixes, suffixes or lengths. Universe exactly US:XNAS:AAPL.
+- Only API recreated with `docker compose up -d --no-deps --no-build --pull never api`.
+  Other running container identities and persistent volume identities unchanged. API/recovery healthy,
+  recovery complete, NTP/container sync marker valid, disk sufficient, Finance/lifecycle stores present.
+  Existing failed bigbrain.service remains untouched; no appliance restart.
+- Container start `2026-10-04T18:07:21.757927106Z`; application boot
+  `2026-10-04T18:07:24.3112689+00:00`. Enabled/healthy runtime plus completed recovery and no cycle
+  events establish the accepted startup-wait behavior. Expected first check approximately
+  2026-10-05 00:07 UTC after recovery plus the full360-minute wait; exact runtime NextCheckUtc is
+  not exposed by the current public aggregate health response. No direct live snapshot is claimed.
+  No cadence shortening, manual cycle, or one-shot command. No provider request during this operation.
+- The prior real AAPL receipt was independently reopened before and after recreation using accepted
+  Finance read-only validators. Receipt count remains1; identity/checksum/lineage and pre-ingestion /
+  at-ingestion cutoff behavior unchanged. Earlier projection checksum unchanged. No evidence deletion,
+  rewrite or new cutoff seal by verification; valid earlier full-store integrity evidence reused.
+- **Mapping limitation preserved:** ValidFrom2026-01-29 / ValidTo2026-10-02. Only source days within
+  this reviewed interval may be requested. Later source dates are rejected before network by the
+  accepted runtime; this activation does NOT authorize extending/removing ValidTo. A rolling3-day
+  window eventually contains no valid source sessions under this mapping. Enabled is not a claim
+  that ongoing newer-date collection is possible with this bounded mapping. Any extension needs
+  truthful separately reviewed mapping evidence/authorization; no code fix is implied.
+- No Qwen/reasoner/research session, grant reset/refund/renewal, automatic SHADOW/freezing/promotion,
+  PAPER/LIVE/AUTO, broker/Avanza, orders/positions/capital, generic scheduler or next checkpoint.
+  Finance remains **RESEARCH / 0 SEK / NONE**. The manual allowance remains consumed1/1;
+  normal future requests are authorized only through the accepted bounded observation runtime.
+
+At the end of activation: **STOP and return control to owner/architect.** No first cycle or
+one-shot was forced. The note was initially local/unpublished; the operational-review authorization
+above now permits its sanitized publication. Private state and unrelated work remain excluded.
+
+## Controlled AAPL acquisition — 2026-10-04 — SUCCESS / STOP
+
+**ONE REAL REQUEST COMPLETED / IMMUTABLE RECEIPT VERIFIED / STOP. NO RETRY.**
+Exact accepted/deployed revision remains `a2373f172600c7b45ce378c56aab1d7da2b9b242`.
+The owner-entered credentials passed presence/format verification without disclosure. Only AAPL
+is configured; EODHD/FRED/ResearchScheduler/ObservationRuntime remain disabled. Alpaca daily
+transport alone is enabled for the authorized one-shot. API-only recreation reused the exact
+accepted image and preserved volumes; healthy recovery, NTP and clock marker verified.
+
+Mapping: US:XNAS:AAPL / Apple Inc. / Equity / USD / XNAS; provider symbol AAPL.
+The bounded effective interval is 2026-01-29 through 2026-10-02, supported by Apple's
+[dated SEC report](https://d18rn0p25nwr6d.cloudfront.net/CIK-0000320193/acd3855e-8e5a-4bed-9e77-689b1fcd314d.pdf)
+and [current issuer listing confirmation](https://investor.apple.com/investor-relations/faq/default.aspx).
+This is an operator-reviewed bounded mapping, not a claim of the original listing start or an
+unlimited symbol-history guarantee. Alpaca documents AAPL as a stock symbol in its
+[historical bars contract](https://docs.alpaca.markets/us/reference/stockbars).
+Mapping evidence token: `operator:apple-sec-0000320193-26-000005-faq-20261004-alpaca-aapl`.
+Owner policy remains `bb132e-owner-data-use-risk-v1`; recorded at current configuration time,
+not backdated. Unknown deletion/termination rights remain Unknown; no provider guarantee asserted.
+
+Accepted read-only maintenance functions passed Finance/lifecycle quickchecks, schema97,
+clock watermark and receipt lineage before invocation. Prior receipt count0; sealed-equivalent
+read-only projection cutoff `2026-10-04T14:29:13.9256374+00:00`, checksum
+`sha256:5d150d96d66c3c6442868d7b251a3c0b027e43e70a7a4ca9e4ec0198d6f62db6`.
+This diagnostic did not seal/write a cutoff. An initial full-store copy diagnostic was cancelled;
+subsequent checks used existing Finance functions in place with read-only SQLite. No source-code
+or accepted implementation change was made. Temporary ignored local tooling is operational only.
+
+New York date2026-10-04; accepted Finance calendar selected2026-10-02, a prior completed session.
+Exactly one `finance-alpaca-daily-once US:XNAS:AAPL 2026-10-02` invocation completed with exit0 / New.
+**Allowance considered consumed1/1 at command start, regardless of result.** No second command,
+retry, different date/instrument, model, SHADOW, scientific grant change or trading is authorized.
+Local ignored attempt/result files support interruption recovery; inspect result/read existing
+Finance evidence only if completion is uncertain. Never retry to establish whether it committed.
+Finance remains **RESEARCH / 0 SEK / NONE**. Commit/push was not authorized by that acquisition task.
+
+Final sanitized evidence:
+
+- Status **New**; origin **AcquiredProviderDaily** (not fixture); provider **Alpaca**;
+  dataset **iex-historical-1Day-raw**; source contract **alpaca-historical-stocks-1Day-raw-v2**;
+  receipt contract **finance-market-observation-daily-v1**; source day **2026-10-02**.
+- Receipt `sha256:caa655557878353e9d700ec84c0c696777fcbf52ee08a63b07f72a99e3a5d11c`.
+- Checksum `sha256:13d6426177e0553e1c6ca86c856d0d814695da5030bc56d9c4dea404d8e9637d`. No predecessor.
+- Trusted acquired time `2026-10-04T17:56:19.98109+00:00`.
+- Trusted ingestion/knowledge time `2026-10-04T17:56:20.0069441+00:00`. Provider publication time
+  is unknown, never fabricated; source day is not knowledge time.
+- Two independent read-only Finance store opens passed existing native receipt validation,
+  canonical/content checksum and immutable lineage checks. Receipt count1, identity stable.
+  The selected receipt is absent at ingestion minus one tick, present at ingestion.
+  The earlier pre-acquisition cutoff's canonical projection checksum remains exactly unchanged.
+  Read-only projection equivalence reused Finance's validated rows and canonical hash; the
+  mutating cutoff-sealing method was not called. No new sealed cutoff was written by diagnostics.
+  The successful full-store preflight was reused; post-commit verification re-read the bounded
+  receipt evidence without redundantly scanning the entire legacy database again.
+- Final API healthy, exact accepted revision unchanged. EODHD/FRED/ResearchScheduler/
+  ObservationRuntime false. Alpaca transport remains true for explicit maintenance use only;
+  this does not authorize another request. Credentials present/format-valid; values not recorded.
+- **Alpaca request allowance consumed1/1.** No second request, new instrument, automatic collection,
+  model/research/SHADOW/trading/broker/order/position/capital work. No grant reset/refund/renewal.
+  No accepted code change, commit or push. Existing failed systemd service remains untouched.
+
+Next: **STOP; owner/architect review only.** Do not rerun the maintenance command or enable
+unattended observation. Local ignored diagnostic helpers/evidence are not deployment source.
+
+## Controlled BB-132F1 API deployment — 2026-10-04 13:29 UTC
+
+**DEPLOYED / RUNNING REVISION VERIFIED / PROVIDER ACTIVATION NOT PERFORMED.**
+This dated operational handoff supersedes the earlier NOT DEPLOYED statement for runtime state;
+the acceptance/checkpoint history below is preserved. That deployment task did not authorize publication.
+
+- Source HEAD and fetched origin/main both `a2373f172600c7b45ce378c56aab1d7da2b9b242`;
+  tracked tree was clean through exact-image build and deployment. The sole subsequent tracked
+  delta is this sanitized recovery note. Unrelated untracked mockups/ADR files remain untouched.
+- Owner authorized disabling only EODHD, FRED, ResearchScheduler, ObservationRuntime and
+  AlpacaDailyObservation in the existing ignored external configuration. All five effective
+  Compose and running-container Enabled values are false. Atomic replacement preserved unrelated
+  configuration entries and mode0600; no credentials or instrument mappings were entered.
+- Accepted `scripts/build-bigbrain-api.sh` succeeded using exact Git archive and no local secret
+  build context. Built/running image ID:
+  `sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a`.
+  Prior image: `sha256:ce133d43d6d42979e0d43b1017bf79bacb7c264a0125b213fcab2b8e148e042a`.
+- `docker compose up -d --no-deps --no-build --pull never api` recreated only the API.
+  Other running container identities and persistent volume identities are unchanged.
+  OCI revision and deployed `system-build-identity` both equal the accepted source SHA above.
+- API healthy; recovery healthy/completed; NTP and mounted synchronized marker valid;
+  Finance/lifecycle stores present; low-disk flag false. Research operations reports disabled,
+  SCHEDULER_DISABLED and executionAuthority NONE. Existing bigbrain.service remains failed
+  (exit-code), untouched; Compose deployment did not repair or use that service.
+- Sanitized startup inspection: no error events, provider cadence/scheduler execution,
+  Alpaca HTTP or model activity observed. Existing owner-drop inspection emitted
+  Rejected / technicalOrPolicyGateFailed warnings; no input was repaired/promoted.
+  Normal recovery/research-operations reconciliation logged once; no research session or
+  scientific evaluation was invoked by this task. Logs are supporting evidence, not a network trace.
+- Alpaca requests in this run: **0**; reserved first acquisition remains **0/1 consumed**.
+  No one-shot acquisition command, Qwen, automatic SHADOW, grant reset/refund/renewal,
+  PAPER/LIVE/AUTO, broker/orders/positions/capital or next checkpoint.
+  Finance remains **RESEARCH / 0 SEK / NONE**.
+
+Next: **STOP for owner/architect review.** No credential entry, mapping configuration, provider
+request or unattended activation could follow automatically. Subsequent separately authorized steps
+are recorded above; this documentation publication does not change the accepted deployment image.
+
 ## BB-132F1 controlled activation gate handoff — 2026-10-04
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED.

@@ -137,6 +137,12 @@ identiteter, privata adresser, råloggar och känsliga paths får inte publicera
 
 - Repositoryts publicerade dokumentation och Git-historik är source of truth mellan agentsessioner; en ny agent ska kunna återskapa aktuell status utan terminalhistorik.
 - Dokumentationspublicering innebär aldrig deployment eller runtimeändring. Sådana åtgärder kräver separat uttrycklig auktorisering.
+- Privat/rå driftstatus, hemligheter, råa providerpayloads och känsliga privata uppgifter får aldrig
+  publiceras. Sanerad operationell evidens som behövs för oberoende arkitektreview publiceras däremot
+  som handoff på en review-branch/checkpoint, även när driftåtgärden inte kräver dokumentändring på
+  main. Publicering är inte acceptance eller merge: Codex stoppar efter push och ChatGPT granskar
+  branchen självständigt. Main får operativ dokumentation endast när den granskade informationen
+  faktiskt hör hemma i bestående source of truth, enligt ordinarie exakt-SHA-godkännande.
 - Kod, tester och tillhörande dokumentation publiceras tillsammans vid en sammanhängande reviewpunkt, även vid misslyckad acceptance eller blocker. Klassificera REVIEW CHECKPOINT eller, först efter genomförd riskmotiverad verifiering och uppfyllda acceptance criteria, MERGE CANDIDATE. Publication är aldrig acceptance.
 - Om endast dokumentation ändrats ska den verifieras, få en separat dokumentationscommit och pushas. Dokumentation får inte lämnas lokalt enbart för att ingen kod ändrades.
 - Om kod inte får pushas ska relevant dokumentation ändå uppdateras lokalt och samtliga väntande filer redovisas.
