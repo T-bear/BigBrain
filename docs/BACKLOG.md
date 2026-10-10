@@ -1,5 +1,13 @@
 # BigBrain Backlog
 
+## BB-132H — versioned observation mapping
+
+**MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable
+assertion persistence implemented; [evidence and limitations](reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
+Separate future decisions: operational adoption and truthful current mapping verification;
+closing an adopted open-ended snapshot/material identity changes; cross-version SHADOW compatibility;
+version/manifest capacity beyond the explicit fail-closed bounds. None is activated by publication.
+
 ## BB-132F1 — controlled activation and deployment gate
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED. Bounded one-shot uses accepted Finance receipts while runtime remains disabled. Actual deployment/service readiness, reviewed mapping/credentials and first real request remain separate operational gates; no unattended activation.

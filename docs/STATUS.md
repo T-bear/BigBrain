@@ -1,5 +1,14 @@
 # BigBrain Status
 
+## BB-132H versioned observation mapping — 2026-10-10
+
+**IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW ONLY.**
+Bounded effective versions preserve exact historical receipt snapshots; additive assertion evidence
+has trusted recording time and explicit expiry. No deployment or operational adoption.
+[Scope, verification and remaining gates](reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
+Finance remains RESEARCH / 0 SEK / NONE. Earlier operational statements below are dated history;
+this checkpoint makes no claim about current running state.
+
 ## BB-132F1 controlled activation gate — 2026-10-04
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED. One-shot maintenance, external Compose pass-through and compiled/OCI revision identity. No live activation/deployment/provider/model/science/trading. Finance RESEARCH / 0 SEK / NONE.

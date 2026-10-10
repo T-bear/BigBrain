@@ -56,8 +56,8 @@ internal sealed partial class EodhdMarketMemory
     // Finance alone selects the current predecessor under the existing immediate transaction.
     internal Task<ObservationAcquisition> ReobserveDailyAsync(AlpacaDailyMarketObservations source,
         CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
-        TimeProvider clock, CancellationToken cancellationToken) =>
-        AcquireObservationCoreAsync(source, instrument, mapping, policy, clock, null, true, cancellationToken);
+        TimeProvider clock, CancellationToken cancellationToken, string? mappingAuthorization = null) =>
+        AcquireObservationCoreAsync(source, instrument, mapping, policy, clock, null, true, cancellationToken, mappingAuthorization);
 
     internal void RequireObservationRuntimeReady(MarketDataEntitlementPolicy policy, DateTimeOffset now)
     {
@@ -82,7 +82,7 @@ internal sealed partial class EodhdMarketMemory
 
     private async Task<ObservationAcquisition> AcquireObservationCoreAsync(IMarketObservationSource source,
         CanonicalInstrument instrument, ProviderInstrumentMapping mapping, MarketDataEntitlementPolicy policy,
-        TimeProvider clock, string? correctsId, bool reobserve, CancellationToken cancellationToken)
+        TimeProvider clock, string? correctsId, bool reobserve, CancellationToken cancellationToken, string? mappingAuthorization = null)
     {
         ArgumentNullException.ThrowIfNull(source); ArgumentNullException.ThrowIfNull(clock);
         if (source.Provider != mapping.Provider || source.Dataset != mapping.ProviderDataset ||
@@ -92,6 +92,13 @@ internal sealed partial class EodhdMarketMemory
         var started = clock.GetUtcNow();
         RequireReceiptRights(source.ContractVersion, policy, mapping, started);
         cancellationToken.ThrowIfCancellationRequested();
+        if (reobserve)
+        {
+            using var authorized = new SqliteConnection(ConnectionString); authorized.Open();
+            if (mappingAuthorization is not null)
+                RequireMappingAuthorization(authorized, mappingAuthorization, instrument, mapping, started);
+            else RequireLegacyObservationMapping(authorized, instrument, started);
+        }
         ProviderObservation value;
         try { value = await source.ReadAsync(mapping, cancellationToken).ConfigureAwait(false); }
         catch (Exception e) when (reobserve && !cancellationToken.IsCancellationRequested &&
@@ -115,6 +122,9 @@ internal sealed partial class EodhdMarketMemory
         var ingested = clock.GetUtcNow(); FinanceTime.RequireUtc(ingested, nameof(clock));
         RequireReceiptRights(source.ContractVersion, policy, mapping, ingested);
         if (ingested < acquired) throw new InvalidDataException("Observation clock regressed.");
+        if (mappingAuthorization is not null)
+            RequireMappingAuthorization(connection, mappingAuthorization, instrument, mapping, ingested);
+        else if (reobserve) RequireLegacyObservationMapping(connection, instrument, ingested);
         var logical = MarketObservationIntegrity.LogicalIdentity(instrument, source.Provider, source.Dataset, source.Origin, value);
         var content = MarketObservationIntegrity.ContentChecksum(value);
         _ = ObservationWatermark(connection);
@@ -151,6 +161,9 @@ internal sealed partial class EodhdMarketMemory
             ("$id", id), ("$key", logical), ("$ticks", ingested.UtcTicks), ("$hash", receipt.Checksum),
             ("$json", JsonSerializer.Serialize(receipt, ObservationJson)));
         Execute(connection, transaction, "UPDATE market_observation_clock SET watermark_ticks=$ticks WHERE singleton=1", ("$ticks", ingested.UtcTicks));
+        if (mappingAuthorization is not null)
+            Execute(connection, transaction, "INSERT INTO observation_mapping_receipts VALUES($receipt,$manifest)",
+                ("$receipt", id), ("$manifest", mappingAuthorization));
         ObservationTestHook?.Invoke("before-observation-commit");
         cancellationToken.ThrowIfCancellationRequested(); transaction.Commit();
         ObservationTestHook?.Invoke("after-observation-commit");
@@ -231,6 +244,7 @@ internal sealed partial class EodhdMarketMemory
         foreach (var p in parameters) command.Parameters.AddWithValue(p.Name, p.Value);
         using var reader = command.ExecuteReader(); var rows = ImmutableArray.CreateBuilder<MarketObservationReceipt>();
         var preceding = new Dictionary<string, string>(StringComparer.Ordinal);
+        ImmutableArray<(string Id, ObservationMappingManifest Manifest, DateTimeOffset Recorded)>? manifests = null;
         while (reader.Read())
         {
             var json = reader.GetString(4);
@@ -251,6 +265,14 @@ internal sealed partial class EodhdMarketMemory
             if (r.CorrectsId != preceding.GetValueOrDefault(r.LogicalIdentity))
                 throw new InvalidDataException("Observation revision lineage mismatch.");
             preceding[r.LogicalIdentity] = r.Id;
+            using var authorization = connection.CreateCommand();
+            authorization.CommandText = "SELECT manifest_id FROM observation_mapping_receipts WHERE receipt_id=$id";
+            authorization.Parameters.AddWithValue("$id", r.Id);
+            if (authorization.ExecuteScalar() is string manifest)
+            {
+                manifests ??= ReadMappingManifests(connection, null);
+                RequireMappingAuthorization(manifests.Value, manifest, r.Instrument, r.Mapping, r.IngestedAtUtc);
+            }
             rows.Add(r);
         }
         return rows.ToImmutable();

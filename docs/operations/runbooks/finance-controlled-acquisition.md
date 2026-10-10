@@ -57,7 +57,7 @@ Do not render `docker compose config` or full container environment when real ke
 | `FINANCE__OBSERVATIONRUNTIME__CADENCEMINUTES` |360; accepted60–1440, unused by one-shot |
 | `FINANCE__OBSERVATIONRUNTIME__LOOKBACKDAYS` |3; accepted1–7, unused by one-shot |
 
-`InstrumentsJson` is bounded to16384characters, depth4,1–4objects, exact DTO property names,
+`InstrumentsJson` is bounded to16384characters, depth6,1–4objects, exact DTO property names,
 no unknown/duplicate properties. It constructs the same `ObservationRuntimeInstrument` objects
 and existing canonical instrument/mapping types. It cannot be combined with the existing indexed
 `Instruments` configuration; ambiguity or invalid JSON empties the list and fails acquisition closed.
@@ -69,6 +69,47 @@ Each reviewed entry needs `InstrumentId`, `DisplayName`, `ProviderSymbol`, `Mic`
 established; do not invent a historical validity date. The initial one-shot allows only explicitly
 configured `US:XNAS:AAPL`/AAPL or `US:XNAS:MSFT`/MSFT, Equity/USD/XNAS. No entries are defaulted.
 SPY is excluded; it must never be mislabelled Equity to pass this gate. IEX is a feed, not listing MIC.
+
+### Versioned mapping configuration — BB-132H review candidate
+
+No operational adoption is authorized by implementation/publication. Keep the live configuration
+unchanged until exact-SHA review, acceptance and a separate operational decision.
+
+A root `InstrumentsJson` entry may use either the existing flat form **or**:
+
+- `InstrumentId`: the stable canonical ID.
+- `MappingVersions`: 1–4 objects, each with `Snapshot`, `VerificationEvidence`, `VerifiedAtUtc`,
+  and `RevalidateByUtc`.
+- `Snapshot`: the complete existing flat instrument entry (including its identical historical
+  display/venue names, dates and `MappingEvidence`); nested versions are forbidden.
+
+In versioned form other root legacy fields must remain absent/default. The same JSON variable,
+16384-character limit and 1–4 **instrument** limit apply; depth6 permits the bounded version nesting.
+Unknown/duplicate properties at every nesting level, overlaps, mixed forms, duplicate instruments,
+material identity/symbol differences and stale/future verification fail closed. No sample production
+universe or valid-from dates are installed. Current AAPL evidence must never be inferred from a fixture.
+
+For every version, provide reviewed evidence for the actual effective dates and an operator-attested
+UTC verification time. Set an explicit UTC revalidation deadline no more than seven days later.
+Null `ValidTo` is no known termination at verification, **not** endless unattended authority.
+Verification expiry blocks new use, including historical reacquisition; past receipts still replay.
+Review/revalidate all retained versions when adopting a refreshed manifest. Do not replace original
+`MappingEvidence` merely to record a newer check: use the separate `VerificationEvidence` assertion.
+Finance records trusted adoption time itself and retains prior manifests in its existing database.
+
+Preserve all previously adopted snapshots. Closing/removing an adopted open-ended snapshot or
+changing a symbol/material identity needs a separate transition decision; do not work around the
+conflict with another canonical ID/feed. The present mechanism deliberately refuses those changes.
+An existing legacy receipt must resolve to its exact original full snapshots before network access.
+No receipt rewrite or copying of old ingestion time is allowed. Once adopted, versioned mode cannot
+be downgraded to legacy configuration for that ID. See the
+[canonical currentness/persistence contract](../../architecture/finance/market-data-memory-and-provenance.md#bb-132h-versioned-observation-mapping--review-implementation-2026-10-10).
+
+Later adoption sequence: approve exact implementation → separately authorize deployment/migration →
+read-only reconcile retained receipt snapshots → obtain truthful current mapping/evidence and reviewed
+version intervals → authorize external configuration/restart explicitly. Do not automatically run a
+one-shot or cycle. F1 still requires unattended runtime false and its own one-request approval.
+Collection across a mapping transition does not authorize mixed-mapping SHADOW v1.
 
 Configuration is frozen at process startup. Editing `.env` does not change an existing container's
 environment. Passing keys later requires a separately authorized same-revision API recreation with

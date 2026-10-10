@@ -157,7 +157,7 @@ public sealed class ProspectiveDailyShadowTests
         var results = await Task.WhenAll(Enumerable.Range(0, 2).Select(_ => Task.Run(() => db.Memory().EvaluateDailyShadow(candidates[0].Id, clock.Now, Policy, clock))));
         Assert.Equal(results[0], results[1]);
         Assert.Equal(1L, db.Scalar("SELECT COUNT(*) FROM prospective_daily_results"));
-        Assert.Equal(97L, db.Scalar("SELECT MAX(version) FROM finance_schema_migrations"));
+        Assert.Equal((long)FinanceSchemaMigrator.LatestVersion, db.Scalar("SELECT MAX(version) FROM finance_schema_migrations"));
     }
 
     [Theory]
@@ -217,7 +217,7 @@ public sealed class ProspectiveDailyShadowTests
         Assert.True(memory.ReserveLearningInvocation());
         FinanceSchemaMigrator.Migrate(db.Path);
         Assert.False(db.Memory().ReserveLearningInvocation());
-        Assert.Equal(97, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
+        Assert.Equal(FinanceSchemaMigrator.LatestVersion, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
     }
 
     [Fact]

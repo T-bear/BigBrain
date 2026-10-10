@@ -1,6 +1,77 @@
 # Finance market-data memory, provenance and learning foundation
 
 
+## BB-132H versioned observation mapping — review implementation, 2026-10-10
+
+**REVIEW CANDIDATE ONLY.** Bounded mapping assertions extend the existing Finance observation
+owner; no production mapping, deployment or live collection is changed. The
+[checkpoint report](../../reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md)
+records verification and the separately reviewed BB-132G analysis (not accepted implementation).
+
+One configured canonical instrument may supply 1–4 immutable effective-dated snapshots through
+`MappingVersions`, instead of the legacy flat mapping fields. The instrument limit remains 4,
+independent of the maximum 4 versions per instrument. `InstrumentMappingCatalog` supplies inclusive
+source-date resolution and overlap rejection; gaps reject the individual date before network.
+Each selected version retains its **complete** `CanonicalInstrument` and `ProviderInstrumentMapping`.
+The stable ID, Equity/USD, listing MIC/venue, display name and provider symbol must agree across
+versions. This first mechanism permits date/provenance transitions, not unreviewed symbol reuse,
+renames, venue changes or other material identity changes. IEX remains the feed, not listing MIC.
+
+`finance-observation-mapping-v1` defines the currentness policy: each version has a bounded
+`VerificationEvidence` reference, operator-attested UTC `VerifiedAtUtc`, and explicit exclusive
+`RevalidateByUtc`, at most seven days after verification. Verification must not be future/default;
+use at/after the deadline rejects. These are trusted operator assertions, not automatic issuer
+checks or a provider warranty. Finance independently records the first adoption time from its
+trusted clock. Source-day validity is separate from both assertion times and market knowledge.
+A null effective end means no known termination **at verification**, never perpetual permission:
+the assertion deadline still applies, even when revisiting historical source days.
+
+Versions are frozen at process configuration, sorted by effective start, and uniquely selected
+before provider access. Currentness is rechecked after spacing and at acquisition start/commit;
+expiry during a request refuses persistence. Renewing verification creates a new immutable manifest
+with unchanged snapshots and a new verification reference/time/deadline. Adoption checks every
+previously adopted snapshot remains present exactly; removal, shortening or replacement is refused.
+An adopted open-ended snapshot cannot be silently closed to admit a successor. Known termination
+or a material change requires stopping affected collection and a separately reviewed transition;
+this checkpoint does not automate corporate actions. Bounds exhaustion also fails closed.
+
+Additive Finance schema98 contains `observation_mapping_manifests` and
+`observation_mapping_receipts` under the same SQLite owner. Persistence is needed because configuration
+alone would lose assertion evidence/recording time after restart, and the unchanged receipt envelope
+has no currentness fields. Manifest identity hashes canonical serialized snapshots/assertions;
+a separate checksum binds that identity and trusted first-recorded time. At most 1000 retained
+manifests are read/adopted; no automatic deletion or history compaction. Existing 1000-receipt limits
+remain. Clock regression against either market watermark or recorded manifests blocks acquisition.
+An assertion may remain after a failed/cancelled provider request; it is not market evidence and
+does not advance the market knowledge watermark. Original receipt JSON and hashes are never migrated.
+
+Before network, Finance validates retained receipts and exact configured historical snapshots.
+Changed metadata cannot become a value revision. A newly persisted versioned receipt and its manifest
+binding commit in one immediate transaction. Duplicate returns the exact original receipt/time and
+retains its original binding; old receipts are not retrofitted. Reopen validates bindings at original
+ingestion time, so later assertion expiry/reverification does not rewrite or invalidate historical
+market knowledge. Expired manifests remain audit evidence, not current permission. Provenance equality
+inside `ReobserveDailyAsync` is unchanged. Legacy acquisition cannot bypass adoption by dropping back
+to flat configuration, including a race where adoption occurs during an in-flight legacy request.
+
+Legacy single-entry configurations remain supported without fabricated verification dates or grants;
+unadopted legacy operation retains its existing explicit owner-review boundary. It gains no versioned
+currentness claim. Historical metadata conflicts now fail before network in runtime/F1, rather than
+only after response. Once a versioned manifest is adopted for an ID, legacy downgrade is refused.
+
+Cadence, lookback, single-flight, serial work/spacing, recovery, transport limits and default-disabled
+state are unchanged. Versions do not multiply provider requests: one instrument/day has at most one
+selected snapshot. Cancellation cannot publish a partial receipt/binding. No scientific grant changes;
+old ledger readers only recognize the additive schema version.
+
+**SHADOW v1 remains fail-closed for mixed mapping provenance.** No equality checks, frozen identities,
+scientific projections or strategy semantics are relaxed. Earlier sealed E remains replayable;
+new mixed-history freezes and later evaluations reject. Collection continuity is not scientific
+cross-version continuity. Operational adoption/current mapping verification and any cross-version
+scientific contract require separate owner/architect decisions. No automatic SHADOW is introduced.
+Finance remains **RESEARCH / 0 SEK / NONE**.
+
+
 ## BB-132F1 controlled activation gate — review implementation, 2026-10-04
 
 A finite maintenance entry can acquire one reviewed AAPL/MSFT daily observation while the

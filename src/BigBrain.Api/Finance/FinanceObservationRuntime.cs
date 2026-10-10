@@ -29,21 +29,30 @@ internal sealed class FinanceObservationRuntimeOptions
         try
         {
             if (options.Instruments.Length != 0 || options.InstrumentsJson.Length > 16384) throw new InvalidDataException();
-            using var json = JsonDocument.Parse(options.InstrumentsJson, new JsonDocumentOptions { MaxDepth = 4 });
+            using var json = JsonDocument.Parse(options.InstrumentsJson, new JsonDocumentOptions { MaxDepth = 6 });
             if (json.RootElement.ValueKind != JsonValueKind.Array || json.RootElement.GetArrayLength() is < 1 or > 4)
                 throw new InvalidDataException();
-            foreach (var entry in json.RootElement.EnumerateArray())
-            {
-                if (entry.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
-                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var property in entry.EnumerateObject())
-                    if (!names.Add(property.Name)) throw new InvalidDataException();
-            }
+            RequireUnique(json.RootElement);
             options.Instruments = JsonSerializer.Deserialize<ObservationRuntimeInstrument[]>(options.InstrumentsJson, InstrumentJson)!;
         }
         catch (Exception e) when (e is JsonException or InvalidDataException)
         { options.Instruments = []; } // Invalid deployment input remains fail-closed, never partially binds.
         return options;
+    }
+
+    private static void RequireUnique(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var property in element.EnumerateObject())
+            {
+                if (!names.Add(property.Name)) throw new InvalidDataException();
+                RequireUnique(property.Value);
+            }
+        }
+        else if (element.ValueKind == JsonValueKind.Array)
+            foreach (var item in element.EnumerateArray()) RequireUnique(item);
     }
 }
 
@@ -59,6 +68,8 @@ internal sealed class ObservationRuntimeInstrument
     public DateOnly ValidFrom { get; set; }
     public DateOnly? ValidTo { get; set; }
     public string MappingEvidence { get; set; } = "";
+
+    public ObservationMappingVersionOptions[] MappingVersions { get; set; } = [];
 
     internal (CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping) Canonical()
     {
@@ -89,7 +100,7 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
     private readonly Func<bool> _ready;
     private readonly Func<DateOnly, AlpacaDailyMarketObservations> _source;
     private readonly Func<TimeSpan, CancellationToken, Task> _delay;
-    private readonly ImmutableArray<(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping)> _instruments;
+    private readonly ImmutableArray<ObservationInstrumentPlan> _instruments;
     private readonly MarketDataEntitlementPolicy? _policy;
     private readonly int _lookback;
     private int _flight;
@@ -128,7 +139,7 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
         { /* Invalid configuration never leaks values or grants network authority. */ }
     }
 
-    internal static (MarketDataEntitlementPolicy Policy, ImmutableArray<(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping)> Instruments)
+    internal static (MarketDataEntitlementPolicy Policy, ImmutableArray<ObservationInstrumentPlan> Instruments)
         ValidateConfiguration(FinanceObservationRuntimeOptions options, AlpacaDailyObservationOptions transport, DateTimeOffset now)
     {
         if (options.CadenceMinutes is < 60 or > 1440 || options.LookbackDays is < 1 or > 7 ||
@@ -138,27 +149,26 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
             throw new InvalidDataException();
         var policy = AlpacaDailyOwnerDecision.Create(options.PolicyRecordedAtUtc, options.CurrentDeletion, options.AffectedUseEnabled);
         AlpacaDailyOwnerDecision.Require(policy, now);
-        var entries = ImmutableArray.CreateBuilder<(CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping)>();
-        foreach (var entry in options.Instruments)
-        {
-            var (instrument, mapping) = (entry ?? throw new InvalidDataException()).Canonical();
-            if (instrument.Type != InstrumentType.Equity || instrument.Lifecycle != InstrumentLifecycle.Active ||
-                instrument.Currency.Code != "USD" || mapping.Provider.Value != "Alpaca" ||
-                mapping.ProviderDataset.Value != DailyMarketEvidence.Dataset || mapping.Mic is not ("XNAS" or "XNYS" or "ARCX") ||
-                mapping.InstrumentId != instrument.Id || mapping.Mic != instrument.Mic || mapping.Venue != instrument.Venue ||
-                mapping.ProviderReference.Length is < 1 or > 16 ||
-                mapping.ProviderReference.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '-')))
-                throw new InvalidDataException();
-            MarketObservationIntegrity.Token(instrument.Id.Value); MarketObservationIntegrity.Token(mapping.Evidence.Value);
-            MarketObservationIntegrity.Token(instrument.Venue.Code);
-            if (instrument.DisplayName.Length > 128 || instrument.Venue.Name.Length > 128) throw new InvalidDataException();
-            entries.Add((instrument, mapping));
-        }
-        var instruments = entries.OrderBy(x => x.Item1.Id.Value, StringComparer.Ordinal).ToImmutableArray();
-        if (instruments.Select(x => x.Instrument.Id).Distinct().Count() != entries.Count ||
-            instruments.Select(x => x.Mapping.ProviderReference).Distinct(StringComparer.Ordinal).Count() != entries.Count)
+        var instruments = options.Instruments.Select(entry => new ObservationInstrumentPlan(entry ?? throw new InvalidDataException(), now))
+            .OrderBy(x => x.InstrumentId, StringComparer.Ordinal).ToImmutableArray();
+        if (instruments.Select(x => x.InstrumentId).Distinct(StringComparer.Ordinal).Count() != instruments.Length ||
+            instruments.Select(x => x.Snapshots[0].Mapping.ProviderReference).Distinct(StringComparer.Ordinal).Count() != instruments.Length)
             throw new InvalidDataException();
         return (policy, instruments);
+    }
+
+    internal static void ValidateSnapshot(CanonicalInstrument instrument, ProviderInstrumentMapping mapping)
+    {
+        if (instrument.Type != InstrumentType.Equity || instrument.Lifecycle != InstrumentLifecycle.Active ||
+            instrument.Currency.Code != "USD" || mapping.Provider.Value != "Alpaca" ||
+            mapping.ProviderDataset.Value != DailyMarketEvidence.Dataset || mapping.Mic is not ("XNAS" or "XNYS" or "ARCX") ||
+            mapping.InstrumentId != instrument.Id || mapping.Mic != instrument.Mic || mapping.Venue != instrument.Venue ||
+            mapping.ProviderReference.Length is < 1 or > 16 ||
+            mapping.ProviderReference.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '-')))
+            throw new InvalidDataException();
+        MarketObservationIntegrity.Token(instrument.Id.Value); MarketObservationIntegrity.Token(mapping.Evidence.Value);
+        MarketObservationIntegrity.Token(instrument.Venue.Code);
+        if (instrument.DisplayName.Length > 128 || instrument.Venue.Name.Length > 128) throw new InvalidDataException();
     }
 
     internal async Task<ObservationRuntimeSnapshot> RunCycleAsync(CancellationToken token)
@@ -191,21 +201,25 @@ internal sealed class FinanceObservationRuntime : IHealthCheck
             {
                 // Calendar only reduces requests. Returned evidence must still pass daily eligibility.
                 if (!UsMarketCalendar.IsSession(day)) continue;
-                foreach (var (instrument, mapping) in _instruments)
+                foreach (var plan in _instruments)
                 {
                     token.ThrowIfCancellationRequested();
-                    if (!mapping.IsValidOn(day) || day < instrument.ValidFrom || day > instrument.ValidTo)
+                    (CanonicalInstrument Instrument, ProviderInstrumentMapping Mapping) selected;
+                    try { selected = plan.Resolve(day, _trusted.GetUtcNow()); }
+                    catch (Exception e) when (e is InvalidDataException or MarketDataNormalizationException)
                     {
-                        attempts.Add(new(instrument.Id.Value, day, null, ObservationFailure.Rejected, null));
+                        attempts.Add(new(plan.InstrumentId, day, null, ObservationFailure.Rejected, null));
                         continue;
                     }
+                    var (instrument, mapping) = selected;
                     _memory.RequireObservationRuntimeReady(_policy!, _trusted.GetUtcNow());
                     if (attempts.Count > 0) await _delay(TimeSpan.FromSeconds(5), token).ConfigureAwait(false);
                     token.ThrowIfCancellationRequested();
                     try
                     {
+                        var authorization = _memory.PrepareObservationMapping(plan, day, _trusted.GetUtcNow());
                         using var source = _source(day);
-                        var result = await _memory.ReobserveDailyAsync(source, instrument, mapping, _policy!, _trusted, token).ConfigureAwait(false);
+                        var result = await _memory.ReobserveDailyAsync(source, instrument, mapping, _policy!, _trusted, token, authorization).ConfigureAwait(false);
                         attempts.Add(new(instrument.Id.Value, day, result.Kind, ObservationFailure.None, result.Receipt.Id));
                     }
                     catch (OperationCanceledException) when (token.IsCancellationRequested)

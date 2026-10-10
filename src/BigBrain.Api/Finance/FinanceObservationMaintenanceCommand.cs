@@ -44,13 +44,12 @@ internal static class FinanceObservationMaintenanceCommand
             var trusted = new FinanceObservationRuntime.GuardedClock(clock);
             var now = trusted.GetUtcNow();
             var (policy, instruments) = FinanceObservationRuntime.ValidateConfiguration(options, transport, now);
-            var selected = instruments.SingleOrDefault(x => x.Instrument.Id.Value == args[1]);
+            if (!DateOnly.TryParseExact(args[2], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day) ||
+                day >= DailyMarketEvidence.SourceDate(now) || !UsMarketCalendar.IsSession(day)) throw new InvalidDataException();
+            var plan = instruments.SingleOrDefault(x => x.InstrumentId == args[1]) ?? throw new InvalidDataException();
+            var selected = plan.Resolve(day, now);
             if (selected.Instrument is null || selected.Mapping.ProviderReference is not ("AAPL" or "MSFT") ||
                 selected.Instrument.Id.Value != "US:XNAS:" + selected.Mapping.ProviderReference || selected.Mapping.Mic != "XNAS")
-                throw new InvalidDataException();
-            if (!DateOnly.TryParseExact(args[2], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day) ||
-                day >= DailyMarketEvidence.SourceDate(now) || !UsMarketCalendar.IsSession(day) ||
-                !selected.Mapping.IsValidOn(day) || day < selected.Instrument.ValidFrom || day > selected.Instrument.ValidTo)
                 throw new InvalidDataException();
             var finance = configuration.GetSection(EodhdFinanceOptions.Section).Get<EodhdFinanceOptions>() ?? new();
             var recovery = configuration.GetSection(SystemRecoveryOptions.SectionName).Get<SystemRecoveryOptions>() ?? new();
@@ -66,12 +65,13 @@ internal static class FinanceObservationMaintenanceCommand
             var memory = new EodhdMarketMemory(finance);
             fixtureSetup?.Invoke(memory);
             memory.RequireObservationRuntimeReady(policy, trusted.GetUtcNow());
+            var authorization = memory.PrepareObservationMapping(plan, day, trusted.GetUtcNow());
             using var source = fixtureTransport is null ? new AlpacaDailyMarketObservations(transport, day) :
                 new AlpacaDailyMarketObservations(transport, day, fixtureTransport);
             stage = "Acquisition";
             // Exactly one call. Existing adapter makes at most one HTTP request, never retries.
             var result = await memory.ReobserveDailyAsync(source, selected.Instrument, selected.Mapping, policy,
-                trusted, cancellationToken).ConfigureAwait(false);
+                trusted, cancellationToken, authorization).ConfigureAwait(false);
             var receipt = result.Receipt;
             output.WriteLine(JsonSerializer.Serialize(new
             {
