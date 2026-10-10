@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132G, 2026-10-10` — [AAPL mapping compatibility review](features/finance/bb-132g-aapl-mapping-compatibility-20261010.md).
+  REVIEW CHECKPOINT, not Merge Candidate: versioned mapping required for full receipt/runtime/shadow
+  compatibility; limited config-only collection tradeoff distinguished. Read-only analysis, no activation.
+
 - `BB-132F1, 2026-10-04` — [Controlled activation and deployment gate](features/finance/bb-132f1-controlled-activation-gate-20261004.md).
   One-shot maintenance, external configuration and build identity; no activation or deployment.
   Exact candidate status, scope and verification in the report.

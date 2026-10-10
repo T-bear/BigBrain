@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-132G AAPL mapping compatibility review — 2026-10-10
+
+**REVIEW CHECKPOINT / ANALYSIS COMPLETE / NOT A MERGE CANDIDATE.**
+Baseline `a2373f172600c7b45ce378c56aab1d7da2b9b242`; branch
+`review/finance-aapl-mapping-compatibility`. Unique publication subject
+`review: document BB-132G AAPL mapping compatibility` resolves exact commit/tree.
+[Authoritative report: verdict, code evidence, option comparison, missing tests and next decision](../reports/features/finance/bb-132g-aapl-mapping-compatibility-20261010.md).
+The separate operational review at `2df263a8cc11bd5837ea205244ffacefa184cec9` is preserved;
+its dated deployment/acquisition/activation evidence supersedes earlier runtime statements below.
+It is not merged here. No current runtime/database inspection or change, provider/model request,
+implementation or test change. Unrelated local work excluded. Finance RESEARCH / 0 SEK / NONE.
+Next: STOP for independent architect review; versioned compatibility recommendation is not
+implementation or operational authorization. Publication checks and scope are recorded in the report.
+
 ## BB-132F1 controlled activation gate handoff — 2026-10-04
 
 **ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED.
