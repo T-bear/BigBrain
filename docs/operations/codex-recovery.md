@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-132J evidence/recovery preflight — 2026-10-10
+
+**REVIEW CHECKPOINT / NOT A MERGE CANDIDATE.** Branch
+`review/finance-bb132j-evidence-recovery-preflight` from exact accepted main
+`618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+H is accepted at that baseline; older candidate labels below are dated history.
+Publication resolves by unique subject `review: publish BB-132J Finance evidence and recovery preflight`.
+[Authoritative report: both receipts, schema, writers, recovery design and separate approval gates](../reports/features/finance/bb-132j-evidence-recovery-preflight-20261010.md).
+I receipt-inventory gap resolved by isolated networkless read-only diagnostics, no production helper
+modification. Only report/catalog/this handoff change; unrelated local work and ignored diagnostics
+remain excluded. No interruption or implementation remains. Next: independent architect review, then
+separately scoped recovery-copy preparation/approval; no backup/deployment/acquisition authority.
+Finance RESEARCH / 0 SEK / NONE. No production mutation or provider/model/scientific action.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created
