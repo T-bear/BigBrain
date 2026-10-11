@@ -1,5 +1,13 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
+## Current review outcome — resumption 2026-10-11
+
+**REVIEW CHECKPOINT — RIGHTS CLASSIFIED UNDER BOUNDED OWNER DECISION; SOURCE-COMPLETENESS
+STOP BEFORE INTERRUPTION. NOT MERGE CANDIDATE.**
+
+The original attempt below remains historical evidence. The [resumption result](#resumption-result--2026-10-11)
+records the new owner decision and the exact remaining blocker. No backup or restore has occurred.
+
 ## Metadata
 
 Detta är en sanerad GitHub-version. Owner authorization/attestation dated2026-10-10;
@@ -18,7 +26,7 @@ the authorized checkpoint date. This report records an execution precondition fa
   [backup runbook](../../../operations/backup-restore/README.md) and
   [controlled acquisition/build runbook](../../../operations/runbooks/finance-controlled-acquisition.md).
 
-## Status
+## Status — original attempt, superseded by the resumption below
 
 **REVIEW CHECKPOINT — GATE A BLOCKED / NO SERVICE INTERRUPTION / NOT MERGE CANDIDATE.**
 
@@ -200,3 +208,128 @@ STOP for independent architect review. Next owner input concerns the specificall
 and lineage evidence, not renewed blanket execution/GnuPG/EODHD approval. Continue this review branch
 additively only after the decision; revalidate execution-time identity and evidence before any later
 interruption. Do not deploy H, migrate98 or restore production under Phase B authority.
+
+## Resumption result — 2026-10-11
+
+This continuation preserves published parent `1b3244e089e1463118169fe99e01a0d3ec508f91`
+(tree `ab52492fc7aee5855c99793ccae8954183f6cce1`) on the same execution review branch.
+Accepted main/tree remain the exact identities above. Resolve this additive publication by subject
+`review: reconcile BB-132K recovery lineage and record completeness stop` and its Git commit/tree metadata.
+No prior checkpoint was rewritten and no new planning sprint/report was created.
+
+### Owner decision and private inventory
+
+The owner explicitly accepts bounded private research handling, protected recovery copying,
+bounded retention and an isolated restore drill for existing GOOGLEFINANCE CSV/workbooks,
+Zenodo/Yahoo-derived datasets and legacy candidate/database copies. Recorded on2026-10-11 as an
+**OWNER-ACCEPTED DATA-USE/RISK DECISION**, not a provider contractual guarantee, legal finding,
+redistribution permission, scientific promotion or override of ADR0028/explicit prohibitions.
+External rights uncertainty remains visible in the inventory; stored candidate policies were not changed.
+
+Existing EODHD active-account attestation and its all-copies expiry/deletion conditions remain binding.
+The recorded WIKI, FRED, ECB, Riksbank and Alpaca policy distinctions are preserved. Bounded inspection
+of existing source policies, candidate metadata, nested manifests and accepted source reports found
+no recorded explicit prohibition of this narrowly authorized private copy/drill. This is a statement
+about the inspected project evidence, not a new independent/current provider-terms verification.
+A subsequently applicable explicit restriction must still stop affected use.
+
+The private inventory v3 supersedes, but preserves, v1/v2. All365 retained file entries now have a
+source/policy association:16 VERIFIED PERMITTED and349 VERIFIED RESTRICTED WITH CONDITIONS.
+For the owner-risk families, the latter means the explicit bounded owner authorization is verified;
+it **does not mean previously unknown third-party copying rights have become verified**. Mixed stores,
+nested copies and derivatives inherit the relevant source restrictions. No source item was excluded.
+No archive creation date, expiry date or deployment-acceptance trigger was fabricated.
+
+- Original WIKI and Zenodo package hashes match their recorded candidate commitments.
+- Both GOOGLEFINANCE source ZIPs match their candidate commitments and their owner-drop duplicates;
+  the ready markers are associated with those same packages.
+- Candidate extraction trees, the generated Zenodo combined CSV and the workbook are associated
+  with their exact candidate/source through the accepted intake layout and implementation. This is
+  a rights/lineage association, not a new qualification or full semantic revalidation of their contents.
+- 45 retained macro/intake/owner-drop files were hashed read-only.13 retained macro files have exact
+  source-candidate associations. The additional historical reference is addressed separately below.
+- Three nested SQLite copies contain EODHD/WIKI and the recorded WIKI/Zenodo candidates; one also
+  contains the earlier FRED candidates. Their inherited restrictions are recorded per file.
+  The BB-091 snapshot hash matches its published original; the BB-090 source snapshot hash matches
+  its retained checksum file. The drill-copy hash is recorded separately, not claimed identical to
+  its pre-migration source. Nested metadata companions are associated with those snapshots.
+- These historical DB files have no WAL/SHM/journal companions in the inspected scope and retain
+  August modification times. Normal read-only opens returned SQLite14 for a standalone legacy
+  copy. A bounded immutable read of these historical files, with size/mtime stability checks and
+  file hashes, completed metadata classification. The live Finance DB was **not** opened immutable;
+  it used a read-only connection/deferred transaction. No journal recovery, integrity drill, migration,
+  copied DB or production file modification was performed.
+
+### Exact unmatched-reference finding
+
+The remaining reference is ECB candidate `ecb-candidate-cec0507f8bd6b80e`, with retained artifact
+commitment `sha256:cec0507f8bd6b80e1ce4a8f03959cc7826168233cb6c9fd05377e4785d60977f`.
+It is recorded **REJECTED / validation FAIL**, with no canonical revision ID. None of the nine
+canonical macro revisions references that artifact hash.
+
+Its expected retained raw file is absent from the inventoried capture roots. A retained file with
+that basename belongs to promoted candidate `ecb-candidate-88a79391bac811be` and hashes to
+`sha256:88a79391bac811be2cfdc2c501f0f8c2a39e5b3f9bb5198464bc5840bdf1efb3`.
+It is different evidence and cannot satisfy the rejected artifact commitment. No matching content
+was found in the45 hashed macro/intake/owner-drop files. The private inventory retains the exact
+reference and path association; those private paths are not published.
+
+Accepted `FinanceMacroMemory.StageEuropean` writes the candidate artifact before recording rejection.
+The BB-091 report describes retained fail-closed attempts. Neither proves where this particular
+raw artifact is now. The inspected schema/code provides no matching macro deletion disposition;
+the dataset quarantine cleanup state machine does not establish deletion of this macro candidate.
+ADR0028 permits appropriately controlled rejected-payload cleanup, but permission is not evidence
+that such cleanup actually occurred. Cause/time of absence remain **UNVERIFIED**. No global claim
+that the file was deleted or cannot exist outside the approved scope is made.
+
+This is not an AAPL receipt mismatch, a promoted macro revision failure or a renewed copying-rights
+question. It is a concrete recovery-completeness discrepancy. The approved consolidated Gate B says
+missing artifacts must stop execution. Accordingly, no complete recovery claim, replacement payload,
+refetch, deletion, omission or silent acceptance of the absence was introduced.
+
+### Actual gates and service state
+
+| Gate | Resumed outcome |
+| --- | --- |
+|0 — source/deployment/evidence | PASS: exact main/tree, unchanged pre-H image/revision and native AAPL commitments rechecked |
+|A — bounded rights/per-file source classification | Completed under the explicit owner risk decision and inherited restrictions; no new provider guarantee |
+|B — execution readiness | BLOCKED by the precisely identified missing rejected ECB artifact; capacity/writer/pinentry clearance for interruption was not issued |
+|C — graceful quiescence/configuration/capture | NOT STARTED |
+|D — isolated restore/integrity/cleanup | NOT STARTED |
+
+API and Web remain running/healthy with their original start timestamps. ObservationRuntime and
+Alpaca transport remain true; EODHD/FRED/ResearchScheduler remain false. No setting, source data,
+service, permission, mapping or credential was changed. Existing scheduled authority was left
+untouched; no manual provider request, one-shot or cycle was triggered by this task.
+
+The final pure-reader recheck at `2026-10-11T03:21:49.3876465+00:00` confirms both receipts, complete instrument/mapping snapshots, full
+checksums, raw JSON commitments, lineage, watermark and historical projection identical to J.
+Schema remains1,90–97; no98. This is read-only live evidence verification, not successful capture
+or restore evidence. No API/Web interruption occurred. No GnuPG invocation/passphrase entry,
+archive, plaintext drill, cleanup or production restore occurred. The archive/drill checks remain
+**NOT EXECUTED**. There is nothing newly copied to retain or dispose of.
+
+### Verification and next exact action
+
+Read-only diagnostics ran in disposable exact-old-image containers with no network, credentials,
+Docker socket or application startup; source/root mounts read-only, dropped capabilities, UID1654,
+bounded CPU/memory/PIDs. An isolated local metadata helper compiled successfully. Two diagnostic
+attempts failed on the historical SQLite open (generic SQLite exception, then confirmed code14);
+the constrained historical immutable read succeeded. Failed attempts are not passing restore checks.
+
+Publication verification: `node scripts/verify-documentation.mjs` PASS (267 Markdown files,
+91 unique backlog IDs); `git diff --check` and `git diff --cached --check` PASS; exact three-document
+scope and private-path/secret-pattern checks PASS; staged
+`gitleaks git --pre-commit --staged --redact --no-banner` PASS, no leaks.
+No application, Finance, frontend or Sentinel suite was run: only sanitized documentation is changed,
+and a test suite cannot prove a production recovery artifact exists.
+
+Next: resolve the exact rejected ECB reference by locating/authenticating an already retained original,
+or obtain an explicit architect/owner disposition of this pre-existing absence as a known recovery
+baseline limitation. Do not claim the absent bytes were preserved/restored and do not refetch or alter
+canonical evidence. The bounded rights decision is settled and need not be requested again.
+After that disposition, continue the same Phase B with fresh execution-time checks and owner-only
+local GnuPG pinentry. No passphrase step is requested while this earlier gate remains blocked.
+Services must not be interrupted merely to prepare encryption. No H deployment/migration98,
+production restore, mapping adoption or provider reactivation follows from this publication.
+Finance remains **RESEARCH / 0 SEK / NONE**. STOP for independent architect review.

@@ -1,8 +1,8 @@
 # Project Report Catalog
 
 - `BB-132K Phase B, 2026-10-10–11` — [Protected recovery gate result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
-  REVIEW CHECKPOINT: Gate0 passed; Gate A blocked by exact private source-rights/lineage items.
-  API/Web unchanged; no archive, drill, interruption or production changes.
+  REVIEW CHECKPOINT: resumed bounded owner-risk decision recorded; retained-file rights classified.
+  Gate B blocked by an unlocated rejected ECB artifact; API/Web unchanged, no archive/drill/interruption.
 
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing

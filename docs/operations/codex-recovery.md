@@ -1,5 +1,26 @@
 # Codex interrupted-run recovery
 
+## BB-132K Phase B resumed completeness stop — 2026-10-11
+
+**REVIEW CHECKPOINT / PRE-INTERRUPTION STOP.** Same branch
+`review/finance-bb132k-protected-recovery-execution`, parent `1b3244e089e1463118169fe99e01a0d3ec508f91`.
+Baseline `618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+Publication subject: `review: reconcile BB-132K recovery lineage and record completeness stop`.
+[Canonical additive result](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#resumption-result--2026-10-11).
+Owner bounded GOOGLEFINANCE/Zenodo/legacy-copy risk acceptance recorded; no provider-rights guarantee.
+Private v3 per-file inventory associates all365 retained entries and preserves prior versions.
+Rights classification is complete under that decision. Gate B cannot clear source completeness:
+one rejected ECB raw artifact remains unlocated, with a different same-basename promoted artifact;
+no canonical revision references its hash, but no deletion disposition was verified.
+Native AAPL/schema97/watermark/projection evidence unchanged. API/Web still running; no config,
+service/source/permission changes, backup/drill/GnuPG/passphrase handling or cleanup occurred.
+Only report/catalog/recovery tracked changes; private diagnostic/metadata artifacts excluded,
+unrelated mockups/ADRs preserved. Documentation/diff/staged-secret checks only; no application tests.
+Next exact decision: authenticate the missing original or explicitly review its pre-existing absence
+as a recovery-baseline limitation; do not silently omit/reconstruct it or ask again for settled rights.
+Gate C/D not started. Owner-exclusive local pinentry remains a later prerequisite, not requested now.
+No H deployment/migration98/production restore/provider/mapping/science authority. RESEARCH / 0 SEK / NONE.
+
 ## BB-132K Phase B rights-gate stop — 2026-10-11
 
 **REVIEW CHECKPOINT / GATE A BLOCKED / NO INTERRUPTION.** Baseline
