@@ -1,5 +1,28 @@
 # Codex interrupted-run recovery
 
+## BB-132K verified crypto / execution gate — 2026-10-11
+
+**INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL EXECUTION PENDING.**
+Same branch `review/finance-bb132k-protected-recovery-execution`; parent
+`16b8555c6d212db0781fa2aad6a756bef4bcb912`. Accepted main/tree unchanged:
+`618f025a3cb72ee4513a9f14b713382e4a673a42` / `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+[Actual continuation and exact local command](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#verified-local-crypto-and-execution-coordination--2026-10-11).
+Owner-local known-text encryption/separate decryption proof is now verified; do not rerun the probe.
+Private rights inventory v4/ECB exception remain authoritative. Gate B DB/file/capacity/clock checks
+pass, but container host-handle scan had139 denied processes and cannot prove writer coverage.
+Ignored `owner-protected-copy.py` now coordinates owner-local sudo read-only host scan and GnuPG;
+no armed-state/host-proof record yet. Owner must start it privately, never expose any password.
+Read-only manifest and isolated SQLite/native helpers are prepared; only syntax/compilation checked.
+No capture/drill/source/config/service change, no archive. API/Web healthy, same pre-H images;
+current runtime/transport flags unchanged. Final writer/client/intake freeze, complete host handles,
+quiescence, disabled gates, manifest, capture/drill and safe old-image restart remain unexecuted.
+Do not create capture-go until owner coordinationVersion2, quiesced handle proof, clean shutdown and
+complete manifest pass. Never invoke migrating owners or reuse a partial archive blindly.
+Only report/catalog/recovery updated; ignored helpers/private metadata and unrelated work excluded.
+Publication resolves by `review: verify BB-132K local crypto proof and record execution gate`.
+No new authorization requested; resume existing Phase B. No H/migration98/provider/mapping/science/trading.
+
+
 ## BB-132K technical pinentry handoff — 2026-10-11
 
 **INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL TEST PENDING.** Same branch/main/tree;

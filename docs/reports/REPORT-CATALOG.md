@@ -2,8 +2,8 @@
 
 - `BB-132K Phase B, 2026-10-10–11` — [Protected recovery gate result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
   REVIEW CHECKPOINT: owner accepted the historical ECB absence, explicitly outside restore guarantee.
-  Owner terminal confirmed; local pinentry encryption/decryption proof prepared but not yet executed.
-  Gate B incomplete; API/Web unchanged, no archive/drill/interruption.
+  Owner-local encryption/separate decryption proof verified; actual capture runner/complete host-handle
+  proof pending. Gate B incomplete; API/Web unchanged, no archive/drill/interruption.
 
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing

@@ -1,12 +1,13 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
-## Current outcome — owner-accepted limitation; local interaction pending
+## Current outcome — local crypto proof verified; execution process pending
 
-**REVIEW CHECKPOINT / INCOMPLETE — OWNER-LOCAL GnuPG INTERACTION REQUIRED BEFORE INTERRUPTION.**
-The owner has accepted the rejected ECB raw-file absence as a pre-existing recovery limitation.
-Its reference/hash/status remain intact; its missing content is excluded from any restore guarantee.
-The [latest continuation](#owner-accepted-limitation-and-local-pinentry-gate) supersedes the previous
-completeness stop. No further rights/exception approval is requested. Backup/drill remain unexecuted.
+**REVIEW CHECKPOINT / INCOMPLETE — PRE-INTERRUPTION STOP.** Owner-local encryption and
+independent decryption now have verified success metadata. This resolves the earlier test gate.
+The [latest execution continuation](#verified-local-crypto-and-execution-coordination--2026-10-11)
+records the remaining owner-local execution/host-handle prerequisite. API/Web remain healthy and
+unchanged; no backup, drill or service interruption has occurred. No new rights or execution approval
+is requested. The accepted missing ECB content remains excluded from the restore guarantee.
 
 ## Prior review outcome — resumption 2026-10-11
 
@@ -464,3 +465,78 @@ This continuation's verification: isolated Gate B diagnostic compilation/read-on
 files/91 backlog IDs), whitespace/scope/sanitization PASS, staged Gitleaks PASS/no leaks. Only the
 same three documentation files are published; local helpers/private metadata stay excluded. No
 application test suite, GnuPG encryption/decryption or backup/restore integrity check was executed.
+
+## Verified local crypto and execution coordination — 2026-10-11
+
+Same accepted main/tree and same review branch, parent `16b8555c6d212db0781fa2aad6a756bef4bcb912`.
+The earlier instruction to run the known-text GnuPG probe is now fulfilled and must not be repeated.
+Private regular mode0600 `verified.json` records `2026-10-11T08:08:15.498211+00:00`:
+encryption exit0, separate decryption exit0, exact known-text comparison, interactive owner terminal,
+and no production data. The metadata was independently read; no passphrase, key material or owner
+terminal contents were inspected. This proves the local crypto test, not an encrypted Finance backup.
+
+### Actual Gate B continuation
+
+- Fresh isolated read-only Finance/lifecycle inspection: schema1,90–97;365 retained files,
+  14279435495bytes and exactly the previously inventoried file paths. All306 acquisitions are complete
+  (304success/2historical failures); no active research runs or finite session;44 scheduling opportunities
+  remain Skipped. Learning v1 is unchanged/Uninitialized. Lifecycle82sessions/318events; running-session
+  clean=0 remains expected, not a clean-shutdown claim. No owner constructor/migration/production write.
+- API and Web remain running/healthy with their prior image identities. API is still pre-H revision
+  `a2373f172600c7b45ce378c56aab1d7da2b9b242`, image
+  `sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a`.
+  No configuration or restart occurred. Observation Runtime/Alpaca remain true as previously deployed;
+  EODHD/FRED/Research Scheduler remain false. No cycle or manual acquisition was triggered.
+- NTP remains synchronized. Latest available destination space454721728512bytes exceeds the measured
+  scope requirement64313142965bytes (3x scope plus20GiB); final quiesced scope still requires validation.
+  Same-disk/ext4 limitations and owner-approved temporary-plaintext/retention boundaries are unchanged.
+- A scoped disposable host-process reader could see the API handles but was denied access to139 live
+  host processes. It therefore **did not prove complete writer coverage**. No broader container privilege,
+  AppArmor relaxation or production permission change was used. A fixed read-only host FD/maps check is
+  prepared for owner-local administrative execution instead; its result does not yet exist.
+
+### Existing execution, now technically coordinated
+
+Private mode0700 execution, metadata, GnuPG and empty drill directories were prepared. They contain
+only control/check metadata, not copied Finance material. Ignored local operator helpers implement
+this one bounded capture/drill: read-only host handles, separate quiescence and capture markers,
+streaming GNU tar to owner-local GnuPG AES256, independent decrypt-and-file-hash comparison, and isolated
+extraction without network, production mounts, credentials or application startup. Fixed source mounts
+are read-only. No archive is marked COMPLETE until subsequent isolated integrity/native verification
+passes. File-manifest and read-only SQLite/native diagnostic helpers are prepared, not executed against
+a backup. Syntax checks and diagnostic compilation succeeded; these are not restore acceptance tests.
+
+The actual owner-local runner must be started in the separate private terminal from the repository root:
+
+```bash
+python3 .env.bb132k-execution/owner-protected-copy.py
+```
+
+It first performs the scoped read-only host handle check through local sudo, then records a sanitized
+armed state and waits. Any sudo password and all later GnuPG passphrase prompts stay in that private
+terminal. Do not send terminal output or secrets to Codex. The runner itself does not stop/restart services
+or edit configuration. Keep clients, owner-drop producers and unrelated maintenance inactive during
+coordination. The operator may proceed only after the armed state/complete host proof is actually present,
+then executes the approved quiescence, disabled-gate configuration and manifest checks before releasing
+capture. A second host-handle proof must show no holders after shutdown and before capture.
+
+At this publication, the actual runner has **not registered an armed state or host-handle proof**;
+no capture marker, encrypted archive, plaintext drill or failure-from-capture record exists.
+Do not infer readiness from the successful earlier GnuPG probe or a chat confirmation. Gate B remains
+incomplete; Gates C/D are NOT EXECUTED. No interruption duration exists. No additional general owner
+approval is needed: the remaining dependency is actual owner-local participation and execution-time
+safety checks. The source/reference/hash/status of the accepted missing rejected ECB artifact is unchanged;
+its contents are neither captured nor guaranteed restorable.
+
+Publication subject: `review: verify BB-132K local crypto proof and record execution gate`.
+Only this existing report, catalog and recovery handoff are published. Private manifests, local helper
+code, host paths and raw evidence remain outside Git. No deployment/H/migration98, configuration edit,
+provider request, production restore, mapping change, Qwen/research/SHADOW/trading action occurred.
+Finance remains **RESEARCH / 0 SEK / NONE**. Resume this same execution when the owner-local process
+is armed; finish the already authorized capture/drill rather than start another planning checkpoint.
+
+Publication verification: `node scripts/verify-documentation.mjs` PASS (267 Markdown files/91 backlog
+IDs), `git diff --check` and staged whitespace PASS, exact three-document scope/manual sanitization
+PASS, `gitleaks git --pre-commit --staged --redact --no-banner` PASS/no leaks. Full application suites
+were not rerun: no production implementation changed, and they cannot establish owner participation.
+No unexecuted capture, independent archive decryption or restore integrity check is reported as PASS.
