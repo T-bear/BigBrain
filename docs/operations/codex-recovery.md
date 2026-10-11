@@ -1,5 +1,21 @@
 # Codex interrupted-run recovery
 
+## BB-132K technical pinentry handoff — 2026-10-11
+
+**INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL TEST PENDING.** Same branch/main/tree;
+parent `9a08dd81663a26eb76b66c5e02423dde3bff3702`. The owner confirmed a private terminal;
+technical proof is still absent. [Exact local command and current Gate B findings](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#technical-pinentry-verification-prepared--owner-ready-continuation).
+Ignored operator check `.env.bb132k-execution/owner-gnupg-check.sh` is prepared and syntax-checked.
+It uses only known test text and owner-local GnuPG pinentry, with no production data or secret capture.
+Next: owner runs that command locally; verify private success metadata before any service stop.
+Existing private inventory v4 remains authoritative; accepted ECB exception unchanged. Read-only
+Gate B diagnostic confirms scope/readability, no active research or unfinished recorded acquisition,
+schema97, unchanged lifecycle counts, adequate capacity and synchronized NTP. Final writer/client/
+intake freeze and all capture/drill checks remain pending. No API/Web/config/source changes occurred.
+Publication resolves by `review: prepare BB-132K owner-local pinentry verification`.
+Only report/catalog/recovery are staged; ignored local checks and unrelated work stay outside Git.
+No further rights/exception approval needed. No H/migration98/provider/mapping/science/trading authority.
+
 ## BB-132K owner-local encryption handoff — 2026-10-11
 
 **INTERRUPTED — SAFE TO RESUME / REVIEW CHECKPOINT / OWNER INTERACTION PENDING.**

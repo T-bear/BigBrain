@@ -415,3 +415,52 @@ Publication checks: documentation verifier PASS (267 Markdown files, 91 backlog 
 `git diff --check` / staged whitespace PASS, exact three-document scope PASS, staged Gitleaks PASS
 (no leaks), manual private-path/credential sanitization PASS. Application suites cannot validate
 owner-local passphrase availability and were not rerun. No unexecuted backup/drill check is called PASS.
+
+## Technical pinentry verification prepared — owner-ready continuation
+
+The owner has now confirmed a private terminal is ready. That confirmation settles availability
+but does not replace a successful local pinentry test. Same accepted main/tree and review branch;
+parent `9a08dd81663a26eb76b66c5e02423dde3bff3702`. No new planning sprint or rights decision.
+
+A local ignored operator check is prepared at `.env.bb132k-execution/owner-gnupg-check.sh`
+(SHA256 `02df1a04230d9336ad889974a6e76cf529c3b73694c4bb2046c2a274868ed7b6`).
+The owner runs it in the separate private terminal from the repository root:
+
+```bash
+bash .env.bb132k-execution/owner-gnupg-check.sh
+```
+
+It requires interactive stdin/stdout/stderr, uses a fresh private mode0700 GnuPG home and curses
+pinentry, disables external/symmetric caching, encrypts only a known non-sensitive test string,
+stops that private GnuPG agent, then independently decrypts and compares the string. The passphrase
+is entered solely through owner-local pinentry, never a shell variable, argument, pipe from Codex
+or agent terminal. It writes only sanitized success metadata after both operations pass. The
+prepared script was syntax-checked; **it has not yet been run by the owner**, and no success file
+exists. No source data or production service is involved in this test. Do not repeat it blindly if
+an incomplete private test directory exists; inspect the non-secret failure state first.
+
+Remaining read-only Gate B work completed: Finance/lifecycle access succeeds; all365 files are
+readable and exactly match the previously inventoried paths, total14279435495bytes. Research runs
+are empty,44 scheduling opportunities are Skipped,306 recorded acquisitions are completed
+(304success/2historical failure), no finite session exists, and learning v1 remains Uninitialized.
+Schema remains1,90–97. Lifecycle has82sessions/318events; current-session clean=0 is expected while
+API is running and is not a successful-shutdown claim. NTP synchronized. Available space454723080192
+bytes exceeds64313142965bytes required at this scope. No configured user crontab or named
+Finance/BigBrain system timer was found; that limited inventory is not an all-writers-stopped claim.
+Failed bigbrain.service has Restart=no and was left untouched. Both API/Web images, health and
+start identities remain unchanged; restart counts are zero.
+
+Gate B remains incomplete only as a pre-interruption clearance, not a failed backup: owner-local
+crypto proof and final coordinated client/intake freeze are still required, then quiesced handle/
+source checks. API/Web have not been stopped, configuration is unchanged, and no capture/drill,
+provider request, migration98 or production write occurred. The accepted missing ECB content is
+still explicitly excluded from the recovery guarantee. Owner has been given the exact local test
+command; no new execution approval is requested. Continue on this same branch after technical proof,
+not merely another chat assertion. Publication subject:
+`review: prepare BB-132K owner-local pinentry verification`.
+
+This continuation's verification: isolated Gate B diagnostic compilation/read-only execution PASS;
+`bash -n` operator-check syntax PASS (not execution); documentation verifier PASS (267 Markdown
+files/91 backlog IDs), whitespace/scope/sanitization PASS, staged Gitleaks PASS/no leaks. Only the
+same three documentation files are published; local helpers/private metadata stay excluded. No
+application test suite, GnuPG encryption/decryption or backup/restore integrity check was executed.
