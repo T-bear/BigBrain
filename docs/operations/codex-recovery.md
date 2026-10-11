@@ -1,5 +1,32 @@
 # Codex interrupted-run recovery
 
+## BB-132K capture verified / drill failed — 2026-10-11
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / REVIEW CHECKPOINT / API AND WEB STOPPED.**
+Same branch `review/finance-bb132k-protected-recovery-execution`; previous review
+`6f4a94d4e9819438ca2099e60b41cb0740839f65`. Main/tree remain
+`618f025a3cb72ee4513a9f14b713382e4a673a42` / `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+[Canonical actual Gate B–D outcome, commitments and containment](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#current-outcome--encrypted-capture-verified-isolated-restore-failed--2026-10-11).
+Owner-approved protocol3 execution reached capture:361 quiesced source files plus8 private metadata
+files; encrypted14,287,207,399bytes; independent decryption369/369 file hashes PASS. Ciphertext
+SHA256 `0f063a2fcfd3ce6c4b1c43b3fbf8f04a30506eefb6ec63d7db5cc1ad16696a3c`;
+post-failure hash matches, mode0400, protected private inventory retained. No COMPLETE marker.
+Isolated extraction failed: local Docker tar command lacks interactive stdin forwarding. No fix/retry.
+Drill empty; cleanup complete; coordinator and disposable diagnostics absent. Full isolated SQLite/
+foreign-key/native restore verification NOT EXECUTED. Optional post-failure native recheck timed out;
+pre-capture/quiesced checks and captured hashes remain evidence, not a claim of restored DB integrity.
+API/Web stopped gracefully13:31UTC and still stopped19:06UTC on original pre-H images, no restart.
+Ignored mode0600 configuration now has five Finance gates false and MaintenancePaused true;
+unrelated settings preserved. Stopped containers retain old frozen environment. No production data
+rewrite, migration98, deployment, provider/model/science/trading action. Finance RESEARCH /0SEK/NONE.
+Missing rejected ECB raw content remains accepted exception, outside restore guarantee.
+Next: architect review of minimal local transport fix plus harmless Docker fixture and resumption
+of isolated drill against retained ciphertext; no new capture/consumed-marker reuse/production restore.
+Safe original-image restart remains gated on successful verification. Current failure requires STOP.
+Private retention maximum review date2026-11-10T13:36:45.157317Z, earlier provider/acceptance triggers;
+separate disposal approval, no auto deletion. Only report/catalog/recovery published; unrelated files
+preserved. Publication subject: `review: record BB-132K verified capture and isolated restore failure`.
+
 ## BB-132K focused helper safety review — 2026-10-11
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / REVIEW CHECKPOINT / NO PRODUCTION EXECUTION.**

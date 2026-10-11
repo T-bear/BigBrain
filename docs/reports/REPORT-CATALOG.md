@@ -1,9 +1,10 @@
 # Project Report Catalog
 
 - `BB-132K Phase B, 2026-10-10–11` — [Protected recovery gate result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
-  REVIEW CHECKPOINT: owner accepted the historical ECB absence, explicitly outside restore guarantee.
-  Focused local helper safety review: mount separation, interruption/cleanup and run-bound markers;
-  27 harmless tests PASS. Production execution held for review; API/Web unchanged, no archive/drill.
+  REVIEW CHECKPOINT: encrypted capture and independent369-file verification passed; isolated
+  extraction failed (Docker stdin forwarding missing). API/Web stopped; no completed restore claim.
+  Ciphertext retained, empty drill, cleanup verified; next is bounded correction/drill review.
+  Owner-accepted missing rejected ECB content remains outside restore guarantee.
 
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing

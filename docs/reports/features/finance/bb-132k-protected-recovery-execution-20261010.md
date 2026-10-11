@@ -1,13 +1,139 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
-## Current outcome — focused helper safety review completed; production execution held
+## Current outcome — encrypted capture verified; isolated restore failed — 2026-10-11
 
-**REVIEW CHECKPOINT / LOCAL SAFETY CORRECTIONS VERIFIED / BACKUP AND DRILL NOT EXECUTED.**
-The [focused four-point safety review](#focused-pre-execution-helper-safety-review--2026-10-11)
-corrects local operator helpers and records harmless regression evidence. It supersedes the previous
-instruction to start the prepared helper immediately. STOP for independent review before any production
-execution. API/Web remain healthy/unchanged; the accepted missing ECB content remains outside the
-restore guarantee. No new Finance implementation, architecture or execution scope is introduced.
+**REVIEW CHECKPOINT / CAPTURE VERIFIED / RESTORE DRILL FAILED / API AND WEB STOPPED.**
+Definition of Done is not met. The owner accepted the focused safety review and started the
+updated private execution process. Gates B–C were performed under coordinationVersion3;
+Gate D stopped on a concrete extraction failure. No repair, retry or production restart followed.
+This section supersedes earlier current-state instructions; subsequent sections preserve history.
+
+Publication subject: `review: record BB-132K verified capture and isolated restore failure`.
+Previous checkpoint: `6f4a94d4e9819438ca2099e60b41cb0740839f65`.
+Accepted main/tree remain `618f025a3cb72ee4513a9f14b713382e4a673a42` /
+`72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`. Exact review SHA/tree are Git metadata of this publication.
+Only this report, report catalog and recovery handoff are published; private inventories/helpers,
+archive, credentials and unrelated local work remain outside Git.
+
+### Actual gates and interruption
+
+| Gate | Execution evidence / result |
+| --- | --- |
+| 0 / A | Exact Git/deployed identities and prior rights inventory v4 revalidated. Bounded owner risk decisions and missing rejected ECB exception preserved; no blanket provider-rights guarantee |
+| B | PASS: current owner process/private controlling terminal, protocol3 run/control/helper bindings, complete privileged host-handle scan, storage/permissions, clock, schema97 and native evidence checks |
+| C | PASS: graceful API/Web-only stop, clean lifecycle shutdown, zero remaining source holders, disabled external gates, complete source manifest, encrypted streaming capture and independent decryption/file checks |
+| D | FAILED during isolated extraction. No files extracted; full restored SQLite/native checks NOT EXECUTED. Owned subprocess/container cleanup verified; no restart |
+
+Pre-stop source contained365 files /14,279,435,495 bytes. Free space was456,112,529,408 bytes,
+above3x scope plus20GiB reserve. Source roots for Finance, lifecycle and owner-drop were physically
+separate and mounted flat for capture; the nested production owner-drop mount was not double-counted.
+The complete pre-stop host scan found only API source handles. After stop:311 processes inspected,
+zero denied, zero source holders. No active research or unfinished recorded acquisition was found.
+
+Web stopped at `2026-10-11T13:31:13.753222598Z`; API at `2026-10-11T13:31:26.200575378Z`.
+Both exited0 without OOM. Lifecycle clean shutdown is recorded at `2026-10-11T13:31:22.9576937Z`.
+Normal SQLite shutdown removed four WAL/SHM companions; quiesced scope is361 files /
+14,279,312,167 bytes. No retained external evidence disappeared. No manual production data write,
+checkpoint, repair or migration was performed.
+
+The existing ignored mode0600 external configuration was atomically updated: EODHD, FRED,
+ResearchScheduler, ObservationRuntime and AlpacaDailyObservation all false; ResearchOperations
+MaintenancePaused true. Unrelated entries were preserved exactly. Effective Compose configuration
+was checked privately. These are prepared startup settings; stopped containers retain their former
+frozen environment. No credentials were changed or disclosed.
+
+### Captured evidence and protection
+
+The deployed pre-H revision remains `a2373f172600c7b45ce378c56aab1d7da2b9b242`.
+API image: `sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a`.
+Web image: `sha256:1c10a3caf19eddaa8849eec6f5eee527073fc8a2c9ec66ba9054ff74dfa2ddcd`.
+No image was built or replaced. The reviewed local owner helper was unchanged:
+`031f388610c5df7eb5b7907b7b2e04f414f1685ac675d0d0c55436addc3ae30e` (SHA256).
+
+The private manifest commits all361 quiesced source files and metadata.304 legacy EODHD payload
+commitments,45 retained macro/intake/owner-drop associations and three nested database commitments
+were checked against existing lineage. Eight private metadata files accompany the source capture.
+The missing rejected `ecb-candidate-cec0507f8bd6b80e` raw content remains excluded from any restore
+guarantee; its original reference, hash and REJECTED/FAIL history are preserved, not reconstructed.
+
+Encrypted capture completed `2026-10-11T13:45:04.777089Z`, tar exit0 / GnuPG exit0.
+Ciphertext size: **14,287,207,399 bytes**.
+Ciphertext SHA256: `0f063a2fcfd3ce6c4b1c43b3fbf8f04a30506eefb6ec63d7db5cc1ad16696a3c`.
+Independent owner-local decryption completed `2026-10-11T13:48:17.433327Z`:
+**369/369 file members matched** expected names, sizes and SHA256; recorded source UID/GID/mode
+matched. Tar path/type/duplicate-member checks passed. Passphrases were handled exclusively by
+owner-local GnuPG pinentry, never agent terminal, arguments, environment, logs or Git.
+
+A fresh post-failure ciphertext hash matched. The private encrypted artifact is retained read-only
+(mode0400), still explicitly incomplete for end-to-end recovery: no COMPLETE marker and no claim
+of a successful restore. Same-disk protection does not provide disk-failure disaster recovery.
+Private retention inventory conservatively starts at capture authorization and sets maximum disposal
+review deadline `2026-11-10T13:36:45.157317Z`, earlier if deployment acceptance+7days or provider
+obligations apply. No deployment acceptance date exists. Disposal requires a separate owner decision;
+no automatic archive/source deletion. Private inventory/manifests remain access-restricted.
+
+### Concrete Gate D failure and containment
+
+At `2026-10-11T13:49:39.937588Z`, the helper recorded phase `isolated-extraction`, RuntimeError,
+cleanup complete, production restart not authorized. Container tar reported:
+`This does not look like a tar archive` and exited unsuccessfully.
+
+Static inspection identifies a concrete transport omission: `Children.docker()` constructs
+`docker run` without `--interactive` / `-i`, while extraction pipes decrypted bytes to Docker CLI
+stdin. Docker requires that option to keep container stdin open. This explains the discrepancy
+between independently verified archive bytes and failed container tar input; a corrected runtime
+has NOT been executed, so successful extraction is not yet demonstrated. The prior27 harmless
+mocked regression tests did not exercise actual Docker stdin forwarding. No helper correction was
+made after this failure and no new capture/decryption/extraction was attempted.
+
+Owned process groups, disposable containers and private GnuPG agent cleanup completed with no
+reported error. Independent Docker inventory found no surviving run-owned or read-only diagnostic
+container. Owner coordinator exited. The isolated drill directory contains **zero entries**:
+no restored source plaintext remains and no plaintext cleanup/secure-erasure claim is needed.
+
+A final optional read-only native recheck timed out after90seconds without a result. Its disposable
+diagnostic was subsequently confirmed absent. This is **unverified**, not another successful native
+check or proof of corruption. The successful pre-capture/quiesced native checks and independently
+verified captured file hashes are the retained evidence. No further diagnostic retry was made.
+
+At `2026-10-11T19:06:28Z`, API and Web were still stopped, exit0, on their exact original images;
+interruption remains ongoing, so no completed downtime duration is claimed. External disabled
+settings and mode0600 were rechecked. No unrelated service was stopped/restarted or systemd repaired.
+
+### Scientific commitments and verification limits
+
+Before capture, pure read-only native verification confirmed both complete receipts, JSON checksums,
+lineage and historical projection unchanged:
+
+| Source date | Receipt ID | Full receipt checksum | Raw stored JSON SHA256 |
+| --- | --- | --- | --- |
+|2026-10-02|`sha256:caa655557878353e9d700ec84c0c696777fcbf52ee08a63b07f72a99e3a5d11c`|`sha256:13d6426177e0553e1c6ca86c856d0d814695da5030bc56d9c4dea404d8e9637d`|`sha256:762922a19de0a65dfc311c37a7903ac0bd5885bcd2697a6ec0e179798e5c1b10`|
+|2026-10-01|`sha256:dfc00b55e068d54947f84c0a15ccb5c4bc9a4bdb3a8fd6aaef86580413ec5677`|`sha256:e0d4e47397eb93c8f2b1091ff69d05656f237197d7622f1554230952c30f9260`|`sha256:9c25dac8187bc80b58350fc61f6627f518894ebbc74d83945fb624698eef793b`|
+
+Watermark remains `639267556488789067`; historical projection remains
+`sha256:5d150d96d66c3c6442868d7b251a3c0b027e43e70a7a4ca9e4ec0198d6f62db6`.
+Schema97 remains; no migration98/mapping tables/adoption, no grant renewal or new scientific result.
+Original acquisition/knowledge times and complete AAPL mapping snapshots remain unchanged as recorded
+in J/K. Full isolated `integrity_check`, `foreign_key_check`, lifecycle/science/grant comparison and
+restored native receipt/projection checks are **NOT RUN** because extraction failed. Archive file-hash
+verification is not a substitute for those checks. No restore to production occurred.
+
+Publication verification: `node scripts/verify-documentation.mjs` PASS (267 Markdown files,
+91 unique backlog IDs); `git diff --check` and `git diff --cached --check` PASS; exact three-document
+scope/private-path review PASS; staged `gitleaks git --pre-commit --staged --redact --no-banner`
+PASS, no leaks. No new application build/full test suite: this publication changes only documentation
+and does not establish product implementation correctness anew.
+
+### Next bounded decision
+
+STOP for independent architect review of this failure. Proposed next action is only a minimal local
+stdin-forwarding correction with a harmless real Docker transport regression, then resume isolated
+owner-local decryption/drill from the existing verified ciphertext. Preserve all current run/cleanup
+records; never reuse consumed markers or recapture/reset source evidence to hide this failed attempt.
+Full isolated integrity/native checks must pass before the already authorized safe old-image restart
+can be considered. No production restore, H deployment/migration98, mapping extension, provider call,
+Qwen/research/SHADOW/PAPER/LIVE/trading is authorized by this report. Finance remains
+**RESEARCH / 0 SEK / NONE**.
 
 ## Prior review outcome — resumption 2026-10-11
 
@@ -21,7 +147,7 @@ records the new owner decision and the exact remaining blocker. No backup or res
 
 Detta är en sanerad GitHub-version. Owner authorization/attestation dated2026-10-10;
 remaining rights inspection and final source check performed2026-10-11 UTC. The filename retains
-the authorized checkpoint date. This report records an execution precondition failure, not a backup.
+the authorized checkpoint date. The original gate attempts below are historical; the current outcome above records the actual capture and failed drill.
 
 - Accepted main: `618f025a3cb72ee4513a9f14b713382e4a673a42`.
 - Tree: `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`; fetched and verified unchanged.
