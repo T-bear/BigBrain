@@ -1,13 +1,13 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
-## Current outcome — local crypto proof verified; execution process pending
+## Current outcome — focused helper safety review completed; production execution held
 
-**REVIEW CHECKPOINT / INCOMPLETE — PRE-INTERRUPTION STOP.** Owner-local encryption and
-independent decryption now have verified success metadata. This resolves the earlier test gate.
-The [latest execution continuation](#verified-local-crypto-and-execution-coordination--2026-10-11)
-records the remaining owner-local execution/host-handle prerequisite. API/Web remain healthy and
-unchanged; no backup, drill or service interruption has occurred. No new rights or execution approval
-is requested. The accepted missing ECB content remains excluded from the restore guarantee.
+**REVIEW CHECKPOINT / LOCAL SAFETY CORRECTIONS VERIFIED / BACKUP AND DRILL NOT EXECUTED.**
+The [focused four-point safety review](#focused-pre-execution-helper-safety-review--2026-10-11)
+corrects local operator helpers and records harmless regression evidence. It supersedes the previous
+instruction to start the prepared helper immediately. STOP for independent review before any production
+execution. API/Web remain healthy/unchanged; the accepted missing ECB content remains outside the
+restore guarantee. No new Finance implementation, architecture or execution scope is introduced.
 
 ## Prior review outcome — resumption 2026-10-11
 
@@ -540,3 +540,142 @@ IDs), `git diff --check` and staged whitespace PASS, exact three-document scope/
 PASS, `gitleaks git --pre-commit --staged --redact --no-banner` PASS/no leaks. Full application suites
 were not rerun: no production implementation changed, and they cannot establish owner participation.
 No unexecuted capture, independent archive decryption or restore integrity check is reported as PASS.
+
+## Focused pre-execution helper safety review — 2026-10-11
+
+Owner requested only the four local helper checks, corrections and harmless verification; no service
+interruption/capture during this review. Same branch, parent `0b19645cc3bc1874fbfb2607c0286f8e5d5f9db9`;
+accepted main `618f025a3cb72ee4513a9f14b713382e4a673a42` and tree
+`72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547` verified unchanged after fetch.
+
+### 1. Finance / owner-drop scope: verified separation, enforced rejection of overlap
+
+Read-only Docker metadata confirms that the three selected mount sources match the private recorded
+control exactly when compared by destination, independent of Docker's array order. Finance and lifecycle
+are separate named volumes; owner-drop is a separate host bind. Their recorded host source roots are
+not equal or nested. The disposable capture/manifest helper mounts them flat as `finance`, `lifecycle`
+and `owner-drop`, all read-only. It does **not** reproduce the API's nested owner-drop mount underneath
+Finance. Therefore the full Finance volume underlay is preserved separately from the bound owner-drop
+content, and the bind is traversed once. The existing read-only inventory has four owner-drop files and
+zero files in the hidden Finance drop underlay; this is reused inventory, not a new production scan.
+
+Added rejection of missing/duplicate scopes, wrong mount types, equal/nested sources and current-vs-recorded
+mount drift. The owner-local host checker also resolves actual paths and device/inode identities and rejects
+symlink aliases/physical root overlap before execution. That privileged host check was **not run** in this
+review. Synthetic-directory tests verify alias/overlap rejection; an actual GNU tar fixture preserves both
+synthetic hidden-underlay and separately bound input exactly once, with no repeated member paths.
+
+### 2. Interruption and safe API/Web restart: explicit, observable, never automatic
+
+The old failure handler recorded only a generic exception and could leave work active. The helper now
+records run identity, last phase, failure category, subprocess cleanup outcome and a sanitized read-only
+observation of API/Web state (or UNKNOWN if unavailable). It does not invoke Compose/start/restart, edit
+configuration, restore production or mark an archive COMPLETE. Partial ciphertext/drill contents and
+failure evidence are preserved; an interrupted run is not silently reused. Existing exclusive run state
+and a held file lock prevent concurrent/blind repeat execution.
+
+The bounded recovery procedure after an interruption is:
+
+1. Keep clients/intake/maintenance frozen. Read this run's armed, failure and cleanup records. Distinguish
+   a failure before quiescence (leave running services untouched) from one after quiescence (leave services
+   stopped). If the process was killed before a record could be written, classify state UNKNOWN.
+2. Verify owned process groups and disposable containers have exited. Inspect only container names bound
+   to the recorded run, checking exact image and run label before any scoped removal. Docker-unavailable,
+   ownership mismatch or incomplete cleanup means STOP; never use broad container/prune/kill operations.
+   Do not delete partial evidence or reset markers to make a retry pass.
+3. Before considering restart, independently verify no source write/restore occurred, clean lifecycle
+   shutdown, preserved schema97/receipt bytes/checksums/watermark/history and source-volume identity.
+   Required full backup/drill validation remains the existing Gate D work, not these synthetic tests.
+   On failed integrity, unclear state or incomplete verification, keep services stopped for containment
+   review. Latest owner authorization permits restart only when verification makes it safe.
+4. Use the original pre-H image IDs recorded in private control, not a mutable tag or a new main build.
+   Confirm effective external configuration keeps all five Finance gates false and MaintenancePaused=true;
+   preserve mappings, secrets, mounts and unrelated settings. Owner-drop has no enable gate: reconcile
+   existing ready/intake state and keep producers paused; unknown pending startup work means STOP.
+5. Only after those conditions and the applicable reviewed execution clearance, use the existing scoped
+   Compose path with pinned old images, `--no-deps --no-build --pull never`, API first and Web after API
+   readiness. Verify image/OCI/compiled pre-H revision, effective disabled gates, clock/recovery/storage,
+   native evidence and absence of unintended startup work. Record actual downtime and post-start state.
+   Do not deploy H/migration98, restore production or restart unrelated services/systemd.
+
+These are verifiable future gates, **not a claim that restart or restore has been tested in production**.
+SIGKILL, host power loss and unavailable Docker cannot be cleaned up reliably by Python `finally`; they
+require the explicit UNKNOWN/manual-containment path. No automatic restart is attempted on any exception.
+
+### 3. GnuPG/tar/Docker lifecycle: corrected and fault-tested
+
+Every capture/decryption/extraction child is registered immediately in its own process group. A `finally`
+cleanup runs for normal completion, exceptions and handled SIGINT/SIGTERM/SIGHUP: close pipes, bounded
+TERM/wait followed by KILL/wait for survivors. Each disposable Docker container has a unique run/phase
+name and run label; cleanup queries the daemon and validates name/image/label before removing only that
+owned container, then checks absence. Killing the Docker CLI alone is no longer treated as completion.
+Only the run-specific private GnuPG agent is stopped. Cleanup failures prevent a successful finished
+record; arbitrary provider/process exception text and credentials are never copied into status.
+
+The manifest helper now uses the same child/container cleanup with no GnuPG-agent operation. It publishes
+its manifest atomically only after its readers have exited and cleanup succeeds. Signals and cleanup
+failure tests prove it cannot publish a supposedly successful manifest after failed cleanup.
+
+All GnuPG/Docker behavior in regression tests used doubles. Harmless real child-process tests cover a
+live producer when the fake encryptor fails, producer exit failure, failure to spawn the second process,
+and a TERM-resistant child requiring KILL. Main-path fault injection covers SIGTERM, capture failure,
+bad decrypted archive and extraction failure. No real GnuPG passphrase or Docker workload was used in
+these tests. The prior owner-local crypto proof remains separate evidence; this review does not claim a
+real encrypted archive was made by the corrected helper.
+
+### 4. Coordination markers: corrected run/state binding
+
+Protocol3 creates a fresh random run ID and binds private mode0600 marker files to it, the frozen
+control-file SHA256, helper-file SHA256 and exact cleanly stopped API/Web state commitment (IDs, images,
+start/finish epochs). Each phase has a distinct marker, UTC issue time within the current run and at most
+five minutes old at consumption. Wrong run/control/helper/version/phase/state, future/stale timestamps,
+changed image/mounts, restart, nonzero exit or OOM all fail closed. Existing old markers refuse startup.
+Files are fully written/fsynced then exclusively published; a consumed phase has an exclusive retained
+consumption record and cannot be replayed. No marker grants new production authority.
+
+The quiesced host proof and source manifest carry the same run/control/state identities. Capture checks
+the manifest commitment, repeats the host-handle check and rechecks stopped service identity immediately
+before capture. Operator coordination must use the new schema; older coordinationVersion2 instructions
+must not be reused. Marker fields are `runId`, `controlSha256`, `helperSha256`, `coordinationVersion:3`,
+`atUtc`, `phase` and `stateSha256`; quiescence additionally requires `servicesStopped:true`, capture the
+actual `manifestSha256`. No old marker or manually guessed hash should be repurposed.
+
+### Exact local delta and verification
+
+Only existing ignored local operational helpers were corrected; one ignored local harmless regression
+script was added. No application source/tests, production configuration, database or permissions changed.
+These host-specific helpers remain local, as requested. Exact SHA256 for review/revalidation:
+
+|Local helper basename|SHA256|
+|---|---|
+|owner-protected-copy.py|031f388610c5df7eb5b7907b7b2e04f414f1685ac675d0d0c55436addc3ae30e|
+|host-scope-handles.py|566071be4257fe4476037e01f2cf6b8ed990e9556e76260b7076e85aee3fee18|
+|manifest-readonly.py|88d1de2aa5336956fcc54e97b411f8f5b4fd589e1cdcdd0d0ab293e5c4465166|
+|test-owner-protected-copy.py|566f203c7694777b58ad03c35433e11422c7bf53e75fb5bff949dd121018ae23|
+
+Commands actually executed:
+
+```text
+python3 -W error::ResourceWarning .env.bb132k-execution/test-owner-protected-copy.py
+python3 -m py_compile .env.bb132k-execution/owner-protected-copy.py .env.bb132k-execution/manifest-readonly.py .env.bb132k-execution/host-scope-handles.py .env.bb132k-execution/test-owner-protected-copy.py
+```
+
+**27 tests PASS,0failed,0skipped; syntax compilation PASS.** An initial harmless test exposed an unclosed
+lock on preflight refusal; corrected with a context-managed lock before the final green run. No unchanged
+application build/backend/frontend suite was repeated: those do not exercise these local Python helpers.
+
+Final read-only service inspection: API/Web running and healthy, exact original image and start identities
+unchanged. No owner armed marker, capture marker or encrypted archive exists. No service stop/restart,
+backup, drill, real provider request, migration, configuration edit, mapping change, model/research/SHADOW
+or trading action occurred. Finance **RESEARCH / 0 SEK / NONE**. The accepted ECB absence remains excluded.
+
+Publication: same report/catalog/recovery only, subject
+`review: harden BB-132K local capture coordination and cleanup`.
+STOP for architect review. The four-point code/fixture review is complete; actual Gate B/C/D execution,
+full privileged handle proof and real protected backup/restore verification are still outstanding.
+
+Publication checks: documentation verifier PASS (267 Markdown files/91 unique backlog IDs);
+working/staged `git diff --check` PASS; exact report/catalog/recovery scope PASS. Gitleaks directory
+scan of the local helper area and staged redacted scan both PASS/no leaks. All four documented
+helper hashes match the local files. No private source paths, raw evidence, credentials or passphrases
+are included in the published delta. Local helper changes themselves remain excluded from Git.

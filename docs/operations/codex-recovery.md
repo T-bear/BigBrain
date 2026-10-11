@@ -1,5 +1,25 @@
 # Codex interrupted-run recovery
 
+## BB-132K focused helper safety review — 2026-10-11
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / REVIEW CHECKPOINT / NO PRODUCTION EXECUTION.**
+Same branch/main/tree; parent `0b19645cc3bc1874fbfb2607c0286f8e5d5f9db9`.
+[Four-point correction, exact local hashes/tests and interruption/restart gates](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#focused-pre-execution-helper-safety-review--2026-10-11).
+Corrected ignored owner-protected-copy.py, manifest-readonly.py and host-scope-handles.py; added local
+harmless regression test.27tests PASS plus syntax compilation. No real GnuPG/Docker capture/drill test.
+Actual mount metadata matches recorded sources; flat mounts preserve hidden underlay and separate bind.
+Coordinator now requires protocol3/run ID/control+helper+stopped-state commitments/fresh phase markers;
+do not reuse protocol2 or old markers. Manifest publication requires successful reader/container cleanup.
+Handled signals/errors record phase and cleanup state. No automatic production restart; UNKNOWN/failed
+cleanup or evidence checks require containment review. SIGKILL/power-loss recovery is explicitly manual.
+API/Web remain healthy on unchanged pre-H images/start epochs, no owner armed/capture/archive state.
+Do NOT follow older immediate-start instructions until this safety review is assessed. No new general
+scope requested; next is architect review, then existing execution gates if cleared. Private rights v4,
+owner-local crypto proof and accepted missing-ECB exception remain valid. No service/config/data changes.
+Only report/catalog/recovery published; local helpers/tests stay ignored; unrelated work preserved.
+Publication resolves by `review: harden BB-132K local capture coordination and cleanup`.
+
+
 ## BB-132K verified crypto / execution gate — 2026-10-11
 
 **INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL EXECUTION PENDING.**
