@@ -1,5 +1,24 @@
 # Codex interrupted-run recovery
 
+## BB-132K authorized stdin correction / private resume pending — 2026-10-11
+
+**INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL DECRYPTION PENDING.** Same execution branch,
+main `618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`;
+previous review `7c49973b035b1a688178e3f512363e48be0a6715` explicitly cleared for correction/resumption.
+[Current correction, local hashes, exact owner command and remaining gates](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#current-continuation--docker-stdin-fixed-owner-local-decryption-pending--2026-10-11).
+Local ignored helper adds extraction `-i` and exclusive `--resume-drill` continuation from retained
+ciphertext only; original failure/run markers preserved. Existing manifest reader binds successful
+resumption. Real Docker stdin/tmpfs tar+hash test PASS;27 harmless tests PASS, cleanup/syntax PASS.
+No new archive/decryption/drill/restart. Owner must start the documented command in private terminal;
+no process/armed/result record at19:23UTC. Never use agent terminal/passphrase transport or invoke
+original capture again. Existing scope approval suffices; continue Gate D after technical owner-local
+process verification, then conditional safe original-image restart. API/Web remain stopped; five
+external Finance gates false/MaintenancePaused true, configuration unchanged this continuation.
+Do not claim completed restore or integrity checks. Missing rejected ECB exception and existing
+protected archive/retention stay unchanged. No H/migration98/provider/model/science/trading.
+Only three docs published; unrelated files preserved. Publication subject:
+`review: verify BB-132K Docker stdin correction and resume gate`.
+
 ## BB-132K capture verified / drill failed — 2026-10-11
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / REVIEW CHECKPOINT / API AND WEB STOPPED.**

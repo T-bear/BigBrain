@@ -1,5 +1,57 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
+## Current continuation — Docker stdin fixed; owner-local decryption pending — 2026-10-11
+
+**REVIEW CHECKPOINT / TRANSPORT FIX VERIFIED / RESTORE AND RESTART STILL PENDING.**
+Owner reviewed `7c49973b035b1a688178e3f512363e48be0a6715` and explicitly authorized the minimal
+Docker stdin correction, harmless real transport test, resumed isolated drill from the retained
+ciphertext and conditional original-image restart. No new backup is authorized or required.
+This section supersedes the previous instruction to seek approval for that correction.
+
+Exact main/tree and same execution branch verified unchanged. The local extraction command now
+includes `-i`. A real disposable Docker test passed tar bytes through stdin, extracted known harmless
+text into tmpfs and verified its SHA256; no production mounts, credentials or network were present.
+Owned disposable container cleanup passed. `python3 .env.bb132k-execution/test-owner-protected-copy.py`
+passed all27 existing tests; Python syntax checks passed. No application build or broad product tests.
+
+The existing ignored owner helper now accepts `--resume-drill`: it requires an owner-controlled
+private terminal and exclusive lock, validates original run/control/ciphertext/stopped-image bindings,
+requires an empty isolated drill tree, hashes the existing archive before and after extraction, uses
+fresh resumption records and preserves all original failure/capture markers. It contains no capture,
+symmetric-encryption, production mount, source rewrite or service-restart path. The existing manifest
+reader recognizes only a matching successful extraction/cleanup continuation when verifying the drill.
+This is bounded recovery continuation, not a replacement backup pipeline.
+
+Local helper SHA256:
+- `owner-protected-copy.py`: `fe6b6f9195c572c2b11ab11dde5272c318a3f6bd9757472c67e2da2d1954d0c2`.
+- `manifest-readonly.py`: `a580752a26c77364e5b288808267ffbf370fe9dced9eaa04f62ccf883cc22d5c`.
+
+At `2026-10-11T19:23:29Z`, no owner-local resume process/armed/result record exists. The owner was
+provided this command, to run from repository root in their **private local terminal**:
+
+```sh
+python3 .env.bb132k-execution/owner-protected-copy.py --resume-drill
+```
+
+Enter the archive passphrase only into that terminal's GnuPG prompt. Do not send it or terminal output
+to Codex/ChatGPT. Do not invoke the helper without `--resume-drill`: the original run is preserved and
+must not be repeated. Technical terminal/process identity must be verified after owner startup; a
+chat acknowledgement alone does not establish the gate.
+
+API/Web remain stopped on original pre-H images. All five external Finance gates remain false and
+MaintenancePaused true; effective Compose parsing verifies those settings. No credentials, source,
+production data or external configuration changed in this continuation. No new decryption/capture,
+restore, service restart, provider/model/scientific operation was performed. Existing protected archive
+and accepted missing-ECB limitation/retention deadlines remain unchanged. Full isolated integrity,
+native lineage/projection and safe-restart checks remain unexecuted, not passing.
+
+Next exact step: owner starts the prepared extraction-only command locally; continue the already
+approved Gate D file/native/SQLite checks and permitted cleanup, then restart only after all recorded
+restart gates pass. No additional scope approval is needed. Do not route pinentry through agent tools
+or improvise a passphrase workaround. This is an owner-interaction block, not a new architecture gate.
+Publication changes only report/catalog/recovery; local helpers remain ignored, unrelated work preserved.
+Resolve exact SHA/tree from publication subject `review: verify BB-132K Docker stdin correction and resume gate`.
+
 ## Current outcome — encrypted capture verified; isolated restore failed — 2026-10-11
 
 **REVIEW CHECKPOINT / CAPTURE VERIFIED / RESTORE DRILL FAILED / API AND WEB STOPPED.**
