@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- `BB-132K Phase B, 2026-10-10–11` — [Protected recovery gate result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
+  REVIEW CHECKPOINT: Gate0 passed; Gate A blocked by exact private source-rights/lineage items.
+  API/Web unchanged; no archive, drill, interruption or production changes.
+
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
   Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.

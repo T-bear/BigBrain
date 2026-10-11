@@ -1,5 +1,23 @@
 # Codex interrupted-run recovery
 
+## BB-132K Phase B rights-gate stop — 2026-10-11
+
+**REVIEW CHECKPOINT / GATE A BLOCKED / NO INTERRUPTION.** Baseline
+`618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+Branch `review/finance-bb132k-protected-recovery-execution`; publication resolves by subject
+`review: record BB-132K protected recovery rights gate`.
+[Canonical result and private-inventory scope](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md).
+Gate0 exact source/deployment/receipt checks PASS; owner EODHD active-account attestation recorded
+as2026-10-10, not independent provider verification. Gate A found unresolved GOOGLEFINANCE and
+Zenodo/upstream copy rights, plus incomplete file-policy linkage. Gates B–D NOT STARTED.
+API/Web still running; source, config, permissions, services and provider authority unchanged.
+Private0700/mode0600 inventory/action list retained outside Git; ignored local rights diagnostic
+source/binary also retained. No raw market copy, GnuPG/passphrase, backup or drill artifact created.
+Unrelated mockups/ADR0006–0009 preserved. No implementation or cleanup remains pending.
+Next: independent architect/owner rights decision, then additive continuation and execution-time
+revalidation. Do not ask again for settled encryption method or EODHD attestation; do not infer
+blanket copying permission. Finance RESEARCH / 0 SEK / NONE; no H deployment/migration/restore.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created
