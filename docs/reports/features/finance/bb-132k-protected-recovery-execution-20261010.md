@@ -1,6 +1,14 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
-## Current review outcome — resumption 2026-10-11
+## Current outcome — owner-accepted limitation; local interaction pending
+
+**REVIEW CHECKPOINT / INCOMPLETE — OWNER-LOCAL GnuPG INTERACTION REQUIRED BEFORE INTERRUPTION.**
+The owner has accepted the rejected ECB raw-file absence as a pre-existing recovery limitation.
+Its reference/hash/status remain intact; its missing content is excluded from any restore guarantee.
+The [latest continuation](#owner-accepted-limitation-and-local-pinentry-gate) supersedes the previous
+completeness stop. No further rights/exception approval is requested. Backup/drill remain unexecuted.
+
+## Prior review outcome — resumption 2026-10-11
 
 **REVIEW CHECKPOINT — RIGHTS CLASSIFIED UNDER BOUNDED OWNER DECISION; SOURCE-COMPLETENESS
 STOP BEFORE INTERRUPTION. NOT MERGE CANDIDATE.**
@@ -333,3 +341,77 @@ local GnuPG pinentry. No passphrase step is requested while this earlier gate re
 Services must not be interrupted merely to prepare encryption. No H deployment/migration98,
 production restore, mapping adoption or provider reactivation follows from this publication.
 Finance remains **RESEARCH / 0 SEK / NONE**. STOP for independent architect review.
+
+## Owner-accepted limitation and local pinentry gate
+
+Owner's subsequent instruction explicitly accepts the pre-existing absence of
+`ecb-candidate-cec0507f8bd6b80e`. Preserve its REJECTED/FAIL status, null canonical revision and
+`sha256:cec0507f8bd6b80e1ce4a8f03959cc7826168233cb6c9fd05377e4785d60977f` commitment.
+**The missing raw content is outside the restoration guarantee.** This acceptance does not reconstruct,
+delete, relabel or amend any historical row. The private v4 inventory preserves v1–v3 and records this
+exact exception; the previously settled source-risk/retention decisions remain applicable.
+
+The owner also authorizes safe return of API/Web after the copy/drill. This supersedes the earlier
+instruction to leave them stopped pending review. Restart remains conditional on clean verification,
+the exact existing pre-H image, schema97 and disabled acquisition/research gates; it is not permission
+to deploy H, migrate98, reactivate providers or restore production. Since no stop occurred in this
+continuation, API/Web already remain in their existing running state.
+
+### Execution preflight actually completed
+
+- Fetched main remains `618f025a3cb72ee4513a9f14b713382e4a673a42`, tree
+  `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`. Same review branch, parent
+  `b6c9c61c4c9b6716e10e4df66933a3294a0eddd8`; unrelated work preserved.
+- Exact existing API image/OCI/compiled revision match the pre-H identity above. API/Web Docker
+  health and original start timestamps unchanged. Only API consumes the Finance/lifecycle volumes.
+- Private external configuration remains a regular ignored mode0600 file. Actual Compose binds all
+  five enable flags and ResearchOperations MaintenancePaused; no configuration was changed.
+  ObservationRuntime/Alpaca remain true, legacy EODHD/FRED/Scheduler false, MaintenancePaused false.
+- Selected existing private parent is owned, mode0700 with no symlink traversal; recovery destination
+  is still absent. Available space454733086720bytes, available inodes181927405. Last inventoried scope
+  is14279435495bytes; its3x plus20GiB requirement is64313142965bytes. This is a capacity precheck,
+  not a substitute for measuring the final quiesced scope and any hidden mount content.
+- Host GNU tar1.35 and GnuPG2.4.7 advertise AES256; pinentry and pinentry-curses are available.
+  A disposable networkless/read-only exact-old-image check confirms GNU tar1.35 is also available
+  for scoped source reads. No host privilege or production permission was changed.
+- At `2026-10-11T07:55:08.4913724+00:00`, the existing isolated pure reader again verifies both AAPL
+  receipts, complete snapshots, raw JSON hashes, checksums, lineage, watermark and historical
+  projection identical to J. Schema remains1,90–97. No production owner constructor or write-capable
+  replay/migration API was invoked.
+
+### Actual stop and safe local next step
+
+Gate A and the specifically identified historical-absence decision are settled. Gate B is incomplete:
+this tool session has no owner-exclusive interactive terminal, and availability of the owner's private
+terminal has not been confirmed. Installed pinentry alone does not demonstrate safe owner participation.
+The approved plan explicitly requires that feasibility **before** service interruption.
+No archive, encryption/decryption, passphrase handling, drill, configuration edit or service stop/restart
+has occurred. Gates C/D and the Definition of Done remain **NOT COMPLETED**.
+
+The owner can open a separate private terminal on the BigBrain server, disable shell tracing, verify
+it is interactive and set its GnuPG terminal locally:
+
+```bash
+set +x
+test -t 0 && test -t 1
+export GPG_TTY="$(tty)"
+command -v gpg pinentry-curses
+```
+
+If the terminal test fails, do not proceed. Leave the private terminal open and confirm only
+“Privat terminal redo”; never send its contents or a passphrase to Codex/ChatGPT. No passphrase
+is entered yet and these commands do not stop services or copy data. At the resumed coordinated
+capture/drill, GnuPG asks the owner locally; no passphrase argument, environment variable, chat,
+agent terminal or captured stdin is allowed. Do not run an unconnected decrypt command that could
+print plaintext. No new general execution approval is requested.
+
+Final writer/client/intake freeze, quiesced scope/handle verification and all capture/drill checks
+must still run at execution time. No deployment, provider call/cycle trigger, mapping adoption,
+Qwen/SHADOW/research/grant/trading action occurred. Finance **RESEARCH / 0 SEK / NONE**.
+
+Publication uses the same three documentation files and resolves by subject
+`review: record BB-132K accepted limitation and owner-local encryption gate`.
+Publication checks: documentation verifier PASS (267 Markdown files, 91 backlog IDs),
+`git diff --check` / staged whitespace PASS, exact three-document scope PASS, staged Gitleaks PASS
+(no leaks), manual private-path/credential sanitization PASS. Application suites cannot validate
+owner-local passphrase availability and were not rerun. No unexecuted backup/drill check is called PASS.

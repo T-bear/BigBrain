@@ -1,5 +1,24 @@
 # Codex interrupted-run recovery
 
+## BB-132K owner-local encryption handoff — 2026-10-11
+
+**INTERRUPTED — SAFE TO RESUME / REVIEW CHECKPOINT / OWNER INTERACTION PENDING.**
+Same execution branch and accepted main/tree; previous review `b6c9c61c4c9b6716e10e4df66933a3294a0eddd8`.
+Resolve additive publication by subject `review: record BB-132K accepted limitation and owner-local encryption gate`.
+[Canonical current result](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#owner-accepted-limitation-and-local-pinentry-gate).
+The owner accepted the missing rejected ECB raw content as a historical limitation excluded from
+restore guarantee; original reference/hash/status are unchanged. Private inventory v4 records that
+exception and conditional safe API/Web restart authorization. No further exception/rights decision needed.
+Source/deployed identity, receipts/schema97/projection, configuration mechanism, initial capacity and
+tar/GnuPG/pinentry availability checked. API/Web remain running with unchanged config; no downtime,
+archive, drill, crypto/passphrase operation, production write or permission change occurred.
+Next: owner confirms availability of a separate private local terminal (instructions in report);
+then resume existing Phase B, validate execution-time writer/intake freeze and coordinate local pinentry
+before stopping services. Never acquire a passphrase through agent tools/chat. Safe old-image restart
+is now authorized after successful verification, with acquisition/research gates disabled.
+Capture/restore DoD incomplete. Only report/catalog/recovery changed; no source/test changes.
+No H/migration98/provider/mapping/science/trading authority. Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-132K Phase B resumed completeness stop — 2026-10-11
 
 **REVIEW CHECKPOINT / PRE-INTERRUPTION STOP.** Same branch
