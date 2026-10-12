@@ -59,6 +59,26 @@
   osäkerhet, vetenskaplig risk, säkerhetsrisk eller annat verifierat behov. Ange kort varför.
   Detta utökar inte uppdragets scope eller befogenheter; arkitekturkonflikt och blockerregler gäller.
 
+### Långvariga operationer
+
+- Ingen aktiv vänteloop: upprepa inte `wait`, polling eller statuskommandon utan ny information,
+  avvikelse eller beslutspunkt. Återuppta aktivt arbete för resultatanalys eller beslut, inte enbart
+  för att kontrollera att processen fortfarande arbetar.
+- Kör långvariga deterministiska processer oberoende av agentens aktiva session när det är tekniskt
+  säkert och inom auktoriserad scope. Anta aldrig att en bakgrundsprocess överlever frånkopplad
+  terminal eller avslutad agentsession; verifiera livslängd, ägarskap, resursgränser och
+  resultatlagring innan den lämnas.
+- Status, slutresultat och fel ska finnas beständigt för nästa session utan omstart av processen.
+  Använd befintliga mekanismer; denna regel motiverar inte ny infrastruktur.
+- Återanvänd redan godkänd, fortsatt giltig verifiering enligt riskreglerna ovan. Omfattande
+  kontroller upprepas endast vid konkret risk, ändrat underlag eller identifierad brist.
+- Säkerhet går före krediter: obligatorisk verifiering, dataintegritet, sekretess, säkerhetskontroller
+  och fail-closed-beteende får aldrig minskas. En kritisk process får inte lämnas utan säker
+  hantering av fel och avbrott.
+- Om pågående exekvering måste lämnas, använd befintlig standard under Interrupted-run recovery
+  för en kort handoff med aktuellt tillstånd, resultatplats, blockerare och nästa beslutspunkt.
+  Publicera inga hemligheter eller känsliga sökvägar.
+
 ## Säkerhet och data
 
 - Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.
