@@ -1,5 +1,130 @@
 # BB-132K Phase B — Protected recovery execution gate result
 
+## Gate D continuation — 2026-10-12
+
+**REVIEW CHECKPOINT / ENCRYPTED RECOVERY AND ISOLATED DRILL VERIFIED / API AND WEB HEALTHY.**
+Technical recovery checks passed; the protection-window deviation below remains for explicit review.
+Owner explicitly authorized the reviewed stdin correction and continuation from the existing archive.
+Previous publication: `b17adc55b5641f1bcb94dff95642ecae4a50f10f`; same branch/main/tree.
+No recapture, new backup, production restore, migration98 or new deployment is part of this continuation.
+
+The private owner process and controlling terminal were technically verified. New resumption records
+bind the prior run, exact ciphertext, control/helper hashes and stopped-service state. Real extraction
+used corrected Docker stdin forwarding, no network and only the isolated drill mount. Owner-local
+extraction and subprocess/GnuPG/container cleanup passed at `2026-10-11T19:32:50.791837Z`.
+The ciphertext hash remained the previously verified
+`0f063a2fcfd3ce6c4b1c43b3fbf8f04a30506eefb6ec63d7db5cc1ad16696a3c`.
+
+### Protection deviation
+
+Execution was interrupted before independent drill validation completed. At resumption on
+`2026-10-12T03:37:16Z`, the temporary plaintext drill was still present: it remained overnight,
+contrary to the approved controlled-window/no-overnight boundary. This is an actual deviation,
+not owner-approved by implication and not erased by a later successful integrity check. Private
+access controls remained in place; no exposure is established, and no forensic claim is made.
+The previously authorized verification and exact-inventory cleanup were completed on resumption.
+Exact inventoried drill plaintext was removed at `2026-10-12T08:49:29.046243Z`. This does not establish
+secure erasure of ext4/swap remnants. The deviation remains recorded for independent review.
+
+### Completed verification
+
+- `manifest-readonly.py drill restored-source-manifest.json`:361 files /14,279,312,167 bytes;
+  all restored source file hashes, sizes, owners, permissions and timestamps match. Eight captured
+  metadata files match independently. Directory set/owners/permissions/timestamps match; one directory's
+  filesystem allocation size differs (40,960 versus53,248 bytes). Directory allocation is not archived
+  file content; the comparison was corrected to exclude only directory st_size. No data mismatch.
+- `InspectQuiesced.dll` on the isolated copy: exact complete receipts/raw JSON, schema97, mapping
+  snapshots, watermark, historical projection, PIT membership, lineage and shadow counts match capture.
+- `GateBQuiesced.dll` on the isolated copy: lifecycle clean shutdown/counts, research/acquisition,
+  finite/v1 grant state and complete file metadata match capture. No owner constructor or app startup.
+- `manifest-readonly.py source pre-restart-source-manifest.json`: the production source manifest is
+  **byte-identical** to capture, SHA256
+  `7f1222ed31081cf65cb30fd43346ddd2db86cacbfa088fa2627664bf017b3baa`.
+- `DrillAllIntegrity.dll`: full integrity_check and foreign_key_check against all five isolated SQLite
+  files (including nested historical copies), read-only with closed-database immutable mode: all10
+  checks PASS. Full isolated verification completed `2026-10-12T04:16:25.307269Z`.
+- Original API/Web images/mounts and effective disabled configuration verified. Existing two ready
+  owner-drop artifacts match their already retained quarantine identities/content, including embedded
+  sidecar semantics. No new intake identified; producers remain frozen during transition.
+
+All diagnostics use the original pre-H image, read-only drill/source mounts as appropriate, no network,
+no credentials and no application startup. No SQLite repair/migration or source modification.
+The accepted missing rejected ECB content remains outside the restore guarantee.
+
+### Cleanup, protection and safe restart
+
+Before cleanup, the entire drill member set matched the private archive inventory exactly. Only that
+isolated tree was mounted writable for deletion; no production volume was present. The directory was
+then verified empty and disposable cleanup processes/containers verified absent. No source evidence
+was deleted, repaired, reconstructed or overwritten. The unchanged encrypted artifact was finalized
+from its incomplete name to the protected final name; ciphertext remains14,287,207,399bytes, mode0400
+under a private0700 parent. COMPLETE and final retention records are private; original failure and
+resumption records remain intact. No new backup/capture was performed.
+
+A fresh read-only source file-set/metadata comparison before restart matched the full hash manifest;
+valid full-hash evidence was reused. NTP remained synchronized. Both existing owner-drop ready
+artifacts matched their prior exact quarantine identities, with embedded ZIP sidecar handling taken
+from accepted code. No new owner-drop input was introduced.
+
+Existing Compose was used with a private override pinning **original image IDs**, and only
+`up -d --no-deps --no-build --pull never api`, then the equivalent `web` command after API readiness.
+No image rebuild, H deployment, unrelated restart or systemd repair occurred. External settings
+remained exactly the six previously approved booleans: five Finance gates false and
+ResearchOperations MaintenancePaused true. Secrets, instrument mappings, mounts and unrelated
+configuration were preserved. No provider/model request or automatic scientific work was triggered.
+
+| Service | Original image | Started UTC | Healthy verified UTC |
+| --- | --- | --- | --- |
+| API | `sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a` |2026-10-12T08:50:44.545636713Z|2026-10-12T08:51:50.045850Z|
+| Web | `sha256:1c10a3caf19eddaa8849eec6f5eee527073fc8a2c9ec66ba9054ff74dfa2ddcd` |2026-10-12T08:52:13.338649394Z|2026-10-12T08:52:20.338071Z|
+
+API OCI and compiled identity both equal `a2373f172600c7b45ce378c56aab1d7da2b9b242`.
+API recovery is healthy/completed, previous shutdown clean, clock synchronized and low-disk false.
+The stop-to-verified-healthy intervals are approximately19h20m24s for API and19h21m7s for Web;
+these are observed availability bounds, not a claim of continuous active execution or an estimated
+future maintenance duration. The interrupted execution accounts for the long elapsed interval.
+
+The initial manual HTTP status check attempted `curl`, absent from the image (exit127). No application
+failure occurred: Docker health was healthy. Recovery JSON was read using the same local Bash TCP
+mechanism already used by the accepted image's healthcheck; no tool installation or network expansion.
+
+Post-start read-only checks PASS: schema97, both full receipt/raw-JSON commitments, complete mapping
+snapshots, watermark, historical projection, PIT membership and native lineage unchanged. No new
+acquisition/research/grant state or shadow candidate/result. Lifecycle has exactly one additional normal
+running session following the recorded clean shutdown. No migration98/mapping manifest adoption.
+
+### Final disposition and publication
+
+Gate A rights decisions/ECB exception preserved; Gate B/C passed; Gate D now technically passed,
+including complete file manifest, independent decryption, isolated full SQLite/native/lifecycle checks,
+source equivalence and approved exact-inventory cleanup. API/Web restored safely with Finance
+acquisition/research gates disabled. The no-overnight plaintext requirement was **not met** and is not
+reported as compliant merely because integrity succeeded. Review that deviation explicitly.
+
+Same-disk encrypted recovery is not disk-failure disaster recovery. Private retention inventory retains
+the earlier deadline rule: seven days after verified deployment acceptance, maximum
+`2026-11-10T13:36:45.157317Z`, shortened by applicable provider obligations. No deployment acceptance
+date is asserted; separate owner disposal decision required. No automatic source/archive deletion.
+The missing rejected ECB raw content remains outside the restore guarantee; all original references,
+hash and historical rejection state are preserved. No attempt was made to restore that absent content.
+
+Local operator commands executed: extraction-only `owner-protected-copy.py --resume-drill` by owner;
+`manifest-readonly.py` drill/source modes; `verify-resumed-drill.py` using existing read-only assemblies;
+`finish-drill-cleanup.py` with exact inventory protection; original-image scoped Compose restart;
+post-restart native/state readers. Local scripts/private paths/raw records remain outside Git.
+No application code or tests changed. Existing27 harmless helper tests and real Docker stdin proof
+are reused unchanged; no redundant product build/full test suite. Documentation verifier, whitespace,
+three-document scope and staged redacted secret scan PASS. `node scripts/verify-documentation.mjs`
+passed267 Markdown files /91 unique backlog IDs; `git diff --check`, staged whitespace and
+`gitleaks git --pre-commit --staged --redact --no-banner` passed with no leaks.
+
+Publication subject: `review: complete BB-132K recovery drill and safe restart`.
+Baseline/main/tree unchanged; exact checkpoint SHA/tree resolve from that commit's Git metadata.
+Only this report, catalog and recovery handoff change. No merge or next checkpoint. Independent
+review must distinguish successful technical recovery from the recorded protection-window deviation.
+Finance remains **RESEARCH / 0 SEK / NONE**; acquisition, research, SHADOW, PAPER/LIVE/AUTO,
+orders/broker/capital and mapping extension remain unauthorized/disabled.
+
 ## Current continuation — Docker stdin fixed; owner-local decryption pending — 2026-10-11
 
 **REVIEW CHECKPOINT / TRANSPORT FIX VERIFIED / RESTORE AND RESTART STILL PENDING.**

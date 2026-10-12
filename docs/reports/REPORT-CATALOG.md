@@ -1,10 +1,10 @@
 # Project Report Catalog
 
-- `BB-132K Phase B, 2026-10-10–11` — [Protected recovery gate result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
-  REVIEW CHECKPOINT: authorized Docker stdin correction verified with a real harmless transport test
-  and27 local tests. Extraction-only continuation prepared; owner-local GnuPG entry pending.
-  Existing ciphertext retained; API/Web stopped, full drill/restart not yet completed.
-  Owner-accepted missing rejected ECB content remains outside restore guarantee.
+- `BB-132K Phase B, 2026-10-10–12` — [Protected recovery execution result](features/finance/bb-132k-protected-recovery-execution-20261010.md).
+  REVIEW CHECKPOINT: encrypted capture/369-file proof and full isolated five-DB integrity drill passed;
+  temporary drill removed; API/Web healthy on original pre-H images, Finance gates disabled.
+  Explicit deviation: interrupted run retained temporary plaintext overnight; not claimed compliant.
+  Missing rejected ECB content remains outside restore guarantee. Independent review required.
 
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing

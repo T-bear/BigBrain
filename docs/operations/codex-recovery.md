@@ -1,5 +1,30 @@
 # Codex interrupted-run recovery
 
+## BB-132K verified drill and original-image restart — 2026-10-12
+
+**REVIEW CHECKPOINT / TECHNICAL EXECUTION COMPLETE / PROTECTION-WINDOW DEVIATION RECORDED.**
+Same branch `review/finance-bb132k-protected-recovery-execution`; parent
+`b17adc55b5641f1bcb94dff95642ecae4a50f10f`. Main/tree remain
+`618f025a3cb72ee4513a9f14b713382e4a673a42` / `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`.
+[Final actual outcome, timestamps, protection deviation and retention](../reports/features/finance/bb-132k-protected-recovery-execution-20261010.md#gate-d-continuation--2026-10-12).
+Owner-local extraction from retained ciphertext passed;361 source+8 metadata files matched, five
+SQLite databases/10 full integrity+FK checks PASS, native receipts/PIT/schema97/lifecycle/grants matched.
+Source manifest byte-identical. After interrupted execution, temporary drill plaintext remained overnight,
+contrary to the approved boundary. Do not conceal or retroactively treat this as authorized. Exact-inventory
+cleanup completed08:49:29UTC on2026-10-12; drill empty, no secure-erasure claim. Encrypted archive finalized
+COMPLETE/mode0400 with unchanged hash and private retention records; no new backup or production restore.
+API/Web safely restored using exact original pre-H images with all five Finance gates false and
+MaintenancePaused true. API healthy verified08:51:50UTC, Web08:52:20UTC; compiled/OCI API revision remains
+`a2373f172600c7b45ce378c56aab1d7da2b9b242`. Recovery healthy, previous shutdown clean, clock synchronized.
+Post-start read-only native checks PASS; no new acquisition/research/grant/shadow state, schema97,
+receipt bytes/watermark/projection unchanged; exactly one normal new lifecycle session. No migration98,
+H deployment, mapping adoption/provider/model/trading. Missing rejected ECB content excluded from guarantee.
+Technical DoD passed with explicit protection-window deviation for architect review. No further operational
+action authorized here. Do not run capture or resume helpers again. Preserve encrypted archive/private
+inventory; disposal needs separate decision under recorded deadline. Only report/catalog/recovery published;
+unrelated files preserved. Publication: `review: complete BB-132K recovery drill and safe restart`.
+Finance RESEARCH /0SEK/NONE. STOP for independent review, no merge or next sprint.
+
 ## BB-132K authorized stdin correction / private resume pending — 2026-10-11
 
 **INTERRUPTED — SAFE TO RESUME / OWNER-LOCAL DECRYPTION PENDING.** Same execution branch,
