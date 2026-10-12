@@ -1,5 +1,196 @@
 # BB-131A — Finance Research Learning contract
 
+## Recurring real-data research — proposed contract, 2026-10-12
+
+**REVIEW CHECKPOINT / PROPOSED / NOT IMPLEMENTED OR AUTHORIZED FOR OPERATION.** Owner chose
+automatic research before deployment (path B), authorizing this contract only. Baseline
+`0851ee48a768348a001f1525f0b30c29584fd821`, tree `685fbe8be345d25a4775a8f64ef7b0d62687798c`.
+[Reviewed release analysis at 340aaf3](https://github.com/T-bear/BigBrain/blob/340aaf3df13ea2b1f00c928eab68936150f01baa/docs/architecture/finance/research-learning-contract.md#finance-automation-release-readiness--2026-10-12)
+is decision evidence, **not merged implementation**. Branch `review/finance-recurring-research-contract`;
+publication subject `review: specify finite recurring Finance research contract` resolves SHA/tree.
+This proposed extension retains ADR0033–0036/0038–0040 ownership; no conflicting replacement or new ADR.
+
+### 1. One finite program; one real-data admission path
+
+Proposed `finance-recurring-research-v1` registers one immutable, explicitly approved program in the
+existing Finance learning-ledger owner/database. It binds owner-decision reference, protocol/rights/
+policy versions, instrument/source/mapping, ordered finite cohort windows, expiry, budgets, allowed
+strategy and falsification, history policy, worker/model identity and resource profile. One active
+program; registration is idempotent and never implicit at startup, tick, configuration reload or migration.
+Registration is a trusted, explicitly approved maintenance action; configuration selects an existing
+program only. It cannot mint a grant or authorize itself through a changed program name.
+BB-131C and BB-132A/B/C snapshots, grants and singleton sessions remain byte-identical; no conversion,
+deletion, refund or fresh database/session key can turn their spent authority into this grant.
+
+Initial scope: one explicitly approved canonical equity and exact Alpaca IEX historical 1Day raw
+source, one exact instrument/mapping snapshot per program, existing momentum/v1 reference period20
+with existing engine-owned 5/10/20 trials. No universe discovery, cross-mapping equivalence, new
+strategy/vocabulary or provider. Mapping transition ends eligibility for this program; H may still
+collect other authorized evidence independently. No current AAPL interval is approved by this text.
+Expired verification does not invalidate retained historical snapshots; current mapping assertion
+authority remains required for acquisition only, independently of historical research eligibility.
+
+| Eligible evidence rule | Required Finance behavior |
+| --- | --- |
+| Retained BB-132E completed daily receipts | Validate receipt/lineage/source contract, full mapping snapshot and purpose-specific rights. Exclude raw one-minute snapshots, quarantine, synthetic/fixture origins and unknown metadata. No provider request from research. |
+| Explicit cutoff K | Finance seals K from trusted time, no later than reservation; reject clock regression. Select latest legitimate revision per source day **at K**, retaining exact constituent IDs/checksums and predecessors in private provenance. Later revisions cannot change that sealed projection. |
+| Source semantics | Preserve IEX feed (not listing MIC), raw price basis, USD, session calendar and acquired/ingested/knowledge times. No whole-market or irrevocable-finality claim. No inferred corporate-action or historical mapping clearance. |
+| Purpose eligibility | Require `ResearchDatasetEligibilityPolicyV1` Eligible for the actual feature/backtest/holdout/robustness purposes, with evidenced rights, identity, price basis and corporate actions. Owner data-use risk acceptance is not a substitute for missing scientific facts. Unknown/limited evidence does not silently become fully eligible. |
+| Causality | Receipt knowledge stays actual ingestion/availability, never session close. Feature availability is at least the maximum knowledge time of every contributing receipt. For each simulated signal, require all consumed inputs knowable by its decision and strictly before the next-session-open execution time used by the accepted engine. Late retrieval/revision failing this preflight is ineligible for that plan, not backdated. |
+| Sufficient source coverage | Fixed session ranges, warmup, embargo and existing engine sample requirements must pass. No invented sessions/values, shrinking partitions or substituting the legacy EODHD eight-instrument readiness projection. Previously retained history is not presumed prospectively observed. |
+
+Finance derives immutable real-data/feature manifests referencing existing receipts and uses the existing
+daily feature engine and result stores; no copied market-evidence database. Do not relabel receipts as
+`SyntheticLearningScope`. Add a versioned real scope while preserving that old type and its tests.
+Historical data may be eligible development evidence under these gates; historical performance is
+still counterfactual research, not proof Finance could act before it knew the inputs. This release
+does not introduce positions, capital or execution state; existing evaluator simulation remains internal.
+
+### 2. Frozen cohorts and protected scientific truth
+
+At registration fix a finite ordered set of calendar windows, their train/validation/holdout partition
+rules, warmup/embargo and intended publication opportunities. Cohorts, including feature dependencies,
+are non-overlapping in this first contract; no rolling-window adaptive search. Each fresh holdout's
+source sessions must be after program registration and must remain unexposed to models/operators/
+other research. Pin model artifact before those sessions; this reduces historical pretraining concerns
+but does not claim statistical independence or profitability. No new data download is implicit.
+
+Before invocation, Finance binds exact available receipts/features and partitions for that cohort.
+Create `LearningDevelopmentInput` from allowlisted train/validation summaries plus sanctioned prior
+history only; no holdout-derived field or raw-data expansion. Strict typed parse/admission and closed
+proposal vocabulary remain authoritative; version the real scope/projection, never loosen v1 parsing.
+Incomplete coverage waits without spending inference; expired program terminates even if no cohort
+ever matures. Waiting for sufficient real sessions may take substantial calendar time; fixtures cannot
+establish production readiness. Recheck exposure/rights before scientific reservation. Existing
+holdout use, unknown exposure, revised/adjusted copies or overlapping legacy experiments deny fresh
+evaluation across **all** programs and legacy paths; new IDs never erase exposure.
+
+Reuse the combined `DeterministicRobustnessEvaluator`: commit the complete plan, full effective trial
+population and selection rules before it runs; no reasoner call between selection and holdout. Reserve
+the whole cohort once, including uncertainty; a second evaluation of its revisions is not new science.
+Do not add a development-only evaluator or change numerical/selection semantics in this slice.
+
+History is Finance-owned: include every prior logical attempt in deterministic chronological order,
+including declines, parser rejections and negative development outcomes, without success filtering.
+Expose only bounded operational/admission categories and the fixed-reference **validation** metric
+permitted by BB-132B, under an additive projection version; never selected/best metrics, holdout values,
+full robustness/classification, protected IDs/hashes, raw rows or outcome-derived error messages.
+Pin the full ordered sanitized history digest; reject overflow rather than omit unfavorable evidence.
+Retain all native results and private lineage, but do not expose protected content merely because it is
+in SQLite. Previous development history must not intersect another cohort's protected dependencies.
+
+Availability/cutoff checks use trusted persisted times; model-visible timing/status must not encode
+protected outcomes. Separate private full-evidence commitments from model-visible input/history hashes.
+Require noninterference tests: modifying only protected values/classifications/IDs at fixed public
+schedule and development facts leaves model-visible bytes/digests and scheduling decisions unchanged.
+Predeclare progress/stop rules, never stop selectively on good/bad holdout performance. No model-weight
+training/fine-tuning occurs: history-conditioned inference proposes; Finance alone decides scientific truth.
+
+### 3. Cumulative authorization and crash semantics
+
+Budgets below are **required owner inputs, not granted defaults**. Missing, zero, contradictory or
+expired authorization leaves runtime disabled. No automatic top-up, expiry extension or replenishment.
+
+| Frozen program field | Accounting rule |
+| --- | --- |
+| I: total inference invocations; E: evaluations | At most one invocation and one admitted evaluation per cohort opportunity; E <= I and E <= registered cohorts. All runs/restarts share these ceilings. Decline/rejection spends invocation but not an unreserved evaluation. |
+| T: total effective trials; C: underlying-call allowance | Every evaluation reserves all three momentum trials and its full bounded call envelope, including benchmark/cost/walk-forward work, before execution. Preflight rejects overflow; existing per-evaluation ceiling64 is not a new grant. |
+| W: cumulative reserved model-runtime; program expiry | Reserve the inference deadline plus cleanup envelope before each start. No refund of unused reservation; keep actual elapsed time separately. Expiry forbids new starts, not safe finalization of already reserved work. Evaluator work is bounded separately by T/C and frozen data size. |
+| Data/history limits and exposure registry | Freeze finite cohort/receipt/feature/history bounds within existing capacities; immutable identity/provenance required. A fresh program needs separate explicit authority and may not requalify spent or exposed evidence. |
+
+Use additive versioned persistence in the existing Finance owner/ledger, plus existing scheduler journal
+and native results; no second database or independent ledger service. Atomic immediate SQLite
+transactions claim unique `(program, cohort, opportunity)` and a global single-flight lease, commit input/
+history identities and spend I/W **before** spawn. After strict parse/admission, a second transaction
+reserves E/T/C and cohort exposure plus immutable full plan **before** any engine call. Rights/clock/
+policy changes between phases abort, never refund spent authority. Default disabled; concurrency1,
+automatic retries0. These are proposed safety constraints, not permission for even one real invocation.
+
+Persist linked states `ReservedInference → ReplyRecorded → ReservedEvaluation → Completed`, with
+terminal Declined/Rejected/Failed/Indeterminate outcomes. Crash/timeout/cancellation after reservation
+keeps it spent; never replace an invocation or recompute uncertain science. Reconcile only already
+durable exact identities/results; proven completion may finalize accounting without execution.
+Uncertain work halts the program for review. Duplicate requests return recorded outcome, no new call.
+Same execution fingerprint with new wording/key is a duplicate, not independent confirmation.
+Program/grant identity binds the original owner decision and exposure registry, preventing alias grants.
+Schema/backup/restore preserves cumulative consumption; stale restore cannot resume authority without
+reviewed reconciliation. This requires no new BB-132K restore exercise in this checkpoint.
+
+### 4. One hosted composition, not another scheduler
+
+Extend BB-093's existing opportunities/orchestrator with an explicit mutually exclusive recurring
+program mode and Finance-owned real-data readiness, leaving legacy mode unchanged. Reuse BB-094
+governor and BB-095 maintenance/recovery/incident status. Cadence/expiry are owner-approved and bounded;
+no catch-up burst, busy polling or agent supervision. Data/resource deferral spends no invocation;
+invalid rights/lineage/clock, exhausted authority, ambiguous persistence/worker cleanup or operational
+failure stops admission. NoUsefulProposal, malformed reply or duplicate proposal terminates the finite
+program in this conservative first version; completed valid evaluations advance by schedule regardless
+of favorable/unfavorable scientific result. Exhaustion/expiry is a normal terminal state.
+While a program is active, Finance must deny competing legacy/manual/campaign scientific starts;
+an existing scheduler lease alone is not proof that those entry points share its exclusion.
+
+The trusted internal composition binds Finance to `IResearchReasoner`/`LocalReasonerRuntime` and the
+owned native BRF1 worker. Preserve pinned artifact/libllama, pidfd/single-flight, isolation, bounded
+payloads/output, cancellation/kill/reap and sanitized durable audit. No tools/SQL/network for the model,
+public mutation endpoint, cloud fallback or generic process runner. F's collector stays separate;
+research cannot enable transport, acquire data, freeze/evaluate SHADOW or promote a strategy.
+
+Owner must approve inference deadlines, CPU/RAM/threads, evaluator work bounds and runtime/cadence.
+The present ordinary reasoner cap is30s;180s is a controlled-acceptance-only path, **not** a reusable
+production allowance. A reviewed recurring runtime profile must explicitly compose its chosen finite
+deadline plus bounded cleanup into the parent cap; do not switch on the old acceptance flag or weaken
+isolation. Worker resource/cleanup enforcement and shared single-flight must be proven model-free before
+any separately authorized runtime provisioning. No agent session is needed for scheduled operation;
+existing durable journal/status provides results, stop reason and next eligible opportunity after restart.
+The existing synchronous scientific engine is bounded by input/trial/call counts, not claimed to have
+hard wall-clock preemption. Cancellation stops new admission, never abandons a still-running engine
+lease; interrupted process work becomes Indeterminate. A requirement for hard evaluator termination
+would need a separately reviewed scope decision, not a hidden Task timeout or new process framework.
+
+### 5. Single implementation boundary and Definition of Done
+
+One future bounded slice: real-data admission/projection + program-scoped ledger extension + one
+existing-scheduler composition, using the same feature/science/result owners. Preserve A/B/C and
+legacy scheduling semantics. No new provider, platform, strategy engine, SHADOW automation or training.
+If implementation needs altered evaluator semantics or broader scope, STOP for architect review.
+
+Model-free DoD, with no real credentials/model artifact/network dependency:
+
+1. Fixture receipts enter through the existing Finance evidence owner. Prove actual knowledge time,
+   sealed revision replay, valid rights/identity/price basis, feature timing and no future contamination;
+   incomplete/late/current-day/mixed-mapping or ambiguous data fails closed without inference.
+2. Explicitly create one finite grant; two scheduled disjoint eligible cohorts invoke fake reasoners,
+   admit and execute the existing evaluator, persist native results, reopen and use sanctioned negative
+   and positive history. Deterministic ordering/identity survives restart; no protected-history leakage.
+3. Prove exact I/E/T/C/W exhaustion independently and cumulatively, duplicate/failure/cancellation,
+   concurrent last-slot claims, crashes at both reservations/native-result commit and stale restore.
+   No grant refund/renewal or exposed-cohort reuse through new IDs/revisions/legacy entry points.
+4. Prove default-off/maintenance/governor/recovery gates, no concurrent legacy run, bounded scheduling,
+   deadline composition, worker cleanup, unavailable data waiting and durable unmonitored completion.
+   Fake transport/owned proof-worker tests exercise actual integration; no model inference.
+5. Additive migration/reopen preserves old receipt/grant bytes and native histories. Focused temporal,
+   science, scheduler and security regressions plus risk-justified final API/build/docs/secrets checks pass.
+
+Acceptance of that model-free slice would not prove real-market scientific eligibility or real-model
+performance. Separate owner permission is required for pinned-model provisioning and a specifically
+counted real inference validation, deployment, mapping adoption, provider activation and unattended
+program activation. No historical A/B/C allowance can fund those steps.
+
+### 6. Outstanding decisions and this review's verification
+
+Owner/architect must approve: the exact eligible source/instrument/mapping and purpose/retention evidence;
+finite cohort dates and overlap/exposure clearance; I/E/T/C/W, expiry and data/history ceilings; cadence,
+timeouts/resources and conservative terminal rules; the exact model-free implementation scope above.
+No numerical budget, new data permission or production setting has been approved by choosing path B.
+Existing Alpaca owner-risk acceptance remains recorded, not a provider warranty or scientific clearance.
+Empty eligibility is a valid waiting outcome; current receipts are not asserted sufficient for any cohort.
+
+This documentation-only review inspects accepted code/contracts and reuses the prior reviewed release
+findings. No host/database inspection, application test run, build, provider/model call or recovery operation here.
+Publication checks are documentation verifier, Markdown/diff/scope and staged secrets scan; results are
+recorded in the publication commit. No new report/ADR or parallel architecture document. STOP for
+independent review and explicit implementation approval; Finance **RESEARCH / 0 SEK / NONE**.
+
 ## BB-132C accepted integration — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](../../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).

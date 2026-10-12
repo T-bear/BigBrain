@@ -1,5 +1,14 @@
 # BigBrain Backlog
 
+## Recurring real-data research — contract pending review, 2026-10-12
+
+Owner chose research capability before controlled deployment. [Single proposed implementation slice,
+open owner decisions and Definition of Done](architecture/finance/research-learning-contract.md#recurring-real-data-research--proposed-contract-2026-10-12)
+are authoritative for this review: real scope + cumulative Finance ledger extension + existing
+scheduler/reasoner composition. No implementation is authorized yet. Preserve all old grants;
+no implicit budget renewal, provider activation or data eligibility. Model-free proof precedes any
+separately authorized real-model validation. This is a contract review, not a new chain of sprints.
+
 ## BB-132H — versioned observation mapping
 
 **MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable

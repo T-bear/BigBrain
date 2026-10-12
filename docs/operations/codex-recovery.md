@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## Recurring research contract handoff — 2026-10-12
+
+**REVIEW CHECKPOINT / PROPOSED CONTRACT / NO IMPLEMENTATION.**
+Baseline `0851ee48a768348a001f1525f0b30c29584fd821`, tree
+`685fbe8be345d25a4775a8f64ef7b0d62687798c`; branch `review/finance-recurring-research-contract`.
+Publication resolves by subject `review: specify finite recurring Finance research contract`.
+Prior release analysis `340aaf3df13ea2b1f00c928eab68936150f01baa` is referenced only; its branch
+was not merged. [Contract, open decisions and DoD](../architecture/finance/research-learning-contract.md#recurring-real-data-research--proposed-contract-2026-10-12).
+Four-document delta: research-learning contract, STATUS, BACKLOG, this handoff. No source/test,
+runtime, host, configuration, DB, grant, provider/model or recovery operation. Unrelated untracked
+and ignored work is preserved. No interrupted execution remains. Next: independent architect review,
+then explicit owner approval of bounded implementation and still-open values; no automatic next task.
+Finance **RESEARCH / 0 SEK / NONE**. No merge, deployment, activation or BB-132K reopening.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created

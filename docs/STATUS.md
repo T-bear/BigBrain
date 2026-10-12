@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## Recurring research contract review — 2026-10-12
+
+**PROPOSED / DOCUMENTATION ONLY.** Owner selected automatic research before deployment (path B).
+[Bounded contract and model-free Definition of Done](architecture/finance/research-learning-contract.md#recurring-real-data-research--proposed-contract-2026-10-12)
+define real-data eligibility, finite cumulative program authority, protected history and one existing
+scheduler composition. Budget values, eligible cohorts, runtime limits and implementation approval
+remain open; no grant or operational permission is created. Release analysis at `340aaf3` is review
+input only, not merged code. No current host verification, deployment or BB-132K work in this review.
+Finance **RESEARCH / 0 SEK / NONE**; no model training or real inference claimed.
+
 ## BB-132H versioned observation mapping — 2026-10-10
 
 **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW ONLY.**
