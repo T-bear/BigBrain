@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## Finance Automation Release readiness — 2026-10-12
+
+**REVIEW CHECKPOINT / FULL AUTOMATION BLOCKED; no implementation or deployment.**
+Baseline `0851ee48a768348a001f1525f0b30c29584fd821`. [Canonical release assessment, A–D scope,
+live versus historical evidence and next decision](architecture/finance/research-learning-contract.md#finance-automation-release-readiness--2026-10-12).
+H is accepted on main; its older review-stage entries below are historical. The inspected API still
+runs pre-H `a2373f172600c7b45ce378c56aab1d7da2b9b242`, healthy, with five Finance gates false
+and MaintenancePaused true. K's technical recovery success and protection deviation are preserved.
+Recurring real-market AI needs reviewed real-data eligibility, cumulative authority and hosted
+composition, exceeding a small release edit. No training/fine-tuning or operational activation claimed.
+Finance **RESEARCH / 0 SEK / NONE**.
+
 ## BB-132H versioned observation mapping — 2026-10-10
 
 **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW ONLY.**

@@ -1,5 +1,16 @@
 # BigBrain Backlog
 
+## Finance Automation Release — readiness decision, 2026-10-12
+
+**BLOCKED AT SCOPE/ARCHITECT DECISION; not an implementation sprint.**
+[Canonical gaps, reused capabilities, owner decisions and verification](architecture/finance/research-learning-contract.md#finance-automation-release-readiness--2026-10-12).
+Remaining: real-market input/temporal eligibility for the local reasoner, finite cumulative
+cross-run model/scientific authority and sanctioned history, hosted composition/provisioning.
+Do not bypass these with synthetic relabelling, fresh database/session keys or an enabled legacy
+scheduler. Completion requires an independently reviewed bounded contract and model-free proof;
+deployment, current mapping adoption and provider/model activation remain separately approved gates.
+This entry creates no new grant or follow-on implementation authorization. K recovery is not reopened.
+
 ## BB-132H — versioned observation mapping
 
 **MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable

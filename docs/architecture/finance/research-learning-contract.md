@@ -1,5 +1,120 @@
 # BB-131A — Finance Research Learning contract
 
+## Finance Automation Release readiness — 2026-10-12
+
+**REVIEW CHECKPOINT / FULL AUTOMATION BLOCKED / NO IMPLEMENTATION CHANGE.** The requested
+market-data → recurring deterministic research → bounded local-model proposals → retained history
+release exceeds a small integration correction. These are intentional accepted contract limits,
+not a demonstrated defect to repair or permission to start another implementation checkpoint.
+Finance remains **RESEARCH / 0 SEK / NONE**.
+
+Baseline fetched from GitHub: `0851ee48a768348a001f1525f0b30c29584fd821`, tree
+`685fbe8be345d25a4775a8f64ef7b0d62687798c`. Review branch:
+`review/finance-automation-release`. Resolve publication SHA/tree from the commit with subject
+`review: bound Finance Automation Release readiness`; no self-referential SHA is embedded here.
+This assessment is the canonical release handoff; no parallel report or new ADR is introduced.
+
+### What exists, and what its evidence establishes
+
+| Component | Accepted implementation and evidence | Deployment / activation distinction |
+| --- | --- | --- |
+| BB-092–095 research operations | Existing scheduler, governor, durable opportunity/run/result history, single-flight, recovery and maintenance gate; ADR0033–0036. Existing strategies are evaluated deterministically. | Disabled in the inspected API. This scheduler does not invoke the local reasoner. |
+| BB-132A/B/C | Owned BRF1 worker → pinned libllama/Qwen3-1.7B, strict Finance admission, persistent finite session and sanitized history. C proved real inference N, one evaluation, reopen and N+1 with exhausted scientific authority. | Controlled synthetic-scope proof, not unattended real-market research. C's two-invocation allowance is consumed. No training/fine-tuning of model weights is implemented or claimed. |
+| BB-132D/E | Immutable receipts, trusted knowledge time, revision lineage and sealed replay; E adds provider daily evidence and explicit prospective SHADOW. | Historical live AAPL receipt/reopen evidence exists; receipt acquisition is not feature generation, model input eligibility or automatic SHADOW evaluation. |
+| BB-132F/F1 | Bounded default-disabled observation worker and separate controlled one-shot; existing Compose/build identity and external secret mechanisms. | Pre-H F1 API is deployed; previous live acquisition is dated evidence, not current collection authority. All relevant gates are now disabled. |
+| BB-132H | Accepted effective-dated mapping versions, immutable manifests/bindings, migration98; historical assertions survive expiry but new acquisition requires current selected authorization. | Merged as `618f025a3cb72ee4513a9f14b713382e4a673a42`, tree `72649fe9c5dd9fb7c2bb7fe0ed0fa0dd9ac06547`; not deployed. Old H report/status wording describes its publication stage, not current Git acceptance. |
+
+Read-only Docker inspection on 2026-10-12 found API **running/healthy**, image
+`sha256:7dd3126240841269096b2027cbc0610be4b9f81fb097f0e0df9fd4097b184f8a`.
+OCI and the safe `system-build-identity` command both identify
+`a2373f172600c7b45ce378c56aab1d7da2b9b242`. Effective container booleans:
+EODHD/FRED/ResearchScheduler/ObservationRuntime/AlpacaDailyObservation **false**;
+ResearchOperations MaintenancePaused **true**. No service/configuration/data change occurred.
+Credentials, mapping freshness, resource-governor readiness and production database contents were
+not revalidated here; no current operational permission is inferred from earlier checks.
+
+[BB-132K final execution evidence at 0e79822](https://github.com/T-bear/BigBrain/blob/0e798221debeffdb7f3286114bd1b01383e1af39/docs/reports/features/finance/bb-132k-protected-recovery-execution-20261010.md)
+is reused: technical encrypted-copy/drill verification passed; post-restart schema97, two receipts,
+lineage, watermark and historical projection were preserved. This is dated operational evidence,
+not a new DB inspection. The overnight plaintext protection deviation remains explicitly unresolved
+by technical success; missing rejected ECB content is outside the restore guarantee. Same-disk copy
+is not disaster recovery; existing private retention/disposal obligations and ADR0028 remain.
+No recovery work is reopened and no new backup/drill is proposed by this review.
+
+### Concrete gaps: configuration alone cannot connect these contracts
+
+1. **Data eligibility and temporal semantics.** `EodhdMarketMemory.ResearchDataReadiness`
+   in `FinanceResearchScheduler.cs`
+   reads legacy `observations` and matching `feature_revisions` for the exact eight-instrument
+   `EodhdCatalog.Watchlist`. F writes Alpaca daily receipts through `ReobserveDailyAsync`; it does
+   not populate that readiness projection. One AAPL receipt stream cannot satisfy it. E's explicit
+   daily SHADOW consumer is not a replacement scheduler input or an automatic research pipeline.
+2. **Real-market model scope.** `SyntheticLearningScope.Validate` requires synthetic revision IDs,
+   a fixed momentum plan, 300–1000 bars and knowledge dates equal to session dates. The finite
+   session accepts that type only. Relabelling Alpaca data as synthetic or backdating its actual
+   ingestion would break lineage/no-lookahead. A reviewed Finance-owned real-data eligibility,
+   feature/history and protected-holdout contract is missing; existing engines/stores should be reused.
+3. **Persistent authority across recurring runs.** `learning_finite_session` is a singleton with an
+   immutable frozen scope; `CreateFiniteResearchSession` reopens the same grant and rejects enrolled
+   or spent v1 authority. Limits remain two invocations, one evaluation, three trials/64 underlying
+   calls, concurrency one, zero retries/refunds. `ProjectFiniteInput` rejects iteration three and
+   projects only the permitted preceding outcome. New keys/databases/daily sessions must not be used
+   to manufacture recurring budget. Cross-run cumulative budget/exposure/history needs an explicit
+   owner-approved bounded protocol before implementation, not automatic renewal of A/B/C grants.
+4. **Hosted composition and packaging.** `FinanceResearchOrchestrator` invokes
+   `RunAutonomousResearch`, not `IResearchReasoner`. The API project/image does not include Brain
+   or the native model worker. `FiniteLocalReasonerIntegrationTests` composes the real boundaries
+   in tests; it is not a production registration. A reviewed hosted composition, resource/timeout,
+   durable audit/recovery and pinned worker/model provisioning gate remain. The existing scheduler,
+   governor, Finance owner and owned-worker isolation should be reused, not replaced.
+
+Unattended collection is also bounded: H's selected assertion expires within a maximum seven-day
+verification window; null effective end is not permanent authorization. Existing market-knowledge
+projection fails closed above 1000 receipts. Revalidation responsibility and operating horizon must
+therefore be explicit; no infinite retention/projection capacity or self-renewal is implied.
+
+These responsibilities interact: a timer/delegate/DI edit would neither authorize real evidence
+nor provide aggregate model/scientific budgets. No small safe code gap was isolated; no code changed.
+Existing model history is evidence reuse during inference, not training or self-modification.
+
+### Minimum release disposition and owner decisions
+
+| Class | Disposition |
+| --- | --- |
+| A — deployable but off | Exact accepted API including H/migration98 can be proposed for a separate controlled deployment with all acquisition/research gates false and MaintenancePaused true. This task does not approve or execute it, and deployment alone does not deliver automation. |
+| B — separate owner decisions | Review K's recorded protection deviation without repeating recovery. Authorize any exact-revision deployment separately; then separately approve truthful mapping assertions/revalidation responsibility, bounded universe, provider-use/retention policy, externally supplied credentials and collection activation. Existing owner Alpaca risk acceptance is preserved, not requested again or treated as provider warranty. |
+| B — research authority decision | Before AI recurrence, specify eligible real dataset/source/purpose and protected splits, an explicit finite aggregate inference/evaluation/trial/exposure/time/resource budget and stop policy across runs, and the authority responsible for any later fresh grant. No suggested default renews consumed authority. |
+| C — missing code, outside a small release fix | Reviewed real-data projection/admission, cross-run bounded authorization/history and hosted reasoner composition with deployment isolation. Architect must first agree one bounded implementation scope; this checkpoint starts none. |
+| D — excluded | Weight training/fine-tuning, new engines/platforms/providers, cloud or paid data, automatic budget renewal, trading/PAPER/LIVE/AUTO/capital, automatic SHADOW/promotion, deployment or activation in this task. |
+
+**Recommended next operational step:** after architect review, decide whether to authorize only a
+controlled exact-revision H deployment/migration98 with Finance gates disabled, preserving the K
+recovery evidence and explicitly addressing its protection deviation. Mapping adoption/provider
+activation remain separate gates. Do not enable the old research scheduler as an Alpaca/AI shortcut.
+If the full recurring-AI goal remains mandatory, approve its bounded scientific/budget contract
+before commissioning implementation; do not present an observation-only deployment as that release.
+
+### Verification and limitations
+
+This is documentation-only characterization. `git diff --exit-code
+bd271824bec656d302a289b3f3f053b73013bf57 origin/main -- src tests` returned an empty diff.
+Reuse [H's recorded verification](../../reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md#review-fix-1--historical-validity-versus-current-authority):
+201 focused PASS; API1152 PASS/8 deliberately skipped model tests; Release/format/docs/secrets PASS.
+These are historical results, not tests rerun here or proof of the missing automation integration.
+C's accepted real sequence remains its own finite synthetic proof; it grants no further inference.
+Reviewed existing tests include `EvaluatedNReopensAndNPlusOneActuallyReasonsWithoutAnotherEvaluation`,
+`ExistingV1EnrollmentOrSpentAuthorityCannotAcquireGrant`,
+`ExistingSessionBindsRuntimeThroughPortAndReopensHistoryWithoutSecondEvaluation`, scheduler readiness/
+restart cases and H's mixed-provenance SHADOW rejection. No test/source file was edited.
+
+Publication verification: `node scripts/verify-documentation.mjs` PASS (266 Markdown files,
+91 unique backlog IDs); Markdown/diff/four-file scope review and `git diff --check` PASS;
+`gitleaks git --pre-commit --staged --redact --no-banner` PASS, no leaks.
+No build/full suite is warranted by this delta. No model, provider, acquisition,
+science, SHADOW, restore, deployment, configuration or trading operation was performed. Future
+implementation would require model-free real-data/PIT/holdout noninterference, cumulative-budget
+exhaustion, replay/concurrent-crash/no-refund and hosted cancellation/resource tests before any live gate.
+
 ## BB-132C accepted integration — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](../../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).

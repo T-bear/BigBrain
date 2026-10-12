@@ -1,5 +1,20 @@
 # Codex interrupted-run recovery
 
+## Finance Automation Release review handoff — 2026-10-12
+
+**REVIEW CHECKPOINT / FULL AUTOMATION BLOCKED / NO IMPLEMENTATION CHANGE.**
+Baseline `0851ee48a768348a001f1525f0b30c29584fd821`, tree
+`685fbe8be345d25a4775a8f64ef7b0d62687798c`; branch `review/finance-automation-release`.
+Resolve publication SHA/tree by subject `review: bound Finance Automation Release readiness`.
+[Single canonical assessment and evidence](../architecture/finance/research-learning-contract.md#finance-automation-release-readiness--2026-10-12)
+contains the data/authority/hosting blockers, A–D disposition, existing test evidence and owner gates.
+Delta is documentation only: that contract, STATUS, BACKLOG and this handoff. No application,
+test, runtime/configuration or database change; no provider/model/scientific execution. Existing
+untracked mockups/ADR files and ignored operational material are untouched/excluded.
+No interrupted operation remains. K final evidence is reused without another recovery exercise.
+Next: independent review and a bounded scope/owner decision; no merge, deployment, activation or
+new sprint. Current pre-H API is healthy with acquisition/research disabled; Finance RESEARCH / 0 SEK / NONE.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created
