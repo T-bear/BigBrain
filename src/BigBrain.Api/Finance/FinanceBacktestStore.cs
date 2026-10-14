@@ -40,6 +40,7 @@ internal sealed partial class EodhdMarketMemory
 
     internal FinanceBacktestBuildEvidence BuildReferenceBacktests()
     {
+        using var scienceLease = FinanceScientificLease.Enter(ConnectionString);
         var watch = Stopwatch.StartNew(); using var connection = new SqliteConnection(ConnectionString); connection.Open();
         var featureRevision = LatestFeatureRevisionId(connection) ?? throw new InvalidOperationException("No immutable feature revision is available.");
         var marketRevisions = JsonSerializer.Deserialize<string[]>(ScalarText(connection, "SELECT source_revisions_json FROM feature_revisions WHERE revision_id=$id", ("$id", featureRevision))) ?? [];

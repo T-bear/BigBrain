@@ -268,6 +268,7 @@ internal sealed partial class EodhdMarketMemory
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         using var transaction = connection.BeginTransaction(deferred: false);
+        FinanceScientificLease.RequireLegacyAllowed(connection);
         var state = ReadLearningState(connection);
         var updated = change(connection, state);
         ValidateLearningState(updated);
@@ -287,7 +288,7 @@ internal sealed partial class EodhdMarketMemory
         // Never run migrations, CREATE, INSERT OR IGNORE or seed on a read/reopen path.
         using (var schema = connection.CreateCommand())
         {
-            schema.CommandText = "SELECT CASE WHEN MAX(version) IN (94,95,96,97,98) AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
+            schema.CommandText = "SELECT CASE WHEN MAX(version) IN (94,95,96,97,98,99) AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
             if (Convert.ToInt64(schema.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) != 1)
                 throw new InvalidOperationException("Unsupported learning schema.");
         }

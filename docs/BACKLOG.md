@@ -1,5 +1,15 @@
 # BigBrain Backlog
 
+## Finance recurring research implementation and release gate
+
+**REVIEW CHECKPOINT; model-free chain implemented, not release acceptance.**
+[Canonical implemented contract](architecture/finance/research-learning-contract.md#recurring-real-data-implementation-checkpoint--2026-10-14)
+and [verification/remaining work](reports/features/finance/recurring-research-implementation-20261014.md).
+Before unattended release: settle consumption reconciliation for consistently stale restored authority;
+approve exact real-data scientific eligibility, finite budget/cohorts, model profile and provisioning;
+separately authorize deployment and bounded real inference. No automatic renewals or new recovery work.
+No generic preparation/consolidation sprint is proposed.
+
 ## BB-132H — versioned observation mapping
 
 **MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable

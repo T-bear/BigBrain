@@ -197,7 +197,7 @@ public sealed class FiniteLocalReasonerIntegrationTests
         var match = Regex.Match(body, "return R\"\\((.*?)\\)\"\\+input\\+R\"\\((.*?)\\)\";", RegexOptions.Singleline);
         Assert.True(match.Success);
         var prompt = match.Groups[1].Value + json + match.Groups[2].Value;
-        Assert.Contains("Absent finiteHistory means empty initial research history.", prompt, StringComparison.Ordinal);
+        Assert.Contains("Absent both means empty initial research history.", prompt, StringComparison.Ordinal);
         Assert.Contains("Present finiteHistory contains only Finance-authorized prior outcome", prompt, StringComparison.Ordinal);
         Assert.DoesNotContain("Initial history is empty: no previous", prompt, StringComparison.Ordinal);
         Assert.Contains(json, prompt, StringComparison.Ordinal);

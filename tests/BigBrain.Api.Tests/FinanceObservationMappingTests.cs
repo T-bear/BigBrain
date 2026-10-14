@@ -374,7 +374,7 @@ public sealed class FinanceObservationMappingTests
         Assert.True(memory.ReserveLearningInvocation());
         FinanceSchemaMigrator.Migrate(db.Path);
         Assert.False(db.Memory().ReserveLearningInvocation());
-        Assert.Equal(98, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
+        Assert.Equal(FinanceSchemaMigrator.LatestVersion, FinanceSchemaMigrator.State(db.Path).CurrentVersion);
     }
 
     [Fact]

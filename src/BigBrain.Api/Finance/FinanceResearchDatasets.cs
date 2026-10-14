@@ -130,6 +130,7 @@ internal sealed partial class FinanceDatasetIntakeStore
 
     internal BacktestResult RunBoundedResearchBacktest(string revisionId)
     {
+        using var scienceLease = FinanceScientificLease.Enter(ConnectionString);
         var item = ResearchCatalog().Datasets.SingleOrDefault(x => x.RevisionId == revisionId)
                    ?? throw new ArgumentException("Research dataset revision does not exist.", nameof(revisionId));
         var capability = item.Capabilities.Single(x => x.Purpose == ResearchDatasetPurpose.BoundedHistoricalBacktest);

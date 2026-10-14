@@ -1,5 +1,90 @@
 # BB-131A — Finance Research Learning contract
 
+## Recurring real-data implementation checkpoint — 2026-10-14
+
+**REVIEW CHECKPOINT / model-free implementation / NOT DEPLOYED OR ACTIVATED.**
+Implementation authority is the owner's approval of the
+[reviewed contract ca2b0fd](https://github.com/T-bear/BigBrain/blob/ca2b0fddaf58b050bde3f43d36db12cfff47ab66/docs/architecture/finance/research-learning-contract.md).
+That review branch was not merged. Baseline is `0851ee48a768348a001f1525f0b30c29584fd821`;
+[implementation evidence and exact remaining release gates](../../reports/features/finance/recurring-research-implementation-20261014.md).
+Older accepted synthetic contracts below retain their own semantics and spent authority.
+
+### Explicit real admission and cumulative authority
+
+`RecurringResearchAuthorization` freezes one owner decision, eligibility evidence, exact canonical
+instrument/mapping, Alpaca historical1Day/IEX/raw source, reasoner identity, expiry, ordered disjoint
+source-date cohorts and I/E/T/C/W budgets. There are no operational defaults or seeded grants.
+The first implementation permits at most **two cohorts/invocations/evaluations**, one instrument,
+300–500 sessions per cohort subject to the unchanged native partition minima, and the existing
+1,000-receipt projection bound. Warmup is inside each cohort; no shared development/holdout windows.
+All required `ResearchDatasetEligibilityPolicyV1` decisions must be Eligible, with Pass evidence for
+rights, integrity, historical identity, price basis and corporate actions. Owner data-use risk acceptance
+alone does not establish these scientific facts. No production authorization is created by tests.
+
+Finance selects persisted daily receipts as of trusted cutoff K, verifies immutable lineage, selects
+revisions known by K and requires exact instrument/mapping snapshots and complete calendar sessions.
+Provider event/source date never becomes knowledge time. Every receipt must have been known **before
+its following session's open**; late historical acquisition fails closed. Existing daily features,
+momentum/v1 period20, fixed 5/10/20 trials, partition/falsification rules and native evaluator are reused.
+Protected holdout begins after program registration. Earlier native evaluations with overlapping source
+coverage veto another inference/evaluation. Missing sessions wait without spending; invalid provenance stops.
+
+Migration99 adds empty program/exclusion tables to the existing Finance SQLite owner. One program
+per database is supported; neither replacement IDs nor expiry/completion creates a fresh grant.
+Original A/B/C records are not reset, converted or refunded. Atomic transactions reserve I/W and the
+full input before inference, then E/three trials/64-call envelope before science. Unused reserved work
+is not refunded; elapsed reasoner time is separate metadata. No retries. Exclusive program authority
+prevents competing legacy/manual/campaign science; existing synchronous legacy builders retain their
+own idempotence/concurrency semantics, with tracked in-flight leases blocking program registration.
+Unclean legacy leases are not automatically erased. Cancellation never abandons an executing evaluator.
+
+Native results remain in existing backtest/robustness stores. Program attempts bind input, receipts,
+full plan, bounded untrusted proposal, response checksum and native result identities. Reopen verifies
+commitments and native result/run checksums. Exact replay does not invoke a reasoner or evaluator.
+Reserved/uncertain work stops, including a crash after native persistence; automatic uncertain-result
+finalization is not provided. Completed positive/negative evaluations advance by the frozen schedule,
+never by holdout success. Decline/rejection/failure stops and remains retained. No catch-up burst.
+
+### Model boundary and existing scheduler
+
+`Finance:ResearchScheduler:RecurringProgramMode` is default false and mutually exclusive with the
+legacy EODHD readiness path. It creates no program. Existing recovery, maintenance, governor,
+opportunity journal and worker remain the hosting path. Internal trusted composition supplies
+`IResearchReasoner.ReasonAsync` and the actual bounded runtime-plus-cleanup duration; API still has
+no assembly reference to Brain. Absent composition defers without spending. No production fake,
+public mutation API, new scheduler or automatic grant provisioning is registered.
+
+The model receives development-only hashes/session counts and all preceding sanitized outcomes with
+precommitted history-release times and **fixed reference validation** excess return. Actual evaluator
+completion time remains private: prior history is released at the next cohort opportunity, and
+completion after that boundary fails closed instead of exposing data-dependent timing. Full receipt/result IDs, selection,
+robustness and holdout values/classifications stay private. Full evidence identity is separate from
+visible identity. Recurring history has its own versioned optional field; existing finite/synthetic
+serialization stays unchanged when it is absent. The native prompt now describes the supplied
+recurring history without asserting synthetic/empty history. Grammar, vocabulary and isolation are unchanged.
+Test fixtures have a durable fixture origin and explicit fixture composition; they cannot pass real-origin
+admission or become operational evidence. This is inference integration, not model-weight training.
+
+### Release boundaries requiring explicit decisions
+
+Actual source eligibility, truthful mapping, current rights/retention, I/E/T/C/W values, cohort dates,
+expiry, reasoner identity/profile, resources and schedule require owner approval. Existing 30s ordinary
+runtime remains unchanged; the old 180s controlled-acceptance allowance is not reused. Runtime provisioning
+and explicit program creation are internal boundaries, not available through a new public control surface.
+No real-model, provider, deployment or activation proof is claimed by this checkpoint.
+
+A consistent rollback of **all** Finance authority/evidence cannot be detected by checksums inside that
+same rolled-back database. Existing recovery readiness is not an independent consumption witness.
+Restored/stale authority must remain maintenance-paused and requires reviewed consumption reconciliation;
+this checkpoint does not claim automatic safe resumption after an undetectable full rollback. This is
+an explicit unresolved release gate against the reviewed contract's stronger stale-restore requirement,
+not authorization to add a parallel ledger or reopen BB-132K. Ordinary reopen of current evidence and
+uncertain in-flight stops are implemented. Operational provisioning and rollback-authority handling must
+be settled before unattended real inference is enabled.
+
+Finance remains **RESEARCH / 0 SEK / NONE**. Collection, SHADOW, model provisioning and research grants
+remain independently controlled; no trading, automatic promotion or capital side effect is introduced.
+
 ## BB-132C accepted integration — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](../../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).

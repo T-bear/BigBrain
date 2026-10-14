@@ -13,6 +13,10 @@ public static class LearningReplyParser
         Func<string, LearningAdmissionReason?>? validateContext)
     {
         ArgumentNullException.ThrowIfNull(input);
+        var scope = input.ScopeHandle;
+        if (scope != SyntheticLearningScope.Handle && !(scope == "real-daily-momentum20-v1" &&
+            input.ProjectionVersion == "recurring-development-v1" && input.RecurringHistory?.Version == RecurringResearchAuthorization.Version))
+            return new(LearningAdmissionReason.UnsupportedScope);
         if (response is null || Encoding.UTF8.GetByteCount(response) > 65536) return new(LearningAdmissionReason.Malformed);
         try
         {
@@ -33,7 +37,7 @@ public static class LearningReplyParser
             else return new(LearningAdmissionReason.UnsupportedContract);
             if (Text(root, "version", 80) != LearningAdmissionPolicy.Version) return new(LearningAdmissionReason.UnsupportedContract);
             if (Text(root, "inputChecksum", 80) != input.InputChecksum) return new(LearningAdmissionReason.EvidenceMismatch);
-            if (Text(root, "scopeHandle", 80) != SyntheticLearningScope.Handle) return new(LearningAdmissionReason.UnsupportedScope);
+            if (Text(root, "scopeHandle", 80) != scope) return new(LearningAdmissionReason.UnsupportedScope);
             // Admission supplies this callback to preserve B's exact validation order.
             // Standalone parsing has no eligibility/budget/exposure authority.
             if (validateContext?.Invoke(discriminator) is { } rejection) return new(rejection);
@@ -52,7 +56,7 @@ public static class LearningReplyParser
             Shape(strategy, "id", "version");
             if (Text(strategy, "id", 80) != "momentum" || Text(strategy, "version", 80) != "v1")
                 return new(LearningAdmissionReason.UnsupportedStrategy);
-            if (Text(variant, "bindingHandle", 80) != SyntheticLearningScope.Handle) return new(LearningAdmissionReason.UnsupportedScope);
+            if (Text(variant, "bindingHandle", 80) != scope) return new(LearningAdmissionReason.UnsupportedScope);
             var parameters = variant.GetProperty("parameters");
             Shape(parameters, "period");
             if (parameters.GetProperty("period").GetDecimal() != 20m) return new(LearningAdmissionReason.UnsupportedParameter);
@@ -66,7 +70,7 @@ public static class LearningReplyParser
                 Text(criterion, "samplePolicy", 80) != LearningAdmissionPolicy.Criterion.SamplePolicy)
                 return new(LearningAdmissionReason.InvalidFalsification);
             var draft = new LearningProposalDraft(question, rationale,
-                new(new("momentum", "v1"), 20m, SyntheticLearningScope.Handle), LearningAdmissionPolicy.Criterion);
+                new(new("momentum", "v1"), 20m, scope), LearningAdmissionPolicy.Criterion);
             return new(null, new LearningReasonerReply.Proposal(response, draft));
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or OverflowException)

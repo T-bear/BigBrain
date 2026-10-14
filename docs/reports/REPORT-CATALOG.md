@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `Finance recurring research, 2026-10-14` — [Model-free recurring implementation](features/finance/recurring-research-implementation-20261014.md). REVIEW CHECKPOINT; two bounded cohorts, shared durable budget, native science and history replay. No operational acceptance; stale-restore reconciliation and real provisioning remain explicit release gates.
+
 - `BB-132H, 2026-10-10` — [Versioned observation mapping](features/finance/bb-132h-versioned-observation-mapping-20261010.md).
   Merge Candidate, review only: immutable effective snapshots/currentness assertions in the existing
   Finance owner, fixture-only lineage/restart/migration proof. No live adoption or SHADOW expansion.
