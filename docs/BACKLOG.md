@@ -7,7 +7,9 @@
 and [verification/remaining work](reports/features/finance/recurring-research-implementation-20261014.md).
 Local reasoner hosting/composition implemented, disabled by default; grant creation remains explicit.
 Production recurring authority is safely blocked in scheduler and kernel, with no config bypass.
-Before unattended release: settle consumption reconciliation for consistently stale restored authority;
+Final authority review: **BLOCKED** on one provisioned independent monotonic consumption witness,
+with explicit writer/reset/restore protection. Existing lifecycle/Sentinel/local volumes do not provide it.
+No ordinary file-marker substitute is implemented. Before unattended release: resolve that exact boundary;
 approve exact real-data scientific eligibility, finite budget/cohorts, model profile and provisioning;
 separately authorize deployment and bounded real inference. No automatic renewals or new recovery work.
 No generic preparation/consolidation sprint is proposed.

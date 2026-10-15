@@ -6,8 +6,11 @@
 Branch `finance/recurring-research`, baseline `0851ee48a768348a001f1525f0b30c29584fd821`,
 tree `685fbe8be345d25a4775a8f64ef7b0d62687798c`.
 Previous reviewed implementation `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9` is preserved.
-Final correction subject `review: gate recurring authority and compose local reasoner` resolves current
-SHA/tree. Production authority is hard-blocked; trusted same-API local composition is implemented,
+Reviewed correction `d7eaa4aa04c8de6af3832563d95e4c517bdd9218`, tree
+`5fb37874d8146f7fc216517ddfaa05c704fe4eea`, is unchanged in code/tests.
+Current publication subject `review: record blocked independent research authority` resolves SHA/tree.
+**BLOCKED:** no accepted independent monotonic consumption witness; next decision is the concrete
+protected writer/restore boundary. No marker/backend implementation or further investigation queued. Production authority is hard-blocked; trusted same-API local composition is implemented,
 not deployed. No safe independent rollback witness exists; no configuration can clear this stop. [Scope, tests, actual limitations and next decision](../reports/features/finance/recurring-research-implementation-20261014.md).
 Unrelated mockups and untracked ADR0006–0009 remain preserved and excluded. No operational/private
 helpers, databases, configuration or credentials were touched. No BB-132K recovery work was reopened.

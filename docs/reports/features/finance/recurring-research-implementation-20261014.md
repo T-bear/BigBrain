@@ -4,7 +4,8 @@ Detta är en sanerad GitHub-version.
 
 Initial publication: 2026-10-14; final release correction: 2026-10-15. **REVIEW CHECKPOINT / NOT MERGE CANDIDATE / NOT OPERATIONALLY ACCEPTED.**
 Implemented and tested functionality is distinguished below from the remaining contract/release gaps.
-No deployment, activation or current host-state verification was performed.
+No deployment or activation was performed. The final authority section records narrowly scoped
+read-only mount/capability inspection; it does not revalidate production evidence or operational health.
 
 ## Metadata
 
@@ -13,12 +14,83 @@ No deployment, activation or current host-state verification was performed.
 - Branch: `finance/recurring-research`.
 - Original reviewed implementation: `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9`;
   tree `ce791771859346ed784cf274d3f3f5a5c34c9808`, preserved without rewriting.
-- Current publication subject: `review: gate recurring authority and compose local reasoner`.
+- Reviewed correction: `d7eaa4aa04c8de6af3832563d95e4c517bdd9218`;
+  tree `5fb37874d8146f7fc216517ddfaa05c704fe4eea`.
+- Current publication subject: `review: record blocked independent research authority`.
 - Resolve the exact publication commit/tree from that unique subject and Git metadata; no recursive
   self-hash is embedded in this report. Main was verified unchanged before publication.
 - Owner authorized implementation against contract review `ca2b0fddaf58b050bde3f43d36db12cfff47ab66`,
   tree `e1413c2367129e33acad43efe62dc91556a7346c`. Neither the contract nor release-analysis branch
   was merged to obtain this baseline.
+
+## Final authority reconciliation — 2026-10-15
+
+**B. BLOCKED — no qualifying independent monotonic authority exists in the inspected accepted
+implementation/deployment contract.** No source/test/configuration change. The enforced production
+stop from d7eaa4a remains intact. This is the task's explicit safety stop, not a new implementation plan.
+
+### Existing mechanisms and actual boundaries
+
+| Candidate | Verified evidence | Why it cannot authorize safe automatic resumption |
+| --- | --- | --- |
+| Finance ledger/receipts/operations | FinanceRecurringResearch and FinanceResearchOperations persist in the Finance SQLite owner. | A complete older database preserves internally valid checksums while rolling back consumption. |
+| Lifecycle journal | SystemRecoveryCoordinator stores sessions/events/clean markers in a separate SQLite store. Compose and scoped live mount inspection show separate Finance/lifecycle **local-driver, local-scope, writable volumes** in the same API container. | Separate path/volume is not an anti-rollback authority. API can write both; accepted recovery scope includes both. Clean/unclean, clock sanity and quick_check do not prove highest consumed sequence. |
+| Local file outside Finance | No existing protected marker backend, dedicated writer capability or enforced restore exclusion was found. | A mode0600 file, rename/fsync, checksum/HMAC or local hash chain cannot detect restoration of its own older valid prefix. A second directory or disk alone does not establish the required protection. |
+| Sentinel | Program exposes read-only metrics/snapshot capability; SentinelRequestAuthorizer replay cache is an in-memory ConcurrentDictionary. ADR0003 freezes Sentinel v1 as read-only. | No durable conditional monotonic update bound to Finance program/grant/consumption exists. Adding privileged authority mutation would exceed an extension of an existing capability and require a separately approved boundary. |
+| Hardware-backed counter | Read-only sysfs enumeration found **0 visible TPM devices** in this execution environment. No accepted TPM/counter integration/provisioning contract exists in main. | Not proof that physical hardware is absent, and not authority to provision hardware or add a platform. It supplies no usable, attested backend here. |
+
+Read-only observations used scoped Docker Compose API identity and mount metadata only, plus volume
+Driver/Scope and filesystem lookup. Finance/lifecycle volume driver/scope are verified local/local;
+physical filesystem/device lookup was unavailable, including noninteractive privileged lookup.
+**Current device identity and physical independence remain unverified.** No private mount source,
+container environment, secret, database content or provider payload is published. More filesystem
+read permission alone would not add the missing monotonic capability/protection contract.
+
+Historical recovery-scope evidence was read from the existing BB-132K execution report at
+`0e798221debeffdb7f3286114bd1b01383e1af39`: Finance and lifecycle are both in the inventoried full
+recovery scope. This is reuse of its documented scope, not a new backup/drill or assertion about the
+latest archive. ADR0028 supplies checksum/restore integrity and inherited retention rules, not rollback
+resistance. ADR0026/0036 supply lifecycle/maintenance recovery, not an independent consumed-budget head.
+Untracked Sentinel ADR0006–0009 were excluded as implementation authority; proposed prose is not a
+provisioned service. No existing server component was changed or granted new privileges.
+
+### Exact missing dependency and minimum action
+
+**One dependency: a provisioned, independently protected monotonic consumption witness with a reviewed
+custody and restore boundary.** The owner/architect must identify and explicitly authorize the concrete
+primitive and its writer/administrator/reset rules: excluded from Finance/lifecycle restores, protected
+against older valid state replacement, missing/reset identity always fail-closed, and durable conditional
+advance binding program ID, authorization hash, cumulative consumption and sequence. Ordinary API file
+write access or a declaration that a directory is “outside backup” does not establish this guarantee.
+
+The minimum next action is that specific storage/privilege/restore-boundary decision and provisioning
+proof, **not another broad review sprint and not permission to bypass the current stop**. No available
+accepted component implements it. Creating a new database/service or widening Sentinel mutation
+therefore cannot be represented as the permitted small Finance correction. If no such primitive can
+be approved within the owner's constraints, automatic post-restart research remains blocked.
+
+Ordering alone cannot replace this prerequisite: SQLite-first with an unadvanced witness leaves a
+crash mismatch; witness-first may conservatively burn an unexecuted reservation, but a rollbackable
+witness can still restore spent budget. A future protocol must refuse mismatches/uncertain commits and
+check before both inference and evaluation; no optimistic reconciliation/refund is acceptable. No
+protocol or marker was implemented or claimed proven against crashes/concurrent manipulation here.
+
+### Verification and scope
+
+- Fetch verified main `0851ee48a768348a001f1525f0b30c29584fd821`, tree
+  `685fbe8be345d25a4775a8f64ef7b0d62687798c`; branch HEAD/remote initially exactly d7eaa4a above.
+- Reused unchanged d7eaa4a code/test evidence: **1177 PASS /0 FAIL /8 intentional real-model SKIP**,
+  Release build0 warnings/errors, existing proof-worker composition, budget/replay/concurrency/history
+  and `RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore` refusal witness.
+- No new executable authority backend exists; consequently new marker crash/manipulation tests were
+  **not run** and are not asserted passing. No full test/build rerun for this documentation-only delta.
+- Publication checks: documentation verifier, working/staged whitespace, staged Gitleaks, exact
+  five-document scope and unchanged source/test/build/configuration tree against d7eaa4a.
+- Same branch, additive documentation checkpoint only. No BB-132K execution, database opening/write,
+  provider/model call, grant creation, deployment, activation, SHADOW or trading.
+
+Finance **RESEARCH /0 SEK /NONE**. STOP after publication for independent review; not mergeable as an
+unattended Finance Automation Release. The previous composition correction remains available unchanged.
 
 ## Final release correction — 2026-10-15
 
