@@ -1,5 +1,92 @@
 # BigBrain Status
 
+## AAPL collection enabled with versioned mapping — 2026-10-15
+
+**ACTIVATED / HEALTH VERIFIED / FIRST SCHEDULED ACQUISITION AND MANIFEST PERSISTENCE PENDING.**
+Owner explicitly authorized the mapping transition and AAPL-only automatic collection. Accepted main
+and deployed revision remain `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`. This supersedes the earlier
+activation stop below; it does not activate research. Operational review continues additively from
+`64ae42fe7564a6e9e21be11d5f2b46b206686924` on `review/finance-recurring-research-deployment`.
+
+### Verified mapping and source evidence
+
+Public official sources inspected2026-10-15 before verification at `2026-10-15T17:44:52.955242+00:00`:
+
+- [Apple investor FAQ](https://investor.apple.com/faq./default.aspx) identifies AAPL on The Nasdaq
+  Stock Market LLC. [Nasdaq's current symbol directory](https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt)
+  identifies Apple Inc. common stock, category Q, non-test, normal financial status, non-ETF;
+  its literal creation stamp was `1015202612:11` (no timezone inferred). Direct public retrieval
+  completed17:43:16UTC. This establishes current identity, not uninterrupted historical/future listing.
+- [Apple corporate-action history](https://investor.apple.com/dividend-history/default.aspx) lists
+  the latest cash dividend declaration2026-07-30 and latest split2020; the FAQ also lists five splits.
+  No inspected source establishes a material current symbol/venue change. This is a bounded current
+  check, not automatic corporate-action monitoring or a guarantee against future changes.
+- [Alpaca historical bars contract](https://docs.alpaca.markets/us/reference/stockbarsingle-1) supports
+  AAPL,1Day,IEX,USD default,raw/unadjusted values and `asof=-` (no implicit historical rename mapping).
+  [Feed semantics](https://docs.alpaca.markets/us/docs/market-data-faq): IEX is one feed, not XNAS listing
+  identity or consolidated US coverage. Raw prices are not dividend/split-adjusted total returns.
+- [Alpaca terms](https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf) retain
+  personal/non-commercial scope and termination/third-party qualifications. No newly established
+  applicable deletion obligation was identified. Existing `bb132e-owner-data-use-risk-v1`,
+  recorded2026-10-04, AffectedUseEnabled=true and CurrentDeletion=Unknown remain unchanged;
+  this is owner risk acceptance, not a contractual retention guarantee or fresh account-entitlement
+  verification. Actual provider acceptance remains untested during this activation.
+
+Exactly one canonical instrument `US:XNAS:AAPL`, Apple Inc., Equity/USD/XNAS, symbol AAPL, now has
+two versions under `finance-observation-mapping-v1`:
+
+| Version | Effective source dates | Assertion / acquisition authority |
+| --- | --- | --- |
+| Historical snapshot | 2026-01-29–2026-10-02, unchanged | Exact retained receipt snapshots checked at `2026-10-15T17:42:25.872551+00:00`; historical-only assertion expired `2026-10-15T17:42:26.872551+00:00`. No new historical acquisition authority. |
+| Current snapshot | 2026-10-15–null | `operator:apple-nasdaq-aapl-20261015`; verification `2026-10-15T17:44:52.955242+00:00`, exclusive revalidation deadline `2026-10-22T17:44:52.955242+00:00`. |
+
+Verification references: `operator:retained-aapl-receipts-20261015` and
+`operator:apple-faq-nasdaq-directory-alpaca-20261015`, resolved by this evidence and the retained
+receipt commitments below. The historical assertion records today's snapshot comparison, not a
+fabricated2026-10-04 verification. Null end means no known termination at verification, never permanent
+permission. No authority is asserted for the gap2026-10-03–14. Reverification is required before the
+current deadline; expiry rejects further requests. Material identity changes require separate review.
+
+### Actual activation and remaining scheduled evidence
+
+Only three existing external keys changed atomically: ObservationRuntime Enabled, Alpaca transport
+Enabled, and InstrumentsJson. The regular ignored configuration remains mode0600; unrelated entries
+were preserved byte-for-byte, credentials unchanged and never output. Binding verified exactly.
+Cadence remains360minutes, lookback3days. EODHD/FRED/ResearchScheduler/model/recurring mode remain
+disabled; ResearchOperations maintenance remains paused. No grant, hypothesis or SHADOW work started.
+
+API-only Compose recreation used `up -d --no-deps --no-build --pull never --wait --wait-timeout 60 api`.
+Same image `sha256:90c9c6d75a7fe1bdde79670537b4fd2ca8cf6b9cd7dd704868ffc947e25882a6`, exact compiled/OCI
+revision verified. API boot17:45:06UTC, clean prior shutdown, recovery complete, synchronized clock,
+zero interrupted jobs, aggregate/container health healthy at17:45:45UTC; mounts and other container
+identities unchanged. Restart policy remains `unless-stopped`; configuration survives normal API
+restart, which starts another full cadence wait. No build, systemd repair or unrelated restart.
+
+Enabled configuration plus healthy registered observation health check establishes accepted startup
+configuration/Waiting state; no cycle log exists yet. The accepted worker waits six hours after
+recovery: next check **approximately2026-10-15 23:45UTC**. Exact in-memory NextCheckUtc is not exposed
+by the existing public aggregate health response; the time is derived, not a queried timestamp.
+That first window precedes completion of the newly covered New York day and must reject older gap
+dates before network. Earliest expected eligible request is **approximately2026-10-16 05:45UTC**
+(07:45 Stockholm), for source2026-10-15. No cadence shortening, manual one-shot or cycle trigger.
+Gap rejections may make runtime health Degraded while other eligible slots can still acquire safely;
+this does not create authority for the uncovered dates. Scheduling is not proof of provider success.
+
+Read-only native reopen after recreation,17:46:29UTC: schema99, two old receipts, identical stored
+JSON hashes/full checksums/snapshots/knowledge times, lineage PASS, unchanged watermark and historical
+PIT commitment. Zero mapping manifests/bindings and zero prospective candidates/results remain.
+**The new mapping is accepted in process configuration and persisted externally; its Finance manifest
+will only be recorded by PrepareObservationMapping at the first eligible scheduled request. It is not
+reported as database-adopted yet. No new Alpaca request or receipt occurred in this operation.**
+
+The worker is owned by Docker/the API, independently of the agent session, with accepted bounded
+serial requests, timeout/cancellation, no retries and expiry checks. Durable receipts/manifests and
+sanitized cycle logs provide the next verification point after the eligible scheduled cycle. No passive
+agent polling is needed. Remaining verification: read-only confirm the new manifest/binding, provider
+outcome and receipt temporal/lineage commitments; do not manually force a request if it fails.
+Unchanged implementation tests are reused; this operational delta uses identity/config/health/native
+reopen checks plus documentation, whitespace and staged-secret checks. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## AAPL collection activation gate — 2026-10-15
 
 **OWNER-AUTHORIZED COLLECTION / STOPPED BEFORE ACTIVATION: CURRENT MAPPING MISSING.**

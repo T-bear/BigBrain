@@ -1,5 +1,33 @@
 # Codex interrupted-run recovery
 
+## AAPL automatic collection activation handoff — 2026-10-15
+
+**INTERRUPTED — SAFE TO RESUME: activation complete; scheduled live-result verification pending.**
+Accepted/deployed revision `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`; continue the same operational
+review branch `review/finance-recurring-research-deployment`, preserving checkpoint
+`64ae42fe7564a6e9e21be11d5f2b46b206686924`. Publication subject
+`docs: record versioned AAPL collection activation` resolves this checkpoint SHA/tree in Git.
+[Authoritative activation evidence, mapping sources/times and limitations](../STATUS.md#aapl-collection-enabled-with-versioned-mapping--2026-10-15).
+
+Only ignored private configuration and API recreation were performed operationally. No product code,
+provider call, manual cycle, research/grant or other-service change. Git delta is only STATUS and this
+handoff; unrelated mockups/ADRs remain excluded. All pre-existing receipts and PIT commitments are
+unchanged on native read-only reopen. Observation/Alpaca enabled only for AAPL, cadence360/lookback3;
+research/legacy workers disabled, maintenance paused. API is healthy on the exact original image.
+
+No agent-owned background operation remains. The existing hosted worker survives the agent session
+under Docker unless-stopped; it deliberately waits a full cadence and does not need agent monitoring.
+Next check approximately23:45UTC; first eligible source-day request approximately05:45UTC2026-10-16.
+Do not repeat recreation, alter cadence, trigger a manual request or infer success from enabled flags.
+Next exact action after that scheduled point: read sanitized cycle outcome and read-only native receipt/
+manifest evidence; compare both preserved receipts, watermark/PIT and new source/ingestion times.
+Manifest adoption/new receipt are **not yet verified**. Existing public health exposes aggregate state,
+not the worker's exact NextCheckUtc. Mapping expiry2026-10-22T17:44:52.955242Z stops further acquisition
+without separately truthful revalidation; it is not an unlimited authorization.
+
+Publication checks: documentation verifier, diff/whitespace, staged Gitleaks; unchanged code suites
+not rerun. No secrets/private paths/raw payloads in publication. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## AAPL collection activation stop — 2026-10-15
 
 **SAFE STOP BEFORE ACTIVATION / CURRENT MAPPING INPUT REQUIRED.**
