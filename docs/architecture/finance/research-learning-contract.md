@@ -84,12 +84,16 @@ rollback detection or unattended restart. Resolving it needs explicit reviewed c
 outside the rollback domain; no such authority is invented here. There is no reconciliation command
 that can simply bless the restored balance. This is a bounded security stop, not a new backup project.
 
-The final authority check found no accepted independent monotonic writer: lifecycle is writable,
-restorable SQLite; Sentinel is read-only; no provisioned hardware counter boundary exists in the
-inspected implementation. Separate local volumes do not prove anti-rollback protection. **BLOCKED**
-until a concrete protected consumption witness, writer privileges and restore/reset exclusions are
-explicitly approved and demonstrated. No file-marker substitute, new service or Sentinel widening is
-implemented. [Exact evidence, unknowns and single next decision](../../reports/features/finance/recurring-research-implementation-20261014.md#final-authority-reconciliation--2026-10-15).
+The owner revised the target: normal restart should resume; backup restore requires manual approval.
+This does not remove the need to distinguish the two reliably. Existing recovery/drill tools do not
+mediate every production database/volume replacement. **BLOCKED** pending a concrete protected,
+mandatory restore/startup interlock outside the common rollback domain, with all replacement paths
+and custody enforced, or equivalent independent evidence. No optional flag/clean marker suffices.
+This is a missing deployment/security primitive, not an implemented or approved mechanism.
+Manual reconciliation is not implemented: it must preserve trustworthy consumed/reserved authority
+and protected exposure. Without that history, the old grant stays unusable; a separately approved new
+grant cannot automatically reuse exposed or exposure-unknown holdouts.
+[Revised policy, precise dependency and verification limits](../../reports/features/finance/recurring-research-implementation-20261014.md#normal-restart-and-manual-restore-approval--2026-10-15).
 
 `BigBrain.Finance.Hosting` is a first-party composition entry for the **same API process**, not another
 service, scheduler or process runner. It references API and Brain; neither references the other or the

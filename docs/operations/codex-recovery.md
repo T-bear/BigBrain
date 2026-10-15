@@ -8,10 +8,14 @@ tree `685fbe8be345d25a4775a8f64ef7b0d62687798c`.
 Previous reviewed implementation `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9` is preserved.
 Reviewed correction `d7eaa4aa04c8de6af3832563d95e4c517bdd9218`, tree
 `5fb37874d8146f7fc216517ddfaa05c704fe4eea`, is unchanged in code/tests.
-Current publication subject `review: record blocked independent research authority` resolves SHA/tree.
-**BLOCKED:** no accepted independent monotonic consumption witness; next decision is the concrete
-protected writer/restore boundary. No marker/backend implementation or further investigation queued. Production authority is hard-blocked; trusted same-API local composition is implemented,
-not deployed. No safe independent rollback witness exists; no configuration can clear this stop. [Scope, tests, actual limitations and next decision](../reports/features/finance/recurring-research-implementation-20261014.md).
+Previous authority checkpoint `e57b8f30ae70a8a37f4b89730855c4278cd3939d` is preserved.
+Current publication subject `review: clarify normal restart and manual restore safety stop` resolves SHA/tree.
+**BLOCKED:** revised normal-restart/manual-restore policy still lacks an enforced independent
+restore/startup boundary. Existing drills do not mediate production replacement. Production stop remains;
+no manual-clear command or code change. Next is the concrete custody/restore-boundary decision, not
+another general investigation. Five-document delta only; prior 1177 PASS/8 intentional SKIP and Release
+build evidence reused, documentation/whitespace/staged-secrets/scope checks apply to this publication.
+[Actual behavior, manual reconciliation limits and exact dependency](../reports/features/finance/recurring-research-implementation-20261014.md#normal-restart-and-manual-restore-approval--2026-10-15).
 Unrelated mockups and untracked ADR0006–0009 remain preserved and excluded. No operational/private
 helpers, databases, configuration or credentials were touched. No BB-132K recovery work was reopened.
 STOP for independent review; no merge/deployment/activation authority. Finance RESEARCH / 0 SEK / NONE.

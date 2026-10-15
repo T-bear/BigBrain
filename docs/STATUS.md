@@ -9,9 +9,11 @@ spent/unchanged. No real provider/model execution. [Evidence and unresolved rele
 Final correction implements same-API local runtime composition, disabled without an explicit profile.
 Real recurring authority is hard-blocked pending independent restore-consumption reconciliation;
 normal reopen preserves history but cannot prove absence of a consistent old restore. NOT MERGE CANDIDATE
-for unattended release. Final authority reconciliation: **BLOCKED**. No accepted independent monotonic consumption witness
-was found; a concrete protected writer/restore boundary is the single remaining technical dependency.
-No marker workaround or operational provisioning/activation. Finance RESEARCH / 0 SEK / NONE.
+for unattended release. Revised owner target permits manual restore approval, but **BLOCKED** remains:
+no enforced independent restore/startup boundary distinguishes ordinary restart from older replacement.
+Manual reconciliation is not implemented; missing consumption history cannot reinstate an old grant.
+[Current decision and limits](reports/features/finance/recurring-research-implementation-20261014.md#normal-restart-and-manual-restore-approval--2026-10-15).
+No code or operational change. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-132H versioned observation mapping — 2026-10-10
 

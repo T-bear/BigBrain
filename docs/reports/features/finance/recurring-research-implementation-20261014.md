@@ -16,14 +16,91 @@ read-only mount/capability inspection; it does not revalidate production evidenc
   tree `ce791771859346ed784cf274d3f3f5a5c34c9808`, preserved without rewriting.
 - Reviewed correction: `d7eaa4aa04c8de6af3832563d95e4c517bdd9218`;
   tree `5fb37874d8146f7fc216517ddfaa05c704fe4eea`.
-- Current publication subject: `review: record blocked independent research authority`.
+- Previous authority checkpoint: `e57b8f30ae70a8a37f4b89730855c4278cd3939d`,
+  tree `750cb1b7d586b1510524d41de492e12188691864`.
+- Current publication subject: `review: clarify normal restart and manual restore safety stop`.
 - Resolve the exact publication commit/tree from that unique subject and Git metadata; no recursive
   self-hash is embedded in this report. Main was verified unchanged before publication.
 - Owner authorized implementation against contract review `ca2b0fddaf58b050bde3f43d36db12cfff47ab66`,
   tree `e1413c2367129e33acad43efe62dc91556a7346c`. Neither the contract nor release-analysis branch
   was merged to obtain this baseline.
 
+## Normal restart and manual restore approval — 2026-10-15
+
+**B. BLOCKED.** The owner now requires automatic normal restart, but only manual reconciliation
+following backup restore. Automatic post-restore resumption is no longer a release requirement.
+This supersedes that requirement in the earlier authority discussion; it does not supply evidence
+that a particular startup is a normal restart. The existing production stop remains unchanged.
+
+### Bounded finding and smallest missing dependency
+
+The existing integration points were inspected, without executing recovery or querying production:
+`SystemRecoveryCoordinator.ReadPreviousSession` reads clean state from restorable lifecycle SQLite;
+`MayStartTimeSensitiveWork` checks readiness/clock/health, not database freshness.
+`FinanceDataProtection.DrillRestore` verifies an isolated staging copy and removes it; it does not
+mediate replacement of the production database or Docker volume. The backup/restore runbook describes
+isolated drills and migration snapshots. `scripts/verify-bigbrain-recovery.sh` reads service/status
+information; it is not a mandatory restore interlock. ADR0026/0028/0036 do not establish one.
+The prior checkpoint's infrastructure evidence is reused; no new host inspection or BB-132K work.
+
+**The one remaining dependency is a trustworthy distinction between ordinary restart and replacement
+with older durable state.** With the revised requirement, the minimum candidate boundary is an
+independently protected, mandatory restore interlock: every permitted production restore/volume
+replacement must durably inhibit research startup *before* replacement, and the inhibitor must not
+roll back with Finance/lifecycle/config backups. Missing or contradictory interlock state must deny
+startup. Its custody, restore exclusions and exclusive control of replacement paths must be established;
+an operator reminder, another writable file or optional restore hook is insufficient. An unmediated
+storage rollback would still require independent consumption evidence; it is not covered by an
+interlock that only handles voluntary restore commands.
+
+No existing mechanism establishes these properties. Creating a flag here would incorrectly allow an
+older self-consistent database to resume. **No code, flag, migration or manual-clear command is added.**
+The smallest next owner/architect decision is approval of a concrete enforced restore/startup boundary
+and its covered failure model, including who can replace volumes and how bypass is prevented. This is
+a specific operational/security dependency, not a request for another general investigation. It is not
+provisioned or approved by this checkpoint. If that boundary cannot be guaranteed within scope, the
+existing stop must remain; a protected independent consumption witness remains an alternative, not a
+new mandatory platform proposed by this task.
+
+### Actual restart behavior and reconciliation limits
+
+- Existing ledger/history can reopen and exact completed attempts can replay without consuming work.
+  Fixture tests demonstrate remaining/spent budget, uncertainty stops and protected history across reopen.
+- New real-origin inference/evaluation remains refused on **both normal and restored startup** with
+  `finance.research.recurring.restoreReconciliationRequired`. This is safe refusal, not successful
+  automatic normal restart or reliable restore classification. Maintenance acknowledgement cannot clear it.
+- Manual reconciliation is **not implemented** because trustworthy restore identification/consumption
+  evidence is unavailable. Any later reconciliation must bind the original program/grant and retained
+  consumption, reservations, uncertainty and protected-data exposure to independently trustworthy history.
+  It may not lower consumption, erase uncertain attempts or refill any quota.
+- If that history cannot be established, the old authorization must remain unusable. A separate explicit
+  new authorization decision must not automatically reuse previously exposed protected cohorts; unknown
+  exposure is a refusal condition. Neither an approval click nor a fresh program ID supplies this proof.
+
+### Verification for this checkpoint
+
+Only five existing canonical documents change. Source, tests, build and configuration remain identical
+to d7eaa4a. Reused executed evidence: full API **1177 passed /0 failed /8 intentional real-model skips**
+and Release build **0 warnings /0 errors**, with commands recorded below. No executable tests rerun.
+
+| Requested scenario | Existing evidence and honest limit |
+| --- | --- |
+| Normal restart, remaining budget/history | `TwoDisjointIterationsPersistNativeScienceAndSanitizedHistoryAcrossReopen` proves fixture continuation; production continuation is blocked. |
+| Exhausted quota | `ExhaustedBudgetAndClockRegressionStopBeforeReasoner` and two-iteration replay retain spent authority. |
+| Older database | `RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore` refuses both a reopened store and its consistent isolated snapshot. It proves refusal, not rollback detection or successful reconciliation of later spending. |
+| Missing/contradictory restore information | No independent restore information protocol exists; unconditional production denial remains. No invented protocol tests claimed. |
+| Interrupted/concurrent/duplicate work | `ConcurrentInvocationAndCrashDoNotRefundOrCreateAnotherExperiment`, negative-outcome and replay tests retain reservations/no extra execution. |
+| Manual reconciliation | Unsupported; no passing manual-resume test claimed and no warning-dismiss bypass introduced. |
+| History and holdout protection | `ProtectedHoldoutChangesDoNotChangeVisibleInputOrLaterHistoryDigest` and sealed-receipt regression evidence reused. |
+
+Publication verification: documentation verifier, working/staged whitespace, staged Gitleaks and
+exact scope/unchanged implementation comparison. No new build/full suite, model/provider call,
+deployment, database/secret change or restore exercise. Finance **RESEARCH / 0 SEK / NONE**.
+STOP after the single additive review checkpoint; automatic recurring release remains blocked.
+
 ## Final authority reconciliation — 2026-10-15
+
+Historical decision context; the revised requirement and current verdict appear above.
 
 **B. BLOCKED — no qualifying independent monotonic authority exists in the inspected accepted
 implementation/deployment contract.** No source/test/configuration change. The enforced production
