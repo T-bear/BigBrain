@@ -1,5 +1,48 @@
 # BigBrain Status
 
+## Finance API deployment — 2026-10-15
+
+**ACCEPTED REVISION DEPLOYED / RUNTIME VERIFIED / RESEARCH NOT ACTIVATED.**
+Owner-authorized source and running revision: `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`,
+tree `84b751733b63eb54c926bb380fe59f1686f4230b`.
+[Exact main CI succeeded](https://github.com/T-bear/BigBrain/actions/runs/38736535147).
+`scripts/build-bigbrain-api.sh be7634bd82f52b3cb536142ae3e03dd0e2656aa2` succeeded from the
+clean tracked Git archive. Image `sha256:90c9c6d75a7fe1bdde79670537b4fd2ca8cf6b9cd7dd704868ffc947e25882a6`
+has matching OCI revision and compiled `system-build-identity`, verified before and after deployment.
+`docker compose -f compose.yaml up -d --no-deps --no-build --pull never --wait --wait-timeout 60 api`
+replaced only API; the running image ID matches the build. API started at 12:53:17 UTC.
+All mount definitions were compared by destination and are unchanged; the initial ordered-list
+comparison differed only because Docker reordered entries. Other existing containers retain their
+IDs and start times. The previous private override pinned only API/Web image identities; its files,
+external configuration, credentials and volumes were not modified.
+
+Health and read-only recovery, Finance observation/cadence/operations, settings and calendar requests
+returned HTTP200. Settings/theme and calendar/week response hashes match their predeployment values.
+Recovery reports healthy, previous shutdown clean, completed recovery, synchronized clock, no low disk
+and zero interrupted jobs; all reported components, including Finance/lifecycle, are healthy.
+This is bounded runtime smoke verification, not a new restore drill or byte-level database audit.
+No source/database repair or manual migration command was run; normal accepted application startup
+owns schema initialization. Existing named storage remains mounted in place.
+
+Effective EODHD, FRED, ResearchScheduler, ObservationRuntime and Alpaca transport remain **false**;
+MaintenancePaused remains **true**. Research operations reports `disabled` / `SCHEDULER_DISABLED`.
+The model profile is not enabled/provisioned by this task; no grant was created, provider/model call
+made or research schedule activated. Startup log review found no error entries. Owner-drop emits
+`Rejected / technicalOrPolicyGateFailed` warnings; no raw artifact or payload is published.
+The already failed `bigbrain.service` remains untouched; this deployment used the healthy Compose
+API directly and does not certify appliance reboot readiness.
+
+**Next separate operational decision:** authorize eligible real-data source/mapping/rights and
+cohort dates, exact model/resource profile and finite budget/expiry. Then perform explicit enrollment,
+protected authority-journal provisioning outside recovery scope, and the read-only authority check
+under the final API UID/capabilities/mounts. Require `RecurringAuthorityMatched` before separately
+approved model/scheduler enablement and maintenance release. Resolve appliance startup ownership
+before claiming unattended reboot readiness. The existing small AAPL receipt set is not sufficient
+evidence for the required 300–500-session cohorts; no dates, grant or profile are invented here.
+[Exact configuration and activation sequence](architecture/finance/research-learning-contract.md#initial-release-configuration-and-operator-sequence).
+Finance remains **RESEARCH / 0 SEK / NONE**. No trading or financial transaction.
+Earlier implementation-only and not-deployed statements below describe their dated checkpoints.
+
 ## Finance recurring research — final release implementation, 2026-10-15
 
 **MERGE CANDIDATE / AUTOMATICALLY VERIFIED / NOT DEPLOYED OR ACTIVATED.**

@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## Finance accepted API deployment handoff — 2026-10-15
+
+**DEPLOYED / VERIFIED / RESEARCH DISABLED / no interrupted operation.**
+Accepted and deployed revision: `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`,
+tree `84b751733b63eb54c926bb380fe59f1686f4230b`.
+Sanitized durable evidence and remaining activation prerequisites are in
+[STATUS](../STATUS.md#finance-api-deployment--2026-10-15).
+Documentation-only review branch `review/finance-recurring-research-deployment`; publication subject
+`docs: record accepted Finance API deployment` resolves its exact commit/tree in Git metadata.
+Only STATUS and this handoff changed. Unrelated mockups and untracked ADR0006–0009 remain preserved.
+Build and API-only Compose recreation succeeded; identity, health, mount/environment preservation
+and read-only smoke checks passed. No deployment process remains running. Review documentation,
+whitespace and staged-secret checks accompany publication; unchanged code suites are not rerun.
+No new grant, provider/model call, activation, systemd repair or configuration edit. Next action is
+owner/architect review and a separate concrete activation authorization; do not automatically continue.
+Earlier implementation-review handoffs below remain historical. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## Finance recurring research final release — 2026-10-15
 
 **MERGE CANDIDATE / SAFE TO REVIEW / no production operation.**
