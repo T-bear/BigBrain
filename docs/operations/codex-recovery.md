@@ -1,5 +1,25 @@
 # Codex interrupted-run recovery
 
+## Historical Qwen operational request — 2026-10-15
+
+**SAFE STOP / NO INFERENCE / NO ACTIVE OPERATION.** Same deployment review branch, accepted main
+`be7634bd82f52b3cb536142ae3e03dd0e2656aa2`; prior operational checkpoint
+`521a3486120b92f7bf5fedce12e520c763bb7eed` retained. Publication subject
+`docs: record historical Qwen admission and authority stop` resolves this checkpoint SHA/tree.
+[Exact dataset, live authority counts, code boundary and smallest required decision](../STATUS.md#historical-local-ai-run--operational-stop-2026-10-15).
+
+Historical data exists; the stop is not a requirement to wait for prospective Alpaca cohorts.
+No registered historical model authority/admission route exists. Owner explicitly excluded new grants;
+do not enroll, reuse synthetic A/B/C authority, relabel WIKI rows, bypass the protected ledger or
+replace Qwen with a deterministic-only result. No worker build is necessary until the actual boundary
+is resolved. Next decision is limited historical admission/ledger integration and explicit one-run
+scope/profile authority; no generic study or automatic continuation is proposed.
+AAPL collection stays untouched. Its first eligible scheduled-result verification remains pending
+as recorded below; this task neither triggers nor waits for it. No production mutation or process
+needs recovery. Only STATUS/recovery documentation changes; unrelated local work remains preserved.
+Read-only metadata diagnostics succeeded; documentation/whitespace/staged-secret checks accompany
+publication. No application test suite or real inference was executed. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## AAPL automatic collection activation handoff — 2026-10-15
 
 **INTERRUPTED — SAFE TO RESUME: activation complete; scheduled live-result verification pending.**

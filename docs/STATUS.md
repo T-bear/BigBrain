@@ -1,5 +1,63 @@
 # BigBrain Status
 
+## Historical local-AI run — operational stop, 2026-10-15
+
+**BLOCKED BEFORE INFERENCE / NO NEW RESEARCH RESULT.** Accepted/deployed revision remains
+`be7634bd82f52b3cb536142ae3e03dd0e2656aa2`. The owner authorized one bounded historical local-model
+run only where existing admission/authority permits it, explicitly excluding creation of grants,
+protected-journal changes, prospective activation and changes to AAPL collection.
+
+Concrete historical input exists: promoted NASDAQ-WIKI revision `wiki-5713d7dccfa38f56`, AAPL,
+**748 persisted observations,2014-01-02–2016-12-19**. Catalog status Promoted, provenance/validation/
+promotion Pass, PublicDomain, RawAndAdjusted; survivorship remains unknown. This is historical
+research evidence, not prospective data. The alternate GoogleFinance AAPL revision
+`research-2be8e5ba1eed5177` has11523 rows,1980-12-12–2026-08-31, technical Pass and historical
+backtest/train-validation-holdout eligibility **with limitations**: unknown external rights under
+owner risk acceptance, unresolved corporate actions, owner-claimed price basis/identity and recorded
+calendar/discontinuity limitations. It is not silently upgraded to fully eligible scientific input.
+
+Bounded live read-only SQLite inspection at17:58:58UTC found: learning_governance one row,
+Lifecycle=Uninitialized, Invocations=0, Submitted=0, EngineStarts=0, no enrolled scope;
+learning_finite_session0 rows, recurring_research_program0 rows, finance_scientific_lease0 rows.
+An uninitialized ledger is not an issued model grant. Existing BB-132C evidence is a completed,
+synthetic two-inference session; its exhausted authority cannot authorize this historical run.
+Current process has no approved local-reasoner profile or recurring-authority configuration.
+
+Exact boundary in the accepted implementation:
+
+- `FinanceResearchDatasets.RunBoundedResearchBacktest` and historical campaigns use existing
+  deterministic strategies/evaluation/persistence; they do not call IResearchReasoner/Qwen.
+- `CreateFiniteResearchSession` accepts `SyntheticLearningScope`; its validator requires synthetic
+  market/feature identities and the synthetic scientific contract. Relabelling WIKI input would
+  falsify provenance. Creating a session would additionally issue authority excluded by this task.
+- `RecurringResearchAuthorization.Validate` and `ProjectRecurring` admit only the specified Alpaca
+  daily receipt contract, explicit program authority and protected prospective cohort semantics.
+  Those requirements are **not imposed on historical backtesting**; they demonstrate why this
+  particular existing AI integration cannot be repurposed operationally for WIKI data.
+- No existing authorized historical Qwen-to-native-result route was found. A native worker rebuild
+  cannot supply historical admission, issue authority or make the separate deterministic command
+  an AI experiment. No substitute simulation or ad-hoc prompt/result file was produced.
+
+Minimum missing prerequisite: a separately approved bounded **historical dataset-to-Qwen admission
+and ledger binding**, using this exact accepted historical revision and a frozen chronological split,
+plus explicit permission to issue one new scoped invocation/evaluation authority and approve its
+local resource profile. This is a specific missing capability/authorization, not another general
+investigation. A repeat generic start approval alone cannot satisfy the current code contracts.
+The existing default local-model deadline is30seconds; the old180-second exception is not reused.
+No subsequent historical AI iteration is currently authorized or runnable through the accepted path.
+
+Verification: existing read-only dataset HTTP catalogs; isolated local BCL diagnostic compiled with
+installed SDK10.0.302 and executed from the exact deployed image with network disabled, read-only
+root/Finance mount, dropped capabilities, Mode=ReadOnly and SELECT-only deferred transaction.
+Only counts, lifecycle fields and historical coverage were queried; no holdout results/raw values.
+No migrating owner, application startup, database write or production diagnostic installation.
+AAPL/Alpaca remain enabled on the same healthy container, cadence360/lookback3 and unchanged mapping;
+research/model gates remain disabled. No restart/configuration change/provider request/model run,
+new hypothesis/report/result, grant or budget mutation was performed by this task. Previously verified
+model artifact evidence is reused; no unnecessary rebuild or inference test was run.
+Documentation/diff/staged-secret checks apply; unchanged product tests are not rerun.
+Finance **RESEARCH / 0 SEK / NONE**.
+
 ## AAPL collection enabled with versioned mapping — 2026-10-15
 
 **ACTIVATED / HEALTH VERIFIED / FIRST SCHEDULED ACQUISITION AND MANIFEST PERSISTENCE PENDING.**
