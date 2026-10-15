@@ -2,7 +2,7 @@
 
 Detta är en sanerad GitHub-version.
 
-Initial publication: 2026-10-14; final release correction: 2026-10-15. **REVIEW CHECKPOINT / NOT MERGE CANDIDATE / NOT OPERATIONALLY ACCEPTED.**
+Initial publication: 2026-10-14; final release implementation: 2026-10-15. **MERGE CANDIDATE / READY FOR RELEASE REVIEW / NOT OPERATIONALLY ACCEPTED.**
 Implemented and tested functionality is distinguished below from the remaining contract/release gaps.
 No deployment or activation was performed. The final authority section records narrowly scoped
 read-only mount/capability inspection; it does not revalidate production evidence or operational health.
@@ -20,14 +20,153 @@ read-only mount/capability inspection; it does not revalidate production evidenc
   tree `750cb1b7d586b1510524d41de492e12188691864`.
 - Previous restart-policy checkpoint: `6b0a240c1daa49fcf0ee54a81f74021166e6bed5`,
   tree `bdb8c93fe9594627c63175352fff2fa2c3d73e98`.
-- Current publication subject: `review: verify single research iteration and retain real-run gates`.
+- Previous single-run checkpoint: `5b958acad8eb3d9de2b3be95073072b99d38d4f1`,
+  tree `b22e95011369629c961b76226a4fd9ae8bc3d1d2`.
+- Current publication subject: `review: implement protected recurring research authority`.
 - Resolve the exact publication commit/tree from that unique subject and Git metadata; no recursive
   self-hash is embedded in this report. Main was verified unchanged before publication.
 - Owner authorized implementation against contract review `ca2b0fddaf58b050bde3f43d36db12cfff47ab66`,
   tree `e1413c2367129e33acad43efe62dc91556a7346c`. Neither the contract nor release-analysis branch
   was merged to obtain this baseline.
 
+## Final release implementation — protected recurring authority — 2026-10-15
+
+**Current verdict: MERGE CANDIDATE — READY FOR RELEASE REVIEW within the documented protection model.** Earlier BLOCKED sections below are preserved historical
+review evidence; this implementation supersedes their absence-of-mechanism finding. No previous commit
+is rewritten. Owner explicitly authorized the smallest independent durable state/restore boundary under
+documented operating conditions. No production provisioning, data acquisition or model invocation.
+
+### Actual delta
+
+- `RecurringResearchAuthority.cs`: one bounded versioned append-only consumption witness, full program/
+  grant/state commitments, cumulative counters, monotonic sequence and chain. No parallel scientific
+  engine, database, result store, scheduler or service. Linux64/ext4/root custody is required, not inferred
+  from an ordinary file. Protected descriptor-relative traversal rejects symlinks/writable ancestors;
+  statx checks root ownership/type/single-link/kernel append-only, fstatfs checks local ext4. API must be
+  nonroot, capability-free and NoNewPrivs=1. Configuration cannot select the fixture opener.
+- Existing `WriteRecurring` advances and fsyncs the witness **first**, under existing SQLite immediate
+  transaction and short nonblocking flock; SQLite commits second. Runtime audits and completion are
+  bound too. Before actual inference and evaluator entry the witness is rechecked. No post-crash refund,
+  journal truncation or automatic repair. Maximum64 records/128KiB; errors retain the existing sanitized
+  reconciliation reason. Initial enrollment is explicit, not inferred from a missing file.
+- Existing scheduler/kernel now admit matched protected authority instead of rejecting every real
+  program. Missing/stale/contradictory protection still denies. Recovery, governor, maintenance, timing,
+  scientific admission, old grants and worker isolation remain authoritative. Interrupted/reserved or
+  Indeterminate attempts never automatically restart, even with a matching witness.
+- `FinanceRecurringMaintenanceCommand.cs` adds two narrow maintenance operations: explicit bounded
+  `finance-recurring-enroll <grant-json> <sha256:raw-hash>` and nonmigrating read-only
+  `finance-recurring-authority-check`. Both require maintenance and disabled acquisition/research gates.
+  Enrollment reuses Finance JSON converters and owner, eligibility, exposure and singleton checks.
+  It emits a proposed seed but cannot install/recreate the protected journal. No resume/reset/grant API.
+- Trusted same-API hosting reads the explicit authority configuration and offers
+  `finance-recurring-profile-identity`, which validates a profile without invoking its worker. Existing
+  LocalReasonerRuntime/BRF1/native artifact behavior is unchanged. No new180s allowance or profile default.
+- No additional migration beyond existing branch migration99. Receipt bytes, mapping, holdouts, native
+  evaluator rules, historical A/B/C authority and Finance RESEARCH /0 SEK /NONE remain unchanged.
+
+### Protection and failure matrix
+
+| Event | Implemented result |
+| --- | --- |
+| Normal restart; durable witness matches validated Finance state | Existing schedule continues with exact remaining counters and history. No clean-shutdown shortcut is used. |
+| Power/process loss before either reservation write | No work was released. The unchanged matched state may proceed. |
+| Witness flushed, SQLite uncommitted/rolled back | Mismatch stops; no provider/model/evaluator call released. Potentially unused authority is not refunded. |
+| SQLite reservation committed; process dies before/during external/scientific work | Reserved/Indeterminate state remains spent and cannot rerun. |
+| Native result persisted before uncertain completion | Native evidence remains; attempt stops, no second evaluation or automatic completion claim. |
+| Older Finance or Finance+lifecycle backup; witness retained | Full-state/counter mismatch blocks new work. |
+| Missing/older/partial/corrupt witness or invalid OS protection | Fail closed, no fallback to fixture/same-database/clean-start authority. |
+| Concurrent scheduler/direct calls | Existing SQLite serialization and retained reservation prevent duplicate inference/evaluation; journal lock is nonblocking. |
+| Budget expired/exhausted or data incomplete | Existing stop/wait rules, no renewal or catch-up. |
+| Privileged rollback of the witness together with all data/configuration | **Outside the protection model; cannot be detected by this software.** Independent host custody/restore exclusion is mandatory, not optional. |
+
+Trusted root must provision one authoritative journal and keep it outside every Finance/lifecycle/config
+recovery set. API cannot replace/truncate it; host administrators must not bypass that boundary or create
+alternate active copies. A root-owned file without append-only enforcement is refused. The code rejects
+paths under configured Finance/lifecycle DB directories, but cannot prove arbitrary external backup tools
+respect exclusions: the deployment approval must bind the actual restore scope and privilege controls.
+Full-host/disk rollback, compromised root, failed flush guarantees and witness loss require stopping the
+old grant and independent reconciliation; no claim of disaster-recovery coverage or same-disk resilience.
+No automatic/manual warning-dismiss operation rewrites the witness to bless an older budget.
+
+Kernel semantics were checked against primary documentation (accessed2026-10-15):
+[ext4 inode flags](https://kernel.org/doc/html/latest/filesystems/ext4/inodes.html),
+[Linux open/O_APPEND](https://www.man7.org/linux/man-pages/man2/open.2.html), and
+[Linux statx attributes](https://man7.org/linux/man-pages/man2/statx.2.html).
+The host requires a positive `finance-recurring-authority-check` under its actual API identity/mounts
+before activation; no production filesystem flag/ownership/capability was changed during verification.
+
+### Model-free evidence and honest limits
+
+New tests use isolated temporary SQLite stores and a temporary journal opener unavailable through
+production configuration. Real-origin-shaped rows are deterministic **test transport data**, not actual
+market observations or evidence that production data is scientifically eligible. The same kernel runs
+non-fixture grants through scheduler → fake reasoner → unchanged native evaluator → persisted result,
+then a fresh owner instance and second scheduled cohort. Owned proof-worker tests additionally carry
+runtime audits through the journal. No Qwen or provider/network call occurs in these tests.
+
+Covered: two iterations across normal reopen; spent budget/history; restored older DB; missing, changed,
+partial and older witness; journal-ahead crash before SQLite commit for both reservations; committed
+interruption before inference, before science and after native persistence; concurrent replay and
+cancellation; default denial on ordinary unprotected file; structural OS-protection checks; explicit
+maintenance enrollment, exact file commitment, JSON roundtrip and rejected replacement grants. Existing
+holdout noninterference, temporal eligibility, maintenance/recovery/governor and profile tests remain.
+
+OS protection success is **not claimed from simulated protocol tests**: unit tests exercise the metadata
+predicate and real negative path, but do not set root append-only flags or change host privileges.
+Actual ext4 protected-file append/reopen must pass the shipped nonmigrating check during separately
+approved provisioning. That check reads the kernel flags; a textual owner assertion alone cannot pass.
+Manual destructive journal repair or joint rollback is deliberately not supported/tested as safe.
+
+Commands/results:
+
+- Focused recurring tests before final committed-interruption cases: **39 PASS /0 FAIL /0 SKIP**.
+- First full API run: **1193 PASS /1 FAIL /8 intentional real-model SKIP**. The proof-worker decline case
+  returned ReasonerFailure under parallel load; its exact underlying transport failure was not retained
+  by the old assertion. No claim of a proven root cause. Fixture-only invocation allowance changed10s
+  to20s, still inside the existing30s reservation, and the assertion now includes sanitized transport
+  audit on failure. No sleep, production profile or runtime timeout policy change. Focused proof cases
+  then passed **2/2**. This integration failure and correction are not hidden as initially green evidence.
+- Final full API: **1194 PASS /0 FAIL /8 intentional real-model SKIP**,1202 total,1m38s. Includes all42
+  recurring tests and relevant observation, mapping, finite/session, science, scheduler/recovery regressions.
+- Full Release solution build: **PASS,0 warnings/0 errors**.
+- Scoped full formatter/static verification, documentation (267 Markdown files/91 unique backlog IDs),
+  working/staged whitespace,13-file intended scope and staged Gitleaks: **PASS**.
+
+Final commands (log redirections only retained local diagnostics; no raw logs published):
+
+```text
+dotnet build BigBrain.slnx -c Release --no-restore
+dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj -c Release --no-build --no-restore --logger 'console;verbosity=minimal'
+dotnet format BigBrain.slnx --no-restore --verify-no-changes --include src/BigBrain.Api/Finance/RecurringResearchAuthority.cs src/BigBrain.Api/Finance/FinanceRecurringMaintenanceCommand.cs src/BigBrain.Api/Finance/FinanceRecurringResearch.cs src/BigBrain.Api/Finance/FinanceResearchScheduler.cs src/BigBrain.Api/Program.cs src/BigBrain.Finance.Hosting/LocalRecurringResearchComposition.cs src/BigBrain.Finance.Hosting/Program.cs tests/BigBrain.Api.Tests/FinanceRecurringResearchTests.cs
+node scripts/verify-documentation.mjs
+git diff --check
+git diff --cached --check
+gitleaks protect --staged --redact --no-banner
+```
+
+The full API rerun is justified by the actual failed integration and new shared-authority boundary.
+No frontend/Sentinel suites: no code/contracts in those components changed. No backup/drill, production
+inspection, deployment, activation, credentials, external request, real inference or grant was performed.
+
+### Exact release gates
+
+The [canonical operator/configuration contract](../../../architecture/finance/research-learning-contract.md#initial-release-configuration-and-operator-sequence)
+contains one bounded initial enrollment/protection/activation sequence. Suggested (not granted) first
+profile is I2/E2/T6/C128/W66s,33s completion per iteration,30s worker +250ms grace +2s reap, concurrency1,
+retries0,60min scheduler check and two disjoint explicitly dated300–500-session cohorts. The code caps
+rather than guarantees real-model completion. A real grant must bind the exact approved profile identity,
+expiry, scientifically eligible source/mapping/receipt facts and as-yet-unexposed holdouts.
+
+Remaining owner decisions are operational: approve exact release/merge/deployment, actual protected
+journal custody and restore exclusions, dataset eligibility/cohort dates, finite grant and profile,
+model artifact/OS resources and actual inference activation. No production dataset, date, profile or
+budget approval is fabricated. Late historical data and the old small AAPL set are not sufficient proof
+of a complete eligible cohort. Collection is separately controlled. No general preparation sprint is
+needed; no inference/data/deployment authority follows from this code checkpoint.
+
 ## First real AI research run — bounded execution check — 2026-10-15
+
+Historical checkpoint; superseded by the final release implementation above.
 
 **BLOCKED / REVIEW CHECKPOINT.** The requested single-run integration already exists in the recurring
 kernel and scheduler. This checkpoint verifies its one-iteration case without changing production

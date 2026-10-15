@@ -47,7 +47,18 @@ internal sealed partial class EodhdMarketMemory
         """;
     // No seeds, grant migration, inferred owner decision or automatic new program after completion.
     private static readonly JsonSerializerOptions RecurringJson = new(ObservationJson);
+    private static readonly JsonSerializerOptions RecurringGrantJson = new(ObservationJson)
+    { UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow };
+    internal static byte[] ExportRecurringAuthorization(RecurringResearchAuthorization value) => JsonSerializer.SerializeToUtf8Bytes(value, RecurringGrantJson);
+    internal static RecurringResearchAuthorization ParseRecurringAuthorization(byte[] value) =>
+        JsonSerializer.Deserialize<RecurringResearchAuthorization>(value, RecurringGrantJson) ?? throw new InvalidDataException();
     internal Action<string>? RecurringResearchTestHook { get; set; }
+    internal RecurringResearchAuthority? RecurringAuthority { get; set; }
+    internal void RequireRecurringAuthority(RecurringResearchProgram state)
+    {
+        if (state.ModelFreeFixture && RecurringAuthority is null) return;
+        (RecurringAuthority ?? throw new RecurringResearchReconciliationRequiredException()).Require(state);
+    }
 
     internal RecurringResearchProgram CreateRecurringResearchProgram(RecurringResearchAuthorization authorization, TimeProvider clock, bool modelFreeFixture = false)
     {
@@ -82,6 +93,14 @@ internal sealed partial class EodhdMarketMemory
         var value = new RecurringResearchProgram(LearningIdentity.Hash(new { Version = RecurringResearchAuthorization.Version, authorization, registered = now }),
             authorization, modelFreeFixture, now, now, RecurringResearchState.Ready, 0, 0, 0, 0, 0, []);
         WriteRecurring(c, tx, value); SealDailyCutoff(c, tx, now); tx.Commit(); return value;
+    }
+
+    internal static RecurringResearchProgram ReadRecurringAuthorityState(string database)
+    {
+        using var c = new SqliteConnection(new SqliteConnectionStringBuilder
+        { DataSource = database, Mode = SqliteOpenMode.ReadOnly }.ToString());
+        c.Open(); using var tx = c.BeginTransaction(deferred: true);
+        return ReadRecurring(c) ?? throw new RecurringResearchReconciliationRequiredException();
     }
 
     internal RecurringResearchProgram? ReadRecurringResearchProgram()
@@ -160,9 +179,17 @@ internal sealed partial class EodhdMarketMemory
         static bool IsHash(string value) => value.Length == 64 && value.All(x => x is >= '0' and <= '9' or >= 'a' and <= 'f');
     }
 
-    private static void WriteRecurring(SqliteConnection c, SqliteTransaction tx, RecurringResearchProgram value) =>
+    private void WriteRecurring(SqliteConnection c, SqliteTransaction tx, RecurringResearchProgram value)
+    {
+        var oldJson = EvaluationScalarOrNull(c, "SELECT snapshot_json FROM recurring_research_program WHERE singleton=1");
+        if (oldJson is not null && (!value.ModelFreeFixture || RecurringAuthority is not null))
+        {
+            var old = ReadRecurring(c) ?? throw new RecurringResearchReconciliationRequiredException();
+            (RecurringAuthority ?? throw new RecurringResearchReconciliationRequiredException()).Advance(old, value);
+        }
         Execute(c, tx, "INSERT INTO recurring_research_program VALUES(1,$hash,$json) ON CONFLICT(singleton) DO UPDATE SET checksum=$hash,snapshot_json=$json",
             ("$hash", LearningIdentity.Hash(value)), ("$json", JsonSerializer.Serialize(value, RecurringJson)));
+    }
     private static void RequireRecurringClock(SqliteConnection c, DateTimeOffset now, DateTimeOffset previous)
     {
         FinanceTime.RequireUtc(now, nameof(now));
@@ -238,11 +265,7 @@ internal sealed partial class EodhdMarketMemory
             state = ReadRecurring(c) ?? throw new InvalidOperationException("Explicit research program required.");
             var now = clock.GetUtcNow(); RequireRecurringClock(c, now, state.WatermarkUtc);
             if (number <= state.Attempts.Length) return state; // replay never becomes the next opportunity
-            // No independent non-rollbackable consumption witness exists in accepted recovery.
-            // A clean lifecycle journal or same-database checksum cannot prove this is not a restore.
-            // Do not invent a config bypass or let composition turn on real authority. Fixture-only
-            // execution remains model-free and cannot admit AcquiredProviderDaily observations.
-            if (!state.ModelFreeFixture) throw new RecurringResearchReconciliationRequiredException();
+            RequireRecurringAuthority(state);
             if (state.State != RecurringResearchState.Ready || number != state.Attempts.Length + 1 || number > state.Authorization.Cohorts.Length)
                 throw new InvalidOperationException("Program is stopped, busy or opportunity is out of order.");
             var grant = state.Authorization; var budget = grant.Budget;
@@ -277,6 +300,7 @@ internal sealed partial class EodhdMarketMemory
             WriteRecurring(c, tx, state); SealDailyCutoff(c, tx, now); tx.Commit();
         }
         RecurringResearchTestHook?.Invoke("after-invocation-commit");
+        RequireRecurringAuthority(state);
         var attempt = state.Attempts[^1]; LearningReasonerReply reply;
         var elapsed = System.Diagnostics.Stopwatch.StartNew();
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(state.Authorization.Budget.CompletionSeconds), clock);
@@ -301,6 +325,7 @@ internal sealed partial class EodhdMarketMemory
             {
                 c.Open(); using var tx = c.BeginTransaction(deferred: false); state = ReadRecurring(c)!;
                 var now = clock.GetUtcNow(); RequireRecurringClock(c, now, state.WatermarkUtc);
+                RequireRecurringAuthority(state);
                 if (state.State != RecurringResearchState.ReservedInference || state.Attempts[^1].Number != number || now >= state.Authorization.ExpiresAtUtc)
                     throw new InvalidOperationException("Scientific reservation no longer authorized.");
                 token.ThrowIfCancellationRequested();
@@ -316,6 +341,7 @@ internal sealed partial class EodhdMarketMemory
                 WriteRecurring(c, tx, state); tx.Commit();
             }
             RecurringResearchTestHook?.Invoke("after-evaluation-commit");
+            RequireRecurringAuthority(state);
             // Synchronous existing bounded science: never abandon a still-running engine on cancellation.
             var build = DeterministicRobustnessEvaluator.Evaluate(attempt.Scope.Plan, new MomentumResearchStrategy(), attempt.Scope.Bars, attempt.Scope.Features);
             using (var c = new SqliteConnection(ConnectionString))

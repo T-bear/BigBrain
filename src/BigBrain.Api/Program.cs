@@ -37,8 +37,14 @@ public partial class Program
             Console.WriteLine("revision=" + BuildRevision.Current);
             return;
         }
+        var enrollment = FinanceRecurringMaintenanceCommand.IsCommand(args);
         var oneShot = FinanceObservationMaintenanceCommand.IsCommand(args);
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = oneShot ? [] : args, ApplicationName = typeof(Program).Assembly.FullName });
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = oneShot || enrollment ? [] : args, ApplicationName = typeof(Program).Assembly.FullName });
+        if (enrollment)
+        {
+            Environment.ExitCode = FinanceRecurringMaintenanceCommand.Run(args, builder.Configuration, TimeProvider.System, Console.Out);
+            return;
+        }
         if (oneShot)
         {
             Environment.ExitCode = FinanceObservationMaintenanceCommand.Run(args, builder.Configuration);

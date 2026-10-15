@@ -28,7 +28,7 @@ public sealed class FinanceRecurringResearchTests
              new(dates[320], dates[639], DailyMarketEvidence.DayStart(dates[639].AddDays(1)).AddHours(3))]);
     }
     private static async Task Seed(FinanceMarketObservationTests.Database db, FinanceMarketObservationTests.Clock clock,
-        RecurringResearchCohort cohort, bool changeHoldout = false, bool late = false, bool fractionalVolume = false)
+        RecurringResearchCohort cohort, bool changeHoldout = false, bool late = false, bool fractionalVolume = false, bool realOriginShape = false)
     {
         var memory = db.Memory(); var dates = RecurringResearchAuthorization.Sessions(cohort);
         foreach (var (day, index) in dates.Select((d, i) => (d, i)))
@@ -39,17 +39,17 @@ public sealed class FinanceRecurringResearchTests
                 close, close + 1, close - 1, close, fractionalVolume ? 10000.5m : 10000,
                 MarketObservationIntegrity.Hash(new[] { day.ToString("O", CultureInfo.InvariantCulture), close.ToString(CultureInfo.InvariantCulture) }),
                 new(DailyMarketEvidence.Eligibility, day, "America/New_York", DailyMarketEvidence.SourceContract, DailyMarketEvidence.SymbolPolicy));
-            await memory.AcquireMarketObservationAsync(new Source(value), Instrument, Mapping, Policy, clock, CancellationToken.None);
+            await memory.AcquireMarketObservationAsync(new Source(value, realOriginShape), Instrument, Mapping, Policy, clock, CancellationToken.None);
         }
         clock.Now = cohort.DueAtUtc;
     }
-    private sealed class Source(ProviderObservation value) : IMarketObservationSource
+    private sealed class Source(ProviderObservation value, bool realOriginShape = false) : IMarketObservationSource
     {
         public string ContractVersion => DailyMarketEvidence.Contract;
         public MarketDataProvider Provider => Mapping.Provider;
         public ProviderDataset Dataset => Mapping.ProviderDataset;
         public string AdapterVersion => "fixture-no-network";
-        public MarketObservationOrigin Origin => MarketObservationOrigin.DeterministicFixture;
+        public MarketObservationOrigin Origin => realOriginShape ? MarketObservationOrigin.AcquiredProviderDaily : MarketObservationOrigin.DeterministicFixture;
         public Task<ProviderObservation> ReadAsync(ProviderInstrumentMapping mapping, CancellationToken cancellationToken) => Task.FromResult(value);
     }
     private static LearningReasonerReply Reply(LearningDevelopmentInput input, bool decline = false)
@@ -79,9 +79,9 @@ public sealed class FinanceRecurringResearchTests
                 ["fixture.ready"], new(0, 0, long.MaxValue, long.MaxValue, 1, null, false, "Healthy", now), "RESEARCH", 0, "NONE"));
     }
     private static FinanceResearchOrchestrator Scheduler(EodhdMarketMemory memory, FinanceMarketObservationTests.Clock clock,
-        Func<LearningDevelopmentInput, CancellationToken, Task<LearningReasonerReply>> reason, bool maintenance = false) =>
+        Func<LearningDevelopmentInput, CancellationToken, Task<LearningReasonerReply>> reason, bool maintenance = false, bool fixture = true) =>
         new(new() { Enabled = true, RecurringProgramMode = true }, memory, new Governor(), new() { MaintenancePaused = maintenance },
-            new("fixture:reasoner-v1", new Reasoner(reason).ReasonAsync, TimeSpan.FromSeconds(30), true), clock);
+            new("fixture:reasoner-v1", new Reasoner(reason).ReasonAsync, TimeSpan.FromSeconds(30), fixture), clock);
 
     [Fact]
     public async Task TwoDisjointIterationsPersistNativeScienceAndSanitizedHistoryAcrossReopen()
@@ -114,6 +114,233 @@ public sealed class FinanceRecurringResearchTests
         Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM research_runs"));
         Assert.Throws<InvalidOperationException>(() => db.Memory().CreateRecurringResearchProgram(grant with { OwnerDecision = "fixture:renew" }, clock, true));
         Assert.Throws<InvalidOperationException>(() => db.Memory().BuildRobustnessEvaluations());
+    }
+
+    // Journal I/O uses isolated ordinary files here; production's independent OS protection is
+    // deliberately not simulated as verified. No runtime config can select this test constructor.
+    private sealed class AuthorityFixture : IDisposable
+    {
+        internal readonly string Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "authority-test-" + Guid.NewGuid().ToString("N"));
+        internal string EnrollmentHash { get; }
+        internal AuthorityFixture(RecurringResearchProgram initial)
+        {
+            var enrollment = RecurringResearchAuthority.Enrollment(initial);
+            EnrollmentHash = RecurringResearchAuthority.EnrollmentChecksum(enrollment);
+            File.WriteAllText(Path, enrollment);
+        }
+        internal RecurringResearchAuthority Open() => new(() => new FileStream(Path, FileMode.Open,
+            FileAccess.ReadWrite, FileShare.ReadWrite), EnrollmentHash);
+        internal EodhdMarketMemory Attach(FinanceMarketObservationTests.Database db)
+        { var memory = db.Memory(); memory.RecurringAuthority = Open(); return memory; }
+        public void Dispose() => File.Delete(Path);
+    }
+
+    [Fact]
+    public async Task IndependentAuthorityPermitsTwoRealOriginShapedIterationsAcrossNormalRestart()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        using var journal = new AuthorityFixture(db.Memory().CreateRecurringResearchProgram(grant, clock));
+        var calls = 0;
+        Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken _)
+        { calls++; return Task.FromResult(Reply(input)); }
+        await Seed(db, clock, grant.Cohorts[0], realOriginShape: true);
+        var first = await Scheduler(journal.Attach(db), clock, Reason, fixture: false).CheckAndRunAsync(clock.Now, true, CancellationToken.None);
+        Assert.Equal(FinanceResearchOpportunityState.Completed, first!.State);
+        var saved = JsonSerializer.Serialize(db.Memory().ReadRecurringResearchProgram(), Json);
+        Assert.Equal(saved, JsonSerializer.Serialize(await journal.Attach(db).RunRecurringResearchAsync(1,
+            grant.ReasonerIdentity, clock, Reason, CancellationToken.None), Json));
+        await Seed(db, clock, grant.Cohorts[1], realOriginShape: true);
+        var second = await Scheduler(journal.Attach(db), clock, Reason, fixture: false).CheckAndRunAsync(clock.Now, true, CancellationToken.None);
+        Assert.Equal(FinanceResearchOpportunityState.Completed, second!.State);
+        var done = db.Memory().ReadRecurringResearchProgram()!;
+        Assert.Equal(RecurringResearchState.Completed, done.State);
+        Assert.Equal(2, calls); Assert.Equal(2, done.Invocations); Assert.Equal(2, done.Evaluations);
+        Assert.Equal(128, done.Calls); journal.Open().Require(done);
+        Assert.Null(Scheduler(journal.Attach(db), clock, Reason, fixture: false).Status(clock.Now).NextDueUtc);
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => RecurringResearchAuthority.Enrollment(done));
+    }
+
+    [Theory]
+    [InlineData("old-database")]
+    [InlineData("missing")]
+    [InlineData("partial")]
+    [InlineData("changed")]
+    [InlineData("older-journal")]
+    public async Task IndependentAuthorityRefusesRollbackOrUncertainJournalBeforeAnyNewCall(string fault)
+    {
+        using var db = new FinanceMarketObservationTests.Database(); using var snapshot = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        using var journal = new AuthorityFixture(db.Memory().CreateRecurringResearchProgram(grant, clock));
+        await Seed(db, clock, grant.Cohorts[0], realOriginShape: true);
+        using (var source = new SqliteConnection("Data Source=" + db.Path))
+        using (var target = new SqliteConnection("Data Source=" + snapshot.Path))
+        { source.Open(); target.Open(); source.BackupDatabase(target); }
+        var oldJournal = File.ReadAllBytes(journal.Path);
+        await journal.Attach(db).RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock,
+            (input, _) => Task.FromResult(Reply(input)), CancellationToken.None);
+        var memory = journal.Attach(fault == "old-database" ? snapshot : db);
+        if (fault == "missing") File.Delete(journal.Path);
+        if (fault == "partial") File.AppendAllText(journal.Path, "{incomplete");
+        if (fault == "changed") File.WriteAllText(journal.Path, "{}\n");
+        if (fault == "older-journal") File.WriteAllBytes(journal.Path, oldJournal);
+        var before = LearningIdentity.Hash(memory.ReadRecurringResearchProgram());
+        await Assert.ThrowsAsync<RecurringResearchReconciliationRequiredException>(() => memory.RunRecurringResearchAsync(
+            fault == "old-database" ? 1 : 2, grant.ReasonerIdentity, clock,
+            (_, _) => throw new Xunit.Sdk.XunitException("No extra inference"), CancellationToken.None));
+        Assert.Equal(before, LearningIdentity.Hash(memory.ReadRecurringResearchProgram()));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task JournalAheadOfSqliteAfterCrashNeverRefundsOrExecutes(bool evaluationReservation)
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        using var journal = new AuthorityFixture(db.Memory().CreateRecurringResearchProgram(grant, clock));
+        await Seed(db, clock, grant.Cohorts[0], realOriginShape: true);
+        var memory = journal.Attach(db); var calls = 0;
+        if (!evaluationReservation) memory.RecurringAuthority!.AfterAdvanceTestHook = () => throw new IOException("fixture crash");
+        await Assert.ThrowsAsync<RecurringResearchReconciliationRequiredException>(() => memory.RunRecurringResearchAsync(1,
+            grant.ReasonerIdentity, clock, (input, _) =>
+            {
+                calls++;
+                memory.RecurringAuthority!.AfterAdvanceTestHook = () => throw new IOException("fixture crash");
+                return Task.FromResult(Reply(input));
+            }, CancellationToken.None));
+        var retained = db.Memory().ReadRecurringResearchProgram()!;
+        Assert.Equal(evaluationReservation ? 1 : 0, calls);
+        Assert.Equal(0, retained.Evaluations);
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => journal.Open().Require(retained));
+        Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM robustness_evaluations"));
+    }
+
+    [Theory]
+    [InlineData("after-invocation-commit", 0)]
+    [InlineData("after-evaluation-commit", 0)]
+    [InlineData("after-native-persistence", 1)]
+    public async Task CommittedInterruptedAuthorityCannotRestartWork(string point, long nativeResults)
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        using var journal = new AuthorityFixture(db.Memory().CreateRecurringResearchProgram(grant, clock));
+        await Seed(db, clock, grant.Cohorts[0], realOriginShape: true);
+        var memory = journal.Attach(db); var calls = 0;
+        memory.RecurringResearchTestHook = at => { if (at == point) throw new IOException("fixture interruption"); };
+        Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken _)
+        { calls++; return Task.FromResult(Reply(input)); }
+        var exception = await Record.ExceptionAsync(() => memory.RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, Reason, CancellationToken.None));
+        if (point == "after-invocation-commit") Assert.IsType<IOException>(exception); else Assert.Null(exception);
+        var retained = EodhdMarketMemory.ReadRecurringAuthorityState(db.Path);
+        journal.Open().Require(retained);
+        Assert.Equal(1, retained.Invocations);
+        Assert.Equal(point == "after-invocation-commit" ? 0 : 1, retained.Evaluations);
+        var reopened = journal.Attach(db);
+        var before = calls;
+        await reopened.RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, Reason, CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => reopened.RunRecurringResearchAsync(2,
+            grant.ReasonerIdentity, clock, Reason, CancellationToken.None));
+        Assert.Equal(before, calls);
+        Assert.Equal(nativeResults, db.Scalar("SELECT COUNT(*) FROM robustness_evaluations"));
+    }
+
+    [Fact]
+    public async Task JournalReservationsStaySpentAcrossConcurrentCancellationAndReopen()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        using var journal = new AuthorityFixture(db.Memory().CreateRecurringResearchProgram(grant, clock));
+        await Seed(db, clock, grant.Cohorts[0], realOriginShape: true);
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cancel = new CancellationTokenSource(); var calls = 0;
+        async Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken token)
+        { calls++; entered.SetResult(); await Task.Delay(Timeout.InfiniteTimeSpan, token); return Reply(input); }
+        var first = journal.Attach(db).RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, Reason, cancel.Token);
+        await entered.Task;
+        var replay = await journal.Attach(db).RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, Reason, CancellationToken.None);
+        Assert.Equal(RecurringResearchState.ReservedInference, replay.State);
+        cancel.Cancel(); var stopped = await first;
+        Assert.Equal(RecurringResearchState.Indeterminate, stopped.State); Assert.Equal(1, calls);
+        journal.Open().Require(db.Memory().ReadRecurringResearchProgram()!);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => journal.Attach(db).RunRecurringResearchAsync(2,
+            grant.ReasonerIdentity, clock, Reason, CancellationToken.None));
+        Assert.Equal(1, db.Memory().ReadRecurringResearchProgram()!.Invocations);
+    }
+
+    [Fact]
+    public void ProductionAuthorityRejectsOrdinaryFileAndMissingBoundaryConfiguration()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var initial = db.Memory().CreateRecurringResearchProgram(Grant(), new FinanceMarketObservationTests.Clock(Registered));
+        using var journal = new AuthorityFixture(initial);
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => RecurringResearchAuthority.FromConfiguration(new ConfigurationBuilder().Build()));
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Finance:RecurringAuthority:JournalPath"] = journal.Path,
+            ["Finance:RecurringAuthority:EnrollmentChecksum"] = journal.EnrollmentHash,
+            ["Finance:RecurringAuthority:RestoreBoundaryDecision"] = "fixture:not-a-real-protection-proof"
+        }).Build();
+        var production = RecurringResearchAuthority.FromConfiguration(config);
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => production.Require(initial));
+        Assert.Equal(RecurringResearchAuthority.Enrollment(initial), File.ReadAllText(journal.Path));
+        config["Finance:Eodhd:DatabasePath"] = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(journal.Path)!, "store.db");
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => RecurringResearchAuthority.FromConfiguration(config));
+    }
+
+    [Fact]
+    public void AuthorityProtectionRequiresRootCustodyAppendFlagAndNoReplacementAccess()
+    {
+        ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x81b0, 1, 0x20, 0x20, false); // root regular0660
+        ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x41e8, 1, 0, 0, true); // root directory0750
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 1000, 0x81b0, 1, 0x20, 0x20, false));
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x81b0, 2, 0x20, 0x20, false));
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x81b0, 1, 0x20, 0, false));
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x81b0, 1, 0, 0x20, false));
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x81b6, 1, 0x20, 0x20, false));
+        Assert.Throws<RecurringResearchReconciliationRequiredException>(() => ProtectedAppendJournal.RequireMetadata(0x7ff, 0, 0x41f8, 1, 0, 0, true)); // group writable
+    }
+
+    [Fact]
+    public void ExplicitEnrollmentRequiresMaintenanceAndExactGrantAndCannotReplaceProgram()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var root = System.IO.Path.GetDirectoryName(db.Path)!;
+        var clock = new FinanceMarketObservationTests.Clock(Registered);
+        File.WriteAllText(System.IO.Path.Combine(root, "synchronized"), "");
+        var grantFile = System.IO.Path.Combine(root, "grant.json");
+        var bytes = EodhdMarketMemory.ExportRecurringAuthorization(Grant()); File.WriteAllBytes(grantFile, bytes);
+        EodhdMarketMemory.ParseRecurringAuthorization(bytes).Validate(clock.GetUtcNow());
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Finance:Eodhd:DatabasePath"] = db.Path,
+            ["Finance:Eodhd:PayloadDirectory"] = System.IO.Path.Combine(root, "payloads"),
+            ["Finance:ResearchOperations:MaintenancePaused"] = "true",
+            ["SystemRecovery:ClockSyncDirectory"] = root,
+            ["SystemRecovery:DatabasePath"] = db.Path,
+            ["SystemRecovery:LowDiskCriticalBytes"] = "1"
+        }).Build();
+        string[] args = ["finance-recurring-enroll", grantFile, LearningIdentity.HashBytes(bytes)];
+        using var output = new StringWriter(CultureInfo.InvariantCulture);
+        config["Finance:ResearchScheduler:Enabled"] = "true";
+        Assert.Equal(1, FinanceRecurringMaintenanceCommand.Run(args, config, clock, output));
+        Assert.Null(db.Memory().ReadRecurringResearchProgram());
+        config["Finance:ResearchScheduler:Enabled"] = "false";
+        Assert.Equal(1, FinanceRecurringMaintenanceCommand.Run([args[0], args[1], "wrong-checksum"], config, clock, output));
+        Assert.Null(db.Memory().ReadRecurringResearchProgram());
+        output.GetStringBuilder().Clear();
+        Assert.Equal(0, FinanceRecurringMaintenanceCommand.Run(args, config, clock, output));
+        var initial = db.Memory().ReadRecurringResearchProgram()!;
+        Assert.False(initial.ModelFreeFixture); Assert.Equal(0, initial.Invocations);
+        Assert.Equal(RecurringResearchAuthority.Enrollment(initial), output.ToString());
+        output.GetStringBuilder().Clear();
+        Assert.Equal(0, FinanceRecurringMaintenanceCommand.Run(args, config, clock, output));
+        Assert.Equal(RecurringResearchAuthority.Enrollment(initial), output.ToString());
+        bytes = EodhdMarketMemory.ExportRecurringAuthorization(Grant() with { OwnerDecision = "fixture:replacement" });
+        File.WriteAllBytes(grantFile, bytes);
+        Assert.Equal(1, FinanceRecurringMaintenanceCommand.Run([args[0], args[1], LearningIdentity.HashBytes(bytes)], config, clock, output));
+        Assert.Equal(LearningIdentity.Hash(initial), LearningIdentity.Hash(db.Memory().ReadRecurringResearchProgram()));
+        Assert.False(File.Exists(System.IO.Path.Combine(root, "authority.journal")));
     }
 
     [Fact]
@@ -401,7 +628,7 @@ public sealed class FinanceRecurringResearchTests
             [p + "Profile:Runtime:WorkerExecutable"] = Path.Combine(AppContext.BaseDirectory, "reasoner-proof", "BigBrain.Reasoner.ProofWorker"),
             [p + "Profile:Runtime:WorkerArguments:0"] = mode,
             [p + "Profile:Runtime:CoordinationDirectory"] = directory,
-            [p + "Profile:Runtime:InvocationTimeout"] = "00:00:10",
+            [p + "Profile:Runtime:InvocationTimeout"] = "00:00:20",
             [p + "Profile:Runtime:GracePeriod"] = "00:00:00.250",
             [p + "Profile:Runtime:ReapTimeout"] = "00:00:02"
         }).Build();
@@ -418,16 +645,20 @@ public sealed class FinanceRecurringResearchTests
         try
         {
             using var db = new FinanceMarketObservationTests.Database(); var clock = new FinanceMarketObservationTests.Clock(Registered);
-            await using var host = LocalRecurringResearchComposition.FromConfiguration(HostingConfiguration(directory, mode), db.Memory(), clock)!;
+            var memory = db.Memory();
+            await using var host = LocalRecurringResearchComposition.FromConfiguration(HostingConfiguration(directory, mode), memory, clock)!;
             var grant = Grant() with { ReasonerIdentity = host.Binding.Identity };
-            db.Memory().CreateRecurringResearchProgram(grant, clock, true);
+            using var journal = new AuthorityFixture(memory.CreateRecurringResearchProgram(grant, clock, true));
+            memory.RecurringAuthority = journal.Open();
             await Seed(db, clock, grant.Cohorts[0]);
             // Fixture permission exists only in tests, never in the host's configuration surface.
-            var scheduler = new FinanceResearchOrchestrator(new() { Enabled = true, RecurringProgramMode = true }, db.Memory(),
+            var scheduler = new FinanceResearchOrchestrator(new() { Enabled = true, RecurringProgramMode = true }, memory,
                 new Governor(), new(), host.Binding with { ModelFreeFixture = true }, clock);
             await scheduler.CheckAndRunAsync(clock.Now, true, CancellationToken.None);
             var retained = db.Memory().ReadRecurringResearchProgram()!;
-            Assert.Equal(expected, retained.Attempts[0].Outcome);
+            journal.Open().Require(retained);
+            Assert.True(expected == retained.Attempts[0].Outcome,
+                $"Expected {expected}; actual {retained.Attempts[0].Outcome}; transport={JsonSerializer.Serialize(retained.Attempts[0].RuntimeAudit, Json)}");
             Assert.Equal(1, retained.Invocations);
             var audit = retained.Attempts[0].RuntimeAudit!.Value;
             Assert.Equal(3, audit.Length); Assert.Equal("Started", audit[0].Phase); Assert.Equal("Completed", audit[^1].Phase);

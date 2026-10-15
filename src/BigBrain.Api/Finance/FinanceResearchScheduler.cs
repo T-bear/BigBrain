@@ -186,8 +186,9 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
         if (!recoveryReady || operations!.MaintenancePaused || recurring is null || clock is null)
             return Finish(FinanceResearchOpportunityState.Deferred, !recoveryReady ? "finance.research.scheduler.recoveryNotReady" :
                 operations!.MaintenancePaused ? "finance.research.scheduler.maintenancePaused" : "finance.research.recurring.reasonerNotProvisioned", now.AddMinutes(options.CheckIntervalMinutes));
-        if (!program.ModelFreeFixture)
-            return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason);
+        try { memory.RequireRecurringAuthority(program); }
+        catch (RecurringResearchReconciliationRequiredException)
+        { return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason); }
         if (recurring.CompletionTimeout <= TimeSpan.Zero ||
             recurring.CompletionTimeout > TimeSpan.FromSeconds(program.Authorization.Budget.CompletionSeconds))
             throw new InvalidOperationException("Reserved runtime does not include authorized worker cleanup.");
@@ -202,6 +203,8 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
             return Finish(completed ? FinanceResearchOpportunityState.Completed : FinanceResearchOpportunityState.Failed,
                 "finance.research.recurring." + (completed ? "evaluated" : result.StopReason ?? result.State.ToString()));
         }
+        catch (RecurringResearchReconciliationRequiredException)
+        { return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason); }
         catch (RecurringResearchDataPendingException)
         { return Finish(FinanceResearchOpportunityState.Deferred, "finance.research.recurring.dataPending", now.AddMinutes(options.CheckIntervalMinutes)); }
     }

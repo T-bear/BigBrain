@@ -1,25 +1,17 @@
 # BigBrain Status
 
-## Finance recurring research — 2026-10-15
+## Finance recurring research — final release implementation, 2026-10-15
 
-Latest bounded one-run check: **BLOCKED** for real execution. Existing single-iteration fixture flow
-is verified (27 focused cases passed); no already-authorized real-data one-shot exists without changing
-the retained production gate. Automatic restore handling is deferred; no recovery work or production
-change. [Exact result and consolidated real-run decision](reports/features/finance/recurring-research-implementation-20261014.md#first-real-ai-research-run--bounded-execution-check--2026-10-15).
-The broader recurring-release status below remains distinct from this one-run request.
-
-**REVIEW CHECKPOINT / IMPLEMENTED MODEL-FREE / NOT DEPLOYED OR ACTIVATED.**
-Existing scheduler, receipt owner and evaluator now compose two explicitly budgeted disjoint cohorts,
-with native results, reopenable sanitized history and cumulative I/E/T/C/W reservations. Old grants stay
-spent/unchanged. No real provider/model execution. [Evidence and unresolved release gates](reports/features/finance/recurring-research-implementation-20261014.md).
-Final correction implements same-API local runtime composition, disabled without an explicit profile.
-Real recurring authority is hard-blocked pending independent restore-consumption reconciliation;
-normal reopen preserves history but cannot prove absence of a consistent old restore. NOT MERGE CANDIDATE
-for unattended release. Revised owner target permits manual restore approval, but **BLOCKED** remains:
-no enforced independent restore/startup boundary distinguishes ordinary restart from older replacement.
-Manual reconciliation is not implemented; missing consumption history cannot reinstate an old grant.
-[Current decision and limits](reports/features/finance/recurring-research-implementation-20261014.md#normal-restart-and-manual-restore-approval--2026-10-15).
-No code or operational change. Finance RESEARCH / 0 SEK / NONE.
+**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / NOT DEPLOYED OR ACTIVATED.**
+Existing scheduler, real-data admission, local reasoner composition and native science now use a bounded
+independent append-only authority journal. Matching durable state permits normal restart; uncertain
+reservation, older database, absent/invalid protection or disagreement stops without refund or retry.
+Root custody, Linux/ext4 append-only enforcement and exclusion from Finance/lifecycle restores are
+mandatory deployment prerequisites; joint privileged host/witness rollback is outside this model.
+Initial explicit enrollment and read-only authority preflight are implemented; no automatic grants.
+[Exact changes, executed verification and limits](reports/features/finance/recurring-research-implementation-20261014.md#final-release-implementation--protected-recurring-authority--2026-10-15).
+[Concrete configuration/provisioning and activation gates](architecture/finance/research-learning-contract.md#initial-release-configuration-and-operator-sequence).
+No real model/provider call or operational change. Finance **RESEARCH / 0 SEK / NONE**.
 
 ## BB-132H versioned observation mapping — 2026-10-10
 

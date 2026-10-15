@@ -25,7 +25,14 @@ internal sealed class LocalRecurringResearchComposition : IAsyncDisposable
     {
         var section = configuration.GetSection(Section);
         if (!section.GetValue<bool>("Enabled")) return null;
-        var p = section.GetSection("Profile"); var runtime = p.GetSection("Runtime");
+        if (configuration.GetSection("Finance:RecurringAuthority").Exists())
+            memory.RecurringAuthority = RecurringResearchAuthority.FromConfiguration(configuration);
+        return new(ReadProfile(configuration), memory.RecordRecurringRuntimeAudit, clock);
+    }
+
+    internal static RecurringLocalProfile ReadProfile(IConfiguration configuration)
+    {
+        var p = configuration.GetSection(Section).GetSection("Profile"); var runtime = p.GetSection("Runtime");
         // Explicit resource values; no inherited 180s acceptance flag or guessed model defaults.
         var options = new LocalReasonerRuntimeOptions
         {
@@ -37,9 +44,9 @@ internal sealed class LocalRecurringResearchComposition : IAsyncDisposable
             GracePeriod = runtime.GetValue<TimeSpan?>("GracePeriod") ?? TimeSpan.Zero,
             ReapTimeout = runtime.GetValue<TimeSpan?>("ReapTimeout") ?? TimeSpan.Zero
         };
-        return new(new(p["OwnerDecision"] ?? "", p["ArtifactAndIsolationEvidence"] ?? "",
+        return new(p["OwnerDecision"] ?? "", p["ArtifactAndIsolationEvidence"] ?? "",
             p.GetValue<DateTimeOffset?>("ApprovedAtUtc") ?? default,
-            p.GetValue<DateTimeOffset?>("ExpiresAtUtc") ?? default, options), memory.RecordRecurringRuntimeAudit, clock);
+            p.GetValue<DateTimeOffset?>("ExpiresAtUtc") ?? default, options);
     }
 
     internal LocalRecurringResearchComposition(RecurringLocalProfile profile,
