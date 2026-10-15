@@ -2,6 +2,12 @@
 
 ## Finance recurring research — 2026-10-15
 
+Latest bounded one-run check: **BLOCKED** for real execution. Existing single-iteration fixture flow
+is verified (27 focused cases passed); no already-authorized real-data one-shot exists without changing
+the retained production gate. Automatic restore handling is deferred; no recovery work or production
+change. [Exact result and consolidated real-run decision](reports/features/finance/recurring-research-implementation-20261014.md#first-real-ai-research-run--bounded-execution-check--2026-10-15).
+The broader recurring-release status below remains distinct from this one-run request.
+
 **REVIEW CHECKPOINT / IMPLEMENTED MODEL-FREE / NOT DEPLOYED OR ACTIVATED.**
 Existing scheduler, receipt owner and evaluator now compose two explicitly budgeted disjoint cohorts,
 with native results, reopenable sanitized history and cumulative I/E/T/C/W reservations. Old grants stay

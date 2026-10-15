@@ -18,12 +18,96 @@ read-only mount/capability inspection; it does not revalidate production evidenc
   tree `5fb37874d8146f7fc216517ddfaa05c704fe4eea`.
 - Previous authority checkpoint: `e57b8f30ae70a8a37f4b89730855c4278cd3939d`,
   tree `750cb1b7d586b1510524d41de492e12188691864`.
-- Current publication subject: `review: clarify normal restart and manual restore safety stop`.
+- Previous restart-policy checkpoint: `6b0a240c1daa49fcf0ee54a81f74021166e6bed5`,
+  tree `bdb8c93fe9594627c63175352fff2fa2c3d73e98`.
+- Current publication subject: `review: verify single research iteration and retain real-run gates`.
 - Resolve the exact publication commit/tree from that unique subject and Git metadata; no recursive
   self-hash is embedded in this report. Main was verified unchanged before publication.
 - Owner authorized implementation against contract review `ca2b0fddaf58b050bde3f43d36db12cfff47ab66`,
   tree `e1413c2367129e33acad43efe62dc91556a7346c`. Neither the contract nor release-analysis branch
   was merged to obtain this baseline.
+
+## First real AI research run — bounded execution check — 2026-10-15
+
+**BLOCKED / REVIEW CHECKPOINT.** The requested single-run integration already exists in the recurring
+kernel and scheduler. This checkpoint verifies its one-iteration case without changing production
+behavior. Automatic backup-rollback handling is deferred by the owner; no further recovery investigation
+or new mechanism was undertaken. Deferral does not override the explicit instruction to retain existing
+safety gates. There is no already-authorized real-data one-shot path that avoids that gate safely.
+
+### Implemented, tested, and not executed
+
+- Existing real-data admission, `IResearchReasoner` composition, strict Finance reply processing,
+  deterministic evaluator, native result storage and retained attempt history are unchanged.
+- New `SingleIterationPersistsResultAndSpentBudgetWithoutReplayExecution` uses an explicitly isolated
+  **deterministic fixture**, the existing scheduler, fake reasoner and existing native evaluator.
+  Budget is exactly **1 invocation /1 evaluation /3 trials /64 underlying-call reservation /30 reserved
+  seconds /30 completion seconds**, one 320-session cohort. These are test values, not an operational
+  grant. It proves one native result, persisted identities/checksums and consumed counters, canonical
+  equality after reopen/replay, no second reasoner call, no replacement grant and no shadow/research-run
+  side effect. Existing native readers validate the retained result during program reopen.
+- `RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore` now covers both one- and two-iteration
+  grants. Scheduler and direct kernel refuse each non-fixture grant with
+  `finance.research.recurring.restoreReconciliationRequired`, before the reasoner and spending.
+- All **27 recurring research cases passed, 0 failed, 0 skipped**, including owned proof-worker
+  composition, history/holdout noninterference, failures, concurrency, temporal admission and replay.
+  The proof worker is model-free. No Qwen inference, real receipt acquisition or production run occurred.
+
+### Why an older one-shot is not a safe substitute
+
+`CreateFiniteResearchSession` accepts `SyntheticLearningScope`; its existing admission requires
+synthetic evidence identities and cannot authorize real-market research. BB-132C's accepted sequence
+was real **model inference on synthetic evidence**, not this real-market goal. Its documented allowance
+is already **2/2 consumed**. Reopening it grants nothing. No old journal or production database was
+opened or changed here. A new database, program ID, fixture flag or rewritten provenance would not be
+an authorized solution. The recurring production gate applies to the first invocation too; choosing
+only one cohort does not exempt it. Its absence of a one-shot exception is deliberate and now tested.
+
+### Single concrete release decision, not another investigation
+
+**Immediate blocker:** no permitted production execution authority through the existing gate. A data,
+model or deployment approval alone cannot enable it. The minimum next decision is whether the architect
+and owner explicitly authorize a bounded one-run authority contract in the existing ledger, while
+preserving the restart stop, spent history and protected exposure. That would be a separately reviewed
+behavior change; this task does not silently implement a bypass or declare such a contract safe.
+The previous automatic-restart dependency is deferred, not reintroduced as this task's work.
+
+Any later real-run approval must be one concrete package with all of the following bound, not a blanket
+"run Qwen" approval:
+
+| Field | Exact present constraint / missing value |
+| --- | --- |
+| Run count and scientific ceiling | Proposed maximum **1 inference, 1 evaluation, 3 trials, 64 underlying calls, concurrency1, retries0/refunds0**; not granted here. A decline/rejection/failure cannot be forced into an evaluation. |
+| Dataset | Exact retained receipt/projection commitment, instrument/mapping, rights and scientific eligibility evidence, cutoff and cohort dates are **not established for a real run**. Current contract requires 300–500 completed sessions, timely knowledge before each next session open, future protected holdout at registration and no overlapping exposure. No dates/checksums or Pass facts are invented. |
+| Local model/resources | Existing pinned local Qwen/BRF1 path only; approved profile identity, artifact/isolation proof and approval/expiry times are missing. Ordinary host invocation ceiling is **30s**; historical controlled **180s** authority cannot be reused. Grant completion/reserved-time values must cover the approved invocation plus cleanup bound; test values are not provisioning approval. |
+| Ledger | Existing program/consumption/exposure must be reconciled for this authorization; no new ID/store/reset to bypass prior spending. No production inspection/reconciliation is claimed. |
+| Publication/operation | Exact independently reviewed code SHA, separate merge/deployment and one real inference approval are required. Provider requests remain **0** unless separately authorized; no data acquisition is needed for a run only if eligible retained evidence actually exists. |
+
+The known historical AAPL observations are not proof that such a research cohort exists. No current
+production inventory is inferred from past handoffs. Even after resolving authority, historical data
+cannot be relabelled as timely prospective observations or an already-known holdout as newly protected.
+
+### Commands and verification
+
+Executed:
+
+```text
+dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj -c Release --no-restore --filter FullyQualifiedName~FinanceRecurringResearchTests --logger 'console;verbosity=minimal'
+dotnet format whitespace tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --verify-no-changes --include tests/BigBrain.Api.Tests/FinanceRecurringResearchTests.cs
+node scripts/verify-documentation.mjs
+git diff --check
+git diff --cached --check
+/tmp/bb130d1-tools/gitleaks protect --staged --redact --no-banner
+```
+
+The focused run rebuilt applicable Release dependencies and passed 27/27 in19s. Source/runtime/config
+remain identical to d7eaa4a; its full API1177 PASS/8 intentional real-model SKIP and full Release build
+are reused for unchanged implementation, not asserted as a fresh full-suite result. Only one test file
+and existing report/status/recovery documents change. No full suites, frontend/Sentinel suites,
+production commands, external provider calls, model inference or restore exercise were required.
+Scoped format, documentation (267 Markdown files/91 unique backlog IDs), whitespace, scope and staged
+secret checks passed. No claim of market edge or model training follows.
+Finance **RESEARCH / 0 SEK / NONE**. STOP after publication; not READY FOR AUTHORIZED REAL RUN.
 
 ## Normal restart and manual restore approval — 2026-10-15
 

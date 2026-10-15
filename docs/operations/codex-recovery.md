@@ -9,13 +9,17 @@ Previous reviewed implementation `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9` is p
 Reviewed correction `d7eaa4aa04c8de6af3832563d95e4c517bdd9218`, tree
 `5fb37874d8146f7fc216517ddfaa05c704fe4eea`, is unchanged in code/tests.
 Previous authority checkpoint `e57b8f30ae70a8a37f4b89730855c4278cd3939d` is preserved.
-Current publication subject `review: clarify normal restart and manual restore safety stop` resolves SHA/tree.
-**BLOCKED:** revised normal-restart/manual-restore policy still lacks an enforced independent
-restore/startup boundary. Existing drills do not mediate production replacement. Production stop remains;
-no manual-clear command or code change. Next is the concrete custody/restore-boundary decision, not
-another general investigation. Five-document delta only; prior 1177 PASS/8 intentional SKIP and Release
-build evidence reused, documentation/whitespace/staged-secrets/scope checks apply to this publication.
-[Actual behavior, manual reconciliation limits and exact dependency](../reports/features/finance/recurring-research-implementation-20261014.md#normal-restart-and-manual-restore-approval--2026-10-15).
+Previous restart-policy checkpoint `6b0a240c1daa49fcf0ee54a81f74021166e6bed5` is preserved.
+Current publication subject `review: verify single research iteration and retain real-run gates` resolves SHA/tree.
+**BLOCKED for real run:** existing one-iteration scheduler/fake/native-evaluator/reopen flow now explicitly
+verified; 27 focused recurring cases PASS/0 FAIL/0 SKIP. One test added and production-refusal test extended
+to a single-iteration grant. No production source, runtime, configuration or gate changed. No already
+permitted real-data one-shot exists; synthetic/spent B/C cannot substitute. Automatic restore work deferred.
+[Exact behavior, test commands and one consolidated decision](../reports/features/finance/recurring-research-implementation-20261014.md#first-real-ai-research-run--bounded-execution-check--2026-10-15).
+Changed scope: one test file plus existing report, STATUS and this recovery note. Scoped whitespace,
+documentation, staged-secrets and diff checks apply; prior full-suite/build evidence reused for unchanged
+implementation. No background process or unfinished implementation remains. Next: independent review
+of the explicit real-run authority blocker and missing dataset/profile/grant values, not a generic study.
 Unrelated mockups and untracked ADR0006–0009 remain preserved and excluded. No operational/private
 helpers, databases, configuration or credentials were touched. No BB-132K recovery work was reopened.
 STOP for independent review; no merge/deployment/activation authority. Finance RESEARCH / 0 SEK / NONE.

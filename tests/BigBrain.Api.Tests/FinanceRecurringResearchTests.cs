@@ -117,6 +117,47 @@ public sealed class FinanceRecurringResearchTests
     }
 
     [Fact]
+    public async Task SingleIterationPersistsResultAndSpentBudgetWithoutReplayExecution()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered);
+        var template = Grant();
+        var grant = template with { Budget = new(1, 1, 3, 64, 30, 30), Cohorts = [template.Cohorts[0]] };
+        db.Memory().CreateRecurringResearchProgram(grant, clock, true);
+        await Seed(db, clock, grant.Cohorts[0]);
+        var calls = 0;
+        Task<LearningReasonerReply> Reason(LearningDevelopmentInput input, CancellationToken _)
+        {
+            calls++;
+            Assert.Empty(input.RecurringHistory!.Entries);
+            return Task.FromResult(Reply(input));
+        }
+        var outcome = await Scheduler(db.Memory(), clock, Reason).CheckAndRunAsync(clock.Now, true, CancellationToken.None);
+        Assert.Equal(FinanceResearchOpportunityState.Completed, outcome!.State);
+        var retained = db.Memory().ReadRecurringResearchProgram()!;
+        Assert.Equal(RecurringResearchState.Completed, retained.State);
+        Assert.Equal(1, retained.Invocations); Assert.Equal(1, retained.Evaluations);
+        Assert.Equal(3, retained.Trials); Assert.Equal(64, retained.Calls); Assert.Equal(30, retained.ReservedSeconds);
+        var attempt = Assert.Single(retained.Attempts);
+        Assert.Equal("Evaluated", attempt.Outcome);
+        Assert.NotNull(attempt.EvaluationId); Assert.NotNull(attempt.EvaluationChecksum);
+        var snapshot = JsonSerializer.Serialize(retained, Json);
+        var reopened = db.Memory();
+        Assert.Equal(snapshot, JsonSerializer.Serialize(await reopened.RunRecurringResearchAsync(1, grant.ReasonerIdentity,
+            clock, Reason, CancellationToken.None), Json));
+        Assert.Null(Scheduler(reopened, clock, Reason).Status(clock.Now).NextDueUtc);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => reopened.RunRecurringResearchAsync(2,
+            grant.ReasonerIdentity, clock, Reason, CancellationToken.None));
+        Assert.Throws<InvalidOperationException>(() => reopened.CreateRecurringResearchProgram(
+            grant with { OwnerDecision = "fixture:no-replacement-grant" }, clock, true));
+        Assert.Equal(snapshot, JsonSerializer.Serialize(db.Memory().ReadRecurringResearchProgram(), Json));
+        Assert.Equal(1, calls);
+        Assert.Equal(1L, db.Scalar("SELECT COUNT(*) FROM robustness_evaluations"));
+        Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM prospective_daily_candidates"));
+        Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM research_runs"));
+    }
+
+    [Fact]
     public async Task MissingDataMaintenanceAndRecoveryNeverSpendAuthority()
     {
         using var db = new FinanceMarketObservationTests.Database(); var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
@@ -319,12 +360,15 @@ public sealed class FinanceRecurringResearchTests
         Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM robustness_evaluations"));
     }
 
-    [Fact]
-    public async Task RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore(bool singleIteration)
     {
         using var db = new FinanceMarketObservationTests.Database();
         using var snapshot = new FinanceMarketObservationTests.Database();
         var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        if (singleIteration) grant = grant with { Budget = new(1, 1, 3, 64, 30, 30), Cohorts = [grant.Cohorts[0]] };
         var original = db.Memory().CreateRecurringResearchProgram(grant, clock); // not fixture authority
         using (var source = new SqliteConnection("Data Source=" + db.Path))
         using (var target = new SqliteConnection("Data Source=" + snapshot.Path))
