@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## Finance operational activation preparation — 2026-10-15
+
+**READ-ONLY COMPLETE / NO ACTIVATION / no interrupted process.**
+Baseline/deployed revision `be7634bd82f52b3cb536142ae3e03dd0e2656aa2` remains unchanged.
+Continuation on `review/finance-recurring-research-deployment`, preserving deployment handoff
+`a27344963e1658632cc3528fa371a87ebc2e2586`. Publication subject
+`docs: record Finance activation evidence and remaining gates` resolves the new exact SHA/tree.
+[Current data counts/timing, model hashes, resource/security prerequisites and specific owner decisions](../STATUS.md#finance-operational-activation-preflight--2026-10-15).
+Reused existing read-only diagnostic assembly with current image and read-only volume, no network
+or application startup. Schema99, both native receipts and lineage verified; zero complete cohorts.
+No production configuration, journal, grant, database, source, service or artifact was changed.
+Only STATUS and this handoff changed; unrelated work preserved. Documentation/diff/staged-secret
+verification applies; no inference/provider call or redundant implementation test run.
+Next: independent review and concrete collection/data/profile/provisioning decisions. Current data
+cannot support a valid real recurring experiment. Do not automatically enroll, activate or repair services.
+Finance **RESEARCH / 0 SEK / NONE**.
+
 ## Finance accepted API deployment handoff — 2026-10-15
 
 **DEPLOYED / VERIFIED / RESEARCH DISABLED / no interrupted operation.**

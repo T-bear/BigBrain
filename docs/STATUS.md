@@ -1,5 +1,109 @@
 # BigBrain Status
 
+## Finance operational activation preflight — 2026-10-15
+
+**READ-ONLY VERIFIED / NOT READY FOR A SCIENTIFIC REAL RUN / NO ACTIVATION.**
+Accepted main and deployed revision remain `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`;
+the deployment evidence below remains valid. API/recovery are healthy, clock synchronized,
+previous shutdown clean, zero interrupted jobs. All five provider/observation/scheduler gates remain
+false, MaintenancePaused=true; recurring model/mode/authority configuration is absent.
+
+### Actual data and temporal eligibility
+
+Reused the existing read-only receipt inspector in a disposable, network-disabled, read-only
+container using the exact deployed image, read-only Finance volume and diagnostic assembly;
+no application startup, migrating constructor, cutoff sealing or production helper installation.
+Current schema is99; two receipts pass native integrity/lineage, watermark is valid, mapping
+manifest/binding counts are0 and prospective candidate/result counts are0.
+
+| AAPL source session | Trusted ingestion/knowledge UTC | Following session open UTC | Recurring timing condition |
+| --- | --- | --- | --- |
+| 2026-10-01 | 2026-10-05T00:07:28.8789067Z | 2026-10-02T13:30:00Z | FAIL: acquired too late |
+| 2026-10-02 | 2026-10-04T17:56:20.0069441Z | 2026-10-05T13:30:00Z | PASS for this condition only |
+
+Both are real `AcquiredProviderDaily`, Alpaca `iex-historical-1Day-raw`, source contract
+`alpaca-historical-stocks-1Day-raw-v2`, unchanged historical AAPL snapshots valid
+2026-01-29 through2026-10-02. October2 receipt/checksum:
+`sha256:caa655557878353e9d700ec84c0c696777fcbf52ee08a63b07f72a99e3a5d11c` /
+`sha256:13d6426177e0553e1c6ca86c856d0d814695da5030bc56d9c4dea404d8e9637d`.
+October1 receipt/checksum:
+`sha256:dfc00b55e068d54947f84c0a15ccb5c4bc9a4bdb3a8fd6aaef86580413ec5677` /
+`sha256:e0d4e47397eb93c8f2b1091ff69d05656f237197d7622f1554230952c30f9260`.
+These are two valid retained session observations, only one timely observation, **zero complete
+eligible recurring cohorts**. Timing PASS does not establish all scientific eligibility facts.
+
+Local catalog reads also show NASDAQ-WIKI3722 promoted historical rows across five instruments,
+GoogleFinance workbook154345 rows/18 instruments pending review, GoogleFinance CSV3126 rows
+rejected, and Zenodo207158 rows/21 instruments pending review. These are row counts, not qualifying
+Alpaca sessions. The18 research datasets comprise9 daily OHLCV,5 close-only market and4 FX datasets;
+none has full Eligible for all five required recurring purposes. Their limited historical capabilities
+do not satisfy the explicit Alpaca receipt/origin/timing contract. No historical import can backdate
+knowledge. One observation HTTP read timed out at20s; other catalog/health/operations reads succeeded;
+the timeout's cause was not established and no service was changed to investigate it.
+
+Current recurring v1 requires300–500 complete sessions per cohort, exact mapping snapshot and fresh
+holdout after registration. The old closed mapping and missing subsequent timely observations cannot
+form such a cohort. The shortest current-contract path is separately authorized prospective collection
+under a reviewed new stable snapshot, then300 timely consecutive sessions for one cohort or at least600
+for two disjoint cohorts. Receipt count alone is insufficient. No scientifically admissible cohort dates
+or grant expiry can be approved from the present evidence; freeze actual dates before holdout begins.
+Mapping revalidation must retain the same snapshot; changing it mid-cohort does not silently become compatible.
+
+### Model, isolation and authority preparation
+
+Host: four-core Intel i5-6600,7863MiB RAM,5381MiB available at inspection; existing host swap is in use.
+Qwen3-1.7B-Q4_K_M is present,1107409472bytes, SHA256
+`b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897`.
+Pinned libllama/ggml/license hashes match the existing manifest (libllama b11146 provenance retained).
+The retained BB-132C worker matches its old build manifest, but that manifest's worker.cpp hash differs
+from accepted recurring source: it is not a proven recurring-release binary. Build/pin the accepted
+native worker before activation; no binary was built or executed in this preflight.
+
+The existing historical cgroup has the required4GiB RAM, swap0, CPU200000/100000, tasks32 and
+oom.group1, but is owned by UID1000; deployed API runs UID1654 and has no model/cgroup mount.
+Workermode775 and runtime libraries664 are not a trusted immutable production installation.
+The native containment code requires this exact cgroup envelope; a smaller RAM quota is not a
+supported configuration. Proposed bounded profile:2threads, CPU-only,4GiB worker limit, swap0,
+32tasks, context4096/input3072/output512, concurrency1 and retries0. Current hosting permits
+InvocationTimeout30s, GracePeriod250ms, ReapTimeout2s; CompletionSeconds33.
+Historical successful inference exceeded50s. Therefore no successful real recurring run within30s
+is verified or promised. The old180s grant cannot be reused; a larger deadline is not an operational
+setting accepted by this release and would require separately reviewed policy/code authorization.
+
+Authority preparation is a specification only: local root filesystem is ext4 and the existing
+root-owned administrative parent is suitable for a separately approved dedicated directory outside
+Finance/lifecycle/config recovery sets. Directory root:API-group0750; journal root:API-group0660,
+single link, append-only, exact enrollment checksum, durable fsync and explicit restore exclusions.
+No directory, journal or enrollment was created. Current API capabilities are zero but NoNewPrivs=0;
+future reviewed Compose override must add cap_drop ALL, no-new-privileges, protected journal mount,
+correct group, read-only pinned artifacts and UID-compatible dedicated cgroup access.
+Configure JournalPath/EnrollmentChecksum/RestoreBoundaryDecision only after genuine enrollment
+and provisioning; placeholders must never be mistaken for a usable authority.
+
+### Concrete owner decisions and service limitation
+
+1. Approve source/instrument scope, truthful effective mapping and verification/revalidation times,
+   provider rights and explicit Pass evidence for integrity, identity, raw price basis and corporate
+   actions. Collection authority is separate from inference. Present historical retention acceptance
+   is not full scientific admission. No new provider or acquisition is proposed as already approved.
+2. Approve exact cohort dates, DueAtUtc and grant/profile expiry once a defensible source schedule is
+   defined, with registration before holdout. Two-iteration envelope: I2/E2/T6/C128/W66s,
+   CompletionSeconds33, scheduler CheckIntervalMinutes60, no catch-up/refund/renewal. One bounded
+   cohort instead uses I1/E1/T3/C64/W33s and does not demonstrate recurring iterations.
+3. Separately authorize native artifact build/provisioning, reviewed CPU/RAM/time profile, protected
+   journal custody and backup exclusions, explicit enrollment and final read-only
+   `RecurringAuthorityMatched` check. Only then separately authorize scheduler/model enablement and
+   maintenance release; do not register an unusable program now.
+4. `bigbrain.service` remains enabled/failed, exit status1, failure state dated2026-09-04. Its configured
+   project and installed helper match the repository; Compose config preflight now passes. No historical
+   journal entries are accessible, so the original cause is unverified. Its start command targets the
+   whole Compose project, not API alone. Owner approval for bounded service reconciliation is required
+   before unattended appliance restart readiness can be claimed; no restart/repair was attempted.
+
+Configuration/approval checklist follows the [existing activation sequence](architecture/finance/research-learning-contract.md#initial-release-configuration-and-operator-sequence).
+No source/config/database/journal/systemd changes, grants, model/provider calls or new recovery work.
+Finance **RESEARCH / 0 SEK / NONE**. Approval alone cannot make the currently missing data timely.
+
 ## Finance API deployment — 2026-10-15
 
 **ACCEPTED REVISION DEPLOYED / RUNTIME VERIFIED / RESEARCH NOT ACTIVATED.**
