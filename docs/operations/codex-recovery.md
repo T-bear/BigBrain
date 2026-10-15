@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## AAPL collection activation stop — 2026-10-15
+
+**SAFE STOP BEFORE ACTIVATION / CURRENT MAPPING INPUT REQUIRED.**
+Continue operational handoffs on `review/finance-recurring-research-deployment`; accepted/running
+baseline remains `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`.
+[Verified gates and exact missing mapping fields](../STATUS.md#aapl-collection-activation-gate--2026-10-15).
+Owner has authorized AAPL-only collection. Credentials/health passed; the only configured snapshot
+ends2026-10-02 and has no versioned current assertion. No production state was changed, request made
+or service restarted. No active process remains; no next collection is scheduled. Resume only with
+truthful current mapping evidence while preserving old receipt snapshots; do not bypass validation.
+Publication subject `docs: record AAPL activation mapping gate`; docs/diff/staged-secret checks only.
+Unrelated work remains excluded. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## Finance operational activation preparation — 2026-10-15
 
 **READ-ONLY COMPLETE / NO ACTIVATION / no interrupted process.**

@@ -1,5 +1,35 @@
 # BigBrain Status
 
+## AAPL collection activation gate — 2026-10-15
+
+**OWNER-AUTHORIZED COLLECTION / STOPPED BEFORE ACTIVATION: CURRENT MAPPING MISSING.**
+Reverified accepted/deployed revision `be7634bd82f52b3cb536142ae3e03dd0e2656aa2`, matching
+compiled/OCI identities, healthy API/recovery and synchronized clock. Both Alpaca credentials exist,
+match running/external configuration and pass the accepted ASCII-alphanumeric format validation;
+the ignored external file remains regular/mode0600. No credential material was output.
+
+Exactly one configured instrument: `US:XNAS:AAPL`, Apple Inc., symbol AAPL, XNAS; accepted
+canonicalization supplies Equity/USD and Alpaca IEX historical1Day/raw. IEX is not the listing venue.
+The configured flat snapshot is still valid2026-01-29 through2026-10-02, with **zero mapping versions**.
+It cannot authorize later source days. Existing policy `bb132e-owner-data-use-risk-v1`, recorded
+2026-10-04, AffectedUseEnabled=true and CurrentDeletion=Unknown matches the accepted owner-risk
+contract; Unknown is explicitly permitted there and is not a provider contractual guarantee.
+Credential format validation does not prove current provider/account entitlement; no request was made.
+
+Required before resumption: retain the exact old canonical instrument/mapping snapshot for both
+historical receipts, and supply a separately evidenced, non-overlapping current AAPL snapshot with
+truthful source-day validity, MappingEvidence, VerificationEvidence, actual UTC VerifiedAtUtc and
+RevalidateByUtc no more than seven days later. No invented historical continuity, backdated assertion
+or permanent-listing claim. Review/adopt through existing BB-132H configuration and persistence;
+never extend or replace the old snapshot. Source date remains distinct from trusted ingestion time.
+
+ObservationRuntime and Alpaca transport remain false, cadence360minutes/lookback3days unchanged;
+**no next acquisition is scheduled**. EODHD/FRED/ResearchScheduler remain false and maintenance true.
+No config edit, container restart, manifest adoption, provider/model call, grant or evidence mutation
+was performed. Collection approval is recorded; no repeated approval of that product decision is needed.
+The missing input is verified current mapping evidence, not another research grant or development sprint.
+Finance **RESEARCH / 0 SEK / NONE**.
+
 ## Finance operational activation preflight — 2026-10-15
 
 **READ-ONLY VERIFIED / NOT READY FOR A SCIENTIFIC REAL RUN / NO ACTIVATION.**
