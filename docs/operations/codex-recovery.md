@@ -1,12 +1,14 @@
 # Codex interrupted-run recovery
 
-## Finance recurring research implementation — 2026-10-14
+## Finance recurring research implementation — 2026-10-15
 
 **REVIEW CHECKPOINT / SAFE TO REVIEW; no production operation.**
 Branch `finance/recurring-research`, baseline `0851ee48a768348a001f1525f0b30c29584fd821`,
 tree `685fbe8be345d25a4775a8f64ef7b0d62687798c`.
-Publication subject `review: implement bounded recurring Finance research` resolves this checkpoint's
-SHA/tree. [Scope, tests, actual limitations and next decision](../reports/features/finance/recurring-research-implementation-20261014.md).
+Previous reviewed implementation `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9` is preserved.
+Final correction subject `review: gate recurring authority and compose local reasoner` resolves current
+SHA/tree. Production authority is hard-blocked; trusted same-API local composition is implemented,
+not deployed. No safe independent rollback witness exists; no configuration can clear this stop. [Scope, tests, actual limitations and next decision](../reports/features/finance/recurring-research-implementation-20261014.md).
 Unrelated mockups and untracked ADR0006–0009 remain preserved and excluded. No operational/private
 helpers, databases, configuration or credentials were touched. No BB-132K recovery work was reopened.
 STOP for independent review; no merge/deployment/activation authority. Finance RESEARCH / 0 SEK / NONE.

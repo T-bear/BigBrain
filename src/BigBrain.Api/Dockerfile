@@ -5,13 +5,17 @@ COPY Directory.Build.props global.json ./
 COPY src/BigBrain.Modules/BigBrain.Modules.csproj src/BigBrain.Modules/
 COPY src/BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj src/BigBrain.Sentinel.Contracts/
 COPY src/BigBrain.Api/BigBrain.Api.csproj src/BigBrain.Api/
-RUN dotnet restore src/BigBrain.Api/BigBrain.Api.csproj
+COPY src/BigBrain.Brain/BigBrain.Brain.csproj src/BigBrain.Brain/
+COPY src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj src/BigBrain.Finance.Hosting/
+RUN dotnet restore src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj
 
 COPY src/BigBrain.Modules/ src/BigBrain.Modules/
 COPY src/BigBrain.Sentinel.Contracts/ src/BigBrain.Sentinel.Contracts/
 COPY src/BigBrain.Api/ src/BigBrain.Api/
+COPY src/BigBrain.Brain/ src/BigBrain.Brain/
+COPY src/BigBrain.Finance.Hosting/ src/BigBrain.Finance.Hosting/
 ARG BIGBRAIN_REVISION=UNKNOWN
-RUN printf '%s\n' "$BIGBRAIN_REVISION" | grep -Eq '^(UNKNOWN|[0-9a-f]{40})$' && dotnet publish src/BigBrain.Api/BigBrain.Api.csproj --configuration Release --no-restore --output /app -p:BigBrainBuildRevision="$BIGBRAIN_REVISION"
+RUN printf '%s\n' "$BIGBRAIN_REVISION" | grep -Eq '^(UNKNOWN|[0-9a-f]{40})$' && dotnet publish src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj --configuration Release --no-restore --output /app -p:BigBrainBuildRevision="$BIGBRAIN_REVISION"
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 ARG BIGBRAIN_REVISION=UNKNOWN
@@ -21,4 +25,4 @@ COPY --from=build /app .
 RUN mkdir -p /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data && chown $APP_UID /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data
 USER $APP_UID
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "BigBrain.Api.dll"]
+ENTRYPOINT ["dotnet", "BigBrain.Finance.Hosting.dll"]

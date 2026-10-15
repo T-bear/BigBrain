@@ -3,6 +3,9 @@ using System.Globalization;
 using System.Text.Json;
 using BigBrain.Api.Finance;
 using BigBrain.Modules.Finance;
+using BigBrain.Finance.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Data.Sqlite;
 
 namespace BigBrain.Api.Tests;
 
@@ -314,6 +317,128 @@ public sealed class FinanceRecurringResearchTests
             (_, _) => throw new Xunit.Sdk.XunitException("Ineligible data must not reach reasoner"), CancellationToken.None));
         Assert.Equal(0, memory.ReadRecurringResearchProgram()!.Invocations);
         Assert.Equal(0L, db.Scalar("SELECT COUNT(*) FROM robustness_evaluations"));
+    }
+
+    [Fact]
+    public async Task RealAuthorityNeverResumesFromCleanReopenOrConsistentOldRestore()
+    {
+        using var db = new FinanceMarketObservationTests.Database();
+        using var snapshot = new FinanceMarketObservationTests.Database();
+        var clock = new FinanceMarketObservationTests.Clock(Registered); var grant = Grant();
+        var original = db.Memory().CreateRecurringResearchProgram(grant, clock); // not fixture authority
+        using (var source = new SqliteConnection("Data Source=" + db.Path))
+        using (var target = new SqliteConnection("Data Source=" + snapshot.Path))
+        { source.Open(); target.Open(); source.BackupDatabase(target); } // isolated test files only
+        clock.Now = grant.Cohorts[0].DueAtUtc;
+        Task<LearningReasonerReply> Never(LearningDevelopmentInput _, CancellationToken __) => throw new Xunit.Sdk.XunitException("Real authority must remain blocked.");
+        foreach (var memory in new[] { db.Memory(), snapshot.Memory() })
+        {
+            Assert.Equal(LearningIdentity.Hash(original), LearningIdentity.Hash(memory.ReadRecurringResearchProgram()));
+            var scheduler = new FinanceResearchOrchestrator(new() { Enabled = true, RecurringProgramMode = true }, memory,
+                new Governor(), new(), new(grant.ReasonerIdentity, Never, TimeSpan.FromSeconds(30)), clock);
+            var outcome = await scheduler.CheckAndRunAsync(clock.Now, true, CancellationToken.None);
+            Assert.Equal(RecurringResearchReconciliationRequiredException.Reason, outcome!.Reason);
+            await Assert.ThrowsAsync<RecurringResearchReconciliationRequiredException>(() =>
+                memory.RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, Never, CancellationToken.None));
+            Assert.Equal(0, memory.ReadRecurringResearchProgram()!.Invocations);
+        }
+    }
+
+    private static IConfiguration HostingConfiguration(string directory, string mode = "valid")
+    {
+        const string p = "Finance:RecurringLocalReasoner:";
+        return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [p + "Enabled"] = "true",
+            [p + "Profile:OwnerDecision"] = "fixture:profile-approval",
+            [p + "Profile:ArtifactAndIsolationEvidence"] = "fixture:owned-proof-no-model",
+            [p + "Profile:ApprovedAtUtc"] = Registered.ToString("O", CultureInfo.InvariantCulture),
+            [p + "Profile:ExpiresAtUtc"] = Grant().ExpiresAtUtc.ToString("O", CultureInfo.InvariantCulture),
+            [p + "Profile:Runtime:WorkerExecutable"] = Path.Combine(AppContext.BaseDirectory, "reasoner-proof", "BigBrain.Reasoner.ProofWorker"),
+            [p + "Profile:Runtime:WorkerArguments:0"] = mode,
+            [p + "Profile:Runtime:CoordinationDirectory"] = directory,
+            [p + "Profile:Runtime:InvocationTimeout"] = "00:00:10",
+            [p + "Profile:Runtime:GracePeriod"] = "00:00:00.250",
+            [p + "Profile:Runtime:ReapTimeout"] = "00:00:02"
+        }).Build();
+    }
+
+    [Theory]
+    [InlineData("valid", "Evaluated")]
+    [InlineData("no-useful", "NoUsefulProposal")]
+    public async Task ProductionCompositionUsesOwnedProofAndPersistsBoundedAudit(string mode, string expected)
+    {
+        if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException();
+        var directory = Path.Combine(Path.GetTempPath(), "bb-recurring-host-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
+            using var db = new FinanceMarketObservationTests.Database(); var clock = new FinanceMarketObservationTests.Clock(Registered);
+            await using var host = LocalRecurringResearchComposition.FromConfiguration(HostingConfiguration(directory, mode), db.Memory(), clock)!;
+            var grant = Grant() with { ReasonerIdentity = host.Binding.Identity };
+            db.Memory().CreateRecurringResearchProgram(grant, clock, true);
+            await Seed(db, clock, grant.Cohorts[0]);
+            // Fixture permission exists only in tests, never in the host's configuration surface.
+            var scheduler = new FinanceResearchOrchestrator(new() { Enabled = true, RecurringProgramMode = true }, db.Memory(),
+                new Governor(), new(), host.Binding with { ModelFreeFixture = true }, clock);
+            await scheduler.CheckAndRunAsync(clock.Now, true, CancellationToken.None);
+            var retained = db.Memory().ReadRecurringResearchProgram()!;
+            Assert.Equal(expected, retained.Attempts[0].Outcome);
+            Assert.Equal(1, retained.Invocations);
+            var audit = retained.Attempts[0].RuntimeAudit!.Value;
+            Assert.Equal(3, audit.Length); Assert.Equal("Started", audit[0].Phase); Assert.Equal("Completed", audit[^1].Phase);
+            Assert.Equal(0, audit[^1].WorkerExitCode);
+            Assert.Equal(mode == "valid" ? 1 : 0, retained.Evaluations);
+            await db.Memory().RunRecurringResearchAsync(1, grant.ReasonerIdentity, clock, host.Binding.Reason, CancellationToken.None);
+            Assert.Equal(LearningIdentity.Hash(retained), LearningIdentity.Hash(db.Memory().ReadRecurringResearchProgram()));
+            Assert.False(File.Exists(Path.Combine(directory, ".local-reasoner-reservation")));
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public async Task HostingDefaultsOffAndRequiresExplicitCurrentBoundedProfileAndGrant()
+    {
+        using var db = new FinanceMarketObservationTests.Database(); var clock = new FinanceMarketObservationTests.Clock(Registered);
+        Assert.Null(LocalRecurringResearchComposition.FromConfiguration(new ConfigurationBuilder().Build(), db.Memory(), clock));
+        var invalid = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        { [LocalRecurringResearchComposition.Section + ":Enabled"] = "true" }).Build();
+        Assert.Throws<InvalidOperationException>(() => LocalRecurringResearchComposition.FromConfiguration(invalid, db.Memory(), clock));
+        var config = HostingConfiguration("/not-provisioned");
+        config[LocalRecurringResearchComposition.Section + ":Profile:ApprovedAtUtc"] = Registered.AddSeconds(1).ToString("O", CultureInfo.InvariantCulture);
+        Assert.Throws<InvalidOperationException>(() => LocalRecurringResearchComposition.FromConfiguration(config, db.Memory(), clock));
+        config[LocalRecurringResearchComposition.Section + ":Profile:ApprovedAtUtc"] = Registered.ToString("O", CultureInfo.InvariantCulture);
+        config[LocalRecurringResearchComposition.Section + ":Profile:Runtime:InvocationTimeout"] = "00:03:00";
+        Assert.Throws<ArgumentException>(() => LocalRecurringResearchComposition.FromConfiguration(config, db.Memory(), clock));
+        Assert.Null(db.Memory().ReadRecurringResearchProgram());
+        await Assert.ThrowsAsync<InvalidOperationException>(() => db.Memory().RunRecurringResearchAsync(1, "missing", clock,
+            (_, _) => throw new Xunit.Sdk.XunitException("No grant."), CancellationToken.None));
+        Assert.DoesNotContain(typeof(Program).Assembly.GetReferencedAssemblies(), x => x.Name is "BigBrain.Brain" or "BigBrain.Finance.Hosting");
+        Assert.DoesNotContain(typeof(BigBrain.Brain.IResearchReasoner).Assembly.GetReferencedAssemblies(), x => x.Name is "BigBrain.Api" or "BigBrain.Finance.Hosting");
+    }
+
+    [Fact]
+    public async Task ComposedProfileExpiryAndRegressionRefuseBeforeWorkerAndProfileChangeChangesIdentity()
+    {
+        if (!OperatingSystem.IsLinux()) throw new PlatformNotSupportedException();
+        var directory = Path.Combine(Path.GetTempPath(), "bb-profile-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        try
+        {
+            using var db = new FinanceMarketObservationTests.Database(); var clock = new FinanceMarketObservationTests.Clock(Registered);
+            var config = HostingConfiguration(directory);
+            await using var host = LocalRecurringResearchComposition.FromConfiguration(config, db.Memory(), clock)!;
+            config[LocalRecurringResearchComposition.Section + ":Profile:OwnerDecision"] = "fixture:different-profile-decision";
+            await using var changed = LocalRecurringResearchComposition.FromConfiguration(config, db.Memory(), clock)!;
+            Assert.NotEqual(host.Binding.Identity, changed.Binding.Identity);
+            clock.Now = Registered.AddTicks(-1);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => host.Binding.Reason(ResearchLearningFixture.Scope().Input, CancellationToken.None));
+            clock.Now = Grant().ExpiresAtUtc;
+            await Assert.ThrowsAsync<InvalidOperationException>(() => host.Binding.Reason(ResearchLearningFixture.Scope().Input, CancellationToken.None));
+            Assert.Empty(Directory.GetFiles(directory));
+            Assert.Null(db.Memory().ReadRecurringResearchProgram());
+        }
+        finally { Directory.Delete(directory, true); }
     }
 
 }

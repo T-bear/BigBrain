@@ -10,13 +10,28 @@ internal sealed record FinanceRecurringReasonerBinding(string Identity,
     Func<LearningDevelopmentInput, CancellationToken, Task<LearningReasonerReply>> Reason,
     TimeSpan CompletionTimeout, bool ModelFreeFixture = false);
 
+internal sealed class RecurringResearchReconciliationRequiredException : InvalidOperationException
+{
+    internal const string Reason = "finance.research.recurring.restoreReconciliationRequired";
+    internal RecurringResearchReconciliationRequiredException() : base(Reason) { }
+}
+
+// Closed transport metadata only. No prompt, reply, path or model-provided rationale.
+internal sealed record FinanceRecurringRuntimeAudit(Guid InvocationId, string Phase, string Outcome,
+    string? Failure, DateTimeOffset AtUtc, long ElapsedMilliseconds, string InputHash,
+    string WorkerConfigurationHash, string? ResponseHash, int? WorkerExitCode);
+
 internal enum RecurringResearchState { Ready, ReservedInference, ReservedEvaluation, Completed, Stopped, Indeterminate }
 internal sealed record RecurringResearchScope(ImmutableArray<string> ReceiptIds, string EvidenceChecksum,
     EvaluationPlan Plan, ImmutableArray<BacktestMarketBar> Bars, ImmutableArray<BacktestFeatureValue> Features,
     LearningDevelopmentInput Input);
 internal sealed record RecurringResearchAttempt(int Number, DateTimeOffset CutoffUtc, RecurringResearchScope Scope,
     string Outcome, DateTimeOffset? AvailableAtUtc = null, string? ResponseChecksum = null,
-    string? EvaluationId = null, string? EvaluationChecksum = null, decimal? ReferenceValidationExcessReturn = null, long? ReasonerElapsedMilliseconds = null, LearningProposalDraft? Proposal = null);
+    string? EvaluationId = null, string? EvaluationChecksum = null, decimal? ReferenceValidationExcessReturn = null, long? ReasonerElapsedMilliseconds = null, LearningProposalDraft? Proposal = null)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ImmutableArray<FinanceRecurringRuntimeAudit>? RuntimeAudit { get; init; }
+}
 internal sealed record RecurringResearchProgram(string Id, RecurringResearchAuthorization Authorization,
     bool ModelFreeFixture,
     DateTimeOffset RegisteredAtUtc, DateTimeOffset WatermarkUtc, RecurringResearchState State,
@@ -117,6 +132,34 @@ internal sealed partial class EodhdMarketMemory
         }
         return value;
     }
+    internal void RecordRecurringRuntimeAudit(FinanceRecurringRuntimeAudit audit)
+    {
+        FinanceTime.RequireUtc(audit.AtUtc, nameof(audit.AtUtc));
+        if (audit.InvocationId == Guid.Empty || audit.ElapsedMilliseconds < 0 ||
+            audit.Phase is not ("Started" or "ResponseStarted" or "Completed") ||
+            audit.Outcome is not ("Started" or "Proposal" or "NoUsefulProposal" or "Cancelled" or "Disabled" or "Failed") ||
+            audit.Failure is not (null or "Disabled" or "Busy" or "InvalidInput" or "InvalidTransport" or "InvalidReply" or "Timeout" or "WorkerFailed" or "AuditFailed" or "StopUnconfirmed") ||
+            !IsHash(audit.WorkerConfigurationHash) || !(audit.InputHash == "" || IsHash(audit.InputHash)) ||
+            audit.ResponseHash is not null && !IsHash(audit.ResponseHash))
+            throw new InvalidDataException("Invalid recurring runtime audit.");
+        using var c = new SqliteConnection(ConnectionString); c.Open(); using var tx = c.BeginTransaction(deferred: false);
+        var program = ReadRecurring(c) ?? throw new InvalidDataException("Runtime audit requires reserved authority.");
+        if (program.State is not (RecurringResearchState.ReservedInference or RecurringResearchState.Indeterminate) || program.Attempts.IsEmpty)
+            throw new InvalidDataException("Runtime audit requires reserved inference.");
+        var attempt = program.Attempts[^1]; var events = attempt.RuntimeAudit ?? [];
+        if (events.Length >= 4 || events.Any(x => x.InvocationId != audit.InvocationId) ||
+            events.IsEmpty && audit.Phase != "Started" ||
+            !events.IsEmpty && (audit.Phase == "Started" || audit.ElapsedMilliseconds < events[^1].ElapsedMilliseconds))
+            throw new InvalidDataException("Runtime audit ownership/order mismatch.");
+        WriteRecurring(c, tx, program with
+        {
+            Attempts = program.Attempts.SetItem(program.Attempts.Length - 1,
+            attempt with { RuntimeAudit = events.Add(audit) })
+        });
+        tx.Commit();
+        static bool IsHash(string value) => value.Length == 64 && value.All(x => x is >= '0' and <= '9' or >= 'a' and <= 'f');
+    }
+
     private static void WriteRecurring(SqliteConnection c, SqliteTransaction tx, RecurringResearchProgram value) =>
         Execute(c, tx, "INSERT INTO recurring_research_program VALUES(1,$hash,$json) ON CONFLICT(singleton) DO UPDATE SET checksum=$hash,snapshot_json=$json",
             ("$hash", LearningIdentity.Hash(value)), ("$json", JsonSerializer.Serialize(value, RecurringJson)));
@@ -195,6 +238,11 @@ internal sealed partial class EodhdMarketMemory
             state = ReadRecurring(c) ?? throw new InvalidOperationException("Explicit research program required.");
             var now = clock.GetUtcNow(); RequireRecurringClock(c, now, state.WatermarkUtc);
             if (number <= state.Attempts.Length) return state; // replay never becomes the next opportunity
+            // No independent non-rollbackable consumption witness exists in accepted recovery.
+            // A clean lifecycle journal or same-database checksum cannot prove this is not a restore.
+            // Do not invent a config bypass or let composition turn on real authority. Fixture-only
+            // execution remains model-free and cannot admit AcquiredProviderDaily observations.
+            if (!state.ModelFreeFixture) throw new RecurringResearchReconciliationRequiredException();
             if (state.State != RecurringResearchState.Ready || number != state.Attempts.Length + 1 || number > state.Authorization.Cohorts.Length)
                 throw new InvalidOperationException("Program is stopped, busy or opportunity is out of order.");
             var grant = state.Authorization; var budget = grant.Budget;
@@ -263,7 +311,7 @@ internal sealed partial class EodhdMarketMemory
                     Trials = state.Trials + 3,
                     Calls = state.Calls + 64,
                     WatermarkUtc = now,
-                    Attempts = state.Attempts.SetItem(number - 1, attempt with { Outcome = "ReservedEvaluation", ResponseChecksum = responseHash, ReasonerElapsedMilliseconds = elapsed.ElapsedMilliseconds, Proposal = ((LearningReasonerReply.Proposal)parsed.Reply!).Draft })
+                    Attempts = state.Attempts.SetItem(number - 1, state.Attempts[number - 1] with { Outcome = "ReservedEvaluation", ResponseChecksum = responseHash, ReasonerElapsedMilliseconds = elapsed.ElapsedMilliseconds, Proposal = ((LearningReasonerReply.Proposal)parsed.Reply!).Draft })
                 };
                 WriteRecurring(c, tx, state); tx.Commit();
             }

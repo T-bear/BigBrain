@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="BigBrain.Api.Tests" />
+    <InternalsVisibleTo Include="BigBrain.Finance.Hosting" />
     <AssemblyMetadata Include="GitRevision" Value="$(BigBrainBuildRevision)" />
   </ItemGroup>
 </Project>

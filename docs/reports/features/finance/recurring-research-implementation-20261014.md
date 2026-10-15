@@ -2,7 +2,7 @@
 
 Detta är en sanerad GitHub-version.
 
-Date: 2026-10-14. **REVIEW CHECKPOINT / NOT MERGE CANDIDATE / NOT OPERATIONALLY ACCEPTED.**
+Initial publication: 2026-10-14; final release correction: 2026-10-15. **REVIEW CHECKPOINT / NOT MERGE CANDIDATE / NOT OPERATIONALLY ACCEPTED.**
 Implemented and tested functionality is distinguished below from the remaining contract/release gaps.
 No deployment, activation or current host-state verification was performed.
 
@@ -11,14 +11,107 @@ No deployment, activation or current host-state verification was performed.
 - Accepted baseline: `0851ee48a768348a001f1525f0b30c29584fd821`.
 - Baseline tree: `685fbe8be345d25a4775a8f64ef7b0d62687798c`.
 - Branch: `finance/recurring-research`.
-- Publication subject: `review: implement bounded recurring Finance research`.
+- Original reviewed implementation: `dc3e5bd42e4c135c7927ca3f9c5cfedbd04e7cc9`;
+  tree `ce791771859346ed784cf274d3f3f5a5c34c9808`, preserved without rewriting.
+- Current publication subject: `review: gate recurring authority and compose local reasoner`.
 - Resolve the exact publication commit/tree from that unique subject and Git metadata; no recursive
   self-hash is embedded in this report. Main was verified unchanged before publication.
 - Owner authorized implementation against contract review `ca2b0fddaf58b050bde3f43d36db12cfff47ab66`,
   tree `e1413c2367129e33acad43efe62dc91556a7346c`. Neither the contract nor release-analysis branch
   was merged to obtain this baseline.
 
+## Final release correction — 2026-10-15
+
+**Decision: REVIEW CHECKPOINT / NOT MERGE CANDIDATE for unattended release.**
+This is one bounded correction on the same branch, not a new recovery or architecture project.
+
+| Blocker | Actual result |
+| --- | --- |
+| Restored consumption authority | **Safely blocked; automatic rollback detection remains unavailable.** Scheduler and Finance kernel refuse every new non-fixture invocation with `finance.research.recurring.restoreReconciliationRequired`. No configuration/clean-start flag clears it. |
+| Production local composition | **Implemented, default disabled.** First-party `BigBrain.Finance.Hosting` composes the same API process, existing scheduler and LocalReasonerRuntime without API↔Brain dependencies. No grant/profile is installed or automatically created. |
+
+A normal restart preserves the same budget/history and completed replay performs no work. However,
+Finance and lifecycle data restored consistently can be indistinguishable from a normal restart.
+A same-store hash or clean lifecycle marker is not an independent authority witness. Consequently
+**both normal and uncertain production reopen are blocked from resuming consumable authority**.
+This is deliberate conservatism, not a claim to distinguish an undetectable full restore. Model-free
+fixture execution remains test-only; it cannot admit real-origin receipts, and hosting cannot select it.
+An owner saying “resume” or changing MaintenancePaused does not bypass the kernel. No refill,
+reset, second database, new schema migration or operational restore drill was introduced.
+
+The smallest remaining security decision is how already-consumed authority can be reconciled against
+independent non-rolled-back evidence. There is no automatic reconciliation command or invented external
+witness. Per this task's explicit stop rule, that question stops here rather than opening a side project.
+No unattended release or production inference is recommended while this concrete stop remains.
+
+Composition is an alternative executable entry for the **same existing API host**, not a second
+service/container/scheduler. Docker packaging publishes it, while maintenance and build identity retain
+API ownership. No production build/deployment occurred. API keeps only a narrow trusted composition
+callback; Brain has no Finance-store dependency. The root disposes the owned runtime after API exit,
+including failure. Native worker/isolation/grammar/runtime implementation are unchanged in this correction.
+
+Trusted external startup Profile requires owner and artifact/isolation evidence references, UTC approval
+and expiry, and every runtime resource/path/argument value. The complete profile hash binds the frozen
+reasoner identity. Missing, future, expired or out-of-bounds profiles fail closed. No real profile ships.
+The ordinary runtime limit remains at most30s; the historical180s acceptance exception is not exposed.
+If real use needs another bound, it requires a separately approved resource-policy decision, not reuse
+of old acceptance authority. Artifact/isolation references are attestations to reviewed provisioning,
+not automatic validation of a server that this task did not inspect or modify.
+
+Existing runtime audit is projected into a closed, at-most-four-entry array in the reserved Finance
+attempt. It retains invocation ID, phase/outcome, fixed failure, time/duration, transport/config hashes
+and exit status. It stores no raw prompt/reply/path and is excluded from visible research history.
+Terminal audit survives evaluation reservation and reopen; failure remains subject to existing runtime
+cleanup/disable behavior. No parallel audit store is added.
+
+Changed implementation surface: `BigBrain.slnx`, API project/friend boundary, Program/Dockerfile,
+FinanceRecurringResearch, FinanceResearchScheduler, FinanceResearchOperations; new three-file
+`src/BigBrain.Finance.Hosting`; API test project and recurring tests. Canonical contract, STATUS,
+BACKLOG and recovery updated; existing catalog link remains sufficient. No unrelated files staged.
+
+### Correction verification
+
+- Focused recurring tests after composition/gate/audit implementation: **24 PASS / 0 FAIL / 0 SKIP**.
+- New coverage includes ordinary and isolated old-copy reopen blocked before reasoner; immutable
+  budget read/replay; disabled/missing/future/180s profiles and missing grant; real owned **proof worker**
+  through production configuration/composition for proposal/evaluation and decline, durable sanitized
+  audit, and unchanged API/Brain dependency direction. No Qwen/model artifact/network is used.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj -c Release --no-restore`:
+  **1177 PASS / 0 FAIL / 8 intentional real-model SKIP**, 1185 total,2m38s. Includes the additional
+  profile expiry/regression/identity witness and all25 recurring tests, scheduler/governor/maintenance,
+  recovery, concurrency, scientific, finite-session and owned-runtime regressions.
+- `dotnet publish src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj -c Release --no-restore -o <isolated review output> -p:BigBrainBuildRevision=UNKNOWN`:
+  **PASS**. API appsettings, both runtimeconfig files and Brain dependency included. Running only
+  `system-build-identity` through each published entry returned `revision=UNKNOWN` exactly. No API
+  server or database owner was started for this packaging smoke check. No Docker build/deployment.
+- `dotnet build BigBrain.slnx -c Release --no-restore`: **PASS, 0 warnings / 0 errors**.
+- `dotnet format BigBrain.slnx --no-restore --verify-no-changes --include` with the seven changed
+  C# files: only whitespace diagnostics in FinanceRecurringResearch and its tests. Corrected with
+  `dotnet format whitespace BigBrain.slnx --no-restore --include` for those two files, then reverified.
+  No semantic code changed after the passing API suite/build; their evidence is reused.
+- `node scripts/verify-documentation.mjs`: **PASS,267 Markdown files /91 unique backlog IDs**.
+- `git diff --check`, `git diff --cached --check`: **PASS**. Scope:17 intended files; unrelated
+  untracked mockups and ADR0006–0009 remain excluded/preserved.
+- `gitleaks protect --staged --redact --no-banner`: **PASS, no leaks** using the installed local binary.
+- Initial new-project build required dependency restore; subsequent compile exposed an entry namespace
+  and analyzer issue, both corrected before the passing focused run. No failing check is hidden.
+- Prior checkpoint's two-iteration/restart/budget/concurrency/replay/holdout tests remain in the suite.
+  Existing runtime cancellation/kill/reap, finite-session, scientific and provider-lineage regressions
+  are reused where unchanged. No unrelated frontend/Sentinel execution or BB-132K work.
+
+### Concrete next decision
+
+Review this exact safety stop and completed composition. **Release remains blocked by independent
+consumption reconciliation**, not by a general need for more analysis. Required later owner decisions:
+that narrowly defined authority mechanism, actual eligible scientific data/cohorts, finite budget,
+explicit artifact/resource profile and any counted real-model validation, then deployment/activation.
+No current approval or profile is fabricated. No code here exposes program creation through startup
+or HTTP. Finance RESEARCH / 0 SEK / NONE.
+
 ## Status
+
+The following initial implementation evidence is historical; the correction above supersedes its
+production-composition gap and makes its restore limitation an enforced safety stop.
 
 The new Finance-owned program explicitly freezes a finite grant, one instrument/source/mapping,
 scientific eligibility evidence, reasoner identity, two disjoint cohort opportunities and expiry.

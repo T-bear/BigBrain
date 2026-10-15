@@ -25,7 +25,11 @@ public partial class Program
     private static readonly System.Text.Json.JsonSerializerOptions WebJsonOptions =
         new(System.Text.Json.JsonSerializerDefaults.Web);
 
-    public static void Main(string[] args)
+    public static void Main(string[] args) => Run(args, null);
+
+    // First-party composition root only; no runtime plugin or public grant endpoint.
+    internal static void Run(string[] args,
+        Func<IConfiguration, EodhdMarketMemory, FinanceRecurringReasonerBinding?>? composeRecurring)
     {
         if (args.Length > 0 && args[0] == "system-build-identity")
         {
@@ -34,7 +38,7 @@ public partial class Program
             return;
         }
         var oneShot = FinanceObservationMaintenanceCommand.IsCommand(args);
-        var builder = WebApplication.CreateBuilder(oneShot ? [] : args);
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = oneShot ? [] : args, ApplicationName = typeof(Program).Assembly.FullName });
         if (oneShot)
         {
             Environment.ExitCode = FinanceObservationMaintenanceCommand.Run(args, builder.Configuration);
@@ -240,7 +244,13 @@ public partial class Program
         builder.Services.AddHostedService<FinanceRobustnessBuildWorker>();
         builder.Services.AddSingleton<FinanceResearchOperationsCoordinator>();
         builder.Services.AddHostedService<FinanceResearchOperationsWorker>();
-        builder.Services.AddSingleton<FinanceResearchOrchestrator>();
+        if (composeRecurring is not null)
+            builder.Services.AddSingleton<FinanceResearchOrchestrator>(services => new(
+                researchSchedulerOptions, services.GetRequiredService<EodhdMarketMemory>(),
+                services.GetRequiredService<IFinanceResearchResourceGovernor>(), researchOperationsOptions,
+                composeRecurring(builder.Configuration, services.GetRequiredService<EodhdMarketMemory>()),
+                services.GetRequiredService<TimeProvider>()));
+        else builder.Services.AddSingleton<FinanceResearchOrchestrator>();
         builder.Services.AddSingleton(TimeProvider.System);
         var observationOptions = FinanceObservationRuntimeOptions.FromConfiguration(builder.Configuration);
         var alpacaDailyOptions = AlpacaDailyObservationOptions.FromConfiguration(builder.Configuration);

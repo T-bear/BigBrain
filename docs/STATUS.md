@@ -1,13 +1,15 @@
 # BigBrain Status
 
-## Finance recurring research — 2026-10-14
+## Finance recurring research — 2026-10-15
 
 **REVIEW CHECKPOINT / IMPLEMENTED MODEL-FREE / NOT DEPLOYED OR ACTIVATED.**
 Existing scheduler, receipt owner and evaluator now compose two explicitly budgeted disjoint cohorts,
 with native results, reopenable sanitized history and cumulative I/E/T/C/W reservations. Old grants stay
 spent/unchanged. No real provider/model execution. [Evidence and unresolved release gates](reports/features/finance/recurring-research-implementation-20261014.md).
-A consistent stale authority restore still requires independent reconciliation; production grant/model
-provisioning and operational activation are not claimed. Finance RESEARCH / 0 SEK / NONE.
+Final correction implements same-API local runtime composition, disabled without an explicit profile.
+Real recurring authority is hard-blocked pending independent restore-consumption reconciliation;
+normal reopen preserves history but cannot prove absence of a consistent old restore. NOT MERGE CANDIDATE
+for unattended release. No operational provisioning or activation. Finance RESEARCH / 0 SEK / NONE.
 
 ## BB-132H versioned observation mapping — 2026-10-10
 

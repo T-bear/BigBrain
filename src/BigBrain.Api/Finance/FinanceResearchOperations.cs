@@ -71,6 +71,7 @@ internal sealed partial class EodhdMarketMemory
         var state = FinanceResearchOperationalState.Waiting; var attention = false; var activity = "WAITING";
         if (!scheduler.Enabled) { state = FinanceResearchOperationalState.Disabled; activity = "SCHEDULER_DISABLED"; }
         else if (options.MaintenancePaused) { state = FinanceResearchOperationalState.Maintenance; activity = "MAINTENANCE_PAUSED"; }
+        else if (latest?.Reason == RecurringResearchReconciliationRequiredException.Reason) { state = FinanceResearchOperationalState.AttentionRequired; attention = true; activity = "RECURRING_AUTHORITY_RECONCILIATION_REQUIRED"; }
         else if (active is not null) { state = FinanceResearchOperationalState.Running; activity = "RESEARCH_RUNNING"; }
         else if (streak >= options.AttentionFailureThreshold) { state = FinanceResearchOperationalState.AttentionRequired; attention = true; activity = "OPERATIONAL_FAILURE_STREAK"; }
         else if (lastEvaluation is null ? (now - recovery.BootedAtUtc > TimeSpan.FromMinutes(options.StaleSchedulerMinutes)) : (now - lastEvaluation > TimeSpan.FromMinutes(options.StaleSchedulerMinutes))) { state = FinanceResearchOperationalState.Degraded; attention = true; activity = "SCHEDULER_STALE"; }

@@ -14,6 +14,7 @@
     <ProjectReference Include="../../src/BigBrain.Api/BigBrain.Api.csproj" />
     <ProjectReference Include="../BigBrain.Reasoner.ProofWorker/BigBrain.Reasoner.ProofWorker.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="../../src/BigBrain.Brain/BigBrain.Brain.csproj" />
+    <ProjectReference Include="../../src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj" />
     <ProjectReference Include="../../src/BigBrain.Modules/BigBrain.Modules.csproj" />
   </ItemGroup>
   <ItemGroup>

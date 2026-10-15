@@ -186,6 +186,8 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
         if (!recoveryReady || operations!.MaintenancePaused || recurring is null || clock is null)
             return Finish(FinanceResearchOpportunityState.Deferred, !recoveryReady ? "finance.research.scheduler.recoveryNotReady" :
                 operations!.MaintenancePaused ? "finance.research.scheduler.maintenancePaused" : "finance.research.recurring.reasonerNotProvisioned", now.AddMinutes(options.CheckIntervalMinutes));
+        if (!program.ModelFreeFixture)
+            return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason);
         if (recurring.CompletionTimeout <= TimeSpan.Zero ||
             recurring.CompletionTimeout > TimeSpan.FromSeconds(program.Authorization.Budget.CompletionSeconds))
             throw new InvalidOperationException("Reserved runtime does not include authorized worker cleanup.");

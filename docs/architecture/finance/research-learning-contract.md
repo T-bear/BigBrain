@@ -65,22 +65,58 @@ recurring history without asserting synthetic/empty history. Grammar, vocabulary
 Test fixtures have a durable fixture origin and explicit fixture composition; they cannot pass real-origin
 admission or become operational evidence. This is inference integration, not model-weight training.
 
-### Release boundaries requiring explicit decisions
+### Final release corrections — 2026-10-15
+
+**Production recurring acquisition is safely blocked, not rollback-detected.** Before any real-origin
+invocation reservation, both the scheduler and Finance kernel refuse production authority with
+`finance.research.recurring.restoreReconciliationRequired`. Operations reports AttentionRequired.
+The denial has no enable flag, TTL, clean-shutdown exception or automatic acknowledgement. Existing
+maintenance/recovery/governor checks still apply; setting MaintenancePaused=false cannot bypass it.
+Exact completed replay/read remains available without execution. Fixture execution is explicitly
+separate and cannot consume AcquiredProviderDaily; production composition cannot select fixture mode.
+No database migration, budget refund, historical record rewrite or new recovery store is introduced.
+
+Normal process reopen retains the same budget/history. A consistent old restore can present exactly
+the same data as a normal reopen: the current Finance/lifecycle stores cannot independently prove
+which occurred. Therefore **neither clean startup nor uncertain recovery may resume real authority**.
+This conservative operational stop closes the unsafe activation path, but does not satisfy automatic
+rollback detection or unattended restart. Resolving it needs explicit reviewed consumption evidence
+outside the rollback domain; no such authority is invented here. There is no reconciliation command
+that can simply bless the restored balance. This is a bounded security stop, not a new backup project.
+
+`BigBrain.Finance.Hosting` is a first-party composition entry for the **same API process**, not another
+service, scheduler or process runner. It references API and Brain; neither references the other or the
+composition root. It calls the existing API startup and registers only the narrow reasoner delegate.
+The API Docker build publishes this entry point and its dependencies; no image was deployed. Existing
+API maintenance commands and compiled build identity remain available. No reflection/plugin loading.
+
+External trusted startup configuration is `Finance:RecurringLocalReasoner:Enabled` (default false)
+and `Profile`. No actual profile or approved resource value is shipped. Profile requires bounded
+OwnerDecision and ArtifactAndIsolationEvidence references, UTC ApprovedAtUtc/ExpiresAtUtc, and Runtime:
+WorkerExecutable, WorkerArguments, CoordinationDirectory, InvocationTimeout, GracePeriod, ReapTimeout.
+These are private first-party deployment inputs, never model/request data. Runtime values are explicit;
+missing values fail closed. Existing ordinary LocalReasonerRuntime bounds apply, including at most30s
+invocation. The old180s acceptance exception is inaccessible from this host. A different limit needs a
+separate explicit profile/policy decision; this correction grants no new real-model allowance.
+
+The full profile checksum is the binding's reasoner identity and must match the explicitly frozen grant.
+Changing a profile does not reinterpret an old grant. Artifact and OS-isolation evidence must establish
+the pinned native worker/libllama/Qwen, read-only artifacts and pre-provisioned cgroup before any future
+activation; the reference itself is an owner attestation, not an automatic proof of those host facts.
+No downloads, model choice, arbitrary command endpoint, grant creator or default production fake.
+
+Composition owns runtime disposal through API shutdown/failure. Single-flight, pidfd ownership,
+cancellation, kill/reap, bounded BRF1 I/O and inherited-environment clearing stay in LocalReasonerRuntime.
+Profile expiry and clock regression fail closed. Started/response/completed fixed audit metadata is
+bounded to four records in the already reserved Finance attempt, checksummed and reopened with it;
+no new audit database or raw prompt/reply logging. Audit failure uses existing runtime failure/disable
+behavior. This metadata remains private and never enters the model-visible history.
 
 Actual source eligibility, truthful mapping, current rights/retention, I/E/T/C/W values, cohort dates,
-expiry, reasoner identity/profile, resources and schedule require owner approval. Existing 30s ordinary
-runtime remains unchanged; the old 180s controlled-acceptance allowance is not reused. Runtime provisioning
-and explicit program creation are internal boundaries, not available through a new public control surface.
-No real-model, provider, deployment or activation proof is claimed by this checkpoint.
-
-A consistent rollback of **all** Finance authority/evidence cannot be detected by checksums inside that
-same rolled-back database. Existing recovery readiness is not an independent consumption witness.
-Restored/stale authority must remain maintenance-paused and requires reviewed consumption reconciliation;
-this checkpoint does not claim automatic safe resumption after an undetectable full rollback. This is
-an explicit unresolved release gate against the reviewed contract's stronger stale-restore requirement,
-not authorization to add a parallel ledger or reopen BB-132K. Ordinary reopen of current evidence and
-uncertain in-flight stops are implemented. Operational provisioning and rollback-authority handling must
-be settled before unattended real inference is enabled.
+expiry, resources and schedule still require owner approval. Program creation remains explicit/internal,
+never a public endpoint or startup side effect. The production binding is implemented; operational
+provisioning is not performed. The remaining release decision is the concrete restore-authority stop,
+then explicit data/profile/grant/real-inference/deployment decisions, not another general study.
 
 Finance remains **RESEARCH / 0 SEK / NONE**. Collection, SHADOW, model provisioning and research grants
 remain independently controlled; no trading, automatic promotion or capital side effect is introduced.
