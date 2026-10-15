@@ -39,10 +39,15 @@ public sealed record LearningDevelopmentInput(string Version, string ProjectionV
     // Optional additive Finance projection; absent v1 serialization and identities are unchanged.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public FiniteResearchHistory? FiniteHistory { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public RecurringResearchHistory? RecurringHistory { get; init; }
     public LearningProtocolLimits Limits => FiniteHistory is null
         ? new(1, 1, 1, 1, 3, 1, 64, 1, 0, 30, 300)
         : new(2, 2, 1, 1, 3, 1, 64, 1, 0, 30, 300);
-    public LearningHistorySummary History => FiniteHistory is null
+    public LearningHistorySummary History => RecurringHistory is { } recurring
+        ? new(recurring.Entries.Length, recurring.Entries.Count(x => x.Outcome == "Evaluated") * 3,
+            recurring.Entries.Count(x => x.Outcome == "Evaluated"), 0, LearningExposure.Unexposed)
+        : FiniteHistory is null
         ? new(0, 0, 0, 0, LearningExposure.Unexposed)
         : new(1, FiniteHistory.PreviousOutcome == LearningAdmissionReason.Admitted ? 3 : 0,
             FiniteHistory.PreviousOutcome == LearningAdmissionReason.Admitted ? 1 : 0, 0,

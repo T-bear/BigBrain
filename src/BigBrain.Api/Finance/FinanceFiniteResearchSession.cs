@@ -41,6 +41,7 @@ internal sealed partial class EodhdMarketMemory
             throw new InvalidOperationException("Ineligible or future synthetic evidence.");
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         using var transaction = connection.BeginTransaction(deferred: false);
+        FinanceScientificLease.RequireLegacyAllowed(connection);
         RequireFiniteSchema(connection);
         var existing = ReadFiniteState(connection);
         if (existing is not null)
@@ -182,6 +183,7 @@ internal sealed partial class EodhdMarketMemory
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         using var transaction = connection.BeginTransaction(deferred: false);
+        FinanceScientificLease.RequireLegacyAllowed(connection);
         var state = RequireFiniteSession(connection, sessionId);
         replay = iteration > 0 && iteration <= state.Iterations.Length;
         if (replay)
@@ -377,7 +379,7 @@ internal sealed partial class EodhdMarketMemory
     private static void RequireFiniteSchema(SqliteConnection connection)
     {
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT CASE WHEN MAX(version) IN (95,96,97,98) AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
+        command.CommandText = "SELECT CASE WHEN MAX(version) IN (95,96,97,98,99) AND SUM(CASE WHEN version=94 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END FROM finance_schema_migrations";
         if (Convert.ToInt64(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) != 1)
             throw new InvalidOperationException("Unsupported finite session schema.");
     }

@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/BigBrain.Api/BigBrain.Api.csproj" />
     <Project Path="src/BigBrain.Brain/BigBrain.Brain.csproj" />
+    <Project Path="src/BigBrain.Finance.Hosting/BigBrain.Finance.Hosting.csproj" />
     <Project Path="src/BigBrain.Modules/BigBrain.Modules.csproj" />
     <Project Path="src/BigBrain.Sentinel/BigBrain.Sentinel.csproj" />
     <Project Path="src/BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj" />

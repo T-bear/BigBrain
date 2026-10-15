@@ -1,5 +1,18 @@
 # BigBrain Backlog
 
+## Finance recurring research implementation and release gate
+
+**MERGE CANDIDATE; implementation verified, no operational activation.** The prior unconditional
+production stop is replaced by protected journal matching. Normal restart and older Finance rollback
+have distinct outcomes within the explicit root-custody/restore-exclusion model.
+[Current implementation evidence](reports/features/finance/recurring-research-implementation-20261014.md#final-release-implementation--protected-recurring-authority--2026-10-15).
+Remaining operational gates: reviewed release SHA, independently provisioned append-only journal and
+actual host protection preflight, exact scientifically eligible data/mapping/cohort dates, finite grant,
+local profile/resources, separate deployment and inference approval. No automatic grant renewal.
+General disaster recovery, privileged whole-host rollback including authority, witness loss and automated
+repair remain outside this release; old grants cannot be reenabled without trustworthy current history.
+No generic preparation sprint or new recovery exercise is queued.
+
 ## BB-132H — versioned observation mapping
 
 **MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable

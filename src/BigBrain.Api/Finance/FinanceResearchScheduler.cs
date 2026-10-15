@@ -11,6 +11,7 @@ public sealed record FinanceResearchSchedulerOptions
     public const string Section = "Finance:ResearchScheduler";
     public const string CurrentVersion = "finance-research-scheduler-v1";
     public bool Enabled { get; set; }
+    public bool RecurringProgramMode { get; set; }
     public string SchedulerVersion { get; set; } = CurrentVersion;
     public int CheckIntervalMinutes { get; set; } = 60;
     public int ScheduledUtcHour { get; set; } = 2;
@@ -63,7 +64,7 @@ internal sealed partial class EodhdMarketMemory
             research_run_id TEXT,reason TEXT,next_eligibility_utc TEXT);
           CREATE INDEX IF NOT EXISTS ix_research_schedule_history ON research_schedule_opportunities(due_utc DESC,opportunity_id DESC);
           UPDATE research_schedule_opportunities SET state='Deferred',reason='finance.research.scheduler.interruptedBeforeResearch',next_eligibility_utc=NULL
-            WHERE state='Started' AND NOT EXISTS(SELECT 1 FROM research_runs WHERE idempotency_key=research_schedule_opportunities.opportunity_id);
+            WHERE state='Started' AND scheduler_version='finance-research-scheduler-v1' AND NOT EXISTS(SELECT 1 FROM research_runs WHERE idempotency_key=research_schedule_opportunities.opportunity_id);
           """; command.ExecuteNonQuery(); AddColumn(connection, "research_schedule_opportunities", "resource_decision_json", "TEXT");
     }
 
@@ -82,7 +83,12 @@ internal sealed partial class EodhdMarketMemory
     internal FinanceResearchOpportunity RecordResearchResourceDecision(string id, FinanceResearchResourceDecision decision)
     { using var c = new SqliteConnection(ConnectionString); c.Open(); Execute(c, null, "UPDATE research_schedule_opportunities SET resource_decision_json=$json WHERE opportunity_id=$id", ("$json", JsonSerializer.Serialize(decision)), ("$id", id)); return ReadResearchOpportunity(c, id)!; }
     internal AutonomousResearchRun? AutonomousResearchRunByKey(string key) { using var c = new SqliteConnection(ConnectionString); c.Open(); return ReadRunByKey(c, key); }
-    internal bool AutonomousResearchIsRunning() { using var c = new SqliteConnection(ConnectionString); c.Open(); return ResearchScalar(c, "SELECT run_id FROM research_runs WHERE state='Running' LIMIT 1") is not null; }
+    internal bool AutonomousResearchIsRunning()
+    {
+        using var c = new SqliteConnection(ConnectionString); c.Open();
+        return ResearchScalar(c, "SELECT run_id FROM research_runs WHERE state='Running' LIMIT 1") is not null ||
+            ReadRecurring(c)?.State is RecurringResearchState.ReservedInference or RecurringResearchState.ReservedEvaluation;
+    }
     internal FinanceResearchDataReadiness ResearchDataReadiness(DateOnly requiredDate)
     {
         var expected = EodhdCatalog.Watchlist.Select(x => x.InstrumentId).Order(StringComparer.Ordinal).ToArray();
@@ -106,6 +112,21 @@ internal sealed partial class EodhdMarketMemory
     }
     internal FinanceResearchReadinessStatus ResearchReadinessStatus(DateTimeOffset nowUtc, FinanceResearchSchedulerOptions scheduler)
     {
+        if (scheduler.RecurringProgramMode)
+        {
+            var p = ReadRecurringResearchProgram();
+            var next = p?.Authorization.Cohorts.ElementAtOrDefault(p.Attempts.Length);
+            var ready = false; var reason = p is null ? "noAuthority" : p.State.ToString();
+            if (p?.State == RecurringResearchState.Ready && next is not null && nowUtc >= next.DueAtUtc)
+            {
+                using var connection = new SqliteConnection(ConnectionString); connection.Open();
+                try { _ = ProjectRecurring(connection, p, p.Attempts.Length + 1, nowUtc); ready = true; reason = "dataReady"; }
+                catch (RecurringResearchDataPendingException) { reason = "dataPending"; }
+            }
+            return new(p?.Attempts.Length > 0, next is not null, next?.To,
+                p is null ? "NO_AUTHORITY" : p.State.ToString(), "FROZEN_PER_COHORT", ready,
+                "finance.research.recurring." + reason, p is null ? 0 : 1, 1);
+        }
         using var c = new SqliteConnection(ConnectionString); c.Open(); using var historical = c.CreateCommand(); historical.CommandText = "SELECT CASE WHEN EXISTS(SELECT 1 FROM observations) AND EXISTS(SELECT 1 FROM feature_revisions) THEN 1 ELSE 0 END"; var historicalAvailable = Convert.ToInt32(historical.ExecuteScalar(), CultureInfo.InvariantCulture) == 1;
         var researchDate = FinanceResearchSchedule.ResearchDate(FinanceResearchSchedule.DueFor(nowUtc, scheduler.ScheduledUtcHour)); var expected = EodhdCatalog.Watchlist.Length;
         if (!UsMarketCalendar.IsSession(researchDate)) return new(historicalAvailable, false, null, "NOT_REQUIRED_NON_RESEARCH_DAY", "NOT_REQUIRED", false, "finance.research.scheduler.nonResearchDay", null, expected);
@@ -123,12 +144,13 @@ internal sealed partial class EodhdMarketMemory
     private static FinanceResearchOpportunity? ReadResearchOpportunity(SqliteConnection c, string id) { using var x = c.CreateCommand(); x.CommandText = "SELECT scheduler_version,research_date,due_utc,created_utc,attempted_utc,completed_utc,state,research_run_id,reason,next_eligibility_utc,resource_decision_json FROM research_schedule_opportunities WHERE opportunity_id=$id"; x.Parameters.AddWithValue("$id", id); using var r = x.ExecuteReader(); if (!r.Read()) return null; return new(id, r.GetString(0), DateOnly.Parse(r.GetString(1), CultureInfo.InvariantCulture), DateTimeOffset.Parse(r.GetString(2), CultureInfo.InvariantCulture), DateTimeOffset.Parse(r.GetString(3), CultureInfo.InvariantCulture), r.IsDBNull(4) ? null : DateTimeOffset.Parse(r.GetString(4), CultureInfo.InvariantCulture), r.IsDBNull(5) ? null : DateTimeOffset.Parse(r.GetString(5), CultureInfo.InvariantCulture), Enum.Parse<FinanceResearchOpportunityState>(r.GetString(6)), r.IsDBNull(7) ? null : r.GetString(7), r.IsDBNull(8) ? null : r.GetString(8), r.IsDBNull(9) ? null : DateTimeOffset.Parse(r.GetString(9), CultureInfo.InvariantCulture), r.IsDBNull(10) ? null : JsonSerializer.Deserialize<FinanceResearchResourceDecision>(r.GetString(10))); }
 }
 
-internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOptions options, EodhdMarketMemory memory, IFinanceResearchResourceGovernor governor, FinanceResearchOperationsOptions? operations = null)
+internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOptions options, EodhdMarketMemory memory, IFinanceResearchResourceGovernor governor, FinanceResearchOperationsOptions? operations = null, FinanceRecurringReasonerBinding? recurring = null, TimeProvider? clock = null)
 {
     internal FinanceResearchOpportunity? CheckAndRun(DateTimeOffset nowUtc, bool mayStartTimeSensitiveWork, CancellationToken token) => CheckAndRunAsync(nowUtc, mayStartTimeSensitiveWork, token).GetAwaiter().GetResult();
     internal async Task<FinanceResearchOpportunity?> CheckAndRunAsync(DateTimeOffset nowUtc, bool mayStartTimeSensitiveWork, CancellationToken token)
     {
         options.Validate(); operations ??= new(); operations.Validate(); if (!options.Enabled) return null; if (nowUtc.Offset != TimeSpan.Zero) throw new ArgumentException("Research scheduler requires UTC time."); token.ThrowIfCancellationRequested(); memory.RecordResearchOperationsEvaluation(nowUtc, null); FinanceResearchOpportunity Finish(FinanceResearchOpportunity value) { memory.RecordResearchOperationsEvaluation(nowUtc, value); return value; }
+        if (options.RecurringProgramMode) { var recurringResult = await CheckRecurring(nowUtc, mayStartTimeSensitiveWork, token); return recurringResult is null ? null : Finish(recurringResult); }
         var due = FinanceResearchSchedule.DueFor(nowUtc, options.ScheduledUtcHour); if (nowUtc < due) return null; var researchDate = FinanceResearchSchedule.ResearchDate(due); memory.SupersedeDeferredResearchOpportunities(researchDate, nowUtc); var id = FinanceResearchSchedule.OpportunityId(options.SchedulerVersion, researchDate); var opportunity = memory.CreateOrReadResearchOpportunity(id, options.SchedulerVersion, researchDate, due, nowUtc);
         if (opportunity.State is FinanceResearchOpportunityState.Completed or FinanceResearchOpportunityState.Failed or FinanceResearchOpportunityState.Skipped) return Finish(opportunity);
         if (opportunity is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null } && opportunity.NextEligibilityUtc > nowUtc) return Finish(opportunity);
@@ -145,8 +167,66 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
         catch (OperationCanceledException) when (token.IsCancellationRequested) { return Finish(memory.UpdateResearchOpportunity(id, FinanceResearchOpportunityState.Deferred, nowUtc, null, "finance.research.scheduler.shutdown", nowUtc.AddMinutes(options.CheckIntervalMinutes))); }
         catch (Exception exception) { var run = memory.AutonomousResearchRunByKey(id); var reason = run?.State == ResearchExperimentState.Failed ? $"finance.research.scheduler.researchFailed.{run.FailureReason}" : $"finance.research.scheduler.unexpected.{exception.GetType().Name}"; return Finish(memory.UpdateResearchOpportunity(id, FinanceResearchOpportunityState.Failed, nowUtc, run?.RunId, reason, null)); }
     }
+    private async Task<FinanceResearchOpportunity?> CheckRecurring(DateTimeOffset now, bool recoveryReady, CancellationToken token)
+    {
+        var program = memory.ReadRecurringResearchProgram();
+        if (program is null) return null; // Startup/config never creates authority.
+        var index = program.State == RecurringResearchState.Ready ? program.Attempts.Length : Math.Max(0, program.Attempts.Length - 1);
+        if (index >= program.Authorization.Cohorts.Length) return null;
+        var cohort = program.Authorization.Cohorts[index];
+        if (now < cohort.DueAtUtc) return null;
+        var id = $"{program.Id}:{index + 1}";
+        memory.CreateOrReadResearchOpportunity(id, RecurringResearchAuthorization.Version, cohort.To, cohort.DueAtUtc, now);
+        FinanceResearchOpportunity Finish(FinanceResearchOpportunityState state, string reason, DateTimeOffset? next = null) =>
+            memory.UpdateResearchOpportunity(id, state, now, null, reason, next);
+        if (program.State is RecurringResearchState.ReservedInference or RecurringResearchState.ReservedEvaluation or RecurringResearchState.Indeterminate)
+            return Finish(FinanceResearchOpportunityState.Failed, "finance.research.recurring.uncertainOrBusy");
+        if (program.State != RecurringResearchState.Ready)
+            return Finish(program.State == RecurringResearchState.Completed ? FinanceResearchOpportunityState.Completed : FinanceResearchOpportunityState.Failed, "finance.research.recurring." + program.State);
+        if (!recoveryReady || operations!.MaintenancePaused || recurring is null || clock is null)
+            return Finish(FinanceResearchOpportunityState.Deferred, !recoveryReady ? "finance.research.scheduler.recoveryNotReady" :
+                operations!.MaintenancePaused ? "finance.research.scheduler.maintenancePaused" : "finance.research.recurring.reasonerNotProvisioned", now.AddMinutes(options.CheckIntervalMinutes));
+        try { memory.RequireRecurringAuthority(program); }
+        catch (RecurringResearchReconciliationRequiredException)
+        { return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason); }
+        if (recurring.CompletionTimeout <= TimeSpan.Zero ||
+            recurring.CompletionTimeout > TimeSpan.FromSeconds(program.Authorization.Budget.CompletionSeconds))
+            throw new InvalidOperationException("Reserved runtime does not include authorized worker cleanup.");
+        if (recurring.ModelFreeFixture != program.ModelFreeFixture) throw new InvalidOperationException("Reasoner/evidence origin mismatch.");
+        var resource = await governor.EvaluateAsync(now, token); memory.RecordResearchResourceDecision(id, resource);
+        if (resource.Decision != FinanceResearchResourceDecisionKind.Allow)
+            return Finish(FinanceResearchOpportunityState.Deferred, resource.ReasonCodes[0], now.AddMinutes(options.CheckIntervalMinutes));
+        try
+        {
+            var result = await memory.RunRecurringResearchAsync(index + 1, recurring.Identity, clock, recurring.Reason, token);
+            var completed = result.Attempts.ElementAtOrDefault(index)?.Outcome == "Evaluated";
+            return Finish(completed ? FinanceResearchOpportunityState.Completed : FinanceResearchOpportunityState.Failed,
+                "finance.research.recurring." + (completed ? "evaluated" : result.StopReason ?? result.State.ToString()));
+        }
+        catch (RecurringResearchReconciliationRequiredException)
+        { return Finish(FinanceResearchOpportunityState.Deferred, RecurringResearchReconciliationRequiredException.Reason); }
+        catch (RecurringResearchDataPendingException)
+        { return Finish(FinanceResearchOpportunityState.Deferred, "finance.research.recurring.dataPending", now.AddMinutes(options.CheckIntervalMinutes)); }
+    }
     private FinanceResearchOpportunity Reconcile(FinanceResearchOpportunity opportunity, DateTimeOffset now) { var run = memory.AutonomousResearchRunByKey(opportunity.OpportunityId); if (run is null) return opportunity; if (run.State == ResearchExperimentState.Completed) return memory.UpdateResearchOpportunity(opportunity.OpportunityId, FinanceResearchOpportunityState.Completed, now, run.RunId, "finance.research.scheduler.completed", null); if (run.State == ResearchExperimentState.Failed) return memory.UpdateResearchOpportunity(opportunity.OpportunityId, FinanceResearchOpportunityState.Failed, now, run.RunId, run.FailureReason, null); return memory.UpdateResearchOpportunity(opportunity.OpportunityId, FinanceResearchOpportunityState.Started, now, run.RunId, "finance.research.scheduler.researchRunning", null); }
-    internal FinanceResearchSchedulerStatus Status(DateTimeOffset nowUtc) { var last = memory.LatestResearchOpportunity(); var next = !options.Enabled ? null : last is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null } ? last.NextEligibilityUtc : FinanceResearchSchedule.NextDue(nowUtc, options.ScheduledUtcHour); var readiness = memory.ResearchReadinessStatus(nowUtc, options); return new(nowUtc, options.Enabled, options.SchedulerVersion, next, last, last?.ResearchRunId, last?.State.ToString() ?? "NotRun", last?.Reason, memory.AutonomousResearchIsRunning(), "RESEARCH", 0m, "NONE", readiness.HistoricalEvidenceAvailable, readiness.CurrentSessionRequired, readiness.RequiredResearchDate, readiness.CurrentSessionReadiness, readiness.FeatureLineageReadiness, readiness.IsReady, readiness.ReasonCode, readiness.CurrentInstrumentCount, readiness.ExpectedInstrumentCount); }
+    internal FinanceResearchSchedulerStatus Status(DateTimeOffset nowUtc)
+    {
+        var last = memory.LatestResearchOpportunity();
+        var program = options.RecurringProgramMode ? memory.ReadRecurringResearchProgram() : null;
+        DateTimeOffset? next = !options.Enabled ? null : options.RecurringProgramMode
+            ? program?.State == RecurringResearchState.Ready ? program.Authorization.Cohorts.ElementAtOrDefault(program.Attempts.Length)?.DueAtUtc : null
+            : last is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null }
+                ? last.NextEligibilityUtc : FinanceResearchSchedule.NextDue(nowUtc, options.ScheduledUtcHour);
+        if (options.RecurringProgramMode && next is not null && last is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null } && last.NextEligibilityUtc > next)
+            next = last.NextEligibilityUtc;
+        var readiness = memory.ResearchReadinessStatus(nowUtc, options);
+        return new(nowUtc, options.Enabled, options.RecurringProgramMode ? RecurringResearchAuthorization.Version : options.SchedulerVersion,
+            next, last, last?.ResearchRunId, last?.State.ToString() ?? "NotRun", last?.Reason, memory.AutonomousResearchIsRunning(),
+            "RESEARCH", 0m, "NONE", readiness.HistoricalEvidenceAvailable, readiness.CurrentSessionRequired, readiness.RequiredResearchDate,
+            readiness.CurrentSessionReadiness, readiness.FeatureLineageReadiness, readiness.IsReady, readiness.ReasonCode,
+            readiness.CurrentInstrumentCount, readiness.ExpectedInstrumentCount);
+    }
+
 }
 
 internal sealed class FinanceResearchSchedulerWorker(FinanceResearchSchedulerOptions options, FinanceResearchOrchestrator orchestrator, SystemRecoveryCoordinator recovery, TimeProvider clock, ILogger<FinanceResearchSchedulerWorker> logger, FinanceResearchOperationsCoordinator? operations = null) : BackgroundService

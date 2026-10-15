@@ -1,5 +1,203 @@
 # BB-131A — Finance Research Learning contract
 
+## Recurring real-data implementation checkpoint — 2026-10-14
+
+**REVIEW CHECKPOINT / model-free implementation / NOT DEPLOYED OR ACTIVATED.**
+Implementation authority is the owner's approval of the
+[reviewed contract ca2b0fd](https://github.com/T-bear/BigBrain/blob/ca2b0fddaf58b050bde3f43d36db12cfff47ab66/docs/architecture/finance/research-learning-contract.md).
+That review branch was not merged. Baseline is `0851ee48a768348a001f1525f0b30c29584fd821`;
+[implementation evidence and exact remaining release gates](../../reports/features/finance/recurring-research-implementation-20261014.md).
+Older accepted synthetic contracts below retain their own semantics and spent authority.
+
+### Explicit real admission and cumulative authority
+
+`RecurringResearchAuthorization` freezes one owner decision, eligibility evidence, exact canonical
+instrument/mapping, Alpaca historical1Day/IEX/raw source, reasoner identity, expiry, ordered disjoint
+source-date cohorts and I/E/T/C/W budgets. There are no operational defaults or seeded grants.
+The first implementation permits at most **two cohorts/invocations/evaluations**, one instrument,
+300–500 sessions per cohort subject to the unchanged native partition minima, and the existing
+1,000-receipt projection bound. Warmup is inside each cohort; no shared development/holdout windows.
+All required `ResearchDatasetEligibilityPolicyV1` decisions must be Eligible, with Pass evidence for
+rights, integrity, historical identity, price basis and corporate actions. Owner data-use risk acceptance
+alone does not establish these scientific facts. No production authorization is created by tests.
+
+Finance selects persisted daily receipts as of trusted cutoff K, verifies immutable lineage, selects
+revisions known by K and requires exact instrument/mapping snapshots and complete calendar sessions.
+Provider event/source date never becomes knowledge time. Every receipt must have been known **before
+its following session's open**; late historical acquisition fails closed. Existing daily features,
+momentum/v1 period20, fixed 5/10/20 trials, partition/falsification rules and native evaluator are reused.
+Protected holdout begins after program registration. Earlier native evaluations with overlapping source
+coverage veto another inference/evaluation. Missing sessions wait without spending; invalid provenance stops.
+
+Migration99 adds empty program/exclusion tables to the existing Finance SQLite owner. One program
+per database is supported; neither replacement IDs nor expiry/completion creates a fresh grant.
+Original A/B/C records are not reset, converted or refunded. Atomic transactions reserve I/W and the
+full input before inference, then E/three trials/64-call envelope before science. Unused reserved work
+is not refunded; elapsed reasoner time is separate metadata. No retries. Exclusive program authority
+prevents competing legacy/manual/campaign science; existing synchronous legacy builders retain their
+own idempotence/concurrency semantics, with tracked in-flight leases blocking program registration.
+Unclean legacy leases are not automatically erased. Cancellation never abandons an executing evaluator.
+
+Native results remain in existing backtest/robustness stores. Program attempts bind input, receipts,
+full plan, bounded untrusted proposal, response checksum and native result identities. Reopen verifies
+commitments and native result/run checksums. Exact replay does not invoke a reasoner or evaluator.
+Reserved/uncertain work stops, including a crash after native persistence; automatic uncertain-result
+finalization is not provided. Completed positive/negative evaluations advance by the frozen schedule,
+never by holdout success. Decline/rejection/failure stops and remains retained. No catch-up burst.
+
+### Model boundary and existing scheduler
+
+`Finance:ResearchScheduler:RecurringProgramMode` is default false and mutually exclusive with the
+legacy EODHD readiness path. It creates no program. Existing recovery, maintenance, governor,
+opportunity journal and worker remain the hosting path. Internal trusted composition supplies
+`IResearchReasoner.ReasonAsync` and the actual bounded runtime-plus-cleanup duration; API still has
+no assembly reference to Brain. Absent composition defers without spending. No production fake,
+public mutation API, new scheduler or automatic grant provisioning is registered.
+
+The model receives development-only hashes/session counts and all preceding sanitized outcomes with
+precommitted history-release times and **fixed reference validation** excess return. Actual evaluator
+completion time remains private: prior history is released at the next cohort opportunity, and
+completion after that boundary fails closed instead of exposing data-dependent timing. Full receipt/result IDs, selection,
+robustness and holdout values/classifications stay private. Full evidence identity is separate from
+visible identity. Recurring history has its own versioned optional field; existing finite/synthetic
+serialization stays unchanged when it is absent. The native prompt now describes the supplied
+recurring history without asserting synthetic/empty history. Grammar, vocabulary and isolation are unchanged.
+Test fixtures have a durable fixture origin and explicit fixture composition; they cannot pass real-origin
+admission or become operational evidence. This is inference integration, not model-weight training.
+
+### Independent recurring authority — final release implementation, 2026-10-15
+
+The former unconditional production stop is replaced by a **required protected journal match**.
+Missing protection or disagreement still returns `finance.research.recurring.restoreReconciliationRequired`;
+operations reports AttentionRequired. Default startup creates neither journal nor grant. The existing
+Finance SQLite owner remains the only research/result/history store. The journal contains only version,
+program/grant/state commitments, cumulative I/E/T/C/W counters, sequence and previous/checksum links.
+It is bounded to64 records/128KiB and is not exposed to the reasoner.
+
+Before each authority mutation, Finance holds its existing SQLite immediate transaction, obtains a
+nonblocking exclusive journal flock, checks the exact previous state and appends/fsyncs the next state
+**before** SQLite commit. Audits and terminal outcomes follow the same rule. Matching state permits
+ordinary restart; durable reservations still prevent replay of interrupted work. Journal-ahead/DB-ahead,
+missing, malformed, partial or contradictory evidence stops. A crash after journal flush but before
+SQLite commit may burn work that never ran: no rollback, truncation, repair, refund or automatic retry.
+The journal is checked before both actual inference and scientific evaluation. Read/completed replay
+can return stored evidence without creating authority. Native result persistence and holdout isolation
+remain unchanged. No extra database migration is needed beyond the branch's migration99.
+
+**Protection model:** Linux64/local ext4, root-owned regular single-link journal with the kernel
+append-only attribute set; root-owned non-group/world-writable ancestors, no symlink traversal, API
+nonroot with zero effective/permitted/ambient capabilities and NoNewPrivs=1. Descriptor-relative
+openat/statx and fstatfs enforce these local properties on every access; writing uses kernel O_APPEND.
+An ordinary writable file, unsupported filesystem or merely asserted protection fails closed.
+The path must be outside configured Finance/lifecycle database directories. This alone is not proof of
+backup independence: trusted host administrators must dedicate this authority location and exclude it
+from **all** Finance/lifecycle/config/volume restore sets. The API cannot truncate, unlink, replace,
+chmod or clear the append-only flag. Administrators must not restore a prior authority prefix, create
+alternate copies for the same grant, or grant API raw-device/mount/immutable privileges.
+
+The reviewed operating model covers Finance/lifecycle rollback with the protected witness retained,
+normal restart and process/power loss with filesystem fsync guarantees. It does **not** protect against
+malicious privileged host administration, full-host/disk rollback including the witness, storage that
+lies about flush durability, or loss of the witness. Those events require an external operational stop
+and independent manual reconciliation; old grants remain unusable if consumption/exposure cannot be
+proved. Same-disk placement is not disaster recovery. No silent fallback accepts an uncertain witness.
+Actual host provisioning/protection must be verified before activation; this checkpoint performs none.
+
+No reconciliation/clear/reset endpoint exists. Reconciliation can restore an independently verified
+current Finance state matching the retained journal, preserving all spending/reservations/exposure.
+It cannot bless an older balance or rewrite the journal to match a backup. A mismatched or lost witness
+cannot be recreated by startup or enrollment. If trustworthy history is unavailable, retire the old
+authority; a separately reviewed new grant must also avoid previously exposed/unknown holdouts.
+
+`BigBrain.Finance.Hosting` is a first-party composition entry for the **same API process**, not another
+service, scheduler or process runner. It references API and Brain; neither references the other or the
+composition root. It calls the existing API startup and registers only the narrow reasoner delegate.
+The API Docker build publishes this entry point and its dependencies; no image was deployed. Existing
+API maintenance commands and compiled build identity remain available. No reflection/plugin loading.
+
+External trusted startup configuration is `Finance:RecurringLocalReasoner:Enabled` (default false)
+and `Profile`. No actual profile or approved resource value is shipped. Profile requires bounded
+OwnerDecision and ArtifactAndIsolationEvidence references, UTC ApprovedAtUtc/ExpiresAtUtc, and Runtime:
+WorkerExecutable, WorkerArguments, CoordinationDirectory, InvocationTimeout, GracePeriod, ReapTimeout.
+These are private first-party deployment inputs, never model/request data. Runtime values are explicit;
+missing values fail closed. Existing ordinary LocalReasonerRuntime bounds apply, including at most30s
+invocation. The old180s acceptance exception is inaccessible from this host. A different limit needs a
+separate explicit profile/policy decision; this correction grants no new real-model allowance.
+
+The full profile checksum is the binding's reasoner identity and must match the explicitly frozen grant.
+Changing a profile does not reinterpret an old grant. Artifact and OS-isolation evidence must establish
+the pinned native worker/libllama/Qwen, read-only artifacts and pre-provisioned cgroup before any future
+activation; the reference itself is an owner attestation, not an automatic proof of those host facts.
+No downloads, model choice, arbitrary command endpoint, grant creator or default production fake.
+
+Composition owns runtime disposal through API shutdown/failure. Single-flight, pidfd ownership,
+cancellation, kill/reap, bounded BRF1 I/O and inherited-environment clearing stay in LocalReasonerRuntime.
+Profile expiry and clock regression fail closed. Started/response/completed fixed audit metadata is
+bounded to four records in the already reserved Finance attempt, checksummed and reopened with it;
+no new audit database or raw prompt/reply logging. Audit failure uses existing runtime failure/disable
+behavior. This metadata remains private and never enters the model-visible history.
+
+### Initial release configuration and operator sequence
+
+Only the explicitly approved initial enrollment is manual. Subsequent eligible cohorts are scheduled
+by the existing worker without a per-experiment operator action. The following are future operational
+steps, **not authorization to execute them during implementation**:
+
+1. Approve exact release SHA, scientifically eligible receipt source/mapping/rights/price-basis and
+   corporate-action evidence, ordered disjoint cohort dates, grant expiry and owner decision. Each
+   cohort needs300–500 sessions and protected holdout beginning after enrollment. No existing small
+   AAPL observation set is claimed sufficient; late imported data cannot become timely evidence.
+2. Approve the existing pinned native worker/libllama/Qwen profile and OS/cgroup resource isolation.
+   Suggested bounded starting envelope (not a grant): **I2/E2/T6/C128, W66s, CompletionSeconds33**,
+   invocation30s + grace250ms + reap2s =32.25s; concurrency1, retries0/refunds0. Scheduler polling60min,
+   with cohort-specific immutable DueAtUtc, no catch-up. One cohort may instead use I1/E1/T3/C64/W33s.
+   Ordinary runtime still caps inference at30s; no claim the real model will finish within that bound.
+   A longer profile requires separate policy approval; old180s experimental authorization is not reused.
+3. With API research/observation/provider workers stopped/disabled and MaintenancePaused=true, prepare
+   the existing trusted external profile. `dotnet BigBrain.Finance.Hosting.dll finance-recurring-profile-identity`
+   validates it and prints only the identity; it starts no worker. Bind that exact identity into the
+   private authorization JSON. The JSON uses the existing Finance observation string-ID converters
+   (`ExportRecurringAuthorization`/`ParseRecurringAuthorization`), not a parallel grant schema.
+4. Explicitly run `dotnet BigBrain.Finance.Hosting.dll finance-recurring-enroll <private-grant-json> <sha256:raw-file-hash>`.
+   It checks exact bounded JSON, maintenance/disabled gates, recovery/clock/store and existing ledger,
+   then persists one program and prints one sanitized enrollment record. Save that output privately.
+   It does not create/repair a witness or call a provider/model. Existing spent/uncertain/replacement
+   programs refuse enrollment. Identical pristine enrollment is idempotent. This command can apply
+   accepted startup migrations; it is not a read-only diagnostic or an automated startup command.
+5. Trusted host root provisions **once** a dedicated authority directory outside all recovery sets:
+   ancestors root-owned without group/other write, directory root:API-group0750, journal root:API-group0660.
+   Seed with the exact enrollment record including its final newline, verify its `checksum`, flush file
+   and directory metadata (`sync -f <journal>` on local ext4), set `chattr +a <journal>` and sync again.
+   No runtime/root helper performs this automatically. Retain authority and initial enrollment commitments;
+   do not rotate, replace, truncate, restore, clone as active, or clean this journal with Finance backups.
+6. Through the existing private Compose override/.env mechanism, bind only that protected directory
+   into the API; no Docker socket, privileged mode, raw devices or generic process authority. Use
+   `cap_drop: [ALL]`, `security_opt: [no-new-privileges:true]`, existing nonroot API user and appropriate
+   journal group. Set `Finance__RecurringAuthority__JournalPath`, `__EnrollmentChecksum` (sha256: prefix)
+   and `__RestoreBoundaryDecision` under the same prefix. The decision attests the actual root custody
+   and restore exclusions, not just a path. Configuration alone cannot establish those facts.
+   The private override also passes the existing `Finance__RecurringLocalReasoner__Profile__...`
+   fields/WorkerArguments indexes and scheduler options; no values/universe/grants are shipped as defaults.
+7. Under the exact deployed API UID/capabilities/mounts, with all gates still disabled and maintenance
+   paused, run `dotnet BigBrain.Finance.Hosting.dll finance-recurring-authority-check`. It opens existing
+   SQLite read-only without constructors/migration and verifies native history plus protected journal.
+   Require `RecurringAuthorityMatched`; no bypass if unavailable. This is the required real-host
+   protection preflight, separate from the model-free journal protocol tests.
+8. Only after separate deployment/inference/data approvals enable `Finance:RecurringLocalReasoner:Enabled`,
+   `Finance:ResearchScheduler:Enabled` and `Finance:ResearchScheduler:RecurringProgramMode`; release
+   MaintenancePaused after recovery is ready. Keep competing legacy research disabled. Market acquisition
+   remains separately authorized under the existing observation runtime. Missing eligible data waits;
+   expired/exhausted/uncertain authority stops. No automatic scientific grant creation or renewal.
+
+Before **any** restore keep scheduler/model disabled and maintenance paused in the independent deployment
+configuration. Never restore the witness/config custody together with Finance. After restore require the
+same read-only authority check and manual consumption/exposure reconciliation before enabling anything.
+A clean lifecycle flag cannot clear a mismatch. Full-host recovery outside this model must not automatically
+restart research; absent independent current evidence, old authority stays retired.
+
+Finance remains **RESEARCH / 0 SEK / NONE**. Collection, SHADOW, model provisioning and research grants
+remain independently controlled; no trading, automatic promotion or capital side effect is introduced.
+
 ## BB-132C accepted integration — 2026-10-02
 
 **ACCEPTED / MERGED / CI VERIFIED.** [Exact approval, merge and CI evidence](../../reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md#accepted-publication--2026-10-02).

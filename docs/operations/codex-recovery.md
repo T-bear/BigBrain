@@ -1,5 +1,25 @@
 # Codex interrupted-run recovery
 
+## Finance recurring research final release — 2026-10-15
+
+**MERGE CANDIDATE / SAFE TO REVIEW / no production operation.**
+Branch `finance/recurring-research`; baseline `0851ee48a768348a001f1525f0b30c29584fd821`,
+tree `685fbe8be345d25a4775a8f64ef7b0d62687798c`. Previous reviewed checkpoint
+`5b958acad8eb3d9de2b3be95073072b99d38d4f1`, tree `b22e95011369629c961b76226a4fd9ae8bc3d1d2`,
+and all earlier commits preserved. Current publication subject
+`review: implement protected recurring research authority` resolves exact SHA/tree in Git.
+Implemented bounded independent append-only consumption journal, existing-kernel/scheduler checks,
+explicit enrollment and nonmigrating preflight, same-API profile identity. No new database/service or
+scientific engine. Trusted host protection/restore boundary is an explicit activation prerequisite.
+[Changes, commands, actual verification outcomes, failure correction and remaining gates](../reports/features/finance/recurring-research-implementation-20261014.md#final-release-implementation--protected-recurring-authority--2026-10-15).
+Final API1194 PASS/0 FAIL/8 intentional SKIP, Release0 warnings/errors, scoped formatter/docs/whitespace/
+staged-secrets PASS. No incomplete implementation or running verification remains. The initial full-suite
+proof-worker failure and fixture-deadline correction are preserved in the report, not hidden.
+Unrelated mockups and untracked ADR0006–0009 remain preserved/excluded. No private operational helper,
+production database, .env, credential, mount or service was changed; no BB-132K operation or real model/
+provider call. Next: independent exact-SHA release review, then separately approved deployment and
+initial provisioning/activation. No automatic next checkpoint. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## BB-132H publication handoff — 2026-10-10
 
 **MERGE CANDIDATE / REVIEW ONLY.** Branch `bb-132h/versioned-observation-mapping` was created

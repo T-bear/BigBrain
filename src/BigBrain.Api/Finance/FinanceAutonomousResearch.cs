@@ -78,6 +78,9 @@ internal sealed partial class EodhdMarketMemory
 
     internal AutonomousResearchRun RunAutonomousResearch(string idempotencyKey, int maximumExperiments)
     {
+        var replay = AutonomousResearchRunByKey(idempotencyKey);
+        if (replay is not null) return replay;
+        using var scienceLease = FinanceScientificLease.Enter(ConnectionString);
         if (string.IsNullOrWhiteSpace(idempotencyKey) || idempotencyKey.Length > 128) throw new ArgumentException("A bounded idempotency key is required."); maximumExperiments = Math.Clamp(maximumExperiments, 1, FinanceResearchContracts.MaximumTotalExperimentsPerRun);
         using var c = new SqliteConnection(ConnectionString); c.Open(); var runId = "research-run-" + FinanceResearchContracts.Fingerprint(new { idempotencyKey, FinanceResearchContracts.EngineVersion })[7..23]; var created = DateTimeOffset.UtcNow;
         Execute(c, null, "BEGIN IMMEDIATE;"); try { var existing = ReadRunByKey(c, idempotencyKey); if (existing is not null) { Execute(c, null, "COMMIT;"); return existing; } var running = ResearchScalar(c, "SELECT run_id FROM research_runs WHERE state='Running' ORDER BY created_utc,run_id LIMIT 1"); if (running is not null) { Execute(c, null, "ROLLBACK;"); throw new AutonomousResearchBusyException(running); } Execute(c, null, "INSERT INTO research_runs VALUES($id,$key,'Running',$at,NULL,NULL)", ("$id", runId), ("$key", idempotencyKey), ("$at", created.ToString("O", CultureInfo.InvariantCulture))); Execute(c, null, "COMMIT;"); }

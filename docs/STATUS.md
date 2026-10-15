@@ -1,5 +1,18 @@
 # BigBrain Status
 
+## Finance recurring research — final release implementation, 2026-10-15
+
+**MERGE CANDIDATE / AUTOMATICALLY VERIFIED / NOT DEPLOYED OR ACTIVATED.**
+Existing scheduler, real-data admission, local reasoner composition and native science now use a bounded
+independent append-only authority journal. Matching durable state permits normal restart; uncertain
+reservation, older database, absent/invalid protection or disagreement stops without refund or retry.
+Root custody, Linux/ext4 append-only enforcement and exclusion from Finance/lifecycle restores are
+mandatory deployment prerequisites; joint privileged host/witness rollback is outside this model.
+Initial explicit enrollment and read-only authority preflight are implemented; no automatic grants.
+[Exact changes, executed verification and limits](reports/features/finance/recurring-research-implementation-20261014.md#final-release-implementation--protected-recurring-authority--2026-10-15).
+[Concrete configuration/provisioning and activation gates](architecture/finance/research-learning-contract.md#initial-release-configuration-and-operator-sequence).
+No real model/provider call or operational change. Finance **RESEARCH / 0 SEK / NONE**.
+
 ## BB-132H versioned observation mapping — 2026-10-10
 
 **IMPLEMENTED / AUTOMATICALLY VERIFIED / MERGE CANDIDATE / REVIEW ONLY.**
