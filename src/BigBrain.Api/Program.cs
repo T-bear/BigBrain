@@ -37,9 +37,21 @@ public partial class Program
             Console.WriteLine("revision=" + BuildRevision.Current);
             return;
         }
+        var historical = FinanceHistoricalResearchCommand.IsCommand(args);
         var enrollment = FinanceRecurringMaintenanceCommand.IsCommand(args);
         var oneShot = FinanceObservationMaintenanceCommand.IsCommand(args);
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = oneShot || enrollment ? [] : args, ApplicationName = typeof(Program).Assembly.FullName });
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = oneShot || enrollment || historical ? [] : args, ApplicationName = typeof(Program).Assembly.FullName });
+        if (historical)
+        {
+            using var stop = new CancellationTokenSource();
+            using var termination = OperatingSystem.IsLinux() ? System.Runtime.InteropServices.PosixSignalRegistration.Create(
+                System.Runtime.InteropServices.PosixSignal.SIGTERM, signal => { signal.Cancel = true; stop.Cancel(); }) : null;
+            ConsoleCancelEventHandler cancel = (_, e) => { e.Cancel = true; stop.Cancel(); };
+            Console.CancelKeyPress += cancel;
+            try { Environment.ExitCode = FinanceHistoricalResearchCommand.RunAsync(args, builder.Configuration, TimeProvider.System, Console.Out, composeRecurring, stop.Token).GetAwaiter().GetResult(); }
+            finally { Console.CancelKeyPress -= cancel; }
+            return;
+        }
         if (enrollment)
         {
             Environment.ExitCode = FinanceRecurringMaintenanceCommand.Run(args, builder.Configuration, TimeProvider.System, Console.Out);

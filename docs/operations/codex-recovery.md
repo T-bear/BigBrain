@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## Historical Qwen integration — 2026-10-16
+
+Active checkpoint: `finance/historical-qwen-research`, from accepted
+`be7634bd82f52b3cb536142ae3e03dd0e2656aa2`. Operational input checkpoint
+`7faba26a391c2246ede7b73b8329b66b3cd7d290` was read, not merged. Resolve publication commit/tree
+from subject `review: integrate bounded historical Qwen research` on this branch.
+[Authoritative implementation, verification and authorization handoff](../reports/features/finance/historical-qwen-integration-20261016.md).
+No production operation, grant, protected journal update or inference performed. Unrelated untracked
+design mockups and four Sentinel ADR drafts remain untouched/unpublished. No source work remains
+outside the published checkpoint; next step is independent architect review and the explicit owner
+authorization boundary documented in the report, not another inference or automatic activation.
+
+
 ## Finance recurring research final release — 2026-10-15
 
 **MERGE CANDIDATE / SAFE TO REVIEW / no production operation.**

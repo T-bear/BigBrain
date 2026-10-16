@@ -41,10 +41,14 @@ public sealed record LearningDevelopmentInput(string Version, string ProjectionV
     public FiniteResearchHistory? FiniteHistory { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public RecurringResearchHistory? RecurringHistory { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public HistoricalDevelopmentEvidence? HistoricalDevelopment { get; init; }
     public LearningProtocolLimits Limits => FiniteHistory is null
         ? new(1, 1, 1, 1, 3, 1, 64, 1, 0, 30, 300)
         : new(2, 2, 1, 1, 3, 1, 64, 1, 0, 30, 300);
-    public LearningHistorySummary History => RecurringHistory is { } recurring
+    public LearningHistorySummary History => HistoricalDevelopment is not null
+        ? new(0, 0, 0, 0, LearningExposure.Unknown)
+        : RecurringHistory is { } recurring
         ? new(recurring.Entries.Length, recurring.Entries.Count(x => x.Outcome == "Evaluated") * 3,
             recurring.Entries.Count(x => x.Outcome == "Evaluated"), 0, LearningExposure.Unexposed)
         : FiniteHistory is null

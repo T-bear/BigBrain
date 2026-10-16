@@ -32,6 +32,10 @@ history and optional finiteHistory or recurringHistory. Absent both means empty 
 Present finiteHistory contains only Finance-authorized prior outcome, availability/cutoff and optional
 reference validation excess return. It is not holdout, a profitability claim or new evaluation authority.
 Present recurringHistory contains only Finance-authorized operational outcomes and fixed reference validation returns.
+Optional historicalDevelopment contains actual development-only raw-price statistics and recent momentum samples.
+For historicalDevelopment, formulate a retrospective momentum hypothesis using these values. Raw prices are not
+adjusted/total-return evidence. Its session clock is simulated, not proof of historical Finance knowledge.
+No protected holdout observations or outcomes are supplied. Do not claim prospective performance or model training.
 Neither history grants additional scientific authority. Respect remainingScientificEvaluations. Do not invent previous outcomes or inspect holdout.
 Only momentum/v1 period 20, one variant, one Finance-selected instrument, three internal trials are allowed.
 Propose a concise falsifiable engineering research question and rationale, not a profitability claim.

@@ -11,6 +11,9 @@ public sealed record RecurringResearchAuthorization(string OwnerDecision, string
     string ReasonerIdentity, DateTimeOffset ExpiresAtUtc, RecurringResearchBudget Budget,
     ImmutableArray<RecurringResearchCohort> Cohorts)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public HistoricalResearchAdmission? Historical { get; init; }
+
     public const string Version = "finance-recurring-research-v1";
     public void Validate(DateTimeOffset registered)
     {
@@ -25,6 +28,11 @@ public sealed record RecurringResearchAuthorization(string OwnerDecision, string
             Cohorts.IsDefaultOrEmpty || Cohorts.Length > 2 || Budget.Evaluations > Cohorts.Length)
             throw new InvalidOperationException("Invalid finite research budget.");
         _ = new InstrumentMappingCatalog([Instrument], [Mapping]);
+        if (Historical is not null)
+        {
+            Historical.Validate(this, registered);
+            return;
+        }
         if (Instrument.Type != InstrumentType.Equity || Instrument.Currency.Code != "USD" ||
             Mapping.Provider.Value != "Alpaca" || Mapping.ProviderDataset.Value != DailyMarketEvidence.Dataset)
             throw new InvalidOperationException("Unsupported real research source.");

@@ -22,6 +22,10 @@ internal static class LocalReasonerProtocol
         string[] texts = [input.Version, input.ProjectionVersion, input.ScopeHandle, input.TargetId,
             input.DevelopmentChecksum, input.AllowedStrategy, input.HistoryChecksum, input.InputChecksum];
         if (texts.Any(x => x is null || x.Length is 0 or > 80)) throw Failure();
+        if (input.HistoricalDevelopment is { } historical &&
+            (historical.Recent.IsDefault || historical.Recent.Length > 8 || historical.From > historical.To ||
+             historical.Sessions != input.DevelopmentSessions || historical.Recent.Any(x => x.Date < historical.From || x.Date > historical.To)))
+            throw Failure();
         var bytes = JsonSerializer.SerializeToUtf8Bytes(input, Json);
         if (bytes.Length > MaximumBytes) throw Failure();
         return bytes;

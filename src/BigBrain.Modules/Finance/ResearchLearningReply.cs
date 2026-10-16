@@ -15,7 +15,9 @@ public static class LearningReplyParser
         ArgumentNullException.ThrowIfNull(input);
         var scope = input.ScopeHandle;
         if (scope != SyntheticLearningScope.Handle && !(scope == "real-daily-momentum20-v1" &&
-            input.ProjectionVersion == "recurring-development-v1" && input.RecurringHistory?.Version == RecurringResearchAuthorization.Version))
+            input.ProjectionVersion == "recurring-development-v1" && input.RecurringHistory?.Version == RecurringResearchAuthorization.Version) &&
+            !(scope == HistoricalResearchAdmission.Scope && input.ProjectionVersion == HistoricalResearchAdmission.Projection &&
+              input.HistoricalDevelopment is not null))
             return new(LearningAdmissionReason.UnsupportedScope);
         if (response is null || Encoding.UTF8.GetByteCount(response) > 65536) return new(LearningAdmissionReason.Malformed);
         try
