@@ -2,7 +2,12 @@
 
 ## Status and scope
 
-**2026-10-16: preparation verified; NOT READY FOR ENROLLMENT OR INFERENCE.**
+**2026-10-16: installed preflight failed; NOT READY FOR ENROLLMENT OR INFERENCE.**
+The owner reports217/USER resolved, then `UnexpectedWritableMount`. Read-only checks confirm the
+installed unit/probe match checkpoint bfa99fb and the unit is failed/exit1 with no live process.
+Do not repeat the initial installation/start procedure below. The current next action is the
+[separate mount diagnostic](#unexpectedwritablemount--one-owner-approved-diagnostic), requiring
+explicit owner approval before any host action. No allowlist correction is justified yet.
 G1/G2 are complete for the accepted API; G3a remains BLOCKED and G3b NOT RUN under
 [FIN-OPS-G3-20261016](../finance-historical-qwen-g3-checklist.md).
 Accepted application: `70b659f772b7b7883a5716786859f1e7833a5634`.
@@ -170,6 +175,8 @@ identity. No model, Finance path, grant, credentials or database is supplied to 
 
 ### Next local administrator action (only the inert preflight)
 
+**Historical initial-installation procedure; already performed by owner. Do not repeat for mount diagnostics.**
+
 Use an owner-local root terminal and the exact published review files, verified against GitHub.
 Do not execute these commands through a privileged container. From that verified checkout, first
 confirm the destination ancestors are root-owned, nonsymlink directories without group/other write,
@@ -245,6 +252,108 @@ model-free context. Before enrollment, the administrator must resolve the final 
 These final-context actions are **NOT RUN/BLOCKED**, not a claim that the preflight-only unit is an
 installed Finance execution environment. The existing root-custody gate prevents advancing here.
 No empty journal, fabricated timestamps or early enrollment should be used to make progress appear complete.
+
+## UnexpectedWritableMount — one owner-approved diagnostic
+
+**PREPARED / NOT EXECUTED. Do not run until owner explicitly approves this single diagnostic.**
+The failed process has exited; its private namespace cannot be recovered through host `findmnt`.
+Use the separate [diagnostic unit](../../../infrastructure/finance/bigbrain-historical-mount-diagnostic.service)
+and [reader](../../../infrastructure/finance/historical-mount-diagnostic.py), never edit or restart the
+installed maintenance preflight. This is one temporary manual unit, not another Finance service.
+
+All isolation/resource settings and the existing state-directory view match the original unit.
+Only description, ExecStart, the **new unit's own** delegated cgroup path and private output routing
+change; a focused test compares every setting. The reader checks UID/GID/caps/NNP and its actual
+controller placement, then reads its own mountinfo. It never writes cgroups, creates children, probes
+writes, opens Finance/model files or calls the original probe/main. No broader writable mounts are added.
+Only the exact diagnostic cgroup target is renamed **in memory for comparison** with the original
+hash-pinned policy; original target/rename marker remain in evidence. No filesystem alias/prefix is allowed.
+
+The private result includes decoded/encoded targets, mount/parent IDs, filesystem types, selected
+mount/superblock flags, all unexpected entries, invocation/time and script/unit identities. Raw source,
+filesystem-root fields, arbitrary options, environment and credentials are omitted. Mount targets can
+still be private: output is root-only, not journal/chat/Git. The reader refuses terminal output.
+`DIAGNOSTIC_ONLY`/exit0 means evidence collected, **never G3a PASS**, even if policy accepts that snapshot.
+The diagnostic does not reproduce child migration or prove the vanished failed namespace identical.
+
+### Single bounded local procedure, pending approval
+
+Use the exact published checkpoint files in an owner-local root terminal. No password goes to Codex.
+The following script refuses existing diagnostic artifacts, baseline drift, running original process,
+drop-ins, unsafe parents or a missing/misowned existing state directory. It creates only temporary
+diagnostic files under `/run` and starts **only** `bigbrain-historical-mount-diagnostic.service` once.
+No `enable`, original-unit start/reset, API/Web/Docker restart or production installation is permitted.
+
+```sh
+set -eu
+test "$(id -u)" = 0
+test "$(systemctl show bigbrain-historical-maintenance.service -p MainPID --value)" = 0
+test -z "$(systemctl show bigbrain-historical-maintenance.service -p DropInPaths --value)"
+test "$(systemctl show bigbrain-historical-mount-diagnostic.service -p LoadState --value)" = not-found
+python3 -I - <<'PY'
+import hashlib, os, pathlib, stat
+def require(ok):
+    if not ok:
+        raise SystemExit('STOP: diagnostic prerequisite mismatch')
+for name in ('/run', '/run/systemd/system'):
+    p = pathlib.Path(name)
+    for ancestor in (p, *p.parents):
+        s = ancestor.lstat()
+        require(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and not s.st_mode & 0o022)
+state = pathlib.Path('/var/lib/bigbrain-historical-preflight')
+s = state.lstat()
+require(state.resolve() == state and stat.S_ISDIR(s.st_mode) and
+        s.st_uid == s.st_gid == 1654 and stat.S_IMODE(s.st_mode) == 0o700)
+expected = {
+ '/usr/local/libexec/bigbrain-historical-preflight.py': '97ecacefdeed8e95e7056557b0871384d5e4ab0b9194e7846679f4cffe04bbf6',
+ '/etc/systemd/system/bigbrain-historical-maintenance.service': 'b643dc93ad1c618753d603072d346af3dfe06d6f3e4e54de05d0a97c6e4b73c4',
+ 'infrastructure/finance/historical-mount-diagnostic.py': 'e78d15cb9e323e3d07da4bc2bcffd82c1bf7035d397187ab6255a4fbeadce380',
+ 'infrastructure/finance/bigbrain-historical-mount-diagnostic.service': 'cb67c30e3c8fb7289ee1bcc86b4c83f565b7ffc8d3255553ed6d052c8d9a9686',
+}
+for name, digest in expected.items():
+    require(hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest() == digest)
+for name in ('/run/bigbrain-historical-mount-diagnostic',
+             '/run/systemd/system/bigbrain-historical-mount-diagnostic.service',
+             '/run/systemd/system/bigbrain-historical-mount-diagnostic.service.d'):
+    require(not os.path.lexists(name))
+os.mkdir('/run/bigbrain-historical-mount-diagnostic', 0o750)
+os.chown('/run/bigbrain-historical-mount-diagnostic', 0, 1654)
+os.chmod('/run/bigbrain-historical-mount-diagnostic', 0o750)
+fd = os.open('/run/bigbrain-historical-mount-diagnostic/result.json',
+             os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+os.fchmod(fd, 0o600)
+os.close(fd)
+PY
+install -o 0 -g 1654 -m 0440 infrastructure/finance/historical-mount-diagnostic.py \
+  /run/bigbrain-historical-mount-diagnostic/diagnostic.py
+install -o 0 -g 0 -m 0644 infrastructure/finance/bigbrain-historical-mount-diagnostic.service \
+  /run/systemd/system/bigbrain-historical-mount-diagnostic.service
+cmp infrastructure/finance/historical-mount-diagnostic.py /run/bigbrain-historical-mount-diagnostic/diagnostic.py
+cmp infrastructure/finance/bigbrain-historical-mount-diagnostic.service \
+  /run/systemd/system/bigbrain-historical-mount-diagnostic.service
+systemd-analyze verify /run/systemd/system/bigbrain-historical-mount-diagnostic.service
+systemctl daemon-reload
+test -z "$(systemctl show bigbrain-historical-mount-diagnostic.service -p DropInPaths --value)"
+systemctl start bigbrain-historical-mount-diagnostic.service
+systemctl show bigbrain-historical-mount-diagnostic.service -p Result -p ExecMainStatus -p MainPID -p InvocationID
+test "$(systemctl show bigbrain-historical-mount-diagnostic.service -p MainPID --value)" = 0
+# Remove only this newly created temporary unit definition; retain private evidence, never retry.
+rm -- /run/systemd/system/bigbrain-historical-mount-diagnostic.service
+systemctl daemon-reload
+```
+
+If any command fails, STOP; do not retry, weaken checks or change the installed production unit.
+Unit timeout45s/termination5s/KillMode=control-group still apply. No persistent new write permission
+is provisioned: only the temporary unit's delegated subtree exists during its lifetime; the original
+state directory is unchanged and the diagnostic never writes to it. Root-owned result/script remain
+private under `/run` for review, not installed under `/etc` or `/usr/local`. Preserve evidence privately
+before reboot if needed; no raw result publication. Original unit and status remain untouched.
+
+Compare private result InvocationID with systemd output. Review every unexpected row and any stacked
+read-only counterpart before proposing a correction. A genuine writable host resource requires fixing
+isolation, not whitelisting it. A masked/inaccessible resource needs positive effective-protection
+evidence before any narrow policy correction. Parser differences require a reproducible fixture from
+the relevant sanitized fields. Missing/failed diagnostic evidence leaves G3a BLOCKED.
 
 ## Stop and rollback boundaries
 

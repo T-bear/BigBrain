@@ -313,3 +313,90 @@ altering those services; the preflight-only unit is not falsely presented as a c
 Existing50.458s inference evidence exceeds the authorized30s cap by20.458s. The cap remains unchanged;
 a later correctly authorized timeout is an outcome, not permission for retry/refund or a larger grant.
 G1/G2 remain verified; G3a BLOCKED; G3b NOT RUN. Finance **RESEARCH / 0 SEK / NONE**.
+
+## UnexpectedWritableMount diagnostic checkpoint — 2026-10-16
+
+**REVIEW CHECKPOINT / G3a BLOCKED / NO POLICY RELAXATION.** Same operational branch. Baseline main
+`70b659f772b7b7883a5716786859f1e7833a5634`, tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`;
+previous reviewed checkpoint`bfa99fb98da83f6dcee7618f1c1a2d26cb94f62d`,
+tree`8b39e20a22aa6055d37ad9a35474eca87a07d549`, all verified after fetch. Resolve this additive SHA/tree
+by subject `review: add isolated G3a mount diagnostics without policy relaxation`. No external Finance
+review, unrelated files or implementation branch was used as development input.
+
+### Verified facts versus operator evidence
+
+- Read-only `systemctl show`: installed unit loaded/static, failed/exit1, MainPID0, no drop-ins.
+  Last start and exit both2026-10-16T17:59:09+02:00. No process remains whose mount namespace can be read.
+- Installed probe and unit match the repository byte-for-byte. SHA-256 respectively
+  `97ecacefdeed8e95e7056557b0871384d5e4ab0b9194e7846679f4cffe04bbf6` and
+  `b643dc93ad1c618753d603072d346af3dfe06d6f3e4e54de05d0a97c6e4b73c4`.
+- Owner reports initial217/USER resolved by dedicated UID/GID1654 account, then persistent result
+  FAIL/UnexpectedWritableMount. This checkpoint did **not** read the protected result or recover the
+  failed namespace. Accessible journal output did not independently establish the exact category.
+- `sudo -n true` still refuses without a password. No administrator operation was attempted.
+
+### Code findings and remaining hypotheses
+
+The original parser uses the correct mountinfo target and per-mount-option fields and locates the
+separator after optional fields. It rejects any unlisted `rw` mount, stops at the first one and saves
+only the category. It neither reports the offending target nor distinguishes masked/stacked mounts;
+it also leaves path escapes undecoded. There is **no evidence yet** that an escape or field-index
+error caused this host failure. All current permitted targets are fixed ASCII paths.
+
+Possible explanations remain: a truly unintended writable host mount; a systemd-created protection
+or private-device mount rejected by the narrow predicate; a stacked/hidden mount; or input handling
+that requires a real offending fixture. None is selected as the cause and no extra mount is allowed.
+VFS mount options and superblock options differ; both are captured separately in the diagnostic.
+[Linux mountinfo specification](https://man7.org/linux/man-pages/man5/proc_pid_mountinfo.5.html),
+accessed2026-10-16, defines those fields and the mount-parent information needed for stacked mounts.
+Systemd257 documents that ProtectKernelLogs makes kernel-log paths inaccessible; this motivates a
+masked-mount hypothesis, **not** proof of this host's mechanism or permission to whitelist such a path.
+[Version-pinned systemd source manual](https://raw.githubusercontent.com/systemd/systemd/v257/man/systemd.exec.xml),
+accessed2026-10-16; the freedesktop rendered-manual request returned403, so was not used as evidence.
+
+### Bounded diagnostic and checks
+
+Added separate `historical-mount-diagnostic.py` and `bigbrain-historical-mount-diagnostic.service`.
+The unit preserves every isolation/resource setting; only executable/description, its own cgroup
+name and private stdout/stderr routing differ. It reuses the existing state-directory view without
+writing its contents. The script imports the **hash-pinned installed** policy without invoking probe/main,
+checks its own identity/controller context and reads only mount metadata. It creates no child, mount,
+cgroup, grant or Finance state. It captures all entries, including readonly/stacked rows, with source,
+filesystem-root and arbitrary option values omitted. Output requires a precreated root0600 regular
+file; terminal/journal fallback is refused. The result remains private because targets may be sensitive.
+
+Only the exact diagnostic unit cgroup target is substituted for original-policy comparison in memory;
+actual target and an explicit substitution marker remain recorded. Unknown paths, subtrees, escaped
+paths and masked examples remain rejected. `DIAGNOSTIC_ONLY` is never a G3a success declaration.
+The original `historical-preflight.py` and maintenance unit are **unchanged**, locally and on the host.
+
+| Check | Outcome |
+| --- | --- |
+| `python3 -B tests/deployment/test_historical_mount_diagnostic.py -v` | PASS10/FAIL0/SKIP0: all unexpected rows, VFS/superblock distinction, escapes, stacked records, exact cgroup-name substitution, redaction, malformed/bounded inputs, terminal refusal, pinned original hashes and full unit-setting equivalence |
+| `python3 -B tests/deployment/test_historical_preflight.py -v` | PASS11/FAIL0/SKIP0; unchanged fail-closed behavior and inert owned-child cleanup. Expected negative fixture prints a FAIL category. |
+| `systemd-analyze verify infrastructure/finance/bigbrain-historical-mount-diagnostic.service` | PASS/exit0, static only |
+| Real diagnostic namespace capture | NOT RUN; requires explicit owner approval and local administrator access |
+| New installed-preflight attempt / inference / Finance operations | NOT RUN / prohibited by this task |
+
+No broader application suite is justified: Finance code and scientific/runtime contracts did not
+change. The separate parser/test additions do not modify installed acceptance behavior. Publication
+checks: `node scripts/verify-documentation.mjs` PASS271 Markdown files/91 unique backlog IDs and
+relative links; Python AST and administrator procedure `bash -n`/embedded Python syntax PASS without
+execution; all four runbook-pinned input hashes match. `git diff --cached --check` and nine-file scope
+PASS. Gitleaks8.28.0 `git --staged --redact --no-banner .` PASS/no leaks. Original production probe/unit,
+application source, Compose, AGENTS and unrelated untracked work are excluded from the delta.
+
+### Decision and next action
+
+**Root cause unverified; P1 remains for actual mount isolation.** No verified P0 or justified production
+policy correction was found. One concrete missing item is a private mount snapshot from the equivalently
+isolated diagnostic process. The [single pending-approval local procedure](../../../operations/runbooks/finance-historical-hosting.md#unexpectedwritablemount--one-owner-approved-diagnostic)
+creates only temporary diagnostic artifacts, starts that separate unit once, preserves private evidence
+and removes only its temporary unit definition after completion. It does not restart the installed
+preflight/API/Web/Docker or create persistent write permissions. On failure STOP without retry.
+
+Owner approval is requested for that diagnostic only, as required by this task's administrator-test
+boundary. Further policy correction must be supported by its actual findings. Successful diagnostic
+collection alone cannot clear G3a; a later corrected real preflight must pass independently. No Qwen,
+enrollment, authority change, AAPL change, provider request, deployment or merge occurred.
+Finance **RESEARCH / 0 SEK / NONE**.

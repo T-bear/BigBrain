@@ -12,7 +12,7 @@ The [hosting runbook](runbooks/finance-historical-hosting.md#g3a-model-free-syst
 | --- | --- | --- |
 | G1 — Merge | Owner approval of exact tree; applicable CI; no unresolved P0/P1 in accepted implementation scope | PASS: candidate87b08d3 merged unchanged as70b659f; tree6433c956; CI38863227447 SUCCESS. Hosting readiness was not implied. |
 | G2 — Deploy | Authorized deployment; compiled/OCI/image identity; API health; no unintended AAPL/other-service effect | PASS for API deployment; report records exact identities/config comparison. The API is **not** a Qwen-ready environment. |
-| G3a — Activation readiness | Actual host isolation, protected artifacts, private profile, finite grant/enrollment, independent append-only journal, `RecurringAuthorityMatched`; no open P0/P1 | **BLOCKED**: administrator installation and actual systemd preflight not executed; downstream authority steps NOT RUN. |
+| G3a — Activation readiness | Actual host isolation, protected artifacts, private profile, finite grant/enrollment, independent append-only journal, `RecurringAuthorityMatched`; no open P0/P1 | **BLOCKED**: installed preflight exited1; owner reports `UnexpectedWritableMount`. Separate namespace diagnostic prepared, NOT RUN; no successful host preflight or downstream authority proof. |
 | G3b — Historical run | Exactly one separately approved invocation and persisted outcome, including unsuccessful outcomes; readback verification | NOT RUN. This G3a task forbids `finance-historical-run`. |
 
 G3a is not passed by a static unit check, mock filesystem, successful Docker loader test, an old
@@ -74,3 +74,5 @@ Retain private, invocation-bound results and a sanitized report covering:
 Keep the historical and prospective operator paths distinct. Authority-check uses six disabled gates
 **only in its own process**; never disable production AAPL to make maintenance validation pass.
 Current blockers, checks and next administrator step are recorded once in the operation report.
+The latest [mount diagnostic checkpoint](../reports/features/finance/historical-qwen-operation-20261016.md#unexpectedwritablemount-diagnostic-checkpoint--2026-10-16)
+supersedes the earlier uninstalled-host status without treating a diagnostic as gate acceptance.

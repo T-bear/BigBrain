@@ -2,6 +2,27 @@
 
 ## Historical Qwen deployment and execution — 2026-10-16
 
+### Current handoff — UnexpectedWritableMount diagnostic
+
+**REVIEW CHECKPOINT / G3a BLOCKED / owner-local diagnostic approval required.** Main remains
+`70b659f772b7b7883a5716786859f1e7833a5634`/tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.
+Continue `review/finance-historical-qwen-deployment`, preserving reviewed
+`bfa99fb98da83f6dcee7618f1c1a2d26cb94f62d`/tree`8b39e20a22aa6055d37ad9a35474eca87a07d549`.
+New publication resolves by `review: add isolated G3a mount diagnostics without policy relaxation`.
+Read-only host checks confirm installed unit/probe byte identity, failed/exit1, MainPID0, static unit
+and no drop-ins. Owner reports217/USER fixed, then UnexpectedWritableMount; no target metadata is
+available and the failed namespace is gone. No verified root cause or justified policy change yet.
+Separate temporary diagnostic unit/script and10 focused tests prepared; original unit/probe unchanged.
+10 diagnostic and11 existing tests PASS; static unit verification PASS. No diagnostic host run,
+unit installation/start, Finance/database/authority operation, inference or API/AAPL change performed.
+[Evidence and hypothesis boundary](../reports/features/finance/historical-qwen-operation-20261016.md#unexpectedwritablemount-diagnostic-checkpoint--2026-10-16).
+Next exact step requires owner approval of the runbook's single bounded root-local diagnostic procedure.
+It never starts the original unit, writes cgroups or creates grants. Keep its result private; no secrets
+or raw mount-source/options/environment export. Do not broaden the allowlist based on fixtures.
+Unrelated design mockups and four Sentinel ADR drafts remain untouched/unpublished.
+
+### Previous G3a checkpoint bfa99fb — historical handoff
+
 G3a continuation: **REVIEW CHECKPOINT / BLOCKED BY ADMINISTRATOR GATE; NO INFERENCE**.
 Same branch and unchanged accepted main below; previous checkpoint
 `e97baa8c110b1ed9604cd2a0be823bc5dea710e8`/tree`7bc6bb89cb10529e1aee0a75910499134db1ee2e`

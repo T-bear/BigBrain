@@ -4,11 +4,12 @@
 
 **G1 PASS / G2 PASS / G3a BLOCKED / G3b NOT RUN**, under
 [FIN-OPS-G3-20261016](operations/finance-historical-qwen-g3-checklist.md).
-The systemd257 maintenance preflight is implemented and model-free tests/static unit verification
-pass; it has **not** been installed or executed under the actual delegated host context. Root-protected
-artifacts, final profile, enrollment, append-only journal and `RecurringAuthorityMatched` remain
-unverified/unprovisioned. The active API is not a ready Qwen execution environment.
-[Exact check results and administrator action](reports/features/finance/historical-qwen-operation-20261016.md#g3a-release-completion--2026-10-16).
+The systemd257 preflight is now installed, matching checkpoint bfa99fb, and failed/exit1 with no
+live process. Owner reports217/USER resolved followed by `UnexpectedWritableMount`; the offending
+mount is not yet known. Separate model-free namespace diagnostics are prepared/tested, NOT RUN.
+The original mount policy is unchanged; no successful host preflight, enrollment, protected journal
+or `RecurringAuthorityMatched` is claimed. The active API is not a ready Qwen execution environment.
+[Actual evidence and single administrator diagnostic gate](reports/features/finance/historical-qwen-operation-20261016.md#unexpectedwritablemount-diagnostic-checkpoint--2026-10-16).
 
 **ACCEPTED / MERGED / DEPLOYED / API HEALTH VERIFIED; QWEN NOT RUN.** Owner-approved candidate
 `87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is merged unchanged as
