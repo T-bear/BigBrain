@@ -7,11 +7,12 @@
 After checkpoint439bbb0, the operator reports one successful diagnostic capture:65 mounts,
 16 rejected by the unchanged mount policy. This is operator-reported evidence, not a Codex-reproduced
 host test or G3a PASS. The temporary diagnostic unit was reportedly removed; the original preflight
-remains unchanged. Root-cause analysis and a conditional unit-isolation correction are now published
-for architect review; no correction or new host run has been performed. No successful isolation
-preflight, enrollment, protected journal or `RecurringAuthorityMatched` is claimed.
-The active API is not a ready Qwen execution environment.
-[Analysis, evidence boundaries and proposed verification](reports/features/finance/historical-qwen-operation-20261016.md#g3a--unexpectedwritablemount-root-cause-analysis-and-proposed-correction).
+remains unchanged on host. Repository-only `MountFlags=private` is now prepared in both units;
+26 focused tests and static systemd257 verification pass. This prevents later propagation but cannot
+remove inherited mounts. No exact target masks are justified yet, and no new host run occurred.
+No successful isolation preflight, enrollment, protected journal or `RecurringAuthorityMatched` is
+claimed. The active API is not a ready Qwen execution environment.
+[Partial correction, evidence and remaining P1](reports/features/finance/historical-qwen-operation-20261016.md#g3a--private-propagation-preparation-and-unresolved-target-gate).
 
 **ACCEPTED / MERGED / DEPLOYED / API HEALTH VERIFIED; QWEN NOT RUN.** Owner-approved candidate
 `87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is merged unchanged as

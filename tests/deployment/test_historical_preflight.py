@@ -1,4 +1,5 @@
 """Model-free checks; no systemd start, cgroup writes, Finance access or provider calls."""
+import hashlib
 import importlib.util
 import os
 from pathlib import Path
@@ -48,6 +49,44 @@ class PreflightTests(unittest.TestCase):
     def test_delegation_must_be_writable_and_present(self):
         with self.assertRaises(P.Refused):
             P.mount_policy(mount(str(P.CGROUP), "cgroup2", "ro"))
+
+    def test_reported_mount_classes_remain_rejected_individually(self):
+        # Synthetic targets only; no claim about the private host diagnostic's actual paths.
+        cases = [(f"/run/fixture-namespaces/{i}", "nsfs") for i in range(12)] + [
+            ("/run/fixture-cache", "tmpfs"), ("/run/fixture-state", "tmpfs"),
+            ("/proc/sys/fs/binfmt_misc", "binfmt_misc"), ("/dev/hugepages", "hugetlbfs")]
+        for path, kind in cases:
+            with self.subTest(path=path, kind=kind), self.assertRaisesRegex(P.Refused, "UnexpectedWritableMount"):
+                P.mount_policy(mount(str(P.CGROUP), "cgroup2") + "\n" + mount(path, kind))
+
+    def test_allowed_target_names_do_not_authorize_submounts_or_lookalikes(self):
+        for path, kind in (("/tmp/submount", "tmpfs"), ("/tmp-extra", "tmpfs"),
+                           (str(P.STATE) + "/other", "ext4"),
+                           (str(P.CGROUP) + "/worker", "cgroup2")):
+            with self.subTest(path=path), self.assertRaisesRegex(P.Refused, "UnexpectedWritableMount"):
+                P.mount_policy(mount(str(P.CGROUP), "cgroup2") + "\n" + mount(path, kind))
+
+    def test_unexpected_mount_rejected_before_cgroup_mutation_or_child(self):
+        mounts = mount(str(P.CGROUP), "cgroup2") + "\n" + mount("/run/fixture-cache", "tmpfs")
+        with patch.object(P.os, "getuid", return_value=1654), patch.object(P.os, "geteuid", return_value=1654), \
+             patch.object(P.os, "getgid", return_value=1654), patch.object(P.os, "getegid", return_value=1654), \
+             patch.object(P, "read", side_effect=[STATUS, "0::" + P.RELATIVE + "/controller", mounts]), \
+             patch.object(P, "write_control") as write, patch.object(P.Path, "mkdir") as mkdir, \
+             patch.object(P, "own_child") as child:
+            with self.assertRaisesRegex(P.Refused, "UnexpectedWritableMount"):
+                P.probe()
+            write.assert_not_called()
+            mkdir.assert_not_called()
+            child.assert_not_called()
+
+    def test_private_propagation_is_the_only_unit_change_from_reviewed_baseline(self):
+        unit = (ROOT / "infrastructure/finance/bigbrain-historical-maintenance.service").read_bytes()
+        directive = b"MountFlags=private\n"
+        self.assertEqual(1, unit.count(directive))
+        # Pin the reviewed unit: every prior identity, privilege, resource and cleanup setting
+        # must survive byte-for-byte. This proves configuration scope, not actual namespace isolation.
+        self.assertEqual("b643dc93ad1c618753d603072d346af3dfe06d6f3e4e54de05d0a97c6e4b73c4",
+                         hashlib.sha256(unit.replace(directive, b"", 1)).hexdigest())
 
     def test_topology_rejected_before_any_cgroup_write(self):
         with patch.object(P.os, "getuid", return_value=1654), patch.object(P.os, "geteuid", return_value=1654), \

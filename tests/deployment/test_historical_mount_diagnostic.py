@@ -78,10 +78,23 @@ class MountDiagnosticTests(unittest.TestCase):
             self.assertEqual(1, D.main())
             write.assert_not_called()
 
-    def test_pinned_production_policy_and_unit_are_unchanged(self):
+    def test_pinned_policy_and_required_installation_match_repository(self):
         for filename, expected in (("historical-preflight.py", D.ORIGINAL_PROBE_SHA),
                                    ("bigbrain-historical-maintenance.service", D.ORIGINAL_UNIT_SHA)):
             self.assertEqual(expected, hashlib.sha256((ROOT / "infrastructure/finance" / filename).read_bytes()).hexdigest())
+
+    def test_old_installed_unit_is_not_accepted_as_equivalent_to_private_propagation(self):
+        current = (ROOT / "infrastructure/finance/bigbrain-historical-maintenance.service").read_bytes()
+        old = current.replace(b"MountFlags=private\n", b"", 1)
+        self.assertEqual("b643dc93ad1c618753d603072d346af3dfe06d6f3e4e54de05d0a97c6e4b73c4",
+                         hashlib.sha256(old).hexdigest())
+        with patch.object(D.Path, "resolve", return_value=Path("/")), \
+             patch.object(D.Path, "lstat", return_value=type("Metadata", (), {"st_uid": 0, "st_mode": 0o755})()), \
+             patch.object(D.Path, "is_file", return_value=True), \
+             patch.object(D.Path, "stat", return_value=type("Links", (), {"st_nlink": 1})()), \
+             patch.object(D.Path, "read_bytes", return_value=old):
+            with self.assertRaisesRegex(D.DiagnosticRefused, "InstalledBaselineMismatch"):
+                D.protected_hash(Path("/"), D.ORIGINAL_UNIT_SHA)
 
     def test_unit_retains_every_isolation_setting_with_only_explicit_deltas(self):
         def settings(filename):

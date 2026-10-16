@@ -15,9 +15,9 @@ Detta är en sanerad GitHub-version.
 
 ## Status
 
-Latest disposition: [G3a mount root-cause analysis and proposed correction](#g3a--unexpectedwritablemount-root-cause-analysis-and-proposed-correction).
+Latest disposition: [G3a private propagation preparation and unresolved target gate](#g3a--private-propagation-preparation-and-unresolved-target-gate).
 The operator reports one diagnostic capture after checkpoint439bbb0. Earlier NOT RUN statements
-retain their historical scope; no successful G3a preflight or correction is implied.
+retain their historical scope. A partial correction is prepared in Git only; no successful host preflight is implied.
 
 **REVIEW CHECKPOINT / historical execution BLOCKED before enrollment or inference.**
 Merge accepted/published and API deployed/healthy; deployment evidence is recorded below. No new product code was changed.
@@ -651,3 +651,116 @@ secrets are excluded. Finance remains **RESEARCH / 0 SEK / NONE**.
 The final publication repeats staged whitespace/secret and documentation validation after adding this
 verification record. Exact published commit/tree and remote verification are resolved from Git metadata
 and the delivery message. Main remains unchanged; no CI or host-validation result is invented.
+
+
+## G3a — private propagation preparation and unresolved target gate
+
+**2026-10-16 — REVIEW CHECKPOINT; partial correction, NOT HOST VERIFIED; G3a BLOCKED / G3b NOT RUN.**
+Owner authorized repository-only correction after the published root-cause analysis. Accepted main
+was fetched and verified as `70b659f772b7b7883a5716786859f1e7833a5634`,
+tree `6433c956ff87bc8434a9a8fff6c5294fe45b258d`. Starting review HEAD was
+`31711a1dc1492e04876ed13b6ca03ba5bcbef883`, tree `9e67a2989e02c1ebd9005810a1d557704e9e7fc9`.
+Tracked work was clean; unrelated design mockups and four Sentinel ADR drafts remain excluded.
+Continue `review/finance-historical-qwen-deployment`; this additive checkpoint resolves by publication
+subject `review: bound G3a mount propagation without policy relaxation` and its Git commit/tree metadata.
+No earlier checkpoint is rewritten. No external Finance review report was used.
+
+### Implemented scope and verified semantics
+
+Only `MountFlags=private` is added to both
+`infrastructure/finance/bigbrain-historical-maintenance.service` and
+`infrastructure/finance/bigbrain-historical-mount-diagnostic.service`.
+The local static verifier identifies systemd **257.13-1~deb13u1**. Version-pinned
+[systemd257.13 execution documentation](https://github.com/systemd/systemd/blob/v257.13/man/systemd.exec.xml)
+and [namespace implementation](https://github.com/systemd/systemd/blob/v257.13/src/core/namespace.c),
+accessed2026-10-16, establish that the directive is supported: after namespace construction systemd
+applies the selected propagation mode recursively. `PrivateMounts=yes` alone would keep incoming
+host propagation and therefore is not the selected correction.
+
+This change prevents later incoming/outgoing propagation across that private namespace boundary;
+it does **not** remove mounts inherited during namespace construction, make inherited writable
+mounts read-only, or prove DAC/namespace/capability isolation. It does not change global propagation
+or grant a new writable host path. Actual final mount flags/topology must still be verified on host.
+Private propagation also prevents receiving host unmounts; inherited mounts can remain pinned until
+the service namespace is destroyed. The unchanged bounded oneshot/whole-control-group cleanup is
+therefore essential. Do not export namespace handles or leave descendants holding the namespace.
+Timeout settings are not proof of cleanup under a kernel hang; lingering processes/handles are STOP.
+
+`historical-preflight.py` is byte-identical to the reviewed version, SHA-256
+`97ecacefdeed8e95e7056557b0871384d5e4ab0b9194e7846679f4cffe04bbf6`.
+No allowlist, parser, cgroup mutation, identity or failure behavior is relaxed.
+The diagnostic reader changes **only its pinned required maintenance-unit checksum**, to
+`212558051adef7b1d42afa3e825fed5fe15a97ef006e0bf0676bfa302f1967f3`.
+It will refuse the old installed unit rather than falsely treating different isolation as equivalent.
+Both unit files must correspond to this reviewed version for any separately authorized future test;
+no installation or test is authorized by publication. The previous diagnostic procedure/hashes remain
+historical evidence, not a runnable procedure for this new tree.
+
+### Why target masking is still blocked
+
+The earlier single capture remains **operator-reported**, not reproduced by Codex:65 mounts,
+16 unexpected entries (12nsfs under/run,2tmpfs under/run,1binfmt_misc under/proc,1hugetlbfs under/dev),
+all reporting rw in both sets of flags. Host shared propagation is also operator-reported.
+The temporary diagnostic unit was reportedly removed; the installed preflight was not changed here.
+Exact target identities, stacked-mount relationships, backing access and effective UID1654 access
+remain unverified. Those aggregate counts do not establish that propagation caused every entry,
+or that rw proves usable write access. Inherited or systemd-bound mounts can remain after this fix.
+
+**No `InaccessiblePaths` entry is added.** Even a familiar filesystem type does not prove its actual
+target or safe masking boundary. The next needed evidence is the exact targets/parent relationships
+from the already captured private result, plus their required-use and effective-access assessment.
+Do not publish private targets or collect a second diagnostic by default. If an exact safe mask is
+established, it requires an explicit reviewed correction; otherwise retain the fail-closed blocker.
+The current unit may still reject all16 entries. This is not a complete UnexpectedWritableMount fix.
+
+### Focused verification and unchanged boundaries
+
+| Executed check | Outcome |
+| --- | --- |
+| `python3 -B tests/deployment/test_historical_preflight.py -v` | PASS:15 tests,0 failures,0 skips. Includes16 synthetic mount-class cases, prefix/submount rejection, rejection before cgroup writes/child creation, original cleanup/identity checks and exact prior-unit hash after removing only the new directive. |
+| `python3 -B tests/deployment/test_historical_mount_diagnostic.py -v` | PASS:11 tests,0 failures,0 skips. Exact equivalent isolation, unchanged policy hash, new unit pin and rejection of old unit bytes; bounded sanitized parsing retained. |
+| `systemd-analyze verify infrastructure/finance/bigbrain-historical-maintenance.service infrastructure/finance/bigbrain-historical-mount-diagnostic.service` | PASS:exit0, no diagnostics; static verification only, neither unit started. |
+| Production preflight, diagnostic, namespace/cgroup host experiment, Qwen, Finance tests/build | NOT RUN. No host action authorized; unchanged Finance code does not justify a full suite. |
+
+The fixture test's printed `HistoricalIsolationPreflight:FAIL:PreflightSystemFailure` is an expected
+negative-path test output, not a host preflight execution or failed test. Synthetic target names are
+not claims about actual private mounts. No Finance/model/data access occurs in these tests.
+
+Byte-level unit regression proves unchanged UID/GID1654, Delegate/DelegateSubgroup, NoNewPrivileges,
+empty capabilities, network/device isolation, CPU200%, memory4GiB, swap0, TasksMax32,45s startup/5s
+stop, KillMode=control-group, SendSIGKILL=yes and Restart=no. Worker controls and0700 enforcement
+remain in the unchanged probe. Static evidence does not prove successful child migration on host.
+
+### Review decision and remaining release evidence
+
+Recommend reviewing this **partial propagation hardening only**, retaining P1 STOP for missing
+actual host isolation evidence and unresolved inherited mount targets. No P0 violation is demonstrated
+by the rw flags alone. Broad filesystem/prefix exceptions remain prohibited. No P1 is waived.
+After target-specific review and separate owner authorization, a matched host installation/test must
+prove: no unauthorized writable/accessible backing; private propagation in the service context;
+unchanged controller/worker topology, effective identity, caps0/NNP1, exact limits; inert child
+migration/kill/reap with empty worker and no leftover processes. Any mismatch or residual unexpected
+mount is FAIL/STOP, never authority to broaden policy. The existing checklist still requires protected
+artifact/loader checks, enrollment, correct append-only journal and `RecurringAuthorityMatched` in the
+final context. None was performed here. G3b remains separately gated; I1/E1/T3/C64/W33s and30s model
+cap remain unchanged, including the historical50.458s timeout risk. No model execution, deployment,
+service start/restart, production mutation, AAPL change, grant/journal action or provider call occurred.
+Finance remains **RESEARCH / 0 SEK / NONE**.
+
+
+### Partial-correction publication checks
+
+Documentation/link validation (`node scripts/verify-documentation.mjs`) PASS:271 Markdown files,
+91 unique backlog IDs. `git diff --check` and staged whitespace/scope checks PASS.
+Gitleaks8.28.0 `git --staged --redact --no-banner .` PASS:no leaks found.
+The final staged snapshot is checked again after recording these outcomes.
+
+Exact changed-file scope is11: the two units, the diagnostic checksum pin, the two deployment test
+files named above, this existing report, `docs/STATUS.md`, `docs/BACKLOG.md`,
+`docs/operations/codex-recovery.md`, `docs/operations/finance-historical-qwen-g3-checklist.md`, and
+`docs/operations/runbooks/finance-historical-hosting.md`. The original probe, application code,
+Finance stores, host configuration and unrelated work are untouched. Existing report-catalog links
+remain sufficient; no new report/ADR or architectural authority is introduced. Private targets,
+raw captures, secrets and protected-authority contents are excluded. This is a REVIEW CHECKPOINT,
+not a Merge Candidate. No new CI or runtime success is claimed. Remote HEAD/main identities are
+verified at publication; exact new commit/tree are reported from Git metadata.

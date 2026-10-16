@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 
 ORIGINAL_UNIT = Path("/etc/systemd/system/bigbrain-historical-maintenance.service")
 ORIGINAL_PROBE = Path("/usr/local/libexec/bigbrain-historical-preflight.py")
-ORIGINAL_UNIT_SHA = "b643dc93ad1c618753d603072d346af3dfe06d6f3e4e54de05d0a97c6e4b73c4"
+ORIGINAL_UNIT_SHA = "212558051adef7b1d42afa3e825fed5fe15a97ef006e0bf0676bfa302f1967f3"
 ORIGINAL_PROBE_SHA = "97ecacefdeed8e95e7056557b0871384d5e4ab0b9194e7846679f4cffe04bbf6"
 DIAGNOSTIC_UNIT = "bigbrain-historical-mount-diagnostic.service"
 DIAGNOSTIC_CGROUP = "/sys/fs/cgroup/system.slice/" + DIAGNOSTIC_UNIT

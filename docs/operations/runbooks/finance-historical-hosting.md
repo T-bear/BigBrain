@@ -3,11 +3,15 @@
 ## Status and scope
 
 **2026-10-16: installed preflight failed; NOT READY FOR ENROLLMENT OR INFERENCE.**
-The owner reports217/USER resolved, then `UnexpectedWritableMount`. Read-only checks confirm the
-installed unit/probe match checkpoint bfa99fb and the unit is failed/exit1 with no live process.
-Do not repeat the initial installation/start procedure below. The current next action is the
-[separate mount diagnostic](#unexpectedwritablemount--one-owner-approved-diagnostic), requiring
-explicit owner approval before any host action. No allowlist correction is justified yet.
+Earlier checks and operator reports established217/USER resolved, then `UnexpectedWritableMount`.
+The operator subsequently reports one separate diagnostic capture (65 mounts/16 rejections), followed
+by removal of the temporary diagnostic unit. No successful G3a host preflight exists.
+The current repository prepares `MountFlags=private` in both units, statically verified on systemd257.13.
+This blocks later propagation, not inherited mounts. No exact `InaccessiblePaths` targets are yet
+justified. The installed maintenance unit is not changed by this checkpoint. The diagnostic now pins
+the updated unit and refuses the old one; do not mix versions or repeat the historical procedures below.
+Next is architect review of the [partial correction and missing target evidence](../../reports/features/finance/historical-qwen-operation-20261016.md#g3a--private-propagation-preparation-and-unresolved-target-gate).
+Installation and any host test require separate approval. No new host action is authorized here.
 G1/G2 are complete for the accepted API; G3a remains BLOCKED and G3b NOT RUN under
 [FIN-OPS-G3-20261016](../finance-historical-qwen-g3-checklist.md).
 Accepted application: `70b659f772b7b7883a5716786859f1e7833a5634`.
@@ -166,9 +170,11 @@ The unit bounds the entire test to45s plus5s termination, KillMode=control-group
 Failure to obtain pidfd leaves whole-unit cleanup to systemd and never uses an arbitrary PID fallback.
 The unit also imposes CPU200%,4GiB,swap0,32tasks; these ceilings cannot increase model authority.
 
-`ProtectSystem=strict` plus explicit cgroup read-only coverage exposes only the unit's own subtree
-writable. Private devices/network and disposable tmpfs prevent host-device/network or shared-temp
-access. Persistent private StateDirectory contains invocation-bound `.json` results; `.pending`
+`ProtectSystem=strict` plus explicit cgroup read-only coverage is intended to expose only the unit's
+own cgroup subtree writable. Private devices/network and disposable tmpfs are intended restrictions;
+inherited backing mounts and effective access still require host proof. Private propagation alone
+does not establish this isolation. Persistent private StateDirectory contains invocation-bound
+`.json` results; `.pending`
 means incomplete, never PASS. A repeated invocation identity cannot replace old evidence. Result
 includes probe/unit hashes and UTC times; operator must additionally retain effective unit/drop-in
 identity. No model, Finance path, grant, credentials or database is supplied to this test.
@@ -255,7 +261,9 @@ No empty journal, fabricated timestamps or early enrollment should be used to ma
 
 ## UnexpectedWritableMount — one owner-approved diagnostic
 
-**PREPARED / NOT EXECUTED. Do not run until owner explicitly approves this single diagnostic.**
+**Historical checkpoint439bbb0 procedure, operator-reported executed once. Do not repeat.**
+The aggregate result and current partial correction are linked above. The old hashes below are
+preserved as evidence; they do not match the current unit/diagnostic pair and must not be bypassed.
 The failed process has exited; its private namespace cannot be recovered through host `findmnt`.
 Use the separate [diagnostic unit](../../../infrastructure/finance/bigbrain-historical-mount-diagnostic.service)
 and [reader](../../../infrastructure/finance/historical-mount-diagnostic.py), never edit or restart the
@@ -276,7 +284,7 @@ still be private: output is root-only, not journal/chat/Git. The reader refuses 
 `DIAGNOSTIC_ONLY`/exit0 means evidence collected, **never G3a PASS**, even if policy accepts that snapshot.
 The diagnostic does not reproduce child migration or prove the vanished failed namespace identical.
 
-### Single bounded local procedure, pending approval
+### Historical single bounded procedure — not for the current tree
 
 Use the exact published checkpoint files in an owner-local root terminal. No password goes to Codex.
 The following script refuses existing diagnostic artifacts, baseline drift, running original process,

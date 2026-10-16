@@ -2,7 +2,25 @@
 
 ## Historical Qwen deployment and execution — 2026-10-16
 
-### Current handoff — mount root-cause analysis published for review
+### Current handoff — partial propagation correction, host gate remains blocked
+
+**REVIEW CHECKPOINT / G3a BLOCKED / G3b NOT RUN.** Accepted main
+`70b659f772b7b7883a5716786859f1e7833a5634`, tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.
+Continue `review/finance-historical-qwen-deployment` above reviewed
+`31711a1dc1492e04876ed13b6ca03ba5bcbef883`, tree`9e67a2989e02c1ebd9005810a1d557704e9e7fc9`.
+Resolve publication SHA/tree by `review: bound G3a mount propagation without policy relaxation`.
+Both units gain only `MountFlags=private`; diagnostic pins the new unit; probe policy unchanged.
+15 preflight and11 diagnostic tests PASS; static systemd257.13 unit verification PASS.
+[Canonical scope, checks and P1](../reports/features/finance/historical-qwen-operation-20261016.md#g3a--private-propagation-preparation-and-unresolved-target-gate).
+No host install/start, production/Finance/AAPL/authority change or inference occurred.
+No target masking: existing private exact-target evidence is still missing from review. Propagation
+hardening does not remove inherited mounts; no completed fix or G3a success is claimed. Next decision:
+architect reviews this partial correction and missing target evidence before any separately approved
+host test. Historical diagnostic commands below are not current installation instructions.
+Only five infrastructure/test files and six canonical documents change. Unrelated design mockups and
+four Sentinel ADR drafts remain untouched/unpublished. No application/science/cgroup policy changed.
+
+### Previous checkpoint31711a1 — mount root-cause analysis published for review
 
 **REVIEW CHECKPOINT / DOCUMENTATION ONLY / G3a BLOCKED / STOP FOR ARCHITECT REVIEW.**
 Verified accepted main remains `70b659f772b7b7883a5716786859f1e7833a5634`,
