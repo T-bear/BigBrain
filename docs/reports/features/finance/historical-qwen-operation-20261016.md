@@ -228,3 +228,88 @@ No inference is permitted in this task, even if those preconditions later pass.
 Versioned changes are the preparation fragment, runbook and existing report/recovery/backlog handoff.
 Private staged binaries/library manifest/config are excluded from Git. No production permissions,
 configuration, cgroup, journal, database, grant or service changed. Finance **RESEARCH / 0 SEK / NONE**.
+
+## G3a release completion — 2026-10-16
+
+**REVIEW CHECKPOINT / G3a BLOCKED / G3b NOT RUN.** This is continuation, not a new Finance sprint.
+Accepted main70b659f772b7b7883a5716786859f1e7833a5634/tree6433c956ff87bc8434a9a8fff6c5294fe45b258d
+and previous checkpointe97baa8c110b1ed9604cd2a0be823bc5dea710e8/tree7bc6bb89cb10529e1aee0a75910499134db1ee2e
+were fetched and verified. Same branch; no review history rewritten. New publication resolves by
+subject `review: prepare G3a systemd isolation and release gates`. The external standalone Finance
+review report was not used. Earlier dated evidence above is preserved and reused within its scope.
+
+### Implemented, without production activation
+
+- [FIN-OPS-G3-20261016](../../../operations/finance-historical-qwen-g3-checklist.md) is the canonical
+  release-local G1/G2/G3a/G3b definition, invariants, severity rules and two-round review limit.
+  STATUS/BACKLOG now distinguish accepted API deployment from unverified Qwen hosting. No general
+  AGENTS/ADR rule or scientific contract was changed.
+- `infrastructure/finance/bigbrain-historical-maintenance.service`: preflight-only, UID/GID1654,
+  Delegate cpu/memory/pids, DelegateSubgroup controller, zero capabilities/NNP, no restart/timer,
+  isolated network/devices/tmp, read-only system, only its own delegated cgroup subtree writable
+  plus persistent private result directory. Whole-unit limits cannot expand the approved model limits.
+- `infrastructure/finance/historical-preflight.py`: no command/path parameters or Finance imports.
+  Validates actual topology, namespace mounts, identity, parent emptiness, controllers; exclusively
+  creates worker0700 and the five exact native limits; migrates one inert child; verifies unchanged
+  parent, child identity, pidfd kill/reap and empty leaf. Exceptions also terminate/reap the owned child;
+  systemd bounds uncertain cleanup. No existing worker/process or result can be adopted/overwritten.
+  Results are persistent/private and bound to fresh systemd InvocationID plus probe/unit hashes.
+- `tests/deployment/test_historical_preflight.py`: fixture policy refusals plus real harmless child
+  lifecycle tests, without systemd/cgroup/Finance writes. The existing runbook contains exact next
+  administrator steps and the boundary between this probe and final data-enabled maintenance context.
+
+The expected topology is a dedicated service parent with empty `cgroup.procs`, sibling `controller`
+and `worker`; only descendants of this delegated service are managed by the probe. This topology is
+**not yet observed** on the host. The current API's private/readonly Docker cgroup remains unchanged.
+Systemd257's installed manual confirms DelegateSubgroup applies to main ExecStart, not ancillary
+ExecStartPre commands; the unit uses only ExecStart. No privileged container, host cgroup namespace,
+broad writable cgroup mount or native containment change is introduced.
+
+### Verification and retained evidence
+
+| Check / command | Result and exact scope |
+| --- | --- |
+| `git fetch origin`; main/branch/tree checks | PASS, exact identities above; unrelated untracked work preserved |
+| `python3 -B tests/deployment/test_historical_preflight.py -v` | PASS:11 tests,0 failures,0 skips; actual inert child kill/reap on success/error. Does not prove cgroup migration. |
+| `systemd-analyze verify infrastructure/finance/bigbrain-historical-maintenance.service` | PASS/exit0 under systemd257.13; syntax/config only |
+| Actual systemd unit start / child migration / mount enforcement | BLOCKED: `sudo -n true` requires a password. No unit installed, cgroup created or permission changed. |
+| `systemctl show bigbrain-historical-maintenance.service -p LoadState -p ActiveState` | PASS as an absence check only: not-found/inactive; no existing installation overwritten |
+| Retained private artifact manifest | PASS7/7 file commitments; updated worker remains0e41bc5c59e300434b888a7cf3533aa19ca8a3a976021590e3f89841db0cb830 |
+| `sha256sum` pinned GGUF | PASS: b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897 |
+| Host `ld-linux-x86-64.so.2 --library-path <staged-runtime> --list <worker/CPU-backend>` | PASS twice, no worker main/model load;9 resolved dependencies hashed into private host-loader manifest, including libgomp |
+| Final root-owned artifact installation and final-unit loader closure | NOT RUN / administrator gate; staged files remain operator-owned. Contained library links must become protected regular copies. |
+| Running API image/OCI/compiled identity/health | PASS: same image26a2b150…, accepted70b659f…, healthy; start remains06:52:20.069029818Z |
+| Current environment/mount equality against retained postdeployment evidence | PASS, exact comparisons without printing values. AAPL/Alpaca true, EODHD/FRED/ResearchScheduler false. |
+| Full Finance/backend/frontend tests | NOT RUN; Finance/application code unchanged. Reuse exact accepted implementation/CI evidence above. |
+| Historical inspect in final context / profile / enrollment / journal / authority-check | NOT RUN; isolation and root custody must pass first. Previous read-only source validation remains dated evidence only. |
+
+Initial focused test run was10 PASS/1 FAIL: a unit-file assertion matched the literal `[Install]` in
+a comment. Checking actual lines corrected the test; no unit security setting changed. Initial private
+manifest comparison omitted its `sha256:` prefix and matched0/7; corrected canonical comparison passed
+7/7 without changing any artifact. These were verification mistakes, not hidden host successes.
+The expected negative duplicate-result test prints a sanitized FAIL category while its assertion passes.
+
+`node scripts/verify-documentation.mjs`: PASS271 Markdown files/91 unique backlog IDs, including
+relative-link checks. Python AST syntax checks PASS for both new scripts. `git diff --cached --check`
+and intended10-file scope PASS; no source/application/production Compose/AGENTS changes. Staged
+`gitleaks git --staged --redact --no-banner .` (8.28.0): PASS, no leaks. Unrelated untracked work excluded.
+No actual model inference or provider command was invoked. No production configuration, database,
+grant, journal, API container or other service was modified. Private manifests are excluded from Git.
+
+### Remaining P1, exact next action and G3 disposition
+
+No P0 invariant breach was found. **P1 remains:** missing actual final host isolation/protected-artifact/
+authority evidence on the selected maintenance path. G3a cannot pass until this evidence exists;
+publication does not approve away that gate. No grant/enrollment was issued to mask missing isolation.
+
+Next concrete action: owner-local administrator follows
+[G3a preflight installation/start](../../../operations/runbooks/finance-historical-hosting.md#g3a-model-free-systemd-preflight),
+using these exact reviewed files. It starts only the inert unit, never Finance or Qwen. After a fresh
+PASS, complete the same runbook's root-protected final-context/artifact/coordination and restore-exclusion
+checks; then follow the existing historical sequence, ending in `RecurringAuthorityMatched` and STOP.
+The final same-DLL context, including Finance/lifecycle and Sentinel access, must be proven without
+altering those services; the preflight-only unit is not falsely presented as a complete runnable host.
+
+Existing50.458s inference evidence exceeds the authorized30s cap by20.458s. The cap remains unchanged;
+a later correctly authorized timeout is an outcome, not permission for retry/refund or a larger grant.
+G1/G2 remain verified; G3a BLOCKED; G3b NOT RUN. Finance **RESEARCH / 0 SEK / NONE**.

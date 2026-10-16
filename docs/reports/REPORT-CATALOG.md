@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- [Historical Qwen deployment and execution — 2026-10-16](features/finance/historical-qwen-operation-20261016.md) — accepted deployment evidence and protected-authority execution gate.
+- [Historical Qwen deployment and execution — 2026-10-16](features/finance/historical-qwen-operation-20261016.md) — accepted G1/G2 evidence; G3a systemd preflight preparation and administrator blocker under [FIN-OPS-G3-20261016](../operations/finance-historical-qwen-g3-checklist.md). G3b not run.
 - `Historical Qwen integration, 2026-10-16` — [Implementation and authorization boundary](features/finance/historical-qwen-integration-20261016.md). Bounded historical WIKI admission, existing ledger/journal/runtime/native evaluator; model-free verification only, no operational grant or inference.
 
 - `Finance recurring research, 2026-10-14` — [Model-free recurring implementation](features/finance/recurring-research-implementation-20261014.md). REVIEW CHECKPOINT; two bounded cohorts, shared durable budget, native science and history replay. No operational acceptance; stale-restore reconciliation and real provisioning remain explicit release gates.

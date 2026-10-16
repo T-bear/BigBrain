@@ -2,6 +2,22 @@
 
 ## Historical Qwen deployment and execution — 2026-10-16
 
+G3a continuation: **REVIEW CHECKPOINT / BLOCKED BY ADMINISTRATOR GATE; NO INFERENCE**.
+Same branch and unchanged accepted main below; previous checkpoint
+`e97baa8c110b1ed9604cd2a0be823bc5dea710e8`/tree`7bc6bb89cb10529e1aee0a75910499134db1ee2e`
+is preserved. Additive publication subject `review: prepare G3a systemd isolation and release gates`
+resolves the new SHA/tree. [Canonical release gates](finance-historical-qwen-g3-checklist.md) and
+[actual checks/remaining work](../reports/features/finance/historical-qwen-operation-20261016.md#g3a-release-completion--2026-10-16).
+Implemented preflight-only systemd257 unit, bounded inert-child probe and11 model-free tests; no
+Finance product logic changed. Static unit validation and focused tests PASS. Actual delegated
+execution BLOCKED (`sudo` requires owner-local credentials); no unit/root artifact installation,
+final profile, enrollment, journal seed or authority-check. Prepared configuration remains inactive.
+Host loader closure and all7 private bundle manifest entries verify; actual final unit closure remains
+NOT RUN. API identity/start/environment/mounts unchanged; AAPL stays enabled. Next exact local action
+is the runbook's root installation and **preflight-only** start, not Finance enrollment or G3b.
+No approval already given for finite authority is being requested again. Root custody and successful
+isolation proof still precede all authority writes. No password should pass through agent/chat.
+
 Operational review branch: `review/finance-historical-qwen-deployment`, from merged accepted main
 `70b659f772b7b7883a5716786859f1e7833a5634`, exact implementation tree
 `6433c956ff87bc8434a9a8fff6c5294fe45b258d`. Previous approved candidate

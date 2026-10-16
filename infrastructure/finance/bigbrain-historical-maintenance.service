@@ -1,0 +1,50 @@
+# G3a only: never starts Finance, opens a database, loads a model or issues authority.
+# Install under this exact unit name. No [Install], timer, automatic restart or API dependency.
+[Unit]
+Description=BigBrain historical research isolation preflight (model-free)
+ConditionPathIsMountPoint=/sys/fs/cgroup
+
+[Service]
+Type=oneshot
+User=1654
+Group=1654
+UMask=0077
+Delegate=cpu memory pids
+DelegateSubgroup=controller
+ExecStart=/usr/bin/python3 -I -B /usr/local/libexec/bigbrain-historical-preflight.py
+Restart=no
+TimeoutStartSec=45s
+TimeoutStopSec=5s
+KillMode=control-group
+SendSIGKILL=yes
+CPUQuota=200%
+CPUQuotaPeriodSec=100ms
+MemoryMax=4G
+MemorySwapMax=0
+TasksMax=32
+LimitCORE=0
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictNamespaces=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+# ProtectControlGroups=yes would prevent the deliberately delegated child migration.
+# Only this service's subtree is writable; no other host cgroup is delegated/mounted writable.
+ReadOnlyPaths=/sys /proc/sys /proc/sysrq-trigger /sys/fs/cgroup
+ReadWritePaths=/sys/fs/cgroup/system.slice/bigbrain-historical-maintenance.service
+TemporaryFileSystem=/tmp:rw,mode=0700 /var/tmp:rw,mode=0700
+StateDirectory=bigbrain-historical-preflight
+StateDirectoryMode=0700
+WorkingDirectory=/var/lib/bigbrain-historical-preflight
+StandardInput=null
+StandardOutput=journal
+StandardError=journal

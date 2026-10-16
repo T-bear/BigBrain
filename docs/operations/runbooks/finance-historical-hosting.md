@@ -3,6 +3,8 @@
 ## Status and scope
 
 **2026-10-16: preparation verified; NOT READY FOR ENROLLMENT OR INFERENCE.**
+G1/G2 are complete for the accepted API; G3a remains BLOCKED and G3b NOT RUN under
+[FIN-OPS-G3-20261016](../finance-historical-qwen-g3-checklist.md).
 Accepted application: `70b659f772b7b7883a5716786859f1e7833a5634`.
 This runbook implements no new Finance behavior, scheduler or model supervisor.
 The [historical contract](../../architecture/finance/research-learning-contract.md#explicit-historical-operator-path-separate-operational-approval-required)
@@ -138,6 +140,111 @@ for the inspected set, not universal independence. Administrator must verify **a
 backup and restore scopes and record explicit journal exclusion; never restore an old active journal,
 clone authority or fabricate a custody assertion. Directory presence alone is not sufficient evidence.
 The current operator cannot list the protected directory, so file absence is owner-reported, not verified.
+
+## G3a model-free systemd preflight
+
+Versioned preparation now includes
+[the dedicated unit](../../../infrastructure/finance/bigbrain-historical-maintenance.service),
+[the inert probe](../../../infrastructure/finance/historical-preflight.py), and
+[focused tests](../../../tests/deployment/test_historical_preflight.py).
+No unit is installed/started by publication. **Administrator privilege is required**; noninteractive
+sudo currently refuses access. Do not supply a password to the agent or use Docker to bypass custody.
+
+The unit is deliberately **preflight-only**, not a Finance process launcher. It cannot enroll or infer.
+Systemd257 places ExecStart directly in `controller`; no ExecStartPre moves processes behind systemd's
+back. The probe refuses a different actual `/proc/self/cgroup`, populated parent, extra child group,
+unexpected writable mount, nonzero capability, wrong UID/GID or absent NoNewPrivs. It enables only
+cpu/memory/pids **inside this delegated service**, exclusively creates `worker` with mode0700, sets
+the five native limits, and migrates one inert direct child. The parent remains in controller and
+uses a retained pidfd to kill/reap. Empty worker is removed; no existing group/process is adopted.
+The unit bounds the entire test to45s plus5s termination, KillMode=control-group, Restart=no, no timer.
+Failure to obtain pidfd leaves whole-unit cleanup to systemd and never uses an arbitrary PID fallback.
+The unit also imposes CPU200%,4GiB,swap0,32tasks; these ceilings cannot increase model authority.
+
+`ProtectSystem=strict` plus explicit cgroup read-only coverage exposes only the unit's own subtree
+writable. Private devices/network and disposable tmpfs prevent host-device/network or shared-temp
+access. Persistent private StateDirectory contains invocation-bound `.json` results; `.pending`
+means incomplete, never PASS. A repeated invocation identity cannot replace old evidence. Result
+includes probe/unit hashes and UTC times; operator must additionally retain effective unit/drop-in
+identity. No model, Finance path, grant, credentials or database is supplied to this test.
+
+### Next local administrator action (only the inert preflight)
+
+Use an owner-local root terminal and the exact published review files, verified against GitHub.
+Do not execute these commands through a privileged container. From that verified checkout, first
+confirm the destination ancestors are root-owned, nonsymlink directories without group/other write,
+and that neither destination file nor any unit/drop-in already exists. STOP on an existing installation
+rather than overwriting it. `systemctl cat bigbrain-historical-maintenance.service` must report no unit.
+
+```sh
+# Owner-local root terminal only; no password/secret appears in these commands.
+set -eu
+test "$(id -u)" = 0 || exit 1
+python3 -I - <<'PY'
+import os, pathlib, stat
+for name in ('/usr/local/libexec', '/etc/systemd/system'):
+    path = pathlib.Path(name)
+    for parent in (path, *path.parents):
+        s = parent.lstat()
+        if not (stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and not s.st_mode & 0o022):
+            raise SystemExit('STOP: destination ancestor is not protected')
+for name in ('/usr/local/libexec/bigbrain-historical-preflight.py',
+             '/etc/systemd/system/bigbrain-historical-maintenance.service',
+             '/etc/systemd/system/bigbrain-historical-maintenance.service.d'):
+    if os.path.lexists(name):
+        raise SystemExit('STOP: destination already exists')
+PY
+# Stop if any check above failed. Never silently create/repair shared destination parents.
+install -o 0 -g 0 -m 0444 infrastructure/finance/historical-preflight.py \
+  /usr/local/libexec/bigbrain-historical-preflight.py
+install -o 0 -g 0 -m 0644 infrastructure/finance/bigbrain-historical-maintenance.service \
+  /etc/systemd/system/bigbrain-historical-maintenance.service
+cmp infrastructure/finance/historical-preflight.py /usr/local/libexec/bigbrain-historical-preflight.py
+cmp infrastructure/finance/bigbrain-historical-maintenance.service \
+  /etc/systemd/system/bigbrain-historical-maintenance.service
+systemd-analyze verify /etc/systemd/system/bigbrain-historical-maintenance.service
+systemctl daemon-reload
+systemctl start bigbrain-historical-maintenance.service
+systemctl show bigbrain-historical-maintenance.service \
+  -p Result -p ExecMainStatus -p InvocationID -p ControlGroup -p Delegate -p DelegateControllers
+```
+
+Run as a fail-fast local script (`set -eu`), not a paste that continues after failed checks. No `enable`,
+API/Web restart, provider call or Finance command is involved. A successful oneshot is subsequently
+inactive, not a failed daemon. In the private state directory, require a new matching invocation JSON
+with status PASS and systemd Result=success/ExecMainStatus=0; missing/pending/mismatched results fail.
+Verify no surviving unit processes or worker cgroup after exit. Retain private effective-unit/result
+evidence; publish only sanitized categories. This is the next concrete step, **not** authority to infer.
+
+### Final-context adoption after the probe passes
+
+The current unit has no production data mounts and no Finance ExecStart. It proves only its actual
+model-free context. Before enrollment, the administrator must resolve the final same-DLL placement:
+
+1. Export/copy the **existing exact accepted** hosting assemblies/runtime into a new root-protected
+   location; do not build another Finance implementation or launch an API. Verify compiled identity.
+2. Install new root-owned regular worker/runtime/model copies with no writable ancestors. Resolve only
+   previously verified in-bundle library links into regular files, preserving every SONAME filename;
+   never follow an outside target. Do not replace the old worker. Compare all checksums against the
+   private manifest, including pinned GGUF and accepted worker source identity. Check complete loader
+   closure (worker and dynamically loaded CPU backend, including libgomp) **inside the final context**.
+3. Provision a distinct persistent coordination directory1654/0700; do not reuse/clear preflight state
+   or uncertain runtime reservations. Administrator verifies authority restore exclusion and custody.
+4. Resolve existing Finance/lifecycle paths and required Sentinel Unix-socket permissions privately,
+   with no other service changes, Docker socket, new exposed secret or broad writable mount. Final
+   writable scopes must be individually reviewed; the shipped probe intentionally rejects additional
+   writable mounts. Do not call its isolated-context PASS proof of data-enabled maintenance placement.
+   If these accesses cannot preserve the existing contracts, STOP before enrollment.
+5. Retain the same delegated controller/worker topology and systemd restrictions for the accepted
+   maintenance DLL; exact final-context model-free proof remains required before any command that
+   writes authority. Bind that evidence and actual final artifact paths into the private profile.
+   No automatic command forwarding, scheduler, inferred grants or preflight-triggered execution exists.
+6. Follow the historical enrollment → exact journal seed/protection → authority-check order above.
+   For authority-check, six local enable gates false and maintenance true; API settings stay untouched.
+
+These final-context actions are **NOT RUN/BLOCKED**, not a claim that the preflight-only unit is an
+installed Finance execution environment. The existing root-custody gate prevents advancing here.
+No empty journal, fabricated timestamps or early enrollment should be used to make progress appear complete.
 
 ## Stop and rollback boundaries
 

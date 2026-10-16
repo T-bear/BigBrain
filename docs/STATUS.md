@@ -2,6 +2,14 @@
 
 ## Historical Qwen operation — 2026-10-16
 
+**G1 PASS / G2 PASS / G3a BLOCKED / G3b NOT RUN**, under
+[FIN-OPS-G3-20261016](operations/finance-historical-qwen-g3-checklist.md).
+The systemd257 maintenance preflight is implemented and model-free tests/static unit verification
+pass; it has **not** been installed or executed under the actual delegated host context. Root-protected
+artifacts, final profile, enrollment, append-only journal and `RecurringAuthorityMatched` remain
+unverified/unprovisioned. The active API is not a ready Qwen execution environment.
+[Exact check results and administrator action](reports/features/finance/historical-qwen-operation-20261016.md#g3a-release-completion--2026-10-16).
+
 **ACCEPTED / MERGED / DEPLOYED / API HEALTH VERIFIED; QWEN NOT RUN.** Owner-approved candidate
 `87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is merged unchanged as
 `70b659f772b7b7883a5716786859f1e7833a5634`. The owner authorizes one historical I1/E1/T3/C64
@@ -10,6 +18,9 @@ continuous historical inference. No real inference or grant has been issued in t
 [Actual deployment, source validation and protected-authority gate](reports/features/finance/historical-qwen-operation-20261016.md).
 Finance remains RESEARCH / 0 SEK / NONE. No new feature development is underway; the requested
 conditional freeze requires a verified independently continuing research process and is not claimed.
+
+Older dated checkpoint descriptions below retain their historical states; they do not supersede
+the accepted merge/deployment facts above. G3a adds no inference, scheduler or new authority.
 
 
 ## Finance recurring research — final release implementation, 2026-10-15
