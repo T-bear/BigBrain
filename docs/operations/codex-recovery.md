@@ -10,6 +10,13 @@ Operational review branch: `review/finance-historical-qwen-deployment`, from mer
 API deployment and unchanged source admission verified; merge CI SUCCESS. No grant, protected journal
 or model invocation has been created. Owner approval already covers one
 bounded run; do not seek the same approval again or bypass root custody with a privileged container.
+Hosting follow-up: preparation-only Compose fragment and operator runbook added. Actual Docker
+cgroup migration/delegation remains blocked; proposed nonroot systemd maintenance placement is not
+installed/tested. Old supplied worker hashes correctly but predates the historical prompt; new unchanged
+accepted-source worker and required libgomp are staged privately, loader-only checks pass. No inference,
+enrollment, protected journal, service/config/permission change. Private ignored preparation file remains
+inactive; do not apply its Compose fragment or run Qwen. Next action requires owner-local administrator
+provisioning and inert-child isolation proof, following the [runbook](runbooks/finance-historical-hosting.md).
 The report is the operational handoff. Existing design mockups and four untracked Sentinel ADR drafts
 remain untouched and excluded. No further feature implementation is authorized by this operation.
 

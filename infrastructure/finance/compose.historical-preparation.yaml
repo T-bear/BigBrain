@@ -1,0 +1,55 @@
+# PREPARATION ONLY. Not a runnable inference configuration.
+# Validate with `docker compose ... config --quiet`; do not apply to the live API.
+# Docker cgroup delegation remains an explicit stop gate: see the operator runbook.
+# All source paths must be explicitly provisioned; missing paths are never auto-created.
+services:
+  api:
+    image: ${FINANCE_HISTORICAL_API_IMAGE:?exact accepted image digest required}
+    privileged: false
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      Finance__RecurringLocalReasoner__Enabled: "false"
+      Finance__ResearchScheduler__Enabled: "false"
+      Finance__ResearchOperations__MaintenancePaused: "true"
+      Finance__RecurringLocalReasoner__Profile__OwnerDecision: ${FINANCE_HISTORICAL_OWNER_DECISION:-}
+      Finance__RecurringLocalReasoner__Profile__ArtifactAndIsolationEvidence: ${FINANCE_HISTORICAL_ISOLATION_EVIDENCE:-}
+      Finance__RecurringLocalReasoner__Profile__ApprovedAtUtc: ${FINANCE_HISTORICAL_APPROVED_AT_UTC:-}
+      Finance__RecurringLocalReasoner__Profile__ExpiresAtUtc: ${FINANCE_HISTORICAL_EXPIRES_AT_UTC:-}
+      Finance__RecurringLocalReasoner__Profile__Runtime__WorkerExecutable: /opt/bigbrain-historical/native-worker
+      Finance__RecurringLocalReasoner__Profile__Runtime__WorkerArguments__0: /opt/bigbrain-historical/runtime
+      Finance__RecurringLocalReasoner__Profile__Runtime__WorkerArguments__1: /opt/bigbrain-historical/model.gguf
+      Finance__RecurringLocalReasoner__Profile__Runtime__WorkerArguments__2: /run/bigbrain-historical-worker-cgroup
+      Finance__RecurringLocalReasoner__Profile__Runtime__CoordinationDirectory: /run/bigbrain-historical-coordination
+      Finance__RecurringLocalReasoner__Profile__Runtime__InvocationTimeout: "00:00:30"
+      Finance__RecurringLocalReasoner__Profile__Runtime__GracePeriod: "00:00:00.250"
+      Finance__RecurringLocalReasoner__Profile__Runtime__ReapTimeout: "00:00:02"
+      Finance__RecurringAuthority__JournalPath: /finance-authority/authority.jsonl
+      Finance__RecurringAuthority__EnrollmentChecksum: ${FINANCE_HISTORICAL_ENROLLMENT_CHECKSUM:-}
+      Finance__RecurringAuthority__RestoreBoundaryDecision: ${FINANCE_HISTORICAL_RESTORE_DECISION:-}
+    volumes:
+      - type: bind
+        source: ${FINANCE_HISTORICAL_BUNDLE_DIR:?root-protected verified artifact bundle required}
+        target: /opt/bigbrain-historical
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${FINANCE_HISTORICAL_MODEL_FILE:?verified pinned GGUF required}
+        target: /opt/bigbrain-historical/model.gguf
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${FINANCE_HISTORICAL_COORDINATION_DIR:?persistent UID-owned mode0700 directory required}
+        target: /run/bigbrain-historical-coordination
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${FINANCE_HISTORICAL_AUTHORITY_DIR:?independent root-owned authority directory required}
+        target: /finance-authority
+        bind:
+          create_host_path: false
+# Deliberately no cgroup:host, cgroup-parent workaround, writable cgroup mount,
+# Docker socket, entrypoint wrapper, provider switch, budget or enrollment record.
+# The worker-cgroup argument is NOT provisioned by this preparation file.

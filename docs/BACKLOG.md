@@ -6,6 +6,10 @@ Owner approved the exact historical implementation, deployment and one I1/E1/T3/
 2026-10-16. Do not request those decisions again. The concrete remaining execution prerequisite is
 host-root provisioning of the accepted protected authority/profile environment; no journal is mounted
 or configured and noninteractive sudo requires a password. No authority was issued prematurely.
+The actual Docker cgroup namespace/migration boundary also prevents a mount-only fix. A disabled
+preparation fragment and [bounded operator procedure](operations/runbooks/finance-historical-hosting.md)
+are available; nonroot delegated systemd maintenance placement needs administrator provisioning and
+inert-child proof. No new Finance implementation or general platform is proposed.
 [Operational evidence and exact containment](reports/features/finance/historical-qwen-operation-20261016.md).
 The ordinary30s inference cap remains; timeout consumes its reservation without retry/refund.
 One authorized iteration does not authorize subsequent iterations or continuous historical research.

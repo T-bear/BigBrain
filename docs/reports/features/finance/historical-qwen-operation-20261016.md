@@ -143,3 +143,88 @@ The approved merge/deployment must not be repeated merely because the research g
 Use the [single recovery handoff](../../../operations/codex-recovery.md#historical-qwen-deployment-and-execution--2026-10-16)
 and actual deployed identity. Owner-local root provisioning, not new development or a general review,
 is the next necessary action. Stop for independent architect review of this sanitized checkpoint.
+
+## Hosting preparation — 2026-10-16
+
+**REVIEW CHECKPOINT / NOT READY FOR ENROLLMENT / NO INFERENCE.** Continuation on the same
+operational branch; accepted main remains `70b659f772b7b7883a5716786859f1e7833a5634`. Resolve the
+additive commit/tree by subject `review: prepare historical Qwen hosting and document cgroup gate`.
+The independent external Finance review report was not consulted or used as implementation input.
+
+### What is implemented and what is not
+
+Added a disabled **preparation-only** Compose fragment and a bounded
+[operator runbook](../../../operations/runbooks/finance-historical-hosting.md). The fragment declares
+read-only bundle/model mounts, persistent private coordination, separate authority-directory mount,
+zero capabilities and no-new-privileges. It does **not** provision a worker cgroup, solve Docker's
+migration boundary or provide an inference-ready deployment. It was not applied to any service.
+
+A mode0600 ignored local preparation file records the existing exact image and staging locations.
+It contains no credential, grant, approval/expiry timestamp or enrollment checksum. It is not the live
+`.env`. The coordination directory, protected journal and effective model profile remain unprovisioned.
+An updated native worker was built into private staging from the exact accepted source; no production
+artifact was overwritten and no worker main/model inference was executed.
+
+### Host and artifact evidence
+
+- Deployed OCI/compiled revision remains the accepted main. API healthy; start timestamp remains
+  `2026-10-16T06:52:20.069029818Z`. No API restart/recreation or AAPL configuration change.
+- Host systemd257, Docker systemd cgroup driver, unified cgroup2 with nsdelegate. API scope Delegate=yes;
+  container namespace private, cgroup mount read-only, root0755 and cgroup.procs0644 owned by root,
+  subtree controllers empty. API UID/GID1654 cannot write the common-ancestor migration file.
+- Supplied model hash matches `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897`.
+- Supplied old worker hash matches `631deb1ccfece198309c0485ada2d5eae62ecd3b146c1efc945078e97dd2eb1b`,
+  but binary bytes lack historicalDevelopment, recurringHistory and finiteHistory prompt additions.
+  Identity match alone does not make this the accepted historical worker.
+- New unchanged-source build hash: `0e41bc5c59e300434b888a7cf3533aa19ca8a3a976021590e3f89841db0cb830`.
+  Source worker hash `cb4f39a1b96e5fbfb87ad332fa422bc65b2d0c2819159ec137e4449ebff65463`;
+  containment hash `c1cbb52e92484ee2de272ae894ec80c20fd62b025bcfcafee6cd2646e24d4c2d`.
+- Existing API image lacks libgomp.so.1. Loader-only check failed127 for that missing dependency.
+  Adding the existing OS library to the **private staged bundle** made worker and Haswell-backend
+  dependency checks both PASS/exit0. Library hash:
+  `6456b504ac347bd50c419667440b691f6966ad8aff5309d2f06c977fe2f9debe`.
+  No package installation/image rebuild, model load or artifact download. The bundle is not yet
+  administrator-protected and is not approved as an active model profile.
+- Existing authority directory and ancestor metadata are root-owned; directory root:1654 mode0750,
+  filesystem ext4. Current operator cannot list its contents and sudo requires a password. No journal
+  is configured/mounted in the API; absence of the file inside the protected directory is owner-reported.
+- Canonicalized journal-directory location is outside Finance/lifecycle/owner-drop source roots and
+  repository. The existing capture helper uses those three explicit data scopes, not the host root.
+  This does not prove exclusion from every possible administrative restore; root must attest all
+  applicable scopes before enrollment. No backup/restoration was reopened or executed.
+
+### Actual commands and checks
+
+- `git fetch origin`, exact accepted identities, tracked production-code/compose comparison: PASS.
+- `sha256sum` of the supplied GGUF/worker: both exact matches.
+- `g++ -std=c++17 -O2 -fopenmp -Wl,--no-as-needed -I data/bb132a/include
+  src/BigBrain.LocalReasoner.Worker/worker.cpp -L data/bb132a/runtime -lllama -lggml -lggml-base
+  '-Wl,-rpath,$ORIGIN/runtime' -o <private-new-worker>`: PASS. Never executes the worker.
+- Disposable exact-image loader containers: no network, read-only bundle, cap-dropALL,
+  no-new-privileges,256MiB/pids32; `ld-linux-x86-64.so.2 --list` on worker and backend: PASS after
+  the documented missing-library correction. No Finance/lifecycle/journal/model mounts or credentials.
+- Compose `config --quiet` and parsed-object assertions: PASS. Unrelated services and all existing
+  AAPL/provider environment values identical; model/scheduler disabled, no cgroup mount or host-path
+  auto-creation. Missing mandatory preparation inputs rejected. Initial assertion assumed an explicit
+  false `privileged` key; Compose normalizes it away. Corrected semantic check passed; no security
+  setting was weakened. These are render checks, not live topology or inference tests.
+- Existing local systemd257 manpage confirms DelegateSubgroup behavior; official kernel/Docker/systemd
+  documentation consulted for the precise migration constraint, linked in the runbook.
+- Documentation verifier PASS270 Markdown files/91 unique backlog IDs; whitespace/scope/staged secrets
+  checked before publication. No full application suites: product code/scientific contracts unchanged.
+
+### Required administrator action and stop
+
+A mount-only API override cannot satisfy the observed cgroup topology. No cgroup:host shortcut,
+privileged container, broad writable host cgroup mount or change to the running API was attempted.
+Minimum proposed placement: the **same accepted maintenance DLL** in one bounded, nonroot delegated
+systemd unit with controller and empty worker child groups. No new inference engine/daemon/scheduler.
+This is proposed, not installed or integration-tested: an owner-local administrator must establish the
+exact delegation/mount/resource boundary and prove inert-child migration/cleanup before enrollment.
+The runbook specifies exact limits, immutable artifact custody and enrollment → journal seed/protection
+→ read-only authority-check order, with process-local disabled gates preserving live AAPL collection.
+No inference is permitted in this task, even if those preconditions later pass.
+
+Versioned changes are the preparation fragment, runbook and existing report/recovery/backlog handoff.
+Private staged binaries/library manifest/config are excluded from Git. No production permissions,
+configuration, cgroup, journal, database, grant or service changed. Finance **RESEARCH / 0 SEK / NONE**.
