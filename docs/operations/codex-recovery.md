@@ -2,7 +2,34 @@
 
 ## Historical Qwen deployment and execution — 2026-10-16
 
-### Current handoff — UnexpectedWritableMount diagnostic
+### Current handoff — mount root-cause analysis published for review
+
+**REVIEW CHECKPOINT / DOCUMENTATION ONLY / G3a BLOCKED / STOP FOR ARCHITECT REVIEW.**
+Verified accepted main remains `70b659f772b7b7883a5716786859f1e7833a5634`,
+tree `6433c956ff87bc8434a9a8fff6c5294fe45b258d`. Continue the same branch
+`review/finance-historical-qwen-deployment`; preceding checkpoint is
+`439bbb05f36ee71e8b3846581e817f17770a7c82`, tree `19d023e1d6206719f18b70635cfa1112a17586bd`.
+Resolve this additive publication's exact SHA/tree by subject
+`docs(finance): publish G3a mount isolation root cause analysis` and Git metadata.
+
+The operator reports one diagnostic run after that checkpoint:65 mounts,16 unexpected writable
+entries, successful evidence collection only. Codex did not reproduce the run; prior attempted private
+result read was denied. Temporary diagnostic unit removal and unchanged original preflight are
+operator-reported. Earlier NOT RUN entries below describe their publication time, not the new report.
+The [canonical analysis](../reports/features/finance/historical-qwen-operation-20261016.md#g3a--unexpectedwritablemount-root-cause-analysis-and-proposed-correction)
+records proven policy behavior, systemd source evidence, unknown effective access, conditional
+`InaccessiblePaths`/`MountFlags=private` proposal, alternatives and PASS/FAIL requirements.
+
+Only the existing report, STATUS, BACKLOG and this handoff change. No code/unit/policy or production
+mutation, diagnostic/preflight/inference start, Finance DB/authority operation or AAPL change.
+Documentation/link, whitespace, four-file scope and staged-secret verification are recorded in the
+report's publication-check subsection. Existing focused test evidence is reused, not rerun.
+No implementation is underway or implicitly authorized. Next: architect reviews this publication;
+owner separately authorizes a bounded correction and any host test. Inspect existing private target
+and mount-parent evidence before selecting exact restrictions; never guess or broaden the allowlist.
+Unrelated design mockups and four Sentinel ADR drafts remain untouched and excluded.
+
+### Previous checkpoint439bbb0 — diagnostic preparation handoff
 
 **REVIEW CHECKPOINT / G3a BLOCKED / owner-local diagnostic approval required.** Main remains
 `70b659f772b7b7883a5716786859f1e7833a5634`/tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.

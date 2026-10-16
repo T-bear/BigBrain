@@ -15,6 +15,10 @@ Detta är en sanerad GitHub-version.
 
 ## Status
 
+Latest disposition: [G3a mount root-cause analysis and proposed correction](#g3a--unexpectedwritablemount-root-cause-analysis-and-proposed-correction).
+The operator reports one diagnostic capture after checkpoint439bbb0. Earlier NOT RUN statements
+retain their historical scope; no successful G3a preflight or correction is implied.
+
 **REVIEW CHECKPOINT / historical execution BLOCKED before enrollment or inference.**
 Merge accepted/published and API deployed/healthy; deployment evidence is recorded below. No new product code was changed.
 No AI-generated hypothesis, evaluation or successful model run is claimed. No inference/evaluation
@@ -400,3 +404,250 @@ boundary. Further policy correction must be supported by its actual findings. Su
 collection alone cannot clear G3a; a later corrected real preflight must pass independently. No Qwen,
 enrollment, authority change, AAPL change, provider request, deployment or merge occurred.
 Finance **RESEARCH / 0 SEK / NONE**.
+
+## G3a – UnexpectedWritableMount: Root Cause Analysis and Proposed Correction
+
+**REVIEW CHECKPOINT / ANALYSIS AND PROPOSAL ONLY / G3a BLOCKED / G3b NOT RUN.**
+This amendment publishes the completed read-only analysis, not a security-policy change or a new
+execution. It supersedes the earlier diagnostic NOT RUN/awaiting-approval status only to the extent
+of the later operator report below. Historical failures and checkpoint evidence remain intact.
+The same distinction applies to the earlier diagnostic-preparation wording in the checklist/runbook.
+
+### Baseline, authority and evidence provenance
+
+- Accepted `origin/main`: `70b659f772b7b7883a5716786859f1e7833a5634`;
+  tree `6433c956ff87bc8434a9a8fff6c5294fe45b258d`.
+- Existing branch: `review/finance-historical-qwen-deployment`. Before publication, local HEAD and
+  remote HEAD both `439bbb05f36ee71e8b3846581e817f17770a7c82`;
+  tree `19d023e1d6206719f18b70635cfa1112a17586bd`. Earlier bfa99fb/e97baa8 history is preserved.
+- `git fetch origin`, ref/tree checks and tracked working-tree inspection repeated for publication;
+  no tracked delta existed before these documentation edits. Unrelated untracked work is excluded.
+- Resolve this publication's exact SHA/tree from Git metadata for subject
+  `docs(finance): publish G3a mount isolation root cause analysis`, not a self-referential report hash.
+- Repository evidence: AGENTS/START-HERE, relevant ARCHITECTURE and Accepted ADR0039/0040,
+  [research contract](../../../architecture/finance/research-learning-contract.md),
+  [G3 gates](../../../operations/finance-historical-qwen-g3-checklist.md), hosting runbook,
+  STATUS/BACKLOG/recovery, both preflight/diagnostic scripts and units, their deployment tests,
+  and the native worker's `containment.h`. No separate external Finance review was used.
+- Read-only analysis independently confirmed local systemd version `257.13-1~deb13u1` and code
+  behavior. Attempted reading of the existing private diagnostic result returned PermissionDenied;
+  there was no privilege escalation. This publication does not repeat that inspection.
+- Primary Linux/systemd sources below were consulted in the preceding analysis on2026-10-16.
+  Upstream source semantics are not proof of this host's exact mount targets or Debian patch behavior.
+
+### Operator-reported diagnostic outcome — not independently reproduced
+
+After the previously published diagnostic-preparation checkpoint, the operator reports **exactly one**
+approved separate diagnostic run on Debian13/systemd257.13. Systemd reported Result=success and
+ExecMainStatus=0; the result reported status=DIAGNOSTIC_ONLY, policyOutcome=UnexpectedWritableMount.
+There were65 mount entries and16 policy rejections:
+
+| Filesystem | Count | Sanitized location class |
+| --- | --- | --- |
+| nsfs | 12 | Under `/run`, all with the same direct parent |
+| tmpfs | 2 | Under `/run` |
+| binfmt_misc | 1 | Under `/proc` |
+| hugetlbfs | 1 | Under `/dev` |
+
+All16 reportedly have rw in both per-mount and superblock flags. The host's `/`, `/run`, `/proc`
+and `/dev` reportedly have shared propagation. The temporary diagnostic unit was reportedly removed;
+the original preflight remained unchanged and was not restarted by this analysis/publication.
+No private target names, namespace identifiers, raw mount records or payloads are published here.
+
+DIAGNOSTIC_ONLY/exit0 means that collection completed, not that isolation passed. The diagnostic
+compares its own namespace against the hash-pinned policy, substituting only its exact delegated
+cgroup target for comparison. It does not reproduce the original failed namespace, migrate a child,
+or establish G3a. Successful collection is not evidence of successful enrollment or authority matching.
+
+### Verified policy behavior and its limits
+
+`infrastructure/finance/historical-preflight.py:mount_policy` examines each mountinfo record's exact
+target, filesystem type and per-mount rw flag. It permits rw only for:
+
+| Filesystem | Exact permitted target |
+| --- | --- |
+| cgroup2 | The original maintenance unit's own delegated cgroup mount |
+| Any type | The fixed preflight StateDirectory mount |
+| tmpfs | `/tmp`, `/var/tmp`, `/dev`, `/dev/shm` |
+| devpts | `/dev/pts` |
+| mqueue | `/dev/mqueue` |
+| proc | `/proc` |
+
+All other rw records fail on the first match. The delegated rw cgroup mount is also mandatory.
+Records without rw bypass this predicate. Therefore all four reported categories are rejected by
+construction. This is the verified immediate failure mechanism, not proof of an exploitable host write.
+
+The parser uses the correct target and per-mount fields, with the separator after optional fields.
+It ignores superblock flags, mount-root/source, propagation relationships, effective DAC/ACL and
+whether a record is hidden by another mount. It does not decode target escapes. No evidence selects
+an escape/indexing error as this incident's cause. Since both flag sets reportedly contain rw,
+confusing superblock rw with a read-only VFS mount does not explain these16 rejections.
+[Linux mountinfo specification](https://man7.org/linux/man-pages/man5/proc_pid_mountinfo.5.html).
+
+The diagnostic preserves all rows, targets, mount/parent IDs and selected flag sets; it intentionally
+omits source/root/arbitrary options and propagation optional fields. It collects no target ownership,
+ACL or actual-access evidence. Its stacked-mount fixture proves records are retained, not that a
+lower mount is safe. The first offending original-preflight row is not established by the aggregate.
+
+### Ranked causes and per-filesystem security assessment
+
+1. **Strongest source-backed explanation: incomplete assumptions about systemd-created mounts.**
+   Systemd257.13 `mount_private_dev()` binds `/dev/hugepages` if present. Its read-only treatment of
+   private `/dev` does not automatically make all submounts read-only. If the reported hugetlbfs target
+   is that standard path, this is a concrete creation mechanism without any late propagation.
+   Exact host correspondence remains unverified.
+2. **Possible: inherited mounts or later host-to-unit propagation.** A private mount namespace does
+   not inherently reject incoming host mounts. Host shared flags support possibility, not timing or
+   causation for any particular record. Existing versus later mounts cannot be distinguished here.
+3. **Possible: hidden/overmounted records.** The policy reads every row rather than resolving actual
+   access through the top mount. Systemd's remount implementation explicitly handles accessible
+   top mounts; underlying records need not describe a reachable writable path. No such topology is
+   yet established for these16 records.
+4. **Weakly supported: parser error.** The known field handling explains rejection without one.
+
+Relevant source implementations:
+[systemd257.13 namespace.c](https://raw.githubusercontent.com/systemd/systemd/v257.13/src/core/namespace.c),
+[systemd257.13 mount-util.c](https://raw.githubusercontent.com/systemd/systemd/v257.13/src/shared/mount-util.c).
+
+| Type | Security meaning and remaining uncertainty |
+| --- | --- |
+| nsfs | Namespace handles, not ordinary writable data directories. Opening a handle does not grant permission to join its namespace. RestrictNamespaces=yes is intended to prohibit switching; setns has capability checks. Likely overclassification as file writability, but exact object, reachability and namespace ownership are unknown. A shared parent does not prove Docker origin. No blanket nsfs exemption is justified. |
+| tmpfs | Can expose shared host storage, private storage or inaccessible replacements. Type/rw alone cannot distinguish them. Exact target, overmount relationship, parent traversal and DAC/ACL are needed. Neither all tmpfs nor all of `/run` may be allowed. |
+| binfmt_misc | A binary-format control interface. Linux's register/status defaults restrict writes to the owner, but actual ownership/permissions and owning user namespace are unverified. Zero capabilities alone is not a substitute for checking access to existing control files. If beneath `/proc/sys`, explain rw against the explicit read-only protection before accepting anything. |
+| hugetlbfs | PrivateDevices may bind an existing host resource, not create a private copy. Actual DAC/ACL and reachability are unknown. Access can consume HugeTLB resources; MemoryMax=4G alone is not proof of HugeTLB accounting/limits. Prefer denying unnecessary access rather than permitting this filesystem. |
+
+[Linux namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html),
+[setns permissions](https://man7.org/linux/man-pages/man2/setns.2.html),
+[Linux binfmt_misc implementation](https://raw.githubusercontent.com/torvalds/linux/v6.12/fs/binfmt_misc.c),
+[cgroup-v2 HugeTLB accounting](https://docs.kernel.org/admin-guide/cgroup-v2.html).
+
+### Flags, propagation, masking and effective access
+
+rw/rw removes two mount-level write prohibitions; it does not establish that UID1654 can perform a
+particular write. Reachable path traversal, inode permissions/ACLs, filesystem operations, namespace
+ownership and security filters also matter. Conversely zero capabilities/NoNewPrivileges do not
+forbid normal writes already allowed by DAC. NoNewPrivileges prevents privilege gain, not all I/O.
+
+A bind mount exposes existing objects at another path; it is not a private copy. Masking covers a
+path with an inaccessible replacement. Propagation distributes mount/unmount events between
+namespaces. None can be inferred solely from rw. ProtectSystem=strict is not a promise that every
+API filesystem is read-only. ReadOnlyPaths does not automatically constrain later propagated mounts.
+PrivateMounts=yes alone does not stop host-to-unit propagation. MountFlags=private can stop that
+direction, but also stops host unmount events from reaching the unit, potentially retaining mounts
+until its processes/namespace terminate.
+[Version-specific systemd.exec contract](https://raw.githubusercontent.com/systemd/systemd/v257.13/man/systemd.exec.xml).
+
+There are two distinct policy risks: it can reject harmless/inaccessible records, yet its accepted
+names/types do not prove private backing or stable isolation. Systemd also binds `/dev/shm` and
+`/dev/mqueue` in PrivateDevices; the existing allowlist accepts them. Their privacy/access must not
+be assumed just because they are absent from the16 rejections. The runbook's blanket private/shared
+temporary-storage claim is stronger than demonstrated evidence. Native Landlock/seccomp in
+containment.h remains defense in depth, not proof of the controller's access or this diagnostic's
+security context; no native containment/model bootstrap was executed by the diagnostic.
+
+### Proposed minimum correction — NOT IMPLEMENTED OR AUTHORIZED
+
+Prefer a unit-local reduction in exposure while initially retaining the original mount predicate:
+
+1. Privately review the already collected targets and mount-parent/overmount relations, binding the
+   result to its invocation and unit/script identities. Select only individually justified unwanted
+   resources. Use `InaccessiblePaths=` for confirmed targets or a confirmed common parent, never
+   a guessed private parent or a blanket writable exception. `/dev/hugepages` and
+   `/proc/sys/fs/binfmt_misc` are standard-path candidates **only if the result confirms them**.
+   The two tmpfs targets and nsfs parent are not established in this public evidence.
+2. Proposed `MountFlags=private` in the bounded maintenance unit prevents future incoming propagation.
+   It does not remove existing mounts; step1 remains necessary. Review retained-mount and cleanup
+   consequences under the existing45s start/5s stop, KillMode=control-group and Restart=no limits.
+   Do not change global host propagation, Docker namespaces or another service.
+3. Keep mount_policy fail-closed. Masking must actually eliminate or safely restrict exposure; it is
+   not guaranteed to remove every recorded rw row. If hidden records still cause failure, do not
+   discard them by assumption. Any later narrow effective-access correction requires separate proof
+   of the inaccessible topology, inability to uncover it, and negative tests for an accessible twin.
+
+This is a conditional correction proposal, not a validated drop-in or a claim that adding two
+directives necessarily resolves all16 entries. Missing target/access evidence is a concrete remaining
+dependency, not grounds for a broader allowlist or a new architecture project.
+
+| Exact repository file | Proposed bounded responsibility |
+| --- | --- |
+| `infrastructure/finance/bigbrain-historical-maintenance.service` | Individually justified restrictions and propagation setting; preserve identity/cgroup/capability/resource controls |
+| `infrastructure/finance/bigbrain-historical-mount-diagnostic.service` | Keep equivalent isolation if reused under separate host-test approval |
+| `tests/deployment/test_historical_preflight.py` | Prove unchanged rejection boundary and required unit protections |
+| `tests/deployment/test_historical_mount_diagnostic.py` | Equivalent units, reported mount classes/stacked cases and exact cgroup substitution |
+| `infrastructure/finance/historical-preflight.py` | No acceptance-policy change proposed merely to allow more types |
+| `infrastructure/finance/historical-mount-diagnostic.py` | No change required to read existing evidence; bounded additional metadata only if a specifically missing fact requires separately approved collection |
+| `docs/operations/runbooks/finance-historical-hosting.md` | Future reviewed installation/verification procedure and corrected privacy assumptions |
+| This report, G3 checklist, STATUS/BACKLOG/recovery | Actual evidence/status only as the approved correction progresses |
+
+Alternatives are limited to: (A) recommended unit-local access restriction plus justified propagation
+containment; (B) access restriction without changing propagation, only if equivalent continuing
+isolation is positively proven; (C) narrow semantic-policy handling for individually proven inaccessible
+or non-writable objects. B retains a future-mount risk; C adds parser/access/topology complexity and
+must not become an allowlist by filesystem or prefix. No alternative is approved by this report.
+
+### Verification plan and severity
+
+Risk remains **HIGH**. No verified P0 write/escape or data loss was found. **P1 remains** for effective
+host-resource access and isolation stability on the selected execution path. Zero unexpected rows
+is necessary for the unchanged predicate but insufficient by itself to prove the whole environment.
+
+| Future check | PASS requirement | FAIL / STOP condition |
+| --- | --- | --- |
+| Focused policy fixtures | All reported classes remain rejected when exposed; exact required scopes accepted; escapes/stacked rows cannot silently bypass policy | Broad filesystem/prefix exception, hidden-row guessing or missing delegated mount accepted |
+| Unit/static tests | Exact UID/GID1654, zero-capability/NNP controls, cgroup ownership/topology, fixed limits and timeout/cleanup preserved; diagnostic has only reviewed deltas | More privilege, broader writable cgroup or changed resource authority |
+| Actual final mount context | Every previous rejection accounted for; denied resources absent/inaccessible; allowed scopes' backing/access verified, including shm/mqueue | Unknown path/overmount, unexpected writable host resource or only a host findmnt substitute |
+| Propagation | Final namespace relationships satisfy chosen containment; harmless isolated fixture proves a late mount cannot introduce an unauthorized write surface | Incoming mount creates reachable write access or necessary cleanup is lost |
+| Actual inert-child preflight | Parent remains controller; owned child enters exact worker; CPU200%,4GiB,swap0,pids32,oom.group1; kill/reap/empty checks pass | Wrong placement/limits, surviving child, cleanup failure, nonzero capabilities or lost NNP |
+| Evidence binding | Current invocation and exact installed/effective unit/script identities, bounded private results | Stale/mismatched result, unreviewed drop-in, unknown installation or result treated as inference authority |
+
+These are **NOT RUN** correction tests. Any future propagation fixture uses isolated harmless test
+resources, never real Finance paths or writes to kernel control interfaces. Actual unit installation
+and host execution need separate authorization. No write probe against binfmt_misc/hugetlbfs is proposed.
+Publication reuses the unchanged checkpoint's10 diagnostic/11 preflight PASS results and static unit
+verification only within their original scope; none proves corrected or successful host isolation.
+No full Finance/API suite is justified for this documentation-only publication.
+
+Exact outstanding evidence: existing private result invocation/hashes, target and mount-parent
+relationships including overlays; for still reachable objects, UID/GID/mode/relevant ACL and traversal
+in the service context; propagation optional fields if the propagation hypothesis must be resolved.
+The existing diagnostic did not retain the latter access/propagation facts. Host metadata after exit
+cannot recreate the vanished namespace. Request only missing decision-critical facts after reviewing
+the retained result; no curiosity-driven repeat diagnostic or original-preflight restart.
+
+### Gate disposition, next decision and publication checks
+
+**G3a BLOCKED.** After a reviewed correction, actual isolation must pass. Final artifact/loader/model
+identity, protected coordination/profile, source-bound enrollment, append-only independent journal
+and RecurringAuthorityMatched remain required in the final security context. This report does not
+perform or authorize them. Adding production data/artifacts later requires verification of that final
+context; a preflight-only environment does not automatically prove it.
+
+**G3b NOT RUN.** A separate execution phase remains necessary. The approved I1/E1/T3/C64/W33s and
+30s inference cap are unchanged. Historical50.458s evidence is a timeout risk, not authority to increase
+the cap, retry, refund or renew. No successful Qwen analysis is claimed.
+
+Recommended architect decision: review the bounded unit-isolation proposal, retain G3a/P1 STOP,
+and require existing private target evidence before approving exact restrictions. Owner approval is
+then needed for implementation and any actual host test; this documentation publication supplies neither.
+No generic investigation sprint, broad mount permission, new Finance feature or ADR is proposed.
+
+Publication changes exactly this report, `docs/STATUS.md`, `docs/BACKLOG.md` and
+`docs/operations/codex-recovery.md`. No application/test/script/unit/security-policy file changes.
+No diagnostic/preflight/Qwen start, enrollment, grant/journal/DB mutation, production/AAPL change,
+provider call, merge or deployment. Sensitive mount targets, raw reports, private configuration and
+secrets are excluded. Finance remains **RESEARCH / 0 SEK / NONE**.
+
+### Documentation publication verification
+
+| Executed check | Result and scope |
+| --- | --- |
+| `node scripts/verify-documentation.mjs` | PASS:271 Markdown files,91 unique backlog IDs, documentation/relative-link validation |
+| `git diff --check` and `git diff --cached --check` | PASS: no whitespace errors |
+| Explicit staged-name comparison against the four documents above | PASS: exact authorized documentation scope; no application, test, unit, script, configuration or policy changes |
+| Gitleaks8.28.0 `git --staged --redact --no-banner .` | PASS: no leaks found in staged changes |
+| Sanitized diff review | PASS: operator evidence labeled; proposals not presented as implemented; no private mount targets, raw result, secrets or protected authority content added |
+| Host diagnostic/preflight, model, application tests/build | NOT RUN: publication is documentation-only; previous focused evidence retains its original scope |
+
+The final publication repeats staged whitespace/secret and documentation validation after adding this
+verification record. Exact published commit/tree and remote verification are resolved from Git metadata
+and the delivery message. Main remains unchanged; no CI or host-validation result is invented.

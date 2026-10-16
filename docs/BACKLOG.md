@@ -4,11 +4,13 @@
 
 Current release gate: [FIN-OPS-G3-20261016](operations/finance-historical-qwen-g3-checklist.md).
 G1 merge/CI and G2 API deployment are complete; **G3a BLOCKED, G3b NOT RUN**. No new sprint.
-P1: actual final maintenance-context isolation and protected authority are not proven. The installed
-preflight failed; `UnexpectedWritableMount` is owner-reported and its target is unknown. Next is
-approval for the [single separate mount diagnostic](operations/runbooks/finance-historical-hosting.md#unexpectedwritablemount--one-owner-approved-diagnostic),
-not another start of the installed preflight.10 diagnostic/11 existing tests pass, but cannot prove
-host isolation. No policy relaxation or enrollment before actual evidence. No G3b here.
+P1: actual final maintenance-context isolation and protected authority are not proven. The operator
+reports the separate diagnostic ran once after checkpoint439bbb0:65 mounts/16 policy rejections.
+Exact access and propagation relationships remain unverified by Codex. Next is architect review of
+the [published analysis and conditional correction](reports/features/finance/historical-qwen-operation-20261016.md#g3a--unexpectedwritablemount-root-cause-analysis-and-proposed-correction),
+then explicit owner authorization before implementation or another host test. Proposed unit-local
+restriction is not implemented; no broader allowlist is approved. Existing10 diagnostic/11 preflight
+test results do not prove host isolation. No enrollment or G3b before the remaining gates pass.
 Existing50.458s model evidence exceeds the unchanged30s cap; it is a known execution risk, not
 permission to increase the deadline. A timeout must remain a spent/uncertain outcome without retry.
 
