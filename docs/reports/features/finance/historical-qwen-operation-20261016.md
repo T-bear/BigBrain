@@ -15,7 +15,7 @@ Detta är en sanerad GitHub-version.
 
 ## Status
 
-Latest disposition: [G3a private propagation preparation and unresolved target gate](#g3a--private-propagation-preparation-and-unresolved-target-gate).
+Latest disposition: [G3a existing diagnostic access blocked](#g3a--existing-diagnostic-access-blocked).
 The operator reports one diagnostic capture after checkpoint439bbb0. Earlier NOT RUN statements
 retain their historical scope. A partial correction is prepared in Git only; no successful host preflight is implied.
 
@@ -764,3 +764,70 @@ remain sufficient; no new report/ADR or architectural authority is introduced. P
 raw captures, secrets and protected-authority contents are excluded. This is a REVIEW CHECKPOINT,
 not a Merge Candidate. No new CI or runtime success is claimed. Remote HEAD/main identities are
 verified at publication; exact new commit/tree are reported from Git metadata.
+
+
+## G3a — existing diagnostic access blocked
+
+**2026-10-16 — DOCUMENTATION-ONLY REVIEW CHECKPOINT; G3a BLOCKED / G3b NOT RUN.**
+Fetched accepted main: `70b659f772b7b7883a5716786859f1e7833a5634`,
+tree `6433c956ff87bc8434a9a8fff6c5294fe45b258d`. Local and remote review HEAD both matched
+`351f25fe125f64322e4ebf5524f32a8ef1712e6e`, tree `40612a0f8e90f5c750f9cdc9c6915c9aa60ee69b`.
+Tracked source was clean. The existing design mockups and four unrelated Sentinel ADR drafts were
+preserved. This additive publication on `review/finance-historical-qwen-deployment` resolves by
+subject `docs(finance): record protected mount diagnostic access blocker` and Git SHA/tree metadata.
+
+### Actual evidence and stop
+
+One attempt to open the owner-designated existing protected diagnostic result with current process
+permissions, using `O_RDONLY | O_NOFOLLOW | O_NONBLOCK`, failed with **PermissionError/EACCES**.
+No bytes were read. No raw content, mount targets or private metadata were printed, copied or logged.
+No sudo, alternate identity, container access, permission change or new diagnostic was attempted.
+Inspection stopped at this boundary, as explicitly required by the owner.
+
+This verifies only that the current process cannot open that path. It does not independently verify
+the file's current existence, owner/mode, contents, completeness or which ancestor denied traversal.
+The previous65-mount/16-rejection result remains operator-reported:12nsfs,2tmpfs,1binfmt_misc,
+1hugetlbfs. No category's exact targets, parent/stack relationships, effective UID1654 access,
+origin (inherited/systemd-created/propagated), or suitability for masking was verified in this task.
+There is no new root-cause conclusion and no individually justified `InaccessiblePaths` proposal.
+
+### Minimum next decision and correction boundary
+
+Separately authorize a **local read-only review by an already privileged administrator** of the
+same captured file, in a private local terminal. Keep the file and its protection unchanged; no
+copy to a less protected location, raw terminal transcript to Codex/Git, or new diagnostic run.
+The administrator needs to verify capture status/invocation and recorded script/unit identities,
+then privately correlate all16 rejected records with their exact targets, mount/parent IDs,
+filesystem and mount/superblock flags and any stacked entries. For each candidate restriction,
+retain the exact target and justification privately; return only a sanitized assessment of whether
+it is required by this preflight, what masking would hide, and which access/origin facts remain unknown.
+A snapshot of mountinfo alone cannot prove effective access or timing of propagation; missing
+facts must remain unknown rather than inferred from rw or filesystem type.
+
+Only after that evidence supports an individually safe target restriction can an explicit correction
+be proposed for the maintenance and equivalent diagnostic units. If an exact directive contains a
+private target, its disclosure/configuration location needs review before any publication. Do not
+substitute a generic prefix or filesystem allowlist. The existing repository-only `MountFlags=private`
+preparation and unchanged fail-closed probe remain as reviewed at351f25f; nothing is installed here.
+Any implementation or host test remains separately authorized. No broad investigation or automatic
+rerun is requested. Missing target evidence and actual isolation proof remain P1 blockers, not a
+newly demonstrated P0 violation. G3a still also requires its existing artifact/authority gates;
+G3b remains NOT RUN. Finance remains **RESEARCH / 0 SEK / NONE**.
+
+### Verification scope
+
+The access check is **BLOCKED**, not PASS. Category analysis and new target-specific correction are
+**NOT PERFORMED** because no diagnostic content was readable. The previous26 focused tests and
+static unit verification retain their original scope: no implementation changed, so they are not
+rerun or presented as host proof. No preflight, diagnostic, systemd installation/start, Qwen,
+Finance/API/AAPL/grant/journal/database operation, merge or deployment occurred.
+Only this report, STATUS, BACKLOG and recovery are updated. Documentation/link, whitespace, exact
+four-file staged scope and staged Gitleaks verification are required before publication; results are
+recorded below. Existing report catalog, runbook, G3 checklist and ADRs require no change: their
+security contracts and blocked gate remain correct.
+
+Publication checks: `node scripts/verify-documentation.mjs` **PASS** (271 Markdown files,91 unique
+backlog IDs, relative-link validation); `git diff --check` and `git diff --cached --check` **PASS**;
+explicit staged-name comparison **PASS** (exactly four documents, no unstaged tracked delta);
+Gitleaks8.28.0 `git --staged --redact --no-banner .` **PASS**, no leaks. Final staged checks are
+repeated after this evidence entry. No code tests/build or host checks are claimed for this publication.

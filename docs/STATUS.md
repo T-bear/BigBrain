@@ -13,6 +13,9 @@ remove inherited mounts. No exact target masks are justified yet, and no new hos
 No successful isolation preflight, enrollment, protected journal or `RecurringAuthorityMatched` is
 claimed. The active API is not a ready Qwen execution environment.
 [Partial correction, evidence and remaining P1](reports/features/finance/historical-qwen-operation-20261016.md#g3a--private-propagation-preparation-and-unresolved-target-gate).
+Current follow-up: opening the existing protected diagnostic with current permissions returned
+EACCES; no content was read. Target-level review stopped without privileged access or a new run.
+[Access blocker and required local review](reports/features/finance/historical-qwen-operation-20261016.md#g3a--existing-diagnostic-access-blocked).
 
 **ACCEPTED / MERGED / DEPLOYED / API HEALTH VERIFIED; QWEN NOT RUN.** Owner-approved candidate
 `87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is merged unchanged as

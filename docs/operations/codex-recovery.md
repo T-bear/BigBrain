@@ -2,7 +2,24 @@
 
 ## Historical Qwen deployment and execution — 2026-10-16
 
-### Current handoff — partial propagation correction, host gate remains blocked
+### Current handoff — existing diagnostic inaccessible, review stopped
+
+**DOCUMENTATION-ONLY REVIEW CHECKPOINT / G3a BLOCKED / G3b NOT RUN.** Verified main
+`70b659f772b7b7883a5716786859f1e7833a5634`, tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.
+Starting local/remote review HEAD`351f25fe125f64322e4ebf5524f32a8ef1712e6e`,
+tree`40612a0f8e90f5c750f9cdc9c6915c9aa60ee69b`; branch unchanged.
+Resolve this publication by `docs(finance): record protected mount diagnostic access blocker`.
+One read-only/no-follow open of the designated existing result returned PermissionError/EACCES;
+no content read, no escalation, copying, permission change or new diagnostic. Category analysis
+stopped; no further safety correction is justified. Implementation and all runtime state untouched.
+[Canonical blocker and next local review](../reports/features/finance/historical-qwen-operation-20261016.md#g3a--existing-diagnostic-access-blocked).
+Next decision: separately authorize an already privileged administrator to review the existing file
+privately and supply sanitized findings, retaining exact targets privately. No raw report to chat/Git.
+Only report/STATUS/BACKLOG/recovery change; unrelated untracked work remains untouched. Previous26
+tests/static verification are reused for unchanged code only; this attempt establishes no host PASS.
+Documentation/scope/secret results belong in the report. Stop after publication; no merge or host action.
+
+### Previous checkpoint351f25f — partial propagation correction, host gate remains blocked
 
 **REVIEW CHECKPOINT / G3a BLOCKED / G3b NOT RUN.** Accepted main
 `70b659f772b7b7883a5716786859f1e7833a5634`, tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.

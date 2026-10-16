@@ -12,6 +12,9 @@ Next is architect review of the [partial correction and target-evidence gate](re
 then separately approved host work only when exact restrictions are justified. No broader allowlist
 is approved. The26 focused tests do not prove host isolation; G3a remains blocked before enrollment
 or G3b. Reuse the existing private capture rather than automatically rerunning diagnostics.
+The current attempt to inspect that capture was denied (EACCES). The next prerequisite is a separately
+authorized private administrator review of the existing file, without changing access or collecting
+new diagnostics; [required evidence and limits](reports/features/finance/historical-qwen-operation-20261016.md#g3a--existing-diagnostic-access-blocked).
 Existing50.458s model evidence exceeds the unchanged30s cap; it is a known execution risk, not
 permission to increase the deadline. A timeout must remain a spent/uncertain outcome without retry.
 
