@@ -1,12 +1,15 @@
 # BigBrain Status
 
-## Historical Qwen integration — 2026-10-16
+## Historical Qwen operation — 2026-10-16
 
-**MERGE CANDIDATE / NOT DEPLOYED / NO REAL INFERENCE.** Historical WIKI AAPL admission and
-explicit one-shot composition reuse the existing ledger, protected journal and evaluator. Prospective
-scheduler and AAPL collection are unchanged. Exact verification/classification and remaining grant,
-profile/journal/deployment approvals are in the [checkpoint report](reports/features/finance/historical-qwen-integration-20261016.md).
-Finance remains RESEARCH / 0 SEK / NONE.
+**ACCEPTED / MERGED / DEPLOYED / API HEALTH VERIFIED; QWEN NOT RUN.** Owner-approved candidate
+`87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is merged unchanged as
+`70b659f772b7b7883a5716786859f1e7833a5634`. The owner authorizes one historical I1/E1/T3/C64
+session, not automatic renewal. The existing historical path is single-shot and does not provide
+continuous historical inference. No real inference or grant has been issued in this operation.
+[Actual deployment, source validation and protected-authority gate](reports/features/finance/historical-qwen-operation-20261016.md).
+Finance remains RESEARCH / 0 SEK / NONE. No new feature development is underway; the requested
+conditional freeze requires a verified independently continuing research process and is not claimed.
 
 
 ## Finance recurring research — final release implementation, 2026-10-15

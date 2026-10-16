@@ -2,12 +2,15 @@
 
 ## Historical Qwen operational gate
 
-Historical integration is implemented for review; no real inference/grant/journal/profile is activated.
-Remaining: separate approval of the exact historical source commitment and I1/E1/T3/C64/W33s grant,
-protected authority provisioning, approved pinned model profile and reviewed deployment. Ordinary30s
-completion is unverified; a failure consumes its reservation and does not permit retry/refund.
-[Contract and operator sequence](architecture/finance/research-learning-contract.md#historical-qwen-admission--implementation-checkpoint-2026-10-16).
-No generic follow-up sprint or second research platform is proposed.
+Owner approved the exact historical implementation, deployment and one I1/E1/T3/C64 session on
+2026-10-16. Do not request those decisions again. The concrete remaining execution prerequisite is
+host-root provisioning of the accepted protected authority/profile environment; no journal is mounted
+or configured and noninteractive sudo requires a password. No authority was issued prematurely.
+[Operational evidence and exact containment](reports/features/finance/historical-qwen-operation-20261016.md).
+The ordinary30s inference cap remains; timeout consumes its reservation without retry/refund.
+One authorized iteration does not authorize subsequent iterations or continuous historical research.
+No new sprint, strategy/provider, optimization or architecture project is started. The owner's formal
+freeze condition (verified independently continuing research) has not been met.
 
 
 ## Finance recurring research implementation and release gate

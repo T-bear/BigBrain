@@ -1,16 +1,17 @@
 # Codex interrupted-run recovery
 
-## Historical Qwen integration — 2026-10-16
+## Historical Qwen deployment and execution — 2026-10-16
 
-Active checkpoint: `finance/historical-qwen-research`, from accepted
-`be7634bd82f52b3cb536142ae3e03dd0e2656aa2`. Operational input checkpoint
-`7faba26a391c2246ede7b73b8329b66b3cd7d290` was read, not merged. Resolve publication commit/tree
-from subject `review: integrate bounded historical Qwen research` on this branch.
-[Authoritative implementation, verification and authorization handoff](../reports/features/finance/historical-qwen-integration-20261016.md).
-No production operation, grant, protected journal update or inference performed. Unrelated untracked
-design mockups and four Sentinel ADR drafts remain untouched/unpublished. No source work remains
-outside the published checkpoint; next step is independent architect review and the explicit owner
-authorization boundary documented in the report, not another inference or automatic activation.
+Operational review branch: `review/finance-historical-qwen-deployment`, from merged accepted main
+`70b659f772b7b7883a5716786859f1e7833a5634`, exact implementation tree
+`6433c956ff87bc8434a9a8fff6c5294fe45b258d`. Previous approved candidate
+`87b08d3d074beb02a4d1d41e467c4e0c28a057bf` is preserved as the merge's second parent.
+[Actual operation, checks and remaining local prerequisite](../reports/features/finance/historical-qwen-operation-20261016.md).
+API deployment and unchanged source admission verified; merge CI SUCCESS. No grant, protected journal
+or model invocation has been created. Owner approval already covers one
+bounded run; do not seek the same approval again or bypass root custody with a privileged container.
+The report is the operational handoff. Existing design mockups and four untracked Sentinel ADR drafts
+remain untouched and excluded. No further feature implementation is authorized by this operation.
 
 
 ## Finance recurring research final release — 2026-10-15
