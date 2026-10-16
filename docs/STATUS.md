@@ -1,5 +1,14 @@
 # BigBrain Status
 
+## Historical Qwen integration — 2026-10-16
+
+**MERGE CANDIDATE / NOT DEPLOYED / NO REAL INFERENCE.** Historical WIKI AAPL admission and
+explicit one-shot composition reuse the existing ledger, protected journal and evaluator. Prospective
+scheduler and AAPL collection are unchanged. Exact verification/classification and remaining grant,
+profile/journal/deployment approvals are in the [checkpoint report](reports/features/finance/historical-qwen-integration-20261016.md).
+Finance remains RESEARCH / 0 SEK / NONE.
+
+
 ## Finance recurring research — final release implementation, 2026-10-15
 
 **MERGE CANDIDATE / AUTOMATICALLY VERIFIED / NOT DEPLOYED OR ACTIVATED.**

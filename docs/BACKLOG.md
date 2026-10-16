@@ -1,5 +1,15 @@
 # BigBrain Backlog
 
+## Historical Qwen operational gate
+
+Historical integration is implemented for review; no real inference/grant/journal/profile is activated.
+Remaining: separate approval of the exact historical source commitment and I1/E1/T3/C64/W33s grant,
+protected authority provisioning, approved pinned model profile and reviewed deployment. Ordinary30s
+completion is unverified; a failure consumes its reservation and does not permit retry/refund.
+[Contract and operator sequence](architecture/finance/research-learning-contract.md#historical-qwen-admission--implementation-checkpoint-2026-10-16).
+No generic follow-up sprint or second research platform is proposed.
+
+
 ## Finance recurring research implementation and release gate
 
 **MERGE CANDIDATE; implementation verified, no operational activation.** The prior unconditional

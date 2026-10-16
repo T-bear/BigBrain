@@ -170,7 +170,7 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
     private async Task<FinanceResearchOpportunity?> CheckRecurring(DateTimeOffset now, bool recoveryReady, CancellationToken token)
     {
         var program = memory.ReadRecurringResearchProgram();
-        if (program is null) return null; // Startup/config never creates authority.
+        if (program is null || program.Authorization.Historical is not null) return null; // Historical authority is explicit one-shot only.
         var index = program.State == RecurringResearchState.Ready ? program.Attempts.Length : Math.Max(0, program.Attempts.Length - 1);
         if (index >= program.Authorization.Cohorts.Length) return null;
         var cohort = program.Authorization.Cohorts[index];
@@ -214,7 +214,7 @@ internal sealed class FinanceResearchOrchestrator(FinanceResearchSchedulerOption
         var last = memory.LatestResearchOpportunity();
         var program = options.RecurringProgramMode ? memory.ReadRecurringResearchProgram() : null;
         DateTimeOffset? next = !options.Enabled ? null : options.RecurringProgramMode
-            ? program?.State == RecurringResearchState.Ready ? program.Authorization.Cohorts.ElementAtOrDefault(program.Attempts.Length)?.DueAtUtc : null
+            ? program?.State == RecurringResearchState.Ready && program.Authorization.Historical is null ? program.Authorization.Cohorts.ElementAtOrDefault(program.Attempts.Length)?.DueAtUtc : null
             : last is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null }
                 ? last.NextEligibilityUtc : FinanceResearchSchedule.NextDue(nowUtc, options.ScheduledUtcHour);
         if (options.RecurringProgramMode && next is not null && last is { State: FinanceResearchOpportunityState.Deferred, NextEligibilityUtc: not null } && last.NextEligibilityUtc > next)

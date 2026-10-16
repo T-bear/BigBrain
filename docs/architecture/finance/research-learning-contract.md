@@ -1,5 +1,81 @@
 # BB-131A — Finance Research Learning contract
 
+
+## Historical Qwen admission — implementation checkpoint, 2026-10-16
+
+This additive path uses the existing recurring ledger, protected authority journal, local BRF1
+composition, daily feature engine and deterministic evaluator. It does **not** convert imported
+history into prospective Alpaca receipts or reuse synthetic/A/B/C authority. The reviewed operational
+stop at `7faba26a391c2246ede7b73b8329b66b3cd7d290` is input evidence, not merged implementation.
+[Checkpoint evidence and limitations](../../reports/features/finance/historical-qwen-integration-20261016.md).
+
+`RecurringResearchAuthorization.Historical` is optional and absent fields retain previous
+serialization/identities. Its version `wiki-historical-research-v1` admits only NASDAQ-WIKI AAPL,
+revision `wiki-5713d7dccfa38f56`, candidate `wiki-eod-mirror-kmfranz-v1`, the pinned WIKI artifact
+and existing Qwen3-1.7B-Q4_K_M artifact. Finance validates exactly748 complete source sessions,
+2014-01-02–2016-12-19, stored rights/promotion/raw capability, OHLCV and acquisition chronology.
+A commitment binds all748 rows, actual acquired times, candidate manifest/validation, revision
+identity and price-capability audit. It must match the explicitly approved grant at admission,
+execution and reopen. Missing or changed evidence fails closed. There is no new table/migration.
+
+The single precommitted experiment uses the **first500 sessions, 2014-01-02–2015-12-24**;
+the remaining248 rows are committed but not searched or evaluated. This retains the existing
+64-call envelope and unchanged partition/embargo, fixed momentum20 proposal and5/10/20 sensitivity
+trials. Raw-price/corporate-action/survivorship limitations are mandatory. Historical exposure is
+**Unknown**, not a claim of untouched prospective holdout. Existing overlapping native evaluation
+veto remains. No total-return, executable-profitability or future-validation claim is permitted.
+
+Retrospective features/backtests use the existing simulated end-of-source-day clock. Actual 2026
+acquisition/admission time remains distinct and bound to source provenance; it is never backdated.
+`historical-development-v1` sends only development statistics and eight recent development samples
+(raw close/momentum20) plus development-only hashes. Full source/model commitments, holdout rows,
+selected outcomes and full feature identities remain Finance-owned. The model can propose only the
+existing closed momentum hypothesis or decline. Its question/rationale are untrusted, persisted
+separately from actual native evaluation. No model weights are trained.
+
+One explicit I1/E1/T3/C64/W33s grant is the intended initial profile; it is **not issued by this
+implementation**. Existing journal append/fsync-before-SQLite, reservations, uncertain-stop, replay,
+expiry and no-refund/no-renewal rules are unchanged. No new program can replace the singleton.
+A completed result remains readable; this version grants no subsequent inference. A future authorized
+iteration must preserve exposure/history and cannot use a replacement database/program to renew quota.
+The prospective scheduler ignores historical programs, including its next-due status.
+
+### Explicit historical operator path (separate operational approval required)
+
+These are bounded maintenance commands in `BigBrain.Finance.Hosting.dll`, never public endpoints.
+Do not execute them against production merely because code is published.
+
+1. Review/merge/deploy the exact candidate separately. Preserve AAPL collection/configuration.
+2. `finance-historical-inspect` opens the existing Finance DB read-only and prints source commitments,
+   coverage, product, fixed evaluation range and limitations; no grant, migration or model invocation.
+3. Approve the finite historical grant (existing exported JSON schema plus Historical binding), its
+   exact source checksum, owner rights/limitations, due/expiry UTC, pinned model and reasoner-profile
+   identity. Prepare the profile using existing `finance-recurring-profile-identity`; no worker runs.
+4. With MaintenancePaused=true and ResearchScheduler/EODHD/FRED/local-reasoner enable gates false,
+   `finance-historical-enroll <private-grant-json> <sha256:raw-file-hash>` persists the explicit grant
+   and emits the existing journal enrollment proposal. ObservationRuntime/Alpaca may remain active.
+   Enrollment does not create the protected journal. It uses the existing Finance owner/startup schema
+   behavior; do not treat it as read-only or as approval to apply unreviewed migrations.
+5. Provision the existing protected journal under the independent root-custody/restore-exclusion
+   contract below, only with separate owner approval. No auto-provisioning or old-grant reuse.
+6. For the controlled maintenance process only, supply the approved external local profile and
+   `Finance:RecurringLocalReasoner:Enabled=true`, preserving scheduler=false and maintenance=true.
+   The trusted composition hashes the actual native worker model argument and matches the grant.
+   Use the accepted CPU2,4GiB memory,swap0,pids32 containment, one concurrent invocation,30s maximum
+   inference,250ms grace and2s reap (reserve33s). No old180s exception, cloud or download. The input
+   remains subject to native3072-token/context4096/output512 bounds. Completion in30s is unproven.
+7. `finance-historical-run` requires recovery/clock/disk, current authority and existing Sentinel
+   resource governor; runs opportunity1 exactly once; persists proposal, runtime audit, input identity,
+   budget and native result. SIGINT/SIGTERM cancel through the owned runtime. No retry or scheduler.
+   Failure/timeout/decline can consume authority without an evaluation; it is not a successful analysis.
+8. `finance-historical-result` opens read-only, reconstructs/validates source and native result
+   commitments, and prints bounded hypothesis/result identities and reference validation outcome.
+   It never reruns inference. Do not publish raw prompts/provider data/private configuration.
+
+Grant issuance, journal custody/provisioning, exact model profile activation and deployment remain
+separate owner decisions. No production grant, journal, profile, AAPL mapping or runtime is changed
+by this checkpoint. Finance remains RESEARCH / 0 SEK / NONE.
+
 ## Recurring real-data implementation checkpoint — 2026-10-14
 
 **REVIEW CHECKPOINT / model-free implementation / NOT DEPLOYED OR ACTIVATED.**

@@ -27,7 +27,20 @@ internal sealed class LocalRecurringResearchComposition : IAsyncDisposable
         if (!section.GetValue<bool>("Enabled")) return null;
         if (configuration.GetSection("Finance:RecurringAuthority").Exists())
             memory.RecurringAuthority = RecurringResearchAuthority.FromConfiguration(configuration);
-        return new(ReadProfile(configuration), memory.RecordRecurringRuntimeAudit, clock);
+        var profile = ReadProfile(configuration);
+        if (memory.ReadRecurringResearchProgram()?.Authorization.Historical is { } historical)
+        {
+            // Accepted native BRF1 argv: runtime directory, GGUF, cgroup. Never infer the artifact identity.
+            if (profile.Runtime.WorkerArguments.Length != 3) throw new InvalidOperationException("Historical model binding required.");
+            var path = profile.Runtime.WorkerArguments[1];
+            var info = new FileInfo(path);
+            if (!info.Exists || info.LinkTarget is not null || info.Length is <= 0 or > 2_147_483_648)
+                throw new InvalidOperationException("Historical model artifact rejected.");
+            using var model = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var hash = "sha256:" + Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(model));
+            if (hash != historical.ModelArtifactChecksum) throw new InvalidOperationException("Historical model identity mismatch.");
+        }
+        return new(profile, memory.RecordRecurringRuntimeAudit, clock);
     }
 
     internal static RecurringLocalProfile ReadProfile(IConfiguration configuration)

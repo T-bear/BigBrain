@@ -81,7 +81,9 @@ internal sealed partial class EodhdMarketMemory
             throw new InvalidOperationException("Competing or uncertain scientific authority.");
         // Fresh holdouts + exclusive science prevent unknown historical exposure. No retroactive
         // registration against previously retained future-source evidence is accepted.
-        foreach (var cohort in authorization.Cohorts)
+        if (authorization.Historical is not null)
+            _ = ReadHistoricalResearchSource(c, authorization, now);
+        foreach (var cohort in authorization.Historical is null ? authorization.Cohorts : [])
         {
             var rows = DailyRows(c, now, authorization.Instrument.Id.Value, authorization.Mapping.Provider.Value, authorization.Mapping.ProviderDataset.Value);
             var sessions = RecurringResearchAuthorization.Sessions(cohort);
@@ -197,6 +199,7 @@ internal sealed partial class EodhdMarketMemory
     }
     private static RecurringResearchScope ProjectRecurring(SqliteConnection c, RecurringResearchProgram state, int number, DateTimeOffset cutoff)
     {
+        if (state.Authorization.Historical is not null) return ProjectHistoricalResearch(c, state, number, cutoff);
         var grant = state.Authorization; var cohort = grant.Cohorts[number - 1];
         var rows = LatestDailyAtCutoff(DailyRows(c, cutoff, grant.Instrument.Id.Value, grant.Mapping.Provider.Value, grant.Mapping.ProviderDataset.Value)
             .Where(x => x.Value.Daily!.SourceDate >= cohort.From && x.Value.Daily.SourceDate <= cohort.To).ToImmutableArray());
@@ -220,7 +223,15 @@ internal sealed partial class EodhdMarketMemory
             x.Value.Open, x.Value.Close, x.KnowledgeTimeUtc, checked((long)x.Value.Volume))).ToImmutableArray();
         var features = featureBuild.Values.Where(x => x.DefinitionId is "momentum.5" or "momentum.10" or "momentum.20")
             .Select(x => new BacktestFeatureValue(x.InstrumentId, x.SessionDate, x.DefinitionId, x.Value, x.KnowledgeTimeUtc, featureBuild.DeterministicChecksum)).ToImmutableArray();
-        var plan = DeterministicRobustnessEvaluator.CreatePlan([evidence], featureBuild.DeterministicChecksum, new MomentumResearchStrategy(),
+        return BuildResearchScope(state, number, cutoff, rows.Select(x => x.Id).ToImmutableArray(), evidence, featureBuild.DeterministicChecksum, bars, features, sessions);
+    }
+
+    private static RecurringResearchScope BuildResearchScope(RecurringResearchProgram state, int number, DateTimeOffset cutoff,
+        ImmutableArray<string> identities, string evidence, string featureChecksum, ImmutableArray<BacktestMarketBar> bars,
+        ImmutableArray<BacktestFeatureValue> features, DateOnly[] sessions)
+    {
+        var grant = state.Authorization; var cohort = grant.Cohorts[number - 1];
+        var plan = DeterministicRobustnessEvaluator.CreatePlan([evidence], featureChecksum, new MomentumResearchStrategy(),
             [grant.Instrument.Id.Value], cohort.From, cohort.To);
         var partition = DeterministicRobustnessEvaluator.CreatePartition(sessions, plan.AntiOverfitting!);
         var development = bars.Where(x => x.SessionDate <= partition.ValidationTo).ToArray();
@@ -243,11 +254,18 @@ internal sealed partial class EodhdMarketMemory
             Bars = development.Select(x => new { x.SessionDate, x.Open, x.Close, x.Volume, x.KnowledgeTimeUtc }).ToArray(),
             Features = features.Where(x => x.SessionDate <= partition.ValidationTo).Select(x => new { x.SessionDate, x.DefinitionId, x.Value, x.KnowledgeTimeUtc }).ToArray()
         });
-        var input = new LearningDevelopmentInput(LearningAdmissionPolicy.Version, "recurring-development-v1", "real-daily-momentum20-v1",
-            "real-next-session-direction", cutoff, development.Length, devHash, "momentum/v1", 20, 3, LearningIdentity.Hash(history), "")
-        { RecurringHistory = history };
+        var input = new LearningDevelopmentInput(LearningAdmissionPolicy.Version, grant.Historical is null ? "recurring-development-v1" : HistoricalResearchAdmission.Projection,
+            grant.Historical is null ? "real-daily-momentum20-v1" : HistoricalResearchAdmission.Scope,
+            grant.Historical is null ? "real-next-session-direction" : "historical-next-session-direction", cutoff, development.Length, devHash, "momentum/v1", 20, 3, LearningIdentity.Hash(history), "")
+        {
+            RecurringHistory = history,
+            HistoricalDevelopment = grant.Historical is null ? null : new(
+            development[0].SessionDate, development[^1].SessionDate, development.Length, development[0].Close, development[^1].Close,
+            development.Min(x => x.Close), development.Max(x => x.Close), development.TakeLast(8).Select(x =>
+                new HistoricalDevelopmentSample(x.SessionDate, x.Close, features.SingleOrDefault(f => f.SessionDate == x.SessionDate && f.DefinitionId == "momentum.20")?.Value)).ToImmutableArray())
+        };
         input = input with { InputChecksum = LearningIdentity.Hash(input) };
-        return new(rows.Select(x => x.Id).ToImmutableArray(), evidence, plan, bars, features, input);
+        return new(identities, evidence, plan, bars, features, input);
     }
 
     // Internal trusted composition only. The caller binds this delegate to IResearchReasoner;

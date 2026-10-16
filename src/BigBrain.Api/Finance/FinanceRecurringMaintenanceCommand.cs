@@ -6,16 +6,16 @@ namespace BigBrain.Api.Finance;
 // Explicit initial enrollment only; no resume/reset/renewal command and no HTTP endpoint.
 internal static class FinanceRecurringMaintenanceCommand
 {
-    private static readonly string[] DisabledSections = ["ResearchScheduler", "RecurringLocalReasoner", "ObservationRuntime", "AlpacaDailyObservation", "Eodhd", "Fred"];
+    internal static readonly string[] DisabledSections = ["ResearchScheduler", "RecurringLocalReasoner", "ObservationRuntime", "AlpacaDailyObservation", "Eodhd", "Fred"];
     internal static bool IsCommand(string[] args) => args.Length > 0 && args[0].StartsWith("finance-recurring-", StringComparison.Ordinal);
-    internal static int Run(string[] args, IConfiguration configuration, TimeProvider clock, TextWriter output)
+    internal static int Run(string[] args, IConfiguration configuration, TimeProvider clock, TextWriter output, bool historical = false)
     {
         try
         {
             var check = args.Length == 1 && args[0] == "finance-recurring-authority-check";
             if ((!check && (args.Length != 3 || args[0] != "finance-recurring-enroll")) ||
                 !configuration.GetValue<bool>("Finance:ResearchOperations:MaintenancePaused") ||
-                DisabledSections
+                DisabledSections.Where(name => !historical || name is not ("ObservationRuntime" or "AlpacaDailyObservation"))
                     .Any(name => configuration.GetValue<bool>("Finance:" + name + ":Enabled")))
                 throw new InvalidOperationException();
             if (check)
@@ -39,6 +39,7 @@ internal static class FinanceRecurringMaintenanceCommand
             }
             if (LearningIdentity.HashBytes(bytes) != args[2]) throw new InvalidOperationException();
             var grant = EodhdMarketMemory.ParseRecurringAuthorization(bytes);
+            if ((grant.Historical is not null) != historical) throw new InvalidOperationException();
             grant.Validate(clock.GetUtcNow());
             var finance = configuration.GetSection(EodhdFinanceOptions.Section).Get<EodhdFinanceOptions>() ?? new();
             var recovery = configuration.GetSection(SystemRecoveryOptions.SectionName).Get<SystemRecoveryOptions>() ?? new();
