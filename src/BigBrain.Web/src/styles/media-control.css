@@ -1,0 +1,8 @@
+.media-control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--bb-space-4); }
+.media-control-card { display: flex; align-items: center; justify-content: space-between; gap: var(--bb-space-3); min-width: 44px; min-height: 44px; padding: var(--bb-card-padding); color: var(--bb-color-text); text-decoration: none; border: 1px solid var(--bb-color-border); border-radius: var(--bb-radius-lg); background: var(--bb-color-surface); }
+.media-control-card span { min-width: 0; overflow-wrap: anywhere; }
+.media-control-card strong, .media-control-card small { display: block; }
+.media-control-card small { margin-top: var(--bb-space-2); color: var(--bb-color-text-muted); }
+.media-control-card:hover { border-color: var(--bb-color-primary); }
+.media-control-card:focus-visible { outline: 2px solid var(--bb-color-primary); outline-offset: 3px; box-shadow: var(--bb-focus-ring); }
+.media-control > .page-header { margin-block: var(--bb-space-5); }

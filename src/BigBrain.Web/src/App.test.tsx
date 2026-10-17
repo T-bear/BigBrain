@@ -251,12 +251,13 @@ test('opens the UX/UI Lab from Admin and supports browser history', async () => 
   await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument())
 })
 
-test('Media keeps technical integrations progressively disclosed', () => {
+test('Media exposes one control entry and defers technical integrations', () => {
   const { container } = render(<App />)
   switchView('Media')
-  const administration = container.querySelector('[data-widget-id="jellyfin-overview"] details.administration')
-  expect(administration).toBeInTheDocument()
-  expect(administration).not.toHaveAttribute('open')
+  expect(screen.getByRole('link', { name: /Öppna Mediekontroll/ })).toBeInTheDocument()
+  expect(container.querySelector('details.administration')).not.toBeInTheDocument()
+  expect(container.querySelector('[data-widget-id="downloads"]')).not.toBeInTheDocument()
+  expect(container.querySelector('[data-widget-id="media-jobs"]')).not.toBeInTheDocument()
 })
 
 test('restores the last selected dashboard and falls back from invalid storage', () => {
@@ -373,7 +374,7 @@ test('cold Finance requests no inactive global data and no system polling', asyn
   ])
 })
 
-test('cold Media starts four visible-view reads without the legacy audiobook module with technical administration deferred', () => {
+test('cold Media defers control reads and the legacy audiobook module', () => {
   window.localStorage.setItem(
     DASHBOARD_PREFERENCES_STORAGE_KEY,
     JSON.stringify({ version: 2, activeView: 'media', views: {} }),
@@ -385,8 +386,6 @@ test('cold Media starts four visible-view reads without the legacy audiobook mod
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
   expect(fetchMock.mock.calls.map(([url]) => url).sort()).toEqual([
-    '/api/v1/modules/media/downloads',
-    '/api/v1/modules/media/jobs?limit=50',
     '/api/v1/modules/media/smart-shuffle/options',
     '/api/v1/settings/theme',
   ])

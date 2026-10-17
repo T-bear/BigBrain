@@ -1,5 +1,20 @@
 # Codex interrupted-run recovery
 
+## Media Mediekontroll — 2026-10-17
+
+**MERGE CANDIDATE / NO MERGE OR DEPLOYMENT.** Branch `media/media-control` starts from
+verified main `628041b200b1ff1283e29955073db91539bac422`, tree
+`a36bb7dcd390c51be395a3de1105cbaefa5c4a29`. Resolve SHA/tree by publication subject
+`feat(media): group operational views under Mediekontroll`.
+[Scope, routes, test results and compatibility](../reports/features/media/media-control-20261017.md).
+Previous Media implementation/test correction is merged, CI passed, Web deployed; owner
+explicitly reports iPhone/PWA acceptance on 2026-10-17. Older entries below are historical.
+New Mediekontroll remains unmerged, undeployed and not physically owner-approved.
+No intended unpublished work remains after publication. Untracked mockups and four Sentinel ADR
+drafts preserved; no backend, Finance, API, data, configuration or runtime operation.
+Next: independent architect review and owner iPhone/PWA verification of this new UI; no automatic
+merge/deployment. Finance remains FROZEN and its separate freeze checkpoint is unchanged.
+
 ## Media CI heading correction — 2026-10-17
 
 **REVIEW CHECKPOINT / SAFE TO REVIEW / NO MERGE OR DEPLOYMENT.**

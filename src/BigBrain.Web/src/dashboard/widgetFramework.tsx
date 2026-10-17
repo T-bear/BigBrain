@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { isMediaLocation, mediaControlPreferences } from '../media-control/mediaNavigation'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AppIconName } from '../AppIcon'
 
 export const dashboardViewIds = ['home', 'family', 'media', 'finance', 'more', 'ai', 'admin'] as const
@@ -132,7 +133,7 @@ export function readDashboardPreferences(
     const views = Object.fromEntries(
       dashboardViewIds.map(view => {
         const available = registry.getForView(view).map(widget => widget.id)
-        const stored = parsed.views?.[view]
+        const stored = mediaControlPreferences(view, parsed.views?.[view])
         const known = (values: unknown) =>
           Array.isArray(values)
             ? values.filter((value): value is string => typeof value === 'string' && available.includes(value))
@@ -174,7 +175,7 @@ const WidgetContext = createContext<WidgetContextValue | null>(null)
 export function WidgetProvider({ children, registry }: { children: ReactNode; registry: ApplicationWidgetRegistry }) {
   const [preferences, setPreferences] = useState(() => {
     const stored = readDashboardPreferences(registry)
-    if (window.location.pathname.startsWith('/media/audiobooks')) return { ...stored, activeView: 'media' as const }
+    if (isMediaLocation()) return { ...stored, activeView: 'media' as const }
     if (window.location.pathname.startsWith('/admin/')) return { ...stored, activeView: 'admin' as const }
     return stored
   })
@@ -191,7 +192,33 @@ export function WidgetProvider({ children, registry }: { children: ReactNode; re
     })
   }
 
-  const setActiveView = (activeView: DashboardViewId) => update(current => ({ ...current, activeView }))
+  useEffect(() => {
+    const changed = () => {
+      const view = isMediaLocation()
+        ? 'media'
+        : window.location.pathname.startsWith('/admin/')
+          ? 'admin'
+          : window.history.state?.bigbrainView
+      if (validView(view)) update(current => ({ ...current, activeView: view }))
+    }
+    window.addEventListener('popstate', changed)
+    window.addEventListener('hashchange', changed)
+    window.addEventListener('bb:navigation', changed)
+    return () => {
+      window.removeEventListener('popstate', changed)
+      window.removeEventListener('hashchange', changed)
+      window.removeEventListener('bb:navigation', changed)
+    }
+  }, [])
+
+  const setActiveView = (activeView: DashboardViewId) => {
+    if (activeView === 'media' || isMediaLocation()) {
+      window.history.replaceState({ ...window.history.state, bigbrainView: preferences.activeView }, '')
+      window.history.pushState({ bigbrainView: activeView }, '', activeView === 'media' ? '/media' : '/')
+      window.dispatchEvent(new Event('bb:navigation'))
+    }
+    update(current => ({ ...current, activeView }))
+  }
   const updateView = (view: DashboardViewId, mutate: (current: WidgetPreferences) => WidgetPreferences) =>
     update(current => ({
       ...current,

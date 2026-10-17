@@ -6,6 +6,8 @@ import { FamilyExperience } from '../family/FamilyExperience'
 import { AppIcon } from '../AppIcon'
 import { BBButton, BBEmptyState } from '../components'
 import { MediaSearch } from '../media-search/MediaSearch'
+import { MediaControl } from '../media-control/MediaControl'
+import { mediaControlPage } from '../media-control/mediaNavigation'
 import { UXLab } from '../ux-lab/UXLab'
 
 function WidgetLibrary({ onClose, view }: { onClose: () => void; view: DashboardViewId }) {
@@ -178,7 +180,7 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
   const [editMode, setEditMode] = useState(false)
   const [libraryOpen, setLibraryOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [pathname, setPathname] = useState(() => window.location.pathname)
+  const [pathname, setPathname] = useState(() => window.location.pathname + window.location.hash)
   const settingsButtonRef = useRef<HTMLButtonElement>(null)
   const settingsRef = useRef<HTMLDivElement>(null)
   const dashboard = dashboards.get(activeView)
@@ -192,10 +194,12 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
   ].filter(widget => !viewPreferences.hidden.includes(widget.id))
 
   useEffect(() => {
-    const changed = () => setPathname(window.location.pathname)
+    const changed = () => setPathname(window.location.pathname + window.location.hash)
+    window.addEventListener('hashchange', changed)
     window.addEventListener('popstate', changed)
     window.addEventListener('bb:navigation', changed)
     return () => {
+      window.removeEventListener('hashchange', changed)
       window.removeEventListener('popstate', changed)
       window.removeEventListener('bb:navigation', changed)
     }
@@ -223,6 +227,13 @@ export function DashboardWorkspace({ dashboards }: { dashboards: DashboardRegist
     }
   }, [settingsOpen])
 
+  const controlPage = mediaControlPage()
+  if (activeView === 'media' && controlPage)
+    return (
+      <main className="main bb-page dashboard-workspace dashboard-workspace--media" id="media">
+        <MediaControl page={controlPage} />
+      </main>
+    )
   if (activeView === 'media' && pathname.startsWith('/media/audiobooks')) {
     return (
       <main className="main bb-page dashboard-workspace dashboard-workspace--media audiobook-route-shell" id="media">

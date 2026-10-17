@@ -1,11 +1,16 @@
 # BigBrain Status
 
-## Media integrated audiobook search — 2026-10-17
+## Media — Mediekontroll review, 2026-10-17
 
-**REVIEW CHECKPOINT / IMPLEMENTED / NOT DEPLOYED / OWNER UX REVIEW PENDING.**
-Mediesökning integrates Film/Serie/Ljudbok and reuses existing Audiobookshelf discovery/catalog APIs.
-Separate audiobook UI is hidden while code/data/progress are retained. Catalog sample limits are explicit.
-[Verification and remaining review](reports/features/media/integrated-audiobook-search-20261017.md).
+**IMPLEMENTED / MERGE CANDIDATE / NOT DEPLOYED.** One Media entry leads to an overview
+and separate download, flow and technical-integration pages. Only the selected function mounts.
+[Navigation, compatibility and verification](reports/features/media/media-control-20261017.md).
+
+Previous integrated Film/Serie/Ljudbok release is **MERGED / CI PASS / WEB DEPLOYED** at
+`628041b200b1ff1283e29955073db91539bac422`. The owner explicitly confirms iPhone/PWA
+acceptance on 2026-10-17; this is manual owner evidence, separate from automated checks and
+[deployment evidence](https://github.com/T-bear/BigBrain/blob/9c7483caa2d48067db848b9bf82c8b72a1c83cb4/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
+That acceptance does not approve the new Mediekontroll UI. Existing catalog bounds remain.
 
 
 ## Historical Qwen integration — 2026-10-16

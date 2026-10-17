@@ -1,6 +1,8 @@
 # Project Report Catalog
 
-- `Media integrated audiobook search, 2026-10-17` — [Implementation and navigation review](features/media/integrated-audiobook-search-20261017.md). Existing APIs, explicit catalog bounds, preserved native code/data; no deployment.
+- `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
+
+- `Media integrated audiobook search, 2026-10-17` — [Implementation and navigation review](features/media/integrated-audiobook-search-20261017.md). Existing APIs, explicit catalog bounds, preserved native code/data; accepted and deployed, owner iPhone/PWA approval recorded.
 
 
 - `Historical Qwen integration, 2026-10-16` — [Implementation and authorization boundary](features/finance/historical-qwen-integration-20261016.md). Bounded historical WIKI admission, existing ledger/journal/runtime/native evaluator; model-free verification only, no operational grant or inference.
