@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- **Finance FROZEN från2026-10-16:** [primär ingång, ägarbeslut, bevarad evidens och återupptagningsprotokoll](../operations/finance-freeze-20261016.md). Inget Finance-arbete återupptas automatiskt.
+
 - [Historical Qwen deployment and execution — 2026-10-16](features/finance/historical-qwen-operation-20261016.md) — accepted G1/G2 evidence; G3a systemd preflight preparation and administrator blocker under [FIN-OPS-G3-20261016](../operations/finance-historical-qwen-g3-checklist.md). G3b not run.
 - `Historical Qwen integration, 2026-10-16` — [Implementation and authorization boundary](features/finance/historical-qwen-integration-20261016.md). Bounded historical WIKI admission, existing ledger/journal/runtime/native evaluator; model-free verification only, no operational grant or inference.
 

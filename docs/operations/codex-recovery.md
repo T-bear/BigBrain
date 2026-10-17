@@ -1,8 +1,12 @@
 # Codex interrupted-run recovery
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Finance är avsiktligt stoppat arbete, inte en avbruten körning som ska återupptas automatiskt. Den aktuella frysningsöverlämningen ersätter alla äldre Finance-instruktioner om nästa åtgärd; tidigare evidens nedan bevaras.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](finance-freeze-20261016.md).
+
 ## Historical Qwen deployment and execution — 2026-10-16
 
-### Current handoff — existing diagnostic inaccessible, review stopped
+### Previous checkpoint545713d — existing diagnostic inaccessible, review stopped
 
 **DOCUMENTATION-ONLY REVIEW CHECKPOINT / G3a BLOCKED / G3b NOT RUN.** Verified main
 `70b659f772b7b7883a5716786859f1e7833a5634`, tree`6433c956ff87bc8434a9a8fff6c5294fe45b258d`.

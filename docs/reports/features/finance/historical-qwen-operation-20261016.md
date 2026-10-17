@@ -1,5 +1,9 @@
 # Historical Qwen deployment and execution — 2026-10-16
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Alla tidigare nästa-steg-förslag i rapporten är vilande genom ägarbeslut2026-10-16. Bevarad teknisk status: G1/G2 PASS, G3a BLOCKED, G3b NOT RUN. Ny ägarrapporterad relationsgranskning och riskacceptans finns i frysdokumentet, inte som teknisk PASS.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](../../../operations/finance-freeze-20261016.md).
+
 Detta är en sanerad GitHub-version.
 
 ## Metadata

@@ -1,5 +1,7 @@
 # Start here — BigBrain continuity
 
+- **Finance FROZEN från2026-10-16:** [primär ingång, ägarbeslut, bevarad evidens och återupptagningsprotokoll](operations/finance-freeze-20261016.md). Inget Finance-arbete återupptas automatiskt.
+
 BigBrain is a modular home-server control plane, with first-party React/TypeScript
 views, an ASP.NET Core API, external-service adapters and a separate Sentinel
 boundary. The owner decides product priority and UX/behavior acceptance; ChatGPT

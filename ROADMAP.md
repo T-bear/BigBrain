@@ -1,5 +1,9 @@
 # BigBrain Roadmap
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Finance-delen av roadmapen är vilande på obestämd tid från2026-10-16. Äldre milstolpar och framtidsplaner bevaras som historik, inte aktivitetsauktorisation. Övriga moduler påverkas inte.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](docs/operations/finance-freeze-20261016.md).
+
 ## BB-132D current bounded direction — 2026-10-02
 
 The next substrate after accepted A/B/C is trustworthy market observation and knowledge-cutoff

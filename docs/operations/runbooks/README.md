@@ -1,5 +1,7 @@
 # Runbooks
 
+- **Finance FROZEN från2026-10-16:** [primär ingång, ägarbeslut, bevarad evidens och återupptagningsprotokoll](../finance-freeze-20261016.md). Inget Finance-arbete återupptas automatiskt.
+
 - [BigBrain appliance lifecycle](bigbrain-appliance-lifecycle.md)
 
 - [Dashboard and Widget Framework verification](dashboard-widget-framework-verification.md)

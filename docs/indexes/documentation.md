@@ -1,5 +1,7 @@
 # Documentation Index
 
+- **Finance FROZEN från2026-10-16:** [primär ingång, ägarbeslut, bevarad evidens och återupptagningsprotokoll](../operations/finance-freeze-20261016.md). Inget Finance-arbete återupptas automatiskt.
+
 - [Finance dataset intake and quarantine](../architecture/finance/dataset-intake-quarantine.md)
 - [Finance owner market-data drop runbook](../operations/runbooks/finance-owner-market-data-drop.md)
 

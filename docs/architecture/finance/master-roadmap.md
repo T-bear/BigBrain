@@ -1,5 +1,9 @@
 # BigBrain Finance – master roadmap
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Hela Finance-planeringen är fryst från2026-10-16. Ingen nästa sprint eller automatisk återupptagning följer av nedanstående historiska milstolpar.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](../../operations/finance-freeze-20261016.md).
+
 ## BB-132D observation substrate — 2026-10-02
 
 Current bounded checkpoint implements provider-independent immutable receipts and deterministic

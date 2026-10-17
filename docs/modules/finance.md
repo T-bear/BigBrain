@@ -1,5 +1,9 @@
 # Finance module
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Primär ingång under frysningen och inför återupptagning är frysdokumentet. Implementerade kontrakt och daterade leveranser nedan kvarstår; de auktoriserar inte nytt arbete.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](../operations/finance-freeze-20261016.md).
+
 ## BB-132E prospective daily shadow — review implementation, 2026-10-03
 
 Explicit internal daily acquisition → trusted immutable receipt → frozen persisted research identity

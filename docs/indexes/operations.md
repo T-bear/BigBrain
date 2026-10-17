@@ -1,5 +1,7 @@
 # Operations Index
 
+- **Finance FROZEN från2026-10-16:** [primär ingång, ägarbeslut, bevarad evidens och återupptagningsprotokoll](../operations/finance-freeze-20261016.md). Inget Finance-arbete återupptas automatiskt.
+
 - [BigBrain appliance lifecycle](../operations/runbooks/bigbrain-appliance-lifecycle.md)
 
 - [Operations overview](../operations/README.md)

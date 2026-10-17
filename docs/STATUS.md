@@ -1,5 +1,9 @@
 # BigBrain Status
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Finance är fryst genom uttryckligt ägarbeslut från2026-10-16, på obestämd tid. Tidigare villkor om att självständig forskning först måste vara igång är ersatt. Drift ändras inte av beslutet.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](operations/finance-freeze-20261016.md).
+
 ## Historical Qwen operation — 2026-10-16
 
 **G1 PASS / G2 PASS / G3a BLOCKED / G3b NOT RUN**, under

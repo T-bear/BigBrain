@@ -1,5 +1,9 @@
 # Finance target architecture and capability boundary
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Ingen Finance-implementation eller arkitekturförändring får fortsätta utan nytt ägarbeslut. Nedanstående accepterade gränser och framtidsbild bevaras.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](../../operations/finance-freeze-20261016.md).
+
 Current deployed state is recorded in the [Finance module baseline](../../modules/finance.md)
 and [Finance master roadmap](master-roadmap.md): `RESEARCH / 0 SEK / NONE`, with real EOD
 memory and the bounded deterministic/autonomous-research chain implemented. The M1/M2 sections

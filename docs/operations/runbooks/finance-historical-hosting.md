@@ -1,5 +1,9 @@
 # Historical Finance hosting — preparation and administrator gate
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Runbooken är vilande. Utför inga installations-, diagnostik-, enrollment-, authority- eller inferenssteg utan nytt uttryckligt ägarbeslut. Den äldre nästa-åtgärd-texten nedan är historik.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](../finance-freeze-20261016.md).
+
 ## Status and scope
 
 **2026-10-16: installed preflight failed; NOT READY FOR ENROLLMENT OR INFERENCE.**

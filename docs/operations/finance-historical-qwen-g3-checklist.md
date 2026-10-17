@@ -1,5 +1,9 @@
 # FIN-OPS-G3-20261016 — Historical Qwen release gates
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Administrativ status: FROZEN. Tekniskt kvarstår G1 PASS / G2 PASS / G3a BLOCKED / G3b NOT RUN. Ingen fortsatt G3a-granskning eller körning är auktoriserad av checklistan.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](finance-freeze-20261016.md).
+
 This is the owner-approved gate definition for this release only. It does not change AGENTS.md,
 ADR authority, the [research contract](../architecture/finance/research-learning-contract.md),
 or grant additional inference/deployment authority. Current evidence belongs in the

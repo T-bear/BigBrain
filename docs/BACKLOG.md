@@ -1,5 +1,9 @@
 # BigBrain Backlog
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Alla Finance-poster och tidigare nästa-steg-instruktioner är vilande. Inget arbete, felsökning, testexperiment eller merge av Finance-kod utan nytt uttryckligt ägarbeslut. Andra modulers backlog påverkas inte.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](operations/finance-freeze-20261016.md).
+
 ## Historical Qwen operational gate
 
 Current release gate: [FIN-OPS-G3-20261016](operations/finance-historical-qwen-g3-checklist.md).

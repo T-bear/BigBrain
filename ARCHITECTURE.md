@@ -1,5 +1,9 @@
 # BigBrain – architecture baseline and future direction
 
+> **FINANCE: FROZEN — OWNER DECISION REQUIRED TO RESUME.**
+> Finance är administrativt fryst från2026-10-16. Detta ändrar inga arkitektur- eller säkerhetskontrakt och inga andra moduler; daterade implementationstillstånd nedan ska läsas mot frysningsinventeringen.
+> [Kanoniskt frysdokument och återupptagningsprotokoll](docs/operations/finance-freeze-20261016.md).
+
 ## BB-132F observation runtime — review implementation, 2026-10-03
 
 A disabled-by-default Finance hosted service composes existing recovery, Alpaca daily transport and
