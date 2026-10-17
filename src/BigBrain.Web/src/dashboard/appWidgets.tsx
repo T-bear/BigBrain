@@ -23,7 +23,6 @@ import { AppIcon } from '../AppIcon'
 import { useWidgets } from './widgetFramework'
 import { ThemeControl } from '../ThemeControl'
 import { AudiobookSettings } from '../audiobooks/AudiobookSettings'
-import { Audiobooks } from '../audiobooks/Audiobooks'
 import { HomeOverview } from './HomeOverview'
 
 export interface AppWidgetData {
@@ -337,7 +336,7 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
     {
       id: 'media-search',
       title: 'Mediesökning',
-      description: 'Hitta filmer och serier.',
+      description: 'Hitta filmer, serier och ljudböcker.',
       icon: '⌕',
       category: 'Media',
       defaultView: 'media',
@@ -346,19 +345,6 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       supportedViews: ['media'],
       permissions: [],
       render: () => <MediaSearch />,
-    },
-    {
-      id: 'audiobooks',
-      title: 'Ljudböcker',
-      description: 'Bibliotek, lyssningsprogress och sökning.',
-      icon: '◉',
-      category: 'Media',
-      defaultView: 'media',
-      defaultSize: 'full',
-      minimumSize: 'medium',
-      supportedViews: ['media'],
-      permissions: [],
-      render: () => <Audiobooks />,
     },
     {
       id: 'downloads',

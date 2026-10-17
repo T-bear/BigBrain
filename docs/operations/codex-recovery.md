@@ -1,5 +1,17 @@
 # Codex interrupted-run recovery
 
+## Media integrated audiobook search — 2026-10-17
+
+**REVIEW CHECKPOINT / SAFE TO REVIEW / NO DEPLOYMENT.**
+Branch `media/integrated-audiobook-search` starts from accepted main
+`70b659f772b7b7883a5716786859f1e7833a5634`, tree `6433c956ff87bc8434a9a8fff6c5294fe45b258d`.
+Resolve publication SHA/tree by subject `feat(media): integrate audiobook search and hide legacy navigation`.
+[Canonical scope, actual verification and limitations](../reports/features/media/integrated-audiobook-search-20261017.md).
+Unrelated untracked design mockups and four Sentinel ADR drafts remain untouched and excluded.
+The separate Finance freeze checkpoint is preserved; no Finance work or runtime operation is authorized.
+Next step: independent architect review, then any separately authorized merge/deployment/physical UX review.
+
+
 ## Historical Qwen integration — 2026-10-16
 
 Active checkpoint: `finance/historical-qwen-research`, from accepted

@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from 'react'
+import { MediaTypeSelector, type MediaTypeSelection } from '../media-search/MediaTypeSelector'
+import { AudiobookLibraryResults } from '../media-search/AudiobookSearch'
 import { AppIcon } from '../AppIcon'
 import { SleepTimerControl, type SleepTimerValue } from '../audiobooks/SleepTimerControl'
 import {
@@ -61,6 +63,7 @@ function Section({ children, id, title }: { children: ReactNode; id: string; tit
 }
 
 export function UXLab() {
+  const [mediaType, setMediaType] = useState<MediaTypeSelection>('movie')
   const [pressed, setPressed] = useState(false)
   const [timer, setTimer] = useState<string | null>(null)
   const back = () => {
@@ -223,6 +226,35 @@ export function UXLab() {
         </Specimen>
       </Section>
       <Section id="media" title="Media">
+        <Specimen
+          name="Media / Integrated search"
+          state="Candidate"
+          description="Film som förval, samma val i båda söklägen. Fysisk iPhone/PWA-granskning återstår."
+        >
+          <MediaTypeSelector value={mediaType} onChange={setMediaType} />
+        </Specimen>
+        <Specimen name="Media / Audiobookshelf result" state="Missing playback link">
+          <AudiobookLibraryResults
+            items={[
+              {
+                id: 'lab-book',
+                title: 'Exempelboken',
+                author: 'Exempelförfattare',
+                narrator: 'Exempeluppläsare',
+                language: 'sv',
+                languageLabel: 'Svenska',
+                series: null,
+                durationSeconds: null,
+                progressPercent: null,
+                description: null,
+                coverUrl: null,
+                publishedYear: null,
+                isAbridged: null,
+                playbackUrl: null,
+              },
+            ]}
+          />
+        </Specimen>
         <Specimen name="Media / Artwork">
           <div className="ux-artwork-pair">
             <BBMediaArtwork alt="Representativt omslag" />

@@ -50,6 +50,7 @@ test('renders accessible search controls and prevents short queries', () => {
   vi.stubGlobal('fetch', fetch)
   const { container } = render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Serie' }))
 
   const input = screen.getByRole('searchbox', { name: 'Titel' })
   const button = screen.getByRole('button', { name: 'Sök' })
@@ -71,6 +72,7 @@ test('Enter starts search and shows loading state', async () => {
   vi.stubGlobal('fetch', fetch)
   render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Serie' }))
 
   fireEvent.change(screen.getByRole('searchbox', { name: 'Titel' }), { target: { value: 'Family Guy' } })
   fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Enter', code: 'Enter' })
@@ -88,6 +90,7 @@ test('groups results, empty state and partial provider failure without actions',
   )
   const { container } = render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Serie' }))
 
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Family Guy' } })
   fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
@@ -111,10 +114,34 @@ test('shows request failure', async () => {
   )
   render(<MediaSearch />)
   fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Serie' }))
 
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Family Guy' } })
   fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
 
   expect(await screen.findByRole('alert')).toHaveTextContent('Åtgärden kunde inte slutföras. Försök igen.')
   expect(screen.queryByText('raw provider error')).not.toBeInTheDocument()
+})
+
+test('Film library search excludes series and changing to Serie clears the old result', async () => {
+  const movie = { ...result.providers[0].results[0], mediaType: 'movie', title: 'Filmen' }
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve(
+        response({
+          ...result,
+          providers: [{ ...result.providers[0], results: [movie, ...result.providers[0].results] }],
+        }),
+      ),
+    ),
+  )
+  render(<MediaSearch />)
+  fireEvent.click(screen.getByRole('button', { name: 'Mina bibliotek' }))
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Film' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  expect(await screen.findByText('Filmen')).toBeInTheDocument()
+  expect(screen.queryByText(result.providers[0].results[0].title)).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Serie' }))
+  expect(screen.queryByText('Filmen')).toBeNull()
 })

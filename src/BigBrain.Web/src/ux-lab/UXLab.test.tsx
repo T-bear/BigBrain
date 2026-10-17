@@ -25,4 +25,15 @@ describe('UX/UI Lab', () => {
     expect(screen.getByText('Aktiv: 30 min')).toBeInTheDocument()
     expect(fetch).not.toHaveBeenCalled()
   })
+  it('provides experimental integrated Media search specimens without provider calls', () => {
+    const fetch = vi.spyOn(globalThis, 'fetch')
+    render(<UXLab />)
+    expect(screen.getByRole('heading', { name: 'Media / Integrated search' }).closest('section')).toHaveTextContent(
+      'EXPERIMENTELL',
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Ljudbok' }))
+    expect(screen.getByRole('button', { name: 'Ljudbok' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText(/Ingen uppspelningslänk/)).toBeInTheDocument()
+    expect(fetch).not.toHaveBeenCalled()
+  })
 })

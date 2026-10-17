@@ -1,5 +1,15 @@
 # BigBrain Backlog
 
+## Media integrated search — review gate, 2026-10-17
+
+Implemented for review: Film/Serie/Ljudbok, default Film, existing acquisition/catalog integration and
+hidden native audiobook UI. Pending: architect review and physical iPhone/PWA UX acceptance; no deployment.
+Known limitation retained: the existing catalog adapter filters one recent page (50 entries for library,
+25 in discovery); true whole-catalog search is not implemented by this checkpoint. UI discloses the bound.
+[Scope and evidence](reports/features/media/integrated-audiobook-search-20261017.md).
+BB-155/156/157 remain unchanged; this is not authorization for a new provider or optimization project.
+
+
 ## Historical Qwen operational gate
 
 Historical integration is implemented for review; no real inference/grant/journal/profile is activated.
