@@ -1,5 +1,20 @@
 # Codex interrupted-run recovery
 
+
+## Media merge/deployment — 2026-10-17
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED.** Owner-approved candidate
+`1ddfaebff19d67f68bf208c43cf6dd4c3c496b39` remains unchanged on
+`media/integrated-audiobook-search`; accepted main remains
+`70b659f772b7b7883a5716786859f1e7833a5634`. No merge or deployment performed.
+No candidate GitHub CI evidence is available; prerequisite PR creation returned GitHub403
+`Resource not accessible by integration`. No permission workaround attempted.
+[Exact evidence and manual PR link](../reports/deployments/media-integrated-search-deployment-20261017.md).
+Documentation-only handoff on `review/media-merge-deployment`; resolve SHA/tree by subject
+`docs(media): record CI permission blocker before deployment`. Unrelated untracked mockups and
+Sentinel ADR drafts remain preserved. Next: authorized GitHub user opens PR, CI passes, then resume
+exact-SHA verification and the already approved Web-only deployment. Finance freeze unchanged.
+
 ## Historical Qwen integration — 2026-10-16
 
 Active checkpoint: `finance/historical-qwen-research`, from accepted
