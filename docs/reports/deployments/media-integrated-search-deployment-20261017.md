@@ -2,6 +2,66 @@
 
 Detta är en sanerad GitHub-version. No secrets, private paths, raw provider data or credentials are published.
 
+## Mediekontroll Web-only deployment and process-discipline merge — 2026-10-17
+
+**MEDIA DEPLOYMENT COMPLETE — automated checks PASS; new physical iPhone/PWA acceptance pending.**
+This section is the latest deployment evidence; earlier dated sections remain history.
+
+Owner-approved process-discipline candidate `03d7116f85fe6fa33e96a294a2732493bbff7260`,
+tree `408dfeeabe24acdbb5701e8d0a334c2cad986695`, was verified against unchanged main
+`3375e83c871e5ce333238e4447de7e3edc143435`: exactly 18 added lines in AGENTS.md,
+zero deletions and no other changed file. Normal merge pushed as
+`133b2b19287c74368828e6904cef241248bdae5e`, with first parent the baseline and second
+parent the exact candidate; merge tree equals candidate tree. No history rewrite.
+[Merge CI](https://github.com/T-bear/BigBrain/actions/runs/39067345966): frontend,
+backend, documentation and secrets all **SUCCESS** for that exact merge SHA.
+
+The separately approved Web deploy source is Mediekontroll merge
+`3375e83c871e5ce333238e4447de7e3edc143435`, tree
+`accd5365a3e097495275aa284c4752e0dcb36fe4`.
+[Deploy-source CI](https://github.com/T-bear/BigBrain/actions/runs/39066173388):
+all four jobs **SUCCESS**, verified before deployment. Web source, Dockerfile, Compose
+and build exclusions are identical between this deploy SHA and the new documentation-only main.
+Reused unchanged candidate tests/build evidence; no local application test suite repeated.
+
+The existing Compose/Web Dockerfile built only `web` from a temporary `git archive` of
+the deploy SHA, with `--env-file /dev/null`; ignored/untracked files and local secrets were
+excluded. After successful build, existing Compose executed
+`docker compose up -d --no-deps --no-build --wait --wait-timeout 60 web`.
+Only Web was recreated. Running image:
+`sha256:48f8ba78000cd1c619a73f4d8bd55c0ecf01e2a110ddb7ac0351a6a17ecf9942`.
+Started `2026-10-17T20:37:38.694649266Z`; container **healthy**, `/` and `/health` HTTP 200.
+The existing image has no compiled/OCI Git identity; attribution uses exact archived source,
+captured build/image identity and verified served assets, not an invented revision endpoint.
+
+HTTP-served files equal running-container files byte-for-byte (SHA-256):
+
+- `index.html`: `6994ab8da9f9b4a73c55c81b895d0a261795f95bf723ff80e7476b11a1f8e0fc`.
+- `index-CuUnHOTD.js`: `57011db688b010ad930d5b53917fbcf02c0366fb86953ed629d88c655f108864`.
+- `index-C1iS_zo5.css`: `0e49b1cf19d662f0788cf61bc66d1811047e80ba659405d73eb2df4481f70d51`.
+
+Overview and all three direct routes returned the correct SPA shell. Disposable Firefox loaded
+the actual deployed overview at 390×844: three ordered cards, no horizontal overflow, minimum
+card height 94 px and visible keyboard focus. API fetches were disabled only in that disposable
+browser, so this proves deployed rendering, not live download/job/provider actions. The first
+harness invocation failed because Node 20 did not enable its WebSocket global; rerunning with
+the existing `--experimental-websocket` flag passed. No product change or installed dependency.
+Physical iPhone/PWA cache, navigation and acceptance remain pending for Mediekontroll.
+
+Build audit reported two high-severity dependency entries. Read-only package-lock audit/lineage
+identified `source-map-js@1.2.1` through PostCSS/jsdom and `undici@7.29.0` through jsdom.
+These are existing build/test dependencies; the final Nginx stage copies only static output,
+not Node or node_modules. No dependency fix was made or audit success claimed. This is retained
+toolchain maintenance evidence, not a demonstrated vulnerability in the served application.
+
+All **14 non-Web containers** retained exact IDs, image IDs, start times, status and restart
+counts. Web has no persistent mounts. No API, Finance, external-media service, database, volume,
+configuration, provider call, model invocation or user-data operation. Finance stays **FROZEN**.
+Unrelated local mockups and Sentinel drafts preserved. This single necessary runtime-evidence
+update continues `review/media-merge-deployment`; it is not merged into main. Resolve publication
+by subject `docs(media): record verified Mediekontroll Web deployment`.
+Documentation/relative-link validation, whitespace, report-only scope and staged Gitleaks PASS.
+
 ## Approved CI correction and Web-only deployment — 2026-10-17
 
 **MEDIA DEPLOYMENT COMPLETE — automated deployment checks passed; physical iPhone/PWA review pending.**
