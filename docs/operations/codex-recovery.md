@@ -3,17 +3,22 @@
 
 ## Media merge/deployment — 2026-10-17
 
-**INTERRUPTED — MANUAL REVIEW REQUIRED.** Owner-approved candidate
-`1ddfaebff19d67f68bf208c43cf6dd4c3c496b39` remains unchanged on
-`media/integrated-audiobook-search`; accepted main remains
-`70b659f772b7b7883a5716786859f1e7833a5634`. No merge or deployment performed.
-No candidate GitHub CI evidence is available; prerequisite PR creation returned GitHub403
-`Resource not accessible by integration`. No permission workaround attempted.
-[Exact evidence and manual PR link](../reports/deployments/media-integrated-search-deployment-20261017.md).
-Documentation-only handoff on `review/media-merge-deployment`; resolve SHA/tree by subject
-`docs(media): record CI permission blocker before deployment`. Unrelated untracked mockups and
-Sentinel ADR drafts remain preserved. Next: authorized GitHub user opens PR, CI passes, then resume
-exact-SHA verification and the already approved Web-only deployment. Finance freeze unchanged.
+**INTERRUPTED — MANUAL REVIEW REQUIRED.** Exact approved candidate
+`1ddfaebff19d67f68bf208c43cf6dd4c3c496b39` was normally merged and pushed to main as
+`08e1bcea6ae190026d4d60a543067c06b71351b1`, tree
+`ad178e419746b9f3d3b3976af429366a3d814bac` (exact candidate tree).
+Parents: prior main `70b659f772b7b7883a5716786859f1e7833a5634`, then candidate.
+Owner authorized direct Git push; the previous PR403 blocker is superseded.
+CI run 256 failed frontend: 214 tests passed, one stale heading assertion failed in
+`MediaDashboard.test.tsx:189`. Backend/documentation/secrets passed. No image build or deployment.
+[Exact CI evidence, service checks and next decision](../reports/deployments/media-integrated-search-deployment-20261017.md#current-outcome--merge-completed-deployment-blocked-by-ci).
+Documentation-only publication remains on `review/media-merge-deployment`; resolve SHA/tree
+from subject `docs(media): record merged candidate and CI deployment stop`. Do not merge this
+branch as implementation. Main retains the approved merge; no rollback or correction attempted.
+Unrelated untracked mockups and Sentinel ADR drafts remain untouched. No intended code delta.
+Next: explicit authorization for the bounded failing-test correction and exact review/CI;
+then resume Web-only deployment only with green CI. No API/Finance/other service changes.
+Finance freeze remains unchanged. Physical iPhone and new deployed UI checks are not run.
 
 ## Historical Qwen integration — 2026-10-16
 

@@ -2,6 +2,62 @@
 
 Detta är en sanerad GitHub-version. No secrets, private paths, raw provider data or credentials are published.
 
+## Current outcome — merge completed, deployment blocked by CI
+
+**MERGED / NOT DEPLOYED — CI FAILED.** This section supersedes the earlier PR-permission
+blocker below. The owner explicitly authorized direct normal Git merge/push and CI on main;
+no PR or permission change was required.
+
+- Verified baseline: `70b659f772b7b7883a5716786859f1e7833a5634`.
+- Verified candidate: `1ddfaebff19d67f68bf208c43cf6dd4c3c496b39`, one ahead/zero behind;
+  exact reviewed 23-file scope, tracked source clean.
+- Merge and verified remote main: `08e1bcea6ae190026d4d60a543067c06b71351b1`.
+- First parent: `70b659f772b7b7883a5716786859f1e7833a5634`.
+- Second parent: `1ddfaebff19d67f68bf208c43cf6dd4c3c496b39`.
+- Merge tree = approved candidate tree: `ad178e419746b9f3d3b3976af429366a3d814bac`.
+- No squash, reset, rebase, force push, candidate amendment or implementation correction.
+
+[Exact merge CI run 256](https://github.com/T-bear/BigBrain/actions/runs/39023635027)
+started from the push to main. Frontend **FAIL**: `npm test -- --run` reports
+214 passed, 1 failed (26 test files passed, 1 failed). The failure is
+`src/BigBrain.Web/src/MediaDashboard.test.tsx:189`, test
+`keeps technical modules in Administration, closed by default and reachable on request`.
+It still requests heading `Hitta film och serier`; the approved UI renders
+`Hitta film, serier och ljudböcker`. This is a concrete stale assertion identified in CI,
+not a corrected or waived check. Frontend build after that step did not run.
+Backend, documentation and secrets jobs **PASS**. All four jobs completed; the workflow
+is failed because frontend failed. No automatic rerun.
+
+The task expressly requires stopping before deployment on any CI failure. Accordingly:
+**no image was built, no Web deployment/restart occurred, and no other service was changed**.
+Prior Web image remains
+`sha256:1c10a3caf19eddaa8849eec6f5eee527073fc8a2c9ec66ba9054ff74dfa2ddcd`.
+Read-only predeployment checks returned HTTP 200 for Web-proxied `/health`, audiobook overview
+and a one-item catalog page. Compose showed API/Web and configured healthchecked companion
+services healthy; Audiobookshelf running. These checks establish reachability, not full
+catalog/progress integrity or the new UI's deployed behavior. No playback, acquisition or
+user-data write was performed. Live Film/Serie search, new UI, postdeployment checks and
+physical iPhone/PWA verification remain **NOT RUN**.
+
+Existing 104 focused candidate tests and local build/layout evidence were reused without
+rerunning unchanged code. The full CI suite exposed an assertion outside that focused set.
+Finance remains FROZEN; no Finance code, runtime, provider, database or model operation.
+Unrelated untracked mockups and Sentinel ADR drafts are preserved.
+
+This additive documentation checkpoint stays on `review/media-merge-deployment` and is
+**not** a replacement implementation or a branch to merge to main. Resolve its SHA/tree
+from subject `docs(media): record merged candidate and CI deployment stop`.
+Next decision: authorize the bounded stale-test correction and review its exact commit;
+then require successful CI before resuming the already authorized Web-only deployment.
+No correction or deployment is included here.
+
+Documentation publication verification: `node scripts/verify-documentation.mjs` PASS
+(269 Markdown files, 91 unique backlog IDs, relative links); `git diff --check` PASS;
+staged scope limited to this report and the Media recovery section; staged Gitleaks PASS.
+No application tests repeated for this documentation-only checkpoint.
+
+## Earlier attempt — historical evidence, superseded above
+
 ## Metadata
 
 - Scope: owner-approved exact Media merge and Web-only deployment; stopped at CI prerequisite.
