@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## Media CI heading correction — 2026-10-17
+
+**REVIEW CHECKPOINT / SAFE TO REVIEW / NO MERGE OR DEPLOYMENT.**
+Branch `media/fix-dashboard-heading-test`, exact main baseline
+`08e1bcea6ae190026d4d60a543067c06b71351b1`, tree `ad178e419746b9f3d3b3976af429366a3d814bac`.
+Publication subject `test(media): align dashboard heading with approved search UI` resolves SHA/tree.
+The approved Media implementation is merged; deployment stopped on CI's stale heading assertion.
+This checkpoint changes only that test expectation and its report/handoff. No product code change.
+[Reproduction, correction and verification](../reports/features/media/integrated-audiobook-search-20261017.md#media-ci-heading-correction--2026-10-17).
+No intended unpublished implementation remains after publication. Unrelated untracked mockups and
+four Sentinel ADR drafts remain preserved. Finance is FROZEN; no runtime operation performed.
+Next: independent architect review, then separate exact-SHA merge approval and successful CI before
+any Web-only deployment. Earlier implementation status below is historical.
+
 ## Media integrated audiobook search — 2026-10-17
 
 **REVIEW CHECKPOINT / SAFE TO REVIEW / NO DEPLOYMENT.**
