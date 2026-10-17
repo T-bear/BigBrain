@@ -1,3 +1,4 @@
+import { audiobookStatusLabel as statusLabel } from './audiobookStatusLabel'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   getAudiobook,
@@ -41,25 +42,6 @@ function readRoute(): Route {
 }
 function notifyRoute() {
   window.dispatchEvent(new Event('bb:navigation'))
-}
-function statusLabel(status: string) {
-  return (
-    (
-      {
-        requested: 'Begärd',
-        searching: 'Söker',
-        candidateFound: 'Träff hittad',
-        awaitingSelection: 'Väntar på val',
-        queued: 'Köad',
-        downloading: 'Hämtas',
-        importing: 'Importeras',
-        indexing: 'Indexeras',
-        completed: 'Klar',
-        failed: 'Misslyckades',
-        cancelled: 'Avbruten',
-      } as Record<string, string>
-    )[status] ?? 'Okänt tillstånd'
-  )
 }
 function knownLanguage(item: Pick<AudiobookItem, 'language' | 'languageLabel'>) {
   return item.language !== 'und' && item.languageLabel !== 'Språk okänt' ? item.languageLabel : null

@@ -1,14 +1,16 @@
 import type { FormEvent, KeyboardEvent } from 'react'
-import { BBButton } from '../components'
+import { BBButton, BBInput } from '../components'
 
 export function MediaSearchForm({
   loading,
+  placeholder = 'Sök efter en film eller serie',
   query,
   showClear,
   onQueryChange,
   onClear,
   onSubmit,
 }: {
+  placeholder?: string
   loading: boolean
   query: string
   showClear: boolean
@@ -33,15 +35,15 @@ export function MediaSearchForm({
     <form className="media-search-form" role="search" onSubmit={submit}>
       <label htmlFor="media-search-query">Titel</label>
       <div className="media-search-controls">
-        <input
-          className="bb-input"
+        <BBInput
           id="media-search-query"
           name="query"
           type="search"
+          maxLength={120}
           value={query}
           onChange={event => onQueryChange(event.target.value)}
           onKeyDown={submitOnEnter}
-          placeholder="Sök efter en film eller serie"
+          placeholder={placeholder}
           autoComplete="off"
         />
         {showClear && (

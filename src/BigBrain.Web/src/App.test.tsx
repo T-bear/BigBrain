@@ -228,11 +228,13 @@ test('switches dashboard without reload and remembers the active view', () => {
   })
 })
 
-test('opens the audiobook collection as a real deep-linked Media route', async () => {
+test('legacy audiobook deep links open integrated search without the native player', async () => {
   window.history.replaceState({}, '', '/media/audiobooks')
   render(<App />)
-  expect(await screen.findByRole('heading', { name: 'Ljudböcker', level: 1 })).toBeInTheDocument()
-  expect(screen.queryByRole('heading', { name: 'Mediesökning' })).not.toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Hitta film, serier och ljudböcker' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Ljudbok' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.queryByRole('heading', { name: 'Ljudböcker' })).not.toBeInTheDocument()
+  expect(document.querySelector('audio')).toBeNull()
   expect(
     screen.getAllByRole('button', { name: /Media/ }).some(button => button.getAttribute('aria-current') === 'page'),
   ).toBe(true)
@@ -371,7 +373,7 @@ test('cold Finance requests no inactive global data and no system polling', asyn
   ])
 })
 
-test('cold Media starts eight visible-view reads with technical administration deferred', () => {
+test('cold Media starts four visible-view reads without the legacy audiobook module with technical administration deferred', () => {
   window.localStorage.setItem(
     DASHBOARD_PREFERENCES_STORAGE_KEY,
     JSON.stringify({ version: 2, activeView: 'media', views: {} }),
@@ -383,10 +385,6 @@ test('cold Media starts eight visible-view reads with technical administration d
   vi.stubGlobal('fetch', fetchMock)
   render(<App />)
   expect(fetchMock.mock.calls.map(([url]) => url).sort()).toEqual([
-    '/api/v1/modules/media/audiobooks/acquisition/jobs?offset=0&limit=25',
-    '/api/v1/modules/media/audiobooks/acquisition/provider-status',
-    '/api/v1/modules/media/audiobooks/overview',
-    '/api/v1/modules/media/audiobooks/playback/availability',
     '/api/v1/modules/media/downloads',
     '/api/v1/modules/media/jobs?limit=50',
     '/api/v1/modules/media/smart-shuffle/options',
@@ -466,4 +464,23 @@ test('Admin polling has one in-flight read, pauses when hidden and stops on exit
   })
   expect(calls()).toBe(2)
   visibility.mockRestore()
+})
+
+test('Media hides the standalone audiobook widget and player while preserving existing progress', async () => {
+  const progressKey = 'bigbrain.audiobooks.hidden-history.v1'
+  window.localStorage.setItem(progressKey, '["existing-job"]')
+  window.localStorage.setItem(
+    DASHBOARD_PREFERENCES_STORAGE_KEY,
+    JSON.stringify({
+      version: 2,
+      activeView: 'media',
+      views: { media: { order: ['audiobooks', 'media-search'], hidden: [], collapsed: [] } },
+    }),
+  )
+  render(<App />)
+  expect(await screen.findByRole('heading', { name: 'Hitta film, serier och ljudböcker' })).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Ljudböcker' })).toBeNull()
+  expect(screen.queryByRole('link', { name: 'Öppna ljudboksbiblioteket' })).toBeNull()
+  expect(document.querySelector('audio')).toBeNull()
+  expect(window.localStorage.getItem(progressKey)).toBe('["existing-job"]')
 })

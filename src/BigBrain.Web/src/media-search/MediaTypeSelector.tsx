@@ -1,9 +1,9 @@
-export type MediaTypeSelection = 'movie' | 'series' | 'all'
+export type MediaTypeSelection = 'movie' | 'series' | 'audiobook'
 
 const choices: Array<{ value: MediaTypeSelection; label: string }> = [
   { value: 'movie', label: 'Film' },
   { value: 'series', label: 'Serie' },
-  { value: 'all', label: 'Båda' },
+  { value: 'audiobook', label: 'Ljudbok' },
 ]
 
 export function MediaTypeSelector({

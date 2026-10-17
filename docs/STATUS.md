@@ -1,5 +1,13 @@
 # BigBrain Status
 
+## Media integrated audiobook search — 2026-10-17
+
+**REVIEW CHECKPOINT / IMPLEMENTED / NOT DEPLOYED / OWNER UX REVIEW PENDING.**
+Mediesökning integrates Film/Serie/Ljudbok and reuses existing Audiobookshelf discovery/catalog APIs.
+Separate audiobook UI is hidden while code/data/progress are retained. Catalog sample limits are explicit.
+[Verification and remaining review](reports/features/media/integrated-audiobook-search-20261017.md).
+
+
 ## Historical Qwen integration — 2026-10-16
 
 **MERGE CANDIDATE / NOT DEPLOYED / NO REAL INFERENCE.** Historical WIKI AAPL admission and

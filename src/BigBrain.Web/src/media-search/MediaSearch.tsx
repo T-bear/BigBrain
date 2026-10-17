@@ -7,14 +7,15 @@ import { MediaSearchModeSelector, type MediaSearchMode } from './MediaSearchMode
 import { MediaLookupResults } from './MediaLookupResults'
 import { MediaRequestDialog } from './MediaRequestDialog'
 import { MediaTypeSelector, type MediaTypeSelection } from './MediaTypeSelector'
+import { AudiobookSearch } from './AudiobookSearch'
 import { AppIcon } from '../AppIcon'
 
-export function MediaSearch() {
+export function MediaSearch({ initialType = 'movie' }: { initialType?: MediaTypeSelection }) {
   const [query, setQuery] = useState('')
   const [result, setResult] = useState<MediaSearchResponse | null>(null)
   const [lookupResult, setLookupResult] = useState<MediaLookupResponse | null>(null)
   const [mode, setMode] = useState<MediaSearchMode>('external')
-  const [mediaType, setMediaType] = useState<MediaTypeSelection>('all')
+  const [mediaType, setMediaType] = useState<MediaTypeSelection>(initialType)
   const [requestTarget, setRequestTarget] = useState<MediaLookupResult | null>(null)
   const [returnFocus, setReturnFocus] = useState<HTMLButtonElement | null>(null)
   const [loading, setLoading] = useState(false)
@@ -67,32 +68,53 @@ export function MediaSearch() {
     controllerRef.current?.abort()
     const controller = new AbortController()
     controllerRef.current = controller
+    setResult(null)
+    setLookupResult(null)
     setLoading(true)
     setErrorCode(null)
     setExpandedProviders([])
     try {
       if (mode === 'libraries') {
-        setResult(await searchMedia(query, controller.signal))
+        const response = await searchMedia(query, controller.signal)
+        if (!controller.signal.aborted)
+          setResult({
+            ...response,
+            providers: response.providers.map(provider => ({
+              ...provider,
+              results: provider.results.filter(item =>
+                mediaType === 'movie'
+                  ? item.mediaType === 'movie'
+                  : ['series', 'season', 'episode'].includes(item.mediaType),
+              ),
+            })),
+          })
       } else {
-        setLookupResult(await lookupMedia(query, mediaType, controller.signal))
+        if (mediaType === 'audiobook') return
+        const response = await lookupMedia(query, mediaType, controller.signal)
+        if (!controller.signal.aborted) setLookupResult(response)
       }
     } catch (error) {
-      if (!(error instanceof Error) || error.name !== 'AbortError')
+      if (!controller.signal.aborted && (!(error instanceof Error) || error.name !== 'AbortError'))
         setErrorCode(error instanceof ApiError ? error.code : 'unknownError')
     } finally {
       if (!controller.signal.aborted) setLoading(false)
     }
   }
 
-  function clearSearch() {
+  function resetResults() {
     controllerRef.current?.abort()
-    setQuery('')
+    setRequestTarget(null)
     setResult(null)
     setLookupResult(null)
     setErrorCode(null)
     setLoading(false)
     setExpandedProviders([])
     setFabOpen(false)
+  }
+
+  function clearSearch() {
+    resetResults()
+    setQuery('')
   }
 
   const hiddenLookupCount =
@@ -108,31 +130,54 @@ export function MediaSearch() {
     window.setTimeout(() => document.getElementById('media-search-query')?.focus(), 0)
   }
 
+  const controls = (
+    <>
+      <MediaSearchModeSelector
+        mode={mode}
+        onChange={next => {
+          resetResults()
+          setMode(next)
+          queueMicrotask(() =>
+            document.querySelector<HTMLButtonElement>(`.media-search-modes button[aria-pressed="true"]`)?.focus(),
+          )
+        }}
+      />
+      <MediaTypeSelector
+        value={mediaType}
+        onChange={next => {
+          resetResults()
+          setMediaType(next)
+          queueMicrotask(() =>
+            document.querySelector<HTMLButtonElement>(`.media-type-selector button[aria-pressed="true"]`)?.focus(),
+          )
+        }}
+      />
+    </>
+  )
+
   return (
     <section className="media-search" aria-labelledby="media-search-heading">
       <div className="media-search-intro">
         <p className="eyebrow">Mediasökning</p>
-        <h3 id="media-search-heading">Hitta film och serier</h3>
+        <h3 id="media-search-heading">Hitta film, serier och ljudböcker</h3>
         <p>Sök efter något nytt eller kontrollera det som redan finns.</p>
       </div>
       <div className="media-search-form-anchor" ref={searchFormRef}>
-        <MediaSearchForm
-          loading={loading}
-          query={query}
-          showClear={query.length > 0 || hasResults || Boolean(errorCode)}
-          onQueryChange={setQuery}
-          onClear={clearSearch}
-          onSubmit={() => void submit()}
-        />
+        {mediaType === 'audiobook' && (
+          <AudiobookSearch key={mode} mode={mode} query={query} onQueryChange={setQuery} controls={controls} />
+        )}
+        {mediaType !== 'audiobook' && (
+          <MediaSearchForm
+            loading={loading}
+            query={query}
+            showClear={query.length > 0 || hasResults || Boolean(errorCode)}
+            onQueryChange={setQuery}
+            onClear={clearSearch}
+            onSubmit={() => void submit()}
+          />
+        )}
       </div>
-      <MediaSearchModeSelector
-        mode={mode}
-        onChange={next => {
-          setMode(next)
-          setErrorCode(null)
-        }}
-      />
-      {mode === 'external' && <MediaTypeSelector value={mediaType} onChange={setMediaType} />}
+      {mediaType !== 'audiobook' && controls}
       {errorCode && (
         <p className="notice notice--error" role="alert">
           {mediaErrorMessage(errorCode)}

@@ -51,7 +51,7 @@ function initial(
   }
 }
 
-test('is registered as a first-class Media view', () => {
+test('legacy audiobook UI is retained but absent from the normal widget registry', () => {
   const registry = createAppWidgetRegistry({
     modules: [],
     moduleError: false,
@@ -62,7 +62,7 @@ test('is registered as a first-class Media view', () => {
     recovery: null,
     recoveryError: false,
   })
-  expect(registry.getAll().some(widget => widget.id === 'audiobooks' && widget.defaultView === 'media')).toBe(true)
+  expect(registry.getAll().some(widget => widget.id === 'audiobooks')).toBe(false)
 })
 
 test('renders provider-neutral search with Swedish preference and no fake progress', async () => {

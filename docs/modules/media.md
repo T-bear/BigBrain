@@ -1,5 +1,20 @@
 # Media Module
 
+## Integrated Media search — review checkpoint, 2026-10-17
+
+Owner-authorized continuation: Mediesökning now presents **Film / Serie / Ljudbok**, default Film,
+in Hitta nytt and Mina bibliotek. Audiobookshelf catalog and existing universal metadata/acquisition
+APIs are reused. Normal standalone audiobook widget/native player access is hidden; implementation,
+media, progress and server configuration are preserved. Legacy audiobook bookmarks open integrated
+search. Playback opens Audiobookshelf through its existing API-supplied link.
+
+Library search explicitly covers the first 50 recent catalog entries, discovery's local match sample
+at most 25; neither claims whole-library search. Requests still require explicit edition confirmation.
+[Implemented behavior, limits, tests and review gates](../reports/features/media/integrated-audiobook-search-20261017.md).
+Not deployed or physically owner-verified. Earlier dated BB-117 pause and playback decisions below
+remain history; this narrow UI task does not reopen deferred providers or other module work.
+
+
 ## BB-117 Media pause decision snapshot
 
 Media's audiobook playback path is functionally stable. The product owner physically approved BB-117 on iPhone/PWA on 2026-08-31 (“I am satisfied”), so Media is in **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. Implemented behavior includes Audiobookshelf-authoritative local media/progress, BigBrain's bounded playback/session API, one AppShell-scoped client timer deadline shared by Continue Listening and detail, 15/30/45/60-minute presets, local-clock deadline, cancellation, ordinary pause/progress sync on best-effort iOS/PWA expiry and no automatic completion. The production timer is a gold 23 px crescent in a 48 px target at the Continue Listening card's lower right, with a compact anchored desktop popover and compact mobile bottom sheet. The active text row—not the icon—is authoritative for the deadline.

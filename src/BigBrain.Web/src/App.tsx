@@ -5,7 +5,6 @@ import { useWidgets, WidgetProvider } from './dashboard/widgetFramework'
 import type { DockerInventory, ModuleDefinition, SystemOverview, SystemRecoverySnapshot } from './types'
 import { ThemeProvider } from './ThemeProvider'
 import { AppShell } from './AppShell'
-import { AudiobookPlaybackProvider } from './audiobooks/AudiobookPlayback'
 
 const POLL_INTERVAL_MS = 5_000
 
@@ -146,9 +145,7 @@ function AppContent() {
         onSystem={setSystem}
         onSystemError={setSystemError}
       />
-      <AudiobookPlaybackProvider>
-        <AppShell />
-      </AudiobookPlaybackProvider>
+      <AppShell />
     </WidgetProvider>
   )
 }

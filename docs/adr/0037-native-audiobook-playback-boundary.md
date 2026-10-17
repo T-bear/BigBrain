@@ -18,3 +18,12 @@ Playback state and the audio element live at the existing AppShell lifetime so r
 ## Consequences and rollback
 
 API restart safely invalidates BigBrain session IDs and Audiobookshelf progress remains durable. Removing the playback environment value and recreating API disables native session creation without affecting catalogue reads. Rollback must not remove Audiobookshelf media or progress and must preserve the integration credential.
+
+## Presentation amendment — owner decision, 2026-10-17 (review implementation)
+
+The owner requested integrated audiobook search in Mediesökning and Audiobookshelf playback.
+The standalone widget and native player are hidden from the normal Web composition; old audiobook
+bookmarks reach integrated search. Native implementation, bounded APIs, credentials and durable
+Audiobookshelf progress are retained. This changes the product presentation, not the accepted playback
+security boundary or the ownership of media/progress. No configuration change or deletion follows.
+[Checkpoint and verification](../reports/features/media/integrated-audiobook-search-20261017.md).
