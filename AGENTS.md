@@ -59,6 +59,24 @@
   osäkerhet, vetenskaplig risk, säkerhetsrisk eller annat verifierat behov. Ange kort varför.
   Detta utökar inte uppdragets scope eller befogenheter; arkitekturkonflikt och blockerregler gäller.
 
+### Processdisciplin och minsta nödvändiga arbetsflöde
+
+Innan ChatGPT formulerar ett Codex-uppdrag och innan Codex utökar ett uppdrag ska följande bedömas
+med stöd av riskreglerna ovan:
+
+- Klassificera uppgiftens faktiska risk och påverkansområde.
+- Identifiera obligatoriska kontroller och uttryckliga godkännandegränser enligt source of truth.
+- Återanvänd giltig verifiering när kod, tree och relevanta förutsättningar är oförändrade.
+- Undvik nya kontrollomgångar, separata agentkörningar, vänteloopar och dokumentationssteg som
+  inte tillför nödvändig verifiering.
+- Skilj mellan produktägarbeslut och tekniska arbetsmoment. Ett tekniskt kontrollmoment ska inte
+  automatiskt bli ett nytt godkännandesteg eller ett separat Codex-uppdrag.
+- Varje extra kontroll eller stopp utöver det normala riskbaserade arbetsflödet ska kunna
+  motiveras med en konkret risk, avvikelse eller uttryckligt krav.
+
+Denna princip får aldrig kringgå obligatorisk säkerhetsverifiering, arkitekturbeslut, Finance-skydd,
+uttryckligt merge-godkännande av exakt SHA eller separat deployment-auktorisering.
+
 ### Långvariga operationer
 
 - Ingen aktiv vänteloop: upprepa inte `wait`, polling eller statuskommandon utan ny information,
