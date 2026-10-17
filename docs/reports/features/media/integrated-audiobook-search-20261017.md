@@ -75,3 +75,43 @@ Independent architect review should assess the API reuse, bounded catalog disclo
 ## Resumption
 
 Start with this report, `docs/modules/media.md` and the Media entry in `docs/operations/codex-recovery.md`. The smallest next step is review of the published checkpoint; no automatic deployment or additional sprint.
+
+
+## Media CI heading correction — 2026-10-17
+
+**REVIEW CHECKPOINT — test-only correction; not merged or deployed.**
+Baseline main `08e1bcea6ae190026d4d60a543067c06b71351b1`, tree
+`ad178e419746b9f3d3b3976af429366a3d814bac`, was fetched and verified unchanged.
+The original Media implementation is now merged; the original checkpoint status above is
+historical. [Merge/deployment handoff](https://github.com/T-bear/BigBrain/blob/97f49985b2fe5df49dc36fa74d4aae98b7ac87f6/docs/reports/deployments/media-integrated-search-deployment-20261017.md)
+records the stopped deployment and [CI run 256](https://github.com/T-bear/BigBrain/actions/runs/39023635027).
+
+Branch `media/fix-dashboard-heading-test` starts from that exact main. Resolve publication
+SHA/tree from commit subject `test(media): align dashboard heading with approved search UI`.
+Only `src/BigBrain.Web/src/MediaDashboard.test.tsx:189` changes in executable source: expected
+heading `Hitta film och serier` becomes `Hitta film, serier och ljudböcker`, matching accepted
+`MediaSearch.tsx`. Administration visibility assertions remain unchanged. No production fix,
+API, configuration, dependency, database, container or Finance change is needed or included.
+
+Verification from `src/BigBrain.Web`:
+
+- Before correction, `npm test -- src/MediaDashboard.test.tsx`: **13 PASS / 1 FAIL / 0 SKIP**;
+  the reported missing-heading failure reproduced at line 189. The test log confirmed the
+  failure; a subsequent log-filter command could not find `rg` in that command environment,
+  so the saved log was read directly. This did not affect test execution.
+- After correction, same command: **14 PASS / 0 FAIL / 0 SKIP**.
+- Full frontend `npm test -- --run`: **215 PASS / 0 FAIL / 0 SKIP**, 27 files passed. This
+  single broader run checks the exact suite that blocked CI. Existing jsdom `scrollTo`
+  unsupported warnings remain non-failing; no other test failure was found.
+- `./node_modules/.bin/prettier --check --config .prettierrc.json --no-editorconfig src/MediaDashboard.test.tsx`: **PASS**.
+
+Unchanged production build evidence from the original approved candidate and backend CI PASS
+from the exact merge are reused; no production build or backend/Finance tests are repeated for
+this text-only assertion correction. Local results are not claimed as new GitHub CI success.
+No merge, deployment, service inspection, provider request or user-data mutation in this task.
+Finance remains FROZEN. Unrelated untracked mockups and four Sentinel ADR drafts are preserved.
+Next: independent architect review of this exact checkpoint; no automatic merge/deployment.
+
+Publication checks: `node scripts/verify-documentation.mjs` (including relative links),
+`git diff --check`, exact staged scope and staged Gitleaks secret scan **PASS**.
+Only the one-line test correction, this existing report and the Media recovery entry are changed.

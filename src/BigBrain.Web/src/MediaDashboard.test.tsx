@@ -186,7 +186,7 @@ test('keeps technical modules in Administration, closed by default and reachable
     vi.fn(() => Promise.resolve(response(overview()))),
   )
   render(<MediaDashboard />)
-  await screen.findByRole('heading', { name: 'Hitta film och serier' })
+  await screen.findByRole('heading', { name: 'Hitta film, serier och ljudböcker' })
   const administration = screen.getByText('Administration', { selector: 'strong' }).closest('details')!
   expect(administration).not.toHaveAttribute('open')
   expect(screen.getByRole('heading', { name: 'Media Health', hidden: true })).not.toBeVisible()
