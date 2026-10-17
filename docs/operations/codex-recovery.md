@@ -1,16 +1,20 @@
 # Codex interrupted-run recovery
 
-## BB-158 — URL import preparation, 2026-10-17
+## BB-158 — continuation stopped at import-owner boundary, 2026-10-17
 
-**REVIEW CHECKPOINT / PARTIAL / NOT MERGE CANDIDATE.** Branch `media/bb158-url-audio-import`,
-baseline `133b2b19287c74368828e6904cef241248bdae5e`. Resolve checkpoint SHA/tree from subject
-`feat(media): prepare bounded DOI-linked URL import intents`.
-[Implemented subset, actual checks and safe-import blocker](../reports/features/media/bb-158-url-import-20261017.md).
-No downloading, decoding, upload, service change or live provider request. No intended unpublished
-work remains after publication; unrelated mockups and four Sentinel ADR drafts preserved.
-Finance FROZEN and unchanged. Next: independent review of this partial checkpoint and the
-no-overwrite/indexing boundary; no merge/deployment authorization or automatic continuation.
-Previous Mediekontroll is merged and deployed; earlier recovery entries below are history.
+**REVIEW CHECKPOINT / PARTIAL / BLOCKED / NOT MERGE CANDIDATE.**
+Branch `media/bb158-url-audio-import`; main `133b2b19287c74368828e6904cef241248bdae5e`;
+previous implementation `68a1a5a99a91a90de91fdded9e33d7c4f9ac6b09` preserved unchanged.
+Resolve this additive documentation commit/tree by subject
+`docs(media): specify BB-158 import-owner prerequisite`.
+[Rechecked evidence and exact proposed Librarr prerequisite](../reports/features/media/bb-158-url-import-20261017.md#continuation--import-owner-authorization-boundary-2026-10-17).
+Current preparation works; actual retrieval, exclusive file commit and exact ABS indexing do not.
+No provider call, library change, deployment, Finance change or new downloader. Unrelated mockups
+and four Sentinel ADR drafts remain untouched. No intended unpublished work after publication.
+Next: owner/architect decision on a bounded direct-file operation in the existing Librarr import
+owner; no new service or API library mount proposed. Container replacement remains separately gated.
+Existing preparation test/build evidence reused; documentation/link, scope, whitespace and staged
+secret verification apply to this documentation-only continuation. No real import success claimed.
 
 ## Media Mediekontroll — 2026-10-17
 

@@ -4,7 +4,9 @@
 
 **PARTIAL / REVIEW CHECKPOINT / NOT DEPLOYED.** Network-free preview and persistent DOI-linked
 import intents are implemented. Download, transformation and library import remain blocked;
-no completed-file or Audiobookshelf-indexing success is claimed.
+no completed-file or Audiobookshelf-indexing success is claimed. Continuation confirmed that a
+bounded Librarr direct-file import contract requires separate authorization; current adapters
+cannot reserve a destination and prove exact ABS file identity.
 [Verified subset and concrete blocker](reports/features/media/bb-158-url-import-20261017.md).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
