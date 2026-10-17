@@ -1,5 +1,16 @@
 # BigBrain Status
 
+## BB-158 — URL import preparation, 2026-10-17
+
+**PARTIAL / REVIEW CHECKPOINT / NOT DEPLOYED.** Network-free preview and persistent DOI-linked
+import intents are implemented. Download, transformation and library import remain blocked;
+no completed-file or Audiobookshelf-indexing success is claimed.
+[Verified subset and concrete blocker](reports/features/media/bb-158-url-import-20261017.md).
+
+Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
+[dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
+The older candidate entry below is historical; new physical iPhone/PWA acceptance remains pending.
+
 ## Media — Mediekontroll review, 2026-10-17
 
 **IMPLEMENTED / MERGE CANDIDATE / NOT DEPLOYED.** One Media entry leads to an overview

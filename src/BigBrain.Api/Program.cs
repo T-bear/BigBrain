@@ -394,6 +394,7 @@ public partial class Program
             (MediaOptions options) => Results.Ok(MediaServiceLinks.From(options)));
 
         app.MapAudiobookEndpoints();
+        app.MapMediaUrlImportEndpoints();
 
         app.MapGet(
             "/api/v1/modules/media/posters/{token}",

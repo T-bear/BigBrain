@@ -43,7 +43,7 @@ public sealed class AudiobookAcquisitionException(string code, string safeMessag
     public int StatusCode { get; } = statusCode;
 }
 
-public sealed class AudiobookAcquisitionStore : IDisposable
+public sealed partial class AudiobookAcquisitionStore : IDisposable
 {
     private readonly string connectionString;
     private readonly SemaphoreSlim gate = new(1, 1);
@@ -68,6 +68,10 @@ public sealed class AudiobookAcquisitionStore : IDisposable
             );
             CREATE INDEX IF NOT EXISTS IX_AudiobookAcquisitionJobs_UpdatedAtUtc
                 ON AudiobookAcquisitionJobs(UpdatedAtUtc DESC);
+            CREATE TABLE IF NOT EXISTS MediaUrlImportDrafts(
+                Id TEXT PRIMARY KEY,
+                DraftJson TEXT NOT NULL
+            );
             """;
         command.ExecuteNonQuery();
     }

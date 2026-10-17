@@ -1,4 +1,5 @@
 import { MediaControlOverview } from '../media-control/MediaControl'
+import { MediaUrlImport } from '../media-control/MediaUrlImport'
 import { useState, type ReactNode } from 'react'
 import { MediaTypeSelector, type MediaTypeSelection } from '../media-search/MediaTypeSelector'
 import { AudiobookLibraryResults } from '../media-search/AudiobookSearch'
@@ -146,6 +147,12 @@ export function UXLab() {
           description="Tre separata destinationskort. Förhandsvisning utan dataanrop eller navigation."
         >
           <MediaControlOverview preview />
+        </Specimen>
+        <Specimen
+          name="Ljudimport – spärrad förhandsgranskning"
+          description="Experimentellt BB-158-formulär. Ingen nätverkshämtning eller import; inte ägargodkänt."
+        >
+          <MediaUrlImport specimen />
         </Specimen>
         <Specimen name="Navigation / Row">
           <BBButton className="ux-navigation-row" variant="contextual">

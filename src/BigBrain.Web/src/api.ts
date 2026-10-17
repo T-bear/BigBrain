@@ -405,3 +405,26 @@ export const operateDownload = (id: string, operation: DownloadOperation, signal
   postJson<DownloadOperationResult>(`${downloadsBase}/${encodeURIComponent(id)}/actions/${operation}`, {}, signal)
 export const operateDownloadsBatch = (ids: string[], operation: DownloadOperation, signal?: AbortSignal) =>
   postJson<DownloadBatchResult>(`${downloadsBase}/actions/batch`, { ids, operation }, signal)
+
+export type MediaUrlImportInput = { sourceUrl: string; fileName: string; doi: string; format: string }
+export type MediaUrlImportDraft = MediaUrlImportInput & {
+  id: string
+  proposedFileName: string
+  createdAtUtc: string
+  expiresAtUtc: string
+  confirmedAtUtc: string | null
+  status: 'previewed' | 'blocked'
+  canStart: boolean
+  blockerCode: string
+  message: string
+}
+const urlImportsBase = '/api/v1/modules/media/url-imports'
+export const getUrlImportDrafts = (signal?: AbortSignal) => getJson<MediaUrlImportDraft[]>(urlImportsBase + '/', signal)
+export const previewUrlImport = (input: MediaUrlImportInput, signal?: AbortSignal) =>
+  postJson<MediaUrlImportDraft>(urlImportsBase + '/preview', input, signal)
+export const confirmUrlImport = (id: string, signal?: AbortSignal) =>
+  postJson<MediaUrlImportDraft>(
+    urlImportsBase + '/' + encodeURIComponent(id) + '/confirm',
+    { detailsConfirmed: true, rightsConfirmed: true },
+    signal,
+  )

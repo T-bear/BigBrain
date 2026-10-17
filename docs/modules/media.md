@@ -1,5 +1,22 @@
 # Media Module
 
+## BB-158 — URL import preparation (review only)
+
+Mediekontroll → Medieflöde → Förbered ljudimport från länk opens `/media/control/import`.
+The existing three overview cards and Media search are preserved. M4A/MP3 selection describes
+the intended same-format file, not supported conversion. Only structural HTTPS-link, filename
+and DOI validation runs; no source is contacted. YouTube/video and conversion are unsupported.
+
+The existing `AudiobookAcquisitionStore` owns an additive `MediaUrlImportDrafts` table in its
+existing SQLite database. Each immutable preview has its own random ID and proposed filename;
+DOI is normalized, non-unique and never a path. Confirmation requires both details and rights
+attestation, is idempotent, expires after 15 minutes and records **blocked**, never queued.
+At most 200 intents are retained; nothing is auto-deleted. No audio file or ABS item exists
+from these records. They remain separate from actual acquisition jobs. No execution worker,
+provider registration, filesystem placement or start endpoint is introduced.
+
+[Checkpoint, safety blocker, verification and unsupported parts](../reports/features/media/bb-158-url-import-20261017.md).
+
 ## Integrated Media search — accepted and deployed, 2026-10-17
 
 Owner-authorized continuation: Mediesökning now presents **Film / Serie / Ljudbok**, default Film,

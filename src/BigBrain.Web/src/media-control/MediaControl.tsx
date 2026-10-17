@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { DownloadControl } from '../download-control/DownloadControl'
 import { MediaJobs } from '../media-jobs/MediaJobs'
+import { MediaUrlImport } from './MediaUrlImport'
 import { MediaDashboard } from '../MediaDashboard'
 import { useWidgets } from '../dashboard/widgetFramework'
 import { AppIcon } from '../AppIcon'
@@ -71,13 +72,25 @@ export function MediaControl({ page }: { page: MediaControlPage }) {
         <div>
           <p className="eyebrow">{page === 'overview' ? 'Media' : 'Mediekontroll'}</p>
           <h1 ref={title} tabIndex={-1}>
-            {page === 'overview' ? 'Mediekontroll' : choices.find(choice => choice.id === page)?.title}
+            {page === 'overview'
+              ? 'Mediekontroll'
+              : page === 'import'
+                ? 'Importera ljud från länk'
+                : choices.find(choice => choice.id === page)?.title}
           </h1>
         </div>
       </header>
       {page === 'overview' && <MediaControlOverview />}
       {page === 'downloads' && <DownloadControl />}
-      {page === 'flow' && <MediaJobs showHeading={false} />}
+      {page === 'flow' && (
+        <>
+          <a className="bb-button bb-button--secondary" href={`${mediaControlPath}/import`} onClick={followMediaLink}>
+            Förbered ljudimport från länk
+          </a>
+          <MediaJobs showHeading={false} />
+        </>
+      )}
+      {page === 'import' && <MediaUrlImport />}
       {page === 'integrations' && <MediaDashboard administrationOnly />}
     </section>
   )

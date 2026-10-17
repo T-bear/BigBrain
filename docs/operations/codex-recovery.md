@@ -1,5 +1,17 @@
 # Codex interrupted-run recovery
 
+## BB-158 — URL import preparation, 2026-10-17
+
+**REVIEW CHECKPOINT / PARTIAL / NOT MERGE CANDIDATE.** Branch `media/bb158-url-audio-import`,
+baseline `133b2b19287c74368828e6904cef241248bdae5e`. Resolve checkpoint SHA/tree from subject
+`feat(media): prepare bounded DOI-linked URL import intents`.
+[Implemented subset, actual checks and safe-import blocker](../reports/features/media/bb-158-url-import-20261017.md).
+No downloading, decoding, upload, service change or live provider request. No intended unpublished
+work remains after publication; unrelated mockups and four Sentinel ADR drafts preserved.
+Finance FROZEN and unchanged. Next: independent review of this partial checkpoint and the
+no-overwrite/indexing boundary; no merge/deployment authorization or automatic continuation.
+Previous Mediekontroll is merged and deployed; earlier recovery entries below are history.
+
 ## Media Mediekontroll — 2026-10-17
 
 **MERGE CANDIDATE / NO MERGE OR DEPLOYMENT.** Branch `media/media-control` starts from

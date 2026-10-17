@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- `BB-158, 2026-10-17` — [URL import preparation and safe-import blocker](features/media/bb-158-url-import-20261017.md). Partial Review Checkpoint; persistent DOI-linked intents only, no download or library import.
+
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
 - `Media integrated audiobook search, 2026-10-17` — [Implementation and navigation review](features/media/integrated-audiobook-search-20261017.md). Existing APIs, explicit catalog bounds, preserved native code/data; accepted and deployed, owner iPhone/PWA approval recorded.

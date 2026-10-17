@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 
-export type MediaControlPage = 'overview' | 'downloads' | 'flow' | 'integrations'
+export type MediaControlPage = 'overview' | 'downloads' | 'flow' | 'integrations' | 'import'
 export const mediaControlPath = '/media/control'
 
 // Existing anchors remain bookmarks into the selected function, not hidden widgets.
@@ -10,7 +10,7 @@ export function mediaControlPage(
 ): MediaControlPage | null {
   const path = pathname.replace(/\/$/, '')
   if (path === mediaControlPath) return 'overview'
-  for (const page of ['downloads', 'flow', 'integrations'] as const)
+  for (const page of ['downloads', 'flow', 'integrations', 'import'] as const)
     if (path === `${mediaControlPath}/${page}`) return page
   if (path === '' || path === '/media') {
     if (['#downloads', '#download-control'].includes(hash)) return 'downloads'
