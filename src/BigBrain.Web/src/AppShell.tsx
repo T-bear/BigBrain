@@ -9,13 +9,7 @@ const primaryDestinations = new Set(['home', 'family', 'media', 'finance', 'more
 
 export function AppShell() {
   const { activeView, setActiveView } = useWidgets()
-  const selectView = (view: Parameters<typeof setActiveView>[0]) => {
-    if (window.location.pathname.startsWith('/media/audiobooks')) {
-      window.history.pushState({}, '', '/')
-      window.dispatchEvent(new Event('bb:navigation'))
-    }
-    setActiveView(view)
-  }
+  const selectView = setActiveView
 
   return (
     <div className="shell bb-page-shell">

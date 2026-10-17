@@ -8,10 +8,9 @@ import {
   ProgressMetric,
   StatusBadge,
 } from '../components'
-import { DownloadControl } from '../download-control/DownloadControl'
-import { MealPlanner } from '../meal-planner/MealPlanner'
+import { MediaControlEntry } from '../media-control/MediaControl'
 import { MediaDashboard } from '../MediaDashboard'
-import { MediaJobs } from '../media-jobs/MediaJobs'
+import { MealPlanner } from '../meal-planner/MealPlanner'
 import { MediaSearch } from '../media-search/MediaSearch'
 import { ShoppingList } from '../shopping-list/ShoppingList'
 import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
@@ -347,17 +346,17 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       render: () => <MediaSearch />,
     },
     {
-      id: 'downloads',
-      title: 'Nedladdningskö',
-      description: 'Hantera aktiva nedladdningar.',
+      id: 'media-control',
+      title: 'Mediekontroll',
+      description: 'Nedladdningskö, medieflöde och tekniska integrationer.',
       icon: '⇣',
       category: 'Media',
       defaultView: 'media',
-      defaultSize: 'large',
+      defaultSize: 'full',
       minimumSize: 'medium',
-      supportedViews: ['media'],
+      supportedViews: ['media', 'admin'],
       permissions: [],
-      render: () => <DownloadControl />,
+      render: () => <MediaControlEntry />,
     },
     {
       id: 'smart-shuffle',
@@ -371,32 +370,6 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       supportedViews: ['media'],
       permissions: [],
       render: () => <SmartShuffle />,
-    },
-    {
-      id: 'media-jobs',
-      title: 'Medieflöde',
-      description: 'Följ film och serier från sökning till bibliotek.',
-      icon: '↧',
-      category: 'Media',
-      defaultView: 'media',
-      defaultSize: 'large',
-      minimumSize: 'medium',
-      supportedViews: ['media'],
-      permissions: [],
-      render: () => <MediaJobs showHeading={false} />,
-    },
-    {
-      id: 'jellyfin-overview',
-      title: 'Tekniska integrationer',
-      description: 'Jellyfin, Sonarr, Radarr och Prowlarr.',
-      icon: '▶',
-      category: 'Avancerat',
-      defaultView: 'media',
-      defaultSize: 'full',
-      minimumSize: 'large',
-      supportedViews: ['media', 'admin'],
-      permissions: [],
-      render: () => <MediaDashboard administrationOnly administrationOpen={false} />,
     },
     {
       id: 'finance-observation',

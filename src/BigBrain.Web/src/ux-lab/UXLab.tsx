@@ -1,3 +1,4 @@
+import { MediaControlOverview } from '../media-control/MediaControl'
 import { useState, type ReactNode } from 'react'
 import { MediaTypeSelector, type MediaTypeSelection } from '../media-search/MediaTypeSelector'
 import { AudiobookLibraryResults } from '../media-search/AudiobookSearch'
@@ -140,6 +141,12 @@ export function UXLab() {
         </Specimen>
       </Section>
       <Section id="navigation" title="Navigation">
+        <Specimen
+          name="Media / Mediekontroll"
+          description="Tre separata destinationskort. Förhandsvisning utan dataanrop eller navigation."
+        >
+          <MediaControlOverview preview />
+        </Specimen>
         <Specimen name="Navigation / Row">
           <BBButton className="ux-navigation-row" variant="contextual">
             <AppIcon name="admin" />

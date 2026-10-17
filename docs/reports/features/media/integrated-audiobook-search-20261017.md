@@ -115,3 +115,18 @@ Next: independent architect review of this exact checkpoint; no automatic merge/
 Publication checks: `node scripts/verify-documentation.mjs` (including relative links),
 `git diff --check`, exact staged scope and staged Gitleaks secret scan **PASS**.
 Only the one-line test correction, this existing report and the Media recovery entry are changed.
+
+
+## Acceptance and deployment reconciliation — 2026-10-17
+
+The historical review-only status above is superseded for the integrated audiobook release:
+implementation merge `08e1bcea6ae190026d4d60a543067c06b71351b1`, followed by approved
+heading-test correction merge `628041b200b1ff1283e29955073db91539bac422` (tree
+`a36bb7dcd390c51be395a3de1105cbaefa5c4a29`). [Exact merge CI](https://github.com/T-bear/BigBrain/actions/runs/39025570041)
+passed all four jobs. [Published Web-only deployment evidence](https://github.com/T-bear/BigBrain/blob/9c7483caa2d48067db848b9bf82c8b72a1c83cb4/docs/reports/deployments/media-integrated-search-deployment-20261017.md)
+records healthy Web, matching assets and unchanged other containers.
+
+The product owner explicitly reports iPhone/PWA approval dated 2026-10-17 in the Mediekontroll
+assignment. This is owner manual acceptance, not an additional Codex device test or new provider
+verification. It applies to the preceding integrated search release, not the new Mediekontroll
+checkpoint. Earlier test failures and dated pending-review statements remain historical evidence.

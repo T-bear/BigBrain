@@ -1,6 +1,6 @@
 # Media Module
 
-## Integrated Media search — review checkpoint, 2026-10-17
+## Integrated Media search — accepted and deployed, 2026-10-17
 
 Owner-authorized continuation: Mediesökning now presents **Film / Serie / Ljudbok**, default Film,
 in Hitta nytt and Mina bibliotek. Audiobookshelf catalog and existing universal metadata/acquisition
@@ -11,9 +11,34 @@ search. Playback opens Audiobookshelf through its existing API-supplied link.
 Library search explicitly covers the first 50 recent catalog entries, discovery's local match sample
 at most 25; neither claims whole-library search. Requests still require explicit edition confirmation.
 [Implemented behavior, limits, tests and review gates](../reports/features/media/integrated-audiobook-search-20261017.md).
-Not deployed or physically owner-verified. Earlier dated BB-117 pause and playback decisions below
-remain history; this narrow UI task does not reopen deferred providers or other module work.
+Merged/deployed at `628041b200b1ff1283e29955073db91539bac422`; owner iPhone/PWA
+acceptance explicitly reported 2026-10-17. [Current status and deployment evidence](../STATUS.md#media--mediekontroll-review-2026-10-17).
+Earlier BB-117 decisions remain history; no deferred provider work is reopened.
 
+
+## Mediekontroll — frontend review, 2026-10-17
+
+Media has one `media-control` entry replacing `downloads`, `media-jobs` and `jellyfin-overview`
+on that navigation level. `/media/control` is a no-data overview with three cards in order:
+Nedladdningskö (`/downloads`), Medieflöde (`/flow`), Tekniska integrationer (`/integrations`),
+all beneath `/media/control`. Each page mounts only its existing component. The technical page
+retains its existing Administration disclosure and existing internal controls.
+
+Real links plus the shell's existing history event support deep links, reload and browser history.
+Return links lead to the overview or `/media`. Existing root/Media hash bookmarks `#downloads`,
+`#download-control`, `#queue`, `#media-jobs`, `#administration`, `#media-administration`,
+`#jellyfin-overview` resolve to the corresponding page. Existing audiobook links still open search.
+
+Version-2 local widget preferences consolidate the old IDs at their first ordered position.
+The new entry is hidden/collapsed only if all three old Media entries were hidden/collapsed;
+Admin's optional old technical widget maps to the same entry. Other preferences stay intact.
+No backend data, downloads or listening progress is migrated. Reverting UI is not data recovery.
+
+Overview causes no download/job/integration reads. Route exit unmounts the selected component,
+using its existing AbortController and interval cleanup. Download actions, confirmations, provider
+policies and error states remain in their original owners. Search and Smart Shuffle remain separate.
+[Implementation and verification evidence](../reports/features/media/media-control-20261017.md).
+No backend API or architectural ownership change; ADR0014 remains in its existing status.
 
 ## BB-117 Media pause decision snapshot
 

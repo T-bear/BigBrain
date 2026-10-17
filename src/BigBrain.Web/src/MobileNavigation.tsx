@@ -7,13 +7,8 @@ const primary = new Set(['home', 'family', 'media', 'finance', 'more'])
 
 export function MobileNavigation({ dashboards = dashboardRegistry }: { dashboards?: DashboardRegistry }) {
   const { activeView, setActiveView } = useWidgets()
-  const selectView = (view: Parameters<typeof setActiveView>[0]) => {
-    if (window.location.pathname.startsWith('/media/audiobooks')) {
-      window.history.pushState({}, '', '/')
-      window.dispatchEvent(new Event('bb:navigation'))
-    }
-    setActiveView(view)
-  }
+  const selectView = setActiveView
+
   return (
     <nav className="mobile-navigation" aria-label="Snabbnavigation">
       {dashboards

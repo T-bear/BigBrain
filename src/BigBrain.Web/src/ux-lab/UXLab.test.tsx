@@ -15,6 +15,17 @@ describe('UX/UI Lab', () => {
     expect(screen.getByText('RATAD')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Primary' })).toHaveClass('bb-button--primary')
   })
+  it('previews Mediekontroll as experimental without requests or navigation', () => {
+    const fetch = vi.spyOn(globalThis, 'fetch')
+    render(<UXLab />)
+    expect(screen.getByRole('heading', { name: 'Media / Mediekontroll' }).closest('section')).toHaveTextContent(
+      'EXPERIMENTELL',
+    )
+    const path = window.location.href
+    fireEvent.click(screen.getByRole('link', { name: /Nedladdningskö/ }))
+    expect(window.location.href).toBe(path)
+    expect(fetch).not.toHaveBeenCalled()
+  })
   it('keeps the accessible timer candidate local', () => {
     const fetch = vi.spyOn(globalThis, 'fetch')
     render(<UXLab />)
