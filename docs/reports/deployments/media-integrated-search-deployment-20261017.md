@@ -2,7 +2,96 @@
 
 Detta är en sanerad GitHub-version. No secrets, private paths, raw provider data or credentials are published.
 
-## Current outcome — merge completed, deployment blocked by CI
+## Approved CI correction and Web-only deployment — 2026-10-17
+
+**MEDIA DEPLOYMENT COMPLETE — automated deployment checks passed; physical iPhone/PWA review pending.**
+
+The owner approved exact test correction `56c4995673b9283be0ad83cc8d27bedd05c512e6`,
+tree `a36bb7dcd390c51be395a3de1105cbaefa5c4a29`, and conditional Web-only deployment.
+Fetched origin: candidate one ahead/zero behind expected main; only one test assertion and
+its two documentation files changed. Tracked source clean; unrelated files preserved.
+
+Normal merge pushed and remote verified:
+
+- Main/merge: `628041b200b1ff1283e29955073db91539bac422`.
+- First parent: `08e1bcea6ae190026d4d60a543067c06b71351b1`.
+- Second parent: `56c4995673b9283be0ad83cc8d27bedd05c512e6`.
+- Tree: `a36bb7dcd390c51be395a3de1105cbaefa5c4a29`, identical to approved candidate.
+- [Exact merge CI](https://github.com/T-bear/BigBrain/actions/runs/39025570041):
+  **SUCCESS**, frontend/backend/documentation/secrets all completed **SUCCESS** before build.
+
+Reused the correction's 215 passing local frontend tests and the exact merge CI; no redundant
+local suites. No PR, new implementation, permission change or history rewrite.
+
+### Web build and deployment evidence
+
+**Build, Web-only recreation and read-only browser verification PASS.**
+Build uses existing Compose/Web Dockerfile with a temporary `git archive` of exact merge SHA
+and `--env-file /dev/null`. Only `build web` is selected. Ignored/untracked files, host secrets
+and user data are excluded. Temporary context is managed by Python TemporaryDirectory; the
+initial shell cleanup form was rejected before execution and replaced with scoped cleanup.
+The executed replacement command was `docker compose up -d --no-deps --no-build --wait --wait-timeout 60 web`,
+separating build from documented Web-only recreation without changing service configuration.
+Compose returned success and healthy. Running image:
+`sha256:b0022f525ea53f9799ee8c8b104241ef396b1db32f6c79721a570dbdd08f70d4`.
+Web started `2026-10-17T15:16:30.847766139Z`. The accepted Web Dockerfile has no compiled
+revision/OCI revision field: revision attribution is the exact archived Git source plus captured
+build/image identity, not an invented runtime revision endpoint.
+
+HTTP-served assets matched the running container byte-for-byte:
+
+- `index.html`: SHA-256 `8b372c1fc0c64c8677b47e5deb7b331bdc88edc7d5eb4cea01ba5d845296adf7`.
+- `index-BCXjikXV.js`: SHA-256 `f98fd469a80fafc50a3b07980e779ccf45ada8ef6aba5c12f435acbc86e76dbb`.
+- `index-cD0Tvv2e.css`: SHA-256 `8965968cd56aca61d50112de5c1234b53a3ed8c1826dc55b792a81e0454a873c`.
+
+Postdeployment `/health`, audiobook overview and library GETs returned HTTP 200, with
+Audiobookshelf `configuredHealthy`. All 11 non-Web containers retained exact IDs, images and
+start times. API and external media infrastructure were not recreated or configured. No volume,
+database, playback/progress or acquisition operation. This verifies preserved runtime identity
+and read access, not a byte-for-byte audit of media databases.
+
+### Live browser verification and limits
+
+Isolated disposable Firefox loaded actual deployed assets and real GET API responses, without
+fixtures. The harness blocked non-GET requests and Finance paths; no acquisition or playback
+was triggered. At 390×844 and 1440×844, across obsidian-gold/forest-night/arctic-wind:
+Film/Serie/Ljudbok present, Båda absent, audiobook deep link selected Ljudbok, controls at least
+44 px, no horizontal overflow, no standalone audiobook widget or native audio element.
+Theme variants were applied only in the disposable browser DOM, not server settings.
+
+Submitting Mina bibliotek made actual GETs to existing BigBrain audiobook overview/library
+endpoints; both returned HTTP 200. The sample query produced the truthful no-local-match state.
+The first harness incorrectly required a nonempty book-result section and timed out; correcting
+only that temporary verification assumption allowed the observed empty-state result to pass.
+No product change or fabricated book response was used. Film/Serie provider lookup GETs were
+verified before recreation; their unchanged API was not redeployed. Candidate/CI tests verify
+external audiobook search routing, request cancellation and mode/type transitions. Live external
+acquisition, downloads, playback and progress writes were deliberately not exercised.
+
+Manual owner checks remain: iPhone/PWA refresh and cache, keyboard/focus/scroll, search with a
+known library title, and Audiobookshelf handoff/playback. Automated Firefox checks do not assert
+physical iOS approval or full-catalog search; the existing bounded catalog limitation remains.
+
+### Predeployment evidence and boundaries
+
+Captured IDs, image IDs and start times for all 12 running containers for later comparison.
+Web has no persistent volume mount. Existing `/health`, audiobook overview and one-item library
+page return HTTP 200; Audiobookshelf reports `configuredHealthy`. Film and Serie lookup GETs
+return HTTP 200 with the intended single provider. No acquisition, playback or progress write.
+Read-only reachability is distinct from successful title acquisition or playback.
+
+Finance remains FROZEN. No API, Finance, external-media service, database, configuration or
+user-data operation is part of this deployment. Physical iPhone/PWA validation remains separate.
+This publication continues `review/media-merge-deployment`; no unrelated documentation history
+is merged into main. Resolve publication SHA/tree from subject
+`docs(media): record verified Web-only deployment`. Earlier stops below remain historical evidence.
+
+Documentation validator (including relative links), whitespace, staged scope and staged Gitleaks
+checks PASS. Only this existing deployment report and the Media recovery section are changed.
+Main and approved candidate identities are rechecked after publication; no intended changes
+remain unpublished. No automatic next implementation or deployment follows.
+
+## Earlier CI stop — historical evidence
 
 **MERGED / NOT DEPLOYED — CI FAILED.** This section supersedes the earlier PR-permission
 blocker below. The owner explicitly authorized direct normal Git merge/push and CI on main;

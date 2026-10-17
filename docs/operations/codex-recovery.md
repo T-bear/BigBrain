@@ -3,22 +3,22 @@
 
 ## Media merge/deployment — 2026-10-17
 
-**INTERRUPTED — MANUAL REVIEW REQUIRED.** Exact approved candidate
-`1ddfaebff19d67f68bf208c43cf6dd4c3c496b39` was normally merged and pushed to main as
-`08e1bcea6ae190026d4d60a543067c06b71351b1`, tree
-`ad178e419746b9f3d3b3976af429366a3d814bac` (exact candidate tree).
-Parents: prior main `70b659f772b7b7883a5716786859f1e7833a5634`, then candidate.
-Owner authorized direct Git push; the previous PR403 blocker is superseded.
-CI run 256 failed frontend: 214 tests passed, one stale heading assertion failed in
-`MediaDashboard.test.tsx:189`. Backend/documentation/secrets passed. No image build or deployment.
-[Exact CI evidence, service checks and next decision](../reports/deployments/media-integrated-search-deployment-20261017.md#current-outcome--merge-completed-deployment-blocked-by-ci).
-Documentation-only publication remains on `review/media-merge-deployment`; resolve SHA/tree
-from subject `docs(media): record merged candidate and CI deployment stop`. Do not merge this
-branch as implementation. Main retains the approved merge; no rollback or correction attempted.
-Unrelated untracked mockups and Sentinel ADR drafts remain untouched. No intended code delta.
-Next: explicit authorization for the bounded failing-test correction and exact review/CI;
-then resume Web-only deployment only with green CI. No API/Finance/other service changes.
-Finance freeze remains unchanged. Physical iPhone and new deployed UI checks are not run.
+**MEDIA DEPLOYMENT COMPLETE / PHYSICAL IPHONE REVIEW PENDING.**
+Approved CI correction `56c4995673b9283be0ad83cc8d27bedd05c512e6` normally merged as
+`628041b200b1ff1283e29955073db91539bac422`; exact candidate tree
+`a36bb7dcd390c51be395a3de1105cbaefa5c4a29`. First parent is prior main
+`08e1bcea6ae190026d4d60a543067c06b71351b1`, second is approved correction.
+GitHub CI run `39025570041`: frontend/backend/documentation/secrets all SUCCESS.
+Only Web built from exact archived main and recreated with Compose `--no-deps --no-build`.
+Running Web image `sha256:b0022f525ea53f9799ee8c8b104241ef396b1db32f6c79721a570dbdd08f70d4`,
+healthy. All 11 other running containers retain IDs/images/start times. Finance remains FROZEN.
+[Build provenance, live browser/API evidence, limitations and historical stops](../reports/deployments/media-integrated-search-deployment-20261017.md#approved-ci-correction-and-web-only-deployment--2026-10-17).
+Documentation-only publication on `review/media-merge-deployment`, subject
+`docs(media): record verified Web-only deployment`; resolve exact publication SHA/tree in Git.
+Do not merge this older documentation branch as implementation. No intended unpublished delta
+remains after publication; unrelated mockups and four Sentinel ADR drafts remain untouched.
+Next is owner iPhone/PWA verification, including known library search and Audiobookshelf handoff.
+No further code, service operation or automatic Finance work is authorized by this handoff.
 
 ## Historical Qwen integration — 2026-10-16
 
