@@ -21,7 +21,7 @@ public sealed class LibrarrDirectAudioImporter(HttpClient http) : IDirectAudioIm
     {
         using var response = await http.GetAsync("api/v1/direct-audio-capabilities", HttpCompletionOption.ResponseHeadersRead, token);
         var value = await ReadAsync<Capabilities>(response, token);
-        if (value.Contract != "bb158-direct-audio-v1" || value.MaximumBytes != DirectAudioTransport.MaximumBytes || value.Formats is not ["mp3"])
+        if (value.Contract != "bb158-direct-audio-v2" || value.MaximumBytes != DirectAudioTransport.MaximumBytes || value.Formats is not ["mp3", "m4a"])
             throw MediaUrlImportValidation.Invalid("importUnavailable", "Librarr saknar den verifierade direktimportfunktionen.", 503);
     }
     private sealed record Capabilities(string Contract, long MaximumBytes, string[] Formats);
@@ -33,7 +33,7 @@ public sealed class LibrarrDirectAudioImporter(HttpClient http) : IDirectAudioIm
         request.Headers.Add("X-Audio-Format", draft.Format);
         request.Headers.Add("X-Audio-Name", Uri.EscapeDataString(draft.FileName));
         request.Content = new StreamContent(file.Stream);
-        request.Content.Headers.ContentType = new("audio/mpeg");
+        request.Content.Headers.ContentType = new(draft.Format == "m4a" ? "audio/mp4" : "audio/mpeg");
         request.Content.Headers.ContentLength = file.Size;
         using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
         return await ReadAsync<DirectAudioResult>(response, token);

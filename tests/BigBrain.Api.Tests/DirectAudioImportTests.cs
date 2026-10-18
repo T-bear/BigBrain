@@ -89,6 +89,53 @@ public sealed class DirectAudioImportTests : IDisposable
         await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => DirectAudioTransport.ReadResponseAsync(response, "mp3", TestContext.Current.CancellationToken));
     }
 
+    [Theory]
+    [InlineData("mp3", "audio/mpeg", true)]
+    [InlineData("m4a", "audio/mp4", true)]
+    [InlineData("m4a", "audio/x-m4a", true)]
+    [InlineData("m4a", "audio/mpeg", false)]
+    [InlineData("mp3", "audio/mp4", false)]
+    [InlineData("m4a", "video/mp4", false)]
+    [InlineData("m4a", "application/octet-stream", false)]
+    public async Task SelectedFormatRequiresMatchingMime(string format, string mime, bool accepted)
+    {
+        using var response = Response(new byte[20]);
+        response.Content.Headers.ContentType = new(mime);
+        if (accepted)
+        {
+            await using var file = await DirectAudioTransport.ReadResponseAsync(response, format, TestContext.Current.CancellationToken);
+            Assert.Equal(20, file.Size); // Content admission belongs to Librarr before publication.
+        }
+        else await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => DirectAudioTransport.ReadResponseAsync(response, format, TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [InlineData("mp3", "https://audio.example/file.m4a")]
+    [InlineData("m4a", "https://audio.example/file.mp3")]
+    public void MismatchedExtensionCannotBePreviewed(string format, string url) =>
+        Assert.Throws<AudiobookAcquisitionException>(() => MediaUrlImportValidation.Normalize(Input with { Format = format, SourceUrl = url }));
+
+    [Theory]
+    [InlineData("bb158-direct-audio-v1", false)]
+    [InlineData("bb158-direct-audio-v2", true)]
+    public async Task CapabilityVersionMustMatchBeforeUpload(string contract, bool supported)
+    {
+        using var handler = new CapabilityHandler(contract);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("https://librarr.example/") };
+        var importer = new LibrarrDirectAudioImporter(client);
+        if (supported) await importer.RequireAvailableAsync(TestContext.Current.CancellationToken);
+        else await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => importer.RequireAvailableAsync(TestContext.Current.CancellationToken));
+    }
+    private sealed class CapabilityHandler(string contract) : HttpMessageHandler
+    {
+        private static readonly string[] Formats = ["mp3", "m4a"];
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = System.Net.Http.Json.JsonContent.Create(new { contract, maximumBytes = DirectAudioTransport.MaximumBytes, formats = Formats })
+            });
+    }
+
     private sealed class OversizeStream : Stream
     {
         private long left = DirectAudioTransport.MaximumBytes + 1;
@@ -118,7 +165,7 @@ public sealed class DirectAudioImportTests : IDisposable
         using var store = new AudiobookAcquisitionStore(Options);
         var source = new FakeSource(); var importer = new FakeImporter();
         using var service = new MediaUrlImportService(store, source, importer, Options, TimeProvider.System);
-        var first = await Confirm(store, Input); var second = await Confirm(store, Input with { FileName = "Chapter 2" });
+        var first = await Confirm(store, Input); var second = await Confirm(store, Input with { FileName = "Chapter 2", SourceUrl = "https://audio.example/second.m4a", Format = "m4a" });
         var placed = await service.StartAsync(first.Id, TestContext.Current.CancellationToken);
         Assert.Equal("indexing", placed.Status); Assert.True(string.IsNullOrEmpty(placed.ItemId));
         var indexed = await service.InspectAsync(first.Id, TestContext.Current.CancellationToken);
@@ -167,16 +214,15 @@ public sealed class DirectAudioImportTests : IDisposable
     }
 
     [Fact]
-    public async Task MissingCapabilityOrM4aCannotFetch()
+    public async Task MissingCapabilityCannotFetchEitherFormat()
     {
         using var store = new AudiobookAcquisitionStore(Options);
         var source = new FakeSource(); var importer = new FakeImporter { Available = false };
         using var service = new MediaUrlImportService(store, source, importer, Options, TimeProvider.System);
         var draft = await Confirm(store, Input);
         await Assert.ThrowsAsync<HttpRequestException>(() => service.StartAsync(draft.Id, TestContext.Current.CancellationToken));
-        importer.Available = true;
         var m4a = await Confirm(store, Input with { SourceUrl = "https://audio.example/file.m4a", Format = "m4a" });
-        await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => service.StartAsync(m4a.Id, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<HttpRequestException>(() => service.StartAsync(m4a.Id, TestContext.Current.CancellationToken));
         Assert.Equal(0, source.Calls);
     }
 
@@ -204,7 +250,7 @@ public sealed class DirectAudioImportTests : IDisposable
     {
         public int Calls { get; private set; }
         public async Task<DownloadedAudio> FetchAsync(MediaUrlImportDraft draft, CancellationToken token)
-        { Calls++; using var r = Response(new byte[834]); return await DirectAudioTransport.ReadResponseAsync(r, draft.Format, token); }
+        { Calls++; using var r = Response(new byte[834]); r.Content.Headers.ContentType = new(draft.Format == "m4a" ? "audio/mp4" : "audio/mpeg"); return await DirectAudioTransport.ReadResponseAsync(r, draft.Format, token); }
     }
     private sealed class FakeImporter : IDirectAudioImporter
     {

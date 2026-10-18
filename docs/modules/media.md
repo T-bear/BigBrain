@@ -4,8 +4,9 @@
 
 Mediekontroll → Medieflöde → Förbered ljudimport från länk retains `/media/control/import`.
 Preview is network-free; explicit rights/details confirmation and a separate Start are required.
-The implemented subset transfers direct HTTPS MP3 without ID3/APE tags, limited to 64 MiB, to the
-existing Librarr import owner. M4A, conversion, YouTube, redirects and IPv6 remain unsupported.
+The implemented subset transfers direct HTTPS MPEG-1 Layer III MP3 (bounded ID3/APEv2 text tags)
+and progressive AAC-LC M4A, limited to 64 MiB, to the existing Librarr import owner.
+Conversion, YouTube, unsupported codec/tag variants, redirects and IPv6 remain unsupported.
 `Media:Librarr:DirectAudioImportEnabled` defaults false. No service is activated by this checkpoint.
 
 `AudiobookAcquisitionStore.MediaUrlImportDrafts` binds each immutable import ID to a non-unique DOI,
@@ -17,8 +18,9 @@ same authorized ID. Status inspection is explicit, not unattended polling; navig
 the bounded request and leaves evidence for reconciliation. A completed item uses the existing ABS
 public link. No native BigBrain player or progress mutation is introduced.
 
-[Supported subset, exact security contract, tests and deployment prerequisites](../reports/features/media/bb-158-url-import-20261017.md#direct-import-implementation--2026-10-18).
-This is a partial Review Checkpoint, not accepted, deployed or a complete M4A implementation.
+[Supported subset, exact security contract, tests and deployment prerequisites](../reports/features/media/bb-158-url-import-20261017.md#mp3-and-m4a-format-completion--2026-10-18).
+This is a Merge Candidate for the documented format subset, not accepted or deployed. The report defines the exact
+codec/tag subset; capability v2 must match before a transfer. Live ABS compatibility remains unverified.
 
 ## Integrated Media search — accepted and deployed, 2026-10-17
 

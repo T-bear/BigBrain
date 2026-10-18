@@ -1,19 +1,17 @@
 # Codex interrupted-run recovery
 
-## BB-158 — direct audio implementation, 2026-10-18
+## BB-158 — MP3/M4A format continuation, 2026-10-18
 
-**REVIEW CHECKPOINT / PARTIAL / NOT MERGE CANDIDATE / NOT DEPLOYED.**
-Same branch `media/bb158-url-audio-import`, main baseline `133b2b19287c74368828e6904cef241248bdae5e`,
-previous checkpoint `0065680c9a7f8602fb013a0ccbbf3046672cfa8b`. Owner now authorizes the bounded
-Librarr extension and isolated verification. Resolve new SHA/tree by publication subject
-`feat(media): add bounded Librarr direct audio import`.
-[Implemented path, tests, limitations and deployment prerequisites](../reports/features/media/bb-158-url-import-20261017.md#direct-import-implementation--2026-10-18).
-MP3-only bounded fetch/import/indexing path works in isolated fixtures; M4A/tagged MP3 and actual
-host/ABS compatibility are not verified. Start defaults disabled; no production/library/provider
-operation, merge, deployment or Finance change. Independent review is next, not activation.
-All intended changes published at checkpoint; unrelated mockups/four Sentinel ADR drafts preserved.
-Ignored development checkouts/toolchains/test outputs are disposable isolated evidence, not runtime
-components or unpublished product implementation. No automatic continuation or retries.
+**MERGE CANDIDATE FOR DOCUMENTED FORMAT SUBSET / NOT DEPLOYED.** Same branch `media/bb158-url-audio-import`, main baseline
+`133b2b19287c74368828e6904cef241248bdae5e`, previous checkpoint
+`43bf4e6ca80dc922f54f49c2b335aaed4118cf52`. Resolve new SHA/tree by publication subject
+`feat(media): validate tagged MP3 and bounded AAC M4A imports`.
+[Exact format subset, source provenance, verification and deployment gates](../reports/features/media/bb-158-url-import-20261017.md#mp3-and-m4a-format-completion--2026-10-18).
+No production/library/provider operation, merge, deployment or Finance change. Start remains disabled
+by default; no actual image/service configuration is changed. Independent architecture/security
+review is next. Do not automatically retry uncertain jobs or broaden format admission.
+After publication all intended work is committed/pushed; unrelated mockups/four Sentinel ADR drafts
+remain untouched. Ignored isolated Librarr/toolchain/test artifacts are development evidence only.
 
 ## Media Mediekontroll — 2026-10-17
 

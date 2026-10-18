@@ -75,13 +75,20 @@ public sealed class DirectAudioTransport(
         return await ReadResponseAsync(response, draft.Format, deadline.Token);
     }
 
+    public static bool MatchesMime(string format, string? mime) => format switch
+    {
+        "mp3" => string.Equals(mime, "audio/mpeg", StringComparison.OrdinalIgnoreCase),
+        "m4a" => string.Equals(mime, "audio/mp4", StringComparison.OrdinalIgnoreCase) || string.Equals(mime, "audio/x-m4a", StringComparison.OrdinalIgnoreCase),
+        _ => false
+    };
+
     public static async Task<DownloadedAudio> ReadResponseAsync(HttpResponseMessage response, string format, CancellationToken token)
     {
-        if (response.StatusCode != HttpStatusCode.OK || format != "mp3"
+        if (response.StatusCode != HttpStatusCode.OK || format is not ("mp3" or "m4a")
             || response.Content.Headers.ContentEncoding.Count != 0
-            || response.Content.Headers.ContentType?.MediaType != "audio/mpeg"
+            || !MatchesMime(format, response.Content.Headers.ContentType?.MediaType)
             || response.Content.Headers.ContentLength is > MaximumBytes or < 8)
-            throw MediaUrlImportValidation.Invalid("sourceRejected", "Källan måste ge en direkt MP3-fil. Omdirigering, annat format eller för stor fil avvisas.", 422);
+            throw MediaUrlImportValidation.Invalid("sourceRejected", "Källan måste ge en direkt ljudfil med MIME-typ som motsvarar valt MP3/M4A-format. Omdirigering, annat format eller för stor fil avvisas.", 422);
         var fileOptions = new FileStreamOptions
         {
             Mode = FileMode.CreateNew,

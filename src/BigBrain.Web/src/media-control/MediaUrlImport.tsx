@@ -111,8 +111,9 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
   return (
     <div className="url-import">
       <p role="note">
-        Importera en direkt MP3-länk som du har rätt att hämta. Max 64 MiB. Ingen hämtning sker före separat start.
-        Endast MPEG-1 Layer III utan ID3/APE-taggar stöds i denna version.
+        Importera en direkt MP3- eller M4A-länk som du har rätt att hämta. Max 64 MiB. Ingen hämtning sker före separat
+        start. MP3 med vanliga ID3- och APEv2-texttaggar och M4A med AAC-LC stöds. Välj samma format som källfilen;
+        ingen konvertering. DRM och andra codecvarianter stöds inte.
       </p>
       <form
         onSubmit={event => {
@@ -153,7 +154,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
         <label>
           Ljudformat
           <BBSelect value={input.format} onChange={e => change('format', e.target.value)}>
-            <option value="m4a">M4A – import ännu inte tillgänglig</option>
+            <option value="m4a">M4A (AAC-LC)</option>
             <option value="mp3">MP3</option>
           </BBSelect>
         </label>

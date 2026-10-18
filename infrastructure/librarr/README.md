@@ -40,16 +40,18 @@ Remove the import patch when a reviewed upstream release provides equivalent fai
 
 ## BB-158 direct audio import — review extension, 2026-10-18
 
-Patch `0008-bounded-direct-audio-import.patch` adds an authenticated, bounded raw MP3 stream API
+Patch `0008-bounded-direct-audio-import.patch` adds an authenticated, bounded raw MP3/M4A stream API
 and an additive table in the existing Librarr DB. The first seven patches/torrent behavior remain
 unchanged. The Dockerfile applies eight patches and now tests the API and DB packages as well.
 No provider/container is replaced by publishing this source.
 
-[Canonical protocol, limits, failure handling, verification and deployment gates](../../docs/reports/features/media/bb-158-url-import-20261017.md#direct-import-implementation--2026-10-18).
-Only MPEG-1 Layer III MP3 without ID3/APE is admitted. M4A stays denied. Final content is published
+[Canonical protocol, limits, failure handling, verification and deployment gates](../../docs/reports/features/media/bb-158-url-import-20261017.md#mp3-and-m4a-format-completion--2026-10-18).
+MPEG-1 Layer III MP3 with bounded ID3/APEv2 text tags and progressive AAC-LC M4A are admitted
+within the report’s explicit format subset. mp4ff v0.59.0 is pinned in patch8; its MIT notice ships
+in the runtime image. No codec execution or transcoding is added. Final content is published
 with an exclusive link only after bounded structural validation/hash/fsync. The existing reservation
 owner is reused; interrupted reservations never become retry authority. Roots/parents must be
 trusted service-owned local directories supporting hardlinks/fsync. Unknown leftovers require manual
 review, not automatic recursive removal. ABS must see identical files/inodes and folder layout.
-The capability endpoint identifies `bb158-direct-audio-v1`; BigBrain's new opt-in defaults false.
+The capability endpoint identifies `bb158-direct-audio-v2`; BigBrain's new opt-in defaults false.
 This is not a decoder sandbox or a production-verified scanner safety claim.

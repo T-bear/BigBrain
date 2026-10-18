@@ -105,8 +105,8 @@ test('UX Lab specimen makes no requests; direct import route is preserved', () =
   expect(mediaControlPage('/media/control/import', '')).toBe('import')
 })
 
-test('MP3 requires explicit separate start and indexing is not completion', async () => {
-  const mp3 = { ...draft, format: 'mp3', sourceUrl: 'https://audio.example/file.mp3' }
+test.each(['mp3', 'm4a'])('%s requires explicit separate start and indexing is not completion', async format => {
+  const mp3 = { ...draft, format, sourceUrl: `https://audio.example/file.${format}` }
   const fetch = vi.fn(async (url: string) =>
     response(
       url.endsWith('/preview')
@@ -131,6 +131,7 @@ test('MP3 requires explicit separate start and indexing is not completion', asyn
   render(<MediaUrlImport />)
   fill()
   fireEvent.change(screen.getByLabelText('Källänk'), { target: { value: mp3.sourceUrl } })
+  fireEvent.change(screen.getByLabelText('Ljudformat'), { target: { value: format } })
   fireEvent.click(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' }))
   await screen.findByRole('checkbox')
   fireEvent.click(screen.getByRole('checkbox'))

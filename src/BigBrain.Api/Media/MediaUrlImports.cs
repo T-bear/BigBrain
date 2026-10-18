@@ -21,7 +21,7 @@ public sealed record MediaUrlImportDraft(
     public string? ItemId { get; init; }
     public string? AudiobookshelfUrl { get; init; }
     public string? MessageOverride { get; init; }
-    public bool CanStart => Status == "confirmed" && Format == "mp3";
+    public bool CanStart => Status == "confirmed" && Format is "mp3" or "m4a";
     public string Message => MessageOverride ?? Status switch
     {
         "confirmed" => "Uppgifterna är bekräftade. Starta import separat för att hämta ljudet.",
@@ -29,9 +29,9 @@ public sealed record MediaUrlImportDraft(
         "importing" => "Ljudet valideras och placeras av importtjänsten.",
         "indexing" => "Filen är placerad. Väntar på exakt Audiobookshelf-indexering.",
         "completed" => "Filen är verifierad i Audiobookshelf. DOI-kopplingen är sparad.",
-        "failed" => "Importen avvisades. Ingen automatisk omkörning görs.",
+        "failed" => "Importtjänsten avvisade filen eller kunde inte placera den säkert. Kontrollera filformat och importstatus; ingen automatisk omkörning görs.",
         "uncertain" => "Resultatet är osäkert. Kontrollera status; starta inte en ny import som ersättning.",
-        _ => "Ingen fil har hämtats. Endast MP3 utan metadatataggar stöds för import; M4A är ännu spärrat."
+        _ => "Ingen fil har hämtats. MP3 och M4A (AAC-LC) kan importeras utan konvertering."
     };
 }
 
@@ -186,7 +186,7 @@ public sealed partial class AudiobookAcquisitionStore
             if (draft.ConfirmedAtUtc is not null) return draft; // Idempotent; no external side effect.
             if (now < draft.CreatedAtUtc || now >= draft.ExpiresAtUtc)
                 throw MediaUrlImportValidation.Invalid("previewExpired", "Förhandsgranskningen har löpt ut. Granska uppgifterna igen.", 409);
-            draft = draft with { Status = draft.Format == "mp3" ? "confirmed" : "blocked", ConfirmedAtUtc = now, BlockerCode = draft.Format == "mp3" ? "" : "formatNotSupported" };
+            draft = draft with { Status = "confirmed", ConfirmedAtUtc = now, BlockerCode = "" };
             command.CommandText = "UPDATE MediaUrlImportDrafts SET DraftJson=$json WHERE Id=$id";
             command.Parameters.AddWithValue("$json", JsonSerializer.Serialize(draft));
             await command.ExecuteNonQueryAsync(token);
