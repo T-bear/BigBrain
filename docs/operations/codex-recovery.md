@@ -1,5 +1,21 @@
 # Codex interrupted-run recovery
 
+## BB-158 resumption — protected file verified, 2026-10-18
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED (active-use verification before interruption).**
+Main `712a25c89c33dca74bf9c141269f085d011c137f` unchanged; all four exact merge CI jobs SUCCESS.
+Owner-installed wrapper checksum, root ownership/mode0555 and protected non-symlink parent chain
+PASS. Effective ABS-only override PASS, not applied. Original containers/images/start times intact.
+[New verified evidence and exact activity gate](../reports/features/media/bb-158-url-import-20261017.md#protected-installation-verified--activity-gate--2026-10-18).
+ABS catalog26 readable, but current token is denied admin session/user endpoints403/404; owner
+local admin confirmation/no-use interval requested and pending. Librarr reports four `downloading`
+entries at0B/s with unknown sizes; safe interruption not established. Do not assume idle.
+Next: resolve that activity evidence, then existing consistent backup/rollback and deployment
+sequence. No new deployment authorization needed. No backup, restart, build, import, opt-in,
+Finance operation or administrative bypass. Restricted ignored inventory retained; no credentials
+published. Same review branch, docs only; unrelated mockups/Sentinel drafts preserved.
+Earlier missing-root-installation and pending-CI entries below are superseded historical records.
+
 ## BB-158 approved merge — local installation stop, 2026-10-18
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED (local administrative authentication).**
