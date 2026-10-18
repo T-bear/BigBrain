@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-158 deployment — 2026-10-18
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED.** Approved main `772cc7542ea4dd7de06a6dd7b7427735028bd9f9`, CI SUCCESS.
+Read-only scanner gate failed before any production change: installed ABS probe inherits root,
+has no wrapper timeout/output bound and no container/ancestor memory or CPU cap. ABS change/restart
+is explicitly outside authorization. [Exact evidence, unchanged images and next decision](../reports/features/media/bb-158-url-import-20261017.md#authorized-deployment-attempt--scanner-gate-stop-2026-10-18).
+No build/copy/import/configuration/restart occurred; no rollback needed. Recovery-copy/torrent
+execution gates remain unverified. Resume existing deployment only after the scanner boundary is
+resolved through separately approved ABS containment or verified equivalent protection. No new
+source was selected and no import allowance consumed. Documentation branch:
+`review/bb158-deployment-safety-gate`; all intended documentation published at checkpoint,
+unrelated mockups/Sentinel drafts preserved.
+
 ## BB-158 — MP3/M4A format continuation, 2026-10-18
 
 **MERGE CANDIDATE FOR DOCUMENTED FORMAT SUBSET / NOT DEPLOYED.** Same branch `media/bb158-url-audio-import`, main baseline
