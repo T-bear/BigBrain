@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-158 deployment — bounded probe review, 2026-10-18
+
+**REVIEW CHECKPOINT / NOT INSTALLED.** Approved application main
+`772cc7542ea4dd7de06a6dd7b7427735028bd9f9`, CI SUCCESS. Same branch
+`review/bb158-deployment-safety-gate`; continuation from `8463be17c4d3219c714b1ccdaeca630c02485f6e`.
+Owner authorized the ffprobe correction but expressly requires exact-SHA review/merge approval
+for new repository infrastructure. [Implementation, tests and remaining deployment gates](../reports/features/media/bb-158-url-import-20261017.md#bounded-ffprobe-correction--2026-10-18).
+Wrapper/ABS-only override implemented; 14 isolated tests PASS plus focused context assertion PASS.
+No production change, backup, restart, import or Finance interruption. All intended source/docs
+published together; unrelated mockups/Sentinel drafts preserved. Next: independent exact-SHA
+review, then protected installation and existing backup/active-use/rollback gates before approved
+ABS and Librarr/API/Web operations. Do not deploy unreviewed wrapper code. Permitted test source
+and truthful DOI association still required; real-import allowance remains unused.
+
 ## BB-158 — MP3/M4A format continuation, 2026-10-18
 
 **MERGE CANDIDATE FOR DOCUMENTED FORMAT SUBSET / NOT DEPLOYED.** Same branch `media/bb158-url-audio-import`, main baseline
