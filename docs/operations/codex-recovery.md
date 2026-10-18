@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-158 approved merge — local installation stop, 2026-10-18
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED (local administrative authentication).**
+Approved `0da084f8614c47fef9009bb5a5b4897a100eea11` merged without content changes to main
+`712a25c89c33dca74bf9c141269f085d011c137f`, tree `f40d12fff843f4417911e4c2060aac13db617228`.
+[Merge CI, exact administrative stop, installation checksum and unchanged production identities](../reports/features/media/bb-158-url-import-20261017.md#approved-safety-merge-and-local-installation-stop--2026-10-18).
+No production mutation or deployment occurred: noninteractive sudo requires a password.
+Owner must handle administrative authentication locally; do not send credentials to the agent.
+Existing deployment authority remains; safe backups/activity/rollback gates still precede restart.
+No permitted smoke-test URL/DOI supplied; no import attempt consumed. This docs-only continuation
+uses the existing safety review branch; unrelated untracked mockups/Sentinel drafts are preserved.
+Earlier entries below describe their dated checkpoint states, not current merge status.
+
 ## BB-158 deployment — bounded probe review, 2026-10-18
 
 **REVIEW CHECKPOINT / NOT INSTALLED.** Approved application main
