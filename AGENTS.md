@@ -44,6 +44,8 @@
   samma bedömning när uppdraget inte anger någon. Ansvarskedjan är ägare → systemarkitekt → Codex.
 - Under implementation används i första hand fokuserade tester för den ändrade ytan. Kör inte
   oförändrade fulla testsviter igen enbart för att en ny commit, push eller checkpoint tillkommit.
+  Efter en avgränsad korrigering verifieras normalt ändringen och berörda beroenden;
+  utöka endast vid konkret risk eller obligatoriskt krav.
 - En Review Checkpoint verifieras proportionellt mot sin delta och risk; full repository-verifiering
   är inte automatisk. En Merge Candidate får den bredaste verifiering som faktisk risk och
   påverkansområde motiverar. Mekaniska, dokumentationsbaserade, isolerade eller andra lågriskändringar
@@ -73,6 +75,24 @@ med stöd av riskreglerna ovan:
   automatiskt bli ett nytt godkännandesteg eller ett separat Codex-uppdrag.
 - Varje extra kontroll eller stopp utöver det normala riskbaserade arbetsflödet ska kunna
   motiveras med en konkret risk, avvikelse eller uttryckligt krav.
+- Håll auktoriserat mål och acceptanskriterier stabila under implementation och review.
+  Förbättringsidéer utökar inte uppdraget; nytt scope kräver produktägarbeslut. Konkreta
+  säkerhetsfel, korrekthetsbrister, arkitekturkonflikter och obligatoriska krav måste fortfarande
+  hanteras enligt befintliga blocker- och godkännanderegler.
+- Klassificera granskningsfynd lättviktigt: **P0** är en kritisk brist som stoppar merge;
+  **P1** är en blockerande brist, exempelvis brutet obligatoriskt krav eller otillräcklig
+  nödvändig verifiering; **P2** är en icke-blockerande brist som kan hanteras separat endast
+  när acceptanskriterier och säkerhetskrav är uppfyllda; **P3** är en framtida förbättring,
+  refaktorering eller alternativ arkitektur. P2/P3 skapar inte automatiskt nya Codex-iterationer.
+- När en Merge Candidate uppfyller Definition of Done, acceptanskriterier och riskmotiverad
+  verifiering ska ChatGPT normalt rekommendera godkännande/merge. Initiera inte sena
+  arkitekturomprövningar utan konkret blockerande evidens eller produktägarens uttryckliga begäran.
+  Inget absolut tak för granskningsrundor införs; nödvändiga blockeråtgärder kvarstår.
+- Formulera normalt Codex-uppdrag kring mål, scope, acceptanskriterier och stoppvillkor;
+  hänvisa till permanenta regler i stället för att återge dem. Följ befintliga dokumentationsregler
+  för kanonisk evidens utan duplicering eller rutinmässiga efterföljande dokumentationscommits.
+  Ytterligare Codex-körningar, separata kontrollsteg och arkitekturutredningar kräver konkret
+  risk, obligatoriskt krav eller produktägarbeslut som motivering.
 
 Denna princip får aldrig kringgå obligatorisk säkerhetsverifiering, arkitekturbeslut, Finance-skydd,
 uttryckligt merge-godkännande av exakt SHA eller separat deployment-auktorisering.
