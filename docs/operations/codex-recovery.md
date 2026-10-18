@@ -3,15 +3,15 @@
 ## BB-158 deployment — 2026-10-18
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED.** Approved main `772cc7542ea4dd7de06a6dd7b7427735028bd9f9`, CI SUCCESS.
-Read-only scanner gate failed before any production change: installed ABS probe inherits root,
-has no wrapper timeout/output bound and no container/ancestor memory or CPU cap. ABS change/restart
-is explicitly outside authorization. [Exact evidence, unchanged images and next decision](../reports/features/media/bb-158-url-import-20261017.md#authorized-deployment-attempt--scanner-gate-stop-2026-10-18).
-No build/copy/import/configuration/restart occurred; no rollback needed. Recovery-copy/torrent
-execution gates remain unverified. Resume existing deployment only after the scanner boundary is
-resolved through separately approved ABS containment or verified equivalent protection. No new
-source was selected and no import allowance consumed. Documentation branch:
-`review/bb158-deployment-safety-gate`; all intended documentation published at checkpoint,
-unrelated mockups/Sentinel drafts preserved.
+Owner now authorizes limited ABS hardening/recreation; the earlier permission blocker is superseded.
+Read-only measured capacity/peaks and installed probe code show container limits alone cannot
+satisfy the requested timeout/output-control gate. [Exact follow-up evidence and smallest remaining dependency](../reports/features/media/bb-158-url-import-20261017.md#abs-containment-authorization-follow-up--2026-10-18).
+No production mutation, build, backup, restart or import occurred. No rollback required; no Finance
+interruption. Same branch `review/bb158-deployment-safety-gate`, additive documentation only.
+Next: explicit narrow decision for a verified bounded probe execution mechanism; do not silently
+replace it with aggregate cgroup limits. Recovery-copy/active-use checks and a permitted test URL
+with truthful DOI association remain execution prerequisites. Import allowance unused. All intended
+documentation is published; unrelated mockups/Sentinel drafts remain preserved.
 
 ## BB-158 — MP3/M4A format continuation, 2026-10-18
 
