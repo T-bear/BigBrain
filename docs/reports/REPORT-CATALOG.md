@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17` — [URL import preparation and safe-import blocker](features/media/bb-158-url-import-20261017.md). Partial Review Checkpoint; persistent DOI-linked intents only, no download or library import.
+- `BB-158, 2026-10-17–18` — [Bounded direct MP3 import via Librarr](features/media/bb-158-url-import-20261017.md). Partial Review Checkpoint; isolated-tested transfer/placement/indexing, M4A and production verification pending.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 

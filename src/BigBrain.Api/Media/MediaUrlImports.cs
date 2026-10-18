@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace BigBrain.Api.Media;
 
-// A durable intent, never evidence that a file was fetched or indexed.
+// Stable intent plus verified import outcome; preview/confirmation never imply file placement.
 public sealed record MediaUrlImportInput(string? SourceUrl, string? FileName, string? Doi, string? Format);
 public sealed record MediaUrlImportConfirmation(bool DetailsConfirmed, bool RightsConfirmed);
 public sealed record MediaUrlImportDraft(
@@ -13,8 +13,26 @@ public sealed record MediaUrlImportDraft(
     string ProposedFileName, DateTimeOffset CreatedAtUtc, DateTimeOffset ExpiresAtUtc,
     string Status, DateTimeOffset? ConfirmedAtUtc, string BlockerCode)
 {
-    public bool CanStart => false;
-    public string Message => "Säker biblioteksimport är ännu inte tillgänglig. Ingen fil hämtas eller skapas i Audiobookshelf.";
+    public string? Checksum { get; init; }
+    public long? Bytes { get; init; }
+    public string? RelativePath { get; init; }
+    public string? Inode { get; init; }
+    public string? LibraryId { get; init; }
+    public string? ItemId { get; init; }
+    public string? AudiobookshelfUrl { get; init; }
+    public string? MessageOverride { get; init; }
+    public bool CanStart => Status == "confirmed" && Format == "mp3";
+    public string Message => MessageOverride ?? Status switch
+    {
+        "confirmed" => "Uppgifterna är bekräftade. Starta import separat för att hämta ljudet.",
+        "downloading" => "Hämtning påbörjad. En avbruten körning startas aldrig om automatiskt.",
+        "importing" => "Ljudet valideras och placeras av importtjänsten.",
+        "indexing" => "Filen är placerad. Väntar på exakt Audiobookshelf-indexering.",
+        "completed" => "Filen är verifierad i Audiobookshelf. DOI-kopplingen är sparad.",
+        "failed" => "Importen avvisades. Ingen automatisk omkörning görs.",
+        "uncertain" => "Resultatet är osäkert. Kontrollera status; starta inte en ny import som ersättning.",
+        _ => "Ingen fil har hämtats. Endast MP3 utan metadatataggar stöds för import; M4A är ännu spärrat."
+    };
 }
 
 public static class MediaUrlImportValidation
@@ -42,6 +60,7 @@ public static class MediaUrlImportValidation
             throw Invalid("unsupportedSource", "Endast direkta länkar med vald ljudändelse kan förhandsgranskas. YouTube, videosidor och konvertering stöds inte.");
 
         var name = input.FileName?.Trim() ?? "";
+        if (name.Length == 0) name = "Ljudimport";
         if (name.Length > 80)
             throw Invalid("invalidFileName", "Filnamnet får vara högst 80 tecken.");
         try { name = name.Normalize(NormalizationForm.FormC); }
@@ -92,6 +111,51 @@ public sealed partial class AudiobookAcquisitionStore
         finally { gate.Release(); }
     }
 
+    public async Task<MediaUrlImportDraft> StartUrlImportAsync(string id, DateTimeOffset now, CancellationToken token)
+    {
+        await gate.WaitAsync(token);
+        try
+        {
+            await using var connection = await OpenAsync(token);
+            using var transaction = connection.BeginTransaction();
+            await using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = "SELECT DraftJson FROM MediaUrlImportDrafts";
+            var drafts = new List<MediaUrlImportDraft>();
+            await using (var reader = await command.ExecuteReaderAsync(token))
+                while (await reader.ReadAsync(token)) drafts.Add(JsonSerializer.Deserialize<MediaUrlImportDraft>(reader.GetString(0))!);
+            var draft = drafts.SingleOrDefault(v => v.Id == id)
+                ?? throw MediaUrlImportValidation.Invalid("draftNotFound", "Importen finns inte.", 404);
+            if (!draft.CanStart || now < draft.CreatedAtUtc || now >= draft.ExpiresAtUtc)
+                throw MediaUrlImportValidation.Invalid("startRejected", "Importen är inte startbar. Förbrukade eller avbrutna importer får inte köras om.", 409);
+            if (drafts.Any(v => v.Status is "downloading" or "importing"))
+                throw MediaUrlImportValidation.Invalid("importBusy", "En aktiv eller avbruten import kräver avstämning först.", 409);
+            draft = draft with { Status = "downloading" };
+            command.CommandText = "UPDATE MediaUrlImportDrafts SET DraftJson=$json WHERE Id=$id";
+            command.Parameters.AddWithValue("$id", id);
+            command.Parameters.AddWithValue("$json", JsonSerializer.Serialize(draft));
+            await command.ExecuteNonQueryAsync(token);
+            transaction.Commit();
+            return draft;
+        }
+        finally { gate.Release(); }
+    }
+
+    public async Task SaveUrlImportAsync(MediaUrlImportDraft draft, CancellationToken token)
+    {
+        await gate.WaitAsync(token);
+        try
+        {
+            await using var connection = await OpenAsync(token);
+            await using var command = connection.CreateCommand();
+            command.CommandText = "UPDATE MediaUrlImportDrafts SET DraftJson=$json WHERE Id=$id";
+            command.Parameters.AddWithValue("$id", draft.Id);
+            command.Parameters.AddWithValue("$json", JsonSerializer.Serialize(draft));
+            if (await command.ExecuteNonQueryAsync(token) != 1) throw new IOException("Missing import identity.");
+        }
+        finally { gate.Release(); }
+    }
+
     public async Task<IReadOnlyList<MediaUrlImportDraft>> ListUrlImportsAsync(CancellationToken token)
     {
         await using var connection = await OpenAsync(token);
@@ -122,7 +186,7 @@ public sealed partial class AudiobookAcquisitionStore
             if (draft.ConfirmedAtUtc is not null) return draft; // Idempotent; no external side effect.
             if (now < draft.CreatedAtUtc || now >= draft.ExpiresAtUtc)
                 throw MediaUrlImportValidation.Invalid("previewExpired", "Förhandsgranskningen har löpt ut. Granska uppgifterna igen.", 409);
-            draft = draft with { Status = "blocked", ConfirmedAtUtc = now };
+            draft = draft with { Status = draft.Format == "mp3" ? "confirmed" : "blocked", ConfirmedAtUtc = now, BlockerCode = draft.Format == "mp3" ? "" : "formatNotSupported" };
             command.CommandText = "UPDATE MediaUrlImportDrafts SET DraftJson=$json WHERE Id=$id";
             command.Parameters.AddWithValue("$json", JsonSerializer.Serialize(draft));
             await command.ExecuteNonQueryAsync(token);
@@ -143,6 +207,10 @@ public static class MediaUrlImportEndpoints
             Execute(async () => Results.Ok(await store.PreviewUrlImportAsync(input, clock.GetUtcNow(), token))));
         group.MapPost("/{id}/confirm", (string id, MediaUrlImportConfirmation input, AudiobookAcquisitionStore store, TimeProvider clock, CancellationToken token) =>
             Execute(async () => Results.Ok(await store.ConfirmUrlImportAsync(id, input, clock.GetUtcNow(), token))));
+        group.MapPost("/{id}/start", (string id, MediaUrlImportService service, CancellationToken token) =>
+            Execute(async () => Results.Ok(await service.StartAsync(id, token))));
+        group.MapPost("/{id}/inspect", (string id, MediaUrlImportService service, CancellationToken token) =>
+            Execute(async () => Results.Ok(await service.InspectAsync(id, token))));
         return app;
     }
 
@@ -154,5 +222,11 @@ public static class MediaUrlImportEndpoints
             return Results.Problem(statusCode: exception.StatusCode, title: "Importen kunde inte förberedas", detail: exception.SafeMessage,
                 extensions: new Dictionary<string, object?> { ["code"] = exception.Code });
         }
+        catch (Exception exception) when (exception is HttpRequestException or IOException or JsonException or OperationCanceledException)
+        {
+            return Results.Problem(statusCode: 503, title: "Importtjänsten kunde inte nås",
+                detail: "Kontrollera sparad status. Ingen automatisk omkörning görs.");
+        }
+
     }
 }

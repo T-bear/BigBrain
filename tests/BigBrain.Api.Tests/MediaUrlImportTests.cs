@@ -80,7 +80,7 @@ public sealed class MediaUrlImportTests : IDisposable
     }
 
     [Fact]
-    public async Task ConfirmationIsExplicitIdempotentAndRemainsBlockedAcrossReopen()
+    public async Task ConfirmationIsExplicitIdempotentAndRemainsConfirmedAcrossReopen()
     {
         MediaUrlImportDraft blocked;
         using (var store = new AudiobookAcquisitionStore(Options))
@@ -91,9 +91,9 @@ public sealed class MediaUrlImportTests : IDisposable
             var results = await Task.WhenAll(Enumerable.Range(0, 8).Select(_ => store.ConfirmUrlImportAsync(draft.Id, new(true, true), Now.AddMinutes(1), TestContext.Current.CancellationToken)));
             blocked = results[0];
             Assert.All(results, value => Assert.Equal(blocked, value));
-            Assert.Equal("blocked", blocked.Status);
-            Assert.False(blocked.CanStart);
-            Assert.Equal("safeImportUnavailable", blocked.BlockerCode);
+            Assert.Equal("confirmed", blocked.Status);
+            Assert.True(blocked.CanStart);
+            Assert.Equal("", blocked.BlockerCode);
             Assert.Empty((await store.ListAsync(0, 25, TestContext.Current.CancellationToken)).Items);
         }
         using var reopened = new AudiobookAcquisitionStore(Options);
@@ -124,10 +124,10 @@ public sealed class MediaUrlImportTests : IDisposable
     }
 
     [Fact]
-    public async Task VersionedEndpointsReturnProblemsAndNeverExposeAStartRoute()
+    public async Task VersionedEndpointsReturnProblemsAndStartFailsClosedWhenDisabled()
     {
         using var host = await new HostBuilder().ConfigureWebHost(web => web.UseTestServer()
-            .ConfigureServices(services => { services.AddRouting(); services.AddSingleton(Options); services.AddSingleton<AudiobookAcquisitionStore>(); services.AddSingleton(TimeProvider.System); })
+            .ConfigureServices(services => { services.AddRouting(); services.AddSingleton(Options); services.AddSingleton<AudiobookAcquisitionStore>(); services.AddSingleton(TimeProvider.System); services.AddSingleton<IDirectAudioTransport, DirectAudioTransport>(); services.AddSingleton<IDirectAudioImporter>(new LibrarrDirectAudioImporter(new HttpClient())); services.AddSingleton<MediaUrlImportService>(); })
             .Configure(app => app.UseRouting().UseEndpoints(endpoints => endpoints.MapMediaUrlImportEndpoints())))
             .StartAsync(TestContext.Current.CancellationToken);
         using var client = host.GetTestClient();
@@ -140,10 +140,10 @@ public sealed class MediaUrlImportTests : IDisposable
         response.EnsureSuccessStatusCode();
         var draft = (await response.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!;
         Assert.False(draft.CanStart);
-        Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync($"/api/v1/modules/media/url-imports/{draft.Id}/start", new { }, TestContext.Current.CancellationToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.PostAsJsonAsync($"/api/v1/modules/media/url-imports/{draft.Id}/start", new { }, TestContext.Current.CancellationToken)).StatusCode);
         var confirmation = await client.PostAsJsonAsync($"/api/v1/modules/media/url-imports/{draft.Id}/confirm", new MediaUrlImportConfirmation(true, true), TestContext.Current.CancellationToken);
         confirmation.EnsureSuccessStatusCode();
-        Assert.Equal("blocked", (await confirmation.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!.Status);
+        Assert.Equal("confirmed", (await confirmation.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!.Status);
     }
 
     public void Dispose() { if (Directory.Exists(directory)) Directory.Delete(directory, true); }

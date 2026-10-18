@@ -413,7 +413,21 @@ export type MediaUrlImportDraft = MediaUrlImportInput & {
   createdAtUtc: string
   expiresAtUtc: string
   confirmedAtUtc: string | null
-  status: 'previewed' | 'blocked'
+  status:
+    | 'previewed'
+    | 'confirmed'
+    | 'blocked'
+    | 'downloading'
+    | 'importing'
+    | 'indexing'
+    | 'completed'
+    | 'failed'
+    | 'uncertain'
+  checksum?: string
+  bytes?: number
+  itemId?: string
+  libraryId?: string
+  audiobookshelfUrl?: string
   canStart: boolean
   blockerCode: string
   message: string
@@ -422,6 +436,10 @@ const urlImportsBase = '/api/v1/modules/media/url-imports'
 export const getUrlImportDrafts = (signal?: AbortSignal) => getJson<MediaUrlImportDraft[]>(urlImportsBase + '/', signal)
 export const previewUrlImport = (input: MediaUrlImportInput, signal?: AbortSignal) =>
   postJson<MediaUrlImportDraft>(urlImportsBase + '/preview', input, signal)
+export const startUrlImport = (id: string, signal?: AbortSignal) =>
+  postJson<MediaUrlImportDraft>(urlImportsBase + '/' + encodeURIComponent(id) + '/start', {}, signal)
+export const inspectUrlImport = (id: string, signal?: AbortSignal) =>
+  postJson<MediaUrlImportDraft>(urlImportsBase + '/' + encodeURIComponent(id) + '/inspect', {}, signal)
 export const confirmUrlImport = (id: string, signal?: AbortSignal) =>
   postJson<MediaUrlImportDraft>(
     urlImportsBase + '/' + encodeURIComponent(id) + '/confirm',

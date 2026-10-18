@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import {
   ApiError,
   confirmUrlImport,
+  startUrlImport,
+  inspectUrlImport,
   getUrlImportDrafts,
   previewUrlImport,
   type MediaUrlImportDraft,
@@ -10,7 +12,7 @@ import {
 import { BBButton, BBEmptyState, BBInput, BBSelect, BBSurface } from '../components'
 
 export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
-  const [input, setInput] = useState<MediaUrlImportInput>({ sourceUrl: '', fileName: '', doi: '', format: 'm4a' })
+  const [input, setInput] = useState<MediaUrlImportInput>({ sourceUrl: '', fileName: '', doi: '', format: 'mp3' })
   const [draft, setDraft] = useState<MediaUrlImportDraft | null>(null)
   const [history, setHistory] = useState<MediaUrlImportDraft[]>([])
   const [agreed, setAgreed] = useState(false)
@@ -78,10 +80,39 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
     }
   }
 
+  async function execute(item: MediaUrlImportDraft, start: boolean) {
+    if (specimen || busy) return
+    request.current?.abort()
+    const controller = new AbortController()
+    request.current = controller
+    const version = ++generation.current
+    setBusy(true)
+    setError('')
+    setDraft(item)
+    try {
+      const value = start
+        ? await startUrlImport(item.id, controller.signal)
+        : await inspectUrlImport(item.id, controller.signal)
+      if (version !== generation.current || controller.signal.aborted) return
+      setDraft(value)
+      setHistory(items => [value, ...items.filter(saved => saved.id !== value.id)])
+    } catch (failure) {
+      if (version === generation.current && !controller.signal.aborted)
+        setError(
+          failure instanceof ApiError
+            ? failure.message
+            : 'Resultatet är osäkert. Läs sparad status innan du gör något mer.',
+        )
+    } finally {
+      if (version === generation.current) setBusy(false)
+    }
+  }
+
   return (
     <div className="url-import">
       <p role="note">
-        Förbered en ljudimport. Nedladdning och biblioteksimport är spärrade tills en säker importväg är verifierad.
+        Importera en direkt MP3-länk som du har rätt att hämta. Max 64 MiB. Ingen hämtning sker före separat start.
+        Endast MPEG-1 Layer III utan ID3/APE-taggar stöds i denna version.
       </p>
       <form
         onSubmit={event => {
@@ -103,7 +134,6 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
         <label>
           Filnamn
           <BBInput
-            required
             maxLength={80}
             placeholder="Kapitel 1 – Introduktion"
             value={input.fileName}
@@ -123,7 +153,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
         <label>
           Ljudformat
           <BBSelect value={input.format} onChange={e => change('format', e.target.value)}>
-            <option value="m4a">M4A</option>
+            <option value="m4a">M4A – import ännu inte tillgänglig</option>
             <option value="mp3">MP3</option>
           </BBSelect>
         </label>
@@ -135,6 +165,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
           Analysera uppgifter och förhandsgranska
         </BBButton>
       </form>
+      {busy && <p role="status">Åtgärden pågår. En avbruten överföring kan kräva avstämning.</p>}
       {error && <p role="alert">{error}</p>}
       <section ref={result} tabIndex={-1} aria-label="Importförhandsgranskning" aria-live="polite">
         {draft && (
@@ -149,7 +180,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
               <dd>{draft.doi}</dd>
               <dt>Ljudformat</dt>
               <dd>{draft.format.toUpperCase()}</dd>
-              <dt>Föreslagen unik filidentitet (ingen fil skapad)</dt>
+              <dt>Unikt filnamn</dt>
               <dd>{draft.proposedFileName}</dd>
             </dl>
             <p>{draft.message}</p>
@@ -167,11 +198,17 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
             {draft.status === 'blocked' && (
               <p role="status">Uppgifterna är bekräftade och sparade. Importen är blockerad, inte köad.</p>
             )}
-            <BBButton type="button" disabled aria-describedby="url-import-blocker">
+            <BBButton
+              type="button"
+              disabled={!draft.canStart || busy || specimen}
+              onClick={() => void execute(draft, true)}
+              aria-describedby="url-import-blocker"
+            >
               Starta import
             </BBButton>
             <p id="url-import-blocker">
-              Säker placering utan överskrivning och exakt Audiobookshelf-indexering måste verifieras först.
+              Start kräver aktiverad direktimport på servern och kompatibel Librarr. Osäkra eller avbrutna importer
+              startas aldrig om automatiskt.
             </p>
           </BBSurface>
         )}
@@ -186,7 +223,39 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
               <li key={item.id}>
                 <strong>{item.fileName}</strong> · DOI {item.doi} · {item.format.toUpperCase()}
                 <br />
-                {item.status === 'blocked' ? 'Bekräftad men blockerad' : 'Förhandsgranskad'} — ingen fil skapad.
+                {item.message}
+                {item.status === 'completed' && (
+                  <>
+                    <p>Audiobookshelf-objekt: {item.itemId}</p>
+                    {item.audiobookshelfUrl && (
+                      <a
+                        className="media-control-card"
+                        href={item.audiobookshelfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Öppna {item.fileName} i Audiobookshelf
+                      </a>
+                    )}
+                  </>
+                )}
+                {['indexing', 'uncertain', 'downloading', 'importing'].includes(item.status) && (
+                  <BBButton type="button" disabled={busy || specimen} onClick={() => void execute(item, false)}>
+                    Kontrollera importstatus för {item.fileName}
+                  </BBButton>
+                )}
+                {item.canStart && (
+                  <BBButton
+                    type="button"
+                    disabled={busy || specimen}
+                    onClick={() => {
+                      setDraft(item)
+                      setAgreed(false)
+                    }}
+                  >
+                    Visa bekräftad import {item.fileName}
+                  </BBButton>
+                )}
                 <br />
                 <small>Import-ID: {item.id}</small>
               </li>

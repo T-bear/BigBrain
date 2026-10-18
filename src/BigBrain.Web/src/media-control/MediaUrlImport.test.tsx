@@ -36,6 +36,7 @@ test('explicit preview and consent persist only an intent; import remains disabl
   render(<MediaUrlImport />)
   await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
   fill()
+  fireEvent.change(screen.getByLabelText('Ljudformat'), { target: { value: 'm4a' } })
   expect(fetch).toHaveBeenCalledTimes(1)
   fireEvent.click(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' }))
   const confirm = await screen.findByRole('button', { name: 'Bekräfta uppgifter – ingen nedladdning' })
@@ -102,4 +103,48 @@ test('UX Lab specimen makes no requests; direct import route is preserved', () =
   expect(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' })).toBeDisabled()
   expect(fetch).not.toHaveBeenCalled()
   expect(mediaControlPage('/media/control/import', '')).toBe('import')
+})
+
+test('MP3 requires explicit separate start and indexing is not completion', async () => {
+  const mp3 = { ...draft, format: 'mp3', sourceUrl: 'https://audio.example/file.mp3' }
+  const fetch = vi.fn(async (url: string) =>
+    response(
+      url.endsWith('/preview')
+        ? mp3
+        : url.endsWith('/confirm')
+          ? { ...mp3, status: 'confirmed', canStart: true }
+          : url.endsWith('/start')
+            ? { ...mp3, status: 'indexing', canStart: false, message: 'Väntar på indexering.' }
+            : url.endsWith('/inspect')
+              ? {
+                  ...mp3,
+                  status: 'completed',
+                  canStart: false,
+                  itemId: 'indexed-item',
+                  audiobookshelfUrl: 'https://abs.example/item/indexed-item',
+                  message: 'Verifierad i Audiobookshelf.',
+                }
+              : [],
+    ),
+  )
+  vi.stubGlobal('fetch', fetch)
+  render(<MediaUrlImport />)
+  fill()
+  fireEvent.change(screen.getByLabelText('Källänk'), { target: { value: mp3.sourceUrl } })
+  fireEvent.click(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' }))
+  await screen.findByRole('checkbox')
+  fireEvent.click(screen.getByRole('checkbox'))
+  fireEvent.click(screen.getByRole('button', { name: 'Bekräfta uppgifter – ingen nedladdning' }))
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Starta import' })).toBeEnabled())
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/start'))).toBe(false)
+  fireEvent.click(screen.getByRole('button', { name: 'Starta import' }))
+  const inspect = await screen.findByRole('button', { name: 'Kontrollera importstatus för Kapitel 1' })
+  expect(screen.queryByText(/Audiobookshelf-objekt:/)).not.toBeInTheDocument()
+  fireEvent.click(inspect)
+  await screen.findByText('Audiobookshelf-objekt: indexed-item')
+  expect(screen.getByRole('link', { name: 'Öppna Kapitel 1 i Audiobookshelf' })).toHaveAttribute(
+    'href',
+    'https://abs.example/item/indexed-item',
+  )
+  expect(fetch.mock.calls.filter(([url]) => url.endsWith('/start'))).toHaveLength(1)
 })

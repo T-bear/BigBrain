@@ -149,8 +149,8 @@ export function UXLab() {
           <MediaControlOverview preview />
         </Specimen>
         <Specimen
-          name="Ljudimport – spärrad förhandsgranskning"
-          description="Experimentellt BB-158-formulär. Ingen nätverkshämtning eller import; inte ägargodkänt."
+          name="Ljudimport – explicit bekräftelse"
+          description="Experimentellt BB-158-formulär. Detta specimen gör inga nätverksanrop; inte ägargodkänt."
         >
           <MediaUrlImport specimen />
         </Specimen>

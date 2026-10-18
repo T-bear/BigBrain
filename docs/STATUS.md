@@ -1,13 +1,12 @@
 # BigBrain Status
 
-## BB-158 — URL import preparation, 2026-10-17
+## BB-158 — direct audio import, 2026-10-18
 
-**PARTIAL / REVIEW CHECKPOINT / NOT DEPLOYED.** Network-free preview and persistent DOI-linked
-import intents are implemented. Download, transformation and library import remain blocked;
-no completed-file or Audiobookshelf-indexing success is claimed. Continuation confirmed that a
-bounded Librarr direct-file import contract requires separate authorization; current adapters
-cannot reserve a destination and prove exact ABS file identity.
-[Verified subset and concrete blocker](reports/features/media/bb-158-url-import-20261017.md).
+**PARTIAL / REVIEW CHECKPOINT / NOT DEPLOYED.** Owner-authorized Librarr extension implements
+bounded MP3 stream import, exclusive placement, durable DOI/file linkage and exact ABS reconciliation
+in isolated tests. The earlier import-owner authorization blocker is resolved. M4A/tagged MP3 remain
+unsupported; live ABS/filesystem compatibility and scanner safety remain activation prerequisites.
+[Current contract, verified results and limitations](reports/features/media/bb-158-url-import-20261017.md#direct-import-implementation--2026-10-18).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).

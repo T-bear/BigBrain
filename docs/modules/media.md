@@ -1,21 +1,24 @@
 # Media Module
 
-## BB-158 — URL import preparation (review only)
+## BB-158 — bounded direct audio import (review only, 2026-10-18)
 
-Mediekontroll → Medieflöde → Förbered ljudimport från länk opens `/media/control/import`.
-The existing three overview cards and Media search are preserved. M4A/MP3 selection describes
-the intended same-format file, not supported conversion. Only structural HTTPS-link, filename
-and DOI validation runs; no source is contacted. YouTube/video and conversion are unsupported.
+Mediekontroll → Medieflöde → Förbered ljudimport från länk retains `/media/control/import`.
+Preview is network-free; explicit rights/details confirmation and a separate Start are required.
+The implemented subset transfers direct HTTPS MP3 without ID3/APE tags, limited to 64 MiB, to the
+existing Librarr import owner. M4A, conversion, YouTube, redirects and IPv6 remain unsupported.
+`Media:Librarr:DirectAudioImportEnabled` defaults false. No service is activated by this checkpoint.
 
-The existing `AudiobookAcquisitionStore` owns an additive `MediaUrlImportDrafts` table in its
-existing SQLite database. Each immutable preview has its own random ID and proposed filename;
-DOI is normalized, non-unique and never a path. Confirmation requires both details and rights
-attestation, is idempotent, expires after 15 minutes and records **blocked**, never queued.
-At most 200 intents are retained; nothing is auto-deleted. No audio file or ABS item exists
-from these records. They remain separate from actual acquisition jobs. No execution worker,
-provider registration, filesystem placement or start endpoint is introduced.
+`AudiobookAcquisitionStore.MediaUrlImportDrafts` binds each immutable import ID to a non-unique DOI,
+name, source and outcome/checksum/file identity. Librarr uses its existing SQLite DB plus an additive
+import table and the existing exclusive directory reservation. No new database or scheduler. A
+placed file remains indexing until exact ABS library/item/path/inode/size/audio evidence matches;
+title/DOI alone never completes a job. Lost responses and restarts cannot re-download/re-upload the
+same authorized ID. Status inspection is explicit, not unattended polling; navigation can interrupt
+the bounded request and leaves evidence for reconciliation. A completed item uses the existing ABS
+public link. No native BigBrain player or progress mutation is introduced.
 
-[Checkpoint, safety blocker, verification and unsupported parts](../reports/features/media/bb-158-url-import-20261017.md).
+[Supported subset, exact security contract, tests and deployment prerequisites](../reports/features/media/bb-158-url-import-20261017.md#direct-import-implementation--2026-10-18).
+This is a partial Review Checkpoint, not accepted, deployed or a complete M4A implementation.
 
 ## Integrated Media search — accepted and deployed, 2026-10-17
 
