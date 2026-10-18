@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-158 — MP3/M4A format continuation, 2026-10-18
+
+**MERGE CANDIDATE FOR DOCUMENTED FORMAT SUBSET / NOT DEPLOYED.** Same branch `media/bb158-url-audio-import`, main baseline
+`133b2b19287c74368828e6904cef241248bdae5e`, previous checkpoint
+`43bf4e6ca80dc922f54f49c2b335aaed4118cf52`. Resolve new SHA/tree by publication subject
+`feat(media): validate tagged MP3 and bounded AAC M4A imports`.
+[Exact format subset, source provenance, verification and deployment gates](../reports/features/media/bb-158-url-import-20261017.md#mp3-and-m4a-format-completion--2026-10-18).
+No production/library/provider operation, merge, deployment or Finance change. Start remains disabled
+by default; no actual image/service configuration is changed. Independent architecture/security
+review is next. Do not automatically retry uncertain jobs or broaden format admission.
+After publication all intended work is committed/pushed; unrelated mockups/four Sentinel ADR drafts
+remain untouched. Ignored isolated Librarr/toolchain/test artifacts are development evidence only.
+
 ## Media Mediekontroll — 2026-10-17
 
 **MERGE CANDIDATE / NO MERGE OR DEPLOYMENT.** Branch `media/media-control` starts from

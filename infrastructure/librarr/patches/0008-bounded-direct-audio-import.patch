@@ -1,0 +1,2055 @@
+diff --git a/go.mod b/go.mod
+index ea5ff34..a3cb9e1 100644
+--- a/go.mod
++++ b/go.mod
+@@ -3,6 +3,7 @@ module github.com/JeremiahM37/librarr
+ go 1.25.0
+ 
+ require (
++	github.com/Eyevinn/mp4ff v0.59.0
+ 	github.com/PuerkitoBio/goquery v1.12.0
+ 	github.com/coreos/go-oidc/v3 v3.17.0
+ 	github.com/pquerna/otp v1.5.0
+diff --git a/go.sum b/go.sum
+index 717210f..e52b4c2 100644
+--- a/go.sum
++++ b/go.sum
+@@ -1,3 +1,5 @@
++github.com/Eyevinn/mp4ff v0.59.0 h1:FkuG2kEuLCdWw561mRRuIic7ehTH24Oy1OJ1t6AFyAs=
++github.com/Eyevinn/mp4ff v0.59.0/go.mod h1:3EZTsioPJ4xTLZEBBkVWoyd7UHnGp4vzwoEJ7lmr3CQ=
+ github.com/PuerkitoBio/goquery v1.12.0 h1:pAcL4g3WRXekcB9AU/y1mbKez2dbY2AajVhtkO8RIBo=
+ github.com/PuerkitoBio/goquery v1.12.0/go.mod h1:802ej+gV2y7bbIhOIoPY5sT183ZW0YFofScC4q/hIpQ=
+ github.com/andybalholm/cascadia v1.3.3 h1:AG2YHrzJIm4BZ19iwJ/DAua6Btl3IwJX+VI4kktS1LM=
+diff --git a/internal/api/direct_import.go b/internal/api/direct_import.go
+new file mode 100644
+index 0000000..2469df0
+--- /dev/null
++++ b/internal/api/direct_import.go
+@@ -0,0 +1,276 @@
++package api
++
++import (
++	"context"
++	"crypto/sha256"
++	"crypto/subtle"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"io"
++	"net/http"
++	"net/url"
++	"os"
++	"path/filepath"
++	"regexp"
++	"strconv"
++	"strings"
++	"sync"
++	"syscall"
++	"time"
++
++	"github.com/JeremiahM37/librarr/internal/db"
++	"github.com/JeremiahM37/librarr/internal/organize"
++)
++
++var directFlight sync.Mutex
++var directIdentity = regexp.MustCompile(`^[a-f0-9]{32}$`)
++var directChecksum = regexp.MustCompile(`^[a-f0-9]{64}$`)
++var directDisplayName = regexp.MustCompile(`^[\pL\pN _().–'-]{1,80}$`)
++
++func (s *Server) directAuthorized(w http.ResponseWriter, r *http.Request) bool {
++	// Explicit header key is required even on a globally open or session-authenticated Librarr.
++	if s.cfg.APIKey == "" || subtle.ConstantTimeCompare([]byte(r.Header.Get("X-Api-Key")), []byte(s.cfg.APIKey)) != 1 {
++		http.Error(w, "unauthorized", 401)
++		return false
++	}
++	if !s.cfg.FileOrgEnabled || !s.cfg.HasAudiobookshelf() || s.cfg.ABSLibraryID == "" {
++		http.Error(w, "direct import not configured", 503)
++		return false
++	}
++	return true
++}
++func (s *Server) handleDirectImport(w http.ResponseWriter, r *http.Request) {
++	if !s.directAuthorized(w, r) {
++		return
++	}
++	if !directFlight.TryLock() {
++		http.Error(w, "import busy", 409)
++		return
++	}
++	defer directFlight.Unlock()
++	if r.Method == http.MethodPut {
++		if err := http.NewResponseController(w).SetReadDeadline(time.Now().Add(90 * time.Second)); err != nil {
++			http.Error(w, "bounded transport unavailable", 503)
++			return
++		}
++	}
++	id := r.PathValue("id")
++	if !directIdentity.MatchString(id) {
++		http.Error(w, "invalid identity", 400)
++		return
++	}
++	if r.Method == http.MethodGet {
++		v, e := s.db.ReadDirectImport(id)
++		if e != nil {
++			http.Error(w, "import unavailable", 404)
++			return
++		}
++		if v.Status == "indexing" {
++			if s.directFileMatches(v) && s.matchDirectABS(r.Context(), &v) {
++				v.Status = "completed"
++				if s.db.SaveDirectImport(v) != nil {
++					http.Error(w, "persistence uncertain", 500)
++					return
++				}
++			}
++		}
++		writeJSON(w, 200, v)
++		return
++	}
++	size := r.ContentLength
++	format := r.Header.Get("X-Audio-Format")
++	// RFC3986-encoded UTF-8 display name; no paths or filenames supplied by client.
++	name, e := url.PathUnescape(r.Header.Get("X-Audio-Name"))
++	sum := r.Header.Get("X-Audio-Sha256")
++	if e != nil || !directDisplayName.MatchString(name) || name == "." || name == ".." || !directChecksum.MatchString(sum) || (format != "mp3" && format != "m4a") || size < 8 || size > organize.DirectAudioLimit || r.Header.Get("Content-Type") != directAudioMIME(format) {
++		http.Error(w, "unsupported direct audio", 400)
++		return
++	}
++	v, fresh, e := s.db.ReserveDirectImport(db.DirectImport{ID: id, SHA256: sum, Name: name, Format: format, Size: size, Status: "receiving"})
++	if e != nil {
++		http.Error(w, "identity conflict or unavailable store", 409)
++		return
++	}
++	if !fresh {
++		writeJSON(w, 200, v)
++		return
++	} // never consume/replay an already reserved import
++	r.Body = http.MaxBytesReader(w, r.Body, organize.DirectAudioLimit)
++	rel, ino, e := s.organizer.PlaceDirectAudio(id, name, format, sum, size, r.Body)
++	if e != nil {
++		v.Status = "failed"
++		if s.db.SaveDirectImport(v) != nil {
++			http.Error(w, "persistence uncertain", 500)
++			return
++		}
++		writeJSON(w, 200, v)
++		return
++	}
++	v.Status = "indexing"
++	v.RelativePath = rel
++	v.Inode = ino
++	v.LibraryID = s.cfg.ABSLibraryID
++	if s.db.SaveDirectImport(v) != nil {
++		http.Error(w, "persistence uncertain", 500)
++		return
++	}
++	// Existing authenticated scan mechanism; success here still means indexing, never completion.
++	if s.targets != nil {
++		s.targets.ImportAudiobook()
++	}
++	writeJSON(w, 200, v)
++}
++
++func (s *Server) directFileMatches(v db.DirectImport) bool {
++	root, e := os.OpenRoot(s.cfg.AudiobookDir)
++	if e != nil {
++		return false
++	}
++	defer root.Close()
++	fi, e := root.Lstat(v.RelativePath)
++	if e != nil || !fi.Mode().IsRegular() {
++		return false
++	}
++	f, e := root.Open(v.RelativePath)
++	if e != nil {
++		return false
++	}
++	defer f.Close()
++	fi, e = f.Stat()
++	if e != nil || !fi.Mode().IsRegular() || fi.Size() != v.Size {
++		return false
++	}
++	st, ok := fi.Sys().(*syscall.Stat_t)
++	if !ok || strconv.FormatUint(st.Ino, 10) != v.Inode {
++		return false
++	}
++	h := sha256.New()
++	n, e := io.Copy(h, io.LimitReader(f, organize.DirectAudioLimit+1))
++	return e == nil && n == v.Size && hex.EncodeToString(h.Sum(nil)) == v.SHA256
++}
++
++type directABSFile struct {
++	Ino      string `json:"ino"`
++	FileType string `json:"fileType"`
++	Metadata struct {
++		RelPath string `json:"relPath"`
++		Size    int64  `json:"size"`
++	} `json:"metadata"`
++}
++type directABSItem struct {
++	ID           string          `json:"id"`
++	LibraryID    string          `json:"libraryId"`
++	RelPath      string          `json:"relPath"`
++	IsMissing    bool            `json:"isMissing"`
++	IsInvalid    bool            `json:"isInvalid"`
++	LibraryFiles []directABSFile `json:"libraryFiles"`
++	Media        struct {
++		AudioFiles []struct {
++			Ino      string  `json:"ino"`
++			Duration float64 `json:"duration"`
++		} `json:"audioFiles"`
++	} `json:"media"`
++}
++
++func directABSMatches(v db.DirectImport, item directABSItem) bool {
++	if item.ID == "" || item.LibraryID != v.LibraryID || item.RelPath != filepath.ToSlash(filepath.Dir(v.RelativePath)) || item.IsMissing || item.IsInvalid || len(item.Media.AudioFiles) != 1 {
++		return false
++	}
++	audio := item.Media.AudioFiles[0]
++	if audio.Ino != v.Inode || audio.Duration <= 0 {
++		return false
++	}
++	matches := 0
++	audioCount := 0
++	for _, f := range item.LibraryFiles {
++		if f.FileType != "audio" {
++			continue
++		}
++		audioCount++
++		if f.Ino == v.Inode && f.Metadata.RelPath == filepath.Base(v.RelativePath) && f.Metadata.Size == v.Size {
++			matches++
++		}
++	}
++	return audioCount == 1 && matches == 1
++}
++func (s *Server) matchDirectABS(ctx context.Context, v *db.DirectImport) bool {
++	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
++	defer cancel()
++	client := &http.Client{Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
++	get := func(path string, target any) bool {
++		req, e := http.NewRequestWithContext(ctx, "GET", strings.TrimRight(s.cfg.ABSURL, "/")+path, nil)
++		if e != nil {
++			return false
++		}
++		req.Header.Set("Authorization", "Bearer "+s.cfg.ABSToken)
++		res, e := client.Do(req)
++		if e != nil {
++			return false
++		}
++		defer res.Body.Close()
++		if res.StatusCode != 200 {
++			return false
++		}
++		b, e := io.ReadAll(io.LimitReader(res.Body, 2<<20+1))
++		return e == nil && len(b) <= 2<<20 && json.Unmarshal(b, target) == nil
++	}
++	// Bounded full inventory: no title-based completion, partial pages never prove uniqueness.
++	var found []string
++	seen := map[string]bool{}
++	total := -1
++	for page := 0; page < 5; page++ {
++		var data struct {
++			Results []directABSItem `json:"results"`
++			Total   int             `json:"total"`
++		}
++		if !get(fmt.Sprintf("/api/libraries/%s/items?limit=100&page=%d&minified=0", url.PathEscape(s.cfg.ABSLibraryID), page), &data) || data.Total < 0 || data.Total > 500 {
++			return false
++		}
++		if total < 0 {
++			total = data.Total
++		}
++		expected := min(100, total-page*100)
++		if data.Total != total || expected < 0 || len(data.Results) != expected {
++			return false
++		}
++		for _, item := range data.Results {
++			if item.ID == "" || seen[item.ID] {
++				return false
++			}
++			seen[item.ID] = true
++			if item.RelPath == filepath.ToSlash(filepath.Dir(v.RelativePath)) {
++				found = append(found, item.ID)
++			}
++		}
++		if (page+1)*100 >= data.Total {
++			if len(found) != 1 {
++				return false
++			}
++			var detail directABSItem
++			if !get("/api/items/"+url.PathEscape(found[0]), &detail) || detail.ID != found[0] || !directABSMatches(*v, detail) {
++				return false
++			}
++			v.ItemID = detail.ID
++			return true
++		}
++		if len(data.Results) != 100 {
++			return false
++		}
++	}
++	return false
++}
++
++func (s *Server) handleDirectCapabilities(w http.ResponseWriter, r *http.Request) {
++	if !s.directAuthorized(w, r) {
++		return
++	}
++	writeJSON(w, 200, map[string]any{"contract": "bb158-direct-audio-v2", "maximumBytes": organize.DirectAudioLimit, "formats": []string{"mp3", "m4a"}})
++}
++
++func directAudioMIME(format string) string {
++	if format == "m4a" {
++		return "audio/mp4"
++	}
++	return "audio/mpeg"
++}
+diff --git a/internal/api/direct_import_test.go b/internal/api/direct_import_test.go
+new file mode 100644
+index 0000000..171ae6d
+--- /dev/null
++++ b/internal/api/direct_import_test.go
+@@ -0,0 +1,266 @@
++package api
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/json"
++	"fmt"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"testing"
++	"time"
++
++	"github.com/JeremiahM37/librarr/internal/config"
++	"github.com/JeremiahM37/librarr/internal/db"
++	"github.com/JeremiahM37/librarr/internal/organize"
++)
++
++func directTestServer(t *testing.T) (*Server, string) {
++	t.Helper()
++	root := t.TempDir()
++	path := filepath.Join(root, "db.sqlite")
++	d, e := db.New(path)
++	if e != nil {
++		t.Fatal(e)
++	}
++	t.Cleanup(func() { d.Close() })
++	library := filepath.Join(root, "library")
++	os.Mkdir(library, 0755)
++	cfg := &config.Config{APIKey: "fixture-key", FileOrgEnabled: true, AudiobookDir: library, ABSURL: "http://abs.invalid", ABSToken: "fixture", ABSLibraryID: "library"}
++	return &Server{cfg: cfg, db: d, organizer: organize.NewOrganizer(cfg)}, path
++}
++func directRequest(s *Server, id string, b []byte, key string) *httptest.ResponseRecorder {
++	r := httptest.NewRequest("PUT", "/api/v1/direct-audio/"+id, bytes.NewReader(b))
++	r.SetPathValue("id", id)
++	r.Header.Set("X-Api-Key", key)
++	r.Header.Set("X-Audio-Sha256", fmt.Sprintf("%x", sha256.Sum256(b)))
++	r.Header.Set("X-Audio-Name", "Chapter")
++	r.Header.Set("X-Audio-Format", "mp3")
++	r.Header.Set("Content-Type", "audio/mpeg")
++	w := httptest.NewRecorder()
++	s.handleDirectImport(directDeadlineWriter{w}, r)
++	return w
++}
++func TestDirectImportDurableReplayAndAuthentication(t *testing.T) {
++	s, path := directTestServer(t)
++	frame := make([]byte, 417)
++	copy(frame, []byte{255, 251, 144, 0})
++	b := append(frame, frame...)
++	id := "11111111111111111111111111111111"
++	if directRequest(s, id, b, "").Code != 401 {
++		t.Fatal("unauthenticated import")
++	}
++	w := directRequest(s, id, b, "fixture-key")
++	if w.Code != 200 {
++		t.Fatal(w.Body.String())
++	}
++	var first db.DirectImport
++	json.Unmarshal(w.Body.Bytes(), &first)
++	if first.Status != "indexing" || first.Inode == "" {
++		t.Fatalf("%+v", first)
++	}
++	s.db.Close()
++	d, e := db.New(path)
++	if e != nil {
++		t.Fatal(e)
++	}
++	defer d.Close()
++	s.db = d
++	w = directRequest(s, id, b, "fixture-key")
++	var replay db.DirectImport
++	json.Unmarshal(w.Body.Bytes(), &replay)
++	if first != replay {
++		t.Fatal("replay changed evidence")
++	}
++	b[10] = 1
++	if directRequest(s, id, b, "fixture-key").Code != 409 {
++		t.Fatal("changed content accepted")
++	}
++}
++func TestDirectImportUncertainReservationNeverRetries(t *testing.T) {
++	s, _ := directTestServer(t)
++	b := []byte("invalid audio data")
++	id := "11111111111111111111111111111111"
++	v := db.DirectImport{ID: id, SHA256: fmt.Sprintf("%x", sha256.Sum256(b)), Format: "mp3", Name: "Chapter", Size: int64(len(b)), Status: "receiving"}
++	if _, fresh, e := s.db.ReserveDirectImport(v); e != nil || !fresh {
++		t.Fatal(e)
++	}
++	w := directRequest(s, id, b, "fixture-key")
++	var got db.DirectImport
++	json.Unmarshal(w.Body.Bytes(), &got)
++	if got.Status != "receiving" {
++		t.Fatal("uncertain replay executed")
++	}
++	entries, _ := os.ReadDir(s.cfg.AudiobookDir)
++	if len(entries) != 0 {
++		t.Fatal("replay wrote library")
++	}
++}
++func TestDirectExactABSIdentity(t *testing.T) {
++	v := db.DirectImport{ID: "11111111111111111111111111111111", LibraryID: "library", RelativePath: "BigBrain Imports/id/Chapter.mp3", Inode: "123", Size: 834}
++	var item directABSItem
++	json.Unmarshal([]byte(`{"id":"item","libraryId":"library","relPath":"BigBrain Imports/id","libraryFiles":[{"ino":"123","fileType":"audio","metadata":{"relPath":"Chapter.mp3","size":834}}],"media":{"audioFiles":[{"ino":"123","duration":1}]}}`), &item)
++	if !directABSMatches(v, item) {
++		t.Fatal("exact match rejected")
++	}
++	item.LibraryFiles[0].Ino = "124"
++	if directABSMatches(v, item) {
++		t.Fatal("different inode admitted")
++	}
++	item.LibraryFiles[0].Ino = "123"
++	item.LibraryFiles = append(item.LibraryFiles, item.LibraryFiles[0])
++	if directABSMatches(v, item) {
++		t.Fatal("ambiguity admitted")
++	}
++}
++func TestDirectABSBoundedInventoryAndCompletion(t *testing.T) {
++	s, _ := directTestServer(t)
++	v := db.DirectImport{LibraryID: "library", RelativePath: "BigBrain Imports/id/file.mp3", Inode: "123", Size: 834}
++	abs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		if r.Header.Get("Authorization") != "Bearer fixture" {
++			t.Error("missing auth")
++		}
++		if r.URL.Path == "/api/items/item" {
++			fmt.Fprint(w, `{"id":"item","libraryId":"library","relPath":"BigBrain Imports/id","libraryFiles":[{"ino":"123","fileType":"audio","metadata":{"relPath":"file.mp3","size":834}}],"media":{"audioFiles":[{"ino":"123","duration":1}]}}`)
++		} else {
++			fmt.Fprint(w, `{"total":1,"results":[{"id":"item","relPath":"BigBrain Imports/id"}]}`)
++		}
++	}))
++	defer abs.Close()
++	s.cfg.ABSURL = abs.URL
++	if !s.matchDirectABS(t.Context(), &v) || v.ItemID != "item" {
++		t.Fatal("exact inventory failed")
++	}
++}
++
++func TestDirectRoutesAreAuthenticatedAndBounded(t *testing.T) {
++	s, _ := directTestServer(t)
++	s.mux = http.NewServeMux()
++	s.mux.HandleFunc("GET /api/v1/direct-audio-capabilities", s.handleDirectCapabilities)
++	s.mux.HandleFunc("PUT /api/v1/direct-audio/{id}", s.handleDirectImport)
++	handler := s.requestSizeLimitMiddleware(s.mux)
++	r := httptest.NewRequest("GET", "/api/v1/direct-audio-capabilities", nil)
++	w := httptest.NewRecorder()
++	handler.ServeHTTP(directDeadlineWriter{w}, r)
++	if w.Code != 401 {
++		t.Fatal("capability authentication bypass")
++	}
++	r.Header.Set("X-Api-Key", "fixture-key")
++	w = httptest.NewRecorder()
++	handler.ServeHTTP(directDeadlineWriter{w}, r)
++	if w.Code != 200 {
++		t.Fatal("capabilities unavailable")
++	}
++	r = httptest.NewRequest("PUT", "/api/v1/direct-audio/11111111111111111111111111111111", bytes.NewReader([]byte("not read")))
++	r.Header.Set("X-Api-Key", "fixture-key")
++	r.ContentLength = organize.DirectAudioLimit + 1
++	w = httptest.NewRecorder()
++	handler.ServeHTTP(directDeadlineWriter{w}, r)
++	if w.Code != 400 {
++		t.Fatal("oversized accepted")
++	}
++	if _, e := s.db.ReadDirectImport("11111111111111111111111111111111"); e == nil {
++		t.Fatal("invalid request reserved identity")
++	}
++}
++
++func TestDirectABSUncertainInventoryStaysPending(t *testing.T) {
++	s, _ := directTestServer(t)
++	for _, payload := range []string{`{"total":0,"results":[{"id":"one","relPath":"BigBrain Imports/id"}]}`, `{"total":501,"results":[]}`, `{"total":2,"results":[{"id":"one","relPath":"BigBrain Imports/id"},{"id":"two","relPath":"BigBrain Imports/id"}]}`, `{"total":101,"results":[]}`} {
++		abs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, payload) }))
++		s.cfg.ABSURL = abs.URL
++		v := db.DirectImport{LibraryID: "library", RelativePath: "BigBrain Imports/id/file.mp3"}
++		if s.matchDirectABS(t.Context(), &v) {
++			t.Error("uncertain inventory matched")
++		}
++		abs.Close()
++	}
++}
++
++// Recorder has no socket; production writers must actually support the read deadline.
++type directDeadlineWriter struct{ *httptest.ResponseRecorder }
++
++func (directDeadlineWriter) SetReadDeadline(time.Time) error { return nil }
++
++func TestDirectImportRefusesUnboundedTransport(t *testing.T) {
++	s, _ := directTestServer(t)
++	r := httptest.NewRequest("PUT", "/api/v1/direct-audio/11111111111111111111111111111111", nil)
++	r.SetPathValue("id", "11111111111111111111111111111111")
++	r.Header.Set("X-Api-Key", "fixture-key")
++	w := httptest.NewRecorder()
++	s.handleDirectImport(w, r)
++	if w.Code != 503 {
++		t.Fatal("missing read-deadline capability accepted")
++	}
++}
++
++func TestDirectHTTPStreamToExactIndexedFile(t *testing.T) {
++	for _, format := range []string{"mp3", "m4a"} {
++		t.Run(format, func(t *testing.T) { directHTTPStreamToExactIndexedFile(t, format) })
++	}
++}
++func directHTTPStreamToExactIndexedFile(t *testing.T, format string) {
++	s, _ := directTestServer(t)
++	mux := http.NewServeMux()
++	mux.HandleFunc("PUT /api/v1/direct-audio/{id}", s.handleDirectImport)
++	mux.HandleFunc("GET /api/v1/direct-audio/{id}", s.handleDirectImport)
++	host := httptest.NewServer(s.requestSizeLimitMiddleware(mux))
++	defer host.Close()
++	frame := make([]byte, 417)
++	copy(frame, []byte{255, 251, 144, 0})
++	b := append(frame, frame...)
++	if format == "m4a" {
++		var e error
++		b, e = os.ReadFile("testdata/direct-aac.m4a")
++		if e != nil {
++			t.Fatal(e)
++		}
++	}
++	id := "11111111111111111111111111111111"
++	request, _ := http.NewRequestWithContext(t.Context(), "PUT", host.URL+"/api/v1/direct-audio/"+id, bytes.NewReader(b))
++	request.Header.Set("X-Api-Key", "fixture-key")
++	request.Header.Set("X-Audio-Sha256", fmt.Sprintf("%x", sha256.Sum256(b)))
++	request.Header.Set("X-Audio-Name", "Chapter")
++	request.Header.Set("X-Audio-Format", format)
++	request.Header.Set("Content-Type", directAudioMIME(format))
++	response, e := host.Client().Do(request)
++	if e != nil {
++		t.Fatal(e)
++	}
++	var placed db.DirectImport
++	e = json.NewDecoder(response.Body).Decode(&placed)
++	response.Body.Close()
++	if e != nil || response.StatusCode != 200 || placed.Status != "indexing" {
++		t.Fatalf("placement %v %+v", e, placed)
++	}
++	abs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		item := map[string]any{"id": "item", "libraryId": "library", "relPath": filepath.ToSlash(filepath.Dir(placed.RelativePath))}
++		if r.URL.Path == "/api/items/item" {
++			item["libraryFiles"] = []any{map[string]any{"ino": placed.Inode, "fileType": "audio", "metadata": map[string]any{"relPath": filepath.Base(placed.RelativePath), "size": len(b)}}}
++			item["media"] = map[string]any{"audioFiles": []any{map[string]any{"ino": placed.Inode, "duration": 0.052}}}
++			json.NewEncoder(w).Encode(item)
++		} else {
++			json.NewEncoder(w).Encode(map[string]any{"total": 1, "results": []any{item}})
++		}
++	}))
++	defer abs.Close()
++	s.cfg.ABSURL = abs.URL
++	request, _ = http.NewRequestWithContext(t.Context(), "GET", host.URL+"/api/v1/direct-audio/"+id, nil)
++	request.Header.Set("X-Api-Key", "fixture-key")
++	response, e = host.Client().Do(request)
++	if e != nil {
++		t.Fatal(e)
++	}
++	var indexed db.DirectImport
++	e = json.NewDecoder(response.Body).Decode(&indexed)
++	response.Body.Close()
++	if e != nil || indexed.Status != "completed" || indexed.ItemID != "item" || indexed.SHA256 != placed.SHA256 {
++		t.Fatalf("index %v %+v", e, indexed)
++	}
++	actual, e := os.ReadFile(filepath.Join(s.cfg.AudiobookDir, indexed.RelativePath))
++	if e != nil || !bytes.Equal(actual, b) {
++		t.Fatal("persisted bytes differ")
++	}
++}
+diff --git a/internal/api/router.go b/internal/api/router.go
+index 44dac67..b8b0629 100644
+--- a/internal/api/router.go
++++ b/internal/api/router.go
+@@ -295,6 +295,10 @@ func (s *Server) registerDownloadRoutes() {
+ 	// Job retry (dead letter).
+ 	s.mux.HandleFunc("POST /api/downloads/jobs/{id}/retry", s.handleRetryJob)
+ 
++	s.mux.HandleFunc("GET /api/v1/direct-audio-capabilities", s.handleDirectCapabilities)
++	// BB-158: dedicated authenticated raw-stream boundary; torrent routes unchanged.
++	s.mux.HandleFunc("PUT /api/v1/direct-audio/{id}", s.handleDirectImport)
++	s.mux.HandleFunc("GET /api/v1/direct-audio/{id}", s.handleDirectImport)
+ 	// File upload.
+ 	s.mux.HandleFunc("POST /api/upload", s.handleUpload)
+ 	s.mux.HandleFunc("GET /api/uploads", s.handleListUploads)
+@@ -491,7 +495,9 @@ func (s *Server) requestSizeLimitMiddleware(next http.Handler) http.Handler {
+ 	const maxBodySize = 1 << 20 // 1MB
+ 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+ 		contentType := r.Header.Get("Content-Type")
+-		if r.Body != nil && !strings.HasPrefix(contentType, "multipart/") {
++		if r.Body != nil && r.Method == http.MethodPut && strings.HasPrefix(r.URL.Path, "/api/v1/direct-audio/") {
++			r.Body = http.MaxBytesReader(w, r.Body, organize.DirectAudioLimit)
++		} else if r.Body != nil && !strings.HasPrefix(contentType, "multipart/") {
+ 			r.Body = http.MaxBytesReader(w, r.Body, maxBodySize)
+ 		}
+ 		next.ServeHTTP(w, r)
+diff --git a/internal/api/testdata/direct-aac.m4a b/internal/api/testdata/direct-aac.m4a
+new file mode 100644
+index 0000000000000000000000000000000000000000..82c5134def66b91ab3df19791c9fce2345f8ffec
+GIT binary patch
+literal 579
+zcmbtQF;2rk5L`PZqM&e)k%(|%BqTnN2LwTfD5*#hlS>pUzFg$HM1nW)4;ubJ!>?$V
+zIiD4f=rTHaXJ<z{=M#}^;a)Zmqnkp2${LN5X;r$*G?~8T?N=ne(8laAtMzWF=-uPv
+zPUKi5@@Fp}%%XSKlq;;6xRuZB{aT4M0=Wkvy49*Gv7*rG|NnaY@&UzC)lC;=&34`K
+zP``DxUVx`o|Jie;T0K|IoO6PAKiM{Q5%{Nd&o%gyb+&t3dhYdR#JdsfTf~x*@YR9q
+zxmA{=H-sk{jL+Bv9L1+;KZ?<vTj#tDoU5QEH06k#kpR@g%-0OFS3eQyqjC?lnF$)b
+F`45?fHYfl9
+
+literal 0
+HcmV?d00001
+
+diff --git a/internal/db/db.go b/internal/db/db.go
+index e524c2a..84894f4 100644
+--- a/internal/db/db.go
++++ b/internal/db/db.go
+@@ -291,6 +291,7 @@ func (d *DB) migrate() error {
+ 		created_at REAL NOT NULL DEFAULT (strftime('%s','now'))
+ 	)`)
+ 
++	migrations = append(migrations, `CREATE TABLE IF NOT EXISTS direct_audio_imports (id TEXT PRIMARY KEY, record TEXT NOT NULL)`)
+ 	for _, m := range migrations {
+ 		if _, err := d.db.Exec(m); err != nil {
+ 			return fmt.Errorf("migration failed: %w\nSQL: %s", err, m)
+diff --git a/internal/db/direct_import.go b/internal/db/direct_import.go
+new file mode 100644
+index 0000000..021bc2e
+--- /dev/null
++++ b/internal/db/direct_import.go
+@@ -0,0 +1,77 @@
++package db
++
++import (
++	"database/sql"
++	"encoding/json"
++	"errors"
++)
++
++// Direct imports share Librarr's durable owner; no torrent identity or retry authority.
++type DirectImport struct {
++	ID           string `json:"id"`
++	SHA256       string `json:"sha256"`
++	Format       string `json:"format"`
++	Name         string `json:"name"`
++	Size         int64  `json:"size"`
++	Status       string `json:"status"`
++	RelativePath string `json:"relativePath"`
++	Inode        string `json:"inode"`
++	LibraryID    string `json:"libraryId"`
++	ItemID       string `json:"itemId"`
++}
++
++func (d *DB) ReserveDirectImport(v DirectImport) (DirectImport, bool, error) {
++	d.mu.Lock()
++	defer d.mu.Unlock()
++	tx, err := d.db.Begin()
++	if err != nil {
++		return v, false, err
++	}
++	defer tx.Rollback()
++	var raw string
++	err = tx.QueryRow("SELECT record FROM direct_audio_imports WHERE id=?", v.ID).Scan(&raw)
++	if err == nil {
++		var old DirectImport
++		if json.Unmarshal([]byte(raw), &old) != nil {
++			return v, false, errors.New("invalid retained record")
++		}
++		if old.SHA256 != v.SHA256 || old.Format != v.Format || old.Name != v.Name || old.Size != v.Size {
++			return v, false, errors.New("identity conflict")
++		}
++		return old, false, nil
++	}
++	// No read error is interpreted as absence.
++	if !errors.Is(err, sql.ErrNoRows) {
++		return v, false, err
++	}
++	var count int
++	if err = tx.QueryRow("SELECT COUNT(*) FROM direct_audio_imports").Scan(&count); err != nil {
++		return v, false, err
++	}
++	if count >= 200 {
++		return v, false, errors.New("import retention bound")
++	}
++	b, _ := json.Marshal(v)
++	if _, err = tx.Exec("INSERT INTO direct_audio_imports(id,record) VALUES(?,?)", v.ID, string(b)); err != nil {
++		return v, false, err
++	}
++	err = tx.Commit()
++	return v, err == nil, err
++}
++func (d *DB) ReadDirectImport(id string) (DirectImport, error) {
++	var raw string
++	var v DirectImport
++	err := d.db.QueryRow("SELECT record FROM direct_audio_imports WHERE id=?", id).Scan(&raw)
++	if err == nil {
++		err = json.Unmarshal([]byte(raw), &v)
++	}
++	return v, err
++}
++func (d *DB) SaveDirectImport(v DirectImport) error {
++	b, err := json.Marshal(v)
++	if err != nil {
++		return err
++	}
++	_, err = d.db.Exec("UPDATE direct_audio_imports SET record=? WHERE id=?", string(b), v.ID)
++	return err
++}
+diff --git a/internal/organize/direct_audio.go b/internal/organize/direct_audio.go
+new file mode 100644
+index 0000000..a4e5198
+--- /dev/null
++++ b/internal/organize/direct_audio.go
+@@ -0,0 +1,95 @@
++package organize
++
++import (
++	"crypto/sha256"
++	"encoding/hex"
++	"errors"
++	"io"
++	"os"
++	"path/filepath"
++	"regexp"
++	"strconv"
++	"syscall"
++)
++
++const DirectAudioLimit = 64 << 20
++
++var directID = regexp.MustCompile(`^[a-f0-9]{32}$`)
++var directName = regexp.MustCompile(`^[\pL\pN _().–'-]{1,80}$`)
++
++// PlaceDirectAudio keeps scanner-visible audio absent until all bytes are validated.
++// The existing no-overwrite directory reservation is reused; torrent placement is unchanged.
++// Configured roots/parents must be service-owned, not writable by untrusted local users.
++func (o *Organizer) PlaceDirectAudio(id, name, format, checksum string, size int64, body io.Reader) (relative, ino string, err error) {
++	if !o.cfg.FileOrgEnabled || !directID.MatchString(id) || !directName.MatchString(name) || name == "." || name == ".." || (format != "mp3" && format != "m4a") || size <= 0 || size > DirectAudioLimit {
++		return "", "", errors.New("invalid direct import")
++	}
++	root := o.cfg.AudiobookDir
++	if fi, e := os.Lstat(root); e != nil || !fi.IsDir() || fi.Mode()&os.ModeSymlink != 0 {
++		return "", "", errors.New("unsafe library root")
++	}
++	dir := filepath.Join(root, "BigBrain Imports", id)
++	if err = reserveAudiobookDestination(root, "BigBrain Imports", dir); err != nil {
++		return "", "", err
++	}
++	// Pin the reserved directory. Never remove the reservation after any uncertain outcome.
++	r, e := os.OpenRoot(dir)
++	if e != nil {
++		return "", "", e
++	}
++	defer r.Close()
++	f, e := r.OpenFile(".pending", os.O_CREATE|os.O_EXCL|os.O_RDWR, 0600)
++	if e != nil {
++		return "", "", e
++	}
++	defer f.Close()
++	defer r.Remove(".pending") // only the exact file created by this call, never other contents
++	h := sha256.New()
++	n, e := io.Copy(io.MultiWriter(f, h), io.LimitReader(body, DirectAudioLimit+1))
++	if e != nil || n != size || hex.EncodeToString(h.Sum(nil)) != checksum {
++		return "", "", errors.New("size or checksum mismatch")
++	}
++	if _, e = f.Seek(0, 0); e != nil {
++		return "", "", e
++	}
++	if e = ValidateDirectAudio(f, n, format); e != nil {
++		return "", "", e
++	}
++	if e = f.Sync(); e != nil {
++		return "", "", e
++	}
++	if e = f.Chmod(0444); e != nil {
++		return "", "", e
++	}
++	filename := name + " -- " + id + "." + format
++	// Exclusive hardlink publication: fails if *anything* already owns this filename.
++	if e = r.Link(".pending", filename); e != nil {
++		return "", "", e
++	}
++	if e = syncDirectDir(dir); e != nil {
++		return "", "", e
++	}
++	if e = syncDirectDir(filepath.Dir(dir)); e != nil {
++		return "", "", e
++	}
++	if e = syncDirectDir(root); e != nil {
++		return "", "", e
++	}
++	info, e := f.Stat()
++	if e != nil {
++		return "", "", e
++	}
++	st, ok := info.Sys().(*syscall.Stat_t)
++	if !ok {
++		return "", "", errors.New("inode unavailable")
++	}
++	return filepath.ToSlash(filepath.Join("BigBrain Imports", id, filename)), strconv.FormatUint(st.Ino, 10), nil
++}
++func syncDirectDir(path string) error {
++	f, e := os.Open(path)
++	if e != nil {
++		return e
++	}
++	defer f.Close()
++	return f.Sync()
++}
+diff --git a/internal/organize/direct_audio_test.go b/internal/organize/direct_audio_test.go
+new file mode 100644
+index 0000000..47105f7
+--- /dev/null
++++ b/internal/organize/direct_audio_test.go
+@@ -0,0 +1,93 @@
++package organize
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"fmt"
++	"os"
++	"path/filepath"
++	"sync"
++	"testing"
++)
++
++func directFixture() []byte {
++	frame := make([]byte, 417)
++	copy(frame, []byte{0xff, 0xfb, 0x90, 0})
++	return append(frame, frame...)
++}
++func TestDirectAudioValidation(t *testing.T) {
++	b := directFixture()
++	for _, c := range []struct {
++		b      []byte
++		format string
++		good   bool
++	}{{b, "mp3", true}, {b, "m4a", false}, {b[:len(b)-1], "mp3", false}, {append([]byte("ID3"), b...), "mp3", false}, {[]byte("<html>not audio</html>"), "mp3", false}} {
++		if e := ValidateDirectAudio(bytes.NewReader(c.b), int64(len(c.b)), c.format); (e == nil) != c.good {
++			t.Fatalf("validation: %v", e)
++		}
++	}
++}
++func TestDirectPlacementExclusiveConcurrentAndPartial(t *testing.T) {
++	o, _, library := audiobookOrganizer(t, "copy")
++	os.MkdirAll(library, 0755)
++	b := directFixture()
++	sum := fmt.Sprintf("%x", sha256.Sum256(b))
++	id := "11111111111111111111111111111111"
++	var wg sync.WaitGroup
++	results := make(chan string, 8)
++	for i := 0; i < 8; i++ {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			rel, ino, e := o.PlaceDirectAudio(id, "Chapter", "mp3", sum, int64(len(b)), bytes.NewReader(b))
++			if e == nil {
++				if ino == "" {
++					t.Error("missing inode")
++				}
++				results <- rel
++			}
++		}()
++	}
++	wg.Wait()
++	close(results)
++	var paths []string
++	for p := range results {
++		paths = append(paths, p)
++	}
++	if len(paths) != 1 {
++		t.Fatalf("successful placements %d", len(paths))
++	}
++	actual, e := os.ReadFile(filepath.Join(library, paths[0]))
++	if e != nil || !bytes.Equal(actual, b) {
++		t.Fatal("bytes changed")
++	}
++	if _, e = os.Stat(filepath.Join(library, "BigBrain Imports", id, ".pending")); !os.IsNotExist(e) {
++		t.Fatal("staging not cleaned")
++	}
++	id = "22222222222222222222222222222222"
++	if _, _, e = o.PlaceDirectAudio(id, "Chapter", "mp3", sum, int64(len(b)), bytes.NewReader(b[:5])); e == nil {
++		t.Fatal("accepted partial")
++	}
++	if _, _, e = o.PlaceDirectAudio(id, "Chapter", "mp3", sum, int64(len(b)), bytes.NewReader(b)); e == nil {
++		t.Fatal("reused uncertain reservation")
++	}
++}
++func TestDirectPlacementRejectsSymlinkAndBadChecksum(t *testing.T) {
++	o, _, library := audiobookOrganizer(t, "move")
++	os.MkdirAll(library, 0755)
++	other := t.TempDir()
++	os.Symlink(other, filepath.Join(library, "BigBrain Imports"))
++	b := directFixture()
++	sum := fmt.Sprintf("%x", sha256.Sum256(b))
++	if _, _, e := o.PlaceDirectAudio("11111111111111111111111111111111", "Title", "mp3", sum, int64(len(b)), bytes.NewReader(b)); e == nil {
++		t.Fatal("symlink admitted")
++	}
++	entries, _ := os.ReadDir(other)
++	if len(entries) != 0 {
++		t.Fatal("escaped root")
++	}
++	os.Remove(filepath.Join(library, "BigBrain Imports"))
++	if _, _, e := o.PlaceDirectAudio("11111111111111111111111111111111", "Title", "mp3", "bad", int64(len(b)), bytes.NewReader(b)); e == nil {
++		t.Fatal("bad checksum accepted")
++	}
++}
+diff --git a/internal/organize/direct_audio_validation.go b/internal/organize/direct_audio_validation.go
+new file mode 100644
+index 0000000..f0fe4f3
+--- /dev/null
++++ b/internal/organize/direct_audio_validation.go
+@@ -0,0 +1,264 @@
++package organize
++
++import (
++	"bytes"
++	"encoding/binary"
++	"errors"
++	"io"
++	"strings"
++	"unicode/utf8"
++)
++
++var errDirectAudio = errors.New("unsupported or malformed audio")
++
++const directMetadataLimit = 4 << 20
++
++// Structural admission only: payloads are never decoded, interpreted or executed.
++func ValidateDirectAudio(r io.ReaderAt, size int64, format string) error {
++	if size < 8 || size > DirectAudioLimit {
++		return errDirectAudio
++	}
++	switch format {
++	case "mp3":
++		return validateDirectMP3(r, size)
++	case "m4a":
++		return validateDirectM4A(r, size)
++	default:
++		return errDirectAudio
++	}
++}
++func readDirect(r io.ReaderAt, offset, size int64) ([]byte, error) {
++	if offset < 0 || size < 0 || size > directMetadataLimit {
++		return nil, errDirectAudio
++	}
++	b := make([]byte, int(size))
++	_, e := r.ReadAt(b, offset)
++	return b, e
++}
++func syncSafe(b []byte) (int, bool) {
++	if len(b) != 4 {
++		return 0, false
++	}
++	n := 0
++	for _, c := range b {
++		if c&128 != 0 {
++			return 0, false
++		}
++		n = n<<7 | int(c)
++	}
++	return n, true
++}
++func zeroBytes(b []byte) bool {
++	for _, c := range b {
++		if c != 0 {
++			return false
++		}
++	}
++	return true
++}
++func id3End(r io.ReaderAt, size int64) (int64, error) {
++	h, e := readDirect(r, 0, 10)
++	if e != nil {
++		return 0, errDirectAudio
++	}
++	if string(h[:3]) != "ID3" {
++		return 0, nil
++	}
++	// Common v2.2/2.3/2.4 frames. Unsupported compression, unsynchronisation and
++	// extended headers fail closed rather than trusting alternate length semantics.
++	version := h[3]
++	if version < 2 || version > 4 || h[4] != 0 || h[5] != 0 && !(version == 4 && h[5] == 16) {
++		return 0, errDirectAudio
++	}
++	n, ok := syncSafe(h[6:])
++	end := int64(10 + n)
++	if !ok || n == 0 || n > directMetadataLimit || end > size {
++		return 0, errDirectAudio
++	}
++	b, e := readDirect(r, 10, int64(n))
++	if e != nil {
++		return 0, errDirectAudio
++	}
++	frames := 0
++	for p := 0; p < len(b); {
++		if b[p] == 0 {
++			if !zeroBytes(b[p:]) || h[5]&16 != 0 {
++				return 0, errDirectAudio
++			}
++			break
++		}
++		head, idLen := 10, 4
++		if version == 2 {
++			head, idLen = 6, 3
++		}
++		if len(b)-p < head || frames >= 1024 {
++			return 0, errDirectAudio
++		}
++		for _, c := range b[p : p+idLen] {
++			if !(c >= 'A' && c <= 'Z' || c >= '0' && c <= '9') {
++				return 0, errDirectAudio
++			}
++		}
++		var length int
++		if version == 2 {
++			length = int(b[p+3])<<16 | int(b[p+4])<<8 | int(b[p+5])
++		} else {
++			length = int(binary.BigEndian.Uint32(b[p+4 : p+8]))
++			if version == 4 {
++				var valid bool
++				length, valid = syncSafe(b[p+4 : p+8])
++				if !valid {
++					return 0, errDirectAudio
++				}
++			}
++			statusMask := byte(0xe0)
++			if version == 4 {
++				statusMask = 0x70
++			}
++			if b[p+8]&^statusMask != 0 || b[p+9] != 0 {
++				return 0, errDirectAudio
++			}
++		}
++		if length <= 0 || length > len(b)-p-head {
++			return 0, errDirectAudio
++		}
++		p += head + length
++		frames++
++	}
++	if frames == 0 {
++		return 0, errDirectAudio
++	}
++	if h[5]&16 != 0 {
++		f, e := readDirect(r, end, 10)
++		if e != nil || end+10 > size || string(f[:3]) != "3DI" || !bytes.Equal(f[3:], h[3:]) {
++			return 0, errDirectAudio
++		}
++		end += 10
++	}
++	return end, nil
++}
++func validateDirectMP3(r io.ReaderAt, size int64) error {
++	pos, e := id3End(r, size)
++	if e != nil {
++		return e
++	}
++	if size-pos >= 128 {
++		b, e := readDirect(r, size-128, 3)
++		if e != nil {
++			return errDirectAudio
++		}
++		if string(b) == "TAG" {
++			size -= 128
++		}
++	}
++	size, e = apeAudioEnd(r, pos, size)
++	if e != nil {
++		return e
++	}
++	rates := [16]int{0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0}
++	samples := [4]int{44100, 48000, 32000, 0}
++	frames := 0
++	var first uint32
++	for pos < size {
++		var b [4]byte
++		if _, e := r.ReadAt(b[:], pos); e != nil {
++			return errDirectAudio
++		}
++		h := binary.BigEndian.Uint32(b[:])
++		if h&0xfffe0000 != 0xfffa0000 || rates[(h>>12)&15] == 0 || samples[(h>>10)&3] == 0 || h&3 == 2 {
++			return errDirectAudio
++		}
++		signature := h & 0x00000cc0
++		if frames > 0 && signature != first {
++			return errDirectAudio
++		}
++		first = signature
++		length := int64(144000*rates[(h>>12)&15]/samples[(h>>10)&3] + int((h>>9)&1))
++		if length < 24 || length > size-pos {
++			return errDirectAudio
++		}
++		pos += length
++		frames++
++	}
++	if frames < 2 {
++		return errDirectAudio
++	}
++	return nil
++}
++
++// APEv2 at the end of audio, before optional ID3v1. Text only; binary/locator
++// items and leading/APE v1 variants are deliberately not admitted.
++func apeAudioEnd(r io.ReaderAt, start, end int64) (int64, error) {
++	if end-start < 32 {
++		return end, nil
++	}
++	footer, e := readDirect(r, end-32, 32)
++	if e != nil {
++		return 0, errDirectAudio
++	}
++	if string(footer[:8]) != "APETAGEX" {
++		return end, nil
++	}
++	version := binary.LittleEndian.Uint32(footer[8:12])
++	n := int64(binary.LittleEndian.Uint32(footer[12:16]))
++	count := binary.LittleEndian.Uint32(footer[16:20])
++	flags := binary.LittleEndian.Uint32(footer[20:24])
++	if version != 2000 || n < 32 || n > directMetadataLimit || n > end-start || count == 0 || count > 1024 || flags&^uint32(0x80000000) != 0 || !zeroBytes(footer[24:]) {
++		return 0, errDirectAudio
++	}
++	begin := end - n
++	b, e := readDirect(r, begin, n-32)
++	if e != nil {
++		return 0, errDirectAudio
++	}
++	if flags != 0 {
++		if begin-start < 32 {
++			return 0, errDirectAudio
++		}
++		header, e := readDirect(r, begin-32, 32)
++		if e != nil {
++			return 0, errDirectAudio
++		}
++		expected := bytes.Clone(footer)
++		binary.LittleEndian.PutUint32(expected[20:24], flags|0x20000000)
++		if !bytes.Equal(header, expected) {
++			return 0, errDirectAudio
++		}
++		begin -= 32
++	}
++	keys := map[string]bool{}
++	for i := uint32(0); i < count; i++ {
++		if len(b) < 11 {
++			return 0, errDirectAudio
++		}
++		n := uint64(binary.LittleEndian.Uint32(b[:4]))
++		flags := binary.LittleEndian.Uint32(b[4:8])
++		if flags&^uint32(1) != 0 {
++			return 0, errDirectAudio
++		}
++		k := bytes.IndexByte(b[8:], 0)
++		if k < 2 || k > 255 {
++			return 0, errDirectAudio
++		}
++		key := b[8 : 8+k]
++		for _, c := range key {
++			if c < 32 || c > 126 || c == '=' {
++				return 0, errDirectAudio
++			}
++		}
++		normalized := strings.ToLower(string(key))
++		if keys[normalized] || normalized == "id3" || normalized == "tag" || normalized == "oggs" || normalized == "mp+" {
++			return 0, errDirectAudio
++		}
++		keys[normalized] = true
++		b = b[9+k:]
++		if n > uint64(len(b)) || !utf8.Valid(b[:int(n)]) || bytes.Count(b[:int(n)], []byte{0}) > 1024 {
++			return 0, errDirectAudio
++		}
++		b = b[int(n):]
++	}
++	if len(b) != 0 {
++		return 0, errDirectAudio
++	}
++	return begin, nil
++}
+diff --git a/internal/organize/direct_format_test.go b/internal/organize/direct_format_test.go
+new file mode 100644
+index 0000000..3f3424e
+--- /dev/null
++++ b/internal/organize/direct_format_test.go
+@@ -0,0 +1,345 @@
++package organize
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/binary"
++	"fmt"
++	"math/rand"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/Eyevinn/mp4ff/mp4"
++)
++
++func boxFixture(kind string, parts ...[]byte) []byte {
++	payload := bytes.Join(parts, nil)
++	b := make([]byte, 8)
++	binary.BigEndian.PutUint32(b, uint32(len(payload)+8))
++	copy(b[4:], kind)
++	return append(b, payload...)
++}
++func wordsFixture(values ...uint32) []byte {
++	b := make([]byte, len(values)*4)
++	for i, v := range values {
++		binary.BigEndian.PutUint32(b[i*4:], v)
++	}
++	return b
++}
++
++// No production content: a structural AAC track with synthetic coded sample bytes.
++func m4aFixture() []byte {
++	ftyp := boxFixture("ftyp", []byte("M4A "), wordsFixture(0), []byte("isom"))
++	mdat := boxFixture("mdat", []byte{0x21, 0x10, 0x04, 0x60, 0x8c, 0x1c, 0x21, 0x10, 0x04, 0x60, 0x8c, 0x1c})
++	mvhd := make([]byte, 100)
++	copy(mvhd[12:], wordsFixture(44100, 2048))
++	copy(mvhd[20:], wordsFixture(0x10000))
++	mvhd[24] = 1
++	tkhd := make([]byte, 84)
++	tkhd[3] = 3
++	copy(tkhd[12:], wordsFixture(1, 0, 2048))
++	mdhd := append(wordsFixture(0, 0, 0, 44100, 2048), []byte{0x55, 0xc4, 0, 0}...)
++	hdlr := append(wordsFixture(0, 0), []byte("soun")...)
++	hdlr = append(hdlr, make([]byte, 12)...)
++	sample := make([]byte, 28)
++	sample[7] = 1
++	sample[17] = 2
++	sample[19] = 16
++	copy(sample[24:], wordsFixture(44100<<16))
++	var esds bytes.Buffer
++	mp4.CreateEsdsBox([]byte{0x12, 0x10}).Encode(&esds)
++	stsd := boxFixture("stsd", wordsFixture(0, 1), boxFixture("mp4a", sample, esds.Bytes()))
++	stbl := boxFixture("stbl", stsd, boxFixture("stts", wordsFixture(0, 1, 2, 1024)), boxFixture("stsc", wordsFixture(0, 1, 1, 2, 1)), boxFixture("stsz", wordsFixture(0, 6, 2)), boxFixture("stco", wordsFixture(0, 1, uint32(len(ftyp)+8))))
++	dinf := boxFixture("dinf", boxFixture("dref", wordsFixture(0, 1), boxFixture("url ", wordsFixture(1))))
++	minf := boxFixture("minf", boxFixture("smhd", make([]byte, 8)), dinf, stbl)
++	mdia := boxFixture("mdia", boxFixture("mdhd", mdhd), boxFixture("hdlr", hdlr), minf)
++	return bytes.Join([][]byte{ftyp, mdat, boxFixture("moov", boxFixture("mvhd", mvhd), boxFixture("trak", boxFixture("tkhd", tkhd), mdia))}, nil)
++}
++func id3Fixture(version byte, footer bool) []byte {
++	payload := append([]byte{3}, []byte("Synthetic title")...)
++	frame := append([]byte("TIT2"), wordsFixture(uint32(len(payload)))...)
++	frame = append(frame, 0, 0)
++	frame = append(frame, payload...)
++	if version == 2 {
++		frame = append([]byte{'T', 'T', '2', 0, 0, byte(len(payload))}, payload...)
++	}
++	h := []byte{'I', 'D', '3', version, 0, 0, 0, 0, 0, byte(len(frame))}
++	if footer {
++		h[5] = 16
++	}
++	b := append(h, frame...)
++	if footer {
++		f := append([]byte("3DI"), h[3:]...)
++		b = append(b, f...)
++	}
++	return b
++}
++func TestDirectID3Formats(t *testing.T) {
++	for _, version := range []byte{2, 3, 4} {
++		for _, v1 := range []bool{false, true} {
++			t.Run(fmt.Sprintf("v2.%d-v1=%v", version, v1), func(t *testing.T) {
++				b := append(id3Fixture(version, false), directFixture()...)
++				if v1 {
++					tail := make([]byte, 128)
++					copy(tail, "TAG")
++					b = append(b, tail...)
++				}
++				if e := ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3"); e != nil {
++					t.Fatal(e)
++				}
++			})
++		}
++	}
++	b := append(id3Fixture(4, true), directFixture()...)
++	if e := ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3"); e != nil {
++		t.Fatal(e)
++	}
++	b = directFixture()
++	tail := make([]byte, 128)
++	copy(tail, "TAG")
++	b = append(b, tail...)
++	if e := ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3"); e != nil {
++		t.Fatal(e)
++	}
++}
++func TestDirectID3MalformedAndAPEFailClosed(t *testing.T) {
++	valid := append(id3Fixture(4, false), directFixture()...)
++	cases := [][]byte{valid[:9], append([]byte("APETAGEX"), directFixture()...), append(directFixture(), []byte("APETAGEX")...), valid[:len(valid)-1]}
++	for _, mut := range []func([]byte){func(b []byte) { b[6] = 255 }, func(b []byte) { copy(b[6:10], []byte{127, 127, 127, 127}) }, func(b []byte) { b[5] = 128 }, func(b []byte) { b[5] = 64 }, func(b []byte) { b[14] = 255 }, func(b []byte) { b[19] = 8 }, func(b []byte) { b[10] = '?' }, func(b []byte) { b[9] = 0 }} {
++		b := bytes.Clone(valid)
++		mut(b)
++		cases = append(cases, b)
++	}
++	for i, b := range cases {
++		if ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3") == nil {
++			t.Fatalf("accepted malformed tag %d", i)
++		}
++	}
++	footer := append(id3Fixture(4, true), directFixture()...)
++	footer[len(id3Fixture(4, true))-1]++
++	if ValidateDirectAudio(bytes.NewReader(footer), int64(len(footer)), "mp3") == nil {
++		t.Fatal("footer mismatch")
++	}
++}
++func TestDirectM4AValidAndExclusivePlacement(t *testing.T) {
++	b := m4aFixture()
++	if e := ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "m4a"); e != nil {
++		t.Fatal(e)
++	}
++	if ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3") == nil {
++		t.Fatal("M4A accepted as MP3")
++	}
++	o, _, library := audiobookOrganizer(t, "copy")
++	os.MkdirAll(library, 0755)
++	id := "33333333333333333333333333333333"
++	sum := fmt.Sprintf("%x", sha256.Sum256(b))
++	rel, _, e := o.PlaceDirectAudio(id, "Title", "m4a", sum, int64(len(b)), bytes.NewReader(b))
++	if e != nil {
++		t.Fatal(e)
++	}
++	got, e := os.ReadFile(filepath.Join(library, rel))
++	if e != nil || !bytes.Equal(got, b) {
++		t.Fatal("changed file")
++	}
++	if _, _, e = o.PlaceDirectAudio(id, "Title", "m4a", sum, int64(len(b)), bytes.NewReader(b)); e == nil {
++		t.Fatal("overwrote")
++	}
++}
++func TestDirectM4AMalformedStructures(t *testing.T) {
++	valid := m4aFixture()
++	cases := []struct {
++		name   string
++		mutate func([]byte) []byte
++	}{
++		{"truncated", func(b []byte) []byte { return b[:len(b)-1] }},
++		{"sizeZero", func(b []byte) []byte { copy(b[:4], wordsFixture(0)); return b }},
++		{"hugeBox", func(b []byte) []byte { copy(b[:4], wordsFixture(0xffffffff)); return b }},
++		{"shortBox", func(b []byte) []byte { copy(b[:4], wordsFixture(7)); return b }},
++		{"noAudio", func(b []byte) []byte { copy(b[bytes.Index(b, []byte("soun")):], "vide"); return b }},
++		{"encrypted", func(b []byte) []byte { copy(b[bytes.Index(b, []byte("mp4a")):], "enca"); return b }},
++		{"externalReference", func(b []byte) []byte { i := bytes.Index(b, []byte("url ")); b[i+7] = 0; return b }},
++		{"sampleCount", func(b []byte) []byte {
++			i := bytes.Index(b, []byte("stsz"))
++			copy(b[i+12:], wordsFixture(0xffffffff))
++			return b
++		}},
++		{"tableCount", func(b []byte) []byte {
++			i := bytes.Index(b, []byte("stsc"))
++			copy(b[i+8:], wordsFixture(0xffffffff))
++			return b
++		}},
++		{"sampleExtent", func(b []byte) []byte { i := bytes.Index(b, []byte("stsz")); copy(b[i+8:], wordsFixture(100)); return b }},
++		{"chunkOutside", func(b []byte) []byte { i := bytes.Index(b, []byte("stco")); copy(b[i+12:], wordsFixture(0)); return b }},
++		{"contradictDuration", func(b []byte) []byte {
++			i := bytes.Index(b, []byte("stts"))
++			copy(b[i+16:], wordsFixture(1023))
++			return b
++		}},
++		{"descriptorLength", func(b []byte) []byte {
++			i := bytes.Index(b, []byte("esds"))
++			for j := i + 9; j < i+13; j++ {
++				b[j] = 255
++			}
++			return b
++		}},
++		{"audioConfig", func(b []byte) []byte { i := bytes.Index(b, []byte{0x12, 0x10}); b[i] = 0x2a; return b }},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			b := c.mutate(bytes.Clone(valid))
++			if ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "m4a") == nil {
++				t.Fatal("malformed file accepted")
++			}
++		})
++	}
++}
++func TestDirectTruncationsAndBoundedMutations(t *testing.T) {
++	for _, format := range []string{"mp3", "m4a"} {
++		b := m4aFixture()
++		if format == "mp3" {
++			b = append(id3Fixture(3, false), directFixture()...)
++		}
++		for n := 0; n < len(b); n++ {
++			if ValidateDirectAudio(bytes.NewReader(b[:n]), int64(n), format) == nil {
++				t.Fatalf("accepted truncation %s/%d", format, n)
++			}
++		}
++		rng := rand.New(rand.NewSource(158))
++		for i := 0; i < 2000; i++ {
++			c := bytes.Clone(b)
++			for j := 0; j < 4; j++ {
++				c[rng.Intn(len(c))] = byte(rng.Intn(256))
++			}
++			ValidateDirectAudio(bytes.NewReader(c), int64(len(c)), format)
++		}
++	}
++}
++func FuzzDirectAudioAdmission(f *testing.F) {
++	f.Add(m4aFixture(), true)
++	f.Add(append(directFixture(), apeFixture(true)...), false)
++	f.Add(append(id3Fixture(3, false), directFixture()...), false)
++	f.Fuzz(func(t *testing.T, b []byte, m4a bool) {
++		if len(b) > 1<<20 {
++			t.Skip()
++		}
++		format := "mp3"
++		if m4a {
++			format = "m4a"
++		}
++		ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), format)
++	})
++}
++
++func apeFixture(header bool) []byte {
++	item := make([]byte, 8)
++	binary.LittleEndian.PutUint32(item, 5)
++	item = append(item, []byte("Title\x00Hello")...)
++	f := make([]byte, 32)
++	copy(f, "APETAGEX")
++	binary.LittleEndian.PutUint32(f[8:], 2000)
++	binary.LittleEndian.PutUint32(f[12:], uint32(len(item)+32))
++	binary.LittleEndian.PutUint32(f[16:], 1)
++	if !header {
++		return append(item, f...)
++	}
++	binary.LittleEndian.PutUint32(f[20:], 0x80000000)
++	h := bytes.Clone(f)
++	binary.LittleEndian.PutUint32(h[20:], 0xa0000000)
++	return bytes.Join([][]byte{h, item, f}, nil)
++}
++func TestDirectAPEv2TextEnvelopes(t *testing.T) {
++	for _, header := range []bool{false, true} {
++		for _, id3 := range []bool{false, true} {
++			b := append(id3Fixture(3, false), directFixture()...)
++			b = append(b, apeFixture(header)...)
++			if id3 {
++				tail := make([]byte, 128)
++				copy(tail, "TAG")
++				b = append(b, tail...)
++			}
++			if e := ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3"); e != nil {
++				t.Fatal(e)
++			}
++		}
++	}
++	for _, mut := range []func([]byte){func(b []byte) { b[len(b)-20] = 255 }, func(b []byte) { b[len(b)-16] = 255 }, func(b []byte) { b[len(b)-12] = 1 }, func(b []byte) { b[4] = 4 }, func(b []byte) { b[0] = 255 }, func(b []byte) { b[8] = 0 }, func(b []byte) { b[14] = 255 }} {
++		tag := apeFixture(false)
++		mut(tag)
++		b := append(directFixture(), tag...)
++		if ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3") == nil {
++			t.Fatal("malformed APE admitted")
++		}
++	}
++	h := apeFixture(true)
++	h[8]++
++	b := append(directFixture(), h...)
++	if ValidateDirectAudio(bytes.NewReader(b), int64(len(b)), "mp3") == nil {
++		t.Fatal("mismatched APE header")
++	}
++}
++
++func TestDirectM4AFixtureProvenance(t *testing.T) {
++	b, e := os.ReadFile("../api/testdata/direct-aac.m4a")
++	if e != nil || !bytes.Equal(b, m4aFixture()) {
++		t.Fatal("API fixture differs from synthetic generator")
++	}
++}
++
++func replaceFixtureBox(b []byte, kind string, replacement []byte) []byte {
++	var out []byte
++	for len(b) > 0 {
++		n := int(binary.BigEndian.Uint32(b))
++		k := string(b[4:8])
++		part := b[:n]
++		if k == kind {
++			part = replacement
++		} else {
++			switch k {
++			case "moov", "trak", "mdia", "minf", "stbl":
++				part = boxFixture(k, replaceFixtureBox(b[8:n], kind, replacement))
++			}
++		}
++		out = append(out, part...)
++		b = b[n:]
++	}
++	return out
++}
++func TestDirectM4AContainerVariants(t *testing.T) {
++	b := m4aFixture()
++	ftypSize := int(binary.BigEndian.Uint32(b))
++	mdatSize := int(binary.BigEndian.Uint32(b[ftypSize:]))
++	moovStart := ftypSize + mdatSize
++	// Fast-start moov ordering, 64-bit chunk offsets and extended mdat headers.
++	fast := replaceFixtureBox(b, "stco", boxFixture("stco", wordsFixture(0, 1, uint32(ftypSize+len(b)-moovStart+8))))
++	fast = bytes.Join([][]byte{fast[:ftypSize], fast[moovStart:], fast[ftypSize:moovStart]}, nil)
++	co64 := replaceFixtureBox(b, "stco", boxFixture("co64", wordsFixture(0, 1, 0, uint32(ftypSize+8))))
++	large := replaceFixtureBox(b, "stco", boxFixture("stco", wordsFixture(0, 1, uint32(ftypSize+16))))
++	large = replaceFixtureBox(large, "mdat", append(append(wordsFixture(1), []byte("mdat")...), append(wordsFixture(0, uint32(mdatSize+8)), b[ftypSize+8:moovStart]...)...))
++	data := boxFixture("data", wordsFixture(1, 0), []byte("Synthetic title"))
++	metadata := boxFixture("udta", boxFixture("meta", wordsFixture(0), boxFixture("ilst", boxFixture("©nam", data))))
++	tagged := replaceFixtureBox(b, "moov", boxFixture("moov", b[moovStart+8:], metadata))
++	for name, v := range map[string][]byte{"fastStart": fast, "co64": co64, "largeMdat": large, "metadata": tagged} {
++		t.Run(name, func(t *testing.T) {
++			if e := ValidateDirectAudio(bytes.NewReader(v), int64(len(v)), "m4a"); e != nil {
++				t.Fatal(e)
++			}
++		})
++	}
++	// Duplicate track, overlapping chunks and opaque metadata with a forged child length fail.
++	trackStart := bytes.Index(b, []byte("trak")) - 4
++	track := b[trackStart : trackStart+int(binary.BigEndian.Uint32(b[trackStart:]))]
++	duplicate := replaceFixtureBox(b, "moov", boxFixture("moov", b[moovStart+8:], track))
++	overlap := replaceFixtureBox(b, "stco", boxFixture("stco", wordsFixture(0, 2, uint32(ftypSize+8), uint32(ftypSize+8))))
++	overlap = replaceFixtureBox(overlap, "stsc", boxFixture("stsc", wordsFixture(0, 1, 1, 1, 1)))
++	corrupt := bytes.Clone(tagged)
++	p := bytes.Index(corrupt, []byte("data")) - 4
++	copy(corrupt[p:], wordsFixture(0xffffffff))
++	for name, v := range map[string][]byte{"duplicateTrack": duplicate, "overlap": overlap, "metadataLength": corrupt} {
++		t.Run(name, func(t *testing.T) {
++			if ValidateDirectAudio(bytes.NewReader(v), int64(len(v)), "m4a") == nil {
++				t.Fatal("malformed admitted")
++			}
++		})
++	}
++}
+diff --git a/internal/organize/direct_m4a_validation.go b/internal/organize/direct_m4a_validation.go
+new file mode 100644
+index 0000000..f8a2a83
+--- /dev/null
++++ b/internal/organize/direct_m4a_validation.go
+@@ -0,0 +1,516 @@
++package organize
++
++import (
++	"bytes"
++	"encoding/binary"
++	"io"
++
++	"github.com/Eyevinn/mp4ff/aac"
++	"github.com/Eyevinn/mp4ff/mp4"
++)
++
++// Bounded progressive AAC-LC admission, not a general decoder. Envelopes and
++// allocation-driving counts are checked BEFORE mp4ff sees individual leaves.
++type directBox struct {
++	kind      string
++	raw, body []byte
++}
++
++func directBoxes(b []byte, budget *int) ([]directBox, error) {
++	var out []directBox
++	for len(b) > 0 {
++		if len(b) < 8 || *budget <= 0 {
++			return nil, errDirectAudio
++		}
++		*budget--
++		n := uint64(binary.BigEndian.Uint32(b))
++		if n < 8 || n > uint64(len(b)) {
++			return nil, errDirectAudio
++		}
++		out = append(out, directBox{string(b[4:8]), b[:int(n)], b[8:int(n)]})
++		b = b[int(n):]
++	}
++	return out, nil
++}
++func oneBox(boxes []directBox, kind string) (directBox, error) {
++	var found directBox
++	n := 0
++	for _, b := range boxes {
++		if b.kind == kind {
++			found = b
++			n++
++		}
++	}
++	if n != 1 {
++		return found, errDirectAudio
++	}
++	return found, nil
++}
++func allowedBoxes(boxes []directBox, kinds ...string) bool {
++	seen := map[string]bool{}
++	for _, b := range boxes {
++		ok := false
++		for _, k := range kinds {
++			if b.kind == k {
++				ok = true
++			}
++		}
++		if !ok || seen[b.kind] && b.kind != "free" {
++			return false
++		}
++		seen[b.kind] = true
++	}
++	return true
++}
++func fullZero(b []byte) bool                        { return len(b) >= 4 && zeroBytes(b[:4]) }
++func decodeDirectLeaf(b directBox) (mp4.Box, error) { return mp4.DecodeBox(0, bytes.NewReader(b.raw)) }
++func validateDirectM4A(r io.ReaderAt, size int64) error {
++	budget := 512
++	var movie []byte
++	var dataStart, dataEnd int64
++	ftyp := false
++	for pos := int64(0); pos < size; {
++		h, e := readDirect(r, pos, 8)
++		if e != nil || budget <= 0 {
++			return errDirectAudio
++		}
++		budget--
++		n := int64(binary.BigEndian.Uint32(h))
++		head := int64(8)
++		kind := string(h[4:])
++		if n == 1 && kind == "mdat" {
++			ext, e := readDirect(r, pos+8, 8)
++			if e != nil {
++				return errDirectAudio
++			}
++			u := binary.BigEndian.Uint64(ext)
++			if u > uint64(size-pos) {
++				return errDirectAudio
++			}
++			n = int64(u)
++			head = 16
++		}
++		if n < head || n > size-pos {
++			return errDirectAudio
++		}
++		switch kind {
++		case "ftyp":
++			if pos != 0 || ftyp || n < 16 || n > 128 || (n-16)%4 != 0 {
++				return errDirectAudio
++			}
++			b, e := readDirect(r, pos+8, n-8)
++			if e != nil {
++				return errDirectAudio
++			}
++			brand := string(b[:4])
++			if brand != "M4A " && brand != "isom" && brand != "mp42" {
++				return errDirectAudio
++			}
++			ftyp = true
++		case "moov":
++			if movie != nil || n > directMetadataLimit {
++				return errDirectAudio
++			}
++			movie, e = readDirect(r, pos+8, n-8)
++			if e != nil {
++				return errDirectAudio
++			}
++		case "mdat":
++			if dataEnd != 0 || n == head {
++				return errDirectAudio
++			}
++			dataStart = pos + head
++			dataEnd = pos + n
++		case "free": // never materialized
++		default:
++			return errDirectAudio // includes fragments, DRM and reference movies
++		}
++		pos += n
++	}
++	if !ftyp || movie == nil || dataEnd == 0 {
++		return errDirectAudio
++	}
++	moov, e := directBoxes(movie, &budget)
++	if e != nil || !allowedBoxes(moov, "mvhd", "trak", "udta", "free") {
++		return errDirectAudio
++	}
++	mvhd, e := oneBox(moov, "mvhd")
++	if e != nil || len(mvhd.body) != 100 || !fullZero(mvhd.body) || binary.BigEndian.Uint32(mvhd.body[12:16]) == 0 || binary.BigEndian.Uint32(mvhd.body[16:20]) == 0 {
++		return errDirectAudio
++	}
++	for _, b := range moov {
++		if b.kind == "udta" && !directMetadata(b.body, &budget) {
++			return errDirectAudio
++		}
++	}
++	track, e := oneBox(moov, "trak")
++	if e != nil {
++		return errDirectAudio
++	}
++	trak, e := directBoxes(track.body, &budget)
++	if e != nil || !allowedBoxes(trak, "tkhd", "mdia", "edts") {
++		return errDirectAudio
++	}
++	tkhd, e := oneBox(trak, "tkhd")
++	if e != nil || len(tkhd.body) != 84 || tkhd.body[0] != 0 || binary.BigEndian.Uint32(tkhd.body[12:16]) == 0 {
++		return errDirectAudio
++	}
++	media, e := oneBox(trak, "mdia")
++	if e != nil {
++		return errDirectAudio
++	}
++	mdia, e := directBoxes(media.body, &budget)
++	if e != nil || !allowedBoxes(mdia, "mdhd", "hdlr", "minf") {
++		return errDirectAudio
++	}
++	mdhd, e := oneBox(mdia, "mdhd")
++	if e != nil || len(mdhd.body) != 24 || !fullZero(mdhd.body) {
++		return errDirectAudio
++	}
++	timescale := binary.BigEndian.Uint32(mdhd.body[12:16])
++	duration := binary.BigEndian.Uint32(mdhd.body[16:20])
++	if timescale == 0 || duration == 0 {
++		return errDirectAudio
++	}
++	movieScale := binary.BigEndian.Uint32(mvhd.body[12:16])
++	trackDuration := binary.BigEndian.Uint32(tkhd.body[20:24])
++	if trackDuration == 0 || trackDuration > binary.BigEndian.Uint32(mvhd.body[16:20]) {
++		return errDirectAudio
++	}
++	hasEdits := false
++	for _, b := range trak {
++		if b.kind == "edts" {
++			hasEdits = true
++			if !directEdits(b.body, &budget, movieScale, timescale, trackDuration, duration) {
++				return errDirectAudio
++			}
++		}
++	}
++	if !hasEdits {
++		actual := uint64(trackDuration) * uint64(timescale)
++		expected := uint64(duration) * uint64(movieScale)
++		tolerance := uint64(timescale)
++		if actual > expected+tolerance || expected > actual+tolerance {
++			return errDirectAudio
++		}
++	}
++	hdlr, e := oneBox(mdia, "hdlr")
++	if e != nil || len(hdlr.body) < 24 || !fullZero(hdlr.body) || string(hdlr.body[8:12]) != "soun" {
++		return errDirectAudio
++	}
++	min, e := oneBox(mdia, "minf")
++	if e != nil {
++		return errDirectAudio
++	}
++	minf, e := directBoxes(min.body, &budget)
++	if e != nil || !allowedBoxes(minf, "smhd", "dinf", "stbl") {
++		return errDirectAudio
++	}
++	smhd, e := oneBox(minf, "smhd")
++	if e != nil || len(smhd.body) != 8 || !fullZero(smhd.body) {
++		return errDirectAudio
++	}
++	dinf, e := oneBox(minf, "dinf")
++	if e != nil || !directDataReference(dinf.body, &budget) {
++		return errDirectAudio
++	}
++	table, e := oneBox(minf, "stbl")
++	if e != nil {
++		return errDirectAudio
++	}
++	stbl, e := directBoxes(table.body, &budget)
++	if e != nil || !allowedBoxes(stbl, "stsd", "stsz", "stsc", "stts", "stco", "co64") {
++		return errDirectAudio
++	}
++	stsd, e := oneBox(stbl, "stsd")
++	if e != nil || len(stsd.body) < 8 || !fullZero(stsd.body) || binary.BigEndian.Uint32(stsd.body[4:8]) != 1 {
++		return errDirectAudio
++	}
++	entries, e := directBoxes(stsd.body[8:], &budget)
++	if e != nil || len(entries) != 1 || entries[0].kind != "mp4a" {
++		return errDirectAudio
++	}
++	if !directAAC(entries[0].body, &budget, timescale) {
++		return errDirectAudio
++	}
++	return directSampleTables(stbl, dataStart, dataEnd, duration)
++}
++func directDataReference(b []byte, budget *int) bool {
++	boxes, e := directBoxes(b, budget)
++	if e != nil || len(boxes) != 1 || boxes[0].kind != "dref" {
++		return false
++	}
++	b = boxes[0].body
++	if len(b) < 8 || !fullZero(b) || binary.BigEndian.Uint32(b[4:8]) != 1 {
++		return false
++	}
++	refs, e := directBoxes(b[8:], budget)
++	return e == nil && len(refs) == 1 && refs[0].kind == "url " && bytes.Equal(refs[0].body, []byte{0, 0, 0, 1})
++}
++func directAAC(b []byte, budget *int, timescale uint32) bool {
++	if len(b) < 28 || !zeroBytes(b[:6]) || binary.BigEndian.Uint16(b[6:8]) != 1 || !zeroBytes(b[8:16]) || binary.BigEndian.Uint16(b[18:20]) != 16 || !zeroBytes(b[20:24]) {
++		return false
++	}
++	channels := binary.BigEndian.Uint16(b[16:18])
++	rate := binary.BigEndian.Uint32(b[24:28])
++	if channels < 1 || channels > 2 || rate&0xffff != 0 || rate>>16 != timescale {
++		return false
++	}
++	children, e := directBoxes(b[28:], budget)
++	if e != nil || !allowedBoxes(children, "esds", "btrt") {
++		return false
++	}
++	esds, e := oneBox(children, "esds")
++	if e != nil || len(esds.body) > 4096 || !fullZero(esds.body) || !directDescriptors(esds.body[4:]) {
++		return false
++	}
++	for _, child := range children {
++		if child.kind == "btrt" && len(child.body) != 12 {
++			return false
++		}
++	}
++	decoded, e := decodeDirectLeaf(esds)
++	if e != nil {
++		return false
++	}
++	descriptor, ok := decoded.(*mp4.EsdsBox)
++	if !ok {
++		return false
++	}
++	d := descriptor.DecConfigDescriptor
++	if d == nil || d.ObjectType != 0x40 || d.StreamType != 0x15 || d.DecSpecificInfo == nil {
++		return false
++	}
++	config := d.DecSpecificInfo.DecConfig
++	if len(config) != 2 || config[1]&7 != 0 {
++		return false
++	}
++	asc, e := aac.DecodeAudioSpecificConfig(bytes.NewReader(config))
++	return e == nil && asc.ObjectType == aac.AAClc && asc.SamplingFrequency == int(timescale) && asc.ChannelConfiguration == byte(channels) && descriptor.Flags == 0
++}
++func directSampleTables(boxes []directBox, start, end int64, duration uint32) error {
++	var sizes *mp4.StszBox
++	var chunks *mp4.StscBox
++	var timing *mp4.SttsBox
++	var offsets []uint64
++	for _, b := range boxes {
++		if b.kind == "stsd" {
++			continue
++		}
++		if len(b.body) < 8 || !fullZero(b.body) {
++			return errDirectAudio
++		}
++		count := binary.BigEndian.Uint32(b.body[4:8])
++		base, width := 8, 4
++		switch b.kind {
++		case "stsz":
++			if len(b.body) < 12 {
++				return errDirectAudio
++			}
++			count = binary.BigEndian.Uint32(b.body[8:12])
++			base = 12
++			if binary.BigEndian.Uint32(b.body[4:8]) != 0 {
++				width = 0
++			}
++		case "stsc":
++			width = 12
++		case "stts", "co64":
++			width = 8
++		}
++		if count == 0 || count > 1000000 || uint64(len(b.body)) != uint64(base)+uint64(count)*uint64(width) {
++			return errDirectAudio
++		}
++		v, e := decodeDirectLeaf(b)
++		if e != nil {
++			return errDirectAudio
++		}
++		switch v := v.(type) {
++		case *mp4.StszBox:
++			sizes = v
++		case *mp4.StscBox:
++			chunks = v
++		case *mp4.SttsBox:
++			timing = v
++		case *mp4.StcoBox:
++			if offsets != nil {
++				return errDirectAudio
++			}
++			for _, o := range v.ChunkOffset {
++				offsets = append(offsets, uint64(o))
++			}
++		case *mp4.Co64Box:
++			if offsets != nil {
++				return errDirectAudio
++			}
++			offsets = v.ChunkOffset
++		default:
++			return errDirectAudio
++		}
++	}
++	if sizes == nil || chunks == nil || timing == nil || len(offsets) == 0 || len(chunks.Entries) == 0 || chunks.Entries[0].FirstChunk != 1 {
++		return errDirectAudio
++	}
++	var sampleCount, totalDuration uint64
++	for i, n := range timing.SampleCount {
++		if n == 0 || timing.SampleTimeDelta[i] == 0 || uint64(n) > uint64(sizes.SampleNumber)-sampleCount {
++			return errDirectAudio
++		}
++		sampleCount += uint64(n)
++		totalDuration += uint64(n) * uint64(timing.SampleTimeDelta[i])
++		if totalDuration > uint64(duration) {
++			return errDirectAudio
++		}
++	}
++	if sampleCount != uint64(sizes.SampleNumber) || totalDuration != uint64(duration) {
++		return errDirectAudio
++	}
++	for i, c := range chunks.Entries {
++		if c.FirstChunk == 0 || c.FirstChunk > uint32(len(offsets)) || c.SamplesPerChunk == 0 || c.SamplesPerChunk > sizes.SampleNumber || i > 0 && c.FirstChunk <= chunks.Entries[i-1].FirstChunk || chunks.GetSampleDescriptionID(i+1) != 1 {
++			return errDirectAudio
++		}
++	}
++	sample, entry := 1, 0
++	next := uint64(start)
++	for i, offset := range offsets {
++		if entry+1 < len(chunks.Entries) && chunks.Entries[entry+1].FirstChunk == uint32(i+1) {
++			entry++
++		}
++		if offset != next {
++			return errDirectAudio
++		}
++		for j := uint32(0); j < chunks.Entries[entry].SamplesPerChunk; j++ {
++			if sample > int(sizes.SampleNumber) {
++				return errDirectAudio
++			}
++			n := sizes.GetSampleSize(sample)
++			if n == 0 || n > 1<<20 || uint64(n) > uint64(end)-next {
++				return errDirectAudio
++			}
++			next += uint64(n)
++			sample++
++		}
++	}
++	if sample != int(sizes.SampleNumber)+1 || next != uint64(end) {
++		return errDirectAudio
++	}
++	return nil
++}
++
++// Common iTunes metadata box envelopes; values remain opaque and are never rendered.
++func directMetadata(b []byte, budget *int) bool {
++	boxes, e := directBoxes(b, budget)
++	if e != nil || !allowedBoxes(boxes, "meta") {
++		return false
++	}
++	for _, m := range boxes {
++		if !fullZero(m.body) {
++			return false
++		}
++		children, e := directBoxes(m.body[4:], budget)
++		if e != nil || !allowedBoxes(children, "hdlr", "ilst") {
++			return false
++		}
++		for _, c := range children {
++			if c.kind == "hdlr" {
++				if len(c.body) < 24 || !fullZero(c.body) {
++					return false
++				}
++				continue
++			}
++			items, e := directBoxes(c.body, budget)
++			if e != nil {
++				return false
++			}
++			for _, item := range items {
++				values, e := directBoxes(item.body, budget)
++				if e != nil {
++					return false
++				}
++				for _, v := range values {
++					if v.kind != "data" || len(v.body) < 8 {
++						return false
++					}
++				}
++			}
++		}
++	}
++	return true
++}
++func directEdits(b []byte, budget *int, movieScale, mediaScale, trackDuration, mediaDuration uint32) bool {
++	boxes, e := directBoxes(b, budget)
++	if e != nil || len(boxes) != 1 || boxes[0].kind != "elst" {
++		return false
++	}
++	b = boxes[0].body
++	if len(b) < 8 || !fullZero(b) {
++		return false
++	}
++	n := binary.BigEndian.Uint32(b[4:8])
++	if n == 0 || n > 2 || len(b) != 8+int(n)*12 {
++		return false
++	}
++	var total uint64
++	for p := 8; p < len(b); p += 12 {
++		segment := binary.BigEndian.Uint32(b[p : p+4])
++		mediaTime := int32(binary.BigEndian.Uint32(b[p+4 : p+8]))
++		if segment == 0 || mediaTime < -1 || !bytes.Equal(b[p+8:p+12], []byte{0, 1, 0, 0}) {
++			return false
++		}
++		total += uint64(segment)
++		if total > uint64(trackDuration) {
++			return false
++		}
++		if mediaTime >= 0 {
++			if uint32(mediaTime) >= mediaDuration {
++				return false
++			}
++			// At most one movie tick of duration rounding, never a range beyond the media.
++			if uint64(segment)*uint64(mediaScale) > uint64(mediaDuration-uint32(mediaTime))*uint64(movieScale)+uint64(mediaScale) {
++				return false
++			}
++		}
++	}
++	if total != uint64(trackDuration) {
++		return false
++	}
++
++	return true
++}
++
++// Validate the exact finite ES -> DecoderConfig -> AAC config + SL tree first.
++// Reject URL/dependent streams, extra descriptors and overlong/truncated length fields.
++func takeDirectDescriptor(b []byte, tag byte) (body, rest []byte, ok bool) {
++	if len(b) < 2 || b[0] != tag {
++		return nil, nil, false
++	}
++	n := 0
++	for i := 1; i <= 4; i++ {
++		if i >= len(b) {
++			return nil, nil, false
++		}
++		n = n<<7 | int(b[i]&127)
++		if b[i]&128 == 0 {
++			if n > len(b)-i-1 {
++				return nil, nil, false
++			}
++			return b[i+1 : i+1+n], b[i+1+n:], true
++		}
++	}
++	return nil, nil, false
++}
++func directDescriptors(b []byte) bool {
++	es, rest, ok := takeDirectDescriptor(b, 3)
++	if !ok || len(rest) != 0 || len(es) < 3 || es[2]&0xe0 != 0 {
++		return false
++	}
++	dec, rest, ok := takeDirectDescriptor(es[3:], 4)
++	if !ok || len(dec) < 13 {
++		return false
++	}
++	config, tail, ok := takeDirectDescriptor(dec[13:], 5)
++	if !ok || len(config) != 2 || len(tail) != 0 {
++		return false
++	}
++	sl, tail, ok := takeDirectDescriptor(rest, 6)
++	return ok && len(tail) == 0 && bytes.Equal(sl, []byte{2})
++}

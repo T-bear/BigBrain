@@ -1,5 +1,17 @@
 # BigBrain Status
 
+## BB-158 — direct audio import, 2026-10-18
+
+**MERGE CANDIDATE FOR DOCUMENTED FORMAT SUBSET / NOT DEPLOYED.** The bounded Librarr import path now admits tagged MP3
+and progressive AAC-LC M4A, with durable DOI/file linkage and exact ABS reconciliation in isolated
+tests. Unsupported codec/tag variants fail closed. Live ABS/filesystem compatibility, scanner safety
+and physical mobile acceptance remain deployment/activation prerequisites.
+[Current contract, verified results and limitations](reports/features/media/bb-158-url-import-20261017.md#mp3-and-m4a-format-completion--2026-10-18).
+
+Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
+[dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
+The older candidate entry below is historical; new physical iPhone/PWA acceptance remains pending.
+
 ## Media — Mediekontroll review, 2026-10-17
 
 **IMPLEMENTED / MERGE CANDIDATE / NOT DEPLOYED.** One Media entry leads to an overview

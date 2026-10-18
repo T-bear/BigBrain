@@ -6,3 +6,8 @@
 .media-control-card:hover { border-color: var(--bb-color-primary); }
 .media-control-card:focus-visible { outline: 2px solid var(--bb-color-primary); outline-offset: 3px; box-shadow: var(--bb-focus-ring); }
 .media-control > .page-header { margin-block: var(--bb-space-5); }
+.url-import { display: grid; gap: var(--bb-space-4); min-width: 0; overflow-wrap: anywhere; }
+.url-import form, .url-import label { display: grid; gap: var(--bb-space-2); min-width: 0; }
+.url-import form { gap: var(--bb-space-4); }
+.url-import dd { margin-inline-start: 0; }
+.url-import .url-import-consent { display: flex; align-items: center; min-height: 44px; }

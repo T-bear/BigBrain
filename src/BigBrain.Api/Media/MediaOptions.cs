@@ -67,6 +67,7 @@ public sealed class MediaOptions
 
 public sealed class LibrarrOptions
 {
+    public bool DirectAudioImportEnabled { get; init; }
     public string BaseUrl { get; init; } = "http://librarr:5050";
     public string? ApiKey { get; init; }
     public int CandidateLifetimeMinutes { get; init; } = 15;

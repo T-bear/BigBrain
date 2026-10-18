@@ -151,6 +151,16 @@ public partial class Program
                 "Librarr",
                 serviceProvider.GetRequiredService<ILogger<ProviderHttpLoggingHandler>>()));
         builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<IDirectAudioTransport, DirectAudioTransport>();
+        builder.Services.AddHttpClient<IDirectAudioImporter, LibrarrDirectAudioImporter>((services, client) =>
+        {
+            var options = services.GetRequiredService<MediaOptions>();
+            client.BaseAddress = new Uri(options.Librarr.BaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(100);
+            if (!string.IsNullOrWhiteSpace(options.Librarr.ApiKey)) client.DefaultRequestHeaders.Add("X-Api-Key", options.Librarr.ApiKey);
+        }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false, UseCookies = false })
+          .RemoveAllLoggers();
+        builder.Services.AddSingleton<MediaUrlImportService>();
         builder.Services.AddSingleton<AudiobookAcquisitionStore>();
         builder.Services.AddSingleton<AudiobookAcquisitionService>();
         builder.Services.AddSingleton<AudiobookUniversalSearchService>();
@@ -394,6 +404,7 @@ public partial class Program
             (MediaOptions options) => Results.Ok(MediaServiceLinks.From(options)));
 
         app.MapAudiobookEndpoints();
+        app.MapMediaUrlImportEndpoints();
 
         app.MapGet(
             "/api/v1/modules/media/posters/{token}",
