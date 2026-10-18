@@ -66,9 +66,21 @@ public sealed class MediaArchitectureTests
         Assert.DoesNotContain("HttpMethod.Put", arrSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Patch", arrSource, StringComparison.Ordinal);
         Assert.DoesNotContain("HttpMethod.Delete", arrSource, StringComparison.Ordinal);
+        // BB-158 permits exactly this upload in the Librarr adapter, not PUT elsewhere in Media.
+        const string approvedUpload = "new HttpRequestMessage(HttpMethod.Put, \"api/v1/direct-audio/\" + draft.Id)";
+        var directAudioSource = File.ReadAllText(Path.Combine(mediaDirectory, "DirectAudioImport.cs"));
+        var adapterStart = directAudioSource.IndexOf("public sealed class LibrarrDirectAudioImporter(", StringComparison.Ordinal);
+        var serviceStart = directAudioSource.IndexOf("public sealed class MediaUrlImportService(", StringComparison.Ordinal);
+        Assert.True(adapterStart >= 0 && serviceStart > adapterStart);
+        Assert.Equal(1, Count(directAudioSource[adapterStart..serviceStart], approvedUpload));
         var allMediaSource = string.Join(
             Environment.NewLine,
-            Directory.GetFiles(mediaDirectory, "*.cs").Select(File.ReadAllText));
+            Directory.GetFiles(mediaDirectory, "*.cs").Select(file =>
+                Path.GetFileName(file) == "DirectAudioImport.cs"
+                    ? directAudioSource[..adapterStart]
+                        + directAudioSource[adapterStart..serviceStart].Replace(approvedUpload, "", StringComparison.Ordinal)
+                        + directAudioSource[serviceStart..]
+                    : File.ReadAllText(file)));
         string[] forbiddenWriteTokens =
         [
             "HttpMethod.Put", "HttpMethod.Patch", "HttpMethod.Delete",
