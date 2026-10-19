@@ -4,8 +4,9 @@
 
 **MERGED BOUNDED SUBSET / DEPLOYMENT INCOMPLETE / IMPORT INACTIVE.** ABS hardening is deployed
 in the prior operational checkpoint; original Librarr/API/Web remain unchanged. The non-root
-Librarr Docker-build correction and session-independent deployment proposal are **REVIEW ONLY**.
-[Current build evidence, runtime provenance and remaining gates](reports/features/media/bb-158-url-import-20261017.md#librarr-build-permission-correction--2026-10-19).
+Librarr build fix is merged with green CI; deployment is **BLOCKED** on unavailable system-manager
+authorization for mandatory independent recovery verification. No production stop.
+[Current build evidence, runtime provenance and remaining gates](reports/features/media/bb-158-url-import-20261017.md#approved-build-fix-merge-and-session-recovery-gate--2026-10-19).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).

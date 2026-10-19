@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-158 — approved merge, recovery authorization stop, 2026-10-19
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / NO PRODUCTION STOP.** Accepted main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`, tree `f378da7239a5903f076bef89d6342a43cde25ca4`,
+contains exact approved fix; CI39186456029 SUCCESS, all four jobs PASS. Documentation-only
+branch `review/bb158-session-recovery-gate`; resolve publication by subject
+`docs(media): record merged build fix and systemd authorization stop`.
+[Exact failure, preserved runtime and local administrator action](../reports/features/media/bb-158-url-import-20261017.md#approved-build-fix-merge-and-session-recovery-gate--2026-10-19).
+System-manager harmless probe denied interactive authorization; no unit created; sudo needs a
+password and user-manager Linger=no. No permission workaround. Recovery fault tests and new
+API/Web builds NOT RUN; reuse existing successful Librarr build. No builds remain in progress
+from this task. All twelve production containers unchanged/running; ABS hardening preserved,
+BB-158 inactive, no API/Finance interruption. Next: authorized local administrator execution,
+then concrete bounded recovery verification and all remaining gates before production stops.
+No new deployment approval is requested. All intended documentation published together; unrelated
+mockups/Sentinel drafts/private artifacts preserved. Historical entries below retain their date.
+
 ## BB-158 — non-root build correction, 2026-10-19
 
 **REVIEW CHECKPOINT / NO DEPLOYMENT.** Branch `fix/bb158-librarr-build-permissions` from
