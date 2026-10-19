@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-158 — non-root build correction, 2026-10-19
+
+**REVIEW CHECKPOINT / NO DEPLOYMENT.** Branch `fix/bb158-librarr-build-permissions` from
+accepted main `712a25c89c33dca74bf9c141269f085d011c137f`. Publication subject
+`fix(librarr): run build tests without root privileges` resolves SHA/tree.
+[Correction, actual build result, prior runtime evidence and remaining deployment gate](../reports/features/media/bb-158-url-import-20261017.md#librarr-build-permission-correction--2026-10-19).
+Only Docker builder privileges/output location and relevant documentation change. ABS is already
+hardened; original Librarr/API/Web remain running; import remains inactive. No production mutation.
+The session-independent deployment envelope is proposed, not installed/tested. Next: independent
+review and exact-SHA owner merge approval; concrete bounded recovery must be verified before any
+later production stop. No automatic data rollback. All intended work is published together;
+unrelated mockups/Sentinel drafts and private ignored evidence preserved. Earlier entries below
+describe their own historical checkpoints, not current deployment state.
+
 ## BB-158 deployment — bounded probe review, 2026-10-18
 
 **REVIEW CHECKPOINT / NOT INSTALLED.** Approved application main

@@ -65,7 +65,9 @@ SIGTERM, supervisor SIGKILL, group descendants and error recovery. No library/se
 
 ## Future installation sequence — exact-SHA approval required
 
-1. Review/approve this code SHA first. Reverify production identity, current use/import activity,
+1. Review/approve this code SHA first. Follow the [BB-158 build-before-stop and session-independent
+   execution proposal](../librarr/README.md#bb-158-deployment-and-session-interruption--proposed-operational-sequence):
+   no interruption while required candidate builds are pending. Reverify production identity, current use/import activity,
    recoverable consistent ABS config/metadata and relevant Media/Librarr state. Preserve old image
    IDs, full private Compose inputs and protected backup checksums. Do not copy active SQLite
    main files without a consistency method; no backup/restore is executed by these files.

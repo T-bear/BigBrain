@@ -33,15 +33,22 @@ RUN cd source \
     && git apply /tmp/audiobookbay-query-case-normalization.patch \
     && git apply --check /tmp/direct-audio-import.patch \
     && git apply /tmp/direct-audio-import.patch \
-    && test -z "$(gofmt -l internal/api/direct_import.go internal/api/direct_import_test.go internal/api/router.go internal/db/db.go internal/db/direct_import.go internal/organize/direct_audio.go internal/organize/direct_audio_validation.go internal/organize/direct_m4a_validation.go internal/organize/direct_format_test.go internal/organize/direct_audio_test.go internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/search/searcher.go internal/search/prowlarr.go internal/search/discovery_query_test.go internal/api/download.go internal/api/search.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)" \
+    && test -z "$(gofmt -l internal/api/direct_import.go internal/api/direct_import_test.go internal/api/router.go internal/db/db.go internal/db/direct_import.go internal/organize/direct_audio.go internal/organize/direct_audio_validation.go internal/organize/direct_m4a_validation.go internal/organize/direct_format_test.go internal/organize/direct_audio_test.go internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/search/searcher.go internal/search/prowlarr.go internal/search/discovery_query_test.go internal/api/download.go internal/api/search.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)"
+
+# Permission-sensitive tests must not inherit root's DAC override.
+RUN adduser -D -u 1000 builder && chown -R builder:builder /build /go
+USER builder
+ENV HOME=/home/builder
+RUN cd source \
+    && test "$(id -u)" -eq 1000 \
     && go test ./internal/organize ./internal/search ./internal/download \
     && go test ./internal/api ./internal/db \
-    && CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /librarr ./cmd/librarr/
+    && CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /build/librarr ./cmd/librarr/
 
 FROM alpine:3.21@sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d
 RUN apk add --no-cache ca-certificates tzdata \
     && adduser -D -u 1000 librarr
-COPY --from=builder /librarr /usr/local/bin/librarr
+COPY --from=builder /build/librarr /usr/local/bin/librarr
 COPY infrastructure/librarr/licenses/mp4ff.txt /usr/share/licenses/mp4ff/LICENSE
 COPY --chmod=0555 infrastructure/librarr/entrypoint.sh /usr/local/bin/bigbrain-librarr-entrypoint
 USER librarr
