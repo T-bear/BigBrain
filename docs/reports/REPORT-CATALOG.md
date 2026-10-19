@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–18` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Merged documented subset; tagged MP3/AAC-LC M4A isolated-tested. Architecture PUT guard merged with green CI; bounded ABS ffprobe wrapper/override merged unchanged; protected installation and merge CI verified; container rollout awaits active-use/quiescence evidence. No production mutation; production verification pending.
+- `BB-158, 2026-10-17–18` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Merged documented subset; tagged MP3/AAC-LC M4A isolated-tested. Architecture PUT guard merged with green CI; bounded ABS ffprobe wrapper/override merged unchanged; ABS hardening deployed/verified with preserved catalog; Librarr Docker root-permission test blocks further rollout. Original Librarr restored, API/Web unchanged, import inactive.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 

@@ -1,5 +1,23 @@
 # Codex interrupted-run recovery
 
+## BB-158 partial deployment — 2026-10-19
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED (accepted Librarr Docker build fails).**
+Main `712a25c89c33dca74bf9c141269f085d011c137f`, all merge CI SUCCESS. Same safety review branch.
+[Actual deployment, backups, interruption duration, build failure and next action](../reports/features/media/bb-158-url-import-20261017.md#audiobookshelf-hardened--librarr-build-blocked--2026-10-19).
+Owner paused use; technical task/queue checks passed. Consistent protected ABS/Librarr recovery
+copies verified. ABS now hardened/running on original image; hook/checksum/limits/health and26
+unchanged catalog items verified. Old Librarr safely restarted, healthy, same container/image/data.
+API/Web/all other containers unchanged; no Finance interruption or operation. Direct import OFF.
+Build exited1: root-context API permission test expected500 but returned200. No test bypass or
+new implementation. API/Web build steps did not execute. Exact-SHA reviewed build-context fix
+is needed before continuation; existing deployment approval is not being requested again.
+Private ignored execution records contain backup/config/identity checksums and completed build
+log/exit result. No build is running, no source edit or intended unpublished implementation.
+Measured Librarr interruption4h52m included session interruption; services have been restored.
+No real import attempted; permitted HTTPS source/DOI still missing. Unrelated drafts preserved.
+Earlier administrative/activity stops below are historical, not current blockers.
+
 ## BB-158 resumption — protected file verified, 2026-10-18
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED (active-use verification before interruption).**
