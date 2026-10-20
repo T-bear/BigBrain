@@ -1,5 +1,23 @@
 # Codex interrupted-run recovery
 
+## BB-158 — active database gate awaiting local administrator, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT INACTIVE.** Main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; prior checkpoint
+`13cd625a2aa009a80cbc32a92be3cb99bb3f2a41`; same review branch. Publication subject
+`ops(media): prepare read-only active database verification`.
+[Canonical method, restrictions, tests and next action](../reports/features/media/bb-158-url-import-20261017.md#active-database-verification-gate--2026-10-20).
+Healthy Librarr/API candidates retained; Web old. Actual live DB integrity NOT RUN: protected host
+paths inaccessible and noninteractive sudo unavailable. Fresh unique private active-db-check package
+pins active containers/files; owner runs `bash run-readonly-check.sh` there with local sudo.
+Checker uses read-only source mounts/SQLite, current in-memory online snapshots only, finite limits,
+no retry, no persistent backup/restore/migration. Ten isolated tests PASS; static unit/shell/checksums
+PASS; actual systemd namespace NOT RUN. Result must match identity and both checks PASS before
+phase2. Do not rerun blindly or supply credentials in chat. No old backup treated as live evidence.
+Phases2–4 conditional: no override written, no Web-only runner implemented/tested, no activation.
+Old API pin and interrupted artifacts remain preserved; no generic Compose up or old run-ID reuse.
+Source/tests/docs published together; unrelated drafts untouched. No Finance or ABS changes.
+
 ## BB-158 — API replacement verification interrupted, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT INACTIVE.** Main

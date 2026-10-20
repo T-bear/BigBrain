@@ -7,8 +7,10 @@ Librarr and API now run accepted candidate images, healthy; Web remains on its o
 Owner-run procedure stopped after API recreation because identical Bind entries changed order.
 Review-only verifier correction passes26 tests; no retry/rollback. Recovery correctly contains
 uncertain replacement. Captured SQLite copies pass integrity checks; live DB checks remain
-unverified. Runtime API image pin still needs controlled reconciliation before any Compose action.
-[Current evidence, remaining gates and safe continuation](reports/features/media/bb-158-url-import-20261017.md#api-replacement-verification-interruption--2026-10-20).
+unverified. A bounded owner-local read-only checker is prepared (10 isolated tests PASS); actual
+administrator execution is pending. Later phases remain paused. Runtime API image pin still needs
+controlled reconciliation before any Compose action.
+[Current evidence, remaining gates and safe continuation](reports/features/media/bb-158-url-import-20261017.md#active-database-verification-gate--2026-10-20).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).

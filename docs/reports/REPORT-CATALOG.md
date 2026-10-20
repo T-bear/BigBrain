@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–20` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Partial deployment: Librarr/API candidates healthy, Web old, import inactive. API verification rejected Bind ordering; review correction tested. Failed run preserved; live DB integrity and API-pin reconciliation remain gates before Web-only continuation.
+- `BB-158, 2026-10-17–20` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Partial deployment: Librarr/API candidates healthy, Web old, import inactive. API verification rejected Bind ordering; review correction tested. Failed run preserved; bounded active-DB checker prepared/tested, owner-local execution pending before API-pin reconciliation and Web-only continuation.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
