@@ -1,5 +1,27 @@
 # Codex interrupted-run recovery
 
+## BB-158 — verified Web, import activation needs local sudo, 2026-10-21
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT DISABLED.** Main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; checkpoint baseline
+`2c39c315ec7d4841b759f3b7f53b0a8b79263e7b`; same review branch. Publication subject
+`ops(media): verify Web deployment and prepare guarded import activation` resolves SHA/tree.
+[Canonical verified runtime, tests, exact action and deactivation](../reports/features/media/bb-158-url-import-20261017.md#production-activation-gate-and-owner-handoff--2026-10-21).
+Owner-run Web receipt verified with actual image/config/invocation; all three candidates deployed,
+healthy. ABS unchanged/hardened;26 items and shared file identities checked read-only. No real
+import performed. New authorization permits activation/API-only recreation; only missing execution
+prerequisite is private local sudo (`sudo -n` unavailable). No new product approval requested.
+Fresh private activation package uses same API image, exactly one opt-in environment addition,
+external existing volumes/networks, bounded systemd operation and no-import probe. Eight focused
+tests, read-only preflight, actual dry-run, unit/shell/static and package checks PASS. No activation
+unit launched or runtime override changed. Owner action is `bash launch.sh` from the private
+activation package supplied in handoff. Wait for LIVE_READY/COMPLETE_NO_ACTION before import.
+Never retry ambiguous state or reuse old run IDs; preserve all histories. Healthy enabled candidate
+without completion requires verification, not automatic rollback/restore. Finance untouched.
+All intended source/tests/docs published; unrelated drafts preserved. If owner executes while the
+agent is absent, read new durable files and actual runtime before describing activation status.
+
+
 ## BB-158 — API pin reconciled, Web-only checkpoint awaiting review, 2026-10-20
 
 **REVIEW CHECKPOINT / SERVICES RUNNING / STOP BEFORE WEB / IMPORT INACTIVE.** Main

@@ -1,15 +1,15 @@
 # BigBrain Status
 
-## BB-158 — direct audio import, 2026-10-20
+## BB-158 — direct audio import, 2026-10-21
 
-**MERGED BOUNDED SUBSET / PARTIAL DEPLOYMENT / IMPORT INACTIVE.** ABS hardening preserved.
-Librarr and API now run accepted candidate images, healthy; Web remains on its original image.
-The interrupted run remains preserved; no retry/rollback. Owner-executed active Media/Librarr
-SQLite snapshots passed integrity/FK and their identities were verified. Only the private API
-image pin has been atomically reconciled; no container changed. A fresh Web-only procedure is
-prepared (20 isolated tests, read-only preflight, Compose dry-run and static unit verification
-PASS), not launched. Stop for independent review before Web replacement. Import remains disabled.
-[Current evidence and exact continuation](reports/features/media/bb-158-url-import-20261017.md#verified-active-databases-and-web-only-preparation--2026-10-20).
+**ALL CANDIDATES DEPLOYED / IMPORT DISABLED / LOCAL ACTIVATION EXECUTION REQUIRED.**
+Owner-run Web completion is now verified against its plan, invocation and actual candidate.
+API/Librarr/Web healthy; ABS hardening and other containers unchanged. Read-only integration/file
+identity checks PASS. Opt-in needs API recreation because configuration is startup-bound.
+Prepared API-only activation: eight isolated tests, live read-only preflight, Compose dry-run and
+static unit checks PASS; no activation run yet. Local sudo is required and unavailable to the agent.
+No real import; owner receives the exact local command and then performs their own iPhone test.
+[Current status, execution boundary and deactivation](reports/features/media/bb-158-url-import-20261017.md#production-activation-gate-and-owner-handoff--2026-10-21).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).

@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–20` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Partial deployment: Librarr/API healthy, Web old, import inactive. Active database checks verified PASS; only API image pin reconciled. Fresh Web-only package/tests/read-only preflight prepared and passed; STOP before deployment for review. Failed-run artifacts preserved.
+- `BB-158, 2026-10-17–21` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Web completion verified; API/Librarr/Web healthy. Import remains disabled pending owner-local sudo for the prepared/tested API-only opt-in. Existing ABS library/identity and hardening checked; no real import.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
