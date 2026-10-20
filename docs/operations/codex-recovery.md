@@ -1,5 +1,28 @@
 # Codex interrupted-run recovery
 
+## BB-158 — API pin reconciled, Web-only checkpoint awaiting review, 2026-10-20
+
+**REVIEW CHECKPOINT / SERVICES RUNNING / STOP BEFORE WEB / IMPORT INACTIVE.** Main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; starting checkpoint
+`d49618d6132e1e0a7868ab35795b32a31446d066`; same `review/bb158-session-recovery-gate` branch.
+Publication subject `ops(media): reconcile API pin and prepare Web-only continuation` resolves SHA/tree.
+[Canonical result, safety boundary and operator command](../reports/features/media/bb-158-url-import-20261017.md#verified-active-databases-and-web-only-preparation--2026-10-20).
+Owner-run active DB result validated against package/plan/current container and file identity;
+both integrity/FK PASS. API image pin now atomically matches its running candidate; all other
+effective Compose values and12 containers unchanged. Separate private before/intent/after evidence
+retained; interrupted run's21 file commitments unchanged. No retry/restore/activation.
+Fresh unique Web-only package prepared, not queued:20 isolated tests, read-only preflight,
+actual Compose dry-run, unit static verification and six package hashes PASS. Existing candidate
+and previous systemd tests reused; new production execution NOT RUN. After independent review and
+owner continuation, run `sha256sum -c package.sha256 && python3 -B web_only.py launch` only from the
+new private Web-only package supplied in the handoff. Never use the old all-service launcher.
+Queued is not completed; inspect durable completion/failure/recovery. Drift/uncertain replacement
+means containment, no automatic data restore/downgrade. Current API/Librarr healthy, Web old;
+ABS/Finance untouched. HTTPS source/DOI and iPhone playback remain pending. Intended sources/docs
+published together; unrelated drafts and all prior private evidence preserved. Older entries below
+retain historical scope and no longer describe the current database/pin gate.
+
+
 ## BB-158 — active database gate awaiting local administrator, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT INACTIVE.** Main

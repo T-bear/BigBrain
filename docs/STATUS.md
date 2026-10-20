@@ -4,13 +4,12 @@
 
 **MERGED BOUNDED SUBSET / PARTIAL DEPLOYMENT / IMPORT INACTIVE.** ABS hardening preserved.
 Librarr and API now run accepted candidate images, healthy; Web remains on its original image.
-Owner-run procedure stopped after API recreation because identical Bind entries changed order.
-Review-only verifier correction passes26 tests; no retry/rollback. Recovery correctly contains
-uncertain replacement. Captured SQLite copies pass integrity checks; live DB checks remain
-unverified. A bounded owner-local read-only checker is prepared (10 isolated tests PASS); actual
-administrator execution is pending. Later phases remain paused. Runtime API image pin still needs
-controlled reconciliation before any Compose action.
-[Current evidence, remaining gates and safe continuation](reports/features/media/bb-158-url-import-20261017.md#active-database-verification-gate--2026-10-20).
+The interrupted run remains preserved; no retry/rollback. Owner-executed active Media/Librarr
+SQLite snapshots passed integrity/FK and their identities were verified. Only the private API
+image pin has been atomically reconciled; no container changed. A fresh Web-only procedure is
+prepared (20 isolated tests, read-only preflight, Compose dry-run and static unit verification
+PASS), not launched. Stop for independent review before Web replacement. Import remains disabled.
+[Current evidence and exact continuation](reports/features/media/bb-158-url-import-20261017.md#verified-active-databases-and-web-only-preparation--2026-10-20).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
