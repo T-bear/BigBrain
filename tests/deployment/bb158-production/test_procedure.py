@@ -10,6 +10,65 @@ from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('procedure',Path(__file__).with_name('execute.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
+class Activity(unittest.TestCase):
+    def setUp(self):
+        self.jobs={'jobs':[{'provider':'qBittorrent','status':'downloading',
+                           'downloadSpeedBytesPerSecond':None}]}
+        self.download={'status':'active','category':'audiobooks',
+                       'diagnosis':{'code':'waitingForMetadata'},
+                       'downloadedBytes':0,'downloadSpeedBytesPerSecond':0}
+
+    def check(self, downloads=None):
+        with patch.object(m,'read_api',side_effect=[
+                self.jobs, {'downloads':downloads if downloads is not None else [self.download]}]):
+            m.activity()
+
+    def test_nullable_display_speed_requires_numeric_queue_evidence(self):
+        self.check()
+
+    def test_explicit_zero_display_speed(self):
+        self.jobs['jobs'][0]['downloadSpeedBytesPerSecond']=0
+        self.check()
+
+    def test_positive_job_speed_rejected(self):
+        self.jobs['jobs'][0]['downloadSpeedBytesPerSecond']=1
+        with self.assertRaises(AssertionError):self.check()
+
+    def test_missing_queue_evidence_rejected(self):
+        with self.assertRaises(AssertionError):self.check([])
+
+    def test_unknown_or_positive_queue_measurements_rejected(self):
+        for field in ('downloadedBytes','downloadSpeedBytesPerSecond'):
+            for value in (None,1,-1,'0',False):
+                with self.subTest(field=field,value=value):
+                    row=copy.deepcopy(self.download);row[field]=value
+                    with self.assertRaises(AssertionError):self.check([row])
+
+    def test_missing_measurement_rejected(self):
+        for field in ('downloadedBytes','downloadSpeedBytesPerSecond'):
+            row=copy.deepcopy(self.download);del row[field]
+            with self.subTest(field=field),self.assertRaises(KeyError):self.check([row])
+
+    def test_other_category_cannot_hide_active_transfer(self):
+        row=copy.deepcopy(self.download);row['category']='other';row['downloadSpeedBytesPerSecond']=1
+        with self.assertRaises(AssertionError):self.check([self.download,row])
+
+    def test_non_metadata_activity_rejected(self):
+        self.download['diagnosis']['code']='downloading'
+        with self.assertRaises(AssertionError):self.check()
+
+    def test_other_provider_or_job_state_rejected(self):
+        for field,value in (('provider','Librarr'),('status','importing')):
+            with self.subTest(field=field):
+                original=copy.deepcopy(self.jobs)
+                self.jobs['jobs'][0][field]=value
+                with self.assertRaises(AssertionError):self.check()
+                self.jobs=original
+
+    def test_upstream_failure_rejected(self):
+        with patch.object(m,'read_api',side_effect=[self.jobs,TimeoutError]),self.assertRaises(TimeoutError):
+            m.activity()
+
 class Recovery(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
@@ -94,5 +153,10 @@ class Execution(unittest.TestCase):
         self.live['api-old']['Image']='unexpected'
         with self.assertRaises(AssertionError):m.execute(self.plan,'i','h')
         self.assertEqual(self.calls,[])
+    def test_activity_failure_prevents_state_and_stop(self):
+        with patch.object(m,'activity',side_effect=AssertionError('QueueSpeedActiveOrUnknown')):
+            with self.assertRaises(AssertionError):m.execute(self.plan,'i','h')
+        self.assertEqual(self.calls,[])
+        self.assertFalse(m.STATE.exists())
 
 if __name__=='__main__':unittest.main()

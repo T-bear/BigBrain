@@ -1,5 +1,25 @@
 # Codex interrupted-run recovery
 
+## BB-158 — failed production launch corrected, review pending, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Accepted main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; prior checkpoint
+`8ec3698453be340bcb537a332cefffb330db9e24`; same review branch.
+Publication subject: `fix(media): verify queue activity before BB-158 production stop`.
+[Canonical cause, correction, evidence and continuation](../reports/features/media/bb-158-url-import-20261017.md#production-launch-activity-gate-correction--2026-10-20).
+Owner launched the previous package; it failed before the first state marker. Nullable display
+speed was incorrectly required to equal zero. Failure reproduced read-only; numeric full-queue
+evidence now required. Focused tests22/22 PASS; guarded read-only pre-stop path PASS. All12 original
+containers, start times and configuration fingerprints unchanged/running. No production capture,
+replacement or activation. Systemd journal metadata supports correct identity/cgroup; unit collected,
+full privileged journal unavailable. Original private package/results preserved byte-identically.
+Fresh private activity-fix package has new run/unit identity and verified hashes, NOT LAUNCHED.
+After review, use only that new package, recheck current gates and owner-local checksum/launch;
+never retry the failed package. No automatic deployment, merge, database restore or Finance change.
+Candidate builds/systemd fault evidence reused. Source/DOI still missing for real import.
+Intended source/tests/docs published together; unrelated drafts and ignored private evidence preserved.
+Older entries below are historical and do not describe the current launch status.
+
 ## BB-158 — production procedure prepared, local launch pending, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Same review branch;

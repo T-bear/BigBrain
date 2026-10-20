@@ -62,12 +62,16 @@ def activity():
     jobs = read_api('/api/v1/modules/media/jobs?limit=50')
     for j in jobs['jobs']:
         assert j['provider'] == 'qBittorrent' and j['status'] == 'downloading'
-        assert j.get('downloadSpeedBytesPerSecond', 0) == 0
+        # QBittorrentClient.Positive maps zero to null in the display-only jobs DTO.
+        # Null is not proof of inactivity: require numeric zero from the full queue below.
+        assert j['downloadSpeedBytesPerSecond'] in (None, 0), 'JobTransferActive'
     downloads = read_api('/api/v1/modules/media/downloads')['downloads']
-    for d in downloads:
-        if d['category'] == 'audiobooks' and d['status'] != 'completed':
-            assert d['diagnosis']['code'] == 'waitingForMetadata'
-            assert d['downloadedBytes'] == 0 and d['downloadSpeedBytesPerSecond'] == 0
+    active = [d for d in downloads if d['status'] != 'completed']
+    assert not jobs['jobs'] or active, 'MissingQueueActivityEvidence'
+    for d in active:
+        assert d['diagnosis']['code'] == 'waitingForMetadata', 'QueueActivityUnsafe'
+        assert type(d['downloadedBytes']) is int and d['downloadedBytes'] == 0, 'QueuePayloadPresentOrUnknown'
+        assert type(d['downloadSpeedBytesPerSecond']) is int and d['downloadSpeedBytesPerSecond'] == 0, 'QueueSpeedActiveOrUnknown'
 
 
 def wait_healthy(cid, seconds=100):

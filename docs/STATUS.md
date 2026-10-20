@@ -4,10 +4,11 @@
 
 **MERGED BOUNDED SUBSET / DEPLOYMENT INCOMPLETE / IMPORT INACTIVE.** ABS hardening is preserved;
 original Librarr/API/Web remain running. All candidate images are built; all seven isolated
-systemd cases now have verified PASS evidence. The concrete production procedure passed focused
-logic/capture tests and Compose dry-run; owner-local administrative launch remains required.
-No production stop, fresh production capture or image replacement has occurred.
-[Current evidence and exact next local action](reports/features/media/bb-158-url-import-20261017.md#verified-systemd-proof-and-prepared-production-procedure--2026-10-20).
+systemd cases have verified PASS evidence. The owner-launched production procedure failed before
+any stop because the jobs display DTO maps zero speed to null. The bounded activity-gate correction
+passes 22 focused tests and a read-only pre-stop path check; new private run identity prepared,
+not launched. No production stop, capture or replacement occurred; all 12 originals unchanged.
+[Current evidence and safe continuation](reports/features/media/bb-158-url-import-20261017.md#production-launch-activity-gate-correction--2026-10-20).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
