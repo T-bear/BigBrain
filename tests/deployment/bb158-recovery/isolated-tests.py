@@ -35,12 +35,37 @@ def production_snapshot():
             if not (i['Config'].get('Labels') or {}).get('bb158.recovery-test')}
 
 
+def verify_detached_process(unit, folder, timeout=5):
+    """Bounded startup observation after --no-block; completed work is not proof."""
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('Manager-owned process not observed within startup deadline')
+        assert not (folder / 'recovery.json').exists(), 'Work completed before disconnect observation'
+        pid = int(run('systemctl', 'show', unit, '-p', 'MainPID', '--value',
+                      timeout=remaining).stdout)
+        if pid > 1:
+            process = Path('/proc') / str(pid)
+            # A disappearing process fails closed; never infer parentage from a stale PID.
+            assert 'PPid:\t1' in (process / 'status').read_text()
+            assert unit in (process / 'cgroup').read_text()
+            save(folder / 'disconnect-observation.json',
+                 {'unit': unit, 'pid': pid, 'managerParent': True, 'unitCgroup': True})
+            return
+        time.sleep(0.05)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--systemd', action='store_true')
     parser.add_argument('--local', action='store_true')
+    parser.add_argument('--case', choices=CASES, action='append',
+                        help='Run only selected cases, in supplied order; defaults to all')
     args = parser.parse_args()
     assert args.systemd != args.local
+    cases = args.case or CASES
+    assert len(set(cases)) == len(cases), 'Duplicate case selection'
     assert os.getuid() == 1000 and os.getgid() == 1000, 'Run as existing operator, not root'
     assert ROOT.stat().st_mode & 0o077 == 0
     # Validate exact private package before any test; no environment-supplied code/targets.
@@ -55,7 +80,7 @@ def main():
     output.mkdir(mode=0o700)
     results = []
     save(ROOT / 'latest-test.json', {'directory': output.name, 'mode': 'systemd' if args.systemd else 'local'})
-    for case in CASES:
+    for case in cases:
         run_id = uuid.uuid4().hex
         folder = output / case
         folder.mkdir(mode=0o700)
@@ -77,7 +102,7 @@ def main():
             save(manifest_path, manifest)
             if args.systemd:
                 # Authentication, if required, is exclusively the owner's local sudo prompt.
-                command = ['sudo', 'systemd-run', '--unit=' + unit, '--collect',
+                command = ['sudo', 'systemd-run', '--unit=' + unit, '--collect', '--no-block',
                            '--property=Type=oneshot', '--property=User=1000', '--property=Group=1000',
                            '--property=SupplementaryGroups=docker', '--property=UMask=0077',
                            '--property=NoNewPrivileges=yes', '--property=CapabilityBoundingSet=',
@@ -85,16 +110,13 @@ def main():
                            '--property=KillMode=control-group', '--property=Restart=no',
                            '--property=ExecStopPost=/usr/bin/python3 ' + str(GUARD) + ' recover ' + str(manifest_path),
                            '/usr/bin/python3', str(GUARD), 'work', str(manifest_path)]
-                # No --wait: the launcher exits while the manager owns ExecStart/ExecStopPost.
+                # Oneshot startup completes only after ExecStart exits. --no-block is
+                # required even without --wait; exit 0 proves enqueueing, not execution.
                 result = subprocess.run(command, timeout=120, check=False)
                 assert result.returncode == 0, 'Local system-manager authorization/start failed'
                 deadline = time.monotonic() + 45
                 if case == 'disconnect':
-                    # Launcher has exited. Require manager-owned work still running after exit.
-                    pid = int(run('systemctl', 'show', unit, '-p', 'MainPID', '--value').stdout)
-                    assert pid > 1
-                    status = Path('/proc') / str(pid) / 'status'
-                    assert 'PPid:\t1' in status.read_text()
+                    verify_detached_process(unit, folder)
                 while not (folder / 'recovery.json').exists() and time.monotonic() < deadline:
                     time.sleep(0.1)
                 assert (folder / 'recovery.json').exists(), 'Bounded recovery result absent'
@@ -133,8 +155,9 @@ def main():
             run('/usr/bin/docker', 'rm', '-f', cid)
     assert production_snapshot() == before, 'Production identity/start-time changed'
     save(output / 'complete.json', {'status': 'PASS', 'mode': 'systemd' if args.systemd else 'local',
-                                  'cases': len(results), 'productionUnchanged': True})
-    print('PASS: 7 isolated cases; production unchanged. ' +
+                                  'cases': len(results), 'selectedCases': list(cases),
+                                  'productionUnchanged': True})
+    print(f'PASS: {len(results)} selected isolated cases; production unchanged. ' +
           ('System-manager execution tested.' if args.systemd else 'Local logic only; NOT a systemd PASS.'))
 
 

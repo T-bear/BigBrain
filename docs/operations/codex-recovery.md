@@ -1,5 +1,24 @@
 # Codex interrupted-run recovery
 
+## BB-158 — systemd disconnect-test correction, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Same review branch,
+accepted main `c198d67e05e19597e7e31e5a76ebbff5c94e7829`, previous checkpoint
+`30fc1c90cc4ba578c90c2327c5c061848ccb35b9`. Publication subject:
+`test(media): fix oneshot disconnect observation`.
+[Root cause, exact package hashes, results and next command](../reports/features/media/bb-158-url-import-20261017.md#systemd-disconnect-test-correction--2026-10-20).
+Owner-run normal case PASS is supported by retained files. Disconnect observation failed after
+work already finished: oneshot launch lacked `--no-block`. Unit collected; system journal not
+readable with current permissions. Corrected driver queues asynchronously and requires bounded
+PID 1/cgroup evidence. Guard unchanged. Seven focused tests and one selected local Docker case
+PASS; corrected systemd execution NOT RUN. Private package updated, old package/results retained.
+Next: owner-local checksum check and `--systemd --case disconnect --case stop-failure
+--case kill-after-stop --case timeout-after-stop --case stale-marker --case replacement-possible`
+from the existing private package directory. Do not repeat normal or send passwords/raw logs.
+No production operations; all 12 original containers unchanged/running. Candidate builds remain
+valid, BB-158 inactive. Production envelope and fresh operational gates remain unverified.
+No new merge; unrelated files preserved. Previous entries retain dated historical evidence.
+
 ## BB-158 — candidate builds and owner-local recovery proof, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Accepted main remains
