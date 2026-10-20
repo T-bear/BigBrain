@@ -1,5 +1,27 @@
 # Codex interrupted-run recovery
 
+## BB-158 — production procedure prepared, local launch pending, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Same review branch;
+main remains `c198d67e05e19597e7e31e5a76ebbff5c94e7829`; previous checkpoint
+`bac7dde4e4b6ae324de65ef264ae1c3ebee78447`. Publication subject
+`ops(media): prepare bounded BB-158 production execution`.
+[Canonical evidence, procedure, limits and next action](../reports/features/media/bb-158-url-import-20261017.md#verified-systemd-proof-and-prepared-production-procedure--2026-10-20).
+Retained owner-run six-case systemd batch verified PASS; original normal PASS reused. No rerun or
+rebuild. Concrete private production package matches `tests/deployment/bb158-production/`;
+11 focused logic tests and real synthetic Docker/SQLite capture PASS, Compose dry-run PASS.
+Private plan pins exact originals, three candidates and input hashes; its production state file
+is absent because no production unit has started. Owner-local `sha256sum -c package.sha256 &&
+python3 launch.py` from that package queues the authorized deployment; password stays in local
+sudo. The agent lacks noninteractive authorization. This command performs production operations,
+not another permission probe. Fresh captures/integrity gates run before replacements; import stays
+false at completion. Inspect durable results before further action; never blindly retry a stateful
+attempt or restore data after uncertain replacement. All 12 original containers remain unchanged
+and running, ABS hardening preserved, no Finance operation. Candidate images and old backups remain
+preserved. Actual deployment, fresh production capture and activation NOT RUN. Source/DOI absent
+for the single permitted import. Public procedure and documentation published together; private
+inputs and unrelated drafts stay private/untouched. Older entries retain their dated scope.
+
 ## BB-158 — systemd disconnect-test correction, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Same review branch,

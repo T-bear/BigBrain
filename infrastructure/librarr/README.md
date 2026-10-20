@@ -147,3 +147,8 @@ package with its matching checksum manifest; do not execute the entire driver as
 The test does not implement capture, Compose replacement or production rollback. The concrete
 production envelope, lock, deadlines and fresh data/activity gates above still require verification
 before any real stop. Do not weaken test target restrictions to operate production.
+
+The later [production-procedure checkpoint](../../docs/reports/features/media/bb-158-url-import-20261017.md#verified-systemd-proof-and-prepared-production-procedure--2026-10-20)
+verifies all seven actual isolated systemd cases and prepares a distinct, exact-plan-bound operator
+procedure. It has not run against production; owner-local administrative launch and all in-procedure
+fresh capture/integrity gates remain required. Existing test-only restrictions are unchanged.
