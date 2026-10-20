@@ -1,5 +1,27 @@
 # Codex interrupted-run recovery
 
+## BB-158 — candidate builds and owner-local recovery proof, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Accepted main remains
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; CI39186456029 SUCCESS reused. Continue on
+`review/bb158-session-recovery-gate`; publication subject
+`test(media): prepare isolated BB-158 recovery proof and candidate evidence`.
+[Current results, exact images/checksums, test limits and next local action](../reports/features/media/bb-158-url-import-20261017.md#candidate-builds-and-isolated-recovery-preparation--2026-10-20).
+Owner reports local administrative probe PASS. Actual systemd failure tests remain NOT RUN:
+agent sudo still requires private local authentication. Prepared private package matches the
+published `tests/deployment/bb158-recovery/` files; local logic tests 7/7 PASS. Owner runs
+`sha256sum -c package.sha256 && python3 isolated-tests.py --systemd` from the prepared private
+test directory, as the existing operator. No password or raw report goes to chat. Inspect its
+durable result before continuing; the isolated proof deliberately refuses production targets.
+API/Web candidate builds and isolated identity/static-Web checks PASS; earlier staging/DNS
+failures are documented, rejected images must not be used. No build remains running. Bind and
+verify the actual bounded production execution envelope and fresh operational gates after the
+systemd test; a successful permission probe or local guard test alone does not authorize a stop.
+All 12 original containers unchanged/running, ABS hardening preserved, import inactive, Finance
+untouched. No merge/deployment. Intended test sources and documentation published together;
+unrelated mockups/Sentinel drafts and ignored private evidence preserved. Earlier entries below
+are dated history, superseded for current build/recovery status.
+
 ## BB-158 — approved merge, recovery authorization stop, 2026-10-19
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / NO PRODUCTION STOP.** Accepted main

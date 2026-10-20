@@ -135,3 +135,15 @@ never trigger automatic rollback; all original data/volume hashes remain unchang
 operational fault tests and the concrete transient unit have **not been run/installed by this
 build-correction checkpoint**. This section is the requested proposal for review, not runtime
 verification or an expansion into general disaster recovery.
+
+### Isolated recovery proof — prepared 2026-10-20
+
+The [bounded test package](../../tests/deployment/bb158-recovery/isolated-tests.py) exercises
+only labelled, networkless, unmounted scratch containers; it rejects production targets.
+The [current report](../../docs/reports/features/media/bb-158-url-import-20261017.md#candidate-builds-and-isolated-recovery-preparation--2026-10-20)
+records private package hashes, seven local PASS results and the pending owner-local
+`--systemd` test. Local mode is not system-manager evidence. Run only from the prepared private
+package with its matching checksum manifest; do not execute the entire driver as root.
+The test does not implement capture, Compose replacement or production rollback. The concrete
+production envelope, lock, deadlines and fresh data/activity gates above still require verification
+before any real stop. Do not weaken test target restrictions to operate production.

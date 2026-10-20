@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–19` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Merged bounded subset; ABS hardening deployed in prior operational evidence. Non-root Docker build correction merged with green CI; deployment stopped on system-manager authorization before recovery verification. Original Librarr/API/Web unchanged; import inactive.
+- `BB-158, 2026-10-17–20` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Merged bounded subset; ABS hardening preserved. Candidate builds and seven local recovery tests PASS; actual system-manager fault proof and production envelope pending. Original Librarr/API/Web unchanged; import inactive.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
