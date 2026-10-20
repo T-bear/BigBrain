@@ -154,7 +154,12 @@ def same_service(old, new, candidate):
     assert dict(v.split('=', 1) for v in old['Config']['Env']) == dict(v.split('=', 1) for v in new['Config']['Env']), 'EnvironmentDrift'
     for key in ('Binds', 'Mounts', 'PortBindings', 'RestartPolicy', 'Privileged', 'CapAdd',
                 'CapDrop', 'SecurityOpt', 'NetworkMode', 'Memory', 'MemorySwap', 'NanoCpus', 'PidsLimit'):
-        assert old['HostConfig'].get(key) == new['HostConfig'].get(key), 'HostConfigDrift'
+        before, after = old['HostConfig'].get(key), new['HostConfig'].get(key)
+        # Compose may reorder Binds. Preserve every source, target, option and duplicate;
+        # resolved Docker mounts are independently compared below.
+        if key == 'Binds' and isinstance(before, list) and isinstance(after, list):
+            before, after = sorted(before), sorted(after)
+        assert before == after, 'HostConfigDrift'
     def mounts(x):
         return sorted((m['Type'], m['Source'], m['Destination'], m['RW']) for m in x['Mounts'])
     assert mounts(old) == mounts(new), 'MountDrift'

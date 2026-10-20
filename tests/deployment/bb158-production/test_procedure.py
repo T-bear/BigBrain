@@ -10,6 +10,48 @@ from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('procedure',Path(__file__).with_name('execute.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
+class ServiceConfiguration(unittest.TestCase):
+    def setUp(self):
+        self.old={'Image':'old', 'Config':{'Env':['EXAMPLE=synthetic']},
+                  'HostConfig':{'Binds':['fixture-volume:/data:rw','/fixture/worker:/worker:ro'],
+                                'Privileged':False, 'Memory':1024},
+                  'Mounts':[{'Type':'volume','Source':'fixture-volume','Destination':'/data','RW':True},
+                            {'Type':'bind','Source':'/fixture/worker','Destination':'/worker','RW':False}]}
+        self.new=copy.deepcopy(self.old);self.new['Image']='candidate'
+
+    def test_bind_and_resolved_mount_order_is_not_drift(self):
+        self.new['HostConfig']['Binds'].reverse();self.new['Mounts'].reverse()
+        m.same_service(self.old,self.new,'candidate')
+
+    def test_bind_source_target_options_and_multiplicity_still_checked(self):
+        cases=[['other-volume:/data:rw','/fixture/worker:/worker:ro'],
+               ['fixture-volume:/elsewhere:rw','/fixture/worker:/worker:ro'],
+               ['fixture-volume:/data:ro','/fixture/worker:/worker:ro'],
+               ['fixture-volume:/data:rw'],
+               self.old['HostConfig']['Binds']+['extra:/extra:ro'],
+               self.old['HostConfig']['Binds']+[self.old['HostConfig']['Binds'][0]],
+               None]
+        for binds in cases:
+            with self.subTest(binds=binds):
+                self.new['HostConfig']['Binds']=binds
+                with self.assertRaises(AssertionError):m.same_service(self.old,self.new,'candidate')
+
+    def test_actual_mount_drift_rejected_even_when_binds_match(self):
+        for key,value in [('Source','different'),('Destination','/different'),('RW',False),('Type','bind')]:
+            with self.subTest(key=key):
+                new=copy.deepcopy(self.new);new['Mounts'][0][key]=value
+                with self.assertRaises(AssertionError):m.same_service(self.old,new,'candidate')
+
+    def test_other_configuration_checks_unchanged(self):
+        for key,value in [('Privileged',True),('Memory',2048)]:
+            with self.subTest(key=key):
+                new=copy.deepcopy(self.new);new['HostConfig'][key]=value
+                with self.assertRaises(AssertionError):m.same_service(self.old,new,'candidate')
+        for key,value in [('Image','wrong'),('Config',{'Env':['EXAMPLE=changed']})]:
+            with self.subTest(key=key):
+                new=copy.deepcopy(self.new);new[key]=value
+                with self.assertRaises(AssertionError):m.same_service(self.old,new,'candidate')
+
 class Activity(unittest.TestCase):
     def setUp(self):
         self.jobs={'jobs':[{'provider':'qBittorrent','status':'downloading',

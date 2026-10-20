@@ -1,5 +1,25 @@
 # Codex interrupted-run recovery
 
+## BB-158 — API replacement verification interrupted, 2026-10-20
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT INACTIVE.** Main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`; starting checkpoint
+`14ec99ba52e6a0d1cfa1ed95b8be4362107e348b`; same review branch. Publication subject
+`fix(media): compare deployment bind mounts independent of ordering`.
+[Canonical cause, current images, integrity limits and continuation](../reports/features/media/bb-158-url-import-20261017.md#api-replacement-verification-interruption--2026-10-20).
+Owner executed the new package. Librarr/API now run accepted candidates healthy; Web stays old.
+State api/replacement-possible, recovery BLOCKED_NO_RESTORE, no API receipt/completion. API's ten
+Bind strings merely reordered; full resolved mounts and other HostConfig properties unchanged.
+Original failure reproduced read-only; review-only sorted-list correction and26 focused tests PASS.
+Recovery containment is correct and unchanged. All ten other containers including Web unchanged.
+Captures/copy SQLite integrity PASS; current live DB integrity UNVERIFIED due access/tool limits.
+Retained failed-run artifacts preserved byte-identically; no private package updated or launched.
+**Do not run the old launcher or generic Compose up:** runtime override still pins the old API.
+Next after review: bounded authorized live DB read checks, reconcile only the running API pin,
+then a new unique Web-only bounded procedure; no old run-ID reuse, rollback or database restore.
+No restart/deployment/activation/Finance change in this investigation. Source/DOI still missing.
+All intended source/tests/docs published; unrelated drafts preserved. Older entries are history.
+
 ## BB-158 — failed production launch corrected, review pending, 2026-10-20
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION RUNNING.** Accepted main

@@ -2,13 +2,13 @@
 
 ## BB-158 — direct audio import, 2026-10-20
 
-**MERGED BOUNDED SUBSET / DEPLOYMENT INCOMPLETE / IMPORT INACTIVE.** ABS hardening is preserved;
-original Librarr/API/Web remain running. All candidate images are built; all seven isolated
-systemd cases have verified PASS evidence. The owner-launched production procedure failed before
-any stop because the jobs display DTO maps zero speed to null. The bounded activity-gate correction
-passes 22 focused tests and a read-only pre-stop path check; new private run identity prepared,
-not launched. No production stop, capture or replacement occurred; all 12 originals unchanged.
-[Current evidence and safe continuation](reports/features/media/bb-158-url-import-20261017.md#production-launch-activity-gate-correction--2026-10-20).
+**MERGED BOUNDED SUBSET / PARTIAL DEPLOYMENT / IMPORT INACTIVE.** ABS hardening preserved.
+Librarr and API now run accepted candidate images, healthy; Web remains on its original image.
+Owner-run procedure stopped after API recreation because identical Bind entries changed order.
+Review-only verifier correction passes26 tests; no retry/rollback. Recovery correctly contains
+uncertain replacement. Captured SQLite copies pass integrity checks; live DB checks remain
+unverified. Runtime API image pin still needs controlled reconciliation before any Compose action.
+[Current evidence, remaining gates and safe continuation](reports/features/media/bb-158-url-import-20261017.md#api-replacement-verification-interruption--2026-10-20).
 
 Mediekontroll is merged at `3375e83c871e5ce333238e4447de7e3edc143435` and Web deployed;
 [dated evidence](https://github.com/T-bear/BigBrain/blob/47ca09092104508e89a1ddfd7ce0adee7f27ac1e/docs/reports/deployments/media-integrated-search-deployment-20261017.md).
