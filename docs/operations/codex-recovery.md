@@ -1,5 +1,30 @@
 # Codex interrupted-run recovery
 
+## BB-158 — optional DOI deployment awaiting local execution, 2026-10-21
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / SERVICES RUNNING / IMPORT ENABLED.** Accepted main
+`f4b66687e5f16836415643f3b3a2ad46782b23b1`, CI39542403007 SUCCESS. Branch
+`review/bb158-optional-doi-deployment`; publication subject
+`ops(media): prepare guarded optional DOI deployment` resolves exact checkpoint SHA/tree.
+[Canonical images, tested package, safeguards and handoff](../reports/features/media/bb-158-url-import-20261017.md#optional-doi-deployment-readiness--2026-10-21).
+Both API/Web candidates are built from immutable accepted source; actual candidate DOI-less
+preview/confirmation/history pass in disposable isolated storage. Eleven procedure tests, scoped
+Compose dry-runs, unit/shell/package checks and unchanged production evidence pass. Private package
+contains immutable plan/configuration, source/image commitments, build/test/probe results and a
+single-use launcher. No queued/state/completion/recovery file exists for this new run yet.
+Production remains previous API/Web, healthy, import opt-in true, zero drafts; all12 containers
+unchanged. Earlier activation LIVE_READY/COMPLETE_NO_ACTION receipts independently verified.
+**Only execution prerequisite missing:** owner-local sudo; noninteractive authentication unavailable.
+Owner command: `bash launch.sh` in the new optional-DOI package supplied in the private handoff.
+Pause client imports; no reuse of older launchers/run IDs. Require DOI_OPTIONAL_LIVE_READY plus
+COMPLETE_NO_ACTION and actual runtime checks before owner import. On failure preserve evidence,
+no automatic DB restore/downgrade/retry. Fresh Media-only capture happens inside guarded execution,
+not during preparation. New systemd production context and final live flow remain NOT RUN.
+No new approval question, Finance change, production operation or real import. All intended
+helper/test/docs changes published together; private configuration remains private. Unrelated
+mockups/Sentinel drafts and all earlier run artifacts preserved. Resume this authorized deployment
+only after reading actual new receipts/current containers; do not rebuild unchanged candidates.
+
 ## BB-158 — optional DOI correction, 2026-10-21
 
 **MERGE CANDIDATE / NOT DEPLOYED.** Branch `fix/bb158-optional-doi` from verified main
