@@ -57,21 +57,60 @@ def read_api(path):
         return json.loads(r.read(2 * 1024 * 1024))
 
 
+def validate_activity(jobs, queue):
+    """Read-only API contract gate; display completion is not proof of no transfer."""
+    expected = {'Sonarr', 'Radarr', 'qBittorrent', 'Jellyfin'}
+    providers = jobs['providers']
+    assert (jobs['status'] == 'complete' and len(providers) == len(expected)
+            and {p['provider'] for p in providers} == expected
+            and all(p['status'] == 'online' for p in providers)), 'ProviderActivityUnknown'
+    rows, downloads = jobs['jobs'], queue['downloads']
+    # /jobs is aggregated and capped at 50, /downloads is the full qBittorrent queue.
+    assert isinstance(rows, list) and len(rows) < 50, 'JobsTruncatedOrInvalid'
+    assert isinstance(downloads, list), 'QueueEvidenceInvalid'
+    metadata_jobs = False
+    for j in rows:
+        assert j['provider'] in expected - {'Jellyfin'}, 'JobProviderUnknown'
+        for field in ('downloadSpeedBytesPerSecond', 'uploadSpeedBytesPerSecond'):
+            # Positive() turns zero into null in this display DTO only.
+            value = j[field]
+            assert value is None or (type(value) is int and value == 0), 'JobTransferActiveOrUnknown'
+        details = j['details']
+        assert isinstance(details, list) and details, 'JobDetailsMissing'
+        if j['status'] in ('available', 'completed'):
+            assert j['progressPercent'] == 100, 'JobCompletionContradictory'
+            if j['status'] == 'available':
+                assert j['canPlay'] is True and bool(j['playItemId']), 'JobAvailabilityUnverified'
+            assert all(x['provider'] in expected - {'Jellyfin'}
+                       and x['status'] in ('available', 'completed')
+                       and x['progressPercent'] == 100 for x in details), 'JobDetailsUnsafe'
+        else:
+            assert (j['provider'] == 'qBittorrent' and j['status'] == 'downloading'
+                    and j['progressPercent'] == 0
+                    and all(x['provider'] == 'qBittorrent' and x['status'] == 'downloading'
+                            and x['progressPercent'] == 0 for x in details)), 'JobActivityUnsafe'
+            metadata_jobs = True
+    metadata_count = 0
+    for d in downloads:
+        # Completed includes seeding: never skip its actual upload/download rates.
+        for field in ('downloadSpeedBytesPerSecond', 'uploadSpeedBytesPerSecond'):
+            assert type(d[field]) is int and d[field] == 0, 'QueueTransferActiveOrUnknown'
+        assert type(d['downloadedBytes']) is int and d['downloadedBytes'] >= 0, 'QueuePayloadUnknown'
+        if d['status'] == 'completed':
+            assert d['progressPercent'] == 100, 'QueueCompletionContradictory'
+        else:
+            assert (d['status'] == 'active' and d['diagnosis']['code'] == 'waitingForMetadata'
+                    and d['progressPercent'] == 0), 'QueueActivityUnsafe'
+            assert d['downloadedBytes'] == 0, 'QueuePayloadPresentOrUnknown'
+            metadata_count += 1
+    assert not metadata_jobs or metadata_count > 0, 'MissingQueueActivityEvidence'
+
+
 def activity():
-    # Existing daemon continues fetching metadata; no torrent mutation is performed.
+    # GET only. Metadata fetching remains in the untouched daemon; no mutation.
     jobs = read_api('/api/v1/modules/media/jobs?limit=50')
-    for j in jobs['jobs']:
-        assert j['provider'] == 'qBittorrent' and j['status'] == 'downloading'
-        # QBittorrentClient.Positive maps zero to null in the display-only jobs DTO.
-        # Null is not proof of inactivity: require numeric zero from the full queue below.
-        assert j['downloadSpeedBytesPerSecond'] in (None, 0), 'JobTransferActive'
-    downloads = read_api('/api/v1/modules/media/downloads')['downloads']
-    active = [d for d in downloads if d['status'] != 'completed']
-    assert not jobs['jobs'] or active, 'MissingQueueActivityEvidence'
-    for d in active:
-        assert d['diagnosis']['code'] == 'waitingForMetadata', 'QueueActivityUnsafe'
-        assert type(d['downloadedBytes']) is int and d['downloadedBytes'] == 0, 'QueuePayloadPresentOrUnknown'
-        assert type(d['downloadSpeedBytesPerSecond']) is int and d['downloadSpeedBytesPerSecond'] == 0, 'QueueSpeedActiveOrUnknown'
+    queue = read_api('/api/v1/modules/media/downloads')
+    validate_activity(jobs, queue)
 
 
 def wait_healthy(cid, seconds=100):

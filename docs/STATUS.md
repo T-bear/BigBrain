@@ -2,12 +2,13 @@
 
 ## BB-158 — optional DOI deployment, 2026-10-21
 
-**MERGED / CI SUCCESS / CANDIDATES BUILT / DEPLOYMENT BLOCKED BY LOCAL SUDO.** Accepted main
-`f4b66687e5f16836415643f3b3a2ad46782b23b1`. Current API/Web remain on their previous healthy images;
-BB-158 opt-in is verified true and import history empty. Candidate DOI-free flow passes isolated
-verification; no production replacement or real import occurred. The bounded API→Web package is
-prepared and tested, awaiting owner-local administrative execution, not new product approval.
-[Actual images, checks and guarded handoff](reports/features/media/bb-158-url-import-20261017.md#optional-doi-deployment-readiness--2026-10-21).
+**MERGED / CI SUCCESS / CANDIDATES BUILT / LIVE ACTIVITY GATE BLOCKED.** Accepted main
+`f4b66687e5f16836415643f3b3a2ad46782b23b1`. Original API/Web remain healthy, opt-in true and
+import history empty. Local sudo was passed by the owner; the launcher then stopped before systemd
+on an incorrect jobs-status assumption. The corrected guard and 27 tests are review-only. Actual
+read-only verification still blocks on unavailable Sonarr evidence; completed torrents also showed
+uploads. No deployment or provider changes. The old package must not be relaunched or rehashed.
+[Root cause, observed state and new-package prerequisite](reports/features/media/bb-158-url-import-20261017.md#optional-doi-activity-guard-correction--2026-10-21).
 Earlier dated entries below retain their historical state.
 
 ## BB-158 — direct audio import, 2026-10-19

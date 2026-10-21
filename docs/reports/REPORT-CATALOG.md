@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–21` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Optional DOI merged, CI SUCCESS; API/Web candidates built and isolated verification passed. Production import remains enabled on old images; guarded deployment awaits local sudo. No production stop or real import in this checkpoint; dated history preserved.
+- `BB-158, 2026-10-17–21` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Optional DOI merged and candidates built; activity guard corrected with 27 passing tests. Live gate still blocks on incomplete provider evidence; completed-torrent uploads also observed. Production unchanged, old package preserved; new run required after review and safe activity checks.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
