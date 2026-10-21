@@ -22,7 +22,7 @@ afterEach(() => {
 function fill() {
   fireEvent.change(screen.getByLabelText('Källänk'), { target: { value: draft.sourceUrl } })
   fireEvent.change(screen.getByLabelText('Filnamn'), { target: { value: draft.fileName } })
-  fireEvent.change(screen.getByLabelText('DOI'), { target: { value: draft.doi } })
+  fireEvent.change(screen.getByLabelText('DOI (valfritt)'), { target: { value: draft.doi } })
 }
 function response(value: unknown) {
   return new Response(JSON.stringify(value), { status: 200, headers: { 'Content-Type': 'application/json' } })
@@ -70,7 +70,7 @@ test('changed input cancels and discards stale preview; navigation cancels reads
   const view = render(<MediaUrlImport />)
   fill()
   fireEvent.click(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' }))
-  fireEvent.change(screen.getByLabelText('DOI'), { target: { value: '10.1234/changed' } })
+  fireEvent.change(screen.getByLabelText('DOI (valfritt)'), { target: { value: '10.1234/changed' } })
   expect(signals[1].aborted).toBe(true)
   await act(async () => resolvePreview(response(draft)))
   expect(screen.queryByText('Granska importavsikten')).not.toBeInTheDocument()
@@ -105,9 +105,23 @@ test('UX Lab specimen makes no requests; direct import route is preserved', () =
   expect(mediaControlPage('/media/control/import', '')).toBe('import')
 })
 
-test.each(['mp3', 'm4a'])('%s requires explicit separate start and indexing is not completion', async format => {
-  const mp3 = { ...draft, format, sourceUrl: `https://audio.example/file.${format}` }
-  const fetch = vi.fn(async (url: string) =>
+test.each([
+  ['mp3', '10.1234/example'],
+  ['m4a', '10.1234/example'],
+  ['mp3', null],
+  ['m4a', null],
+])('%s with DOI %s preserves preview, consent, start, status and history', async (format, doi) => {
+  const mp3 = { ...draft, format, doi, sourceUrl: `https://audio.example/file.${format}` }
+  const completed = {
+    ...mp3,
+    status: 'completed',
+    canStart: false,
+    itemId: 'indexed-item',
+    audiobookshelfUrl: 'https://abs.example/item/indexed-item',
+    message: 'Verifierad i Audiobookshelf.',
+  }
+  let history: unknown[] = []
+  const fetch = vi.fn(async (url: string, _init?: RequestInit) =>
     response(
       url.endsWith('/preview')
         ? mp3
@@ -116,24 +130,28 @@ test.each(['mp3', 'm4a'])('%s requires explicit separate start and indexing is n
           : url.endsWith('/start')
             ? { ...mp3, status: 'indexing', canStart: false, message: 'Väntar på indexering.' }
             : url.endsWith('/inspect')
-              ? {
-                  ...mp3,
-                  status: 'completed',
-                  canStart: false,
-                  itemId: 'indexed-item',
-                  audiobookshelfUrl: 'https://abs.example/item/indexed-item',
-                  message: 'Verifierad i Audiobookshelf.',
-                }
-              : [],
+              ? completed
+              : history,
     ),
   )
   vi.stubGlobal('fetch', fetch)
-  render(<MediaUrlImport />)
+  const view = render(<MediaUrlImport />)
   fill()
+  const doiField = screen.getByLabelText('DOI (valfritt)')
+  expect(doiField).not.toBeRequired()
+  fireEvent.change(doiField, { target: { value: doi ?? '' } })
   fireEvent.change(screen.getByLabelText('Källänk'), { target: { value: mp3.sourceUrl } })
   fireEvent.change(screen.getByLabelText('Ljudformat'), { target: { value: format } })
   fireEvent.click(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' }))
   await screen.findByRole('checkbox')
+  const previewCall = fetch.mock.calls.find(([url]) => url.endsWith('/preview'))!
+  expect(JSON.parse(previewCall[1]!.body as string)).toEqual({
+    sourceUrl: mp3.sourceUrl,
+    fileName: draft.fileName,
+    doi,
+    format,
+  })
+  if (doi === null) expect(screen.getAllByText(/Ingen DOI angiven/)).toHaveLength(2)
   fireEvent.click(screen.getByRole('checkbox'))
   fireEvent.click(screen.getByRole('button', { name: 'Bekräfta uppgifter – ingen nedladdning' }))
   await waitFor(() => expect(screen.getByRole('button', { name: 'Starta import' })).toBeEnabled())
@@ -147,5 +165,12 @@ test.each(['mp3', 'm4a'])('%s requires explicit separate start and indexing is n
     'href',
     'https://abs.example/item/indexed-item',
   )
+  expect(fetch.mock.calls.filter(([url]) => url.endsWith('/start'))).toHaveLength(1)
+  history = [completed]
+  view.unmount()
+  render(<MediaUrlImport />)
+  await screen.findByText('Audiobookshelf-objekt: indexed-item')
+  if (doi === null) expect(screen.getByText(/Ingen DOI angiven/)).toBeInTheDocument()
+  else expect(screen.getByText(/DOI 10.1234\/example/)).toBeInTheDocument()
   expect(fetch.mock.calls.filter(([url]) => url.endsWith('/start'))).toHaveLength(1)
 })
