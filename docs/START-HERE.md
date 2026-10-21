@@ -30,6 +30,8 @@ tested or deployed. Code does not retroactively accept a proposal, and an ADR do
 not prove deployment. Apply the existing documentation-index hierarchy within the
 same scope. Report contradictions explicitly; stop for architectural conflicts.
 Owner UX approval requires explicit owner evidence and cannot be inferred from CI.
+Apply the overarching [KISS principle](../AGENTS.md#kiss--keep-it-simple-stupid)
+before implementation assignments and during architecture review.
 
 ## Continuity contract for significant work
 
