@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–19` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Merged bounded subset; ABS hardening deployed in prior operational evidence. Non-root Docker build correction and session-safe deployment proposal in review. Original Librarr/API/Web unchanged; import inactive.
+- `BB-158, 2026-10-17–21` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Owner-reported LIVE activation; optional-DOI API/Web correction in review, not deployed. Null persistence without migration; existing identity and security gates preserved. Dated deployment/build evidence remains historical.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 

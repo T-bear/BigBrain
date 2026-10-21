@@ -1,5 +1,14 @@
 # BigBrain Status
 
+## BB-158 — optional DOI correction, 2026-10-21
+
+**OWNER-REPORTED LIVE / DOI CORRECTION IN REVIEW, NOT DEPLOYED.** The owner's first-use report
+identifies mandatory DOI as blocking legitimate audio without a DOI. The bounded API/Web correction
+uses null for absence, preserving existing IDs and supplied DOI associations without a migration.
+[Current evidence, verification and deployment boundary](reports/features/media/bb-158-url-import-20261017.md#optional-doi-correction--2026-10-21).
+No production inspection or mutation in this correction task. Earlier dated runtime states below
+remain historical; operational history is linked from the report.
+
 ## BB-158 — direct audio import, 2026-10-19
 
 **MERGED BOUNDED SUBSET / DEPLOYMENT INCOMPLETE / IMPORT INACTIVE.** ABS hardening is deployed

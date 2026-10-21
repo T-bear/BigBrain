@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-158 — optional DOI correction, 2026-10-21
+
+**MERGE CANDIDATE / NOT DEPLOYED.** Branch `fix/bb158-optional-doi` from verified main
+`c198d67e05e19597e7e31e5a76ebbff5c94e7829`. Publication subject
+`fix(media): allow audio imports without DOI` resolves exact SHA/tree.
+[Root cause, null contract, tests and deployment risks](../reports/features/media/bb-158-url-import-20261017.md#optional-doi-correction--2026-10-21)
+is the canonical handoff. The owner reports BB-158 LIVE_READY but their first attempt was blocked
+by mandatory DOI; this correction does not re-inspect or modify production. Previous operational
+work remains published separately at `24dba82b3bd1e8fc1d076f857c6d2813d3bfcf17` on
+`review/bb158-session-recovery-gate`; it is not merged into this correction branch.
+Only API/Web nullable DOI and focused tests plus necessary docs change; no migration/Librarr/ABS
+or Finance change. Untracked design mockups, four Sentinel ADR drafts and ignored local evidence
+remain untouched. All intended changes are published together at this checkpoint.
+Next: independent review, exact-SHA merge approval and separately approved API then Web deployment;
+no automatic continuation, real import or runtime action. The owner retries only after deployment.
+Older recovery entries below describe their own dates, not current activation status.
+
 ## BB-158 — non-root build correction, 2026-10-19
 
 **REVIEW CHECKPOINT / NO DEPLOYMENT.** Branch `fix/bb158-librarr-build-permissions` from

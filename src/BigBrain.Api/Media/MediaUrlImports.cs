@@ -9,7 +9,7 @@ namespace BigBrain.Api.Media;
 public sealed record MediaUrlImportInput(string? SourceUrl, string? FileName, string? Doi, string? Format);
 public sealed record MediaUrlImportConfirmation(bool DetailsConfirmed, bool RightsConfirmed);
 public sealed record MediaUrlImportDraft(
-    string Id, string SourceUrl, string FileName, string Doi, string Format,
+    string Id, string SourceUrl, string FileName, string? Doi, string Format,
     string ProposedFileName, DateTimeOffset CreatedAtUtc, DateTimeOffset ExpiresAtUtc,
     string Status, DateTimeOffset? ConfirmedAtUtc, string BlockerCode)
 {
@@ -28,7 +28,9 @@ public sealed record MediaUrlImportDraft(
         "downloading" => "Hämtning påbörjad. En avbruten körning startas aldrig om automatiskt.",
         "importing" => "Ljudet valideras och placeras av importtjänsten.",
         "indexing" => "Filen är placerad. Väntar på exakt Audiobookshelf-indexering.",
-        "completed" => "Filen är verifierad i Audiobookshelf. DOI-kopplingen är sparad.",
+        "completed" => Doi is null
+            ? "Filen är verifierad i Audiobookshelf. Ingen DOI angiven."
+            : "Filen är verifierad i Audiobookshelf. DOI-kopplingen är sparad.",
         "failed" => "Importtjänsten avvisade filen eller kunde inte placera den säkert. Kontrollera filformat och importstatus; ingen automatisk omkörning görs.",
         "uncertain" => "Resultatet är osäkert. Kontrollera status; starta inte en ny import som ersättning.",
         _ => "Ingen fil har hämtats. MP3 och M4A (AAC-LC) kan importeras utan konvertering."
@@ -71,11 +73,15 @@ public static class MediaUrlImportValidation
             || Regex.IsMatch(name, @"^(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(?:\.|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
             throw Invalid("invalidFileName", "Ange ett filnamn på 1–80 tecken utan sökväg, kontrolltecken eller reserverat namn.");
 
-        var doi = (input.Doi?.Trim() ?? "").ToLowerInvariant();
-        if (doi.StartsWith("https://doi.org/", StringComparison.Ordinal)) doi = doi[16..];
-        if (doi.StartsWith("doi:", StringComparison.Ordinal)) doi = doi[4..].Trim();
-        if (doi.Length > 255 || !Regex.IsMatch(doi, @"\A10\.[0-9]{4,9}/[a-z0-9][a-z0-9._;()/:-]*\z", RegexOptions.CultureInvariant))
-            throw Invalid("invalidDoi", "Ange DOI som 10.1234/exempel. Formatkontrollen verifierar inte registrering eller rättigheter.");
+        string? doi = null;
+        if (!string.IsNullOrWhiteSpace(input.Doi))
+        {
+            doi = input.Doi.Trim().ToLowerInvariant();
+            if (doi.StartsWith("https://doi.org/", StringComparison.Ordinal)) doi = doi[16..];
+            if (doi.StartsWith("doi:", StringComparison.Ordinal)) doi = doi[4..].Trim();
+            if (doi.Length > 255 || !Regex.IsMatch(doi, @"\A10\.[0-9]{4,9}/[a-z0-9][a-z0-9._;()/:-]*\z", RegexOptions.CultureInvariant))
+                throw Invalid("invalidDoi", "Ange DOI som 10.1234/exempel eller lämna fältet tomt. Formatkontrollen verifierar inte registrering eller rättigheter.");
+        }
         return new(uri.AbsoluteUri, name, doi, format);
     }
 
@@ -89,7 +95,7 @@ public sealed partial class AudiobookAcquisitionStore
     {
         var normalized = MediaUrlImportValidation.Normalize(input);
         var id = Guid.NewGuid().ToString("N");
-        var draft = new MediaUrlImportDraft(id, normalized.SourceUrl!, normalized.FileName!, normalized.Doi!, normalized.Format!,
+        var draft = new MediaUrlImportDraft(id, normalized.SourceUrl!, normalized.FileName!, normalized.Doi, normalized.Format!,
             $"{normalized.FileName} -- {id}.{normalized.Format}", now, now.AddMinutes(15), "previewed", null, "safeImportUnavailable");
         await gate.WaitAsync(token);
         try

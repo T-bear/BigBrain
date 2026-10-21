@@ -1,5 +1,16 @@
 # Media Module
 
+## BB-158 — optional DOI amendment (review, 2026-10-21)
+
+DOI is optional metadata for direct MP3/M4A imports. Missing/blank input becomes JSON null in API
+responses and the existing `DraftJson`; supplied DOI keeps bounded normalization/validation.
+No schema migration or rewrite of old records. Import IDs, checksums, placement and exact ABS
+reconciliation remain authoritative independently of DOI. Preview/history explicitly display
+absence; a completed DOI-less import never claims a saved DOI association.
+[Correction, compatibility and review/deployment status](../reports/features/media/bb-158-url-import-20261017.md#optional-doi-correction--2026-10-21).
+This amendment is review-only and does not activate or deploy anything. Older dated entries below
+retain their original scope and status.
+
 ## BB-158 — bounded direct audio import (review only, 2026-10-18)
 
 Mediekontroll → Medieflöde → Förbered ljudimport från länk retains `/media/control/import`.

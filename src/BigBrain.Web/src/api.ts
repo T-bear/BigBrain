@@ -406,7 +406,7 @@ export const operateDownload = (id: string, operation: DownloadOperation, signal
 export const operateDownloadsBatch = (ids: string[], operation: DownloadOperation, signal?: AbortSignal) =>
   postJson<DownloadBatchResult>(`${downloadsBase}/actions/batch`, { ids, operation }, signal)
 
-export type MediaUrlImportInput = { sourceUrl: string; fileName: string; doi: string; format: string }
+export type MediaUrlImportInput = { sourceUrl: string; fileName: string; doi: string | null; format: string }
 export type MediaUrlImportDraft = MediaUrlImportInput & {
   id: string
   proposedFileName: string

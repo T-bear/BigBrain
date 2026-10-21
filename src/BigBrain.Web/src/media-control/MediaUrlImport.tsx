@@ -63,7 +63,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
     try {
       const value = confirm
         ? await confirmUrlImport(draft!.id, controller.signal)
-        : await previewUrlImport(input, controller.signal)
+        : await previewUrlImport({ ...input, doi: input.doi?.trim() || null }, controller.signal)
       if (version !== generation.current || controller.signal.aborted) return
       setDraft(value)
       setHistory(items => [value, ...items.filter(item => item.id !== value.id)].slice(0, 200))
@@ -142,12 +142,11 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
           />
         </label>
         <label>
-          DOI
+          DOI (valfritt)
           <BBInput
-            required
             maxLength={271}
             placeholder="10.1234/exempel"
-            value={input.doi}
+            value={input.doi ?? ''}
             onChange={e => change('doi', e.target.value)}
           />
         </label>
@@ -178,7 +177,7 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
               <dt>Filnamn</dt>
               <dd>{draft.fileName}</dd>
               <dt>DOI</dt>
-              <dd>{draft.doi}</dd>
+              <dd>{draft.doi ?? 'Ingen DOI angiven'}</dd>
               <dt>Ljudformat</dt>
               <dd>{draft.format.toUpperCase()}</dd>
               <dt>Unikt filnamn</dt>
@@ -222,7 +221,8 @@ export function MediaUrlImport({ specimen = false }: { specimen?: boolean }) {
           <ul>
             {history.map(item => (
               <li key={item.id}>
-                <strong>{item.fileName}</strong> · DOI {item.doi} · {item.format.toUpperCase()}
+                <strong>{item.fileName}</strong> · {item.doi ? `DOI ${item.doi}` : 'Ingen DOI angiven'} ·{' '}
+                {item.format.toUpperCase()}
                 <br />
                 {item.message}
                 {item.status === 'completed' && (

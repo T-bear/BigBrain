@@ -49,13 +49,42 @@ public sealed class MediaUrlImportTests : IDisposable
         Assert.Throws<AudiobookAcquisitionException>(() => MediaUrlImportValidation.Normalize(Input with { FileName = name }));
 
     [Theory]
-    [InlineData("")]
+    [InlineData("doi:")]
+    [InlineData("https://doi.org/")]
     [InlineData("10.12/example")]
     [InlineData("10.1234/example\ntrailer")]
     [InlineData("https://evil.example/10.1234/example")]
     [InlineData("10.1234/")]
     public void DoiRequiresBoundedSyntax(string doi) =>
         Assert.Throws<AudiobookAcquisitionException>(() => MediaUrlImportValidation.Normalize(Input with { Doi = doi }));
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task AbsentDoiIsPersistedAsJsonNullWithoutChangingExistingDoiRecords(string? doi)
+    {
+        using var store = new AudiobookAcquisitionStore(Options);
+        var existing = await store.PreviewUrlImportAsync(Input, Now, TestContext.Current.CancellationToken);
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={Options.Audiobookshelf.AcquisitionDatabasePath}");
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
+        using var query = connection.CreateCommand();
+        query.CommandText = "SELECT DraftJson FROM MediaUrlImportDrafts WHERE Id=$id";
+        query.Parameters.AddWithValue("$id", existing.Id);
+        var originalJson = (string)(await query.ExecuteScalarAsync(TestContext.Current.CancellationToken))!;
+        var absent = await store.PreviewUrlImportAsync(Input with { Doi = doi }, Now, TestContext.Current.CancellationToken);
+        Assert.Null(absent.Doi);
+        Assert.NotEqual(existing.Id, absent.Id);
+        Assert.NotEqual(existing.ProposedFileName, absent.ProposedFileName);
+        Assert.Equal(originalJson, await query.ExecuteScalarAsync(TestContext.Current.CancellationToken));
+        query.Parameters["$id"].Value = absent.Id;
+        using var json = JsonDocument.Parse((string)(await query.ExecuteScalarAsync(TestContext.Current.CancellationToken))!);
+        Assert.Equal(JsonValueKind.Null, json.RootElement.GetProperty("Doi").ValueKind);
+        using var reopened = new AudiobookAcquisitionStore(Options);
+        var history = await reopened.ListUrlImportsAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(existing, history.Single(x => x.Id == existing.Id));
+        Assert.Null(history.Single(x => x.Id == absent.Id).Doi);
+    }
 
     [Fact]
     public async Task MultipleNamesShareNormalizedDoiButHaveDistinctDurableIdentitiesAndNoFiles()
@@ -69,6 +98,7 @@ public sealed class MediaUrlImportTests : IDisposable
             Assert.Equal(first.Doi, second.Doi);
             Assert.NotEqual(first.Id, second.Id);
             Assert.NotEqual(first.ProposedFileName, second.ProposedFileName);
+            Assert.NotNull(first.Doi);
             Assert.DoesNotContain(first.Doi, first.ProposedFileName);
             Assert.False(first.CanStart);
             Assert.Empty((await store.ListAsync(0, 25, TestContext.Current.CancellationToken)).Items);
@@ -123,8 +153,12 @@ public sealed class MediaUrlImportTests : IDisposable
         Assert.Equal(200, (await store.ListUrlImportsAsync(TestContext.Current.CancellationToken)).Count);
     }
 
-    [Fact]
-    public async Task VersionedEndpointsReturnProblemsAndStartFailsClosedWhenDisabled()
+    [Theory]
+    [InlineData("mp3", false)]
+    [InlineData("m4a", false)]
+    [InlineData("mp3", true)]
+    [InlineData("m4a", true)]
+    public async Task VersionedEndpointsAcceptNullOrOmittedDoiAndStartFailsClosedWhenDisabled(string format, bool omitDoi)
     {
         using var host = await new HostBuilder().ConfigureWebHost(web => web.UseTestServer()
             .ConfigureServices(services => { services.AddRouting(); services.AddSingleton(Options); services.AddSingleton<AudiobookAcquisitionStore>(); services.AddSingleton(TimeProvider.System); services.AddSingleton<IDirectAudioTransport, DirectAudioTransport>(); services.AddSingleton<IDirectAudioImporter>(new LibrarrDirectAudioImporter(new HttpClient())); services.AddSingleton<MediaUrlImportService>(); })
@@ -136,14 +170,27 @@ public sealed class MediaUrlImportTests : IDisposable
         Assert.Equal("application/problem+json", rejected.Content.Headers.ContentType!.MediaType);
         using var problem = JsonDocument.Parse(await rejected.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
         Assert.Equal("invalidSource", problem.RootElement.GetProperty("code").GetString());
-        var response = await client.PostAsJsonAsync("/api/v1/modules/media/url-imports/preview", Input, TestContext.Current.CancellationToken);
+        var invalidDoi = await client.PostAsJsonAsync("/api/v1/modules/media/url-imports/preview", Input with { Doi = "not-a-doi" }, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.BadRequest, invalidDoi.StatusCode);
+        using var doiProblem = JsonDocument.Parse(await invalidDoi.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        Assert.Equal("invalidDoi", doiProblem.RootElement.GetProperty("code").GetString());
+        var payload = new Dictionary<string, object?> { ["sourceUrl"] = $"https://audio.example/chapter.{format}", ["fileName"] = "Chapter", ["format"] = format };
+        if (!omitDoi) payload["doi"] = null;
+        var response = await client.PostAsJsonAsync("/api/v1/modules/media/url-imports/preview", payload, TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
         var draft = (await response.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!;
         Assert.False(draft.CanStart);
+        Assert.Null(draft.Doi);
+        using var previewJson = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(JsonValueKind.Null, previewJson.RootElement.GetProperty("doi").ValueKind);
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.PostAsJsonAsync($"/api/v1/modules/media/url-imports/{draft.Id}/start", new { }, TestContext.Current.CancellationToken)).StatusCode);
         var confirmation = await client.PostAsJsonAsync($"/api/v1/modules/media/url-imports/{draft.Id}/confirm", new MediaUrlImportConfirmation(true, true), TestContext.Current.CancellationToken);
         confirmation.EnsureSuccessStatusCode();
-        Assert.Equal("confirmed", (await confirmation.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!.Status);
+        var confirmed = (await confirmation.Content.ReadFromJsonAsync<MediaUrlImportDraft>(TestContext.Current.CancellationToken))!;
+        Assert.Equal("confirmed", confirmed.Status);
+        Assert.Null(confirmed.Doi);
+        var history = await client.GetFromJsonAsync<MediaUrlImportDraft[]>("/api/v1/modules/media/url-imports/", TestContext.Current.CancellationToken);
+        Assert.Equal(confirmed, Assert.Single(history!));
     }
 
     public void Dispose() { if (Directory.Exists(directory)) Directory.Delete(directory, true); }

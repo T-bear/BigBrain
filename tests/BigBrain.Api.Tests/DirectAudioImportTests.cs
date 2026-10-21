@@ -159,13 +159,15 @@ public sealed class DirectAudioImportTests : IDisposable
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 
-    [Fact]
-    public async Task TwoFilesShareDoiAndReopenWithExactIndependentIndexIdentity()
+    [Theory]
+    [InlineData("10.1234/example")]
+    [InlineData(null)]
+    public async Task BothFormatsReopenWithExactIndependentIndexIdentityWithOrWithoutDoi(string? doi)
     {
         using var store = new AudiobookAcquisitionStore(Options);
         var source = new FakeSource(); var importer = new FakeImporter();
         using var service = new MediaUrlImportService(store, source, importer, Options, TimeProvider.System);
-        var first = await Confirm(store, Input); var second = await Confirm(store, Input with { FileName = "Chapter 2", SourceUrl = "https://audio.example/second.m4a", Format = "m4a" });
+        var first = await Confirm(store, Input with { Doi = doi }); var second = await Confirm(store, Input with { Doi = doi, FileName = "Chapter 2", SourceUrl = "https://audio.example/second.m4a", Format = "m4a" });
         var placed = await service.StartAsync(first.Id, TestContext.Current.CancellationToken);
         Assert.Equal("indexing", placed.Status); Assert.True(string.IsNullOrEmpty(placed.ItemId));
         var indexed = await service.InspectAsync(first.Id, TestContext.Current.CancellationToken);
@@ -175,19 +177,32 @@ public sealed class DirectAudioImportTests : IDisposable
         await service.InspectAsync(second.Id, TestContext.Current.CancellationToken);
         using var reopened = new AudiobookAcquisitionStore(Options);
         var saved = await reopened.ListUrlImportsAsync(TestContext.Current.CancellationToken);
-        Assert.Equal(2, saved.Count); Assert.All(saved, v => Assert.Equal("10.1234/example", v.Doi));
+        Assert.Equal(2, saved.Count); Assert.All(saved, v =>
+        {
+            Assert.Equal(doi, v.Doi);
+            Assert.Equal("completed", v.Status);
+            Assert.Equal(64, v.Checksum!.Length);
+            Assert.Equal(834, v.Bytes);
+            Assert.Equal("library", v.LibraryId);
+            Assert.Equal("123", v.Inode);
+            Assert.Equal($"BigBrain Imports/{v.Id}/{v.ProposedFileName}", v.RelativePath);
+            if (doi is null) Assert.DoesNotContain("DOI-kopplingen", v.Message);
+            else Assert.Contains("DOI-kopplingen", v.Message);
+        });
         Assert.Equal(2, saved.Select(v => v.ItemId).Distinct().Count());
         Assert.Equal(2, source.Calls);
         await Assert.ThrowsAsync<AudiobookAcquisitionException>(() => service.StartAsync(first.Id, TestContext.Current.CancellationToken));
         Assert.Equal(2, source.Calls);
     }
 
-    [Fact]
-    public async Task LostUploadResponseIsInspectedWithoutRedownloadAfterRestart()
+    [Theory]
+    [InlineData("10.1234/example")]
+    [InlineData(null)]
+    public async Task LostUploadResponseIsInspectedWithoutRedownloadAfterRestart(string? doi)
     {
         var source = new FakeSource(); var importer = new FakeImporter { LoseResponse = true };
         using var store = new AudiobookAcquisitionStore(Options);
-        var draft = await Confirm(store, Input);
+        var draft = await Confirm(store, Input with { Doi = doi });
         using (var service = new MediaUrlImportService(store, source, importer, Options, TimeProvider.System))
             Assert.Equal("uncertain", (await service.StartAsync(draft.Id, TestContext.Current.CancellationToken)).Status);
         using var reopened = new AudiobookAcquisitionStore(Options);
