@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## BB-158 — Sonarr availability correction, 2026-10-21
+
+**ADAPTER FIX IN REVIEW / OPTIONAL DOI MERGED / DEPLOYMENT STILL BLOCKED.** Accepted main
+`f4b66687e5f16836415643f3b3a2ad46782b23b1`. Sonarr returns valid queue duration strings that
+BigBrain incorrectly reads as numeric seconds. Bounded correction passes 70 tests and real-response
+offline replay; actual import warnings remain failed. Production API/Web and all other containers
+are unchanged; import opt-in true and history empty. No deployment or Finance/provider change.
+[Evidence and remaining safety boundary](reports/features/media/bb-158-url-import-20261017.md#sonarr-queue-duration-correction--2026-10-21).
+Earlier dated entries below describe their own historical checkpoints.
+
 ## BB-158 — optional DOI correction, 2026-10-21
 
 **OWNER-REPORTED LIVE / DOI CORRECTION IN REVIEW, NOT DEPLOYED.** The owner's first-use report

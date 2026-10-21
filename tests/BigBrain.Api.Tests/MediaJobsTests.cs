@@ -313,6 +313,86 @@ public sealed class MediaJobsTests
             method => Assert.Equal(HttpMethod.Get, method));
     }
 
+    [Theory]
+    [InlineData("Sonarr", "\"00:01:30\"", 90L)]
+    [InlineData("Radarr", "\"00:01:30\"", 90L)]
+    [InlineData("Sonarr", "\"1.02:03:04\"", 93784L)]
+    [InlineData("Sonarr", "\"00:00:01.5000000\"", 1L)]
+    [InlineData("Sonarr", "90", 90L)]
+    [InlineData("Sonarr", "0", 0L)]
+    [InlineData("Sonarr", "null", null)]
+    [InlineData("Sonarr", "missing", null)]
+    [InlineData("Sonarr", "999999999999999999999999999999", null)]
+    [InlineData("Sonarr", "\"0000000000000000000000000000000000000000\"", null)]
+    [InlineData("Sonarr", "\"unknown\"", null)]
+    [InlineData("Sonarr", "\"-00:00:01\"", null)]
+    [InlineData("Sonarr", "\"100.00:00:00\"", null)]
+    [InlineData("Sonarr", "-1", null)]
+    [InlineData("Sonarr", "8640000", null)]
+    [InlineData("Sonarr", "1.5", null)]
+    [InlineData("Sonarr", "true", null)]
+    [InlineData("Sonarr", "{}", null)]
+    [InlineData("Sonarr", "[]", null)]
+    public async Task ArrQueueTimeLeftDoesNotInvalidateProviderSnapshot(
+        string provider, string timeLeftJson, long? expectedSeconds)
+    {
+        var sonarr = provider == "Sonarr";
+        var libraryPath = sonarr ? "/api/v3/series" : "/api/v3/movie";
+        var libraryJson = sonarr
+            ? """[{"id":7,"tvdbId":42,"title":"Fixture series","statistics":{"episodeFileCount":0}}]"""
+            : """[{"id":7,"tmdbId":42,"title":"Fixture movie","hasFile":false}]""";
+        var queueJson = "{\"records\":[{\"" + (sonarr ? "seriesId" : "movieId")
+            + "\":7,\"title\":\"Fixture\",\"status\":\"downloading\",\"size\":100,\"sizeleft\":50,\"timeleft\":"
+            + timeLeftJson + "}]}";
+        if (timeLeftJson == "missing") queueJson = queueJson.Replace(
+            ",\"timeleft\":missing", string.Empty, StringComparison.Ordinal);
+        var handler = new RecordingHandler(request => request.RequestUri!.AbsolutePath switch
+        {
+            var path when path == libraryPath => Json(libraryJson),
+            "/api/v3/queue" => Json(queueJson),
+            _ => throw new InvalidOperationException()
+        });
+        var options = new MediaOptions
+        {
+            Sonarr = new("http://sonarr.test/") { ApiKey = "test-key" },
+            Radarr = new("http://radarr.test/") { ApiKey = "test-key" }
+        };
+        IMediaJobsProvider adapter = sonarr
+            ? new SonarrClient(Client(handler, "http://sonarr.test/"), options)
+            : new RadarrClient(Client(handler, "http://radarr.test/"), options);
+        using var service = Service(adapter, new StubCatalog());
+
+        var result = await service.GetJobsAsync(AllJobs, Token);
+
+        Assert.Equal("complete", result.Status);
+        Assert.Equal(MediaStatuses.Online, Assert.Single(result.Providers, p => p.Provider == provider).Status);
+        var mapped = Assert.Single(result.Jobs);
+        Assert.Equal(MediaJobStatuses.Downloading, mapped.Status);
+        Assert.Equal(50, mapped.ProgressPercent);
+        Assert.Equal(expectedSeconds, mapped.EtaSeconds);
+        Assert.All(handler.Methods, method => Assert.Equal(HttpMethod.Get, method));
+        Assert.Equal(2, handler.Methods.Count);
+    }
+
+    [Fact]
+    public void ArrDurationParsingPreservesImportWarnings()
+    {
+        using var library = System.Text.Json.JsonDocument.Parse(
+            """[{"id":7,"tvdbId":42,"title":"Fixture"}]""");
+        using var queue = System.Text.Json.JsonDocument.Parse("""
+            {"records":[{"seriesId":7,"title":"Fixture","status":"completed",
+            "trackedDownloadStatus":"warning","trackedDownloadState":"importBlocked",
+            "statusMessages":[{"title":"Fixture warning","messages":["Fixture"]}],
+            "size":100,"sizeleft":0,"timeleft":"00:00:00"}]}
+            """);
+        var snapshot = ArrJobMapper.Map("Sonarr", "series", library.RootElement,
+            queue.RootElement, "seriesId", "tvdbId", _ => false);
+        var mapped = Assert.Single(snapshot.Jobs);
+        Assert.Equal(MediaJobStatuses.Failed, mapped.Status);
+        Assert.Equal("providerJobFailed", mapped.ErrorCode);
+        Assert.Equal(0, mapped.EtaSeconds);
+    }
+
     private static CancellationToken Token => TestContext.Current.CancellationToken;
 
     private static ProviderMediaJob Job(
