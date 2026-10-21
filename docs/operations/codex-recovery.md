@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-158 — Sonarr queue duration correction, 2026-10-21
+
+**MERGE CANDIDATE / NOT DEPLOYED.** New bounded branch `fix/bb158-sonarr-queue-duration` from
+main `f4b66687e5f16836415643f3b3a2ad46782b23b1`; publication subject
+`fix(media): parse Arr queue timeleft durations safely` resolves SHA/tree.
+[Root cause, 70 tests, real-response replay and remaining operational blockers](../reports/features/media/bb-158-url-import-20261017.md#sonarr-queue-duration-correction--2026-10-21).
+The deployment guard checkpoint `9709d880da84cd87e502e68d9f54da64eb8f9c71` on
+`review/bb158-optional-doi-deployment` is preserved separately, not merged into this product fix.
+Actual Sonarr queue duration strings caused InvalidOperationException in the shared Arr ETA parser.
+Typed bounded parsing fixes the offline adapter replay; all 50 sampled warning jobs remain failed.
+Production still uses the old API/Web; all 12 containers unchanged, opt-in true, zero BB-158 drafts.
+No production action, Finance change or new run package. All intended changes published; untracked
+mockups/Sentinel ADRs and ignored private artifacts preserved. No interrupted unpublished code.
+Next: architect review/exact-SHA merge approval. Actual Sonarr import warnings remain a safety gate;
+no automatic provider repair or reclassification. Later API build must include accepted correction,
+with fresh activity checks and a new deployment package. Never relaunch/rehash the old package.
+
 ## BB-158 — optional DOI correction, 2026-10-21
 
 **MERGE CANDIDATE / NOT DEPLOYED.** Branch `fix/bb158-optional-doi` from verified main

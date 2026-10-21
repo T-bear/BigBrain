@@ -737,7 +737,18 @@ internal static class ArrJobMapper
         && value.TryGetInt64(out var result) ? result : 0;
     private static DateTimeOffset? Date(JsonElement element, string property) =>
         DateTimeOffset.TryParse(String(element, property), out var result) ? result : null;
-    private static long? Seconds(JsonElement element, string property) =>
-        element.TryGetProperty(property, out var value) && value.TryGetInt64(out var result)
-        && result is >= 0 and < 8_640_000 ? result : null;
+    private static long? Seconds(JsonElement element, string property)
+    {
+        if (!element.TryGetProperty(property, out var value)) return null;
+        if (value.ValueKind == JsonValueKind.Number)
+            return value.TryGetInt64(out var seconds) && seconds is >= 0 and < 8_640_000 ? seconds : null;
+        // Arr timeleft is normally a TimeSpan string, not a JSON number. ETA is optional;
+        // an absent/invalid ETA must not discard the provider's actual queue status.
+        if (value.ValueKind != JsonValueKind.String) return null;
+        var text = value.GetString();
+        return text is { Length: <= 32 }
+            && TimeSpan.TryParseExact(text, "c", System.Globalization.CultureInfo.InvariantCulture, out var duration)
+            && duration.TotalSeconds is >= 0 and < 8_640_000
+                ? (long)duration.TotalSeconds : null;
+    }
 }

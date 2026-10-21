@@ -116,6 +116,15 @@ uttryckligt merge-godkännande av exakt SHA eller separat deployment-auktoriseri
 - AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom det vanliga auktoriserade API:t.
 - Godtycklig tredjepartskod får inte laddas i API-, Web- eller Brain-processen.
 
+### KISS – Keep It Simple, Stupid
+
+KISS är en övergripande arkitekturprincip för hela BigBrain och ska beaktas vid
+arkitekturgranskning och innan implementationsuppdrag. Föredra den enklaste lösningen som
+uppfyller produktägarens krav och återanvänd befintliga komponenter och integrationsmöjligheter.
+Undvik onödiga beroenden, abstraktioner, tjänster och parallella lösningar; ytterligare komplexitet
+ska motiveras av ett konkret behov enligt reglerna ovan. Förenkling får aldrig försämra säkerhet,
+korrekthet, tillförlitlighet eller underhållbarhet.
+
 ## Kvalitet och redovisning
 
 - Nya funktioner ska ha relevanta tester.
