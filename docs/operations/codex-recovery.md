@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-158 — API/Web scope continuation, 2026-10-22
+
+**INTERRUPTED — SAFE TO RESUME PREPARATION / NO PRODUCTION STOP.** Same review branch,
+accepted main `712679fda646aced2a417adf696e59d4a7c0f57b` unchanged.
+[Component coupling, current evidence and systemd denial](../reports/features/media/bb-158-url-import-20261017.md#apiweb-impact-and-systemd-execution-boundary--2026-10-22).
+External provider queues alone do not block scoped API/Web replacement; API-owned active or uncertain
+imports do. Fresh BB-158 list empty. System-manager authentication is unavailable to this session.
+New detached build-only work is in a private ignored directory whose name starts `bb158-safe-deploy-`;
+identify it by build-process.json revision and current manifest, not by reusing any old failed package.
+Read durable build-exit/api.iid/web.iid and private build log on resume; never assume success or rebuild
+unchanged successful images. This build cannot stop production. No production procedure launched.
+Remaining: verify completed candidates, current runtime/config/activity and backup conditions; prepare
+an API/Web-only instance of the existing bounded systemd procedure for local administrator execution.
+No database rollback or provider mutations. No launch command is yet declared safe or ready.
+Untracked design mockups and Sentinel ADRs remain preserved. This continuation changes documentation only.
+
+
 ## BB-158 — safe deployment activity stop, 2026-10-22
 
 **INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION LEFT RUNNING.** Accepted main

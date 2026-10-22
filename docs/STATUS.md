@@ -2,10 +2,10 @@
 
 ## BB-158 — deployment activity gate, 2026-10-22
 
-**CORRECTIONS MERGED / DEPLOYMENT BLOCKED BEFORE CHANGE.** Accepted main
-`712679fda646aced2a417adf696e59d4a7c0f57b`, CI success. Pending/changing Sonarr import activity
-has not passed the existing safety gate. Old API/Web remain in place; import opt-in was enabled.
-[Point-in-time observations and continuation boundary](reports/features/media/bb-158-url-import-20261017.md#safe-deployment-activity-gate--2026-10-22).
+**CORRECTIONS MERGED / DEPLOYMENT BLOCKED AT SYSTEMD AUTHENTICATION.** Accepted main
+`712679fda646aced2a417adf696e59d4a7c0f57b`, CI success. API/Web-only impact is assessed; external Sonarr queues alone are not a blocker. Local system-manager
+authentication is unavailable. New builds are prepared; old API/Web remain in place.
+[Point-in-time observations and continuation boundary](reports/features/media/bb-158-url-import-20261017.md#apiweb-impact-and-systemd-execution-boundary--2026-10-22).
 Earlier entries describe historical checkpoints; none authorizes an automatic retry.
 
 ## BB-158 — Sonarr availability correction, 2026-10-21
