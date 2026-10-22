@@ -1,5 +1,21 @@
 # Codex interrupted-run recovery
 
+## BB-158 — safe deployment activity stop, 2026-10-22
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED / PRODUCTION LEFT RUNNING.** Accepted main
+`712679fda646aced2a417adf696e59d4a7c0f57b`, tree `d077f879b83d49df497617a815650d1af2a3c8fb`.
+Documentation checkpoint: `review/bb158-production-activity-gate`; exact SHA/tree resolve in Git.
+[Canonical runtime observations, CI, limits and next action](../reports/features/media/bb-158-url-import-20261017.md#safe-deployment-activity-gate--2026-10-22).
+No deployment performed. Sonarr queue changed from blocked/pending to 319 pending warnings;
+completed downloads/recent commands and zero instantaneous torrent rates did not establish safe idle.
+No old package execution or mutation. API/Web remain the previously inspected old candidates;
+existing import opt-in remains enabled. Revalidate runtime after the interruption, not by assumption.
+Next: establish safe provider activity before a new unique API/Web deployment procedure. No provider
+repair, removal, Finance action or automatic recovery is authorized by this handoff.
+Unrelated untracked design mockups and four Sentinel ADR files remain preserved and unpublished.
+Only report, STATUS, BACKLOG and this recovery note change in this checkpoint. No code tests needed.
+
+
 ## BB-158 — Sonarr queue duration correction, 2026-10-21
 
 **MERGE CANDIDATE / NOT DEPLOYED.** New bounded branch `fix/bb158-sonarr-queue-duration` from
