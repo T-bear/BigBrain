@@ -1,5 +1,16 @@
 # Media Module
 
+## BB-158 — approved YouTube placement, 2026-10-22
+
+Owner decision: extend **existing Librarr** with a bounded single-video YouTube fetch/conversion
+capability, reusing import IDs, durable outcomes, exclusive placement and ABS reconciliation. No new
+service/database or parallel importer. API/Web remain process-free; their no-command rule and
+Sentinel boundary are unchanged. New UI uses optional ISBN-10/13; historical DOI records must remain
+readable and intact. Direct MP3/M4A support remains required.
+This authorizes implementation, not merge, deployment or production import. Containment, controlled
+egress, finite resources, explicit confirmation and permitted access remain mandatory.
+[Actual sandbox prerequisite failure and verification limits](../reports/features/media/bb-158-url-import-20261017.md#librarr-containment-prerequisite--2026-10-22).
+
 ## BB-158 — optional DOI amendment (review, 2026-10-21)
 
 DOI is optional metadata for direct MP3/M4A imports. Missing/blank input becomes JSON null in API

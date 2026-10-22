@@ -2,10 +2,10 @@
 
 ## BB-158 — YouTube completion, 2026-10-22
 
-**BLOCKED BEFORE IMPLEMENTATION — EXECUTION BOUNDARY DECISION.** Main
+**LIBRARR DIRECTION APPROVED / CONTAINMENT PREREQUISITE BLOCKED.** Main
 `712679fda646aced2a417adf696e59d4a7c0f57b` includes optional DOI/Sonarr corrections. Owner reports
 BB-158 deployed; this task does not certify runtime. Requested YouTube/ISBN flow is not implemented.
-[Concrete contract conflict and minimum proposed decision](reports/features/media/bb-158-url-import-20261017.md#youtube-and-isbn-completion-boundary--2026-10-22).
+[Actual namespace probe and verification limits](reports/features/media/bb-158-url-import-20261017.md#librarr-containment-prerequisite--2026-10-22).
 Existing operations checkpoint is preserved separately. Earlier entries are historical.
 
 ## BB-158 — Sonarr availability correction, 2026-10-21

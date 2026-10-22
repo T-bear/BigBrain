@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-158 — approved Librarr direction, containment stop, 2026-10-22
+
+**BLOCKED — NO UNPUBLISHED APPLICATION IMPLEMENTATION.** Continue the same branch
+`review/bb158-youtube-execution-boundary`; main `712679fda646aced2a417adf696e59d4a7c0f57b` unchanged.
+Owner placement approval is recorded in Media's module contract; do not ask for that decision again.
+[Exact test context, namespace denial and limits](../reports/features/media/bb-158-url-import-20261017.md#librarr-containment-prerequisite--2026-10-22).
+Host harmless bubblewrap probe PASS; isolated nonprivileged Docker probe BLOCKED before child start.
+The committed reproducer returns 2 for blocked containment. It does not invoke yt-dlp/FFmpeg or mount
+production data. Next: identify the precise security denial and demonstrate safe per-Librarr child
+containment; no global policy weakening or unsandboxed library access. No real YouTube/ABS run.
+Application code/tests, existing DOI data, direct imports and all production services remain unchanged.
+Preserve unrelated mockups/Sentinel ADRs and the separate previous deployment/build handoff.
+
+
 ## BB-158 — YouTube completion boundary, 2026-10-22
 
 **BLOCKED — ARCHITECTURE DECISION REQUIRED; NO UNPUBLISHED IMPLEMENTATION.** Branch
