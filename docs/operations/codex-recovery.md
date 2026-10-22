@@ -1,5 +1,22 @@
 # Codex interrupted-run recovery
 
+## BB-158 — YouTube completion boundary, 2026-10-22
+
+**BLOCKED — ARCHITECTURE DECISION REQUIRED; NO UNPUBLISHED IMPLEMENTATION.** Branch
+`review/bb158-youtube-execution-boundary` from accepted main
+`712679fda646aced2a417adf696e59d4a7c0f57b` (tree `d077f879b83d49df497617a815650d1af2a3c8fb`).
+[Exact contract conflict, source evidence and smallest proposed decision](../reports/features/media/bb-158-url-import-20261017.md#youtube-and-isbn-completion-boundary--2026-10-22).
+API command execution is prohibited; existing Librarr capability receives bytes, not YouTube jobs.
+No process exception, ISBN-only partial implementation or generic URL allowance added. Next: review
+placement of a bounded source capability in existing Librarr before implementation; do not alter
+Sentinel or treat content rights confirmation as proof of provider permission.
+Owner reports deployed BB-158; this task made no runtime inspection/change. Prior operational branch
+`review/bb158-production-activity-gate` at `c514b48660054f488b57305b13a59564bfbb19e2` remains
+preserved, including its separate deployment/build handoff. No old package was reused.
+Only report, catalog, STATUS, BB-158 BACKLOG and this note change. Untracked design mockups and four
+Sentinel ADRs remain untouched. No application tests/builds run for this documentation-only stop.
+
+
 ## BB-158 — Sonarr queue duration correction, 2026-10-21
 
 **MERGE CANDIDATE / NOT DEPLOYED.** New bounded branch `fix/bb158-sonarr-queue-duration` from
