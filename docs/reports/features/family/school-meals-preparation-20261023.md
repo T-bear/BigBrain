@@ -339,3 +339,68 @@ wrong-week/year and actual HTML assertions before the final passing run. **19 fr
 and Prettier check **PASS**. Documentation validator/local links **PASS** (274 Markdown / 91 backlog
 IDs), whitespace check **PASS**. Earlier Family composition evidence is reused: its embedding and
 navigation are unchanged. No new live, browser or original-file evidence is implied by these checks.
+
+
+## Skollunch v1 — original-file verification 2026-10-23
+
+**REVIEW CHECKPOINT — OFFLINE ONLY, NOT DEPLOYED.** Same `family/school-lunch-v1` branch;
+main remains `7f3dfd149ec5776b792a993faa2711cb33cc572e`, prior checkpoint
+`6e0988d25153d4bfc52242754bb1b456be30637f`. Publication subject
+`fix(family): verify school lunch original fixtures` identifies this commit/tree through Git metadata.
+Earlier missing-original statements above are historical and superseded by this section.
+
+Both owner-provided files were available and read locally, without downloading anything:
+
+| Original | Bytes | SHA-256 |
+| --- | --- | --- |
+| rss.rss | 2684 | `41cc0bd732e0b876cb67eecec1366c8937493183d13bdb08344d29170c41f034` |
+| musikugglan.html | 1976 | `f0c8571e042a7967d51bfd681e3ac584e1ad6425890718cba9fb35ec12c9d30c` |
+
+The temporary originals are not added to Git. Existing embedded offline fixtures now contain the
+full RSS menu and the original HTML lunch/snack section, retaining nonbreaking spaces and padding;
+unrelated stylesheet/page chrome and repeated empty HTML tail are omitted. Line endings are
+normalized in source. No invented lunches remain in preview or the five-day positive tests.
+Synthetic malformed/entity cases remain deliberately isolated negative/normalization tests.
+
+Initial full-file replay: RSS **PASS**, HTML **FAIL** (`invalid`). The actual HTML includes an empty
+strong element before the title and empty paragraphs before/after the table. The former strict
+heading/table boundary rejected these. The minimal correction removes whitespace-only strong and
+p elements before locating that same bounded fragment. Nonempty intervening content remains rejected,
+with a regression test. Existing DTD prohibition, null XML resolver, size/regex/depth limits, week
+checks, required snack boundary and narrow allowed tags remain intact. No dependencies were added.
+
+Final replay reads both complete original files and compares every resulting date and ordered dish
+against the embedded preview. Rosenfeldt has all five GUID dates 2026-10-19–23 and two alternatives
+per day, including identical Thursday/Friday alternatives. XML/HTML entity decoding preserves
+ampersands. Musikugglan has all five lunches; whitespace is normalized, slash remains within the
+original dish string, and none of the snack section becomes lunch. HTML verifies week 44 only;
+year 2026 remains owner-observed display context, never a source-verified year. Wrong-week/year
+fixture requests remain unavailable. The UI retains separate historical test weeks and explicit
+TESTDATA labeling, with obsolete missing-file text removed.
+
+Verification commands and results:
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMealsTests|FullyQualifiedName~SchoolMealsOriginalReplayTests|FullyQualifiedName~MealPlannerApiTests' -v quiet`:
+  **38 PASS** (36 retained backend cases and 2 full-original replay cases). The two local-only original replay cases use the
+  owner files; their temporary harness is removed before publication. Published regression cases
+  use repository fixtures, not a private filesystem path.
+- `npm test -- --run src/meal-planner/SchoolLunch.test.tsx src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`:
+  **19 PASS**; `npm run build`: **PASS** (TypeScript/Vite).
+- Existing API tests cover Development-only fixtures, Production rejection and unchanged household
+  meals. Parsers/endpoint have no HTTP client or storage write path; opening Family triggers no
+  school request. No external provider call was made. No network-capable source adapter was added.
+- Previous unchanged Family composition/theme evidence is reused. No full repository suite,
+  browser/iPhone test, merge, deployment or source activation was performed.
+
+Remaining: independent review and owner iPhone/PWA acceptance; external retrieval still requires
+separate access/activation approval and implementation. HTML parsing remains deliberately bounded
+to the verified structure, not a general HTML engine. No original-file blocker remains. Finance and
+BB-158 stay frozen and untouched.
+
+Publication checks: scoped `dotnet format BigBrain.slnx --no-restore --include` for the two parser
+files and SchoolMealsTests **PASS**; scoped Prettier **PASS**. Documentation/link validator
+`node scripts/verify-documentation.mjs` **PASS** (274 Markdown files, 91 backlog IDs).
+`git diff --cached --check` **PASS**; staged Gitleaks **PASS**, no leaks. Original file hashes
+remained unchanged after tests. Only the five school-lunch code/test files and six relevant
+existing documentation files are included; no tmp originals or local-only replay harness.

@@ -28,6 +28,11 @@ public static class MusikugglanSchoolMeals
         {
             // Ignore non-rendered content before finding the unique, explicitly bounded lunch fragment.
             html = Regex.Replace(html, @"<!--.*?-->|<script\b[^>]*>.*?</script\s*>|<style\b[^>]*>.*?</style\s*>", "", Options, MatchTimeout);
+            // The original page pads headings/table with empty strong/p elements. Remove only
+            // whitespace-only formatting, never nonempty content or unknown intervening markup.
+            const string blank = @"(?:\s|&nbsp;|&#160;|&#x[aA]0;)*";
+            html = Regex.Replace(html, @"<strong\b[^>]*>" + blank + "</strong>", "", Options, MatchTimeout);
+            html = Regex.Replace(html, @"<p\b[^>]*>" + blank + "</p>", "", Options, MatchTimeout);
             var headings = Regex.Matches(html, HeadingStart + @"Matsedel\s+v\.\s*(?<week>\d{1,2})" + HeadingEnd, Options, MatchTimeout);
             if (headings.Count != 1) return Result("invalid");
             var heading = headings[0];
@@ -86,16 +91,45 @@ public static class MusikugglanSchoolMeals
         _ => ""
     }));
 
-    // Normalized excerpt supplied in the owner task; not the original downloaded HTML file.
+    // Historical offline fixture from the original lunch/snack section; never fetched/live.
     public const string ExampleHtml = """
-        <p><strong>Matsedel v. 44<br /></strong></p>
-        <table border="2"><tbody>
-        <tr><td>Måndag</td><td><p>Pasta med köttfärssås/Vegosås</p></td></tr>
-        <tr><td>Tisdag</td><td>Currygryta med kyckling samt ris/Vegogryta</td></tr>
-        <tr><td>Onsdag</td><td>Stekt falukorv med makaroner och ketchup/Vegokorv</td></tr>
-        <tr><td>Torsdag</td><td>Ugnspannkaka med baconströssel och stekt potatis,lingonsylt</td></tr>
-        <tr><td>Fredag</td><td>Fläsknoisette och stekt kulpotatis samt kall sås /Vegobiff</td></tr>
-        </tbody></table>
+        <p> </p>
+        <p><strong> </strong><strong>Matsedel v. 44<br /></strong></p>
+        <p><strong> </strong></p>
+        <table border="2">
+        <tbody>
+        <tr>
+        <td>Måndag</td>
+        <td>
+        <p> Pasta med köttfärssås/Vegosås</p>
+        </td>
+        </tr>
+        <tr>
+        <td>Tisdag</td>
+        <td> Currygryta med kyckling samt ris/Vegogryta</td>
+        </tr>
+        <tr>
+        <td>Onsdag</td>
+        <td> Stekt falukorv med makaroner och ketchup/Vegokorv</td>
+        </tr>
+        <tr>
+        <td>Torsdag</td>
+        <td> Ugnspannkaka med baconströssel och stekt potatis,lingonsylt</td>
+        </tr>
+        <tr>
+        <td>Fredag</td>
+        <td> Fläsknoisette och stekt kulpotatis samt kall sås /Vegobiff</td>
+        </tr>
+        </tbody>
+        </table>
+        <p> </p>
+        <p><strong> </strong></p>
         <p><strong>Mellanmål v. 44</strong></p>
+        <p> </p>
+        <p><strong>Måndag: Rågpinnar,pålägg</strong></p>
+        <p><strong>Tisdag:  Hallowen smoothie,macka,pålägg</strong><strong><br /></strong></p>
+        <p><strong>Onsdag:  Mjölk,macka,pålägg</strong></p>
+        <p><strong>Torsdag: Yoghurt,havrekuddar,knäcke,pålägg</strong><strong><br /></strong></p>
+        <p><strong>Fredag:  Tekaka,mjukost</strong></p>
         """;
 }

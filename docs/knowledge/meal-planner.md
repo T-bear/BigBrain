@@ -20,7 +20,7 @@ Samla verifierad kunskap om modulen Matlista.
 - Backup/restore och fleranvändarkonflikter är inte lösta.
 - Skollunch v1 har en offline RSS-parser och separat read-only skolmåltidskontrakt för review.
   Family visar offline-status och utvecklingsfixtur; ingen hushållsplan eller inköpslista skrivs.
-  Live-hämtning är inte implementerad/aktiverad. Musikugglans HTML-utdrag parsas offline; originalfilernas fullständiga verifiering återstår.
+  Live-hämtning är inte implementerad/aktiverad. Båda originalfilerna har parsats offline med fem lunchdagar; HTML anger vecka men inte årtal.
   Skolmedveten hushållsmenygenerering är fortsatt framtida scope.
   [Kontrakt och evidens](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
 

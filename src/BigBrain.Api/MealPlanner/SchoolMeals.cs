@@ -90,13 +90,49 @@ public static class SchoolMeals
             year, week, status, basis, null, fixture, days);
     }
 
-    // Owner-supplied single real item; missing days intentionally remain missing. Never fetched/live.
+    // Historical offline fixture from the owner-provided original; never fetched/live.
     public const string ExampleRss = """
-        <rss version="2.0"><channel><title>Skolmat - Rosenfeldtskolan</title><ttl>5</ttl>
-        <item><title>Måndag 19 oktober 2026</title>
-        <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
-        <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-19</guid>
-        <description>Pasta med spenat och ostsås&lt;br /&gt;Pasta serveras med ost &amp;amp; skinksås</description>
-        </item></channel></rss>
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+          <channel>
+            <title>Skolmat - Rosenfeldtskolan</title>
+            <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685</link>
+            <description>Matsedel för Rosenfeldtskolan, Karlskrona.</description>
+            <language>sv-SE</language>
+            <generator>Skolmat</generator>
+            <ttl>5</ttl>
+            <atom:link href="https://www.skolmat.info/api/public/matsedlar/C9643AEF-D05B-463E-84CB-76BEB47FF685/rss?period=current-week" rel="self" type="application/rss+xml" />
+            <item>
+              <title>Måndag 19 oktober 2026</title>
+              <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
+              <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-19</guid>
+              <description>Pasta med spenat och ostsås&lt;br /&gt;Pasta serveras med ost &amp;amp; skinksås</description>
+            </item>
+            <item>
+              <title>Tisdag 20 oktober 2026</title>
+              <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
+              <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-20</guid>
+              <description>Grönsakragu serveras med kokt potatis&lt;br /&gt;Krämigt örtbakad fisk serveras med kokt potatis</description>
+            </item>
+            <item>
+              <title>Onsdag 21 oktober 2026</title>
+              <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
+              <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-21</guid>
+              <description>Korv serveras med potatismos, ketchup &amp;amp; senap&lt;br /&gt;Stekt kycklingkorv serveras med potatismos, ketchup och senap</description>
+            </item>
+            <item>
+              <title>Torsdag 22 oktober 2026</title>
+              <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
+              <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-22</guid>
+              <description>Gulaschsoppa serveras med bröd och ost&lt;br /&gt;Gulaschsoppa serveras med bröd och ost</description>
+            </item>
+            <item>
+              <title>Fredag 23 oktober 2026</title>
+              <link>https://www.skolmat.info/matsedlar?facilityId=C9643AEF-D05B-463E-84CB-76BEB47FF685&amp;year=2026&amp;week=43</link>
+              <guid isPermaLink="false">skolmat:menu:C9643AEF-D05B-463E-84CB-76BEB47FF685:2026-10-23</guid>
+              <description>Kockens val&lt;br /&gt;Kockens val</description>
+            </item>
+          </channel>
+        </rss>
         """;
 }

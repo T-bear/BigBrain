@@ -27,14 +27,36 @@ describe('SchoolLunch', () => {
       fetchedAtUtc: null,
       isFixture: true,
       days: Array.from({ length: 5 }, (_, i) => ({
-        date: `2026-10-${19 + i}`,
-        status: i === 0 && id === 'rosenfeldt' ? 'published' : 'missing',
-        dishes: i === 0 && id === 'rosenfeldt' ? ['Testtext', 'Testtext'] : [],
+        date: `2026-10-${(id === 'rosenfeldt' ? 19 : 26) + i}`,
+        status: 'published',
+        dishes:
+          id === 'rosenfeldt'
+            ? [
+                ['Pasta med spenat och ostsås', 'Pasta serveras med ost & skinksås'],
+                ['Grönsakragu serveras med kokt potatis', 'Krämigt örtbakad fisk serveras med kokt potatis'],
+                [
+                  'Korv serveras med potatismos, ketchup & senap',
+                  'Stekt kycklingkorv serveras med potatismos, ketchup och senap',
+                ],
+                ['Gulaschsoppa serveras med bröd och ost', 'Gulaschsoppa serveras med bröd och ost'],
+                ['Kockens val', 'Kockens val'],
+              ][i]
+            : [
+                [
+                  'Pasta med köttfärssås/Vegosås',
+                  'Currygryta med kyckling samt ris/Vegogryta',
+                  'Stekt falukorv med makaroner och ketchup/Vegokorv',
+                  'Ugnspannkaka med baconströssel och stekt potatis,lingonsylt',
+                  'Fläsknoisette och stekt kulpotatis samt kall sås /Vegobiff',
+                ][i],
+              ],
       })),
     }))
     const view = render(<SchoolLunch allowFixture />)
     fireEvent.click(screen.getByRole('button', { name: 'Visa testveckorna' }))
-    expect(await screen.findAllByText('Testtext')).toHaveLength(2)
+    expect(await screen.findAllByText('Kockens val')).toHaveLength(2)
+    expect(screen.getByText('Pasta serveras med ost & skinksås')).toBeInTheDocument()
+    expect(screen.getByText('Fläsknoisette och stekt kulpotatis samt kall sås /Vegobiff')).toBeInTheDocument()
     expect(screen.getByText(/TESTDATA/)).toBeInTheDocument()
     expect(api.getSchoolMeals).toHaveBeenCalledWith('rosenfeldt', 2026, 43, true, expect.any(AbortSignal))
     expect(api.getSchoolMeals).toHaveBeenCalledWith('musikugglan', 2026, 44, true, expect.any(AbortSignal))

@@ -5,12 +5,15 @@
 **REVIEW CHECKPOINT — OFFLINE ONLY.** Branch `family/school-lunch-v1`, baseline
 `7f3dfd149ec5776b792a993faa2711cb33cc572e`; publication subject `feat(family): add offline school lunch preview`.
 [Implementation, tests and remaining evidence](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
-Completion review: original rss.rss/musikugglan.html are not available locally. Rosenfeldt preview
-retains only the owner's Monday item; five-item coverage uses synthetic test text. Musikugglan now
-parses the owner's exact normalized excerpt. Test views separate week 43 from week 44, with unknown
-HTML source year. No live fetching or complete-original-fixture claim. Both prior source-review branches remain separate and unchanged.
-No external requests, storage changes, deployment or freeze changes. Unrelated untracked work preserved.
-Next: independent review; owner supplies original files for full fixture verification and approves UX/any later source activation separately.
+Final original-file verification supersedes the earlier missing-file limitation. Both owner-provided
+files were read locally; RSS has five days in week 43, HTML five lunches in week 44 with no source year.
+Only empty HTML formatting required a parser correction. Full-file replay and embedded representative
+fixtures agree on every date and dish. Original tmp files remain outside Git. No external requests,
+storage changes, deployment or freeze changes. Unrelated untracked work preserved.
+Publication subject `fix(family): verify school lunch original fixtures` resolves this additive checkpoint.
+[Final verification](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--original-file-verification-2026-10-23).
+Next: independent review, then separate owner decisions for merge/deployment, iPhone UX and any external access.
+
 
 
 ## BB-158 freeze / Family preparation — 2026-10-23

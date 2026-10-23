@@ -80,8 +80,8 @@ export function SchoolLunch({ allowFixture = import.meta.env.DEV }: { allowFixtu
               </h3>
               <p>
                 {menu.schoolId === 'rosenfeldt'
-                  ? 'Endast måndagens källpost finns i testunderlaget. Originalfilen med hela veckan saknas.'
-                  : 'Normaliserat HTML-utdrag från produktägaren. Originalfilen saknas. Visningsår 2026 enligt ägarens observation, inte verifierat i HTML.'}
+                  ? 'Fem vardagar från den manuellt hämtade RSS-filen, vecka 43 år 2026.'
+                  : 'Fem luncher från den manuellt hämtade HTML-filen, vecka 44. Visningsår 2026 enligt ägarens observation, inte verifierat i HTML.'}
               </p>
               {weekdays.map((day, index) => (
                 <div className="school-lunch-day" key={day}>
