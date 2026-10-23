@@ -6,6 +6,9 @@ Detta är en sanerad GitHub-version. Inga hemligheter, privata data eller rålog
 
 ## Status
 
+Aktuell läsning: [Skollunch v2-plan](#skollunch-v2--plan-för-hämtning-vid-behov-2026-10-23).
+V1 är mergad och CI-verifierad; v2 är endast planering. Äldre daterade statusar nedan bevaras.
+
 Datum: 2026-10-23. **REVIEW CHECKPOINT — PREPARATION ONLY; NOT IMPLEMENTED / NOT DEPLOYED.**
 Baseline `712679fda646aced2a417adf696e59d4a7c0f57b`, branch
 `docs/bb158-freeze-family-school-meals`. Publiceringsämne
@@ -404,3 +407,133 @@ files and SchoolMealsTests **PASS**; scoped Prettier **PASS**. Documentation/lin
 `git diff --cached --check` **PASS**; staged Gitleaks **PASS**, no leaks. Original file hashes
 remained unchanged after tests. Only the five school-lunch code/test files and six relevant
 existing documentation files are included; no tmp originals or local-only replay harness.
+
+## Skollunch v2 — plan för hämtning vid behov, 2026-10-23
+
+**REVIEW CHECKPOINT — ENDAST PLANERING.** Branch `docs/school-lunch-v2-preparation` från
+accepterad main `6d7f6de68f618f6c06b0845b659983ec12529f96`, tree
+`23736fbf23a29fc7ad59b8105e28bf0527bff046`. Publiceringsämne
+`docs(family): prepare bounded school lunch live fetching` identifierar planens commit/tree.
+Detta avsnitt är aktuell v2-plan; äldre JSON-, veckonavigations- och cacheförslag ovan är historik.
+Ingen implementation, extern menyhämtning, kontakt med leverantör, merge eller deployment ingår.
+
+### Verifierat nuläge och evidensgräns
+
+V1 är mergad, med [CI 39959910684](https://github.com/T-bear/BigBrain/actions/runs/39959910684)
+**SUCCESS** för exakt main-SHA ovan, verifierat i GitHub Actions REST i denna kontroll.
+Deployment är inte utförd eller verifierad i detta uppdrag. Originalfilernas föregående offline-
+verifiering och testresultat återanvänds; inga parser-/applikationstester kördes om.
+`SchoolMeals.cs` och `MusikugglanSchoolMeals.cs` är rena parsrar. `MealPlannerEndpoints.cs`
+returnerar offline utan fixture; fixture kräver `IsDevelopment()`. `SchoolLunch.tsx` anropar
+bara lokal testvy efter knapptryck, med separata historiska veckor. Ingen liveadapter/cache finns.
+
+### Åtkomstvillkor — blockerare före liveaktivering
+
+| Källa | Teknisk evidens som återanvänds | Tillåten automatisk användning/cache |
+| --- | --- | --- |
+| [Rosenfeldt RSS](https://www.skolmat.info/api/public/matsedlar/C9643AEF-D05B-463E-84CB-76BEB47FF685/rss?period=current-week) | Ägarhämtad RSS 2.0, korrekt facilityId, GUID-datum och fem poster; `ttl=5` samt atom self-link. | **BLOCKED för aktivering:** tidigare robots-observation `Disallow: /`; ingen verifierad RSS-specifik tillåtelse eller cachelicens. TTL är en teknisk cacheledtråd, inte tillstånd eller krav på femminuterspollning. |
+| [Musikugglan/Tant Grön](https://www.tantgron.nu/matsedel/) | Ägarhämtad HTML med lunch och mellanmål; vecka men inget år. | **UNVERIFIED, blockerar aktivering:** tidigare robots-observation begränsade `/admin`, men inget uttryckligt automatiserings-/cachevillkor är verifierat. |
+
+Avgränsad webbsökning efter officiella API/RSS-/användningsvillkor gav inget verifierbart
+integrationsavtal för dessa två källor. Tredjepartsintegrationer och andra kommuners öppna data
+används inte som rättighetsbevis. Försök att läsa de två kända robots.txt-adresserna med webbverktyget
+kunde inte återge dokumenten; de tidigare robots-fynden ovan är därför daterad återanvänd evidens,
+inte en ny verifiering av nuvarande innehåll. Inga menyendpoints anropades eller gissades, inga
+alternativa domäner eller User-Agent-trick användes. Robots är en automatiseringssignal, inte i sig
+ett juridiskt avgörande. Frånvaron av hittade villkor bevisar inte att villkor saknas.
+
+Minsta nästa åtkomståtgärd: ägaren tillhandahåller ett officiellt publicerat villkor eller besked som
+omfattar just RSS-/HTML-hämtning i privat familjesystem, hämtningsfrekvens och cachelagring/stale-visning.
+För Skolmat.info måste även förhållandet till robots-begränsningen klarläggas. Codex skickar inget.
+Kontaktväg för Musikugglan finns på [skolans officiella kontaktsida](https://www.tantgron.nu/kontakt).
+Ägarens implementationsbeslut ersätter inte källans åtkomstvillkor.
+
+### Minsta tekniska lösning — föreslagen, inte implementerad
+
+- Behåll befintlig endpoint, skol-ID:n, DTO-grund, parsrar och Family-sektion. En liten
+  modullokal `SchoolMealSourceClient` hämtar de två fasta HTTPS-adresserna; format väljer befintlig
+  parser. En liten `SchoolMealService` håller högst två källposter i minnet och samordnar samtidiga
+  anrop per källa. Ingen generell adapterplattform eller ny cachetjänst behövs.
+- Använd `IHttpClientFactory` i `Program.cs`, cancellation och Problem Details enligt befintliga
+  mönster. `Media/MediaPosters.cs` är referens för named client, ResponseHeadersRead och felmappning;
+  återanvänd mönstret, inte Media-modulens tjänst eller tillstånd.
+- Föreslagen konfiguration under befintlig `MealPlanner`-sektion: `SchoolMeals.Enabled=false`
+  samt separata `RosenfeldtEnabled=false` och `MusikugglanEnabled=false`. Hämta aldrig för en
+  avstängd källa. Options binds vid processstart som befintliga `MealPlannerOptions`; ingen dold
+  hot-reload eller ny administrationsendpoint. Eventuell senare omstart kräver deploymentgodkännande.
+- Inga användarstyrda URL:er, cookies, credentials, JavaScript eller följande av inbäddade länkar.
+  Stäng automatisk redirect; 3xx blir otillgänglig källa tills ny adress verifierats. Använd endast
+  fasta publika HTTPS-källor. Begränsa även strömmad/dekomprimerad body till 512 KiB, inte enbart
+  Content-Length; behåll parserns separata teckengräns. Total deadline 5 s ska omfatta headers
+  **och body** via cancellation-token (HttpClient-timeout ensam räcker inte med ResponseHeadersRead).
+- Konkreta berörda ytor vid senare implementation: nya små källklient/servicefiler under
+  `src/BigBrain.Api/MealPlanner/`, `MealPlannerContracts.cs` (options), `SchoolMeals.cs` (DTO),
+  `MealPlannerEndpoints.cs`, `Program.cs`, `src/BigBrain.Web/src/api.ts`,
+  `meal-planner/SchoolLunch.tsx` och befintliga skolmåltidstester. Endast nödvändiga lokala CSS-/UX-Lab-
+  tillstånd tillkommer. Inga ändringar av hushållsstore, Shopping List, Finance eller BB-158.
+
+### Cache, fel och datum — föreslagen policy att godkänna
+
+| Fall | Beteende |
+| --- | --- |
+| Family öppnas | Två lokala read-only API-anrop, ett per skola, avbryts vid navigation. Ingen frontendpollning. Avstängd källa ger offline utan utgående HTTP. |
+| Cache miss/utgången | Högst ett pågående försök per källa. Föreslagen minsta intervall 6 h mellan försök, även vid fel/veckoskifte, delad av alla klienter. Ingen intern retry-loop. |
+| Belastning | Vid kontinuerlig användning cirka fyra försök per källa och dygn, åtta totalt vid stabil API-process. Inga försök utan efterfrågan. Omstart tömmer minnet och kan ge ett nytt försök; detta är ingen persistent dygnskvot. Striktare leverantörskrav kan kräva annan policy och stoppar aktivering tills löst. |
+| Giltig cache | Återge normaliserad meny med `fetchedAtUtc`, separat `lastCheckedAtUtc` och nullable `sourceUpdatedAtUtc`. Hämtningstid bevisar inte när menyn ändrades. HTTP validators används endast om faktiskt erbjudna; 304 kräver befintlig matchande post. |
+| Timeout/HTTP/ogiltigt svar | Returnera explicit `unavailable` eller `invalid`. Tidigare giltig meny får visas endast märkt `isStale=true`, inom samma ISO-vecka och högst 24 h efter senaste lyckade validering, om cachevillkoren tillåter. Fel ändrar inte senaste lyckade tid. Ingen fallback till fixture. |
+| 429/Retry-After | Ingen omedelbar retry. Nästa försök tidigast efter både lokal intervall och giltig Retry-After. Okänt/felaktigt besked ger säkert fel, inte tätare hämtning. |
+| no-store/striktare villkor | Respektera källans cachevillkor; ingen stale-lagring i strid med dem. Om föreslagen cache inte medges måste policyn avgöras före aktivering, inte ersättas med obegränsad hämtning. |
+| Giltig tom meny/annan vecka | `notPublished`; ingen maskering med tidigare meny. En saknad dag är `missing`, aldrig gissat lov. Ingen upstreamhämtning för godtyckliga historiska/framtida API-veckor. |
+| ISO-årsskifte | Serverns Europe/Stockholm-datum och ISOWeek.GetYear/GetWeekOfYear bestämmer aktuell vecka, med TimeProvider för test. RSS-GUID måste matcha exakt ISO-år/vecka; kalenderår får inte ersätta ISO-år. |
+| HTML utan år | Matchande källvecka får mappas till aktuell ISO-vecka med `htmlWeekRequestedYear`, tydligt härlett år. Återanvänd aldrig föregående års/veckas cache som aktuell. Veckomatch ensam bevisar inte att källtexten uppdaterats det året; denna kvarstående osäkerhet måste accepteras uttryckligen eller hindra visning. |
+
+V2:s lilla DTO-delta är freshness-/felmetadata, inte en ny måltidsmodell. Fel vid ogiltiga
+klientparametrar förblir Problem Details 400; källfel ska kunna visas per skola utan att slå ut den
+andra. Status `published` avser källa inom begärd vecka, inte garanterat nypublicerad information.
+Inga råa HTML-fel eller upstreamdetaljer exponeras för användaren. Byte av vecka ogiltigförklarar
+synlig föregående veckomeny även om cache-TTL återstår. Efter omstart finns ingen menyhistorik.
+
+Original-HTML:en angav vecka 44 när ägaren observerade den under vecka 43. Det visar att publicisten
+kan byta innehåll i förväg; det ger inte ett generellt framtids-API. V2 visar då att aktuell veckas
+meny saknas, inte vecka 44 som vecka 43. Ingen historik-/framtidsnavigation föreslås.
+
+### Family View och avgränsad Definition of Done
+
+På iPhone: befintlig Skollunch-sektion, aktuell veckorubrik, båda skolor vertikalt och måndag–fredag
+med originalalternativ i ordning. Behåll teman, fokus och touchytor. Visa källa, senast kontrollerat,
+härledda datum och tydliga offline-/fel-/stale-tillstånd per skola. Ingen ny navigation. Development-
+exemplen behålls bakom uttryckligt separat testval med TESTDATA och sina historiska veckor; aldrig
+som livefelreserv. Hushållets middagar och inköpslista lämnas orörda.
+
+Minsta kommande sprint, bedömd **MEDIUM**, efter separat implementationsbeslut:
+
+1. Två fasta HTTP-källor, default-off options och bounded hämtning/cache ovan inom Meal Planner.
+2. Återanvänd parsrar och versionerad endpoint; korrekt freshness, datumgrund och separat källfel.
+3. Family öppnar aktuell vecka genom lokal API-läsning; test/live-data hålls åtskilda.
+4. Fokuserade tester med stub HttpMessageHandler och styrbar klocka: default-off gör noll HTTP-anrop,
+   samtidiga klienter ger en hämtning, TTL/cooldown, 304/429/redirect, timeout inklusive body,
+   storleksgräns, ogiltigt svar, cacheförlust, gammalt/annat veckoinnehåll, ISO-årsskifte och HTML utan år.
+   Befintliga parserfixturer återanvänds. Inga verkliga nätverksanrop i automatiska tester.
+5. API-/frontendtester verifierar isolerade skolfel, cancellation, tydlig stale/testmärkning och inga
+   mutationer av måltidsplanering/inköpslista; relevant build. Ingen rutinmässig full repository-svit.
+6. Teknisk Review Checkpoint skiljs från liveacceptans: tillåtna verkliga hämtningar för båda skolor,
+   separat deployment/aktivering och ägarens iPhone/PWA-acceptans krävs innan livefunktionen kallas klar.
+
+### Exakta beslut före nästa etapp
+
+- Godkänner ägaren en avgränsad default-off implementation av aktuell vecka för båda skolor,
+  utan historik/framtidsvy eller påverkan på middagsplaneringen?
+- Vilket officiellt underlag tillåter automatisk hämtning och cache för respektive källa,
+  inklusive RSS trots tidigare robots-disallow? Detta är **kvarstående aktiveringsblockerare**.
+- Godkänns föreslaget 6 h-intervall, högst 24 h märkt stale inom samma vecka och förlust av cache
+  vid omstart, förutsatt att leverantörernas villkor medger detta?
+- Accepteras Musikugglans tydligt härledda år/datum, med veckomismatch som saknad meny och utan
+  möjlighet att bevisa källans publiceringsår? Annars krävs källstöd för årtal före livevisning.
+
+Inget av dessa beslut antas genom publicering av planen. Ingen ny ADR behövs för det föreslagna
+återbruket; eventuell faktisk konflikt ska hanteras före implementation. Stoppa efter review.
+
+Planens verifiering: dokumentationsvalidator inklusive lokala länkar **PASS** (274 Markdown-filer,
+91 backlog-ID:n), `git diff --check` **PASS**. Inga applikationstester eller byggen behövs för denna
+rena dokumentationsdelta. Main och produktionskod lämnas oförändrade; scope/secrets kontrolleras
+vid publicering. V1:s giltiga test-/CI-evidens återanvänds utan omkörning.
