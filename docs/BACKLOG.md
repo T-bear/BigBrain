@@ -1257,7 +1257,7 @@ wide duplicate assessment are recorded in the [2026-08-17 planning record](repor
 ### Existing Family-epic member: External school meals in Meal Planner
 
 - Owner priority 2026-10-23: [source preparation and bounded implementation proposal](reports/features/family/school-meals-preparation-20261023.md).
-  Owner-approved offline Skollunch v1 implemented for review; RSS fixture/API/Family UI available.
+  Skollunch v1 and v2 plan merged. Default-off v2 HTTP/cache/API/Family implementation in review; no deployment.
   Both owner-provided original RSS/HTML files verified offline; five-day fixtures complete. External access remains MANUAL_REVIEW.
   No deployment, live-data acceptance or completion of the two-school live goal.
 

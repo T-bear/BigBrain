@@ -87,6 +87,21 @@ function successfulFetch() {
     if (url.endsWith('/api/v1/system/overview')) return Promise.resolve(response(overview))
     if (url.endsWith('/api/v1/docker/containers')) return Promise.resolve(response(dockerUnavailable))
     if (url.endsWith('/api/v1/system/recovery')) return Promise.resolve(response(recovery))
+    if (url.includes('/api/v1/modules/meal-planner/school-meals?'))
+      return Promise.resolve(
+        response({
+          schoolId: url.includes('rosenfeldt') ? 'rosenfeldt' : 'musikugglan',
+          sourceName: 'Testkälla',
+          sourceUrl: 'https://example.org',
+          year: 2026,
+          week: 43,
+          status: 'offline',
+          dateBasis: 'unknown',
+          isFixture: false,
+          fetchedAtUtc: null,
+          days: [],
+        }),
+      )
     if (url.endsWith('/api/v1/modules/meal-planner/schedules'))
       return Promise.resolve(
         response([
@@ -199,7 +214,7 @@ test('starts on the calm Home launcher and keeps family tools in Family', async 
   ).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
   expect(container.querySelector('#family')).toHaveClass('family-experience')
   expect(screen.getByRole('heading', { name: 'Skollunch' })).toBeInTheDocument()
-  expect(screen.getByText('Offline – extern hämtning är avstängd.')).toBeInTheDocument()
+  expect(screen.getByText('Aktuell veckas skolluncher')).toBeInTheDocument()
   expect(container.querySelector('#family .dashboard-widget')).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Dashboardinställningar' })).toHaveAttribute('aria-haspopup', 'dialog')

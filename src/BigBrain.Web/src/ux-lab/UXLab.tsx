@@ -220,7 +220,7 @@ export function UXLab() {
       </Section>
       <Section id="feedback" title="Feedback">
         <Specimen name="Skollunch" state="Offline / testdata" description="Kandidat för Family View; inte ägargodkänd.">
-          <SchoolLunch />
+          <SchoolLunch offlinePreview />
         </Specimen>
         <Specimen name="Feedback / Loading">
           <BBLoadingIndicator label="Laddar exempel" />

@@ -458,10 +458,14 @@ export type SchoolMealWeek = {
   dateBasis: string
   fetchedAtUtc: string | null
   isFixture: boolean
+  lastCheckedAtUtc?: string | null
+  sourceUpdatedAtUtc?: string | null
+  isStale?: boolean
+  sourceStatus?: string | null
   days: { date: string; status: string; dishes: string[] }[]
 }
-export const getSchoolMeals = (schoolId: string, year: number, week: number, fixture = false, signal?: AbortSignal) =>
+export const getSchoolMeals = (schoolId: string, year?: number, week?: number, fixture = false, signal?: AbortSignal) =>
   getJson<SchoolMealWeek>(
-    `${mealPlannerBase}/school-meals?schoolId=${encodeURIComponent(schoolId)}&year=${year}&week=${week}&fixture=${fixture}`,
+    `${mealPlannerBase}/school-meals?schoolId=${encodeURIComponent(schoolId)}${year !== undefined && week !== undefined ? `&year=${year}&week=${week}` : ''}&fixture=${fixture}`,
     signal,
   )

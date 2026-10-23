@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- [Family school meals preparation, 2026-10-23](features/family/school-meals-preparation-20261023.md): source preparation history and offline Skollunch v1 review evidence; owner-supplied Rosenfeldt RSS, Musikugglan HTML parser; both original files verified offline with five-day fixtures, no external access.
+- [Family school meals preparation, 2026-10-23](features/family/school-meals-preparation-20261023.md): source preparation history and offline Skollunch v1 review evidence; owner-supplied Rosenfeldt RSS, Musikugglan HTML parser; both originals verified offline; v2 default-off HTTP/cache implementation in review, no external access or deployment.
 - [BB-158 freeze, 2026-10-23](../operations/bb158-freeze-20261023.md): canonical preservation and resumption gate; historical reports below are not continuation authority.
 
 
