@@ -1,12 +1,12 @@
 # BigBrain Status
 
-## BB-158 — YouTube completion, 2026-10-22
+## BB-158 — YouTube isolation decision, 2026-10-23
 
-**LIBRARR DIRECTION APPROVED / INITIAL SECCOMP CAUSE IDENTIFIED / CONTAINMENT STILL BLOCKED.** Main
-`712679fda646aced2a417adf696e59d4a7c0f57b` includes optional DOI/Sonarr corrections. Owner reports
-BB-158 deployed; this task does not certify runtime. Requested YouTube/ISBN flow is not implemented.
-[Actual namespace probe and verification limits](reports/features/media/bb-158-url-import-20261017.md#docker-namespace-denial-diagnosis--2026-10-22).
-Existing operations checkpoint is preserved separately. Earlier entries are historical.
+**NO COMPLETE ISOLATION SELECTED / LANDLOCK PRIMITIVES VERIFIED / EGRESS UNVERIFIED.**
+Existing-Librarr placement is approved. Direct import deployment remains owner-reported;
+this checkpoint makes no production change. YouTube/ISBN remains unimplemented.
+[Two-option decision, negative tests and exact remaining boundary](reports/features/media/bb-158-url-import-20261017.md#isolation-choice-assessment--2026-10-23).
+Earlier dated evidence is preserved in the report.
 
 ## BB-158 — Sonarr availability correction, 2026-10-21
 

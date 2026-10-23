@@ -1,5 +1,17 @@
 # Codex interrupted-run recovery
 
+## BB-158 — isolation choice assessment, 2026-10-23
+
+**REVIEW CHECKPOINT — NO PRODUCTION CHANGE.** Main `712679fda646aced2a417adf696e59d4a7c0f57b`;
+same review branch, continuation of `f103a71e8dccb99e26822e9b34cbc1c6d5f1d589`.
+Owner audit read completed with zero matches; no further identical journal read needed.
+[Decision and reproducible primitive tests](../reports/features/media/bb-158-url-import-20261017.md#isolation-choice-assessment--2026-10-23).
+No complete option selected. B has passing Landlock/seccomp synthetic negative tests; actual bounded
+egress/tool/resource integration is unverified. A retains setup-policy blocker. Next review should
+address the concrete egress/launcher implementation boundary, not reopen approved Librarr placement.
+Two test files and canonical evidence published together; no application edits or production package.
+Preserve unrelated mockups/Sentinel ADRs and earlier operational artefacts. No merge/deployment.
+
 ## BB-158 — Docker denial diagnosis, 2026-10-22
 
 **REVIEW CHECKPOINT — NO PRODUCTION CHANGE.** Same branch; baseline
