@@ -446,3 +446,22 @@ export const confirmUrlImport = (id: string, signal?: AbortSignal) =>
     { detailsConfirmed: true, rightsConfirmed: true },
     signal,
   )
+
+export type SchoolMealWeek = {
+  schoolId: string
+  schoolName: string
+  sourceName: string
+  sourceUrl: string
+  year: number
+  week: number
+  status: string
+  dateBasis: string
+  fetchedAtUtc: string | null
+  isFixture: boolean
+  days: { date: string; status: string; dishes: string[] }[]
+}
+export const getSchoolMeals = (schoolId: string, year: number, week: number, fixture = false, signal?: AbortSignal) =>
+  getJson<SchoolMealWeek>(
+    `${mealPlannerBase}/school-meals?schoolId=${encodeURIComponent(schoolId)}&year=${year}&week=${week}&fixture=${fixture}`,
+    signal,
+  )

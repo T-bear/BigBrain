@@ -6,8 +6,9 @@
 inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
 är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
 
-Nästa prioriterade funktion: skolmåltider i Family View. Endast [källverifiering och förslag](reports/features/family/school-meals-preparation-20261023.md)
-är genomförda; ingen implementation eller deployment är auktoriserad av denna checkpoint.
+Skollunch v1: offline RSS-parser, read-only API och Family-testvisning implementerade för review.
+Ingen extern hämtning, merge eller deployment. Båda ägartillhandahållna originalfilerna är verifierade offline med fem lunchdagar; se skolmatsrapportens slutverifiering.
+[Implementation och evidens](reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
 
 
 ## BB-158 — Sonarr availability correction, 2026-10-21

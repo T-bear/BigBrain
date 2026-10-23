@@ -1,5 +1,21 @@
 # Codex interrupted-run recovery
 
+## Skollunch v1 — 2026-10-23
+
+**REVIEW CHECKPOINT — OFFLINE ONLY.** Branch `family/school-lunch-v1`, baseline
+`7f3dfd149ec5776b792a993faa2711cb33cc572e`; publication subject `feat(family): add offline school lunch preview`.
+[Implementation, tests and remaining evidence](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
+Final original-file verification supersedes the earlier missing-file limitation. Both owner-provided
+files were read locally; RSS has five days in week 43, HTML five lunches in week 44 with no source year.
+Only empty HTML formatting required a parser correction. Full-file replay and embedded representative
+fixtures agree on every date and dish. Original tmp files remain outside Git. No external requests,
+storage changes, deployment or freeze changes. Unrelated untracked work preserved.
+Publication subject `fix(family): verify school lunch original fixtures` resolves this additive checkpoint.
+[Final verification](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--original-file-verification-2026-10-23).
+Next: independent review, then separate owner decisions for merge/deployment, iPhone UX and any external access.
+
+
+
 ## BB-158 freeze / Family preparation — 2026-10-23
 
 **REVIEW CHECKPOINT — DOCUMENTATION ONLY.** Branch `docs/bb158-freeze-family-school-meals`

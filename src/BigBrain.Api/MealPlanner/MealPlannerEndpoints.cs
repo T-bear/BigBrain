@@ -6,6 +6,15 @@ public static class MealPlannerEndpoints
     {
         var group = app.MapGroup("/api/v1/modules/meal-planner");
 
+        group.MapGet("/school-meals", (string schoolId, int year, int week, bool? fixture, IHostEnvironment environment) =>
+        {
+            if (!SchoolMeals.KnownSchool(schoolId) || !SchoolMeals.ValidWeek(year, week))
+                return Problem("schoolMeals.invalidRequest", "Unknown school or invalid ISO week.", 400);
+            if (fixture == true && !environment.IsDevelopment())
+                return Problem("schoolMeals.fixtureUnavailable", "Fixtures require Development environment.", 403);
+            return Results.Ok(fixture == true ? SchoolMeals.Preview(schoolId, year, week) : SchoolMeals.Unavailable(schoolId, year, week));
+        });
+
         group.MapGet("/meals", async (string? tags, MealPlannerService service, CancellationToken token) =>
             await ExecuteAsync(async () => Results.Ok(await service.GetMealsAsync(ParseTags(tags), token))));
         group.MapPost("/meals", async (CreateMealRequest request, MealPlannerService service, CancellationToken token) =>

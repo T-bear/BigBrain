@@ -107,3 +107,9 @@
 @media(max-width:899px){.shell:has(.family-experience)>.sidebar{display:none}.family-experience{padding-right:16px;padding-left:16px}.family-settings{position:fixed;top:auto;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));left:12px;width:auto}}
 @media(min-width:900px){.family-experience{max-width:880px;padding-top:48px}.family-flow{grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);align-items:start}.family-section--meal-plan{grid-row:span 3}.family-section .meal-planner__day{grid-template-columns:110px minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){.family-settings-trigger,.family-section .meal-planner button,.family-section .calendar-widget>header button,.family-section .shopping-list button,.mobile-navigation button{transition:none}.family-section .meal-planner__replace-panel{animation:none}}
+
+.school-lunch { min-width:0; overflow-wrap:anywhere; }
+.school-lunch-day { padding-block:var(--bb-space-3); border-bottom:1px solid var(--bb-color-border); }
+.school-lunch-day h4 { margin-block:var(--bb-space-2); }
+.school-lunch a { display:inline-flex; align-items:center; min-height:44px; }
+.school-lunch a:focus-visible { box-shadow:var(--bb-focus-ring); }

@@ -124,6 +124,33 @@ public sealed class MealPlannerApiTests : IDisposable
         Assert.Equal(meals.Length, meals.Select(meal => meal.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
+    [Theory]
+    [InlineData("Production", false)]
+    [InlineData("Development", true)]
+    public async Task SchoolMealsAreReadOnlyOfflineAndFixturesAreDevelopmentOnly(string environment, bool allowed)
+    {
+        await using var factory = Factory().WithWebHostBuilder(builder => builder.UseEnvironment(environment));
+        using var client = factory.CreateClient();
+        var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);
+        var offline = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026&week=43", TestContext.Current.CancellationToken);
+        Assert.Equal("offline", offline!.Status);
+        Assert.False(offline.IsFixture);
+        var preview = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026&week=43&fixture=true", TestContext.Current.CancellationToken);
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Forbidden, preview.StatusCode);
+        var html = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=musikugglan&year=2026&week=44&fixture=true", TestContext.Current.CancellationToken);
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Forbidden, html.StatusCode);
+        if (allowed)
+        {
+            var menu = await html.Content.ReadFromJsonAsync<SchoolMealWeek>(TestContext.Current.CancellationToken);
+            Assert.Equal("htmlWeekRequestedYear", menu!.DateBasis);
+            Assert.Equal(5, menu.Days.Count(day => day.Status == "published"));
+        }
+        var invalid = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=unknown&year=2026&week=99", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        Assert.Contains("schoolMeals.invalidRequest", await invalid.Content.ReadAsStringAsync(TestContext.Current.CancellationToken), StringComparison.Ordinal);
+        Assert.Equal(before, await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken));
+    }
+
     private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         builder.ConfigureTestServices(services =>
         {

@@ -1,3 +1,4 @@
+import { SchoolLunch } from '../meal-planner/SchoolLunch'
 import { MediaControlOverview } from '../media-control/MediaControl'
 import { MediaUrlImport } from '../media-control/MediaUrlImport'
 import { useState, type ReactNode } from 'react'
@@ -218,6 +219,9 @@ export function UXLab() {
         </Specimen>
       </Section>
       <Section id="feedback" title="Feedback">
+        <Specimen name="Skollunch" state="Offline / testdata" description="Kandidat för Family View; inte ägargodkänd.">
+          <SchoolLunch />
+        </Specimen>
         <Specimen name="Feedback / Loading">
           <BBLoadingIndicator label="Laddar exempel" />
         </Specimen>
