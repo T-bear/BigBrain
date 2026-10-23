@@ -12,6 +12,13 @@ verification and an implementation proposal, not the full epic or a new Family C
 Older priority ordering below is historical; Finance remains frozen and BB-158 has a separate
 [owner freeze](../operations/bb158-freeze-20261023.md). No new UI acceptance is inferred.
 
+## Bounded offline implementation authorization — 2026-10-23
+
+The owner subsequently authorized Skollunch v1: offline parsing and a read-only Meal Planner
+contract presented in Family. No external fetching, deployment or general Family Context engine.
+[Implementation boundaries](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
+The earlier preparation section remains historical; source-access conditions still apply.
+
 ## Status, purpose and priority
 
 This is a future product epic and planning baseline, not an approved sprint, architecture schema or

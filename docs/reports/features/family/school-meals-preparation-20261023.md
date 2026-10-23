@@ -174,3 +174,96 @@ publika GET-observationerna är ny källevidens. Inga hemligheter, privata konta
 Efter oberoende granskning: ägaren beslutar om den avgränsade skolmåltidsimplementationen.
 Inhämta rätt Rosenfeldt-källidentitet och tillåtet åtkomstsätt samt avgör Musikugglans datum-/veckogräns
 innan källa aktiveras. Återanvänd fynden; ingen ny generell källutredning behövs. BB-158 förblir fryst.
+
+## Skollunch v1 — offline implementation 2026-10-23
+
+**REVIEW CHECKPOINT — IMPLEMENTED OFFLINE / NOT DEPLOYED / NO EXTERNAL ACCESS.**
+Branch `family/school-lunch-v1` from main `7f3dfd149ec5776b792a993faa2711cb33cc572e`.
+Publication subject `feat(family): add offline school lunch preview` resolves commit/tree via Gitmetadata.
+Owner authorization now permits offline implementation, superseding preparation-only scope above.
+Live-source permissions remain unresolved. BB-158 and Finance are untouched and frozen.
+
+### Source evidence and preserved reviews
+
+The owner supplied Rosenfeldtskolan facilityId `C9643AEF-D05B-463E-84CB-76BEB47FF685`, RSS URL
+`https://www.skolmat.info/api/public/matsedlar/C9643AEF-D05B-463E-84CB-76BEB47FF685/rss?period=current-week`
+and one actual item for 2026-10-19. This is **owner-reported manual retrieval**, not a Codex live test.
+The supplied channel/version/TTL/atom-link description covers five dates, but only the quoted Monday
+item is available as literal data. The small offline RSS envelope uses that item; it does not fabricate
+the other four lunches. TTL 5 is not treated as permission or a configured fetching interval.
+
+Earlier documentation remains preserved on separate, unmerged branches:
+`docs/rosenfeldt-school-meal-source` at `55f781aa4b54646815305656b2f0e1f588dac986` and
+`docs/skolmat-api-verification` at `5394066139faefd20eed8a0e8e94e77a4bad541c`.
+Their source-access and third-party JSON findings were read, not merged/copied or rewritten. The new
+owner-supplied RSS identity supersedes UNKNOWN for offline parser configuration only, not access rights.
+
+No raw Musikugglan HTML fixture was found in the repository/local source inventory. Prior notes describe
+week heading, weekday table and separate snack section but not sufficient exact DOM evidence for a
+reliable parser. **HTML parser NOT IMPLEMENTED**, per the explicit owner fallback. `sourceEvidenceMissing`
+is returned with no dishes and unknown date provenance. No guessed HTML or fake school menu is used.
+The smallest next prerequisite is an owner-supplied saved HTML response from the already identified
+Tant Grön page, including week heading, lunch table and snack boundary. No new live request was made.
+
+### Implemented components and contract
+
+- `src/BigBrain.Api/MealPlanner/SchoolMeals.cs`: typed week/day DTOs, fixed school/source identities,
+  bounded RSS 2.0 parser and explicit offline sample. .NET XmlReader prohibits DTD and disables
+  XmlResolver; input capped at 512 Ki characters. Required fields, facility/date GUID, ISO week,
+  duplicate dates and malformed XML fail closed. Ordered duplicate dish alternatives are preserved.
+  XML decoding precedes bounded `<br>` splitting and HTML text decoding. No vegetarian labels,
+  HTML execution, household storage or HTTP dependency.
+- `MealPlannerEndpoints.cs`: `GET /api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt|musikugglan&year=2026&week=43`.
+  Unknown school/invalid ISO week returns Problem Details 400. Normal mode always returns offline or
+  missing-source-evidence; there is no configuration flag that activates live HTTP.
+  Optional `fixture=true` requires ASP.NET Development environment; other environments return 403.
+- Week DTO: school ID/name, fixed source name/link, requested ISO year/week, status, `dateBasis`,
+  nullable `fetchedAtUtc`, `isFixture`, five weekday slots with date/status/ordered dishes. Slots are
+  the requested calendar, not evidence that a menu exists. Published RSS dates use `sourceGuid`;
+  unavailable/invalid data uses `unknown`. `fetchedAtUtc` is null because nothing was fetched.
+  Missing days are `missing`, never inferred holidays; wrong fixture week is `notPublished`.
+- `SchoolLunch.tsx`, `api.ts`, `FamilyExperience.tsx`, scoped `family.css`: separate Skollunch section
+  showing both schools without changing meals, shopping or navigation. Opening Family causes **zero
+  school API/source calls**. In development only, explicit button loads both local API fixtures for
+  fixed week 43/2026 with a persistent TESTDATA/non-live label. No navigation that could relabel it
+  as current. Cancellation prevents late updates after closing/unmounting. Loading/error states remain
+  explicit. Source links are ordinary user navigation, not automatically fetched resources.
+- UX Lab includes an EXPERIMENTELL offline specimen; no owner approval inferred. Existing BBButton,
+  Family structure and theme tokens retained; 44px actions/links, focus indication and wrapping text.
+
+### Verification and limits
+
+Focused backend: `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+'FullyQualifiedName~SchoolMealsTests|FullyQualifiedName~MealPlannerApiTests' -v quiet`: **22 PASS**,
+including API/production fixture gating and unchanged household meal readback. XML/XXE rejection,
+entities/br, duplicate alternatives/dates, size limit, missing days, invalid identity/date and ISO
+boundary covered. Initial build caught nullable/analyzer errors; corrected before passing tests.
+Frontend: `npm test -- --run src/meal-planner/SchoolLunch.test.tsx src/meal-planner/MealPlanner.test.tsx
+src/ux-lab/UXLab.test.tsx`: **19 PASS**. `npm run build`: **PASS** (TypeScript + Vite).
+No broad Finance/backend suites or external tests. No network or storage dependency exists in the
+school service; no Shopping List production file changes. Household regression suite reused above.
+Additional Family composition, formatting, documentation/link, whitespace and staged secrets checks
+are recorded at publication below. Browser/iPhone visual acceptance is **NOT RUN**; responsive CSS
+and rendering tests do not prove device acceptance. HTML structure tests are **NOT RUN** because the
+parser is intentionally blocked by missing evidence, rather than tested against invented markup.
+
+### Running the offline review and next decision
+
+Run the existing API in Development and Web via its existing development command; Family → Skollunch
+→ Visa testvecka 43, 2026. Only the supplied Monday dishes appear; other Rosenfeldt days remain missing,
+Musikugglan displays its evidence limitation. Production builds hide this control; API independently
+enforces the environment gate. No live fallback, schedule or persistence is introduced.
+
+A future external adapter requires separate owner approval after access/cache terms, a verified HTML
+fixture, and source-specific request/error tests. It would use existing Meal Planner HttpClient
+mechanisms and fixed sources; this checkpoint provides no live activation switch. No database or
+migration needed. Remaining UX decision: owner review on iPhone/PWA and presentation acceptance.
+The offline DoD permits the documented Musikugglan evidence fallback; the two-school live feature
+is **not complete**, and this delivery is a Review Checkpoint rather than a live Merge Candidate.
+
+Publication checks: Family integration test
+`npm test -- --run src/App.test.tsx -t 'starts on the calm Home launcher'`: **1 PASS**, 17 unrelated
+tests intentionally unselected. An initial mistyped filter selected zero tests and is not counted
+as evidence. Scoped `dotnet format ... --include` and Prettier check: **PASS**.
+`node scripts/verify-documentation.mjs`: **PASS**, 274 Markdown files / 91 backlog IDs.
+`git diff --check`: **PASS**. No source-provider request or real menu download occurred.

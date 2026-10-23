@@ -1,5 +1,16 @@
 # Codex interrupted-run recovery
 
+## Skollunch v1 — 2026-10-23
+
+**REVIEW CHECKPOINT — OFFLINE ONLY.** Branch `family/school-lunch-v1`, baseline
+`7f3dfd149ec5776b792a993faa2711cb33cc572e`; publication subject `feat(family): add offline school lunch preview`.
+[Implementation, tests and remaining evidence](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
+Only the owner's single RSS item is used as a historical fixture. Musikugglan has no verified local
+HTML fixture; no speculative parser. Both prior source-review branches remain separate and unchanged.
+No external requests, storage changes, deployment or freeze changes. Unrelated untracked work preserved.
+Next: independent review; owner supplies HTML evidence/approves UX and any later source activation separately.
+
+
 ## BB-158 freeze / Family preparation — 2026-10-23
 
 **REVIEW CHECKPOINT — DOCUMENTATION ONLY.** Branch `docs/bb158-freeze-family-school-meals`

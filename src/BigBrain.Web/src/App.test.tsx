@@ -198,6 +198,8 @@ test('starts on the calm Home launcher and keeps family tools in Family', async 
     [...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')),
   ).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
   expect(container.querySelector('#family')).toHaveClass('family-experience')
+  expect(screen.getByRole('heading', { name: 'Skollunch' })).toBeInTheDocument()
+  expect(screen.getByText('Offline – extern hämtning är avstängd.')).toBeInTheDocument()
   expect(container.querySelector('#family .dashboard-widget')).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Dashboardinställningar' })).toHaveAttribute('aria-haspopup', 'dialog')
