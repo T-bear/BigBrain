@@ -1,5 +1,9 @@
 # Project Report Catalog
 
+- [Family school meals preparation, 2026-10-23](features/family/school-meals-preparation-20261023.md): verified Musikugglan HTML; Rosenfeldt identity/access unresolved. Proposal only.
+- [BB-158 freeze, 2026-10-23](../operations/bb158-freeze-20261023.md): canonical preservation and resumption gate; historical reports below are not continuation authority.
+
+
 - `BB-158, 2026-10-17–21` — [Bounded MP3/M4A import via Librarr](features/media/bb-158-url-import-20261017.md). Optional DOI merged, not deployed; Sonarr timeleft parser fix in review with 70 passing tests and real-response replay. Actual import warnings remain failed; production unchanged and release still blocked. Separate operational checkpoint preserved.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.

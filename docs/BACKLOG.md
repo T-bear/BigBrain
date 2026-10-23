@@ -1,5 +1,10 @@
 # BigBrain Backlog
 
+**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
+inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
+är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
+
+
 ## Media — Mediekontroll review gate, 2026-10-17
 
 Remaining: independent exact-checkpoint review and owner iPhone/PWA verification of the new
@@ -958,8 +963,10 @@ Other persistence, intake, composition/schema and BB-130D work remains separatel
 
 ## BB-158 — Media URL Import & Audio Extraction
 
-- Status: **OPTIONAL DOI MERGED / SONARR ETA FIX IN REVIEW / DEPLOYMENT BLOCKED** (2026-10-21).
-- [Confirmed mapper defect, 70 tests and real-response replay](reports/features/media/bb-158-url-import-20261017.md#sonarr-queue-duration-correction--2026-10-21). Queue durations no longer discard provider evidence in the corrected code, but actual import warnings remain failed. Independent review/exact-SHA merge required; later API build must include the accepted correction. Safely assess Sonarr activity before preparing a new deployment run. The 50-row queue cap leaves unsampled activity unknown; no full-queue safety claim. Existing runtime remains enabled on old images; iPhone/PWA optional-DOI acceptance still pending. No migration, provider repair, Finance change or agent import.
+- Status: **FROZEN / OWNER DECISION REQUIRED TO RESUME**, hela BB-158 från2026-10-23.
+- [Kanonisk bevarande- och återupptagningspunkt](operations/bb158-freeze-20261023.md).
+  Accepterad direktimport bevaras; YouTube/ISBN är inte färdigt. Ingen felsökning, testning, merge
+  eller deployment utan nytt ägarbeslut. Följande avsikter är historisk scope, inte aktiv plan.
 - Future intent: accept an untrusted media URL, analyze only an explicitly supported source, verify that retrieval/import is permitted, present available metadata, lawfully extract/transcode audio where appropriate, normalize filename/metadata/artwork and import through existing Media/job/import architecture without silent overwrite.
 - Rights boundary: the user must own or otherwise have permission to retrieve the content. Provider terms and lawful access require separate investigation. Never bypass DRM, authentication, paywalls or other access controls; public playback does not approve YouTube or any other provider automatically. External access belongs behind adapters and no separate downloader service is justified without evidence.
 - Security boundary: future design must fail closed on SSRF, redirects, DNS rebinding, private-network/file targets, MIME/type and size limits, timeouts, resource exhaustion and malicious media. Never construct arbitrary shell commands from input or expose cookies/tokens/secrets to the frontend. Evaluate FFmpeg only for lawful bounded transcoding; preserve source/transformation provenance and collision-safe imports.
@@ -1248,6 +1255,9 @@ wide duplicate assessment are recorded in the [2026-08-17 planning record](repor
   phase according to the current roadmap; do not change the evidenced pentest or Finance ordering.
 
 ### Existing Family-epic member: External school meals in Meal Planner
+
+- Owner priority 2026-10-23: [source preparation and bounded implementation proposal](reports/features/family/school-meals-preparation-20261023.md).
+  Preparation only; automation rights remain MANUAL_REVIEW. No new backlog ID or implementation approval.
 
 - Module: Meal Planner; status: future enhancement, source rights `MANUAL_REVIEW` until verified.
 - Initial use case: weekday Lunch within the existing weekly Meal Planner shows authoritative meals

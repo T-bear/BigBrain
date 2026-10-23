@@ -1,5 +1,9 @@
 # Documentation Index
 
+- [BB-158 — canonical freeze / primary entry](../operations/bb158-freeze-20261023.md)
+- [Family school meals — source preparation only](../reports/features/family/school-meals-preparation-20261023.md)
+
+
 - [Finance dataset intake and quarantine](../architecture/finance/dataset-intake-quarantine.md)
 - [Finance owner market-data drop runbook](../operations/runbooks/finance-owner-market-data-drop.md)
 

@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-158 freeze / Family preparation — 2026-10-23
+
+**REVIEW CHECKPOINT — DOCUMENTATION ONLY.** Branch `docs/bb158-freeze-family-school-meals`
+from main `712679fda646aced2a417adf696e59d4a7c0f57b`.
+[BB-158 freeze](bb158-freeze-20261023.md) overrides every older BB-158 continuation instruction below.
+Review `a222eb9546be76b8021af3c9eaa7b73e5d2ccdcd` is preserved separately, not merged/copied.
+[School source observations and proposal](../reports/features/family/school-meals-preparation-20261023.md) are preparation only.
+Musikugglan HTML verified; Rosenfeldt identity/automation permission unresolved. No production or code
+changes, no new BB-158 experiments. Unrelated mockups/Sentinel files/cache preserved. Next: independent
+review and explicit owner decision for school implementation; BB-158 remains frozen indefinitely.
+The Finance-freeze template exists at commit378d43e, not on main; no Finance review history imported.
+
+
 ## BB-158 — Sonarr queue duration correction, 2026-10-21
 
 **MERGE CANDIDATE / NOT DEPLOYED.** New bounded branch `fix/bb158-sonarr-queue-duration` from
