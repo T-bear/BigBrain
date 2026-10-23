@@ -1,5 +1,19 @@
 # Codex interrupted-run recovery
 
+## BB-158 — Docker denial diagnosis, 2026-10-22
+
+**REVIEW CHECKPOINT — NO PRODUCTION CHANGE.** Same branch; baseline
+`712679fda646aced2a417adf696e59d4a7c0f57b`. Initial clone/seccomp cause isolated; next mount EACCES
+under docker-default requires accessible host audit evidence for final AppArmor attribution.
+[Exact experiment matrix, bounded local journal command and remaining requirements](../reports/features/media/bb-158-url-import-20261017.md#docker-namespace-denial-diagnosis--2026-10-22).
+No verified production profile exists; diagnostic profile variants must not be deployed. Approved
+Librarr placement remains settled. Landlock ABI 6 available, not a verified replacement sandbox.
+Updated probe and audit sanitizer are published with documentation. No unresolved application edits,
+no importer execution, no new production package, no merge. Preserve previous operational handoff
+and unrelated untracked design mockups/Sentinel ADRs. Next is the single filtered owner-local audit
+read, not an unrestricted container or repeated full test suite.
+
+
 ## BB-158 — approved Librarr direction, containment stop, 2026-10-22
 
 **BLOCKED — NO UNPUBLISHED APPLICATION IMPLEMENTATION.** Continue the same branch

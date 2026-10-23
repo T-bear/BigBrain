@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–22` — [Direct import and YouTube execution-boundary review](features/media/bb-158-url-import-20261017.md#librarr-containment-prerequisite--2026-10-22). Existing-Librarr placement approved. Host namespace probe passes; isolated Docker probe blocked before child start. No product implementation or end-to-end YouTube verification.
+- `BB-158, 2026-10-17–22` — [Direct import and YouTube execution-boundary review](features/media/bb-158-url-import-20261017.md#docker-namespace-denial-diagnosis--2026-10-22). Existing-Librarr placement approved. Exact clone/seccomp denial identified; subsequent mount EACCES awaits audit confirmation. No safe production sandbox or end-to-end YouTube verification.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
