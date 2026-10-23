@@ -9,9 +9,15 @@ namespace BigBrain.Api.MealPlanner;
 public sealed record SchoolLunchDay(DateOnly Date, string Status, IReadOnlyList<string> Dishes);
 public sealed record SchoolMealWeek(string SchoolId, string SchoolName, string SourceName, string SourceUrl,
     int Year, int Week, string Status, string DateBasis, DateTimeOffset? FetchedAtUtc, bool IsFixture,
-    IReadOnlyList<SchoolLunchDay> Days);
+    IReadOnlyList<SchoolLunchDay> Days)
+{
+    public DateTimeOffset? LastCheckedAtUtc { get; init; }
+    public DateTimeOffset? SourceUpdatedAtUtc { get; init; }
+    public bool IsStale { get; init; }
+    public string? SourceStatus { get; init; }
+}
 
-// No HTTP client, storage dependency or scheduler: external access is deliberately not implemented.
+// Pure parsing and offline fixtures; HTTP/cache ownership stays in SchoolMealService.
 public static class SchoolMeals
 {
     public const string FacilityId = "C9643AEF-D05B-463E-84CB-76BEB47FF685";

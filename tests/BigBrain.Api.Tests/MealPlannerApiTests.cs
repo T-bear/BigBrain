@@ -132,6 +132,9 @@ public sealed class MealPlannerApiTests : IDisposable
         await using var factory = Factory().WithWebHostBuilder(builder => builder.UseEnvironment(environment));
         using var client = factory.CreateClient();
         var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);
+        var current = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt", TestContext.Current.CancellationToken);
+        Assert.Equal("offline", current!.Status);
+        Assert.False(current.IsFixture);
         var offline = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026&week=43", TestContext.Current.CancellationToken);
         Assert.Equal("offline", offline!.Status);
         Assert.False(offline.IsFixture);
@@ -149,6 +152,49 @@ public sealed class MealPlannerApiTests : IDisposable
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
         Assert.Contains("schoolMeals.invalidRequest", await invalid.Content.ReadAsStringAsync(TestContext.Current.CancellationToken), StringComparison.Ordinal);
         Assert.Equal(before, await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SchoolMealsEndpointUsesServerWeekAndIsolatesSourceFailure()
+    {
+        var clock = new SchoolClock();
+        using var transport = new SchoolHandler();
+        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } };
+        await using var factory = Factory().WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<SchoolMealService>();
+            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock), clock));
+        }));
+        using var client = factory.CreateClient();
+        var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);
+        var rss = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt", TestContext.Current.CancellationToken);
+        Assert.Equal("published", rss!.Status);
+        Assert.False(rss.IsFixture);
+        Assert.Equal(2026, rss.Year);
+        Assert.Equal(43, rss.Week);
+        var html = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=musikugglan", TestContext.Current.CancellationToken);
+        Assert.Equal("unavailable", html!.Status);
+        var partial = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.BadRequest, partial.StatusCode);
+        Assert.Equal(before, await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken));
+        Assert.Equal(2, transport.Calls);
+    }
+
+    private sealed class SchoolClock : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => new(2026, 10, 19, 12, 0, 0, TimeSpan.Zero);
+    }
+
+    private sealed class SchoolHandler : HttpMessageHandler
+    {
+        public int Calls;
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+        {
+            Calls++;
+            return Task.FromResult(request.RequestUri!.Host == "www.skolmat.info"
+                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(SchoolMeals.ExampleRss, System.Text.Encoding.UTF8, "application/rss+xml") }
+                : new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+        }
     }
 
     private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>

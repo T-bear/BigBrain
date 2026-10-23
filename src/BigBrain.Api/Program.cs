@@ -76,6 +76,9 @@ public partial class Program
             .Get<MealPlannerOptions>() ?? new MealPlannerOptions();
         builder.Services.AddSingleton(mealPlannerOptions);
         builder.Services.AddSingleton<MealPlannerStore>();
+        builder.Services.AddHttpClient<SchoolMealSourceClient>()
+            .ConfigurePrimaryHttpMessageHandler(SchoolMealSourceClient.CreateHandler);
+        builder.Services.AddSingleton<SchoolMealService>();
         builder.Services.AddSingleton<IFamilySchedule, TwoWeekFamilySchedule>();
         builder.Services.AddSingleton<IMealSelectionRandomFactory, SeededMealSelectionRandomFactory>();
         builder.Services.AddSingleton<MealPlanGenerator>();

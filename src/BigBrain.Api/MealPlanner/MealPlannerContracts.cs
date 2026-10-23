@@ -35,6 +35,7 @@ public sealed record MealPlannerOptions
 {
     public const string SectionName = "MealPlanner";
     public string DatabasePath { get; init; } = "data/meal-planner.db";
+    public SchoolMealOptions SchoolMeals { get; init; } = new();
 }
 
 public sealed record Meal(string Id, string Name, IReadOnlyList<string> TagIds, DateTimeOffset CreatedAtUtc, DateTimeOffset UpdatedAtUtc);

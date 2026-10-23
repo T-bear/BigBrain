@@ -1,5 +1,17 @@
 # Codex interrupted-run recovery
 
+## Skollunch v2 implementation — 2026-10-23
+
+**MERGE CANDIDATE — DEFAULT OFF / NOT DEPLOYED.** Branch `family/school-lunch-v2` from `1125b65393e99d3606fbdb00d67cbd02d5582f36`.
+The approved plan is merged; CI39961868198 SUCCESS. Implementation remains unmerged, default-off,
+not deployed. Publication subject `feat(family): add disabled school lunch fetching and cache`.
+[Canonical behavior, verification and gates](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v2--default-off-implementation-2026-10-23).
+63 backend tests and 39 frontend tests PASS; frontend build and scoped format PASS.
+No school requests, original replay, production changes or Finance/BB-158 activity. Unrelated
+untracked work preserved. Next: independent review and explicit exact-SHA approval; then separate
+deployment clearance. Source activation additionally requires verified permission/cache conditions.
+Earlier planning/v1 entries below retain historical scope.
+
 ## Skollunch v2 — planering 2026-10-23
 
 **REVIEW CHECKPOINT — DOCUMENTATION ONLY.** `docs/school-lunch-v2-preparation` från main

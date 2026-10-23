@@ -6,13 +6,19 @@ public static class MealPlannerEndpoints
     {
         var group = app.MapGroup("/api/v1/modules/meal-planner");
 
-        group.MapGet("/school-meals", (string schoolId, int year, int week, bool? fixture, IHostEnvironment environment) =>
+        group.MapGet("/school-meals", async (string schoolId, int? year, int? week, bool? fixture,
+            IHostEnvironment environment, SchoolMealService service, HttpContext context, CancellationToken token) =>
         {
-            if (!SchoolMeals.KnownSchool(schoolId) || !SchoolMeals.ValidWeek(year, week))
+            context.Response.Headers.CacheControl = "no-store";
+            var current = service.CurrentWeek();
+            if (!SchoolMeals.KnownSchool(schoolId) || year.HasValue != week.HasValue ||
+                !SchoolMeals.ValidWeek(year ?? current.Year, week ?? current.Week))
                 return Problem("schoolMeals.invalidRequest", "Unknown school or invalid ISO week.", 400);
             if (fixture == true && !environment.IsDevelopment())
                 return Problem("schoolMeals.fixtureUnavailable", "Fixtures require Development environment.", 403);
-            return Results.Ok(fixture == true ? SchoolMeals.Preview(schoolId, year, week) : SchoolMeals.Unavailable(schoolId, year, week));
+            return Results.Ok(fixture == true
+                ? SchoolMeals.Preview(schoolId, year ?? current.Year, week ?? current.Week)
+                : await service.GetAsync(schoolId, year ?? current.Year, week ?? current.Week, token));
         });
 
         group.MapGet("/meals", async (string? tags, MealPlannerService service, CancellationToken token) =>

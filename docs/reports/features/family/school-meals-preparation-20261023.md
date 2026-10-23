@@ -7,7 +7,7 @@ Detta är en sanerad GitHub-version. Inga hemligheter, privata data eller rålog
 ## Status
 
 Aktuell läsning: [Skollunch v2-plan](#skollunch-v2--plan-för-hämtning-vid-behov-2026-10-23).
-V1 är mergad och CI-verifierad; v2 är endast planering. Äldre daterade statusar nedan bevaras.
+V1 och v2-planen är mergade och CI-verifierade. [V2-implementation](#skollunch-v2--default-off-implementation-2026-10-23) är under review, default-off och inte deployad. Äldre daterade statusar bevaras.
 
 Datum: 2026-10-23. **REVIEW CHECKPOINT — PREPARATION ONLY; NOT IMPLEMENTED / NOT DEPLOYED.**
 Baseline `712679fda646aced2a417adf696e59d4a7c0f57b`, branch
@@ -537,3 +537,128 @@ Planens verifiering: dokumentationsvalidator inklusive lokala länkar **PASS** (
 91 backlog-ID:n), `git diff --check` **PASS**. Inga applikationstester eller byggen behövs för denna
 rena dokumentationsdelta. Main och produktionskod lämnas oförändrade; scope/secrets kontrolleras
 vid publicering. V1:s giltiga test-/CI-evidens återanvänds utan omkörning.
+
+## Skollunch v2 — default-off implementation, 2026-10-23
+
+**MERGE CANDIDATE — IMPLEMENTED / OFFLINE VERIFIED / NOT DEPLOYED / SOURCES DISABLED.**
+Branch `family/school-lunch-v2` from accepted main `1125b65393e99d3606fbdb00d67cbd02d5582f36`.
+The owner approved merging plan commit `783fd507ee6155cea02809e51a01a62f7ff16390`; that merge
+preserved tree `29fe30b25357611393db9f7234eb7ed630c7d5f7` and
+[CI39961868198](https://github.com/T-bear/BigBrain/actions/runs/39961868198) is **SUCCESS**.
+Only the documentation plan has been merged. Implementation publication subject
+`feat(family): add disabled school lunch fetching and cache` identifies the candidate SHA/tree.
+Implementation merge requires independent review and owner approval of its exact SHA; deployment
+requires a subsequent separate clearance. No deployment or production inspection occurred here.
+
+### Delivered scope and files
+
+- `SchoolMealSourceClient.cs`: two hardcoded HTTPS destinations, .NET HttpClientFactory transport,
+  no redirects/cookies/credentials, pooled-connection lifetime six hours, GET only. Total five-second
+  deadline covers headers and streamed body; 512 KiB bound applies after gzip/deflate decoding.
+  UTF-8 and source-specific RSS/XML or HTML media types are required. Only a complete HTTP200 body
+  or validated conditional304 is accepted. Raw upstream errors/content are not exposed as errors.
+- `SchoolMealService.cs`: singleton with exactly two cache entries and one semaphore per school.
+  Current ISO year/week comes from TimeProvider in Europe/Stockholm. Same-school concurrent callers
+  share cached results; other schools are independent. Six hours between attempts includes failures,
+  cancelled attempts and week rollover; no scheduler, retry loop, database or persistent cache.
+- `MealPlannerContracts.cs`, `Program.cs`: default-off options and scoped module registrations.
+  Existing API-wide TimeProvider is reused. All three new options default to false:
+  `MealPlanner:SchoolMeals:Enabled`, `RosenfeldtEnabled`, `MusikugglanEnabled` (the latter two
+  under the same SchoolMeals section). No production configuration was changed.
+- `SchoolMeals.cs`: additive DTO fields `lastCheckedAtUtc`, `sourceUpdatedAtUtc`, `isStale` and
+  `sourceStatus`. Existing parser behavior and data ownership remain unchanged.
+- `MealPlannerEndpoints.cs`: same versioned read-only route. Omitting both year/week selects
+  the server's current Stockholm ISO week; supplying only one or invalid input gives Problem Details400.
+  Requests for other weeks do not cause external traffic. `fixture=true` still requires Development
+  and never goes through the live client. Responses use HTTP `Cache-Control: no-store` so browser
+  caching cannot bypass the service's week/freshness decision.
+- Web `api.ts`, `SchoolLunch.tsx`: two local API reads when Family opens, per-school loading/errors,
+  source/date provenance and timestamps, stale warning, cancellation on unmount/mode change. No
+  polling, new navigation, global state or household editing. Development fixtures remain an explicit
+  separate historical test mode, never a fallback. `UXLab.tsx` uses a static offline specimen without
+  requests, preserving the lab's established no-network contract and experimental review status.
+- Focused `SchoolMealLiveTests.cs`, existing `SchoolMealsTests.cs` evidence, `MealPlannerApiTests.cs`,
+  SchoolLunch/App frontend tests. Existing RSS/HTML originals are not reread or republished.
+
+### Exact cache and failure behavior
+
+ETag/Last-Modified are sent only for an existing matching cached menu. A 304 without such a menu is
+invalid. Successful304 updates validation time, not original fetch time. Valid empty/different-week
+content replaces old data with `notPublished`; it is not hidden behind stale data. Missing days do not
+mean holidays. Week rollover removes the prior menu/validators but preserves attempt cooldown.
+
+On timeout, malformed content or HTTP failure, previously published data may be returned as stale
+only for the same ISO week, up to 24 hours after last successful validation and only if original
+cache policy allows it. Failed attempts never refresh that validation time. `must-revalidate`
+prevents stale reuse. No-store/no-cache, remaining max-age below six hours (including HTTP Age),
+or earlier Expires without max-age return `cachePolicy` and discard old content/validators. This
+conservatively blocks incompatible source caching; it does not compensate with more frequent requests.
+Retry-After on429 can extend the six-hour cooldown; there is no immediate retry. Raw errors stay internal.
+
+A cancelled caller may cancel its fetch; the semaphore is released and cooldown remains. Other
+waiting callers then receive the honest error/stale result. On process restart both entries disappear,
+so another on-demand attempt is possible; this is explicitly not a durable daily quota. No database
+writes, migrations or automatic database restore are involved.
+
+HTML year remains derived, not source-verified; week mismatch is notPublished. The fixed original
+week44 example does not authorize a future-menu API. Source access/cache rights and owner acceptance
+of derived year remain activation gates. Strict content-type/UTF-8/cache behavior has only offline
+verification; actual allowed HTTP headers may require a separately reviewed compatibility correction.
+
+### Verification and remaining acceptance
+
+Use stub HttpMessageHandler instances and injected clocks only; zero school-provider HTTP calls.
+Tests cover disabled flags, concurrency, cache interval, stale expiry, invalid/empty replacement,
+conditional304, 302/206/500 rejection, 429 cooldown, no-store/no-cache/max-age/Expires, must-revalidate,
+content type/encoding, bounded streaming with/without Content-Length, header/body timeout, cancellation,
+cache loss, separate sources and Stockholm ISO rollover. API integration checks server-selected week,
+per-school failure and unchanged household meals. Frontend tests check automatic local API reads,
+separate failure/stale display, historical mode and discarded late responses; UX Lab stays offline.
+
+Transient verification findings were corrected within scope: disposable semaphore ownership required
+Entry.Dispose; a test array triggered a style analyzer; the new mounted read exposed UX Lab's no-request
+contract, now retained with static offlinePreview; prior static offline-heading expectation and test
+DOM cleanup were updated. No assertion protecting source isolation or parser correctness was removed.
+Final commands/results are recorded below; no full repository suite is required.
+
+Remaining gates: independent architecture review, exact implementation-SHA merge approval, separate
+API/Web deployment clearance, verified source rights/cache conditions and explicit source activation,
+then authorized live verification and owner iPhone/PWA acceptance. Neither source was activated and
+no live/end-to-end success is claimed. Finance and BB-158 remain frozen and untouched.
+
+### Later operational handoff — not executed
+
+Keep all three flags false through any approved deployment. Reuse the existing API-then-Web build,
+health/identity and safe recovery process; preserve mounts, databases and all unrelated services.
+Before any later activation, record source-specific permission/cache evidence and configure only
+the corresponding flags through the existing private configuration mechanism. Options are startup
+bound; an API restart is a separately authorized operational action, not an endpoint toggle.
+To disable: set global Enabled=false using that same mechanism and approved restart; no file/data
+cleanup or database/image rollback is needed to disable fetching. In-memory cache is lost on restart.
+The current task does not execute this procedure or imply that deployment prerequisites are verified.
+
+
+Final verification for this candidate:
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlannerApiTests' -v quiet`: **63 PASS**, zero
+  failed/skipped; API and tests compiled with analyzers. Earlier 57-case pass was extended for
+  cancellation, encoding, HTTP expiry/partial responses and endpoint integration, not repeated by habit.
+- `npm test -- --run src/meal-planner/SchoolLunch.test.tsx src/meal-planner/MealPlanner.test.tsx
+  src/ux-lab/UXLab.test.tsx src/App.test.tsx`: **21 focused component tests PASS**; the old App heading
+  failed before its contract update. Subsequent `npm test -- --run src/App.test.tsx`: **18 PASS**.
+  Together **39 current frontend tests PASS**, reusing the unchanged 21 component results.
+- `npm run build`: **PASS**, TypeScript and Vite. Scoped `dotnet format BigBrain.slnx --no-restore
+  --include ...` and Prettier for changed frontend files: **PASS**.
+- `node scripts/verify-documentation.mjs`: **PASS**, local links included. Whitespace, staged secrets
+  and scope checks are publication gates. No original-file replay, external HTTP or production test.
+
+All default-off implementation acceptance checks are complete; **Merge Candidate** refers to this
+bounded code scope, not live-source or deployment approval. No known unresolved P0/P1 in the tested
+scope. Actual source permission/HTTP compatibility, derived HTML year acceptance and iPhone UX are
+explicit outstanding activation/runtime gates, not claimed PASS. Main's documentation merge and
+implementation checkpoint remain separate identities.
+
+Publication scope: 19 files, limited to school-meal API/Web/tests and six existing canonical documents.
+Documentation validator **PASS** (274 Markdown / 91 backlog IDs), staged whitespace **PASS**, staged
+Gitleaks **PASS**, no leaks. Unrelated untracked work and accepted Finance/BB-158 content are preserved.
