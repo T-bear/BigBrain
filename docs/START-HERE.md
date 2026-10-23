@@ -1,5 +1,10 @@
 # Start here — BigBrain continuity
 
+**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
+inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
+är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
+
+
 BigBrain is a modular home-server control plane, with first-party React/TypeScript
 views, an ASP.NET Core API, external-service adapters and a separate Sentinel
 boundary. The owner decides product priority and UX/behavior acceptance; ChatGPT

@@ -1,5 +1,15 @@
 # BigBrain Status
 
+## Ägarprioritet — 2026-10-23
+
+**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
+inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
+är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
+
+Nästa prioriterade funktion: skolmåltider i Family View. Endast [källverifiering och förslag](reports/features/family/school-meals-preparation-20261023.md)
+är genomförda; ingen implementation eller deployment är auktoriserad av denna checkpoint.
+
+
 ## BB-158 — Sonarr availability correction, 2026-10-21
 
 **ADAPTER FIX IN REVIEW / OPTIONAL DOI MERGED / DEPLOYMENT STILL BLOCKED.** Accepted main

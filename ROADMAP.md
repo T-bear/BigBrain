@@ -1,5 +1,13 @@
 # BigBrain Roadmap
 
+**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
+inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
+är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](docs/operations/bb158-freeze-20261023.md).
+
+Ägaren prioriterar nu [förberedelse för skolmåltider i Family View](docs/reports/features/family/school-meals-preparation-20261023.md).
+Äldre prioriteringsnoter är historik; ingen skolmatsimplementation startas här. Finance förblir fryst.
+
+
 ## BB-132D current bounded direction — 2026-10-02
 
 The next substrate after accepted A/B/C is trustworthy market observation and knowledge-cutoff

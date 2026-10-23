@@ -1,5 +1,10 @@
 # Media Module
 
+**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
+inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
+är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](../operations/bb158-freeze-20261023.md).
+
+
 ## BB-158 — optional DOI amendment (review, 2026-10-21)
 
 DOI is optional metadata for direct MP3/M4A imports. Missing/blank input becomes JSON null in API

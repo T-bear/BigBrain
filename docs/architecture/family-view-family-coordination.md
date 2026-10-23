@@ -4,6 +4,14 @@
 
 The normal Family route uses a dedicated `FamilyExperience` composition rather than the generic dashboard-widget frame. This is a frontend presentation boundary only: Meal Planner, Shopping List and Calendar retain their existing modules, API contracts and data ownership. Widget registry metadata continues to provide visibility/order preferences and edit mode, but it does not dictate Family's visible card anatomy, headings or grouping. Other views continue to use `DashboardWorkspace` and `DashboardWidget`; no shared component is deleted. This exception is intentionally narrow until the product owner approves the Family/Obsidian Gold reference direction.
 
+## Current preparation authority — 2026-10-23
+
+The owner now prioritizes school meals in existing Family View. This task authorizes only source
+verification and an implementation proposal, not the full epic or a new Family Context platform.
+[Source findings and bounded proposal](../reports/features/family/school-meals-preparation-20261023.md).
+Older priority ordering below is historical; Finance remains frozen and BB-158 has a separate
+[owner freeze](../operations/bb158-freeze-20261023.md). No new UI acceptance is inferred.
+
 ## Status, purpose and priority
 
 This is a future product epic and planning baseline, not an approved sprint, architecture schema or

@@ -1,5 +1,8 @@
 # Operations Index
 
+- [BB-158 — frozen by owner decision](../operations/bb158-freeze-20261023.md)
+
+
 - [BigBrain appliance lifecycle](../operations/runbooks/bigbrain-appliance-lifecycle.md)
 
 - [Operations overview](../operations/README.md)
