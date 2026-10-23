@@ -1,5 +1,14 @@
 # Codex interrupted-run recovery
 
+## Skollunch v2 — planering 2026-10-23
+
+**REVIEW CHECKPOINT — DOCUMENTATION ONLY.** `docs/school-lunch-v2-preparation` från main
+`6d7f6de68f618f6c06b0845b659983ec12529f96`. V1 är mergad; CI39959910684 SUCCESS.
+[Plan, åtkomstblockerare och beslut](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v2--plan-för-hämtning-vid-behov-2026-10-23).
+Ingen implementation eller automatisk hämtning aktiverad; inga originaltester upprepade.
+Äldre v1-not nedan är historik. Nästa: oberoende review och ägarbeslut om default-off implementation;
+extern aktivering kräver verifierade källvillkor och separat godkännande. Orelaterade arbetsfiler bevarade.
+
 ## Skollunch v1 — 2026-10-23
 
 **REVIEW CHECKPOINT — OFFLINE ONLY.** Branch `family/school-lunch-v1`, baseline
