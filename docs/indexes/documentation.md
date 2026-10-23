@@ -1,5 +1,7 @@
 # Documentation Index
 
+- [Frysningsregister](../operations/freezes.md): index till kanoniska ägarbeslut och återupptagningsprotokoll.
+
 - [BB-158 — canonical freeze / primary entry](../operations/bb158-freeze-20261023.md)
 - [Family school meals — source preparation only](../reports/features/family/school-meals-preparation-20261023.md)
 
@@ -24,7 +26,7 @@ When sources disagree, use this order and resolve the inconsistency explicitly:
 
 ## Entry points
 
-- [Start here / continuity](../START-HERE.md): mandatory read order and significant-work contract.
+- [Start here / continuity](../START-HERE.md): uppgiftsstyrd läsguide och hänvisning till beständig handoff.
 - [Product roadmap](../../ROADMAP.md): direction and domain-roadmap delegation.
 - [BB-130 ordered stabilization plan](../architecture/bb-130-stabilization.md): phase scope and DoD.
 
@@ -41,7 +43,7 @@ are not repository authority. Sanitized knowledge is published under
 `docs/reports/`, including incomplete Review Checkpoints awaiting independent review. Main records
 accepted work; the active checkpoint branch records ongoing unaccepted work. Publication never
 promotes branch code or a proposed decision above accepted architecture. See the
-[permanent workflow](../../AGENTS.md#permanent-checkpoint-branch-workflow).
+[permanent workflow](../../AGENTS.md#8-git-och-review-checkpoints).
 
 ## Product and architecture
 
