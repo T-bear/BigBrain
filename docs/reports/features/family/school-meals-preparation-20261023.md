@@ -174,3 +174,63 @@ publika GET-observationerna är ny källevidens. Inga hemligheter, privata konta
 Efter oberoende granskning: ägaren beslutar om den avgränsade skolmåltidsimplementationen.
 Inhämta rätt Rosenfeldt-källidentitet och tillåtet åtkomstsätt samt avgör Musikugglans datum-/veckogräns
 innan källa aktiveras. Återanvänd fynden; ingen ny generell källutredning behövs. BB-158 förblir fryst.
+
+## Skolmat.info – tredjepartsintegration och API-verifiering
+
+2026-10-23. **REVIEW CHECKPOINT; åtkomststatus UNVERIFIED.** Ren dokumentationsbranch
+`docs/skolmat-api-verification` från main `7f3dfd149ec5776b792a993faa2711cb33cc572e`.
+Publiceringsämne `docs(family): verify third-party Skolmat API contract` identifierar SHA/tree i Git.
+Den tidigare kompletteringen på `docs/rosenfeldt-school-meal-source`, commit
+`55f781aa4b54646815305656b2f0e1f588dac986`, är ännu inte accepterad på main och bevaras separat;
+dess avgränsade sökresultat och kontaktförslag återanvänds, inte dess branchhistorik.
+
+### Nya kodverifierade detaljer — inte officiellt leverantörskontrakt
+
+Kaptensanders/skolmat main verifierades till `7c5203201cfff1a3ce84f336d4f57261decdc5a1`.
+[README](https://github.com/Kaptensanders/skolmat/blob/7c5203201cfff1a3ce84f336d4f57261decdc5a1/README.md#skolmatinfo)
+och [SkolmatInfoMenu](https://github.com/Kaptensanders/skolmat/blob/7c5203201cfff1a3ce84f336d4f57261decdc5a1/custom_components/skolmat/menu.py#L867)
+lästes via GitHub/raw GitHub, utan exekvering av integrationen eller anrop till menyleverantören.
+
+- **Identifiering:** README instruerar användaren att välja skola i portalen och kopiera menylänken.
+  `_fixUrl` läser första queryvärdet `facilityId`, trimmar och URL-kodar det som ett pathsegment.
+  Tomt/saknat ID avvisas. Ingen namn→ID-sökning eller verifiering av skolans identitet görs där.
+  `countyCode` och `municipalityId` finns i dokumenterad exempellänk men används inte för API-anropet.
+  Exempel-ID:t är inte belagt som Rosenfeldtsskolans och får inte återanvändas som sådant.
+- **Anrop:** `_getWeek` bygger
+  `GET https://www.skolmat.info/api/public/matsedlar/{facilityId}?year=YYYY&week=WW`.
+  Den specifika klassen sätter `Accept: application/json` och `Referer` till portalens rot;
+  ingen API-nyckel eller Authorization-header sätts i den kodvägen. Detta visar klientens beteende,
+  inte att servern idag accepterar anonyma externa integrationer. Inga headers har efterliknats här.
+- **Förväntat JSON:** top-level objekt med `ok: true` och objektet `week`; däri `year`,
+  `weekNumber` och `days` som objekt med nycklar `MONDAY` till `SUNDAY`. Varje dag kan ha
+  `isOpen` och `rows`, där radens `text` blir rättens benämning. Felvägen läser eventuellt `error`.
+  Parsern hoppar över saknade/stängda dagar och tomma/icke-objektrader; den skapar lunchposter
+  i radordning utan särskild alternativetikett. Detta är parserns förväntningar, inte full JSON-schema
+  eller ett verifierat verkligt Rosenfeldt-svar.
+- **Veckosemantik:** svarsåret och veckonumret används med `date.fromisocalendar` för dagarnas datum.
+  Klienten förutsätter således ISO-veckor. Det bevisar inte leverantörens årsskifteskontrakt eller
+  vilka historiska/framtida veckor som är tillgängliga. Helghämtning börjar med nästa vecka i klienten;
+  detta är ett UI-/klientval, inte ett krav för BigBrain.
+- **Dokumentation/villkor:** inga hänvisningar till officiell skolmat.info-API-dokumentation eller
+  integrations-/cachevillkor identifierades i läst README och leverantörsklass. Projektets MIT-licens
+  gäller koden, inte menytjänstens åtkomst eller data. Inga generella slutsatser om allt projektmaterial.
+
+### Verifieringsgräns och beslut
+
+**Rosenfeldtsskolans facilityId: UNKNOWN. Verkligt API-svar: NOT RUN.** Tidigare officiella
+sökindexfynd belägger kommunens hänvisning till skolmat.info, inte skolans exakta menylänk.
+Ingen ytterligare officiell skolspecifik länk har tillkommit i det granskade underlaget.
+Tidigare sökning efter villkor och skolidentitet upprepades inte; robots-stoppet kvarstår.
+Officiell dokumentation, extern integrationsrätt, anonym serveråtkomst och cachevillkor är fortfarande
+UNVERIFIED. Därmed är ägarens två förutsättningar för ett enda lästest inte uppfyllda.
+Ingen probing, alternativ domän, sessionsefterlikning eller endpoint-gissning genomfördes.
+
+**KISS-rekommendation:** inhämta officiell skollänk/facilityId och uttryckligt tillåtet API-/cacheavtal
+från kommunen eller leverantören. Därefter kan ett tillåtet veckosvar verifieras. Om det bekräftas:
+befintlig ASP.NET Meal Planner-modul → HttpClient/JSON → normaliserade datum och lunchtexter →
+read-only Family View. Ingen ny databas, container, scheduler eller tjänst. Saknade dagar får inte
+automatiskt betecknas lov. Ingen implementation är auktoriserad genom denna rapport.
+
+Endast rapporten ändras; BB-158, Finance och orelaterat lokalt arbete bevaras. Dokumentationsvalidator,
+lokala länkar, whitespace/diff och staged sekretess kontrolleras före push. Inga applikationstester
+eller live-menyanrop körs. Nästa steg är leverantörsbesked och oberoende granskning, inte ny probing.
