@@ -267,3 +267,75 @@ tests intentionally unselected. An initial mistyped filter selected zero tests a
 as evidence. Scoped `dotnet format ... --include` and Prettier check: **PASS**.
 `node scripts/verify-documentation.mjs`: **PASS**, 274 Markdown files / 91 backlog IDs.
 `git diff --check`: **PASS**. No source-provider request or real menu download occurred.
+
+## Skollunch v1 — completion review 2026-10-23
+
+**REVIEW CHECKPOINT — OFFLINE ONLY, NOT DEPLOYED.** Same branch `family/school-lunch-v1`,
+main baseline `7f3dfd149ec5776b792a993faa2711cb33cc572e`; previous checkpoint
+`d85d9996602a2767183f719a308d11e4dce1d1fb` remains intact. Publication subject
+`feat(family): parse offline Musikugglan lunch excerpt` resolves this additive commit/tree.
+Earlier sections describe their dated checkpoint; this section supersedes the HTML-parser limitation.
+
+### Actual inputs and remaining evidence gap
+
+Neither `rss.rss` nor `musikugglan.html` was found in the repository or checked local attachment/temp
+locations. Files attached only in ChatGPT are not claimed to have been read. **No original source file
+was used and no external request was made.** The owner's normalized HTML excerpt and five stated dish
+texts are embedded verbatim as `MusikugglanSchoolMeals.ExampleHtml`; it is not the original HTML.
+The existing RSS example retains the only available real item, Monday 2026-10-19. The remaining four
+real lunches cannot be reconstructed and are not invented. A five-item RSS regression uses explicitly
+synthetic text solely to prove date/row handling, not as a menu shown to the user.
+
+### Implementation and semantics
+
+`MusikugglanSchoolMeals.cs` accepts the known unique Matsedel v. NN heading, its immediately following
+lunch table and the subsequent matching Mellanmål v. NN boundary. It ignores comments/script/style
+blocks while locating the fragment, then parses only the bounded table with .NET XmlReader/XElement.
+HTML entities are decoded and XML-escaped before parsing, br is normalized, inline p/br spacing and
+text whitespace are normalized. DTD/external resolution are disabled. Input length, regex time,
+element count and nesting are bounded. No new dependency or general HTML engine is introduced.
+Unknown tags, malformed table/cells, ambiguous heading, duplicate/out-of-order weekdays and broken
+snack boundary return `invalid`. Valid absent/empty weekday rows return `missing`; an empty table or
+a different week returns `notPublished`. The snack text after its heading is never included.
+
+This is a deliberately narrow HTML-fragment contract, not a claim to accept arbitrary browser-valid
+HTML. Omitted closing tags, unquoted attributes or structural changes may be rejected safely. The
+original full page must still be replayed offline before claiming compatibility with that file.
+Dish text/slash punctuation is retained as one ordered string per cell; no vegetarian classification.
+
+The shared DTO remains unchanged. `dateBasis=sourceGuid` identifies RSS dates.
+`dateBasis=htmlWeekRequestedYear` explicitly means the HTML supplied the week **but not the year**;
+DTO year/dates are derived from the requested display year. This is not evidence of the source year.
+The preview is pinned to owner-observed display year 2026 and rejects other fixture years. Missing
+or invalid data keeps its existing honest statuses. No database, household or Shopping List writes.
+
+Family displays separate school sections: Rosenfeldt week 43/2026 and Musikugglan week 44 with source
+year explicitly unknown. The fixed test requests cannot present those menus as one current week.
+The banner reads “TESTDATA – manuellt hämtade exempel, inte aktuell live-matsedel.” Each section
+also discloses excerpt/original-file limits. No fetch occurs on opening Family; only explicit
+Development preview loads the local API. Production fixture rejection, cancellation, existing
+components and theme behavior remain intact. No external HTTP adapter or activation flag exists.
+
+### Verification, completion limit and next action
+
+Focused tests add the five-item synthetic RSS, exact GUID dates, all five owner-supplied HTML lunches,
+entity/whitespace/br handling, snack exclusion, slash retention, missing rows, malformed structure,
+wrong week/year, ambiguous headings and resource limits. API tests cover both local parsers and
+Production rejection; existing household readback and no-request frontend tests remain.
+Results are recorded below after execution. No full repository suites or live/source-provider tests.
+
+**Remaining:** full original-file verification (especially the actual HTML envelope/entities and the
+four missing RSS lunches), iPhone/PWA owner acceptance and separate source-access/activation approval.
+The offline implementation can now show both supplied source formats, but the complete real RSS week
+is not available. This is a review checkpoint with that explicit evidence limitation, not a claim of
+full real-file or live acceptance. The smallest next action is to make the two originals available
+in the repository workspace for a bounded offline replay after review. No merge or deployment here.
+
+Completion verification: **35 backend tests PASS** using the same focused SchoolMealsTests /
+MealPlannerApiTests filter; backend compiled with analyzers. The first transitional run was 21 PASS /
+1 FAIL because the old test still expected the removed missing-HTML status; it was replaced with
+wrong-week/year and actual HTML assertions before the final passing run. **19 frontend tests PASS**
+(SchoolLunch, MealPlanner, UXLab); **TypeScript/Vite production build PASS**. Scoped dotnet format
+and Prettier check **PASS**. Documentation validator/local links **PASS** (274 Markdown / 91 backlog
+IDs), whitespace check **PASS**. Earlier Family composition evidence is reused: its embedding and
+navigation are unchanged. No new live, browser or original-file evidence is implied by these checks.

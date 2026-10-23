@@ -7,7 +7,7 @@ inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldr
 är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
 
 Skollunch v1: offline RSS-parser, read-only API och Family-testvisning implementerade för review.
-Ingen extern hämtning, merge eller deployment. Musikugglans parser saknar verifierad HTML-fixtur.
+Ingen extern hämtning, merge eller deployment. Musikugglans parser verifieras mot ägarens HTML-utdrag; båda originalfilerna saknas lokalt.
 [Implementation och evidens](reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
 
 

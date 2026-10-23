@@ -21,9 +21,9 @@ describe('SchoolLunch', () => {
       sourceName: 'Testkälla',
       sourceUrl: 'https://example.org',
       year: 2026,
-      week: 43,
+      week: id === 'rosenfeldt' ? 43 : 44,
       status: 'published',
-      dateBasis: 'sourceGuid',
+      dateBasis: id === 'rosenfeldt' ? 'sourceGuid' : 'htmlWeekRequestedYear',
       fetchedAtUtc: null,
       isFixture: true,
       days: Array.from({ length: 5 }, (_, i) => ({
@@ -33,10 +33,13 @@ describe('SchoolLunch', () => {
       })),
     }))
     const view = render(<SchoolLunch allowFixture />)
-    fireEvent.click(screen.getByRole('button', { name: 'Visa testvecka 43, 2026' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Visa testveckorna' }))
     expect(await screen.findAllByText('Testtext')).toHaveLength(2)
     expect(screen.getByText(/TESTDATA/)).toBeInTheDocument()
     expect(api.getSchoolMeals).toHaveBeenCalledWith('rosenfeldt', 2026, 43, true, expect.any(AbortSignal))
+    expect(api.getSchoolMeals).toHaveBeenCalledWith('musikugglan', 2026, 44, true, expect.any(AbortSignal))
+    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan · vecka 43, 2026' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Musikugglan · vecka 44 (källans årtal saknas)' })).toBeInTheDocument()
     const signal = vi.mocked(api.getSchoolMeals).mock.calls[0][4]!
     view.unmount()
     expect(signal.aborted).toBe(true)
@@ -44,7 +47,7 @@ describe('SchoolLunch', () => {
   it('reports a failed local preview honestly', async () => {
     vi.mocked(api.getSchoolMeals).mockRejectedValue(new Error('offline'))
     render(<SchoolLunch allowFixture />)
-    fireEvent.click(screen.getByRole('button', { name: 'Visa testvecka 43, 2026' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Visa testveckorna' }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Testmenyn kunde inte läsas'))
   })
 })

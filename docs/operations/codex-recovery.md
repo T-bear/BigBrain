@@ -5,10 +5,12 @@
 **REVIEW CHECKPOINT — OFFLINE ONLY.** Branch `family/school-lunch-v1`, baseline
 `7f3dfd149ec5776b792a993faa2711cb33cc572e`; publication subject `feat(family): add offline school lunch preview`.
 [Implementation, tests and remaining evidence](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
-Only the owner's single RSS item is used as a historical fixture. Musikugglan has no verified local
-HTML fixture; no speculative parser. Both prior source-review branches remain separate and unchanged.
+Completion review: original rss.rss/musikugglan.html are not available locally. Rosenfeldt preview
+retains only the owner's Monday item; five-item coverage uses synthetic test text. Musikugglan now
+parses the owner's exact normalized excerpt. Test views separate week 43 from week 44, with unknown
+HTML source year. No live fetching or complete-original-fixture claim. Both prior source-review branches remain separate and unchanged.
 No external requests, storage changes, deployment or freeze changes. Unrelated untracked work preserved.
-Next: independent review; owner supplies HTML evidence/approves UX and any later source activation separately.
+Next: independent review; owner supplies original files for full fixture verification and approves UX/any later source activation separately.
 
 
 ## BB-158 freeze / Family preparation — 2026-10-23

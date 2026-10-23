@@ -5,7 +5,6 @@ import { BBButton } from '../components'
 const weekdays = ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']
 const statusText: Record<string, string> = {
   offline: 'Extern hämtning är avstängd.',
-  sourceEvidenceMissing: 'Verifierat HTML-underlag saknas. Menyn kan inte visas ännu.',
   notPublished: 'Ingen meny tillgänglig för vald vecka.',
   missing: 'Meny saknas för dagen. Det betyder inte att skolan är stängd.',
   invalid: 'Menyn kunde inte tolkas säkert.',
@@ -21,7 +20,10 @@ export function SchoolLunch({ allowFixture = import.meta.env.DEV }: { allowFixtu
     const controller = new AbortController()
     setMenus([])
     setFailed(false)
-    void Promise.all(['rosenfeldt', 'musikugglan'].map(id => getSchoolMeals(id, 2026, 43, true, controller.signal)))
+    void Promise.all([
+      getSchoolMeals('rosenfeldt', 2026, 43, true, controller.signal),
+      getSchoolMeals('musikugglan', 2026, 44, true, controller.signal),
+    ])
       .then(data => {
         if (!controller.signal.aborted) setMenus(data)
       })
@@ -42,12 +44,12 @@ export function SchoolLunch({ allowFixture = import.meta.env.DEV }: { allowFixtu
       <div className="family-section__content">
         <p role="status">
           {fixture
-            ? 'TESTDATA – exempel för vecka 43, 2026. Inte en aktuell live-matsedel.'
+            ? 'TESTDATA – manuellt hämtade exempel, inte aktuell live-matsedel.'
             : 'Offline – extern hämtning är avstängd.'}
         </p>
         {allowFixture && (
           <BBButton variant="secondary" aria-pressed={fixture} onClick={() => setFixture(!fixture)}>
-            {fixture ? 'Stäng testvisning' : 'Visa testvecka 43, 2026'}
+            {fixture ? 'Stäng testvisning' : 'Visa testveckorna'}
           </BBButton>
         )}
         {!fixture && (
@@ -61,7 +63,7 @@ export function SchoolLunch({ allowFixture = import.meta.env.DEV }: { allowFixtu
             </p>
             <h3>Musikugglan</h3>
             <p>
-              {statusText.sourceEvidenceMissing} Källa: <a href="https://www.tantgron.nu/matsedel/">Tant Grön</a>
+              {statusText.offline} Källa: <a href="https://www.tantgron.nu/matsedel/">Tant Grön</a>
             </p>
           </>
         )}
@@ -69,39 +71,41 @@ export function SchoolLunch({ allowFixture = import.meta.env.DEV }: { allowFixtu
         {fixture && failed && (
           <p role="alert">Testmenyn kunde inte läsas. Kontrollera att API körs i utvecklingsläge.</p>
         )}
-        {fixture && menus.length > 0 && (
-          <>
-            <h3>Vecka 43, 2026 · 19–23 oktober</h3>
-            {weekdays.map((day, index) => (
-              <div className="school-lunch-day" key={day}>
-                <h4>{day}</h4>
-                {menus.map(menu => (
-                  <div key={menu.schoolId}>
-                    <strong>{menu.schoolName}</strong>
-                    {menu.days[index]?.status === 'published' ? (
-                      <ul>
-                        {menu.days[index].dishes.map((dish, order) => (
-                          <li key={order}>{dish}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>{statusText[menu.days[index]?.status] ?? 'Information saknas.'}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))}
-            {menus.map(menu => (
-              <p key={menu.schoolId}>
-                Källa för {menu.schoolName}: <a href={menu.sourceUrl}>{menu.sourceName}</a>.{' '}
+        {fixture &&
+          menus.map(menu => (
+            <div key={menu.schoolId}>
+              <h3>
+                {menu.schoolName} · vecka {menu.week}
+                {menu.dateBasis === 'sourceGuid' ? `, ${menu.year}` : ' (källans årtal saknas)'}
+              </h3>
+              <p>
+                {menu.schoolId === 'rosenfeldt'
+                  ? 'Endast måndagens källpost finns i testunderlaget. Originalfilen med hela veckan saknas.'
+                  : 'Normaliserat HTML-utdrag från produktägaren. Originalfilen saknas. Visningsår 2026 enligt ägarens observation, inte verifierat i HTML.'}
+              </p>
+              {weekdays.map((day, index) => (
+                <div className="school-lunch-day" key={day}>
+                  <h4>{day}</h4>
+                  {menu.days[index]?.status === 'published' ? (
+                    <ul>
+                      {menu.days[index].dishes.map((dish, order) => (
+                        <li key={order}>{dish}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>{statusText[menu.days[index]?.status] ?? 'Information saknas.'}</p>
+                  )}
+                </div>
+              ))}
+              <p>
+                Källa: <a href={menu.sourceUrl}>{menu.sourceName}</a>.{' '}
                 {menu.dateBasis === 'sourceGuid'
-                  ? 'Exempeldatum från RSS-identitet.'
-                  : 'Datum avser vald testvecka, inte verifierad källmeny.'}{' '}
+                  ? 'Datum från RSS-identitet.'
+                  : 'Datum i vald visningsvecka är härledda; källan anger endast veckonummer.'}{' '}
                 Ingen extern hämtning.
               </p>
-            ))}
-          </>
-        )}
+            </div>
+          ))}
       </div>
     </section>
   )

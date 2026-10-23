@@ -22,10 +22,12 @@ public static class SchoolMeals
     public static bool KnownSchool(string id) => id is Rosenfeldt or Musikugglan;
 
     public static SchoolMealWeek Unavailable(string id, int year, int week, bool fixture = false) =>
-        Create(id, year, week, id == Musikugglan ? "sourceEvidenceMissing" : "offline", "unknown", fixture, new Dictionary<DateOnly, IReadOnlyList<string>>());
+        Create(id, year, week, "offline", "unknown", fixture, new Dictionary<DateOnly, IReadOnlyList<string>>());
 
     public static SchoolMealWeek Preview(string id, int year, int week) => id == Rosenfeldt
-        ? ParseRss(ExampleRss, year, week, true) : Unavailable(id, year, week, true);
+        ? ParseRss(ExampleRss, year, week, true)
+        : year == 2026 ? MusikugglanSchoolMeals.Parse(MusikugglanSchoolMeals.ExampleHtml, year, week, true)
+        : Create(id, year, week, "notPublished", "unknown", true, new Dictionary<DateOnly, IReadOnlyList<string>>());
 
     public static SchoolMealWeek ParseRss(string xml, int year, int week, bool fixture = false)
     {
@@ -70,7 +72,7 @@ public static class SchoolMeals
         }
     }
 
-    private static SchoolMealWeek Create(string id, int year, int week, string status, string basis, bool fixture,
+    internal static SchoolMealWeek Create(string id, int year, int week, string status, string basis, bool fixture,
         Dictionary<DateOnly, IReadOnlyList<string>> dishes)
     {
         if (!KnownSchool(id) || !ValidWeek(year, week)) throw new ArgumentException("Invalid school or ISO week.");
