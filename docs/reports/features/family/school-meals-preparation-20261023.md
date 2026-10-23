@@ -174,3 +174,90 @@ publika GET-observationerna är ny källevidens. Inga hemligheter, privata konta
 Efter oberoende granskning: ägaren beslutar om den avgränsade skolmåltidsimplementationen.
 Inhämta rätt Rosenfeldt-källidentitet och tillåtet åtkomstsätt samt avgör Musikugglans datum-/veckogräns
 innan källa aktiveras. Återanvänd fynden; ingen ny generell källutredning behövs. BB-158 förblir fryst.
+
+## Rosenfeldtsskolan — kompletterande källverifiering 2026-10-23
+
+**REVIEW CHECKPOINT — READ-ONLY SOURCE REVIEW. Automatiserad åtkomst: UNVERIFIED;
+implementation/aktivering BLOCKED i väntan på källidentitet och tillåtet åtkomstsätt.**
+Baseline `7f3dfd149ec5776b792a993faa2711cb33cc572e`, branch
+`docs/rosenfeldt-school-meal-source`. Commitämnet
+`docs(family): record Rosenfeldt source access verification` identifierar denna publiceringspunkt
+med exakt SHA/tree i Gitmetadata. Tidigare fynd ovan bevaras; ingen skolmatskod implementeras.
+
+### Metod och evidensgräns
+
+Avgränsade sökindexfrågor mot officiell kommuninformation och efter leverantörens dokumentation,
+API, integration, villkor och kontakt. Alternativa kommunala menyformat/PDF/öppna data söktes också.
+Sökindexets återgivning av officiella sidor är evidensen nedan, inte självständigt verifierade
+live-svar från dessa sidor eller från en veckomeny. Kommunens tidigare robotkontroll och skolmat.infos
+`Disallow: /` återanvänds som daterad evidens; inga nya portal-, robots- eller API-anrop gjordes.
+Inga alternativa värdnamn användes för åtkomst, inga gissade endpoints, cookies, inloggningar eller
+User-Agent-byten. Ingen kontakt skickades. Uteblivna sökträffar bevisar inte att dokumentation saknas.
+
+### Verifierade uppgifter och kvarstående okända förhållanden
+
+| Fråga | Resultat och källa | Evidensklass |
+| --- | --- | --- |
+| Officiell publiceringsväg | [Kommunens Skolans matsedel](https://www.karlskrona.se/skola-och-forskola/matsedel-skolan), indexerad som uppdaterad 2026-08-05, hänvisar till skolmat.info för kommunens skolor. Texten nämner meny.skolmat.info och länktexten www.skolmat.info; detta verifierar inte omdirigering eller en skolspecifik adress. | Verifierat i sökindexerad officiell information; live-meny ej verifierad. |
+| Koppling till Rosenfeldtsskolan | [Kommunens Mat och måltider](https://www.karlskrona.se/omsorg-och-stod/aldreomsorg-och-senior/mat-och-maltider/) listar Rosenfeldtsskolans skolrestaurang och hänvisar till skolans matsedel. Ingen egen veckomeny eller leverantörsidentifierare framgår av den återgivna texten. | Verifierad kommunal restaurangpost; exakt skolmenymappning kvarstår. |
+| Leverantör | skolmat.info är kommunens anvisade publiceringstjänst. Juridisk leverantör och integrationsavtal har inte identifierats. | Tjänsten belagd ovan; avtalsparter okända. |
+| Skol-ID | **UNKNOWN**. Ingen officiell facilityId eller direkt skollänk identifierad. Skolenhetsnummer eller exempel-ID från tredjepartsintegration får inte användas som meny-ID. | Ej verifierat. |
+| API/JSON/ICS/PDF | Inget officiellt dokumenterat eller uttryckligen tillåtet maskinläsbart menyformat hittades i den avgränsade sökningen. Tidigare JSON-referens är fortfarande endast tredjepartsevidens. | Ej verifierat; inte bevis för att API saknas. |
+| HTML | Publik HTML-portal observerades tidigare; ingen tillåten automatisk Rosenfeldt-hämtning eller faktisk veckomeny verifierad. | Återanvänd daterad evidens, inget nytt hämtningstest. |
+| ISO-år/vecka, lov och historik | Inget verkligt Rosenfeldt-svar för ett valt ISO-år/vecka hämtades. Veckosemantik, tillgängligt intervall, datum, alternativ och saknade veckor är okända. | Ej verifierat. |
+| Automatisering och cache | Ingen uttrycklig rätt, tillåten frekvens, retention eller cachetid verifierad. Robots-stoppet kvarstår; det är inte i sig en fullständig licensbedömning. | Åtkomstgrinden kvarstår. |
+| Kontaktväg | [Kommunens Kontakt och dialog](https://www.karlskrona.se/kommun-och-politik/kontakt-och-dialog) anger kundservice@karlskrona.se och växel 0455-30 30 00. Be kundservice vidarebefordra till ansvarig för skolmatspublicering. | Offentlig funktionskontakt verifierad i indexerad kommuninformation. |
+
+Sökningen gav även tredjepartsuppgifter om skolmaten.se. Dessa används inte som belägg för ett
+leverantörsbyte eller som alternativ hämtväg: kommunens egen information har företräde. Ingen separat
+officiell Rosenfeldt-menykanal, tillåten kommunal dataexport eller leverantörsdokumentation kunde
+fastställas här. Ingen slutsats dras om att en sådan kanal aldrig kan finnas.
+
+### Teknisk inferens och rekommenderad minsta fortsättning
+
+Den tidigare beskrivna JSON-routen kan tekniskt vara lämpad för en liten läsadapter, **om** kommunen
+eller leverantören bekräftar rätt skol-ID, API-kontrakt och åtkomstvillkor. Det är en villkorad inferens,
+inte en rekommendation att anropa den nu. En publik portal eller tredjepartsintegration ger inte
+BigBrain ett verifierat integrationsavtal.
+
+Prioritet efter besked: dokumenterat API, annars uttryckligen tillåten strukturerad export, därefter
+tillåten enkel HTML. Tills dess är en länk till kommunens officiella matsedel minsta reservlösning;
+manuell import kan övervägas vid separat ägarbeslut och klarlagd återanvändningsrätt. Ingen ny
+scheduler, tjänst, container, databas eller generell scraper behövs. Tidigare föreslagna cachevärden
+är produktförslag, inte leverantörsgodkända gränser.
+
+**Nästa åtgärd:** produktägaren kan skicka frågan nedan. Invänta svar med verifierad skolmappning,
+tillåtet format och hämtnings-/cachevillkor före ny källhämtning eller implementationsbeslut.
+Detta avslutar undersökningen; ingen ytterligare probing eller automatisk implementation följer.
+
+### Färdigt kontaktmeddelande — inte skickat
+
+Till: kundservice@karlskrona.se, för vidarebefordran till ansvarig för skolmatspublicering.
+
+Ämne: Rosenfeldtsskolans matsedel – datakälla och privat integration
+
+Hej!
+
+Jag vill visa Rosenfeldtsskolans lunchmeny i Karlskrona vecka för vecka i ett privat,
+icke-kommersiellt, självhostat familjesystem. Er webbplats hänvisar till skolmat.info.
+
+Kan ni bekräfta skolans officiella matsedelslänk och skolidentifierare hos leverantören?
+Finns ett dokumenterat API eller annat maskinläsbart format, exempelvis JSON, kalenderflöde
+eller export, där menyn kan hämtas för ett angivet ISO-år och ISO-veckonummer?
+Vilka veckor finns tillgängliga och hur anges datum, lov och saknad meny?
+
+Är sådan automatisk hämtning tillåten för detta privata ändamål? Vilken hämtningsfrekvens,
+cachetid och lokal lagring är tillåten, och finns krav på källangivelse eller radering?
+Jag har noterat robots-begränsningen och vill använda en uttryckligen tillåten väg.
+Skicka gärna dokumentation och villkor, eller hänvisa mig till rätt leverantörskontakt.
+
+Tack på förhand!
+
+### Checkpoint-verifiering
+
+Endast denna rapport ändras. STATUS/BACKLOG anger redan källrättigheter som olösta och länkar hit;
+inget nytt statuslager eller ny arkitekturregel behövs. Dokumentationsvalidator med lokala länkar,
+whitespace-/diffkontroll och staged sekretesskontroll: PASS (274 Markdown-filer, 91 unika backlog-ID:n;
+ingen sekretessdetektion). Ingen applikationstestsvit,
+produktion, Finance- eller BB-158-åtgärd ingår. Orelaterade lokala filer bevaras. Checkpointen lämnas
+för oberoende granskning; merge och implementation kräver separata ägarbeslut.
