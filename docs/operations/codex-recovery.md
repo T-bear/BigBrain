@@ -1,5 +1,18 @@
 # Codex interrupted-run recovery
 
+## BB-158 — component completion gate, 2026-10-23
+
+**REVIEW CHECKPOINT — BLOCKED; NO UNPUBLISHED IMPLEMENTATION.** Same review branch;
+main `712679fda646aced2a417adf696e59d4a7c0f57b`, continuation from
+`6e163a3f9e927f76ce0109f947402c909afc6586`. Owner now permits comparing existing retrieval
+components while retaining Librarr import ownership.
+[Inspected contracts and exact missing execution/egress boundary](../reports/features/media/bb-158-url-import-20261017.md#existing-component-completion-gate--2026-10-23).
+No existing adapter provides the complete safe YouTube path. Prior Landlock negative evidence is
+reused, not rerun. No placement reapproval or blanket security exception requested. No functional
+YouTube/ISBN edits, runtime changes or new package. Next technical gate is the concrete bounded
+retrieval/launcher integration; do not repeat the prior journal query or claim a proxy setting proves
+containment. Preserve unrelated mockups/Sentinel files and previous operational evidence.
+
 ## BB-158 — isolation choice assessment, 2026-10-23
 
 **REVIEW CHECKPOINT — NO PRODUCTION CHANGE.** Main `712679fda646aced2a417adf696e59d4a7c0f57b`;

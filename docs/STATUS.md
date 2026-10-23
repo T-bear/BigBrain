@@ -5,7 +5,7 @@
 **NO COMPLETE ISOLATION SELECTED / LANDLOCK PRIMITIVES VERIFIED / EGRESS UNVERIFIED.**
 Existing-Librarr placement is approved. Direct import deployment remains owner-reported;
 this checkpoint makes no production change. YouTube/ISBN remains unimplemented.
-[Two-option decision, negative tests and exact remaining boundary](reports/features/media/bb-158-url-import-20261017.md#isolation-choice-assessment--2026-10-23).
+[Current component reuse check and exact remaining boundary](reports/features/media/bb-158-url-import-20261017.md#existing-component-completion-gate--2026-10-23).
 Earlier dated evidence is preserved in the report.
 
 ## BB-158 — Sonarr availability correction, 2026-10-21

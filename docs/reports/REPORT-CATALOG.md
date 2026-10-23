@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- `BB-158, 2026-10-17–23` — [Direct import and YouTube isolation choice](features/media/bb-158-url-import-20261017.md#isolation-choice-assessment--2026-10-23). No complete option selected. Landlock/seccomp primitive negative tests pass; controlled tool egress and lifecycle remain unverified. No production change.
+- `BB-158, 2026-10-17–23` — [Direct import and YouTube isolation choice](features/media/bb-158-url-import-20261017.md#existing-component-completion-gate--2026-10-23). No complete option selected. Landlock/seccomp primitive negative tests pass; controlled tool egress and lifecycle remain unverified. No production change.
 
 - `Media control, 2026-10-17` — [Navigation and lazy-loading review](features/media/media-control-20261017.md). One entry, three separate pages; review only, no deployment.
 
