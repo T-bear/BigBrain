@@ -29,6 +29,15 @@ Utöka läsning vid konkret risk, osäkerhet, beroende eller konflikt. Tabellen 
 inte ett nytt fullständigt läskrav. [Dokumentationsindexet](indexes/documentation.md) hjälper till
 att hitta källor; [TESTING](../TESTING.md) hjälper till att välja riskmotiverad verifiering.
 
+Vid breda sökningar ska historiska dokument normalt exkluderas. Exempel från repositoryroten:
+
+```sh
+rg --glob '!docs/history/**' 'sökterm'
+```
+
+Läs historiken vid riktad spårbarhetskontroll, felsökning eller när ett aktuellt dokument
+hänvisar till den. Detta ändrar inte dokumentauktoriteten.
+
 ## Dokumentauktoritet
 
 Behåll [indexets auktoritetsordning](indexes/documentation.md#authority-order): accepterad ADR →
