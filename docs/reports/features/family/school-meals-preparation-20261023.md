@@ -698,3 +698,26 @@ infer automatic database/image rollback permission. Existing deployment authoriz
 limited to the same scope; no new implementation or broader service action is authorized.
 After a safe deployment, verify effective false flags/disabled responses and API/Web health;
 owner iPhone/PWA acceptance of the unavailable-source presentation remains pending.
+
+### Follow-up preflight — operator authentication boundary, 2026-10-24
+
+Owner reports that the lifecycle-unit failure dates from 2026-09-04 and was caused by
+Flaresolverr being unhealthy then. Treat it as a separate historical fault, not evidence that
+API/Web deployment requires restarting or repairing that unit. No unit action was performed.
+Main remains `485aeda2ec5819ffc7f433b51ac867c55157c19f`; its previously verified four-job CI
+success is reused. Read-only reinspection verified all 12 containers running, API/Web healthy
+on the exact images/revision recorded above, both old images locally available, no SchoolMeals
+environment overrides, and approximately 388.5 GiB available on the workspace filesystem.
+This capacity observation does not verify backup size, completeness, integrity or restore safety.
+
+First blocking prerequisite: `sudo -n -l /usr/bin/systemd-run` returned exit 1, password required.
+The owner's successful local `sudo -v` does not confer authorization in the agent session.
+The exact bounded local operator check is `sudo -l /usr/bin/systemd-run`, with authentication
+only in the owner's terminal. It lists permission; it does not launch deployment, grant Codex
+passwordless sudo, verify ExecStopPost recovery or satisfy the backup/activity gates. Do not
+send passwords, change sudoers, rerun an old launch package or start the full Compose stack.
+A future privileged launch must identify the freshly verified API/Web-only procedure and its
+inputs; no executable production launch command can honestly be supplied at this stop point.
+STOP before build or mutation. Backup usability, current import/database activity and concrete
+new-run recovery remain UNVERIFIED, not failed or waived. No school-provider requests, flag
+changes, container changes, application tests or Finance/BB-158 actions occurred.
