@@ -70,3 +70,11 @@ promotes branch code or a proposed decision above accepted architecture. See the
   [Recovery före DOC-2A](../history/codex-recovery-before-doc-2a-20261024.md): historisk evidens, inte aktuella körorder.
 - [DOC-2A inventering och destinationer](../reports/documentation/doc-2a-recovery-status-inventory-20261024.md#fas-b--godkänd-konsolidering-2026-10-24).
   Aktuella ingångar är fortsatt STATUS och codex-recovery; auktoritetsordningen ovan är oförändrad.
+
+## Backlog- och Roadmap-historik
+
+- [Backlog före DOC-2B](../history/backlog-before-doc-2b-20261024.md) och
+  [Roadmap före DOC-2B](../history/roadmap-before-doc-2b-20261024.md): full historik, inga aktuella körorder.
+- [DOC-2B inventering och faktisk arkivmappning](../reports/documentation/doc-2b-backlog-roadmap-inventory-20261024.md#fas-b--förlustfri-konsolidering-2026-10-24).
+  [Backlog](../BACKLOG.md) behåller kvarstående arbete/DoD och [Roadmap](../../ROADMAP.md) produktinriktning;
+  arkivering stänger inga poster eller ändrar kanonisk auktoritet.
