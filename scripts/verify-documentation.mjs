@@ -31,13 +31,97 @@ for (const field of ["Senast uppdaterad:", "Verifierad mot commit:", "Runtime se
 }
 
 const agents = readFileSync(resolve(root, "AGENTS.md"), "utf8");
-for (const marker of [
-  "## Documentation and publication completion rule",
-  "DOCUMENTATION STATUS",
-  "Dokumenten är uppdaterade:",
-  "Dokumenten är granskade och inga uppdateringar behövdes.",
-]) {
-  if (!agents.includes(marker)) failures.push(`AGENTS missing completion rule marker: ${marker}`);
+// Structural/presence guard, not a substitute for independent semantic rule review.
+// Normalize wrapping so ordinary Markdown line reflow does not change the contract.
+const agentSections = [
+  ["1. Roller och auktoritet", [
+    "Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.",
+    "Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.",
+    "Owner UX approval registreras endast efter uttryckligt ägargodkännande.",
+  ]],
+  ["2. KISS och uppgiftsstyrd kontext", [
+    "Läs alltid AGENTS.md och verifiera Git-baslinje och working tree.",
+    "Förenkling får inte försämra säkerhet, korrekthet, tillförlitlighet eller underhållbarhet.",
+  ]],
+  ["3. Riskbaserad arbetsinsats", [
+    "| LOW |", "| MEDIUM |", "| HIGH |",
+    "Återanvänd giltig evidens när relevant tree/kod, beroenden och antaganden är oförändrade.",
+    "Compute Economy tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview, fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.",
+  ]],
+  ["4. Scope och Definition of Done", [
+    "Saknas DoD får agenten undersöka och föreslå den, men implementation väntar på ägarens eller arkitektens godkännande inom ägarens auktoriserade scope.",
+    "nytt scope kräver ägarbeslut.",
+    "Uppfylld DoD avslutar uppdraget: ingen automatisk nästa sprint, checkpoint eller förbättringsloop.",
+  ]],
+  ["5. Säkerhet och arkitektur", [
+    "Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.",
+    "Montera aldrig Docker-socketen i API eller Web.",
+    "Använd minsta behörighet för processer, containers, API:er och användare.",
+    "Destruktiva funktioner kräver tydlig auktorisering, uttrycklig bekräftelse och audit.",
+    "Radera eller skriv aldrig över användardata.",
+    "Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag;",
+    "ändra aldrig andra containers eller deras data som bieffekt av utveckling eller test.",
+    "Moduler får inte läsa eller skriva andra modulers datalager direkt.",
+    "Externa tjänster kapslas bakom adapters.",
+    "Alla publika API:er versionssätts; alla API-fel använder Problem Details.",
+    "`BigBrain.Brain` innehåller endast AI-orkestrering enligt `ARCHITECTURE.md`, inte generell kod.",
+    "AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom det vanliga auktoriserade API:t.",
+    "Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.",
+    "Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser gäller oförändrat.",
+    "Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.",
+  ]],
+  ["6. Dokumentation – minsta beständiga sanning", [
+    "NO UNDOCUMENTED SIGNIFICANT WORK:",
+    "Chatt och terminalhistorik är inte bestående source of truth. Dokumentation ingår i DoD.",
+    "Påstå aldrig färdigstatus utan evidens.",
+  ]],
+  ["7. Review och blockerare", [
+    "| P0 |", "| P1 |", "| P2 |", "| P3 |",
+    "Verifierade P0/P1 får aldrig kringgås för att nå en rundgräns;",
+    "P2/P3 öppnar inte automatiskt nya Codex-iterationer.",
+    "När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från GitHub, jämföra med accepterad main-baseline",
+  ]],
+  ["8. Git och Review Checkpoints", [
+    "Ingen reset, rebase, amend, squash, force push eller historieskrivning av reviewhistorik.",
+    "Skriv inte över eller återställ befintliga ändringar.",
+    "**REVIEW CHECKPOINT:**", "**MERGE CANDIDATE:**",
+    "**ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.",
+    "Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och relevanta required checks.",
+    "Avvikelse kräver STOP/re-review.",
+    "Deployment kräver separat uttrycklig auktorisering.",
+  ]],
+  ["9. Avbrott och blockerad implementation", [
+    "Vid avbrott: bevara giltigt working-tree-arbete; kasta eller gör inte om det.",
+    "INTERRUPTED — SAFE TO RESUME", "INTERRUPTED — MANUAL REVIEW REQUIRED",
+    "BLOCKER HANDOFF — NOT MERGEABLE", "Blocker-branchen får inte mergas;",
+    "Korrigering kräver separat uttryckligen auktoriserad checkpoint från verifierad main.",
+  ]],
+  ["10. Långvariga processer", [
+    "Verifiera livslängd, ägarskap, resursgränser och beständig resultatlagring innan processen lämnas;",
+    "En kritisk process får aldrig lämnas utan säker fel-/avbrottshantering.",
+  ]],
+  ["11. Kort sluthandoff", [
+    "exakt verifierad remote-SHA/tree", "PASS/FAIL/PENDING/SKIP",
+    "Vid beslut: ange exakt godkännande som behövs; begär inte redan givet godkännande.",
+    "Misslyckade/ej körda kontroller får aldrig beskrivas som gröna.",
+  ]],
+  ["12. Befintliga frysningar och beslut", [
+    "[Frysningsregistret](docs/operations/freezes.md)",
+    "Historiska fortsättningsinstruktioner upphäver inte senare ägarbeslut.",
+    "Upptining kräver nytt uttryckligt ägarbeslut och ny auktoriserad scope/DoD;",
+    "Befintlig drift lämnas orörd utan separat beslut.",
+  ]],
+];
+const sections = [...agents.matchAll(/^## (.+)\r?\n([\s\S]*?)(?=^## |$(?![\s\S]))/gm)];
+if (JSON.stringify(sections.map((section) => section[1].trim())) !==
+    JSON.stringify(agentSections.map(([heading]) => heading))) {
+  failures.push("AGENTS must contain the 12 required sections in order, without duplicates or extra sections");
+}
+for (const [heading, rules] of agentSections) {
+  const content = sections.find((section) => section[1].trim() === heading)?.[2].replace(/\s+/g, " ") ?? "";
+  for (const rule of rules) {
+    if (!content.includes(rule)) failures.push(`AGENTS missing required rule in ${heading}: ${rule}`);
+  }
 }
 
 const forbiddenClaim = "No BigBrain POST, PUT, PATCH or DELETE Media route exists";
