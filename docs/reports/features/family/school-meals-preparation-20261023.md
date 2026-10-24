@@ -662,3 +662,39 @@ implementation checkpoint remain separate identities.
 Publication scope: 19 files, limited to school-meal API/Web/tests and six existing canonical documents.
 Documentation validator **PASS** (274 Markdown / 91 backlog IDs), staged whitespace **PASS**, staged
 Gitleaks **PASS**, no leaks. Unrelated untracked work and accepted Finance/BB-158 content are preserved.
+
+## Deployment preflight — stopped before mutation, 2026-10-24
+
+**BLOCKED / NOT DEPLOYED.** The owner authorized API/Web deployment with all school sources
+remaining disabled. Accepted target main is `485aeda2ec5819ffc7f433b51ac867c55157c19f`, containing
+implementation merge `c8aaba15ac6382b6934591acfa6f615505c95819`; no source/Compose/infrastructure
+changes occurred between that implementation merge and target main. [CI 40123886908](https://github.com/T-bear/BigBrain/actions/runs/40123886908)
+was verified completed/success for exactly target main: backend, frontend, documentation, secrets.
+
+Read-only Docker inspection found API and Web running and healthy, both labelled revision
+`712679fda646aced2a417adf696e59d4a7c0f57b`. API image:
+`sha256:8b92e5ea802f215427456e670875df07760e2eff5694bd4ef24d6ad6ed32aa5c`;
+Web image: `sha256:195f2bf3792c23a05f44c4ad1b15feea598dfec93490d2fbcf2b8e0e111f0ad6`.
+These are pre-existing images, not a new deployment. The running API predates Skollunch v1/v2.
+No SchoolMeals settings were found in its container environment, deployed appsettings.json or
+private API/Web Compose environment overrides. The accepted v2 defaults for Enabled,
+RosenfeldtEnabled and MusikugglanEnabled are all false; no flags were changed and no source called.
+This is not a post-deployment endpoint or effective-options verification.
+
+The documented session-independent system-manager execution/recovery prerequisite could not be
+established: `sudo -n -v` failed because local password authentication is required. The host's
+`bigbrain.service` was also listed failed; its cause and suitability for recovery were not
+investigated or asserted. Healthy Docker containers do not prove that this lifecycle unit can
+recover a replacement. No old BB-158 deployment package or run ID was executed or modified.
+Fresh backup validity, active-import safety and a concrete bounded API/Web recovery execution
+remain **UNVERIFIED**; historical copies/tests do not establish them for a new run.
+
+STOP before build, backup mutation, stop, container replacement or configuration change. No
+Finance/BB-158 work, database operation, provider request, rollback or application test occurred.
+Next operational step: establish locally authorized system-manager execution and verify the
+existing procedure's bounded recovery, fresh backups and activity gates for a new API/Web-only
+run. Do not request credentials in chat, reuse old launch packages, start the whole stack or
+infer automatic database/image rollback permission. Existing deployment authorization remains
+limited to the same scope; no new implementation or broader service action is authorized.
+After a safe deployment, verify effective false flags/disabled responses and API/Web health;
+owner iPhone/PWA acceptance of the unavailable-source presentation remains pending.
