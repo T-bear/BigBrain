@@ -100,10 +100,14 @@ nytt godkännandesteg eller separat uppdrag. Detta kringgår aldrig obligatorisk
 säkerhets- och återhämtningsbeslut samt viktiga tekniska lärdomar ska bevaras i rätt kanoniskt
 underlag. Chatt och terminalhistorik är inte bestående source of truth. Dokumentation ingår i DoD.
 
-Uppdatera minsta relevanta status/backlog, kontrakt/ADR, modul-, test-, rapport-, recovery- eller
-runbookunderlag. Läs/uppdatera inte hela dokumentträdet rutinmässigt. Länka till auktoritativ
-information och undvik duplicering där dokumenten inte har skilda ansvar. Ingen rutinmässig
+Uppdatera i första hand befintligt kanoniskt status/backlog-, kontrakt/ADR-, modul-, test-,
+rapport-, recovery- eller runbookunderlag. Läs/uppdatera inte hela dokumentträdet rutinmässigt.
+Länka till auktoritativ information och undvik duplicering där dokumenten inte har skilda ansvar. Ingen rutinmässig
 post-merge-dokumentationscommit; avstäm endast verkligt bestående nya fakta.
+
+STATUS är en kort, aktuell nulägesbild, inte en kronologisk arbetslogg. Ersatt historik ska
+inte ackumuleras där. När innehåll behöver ersättas och historiken är relevant ska den bevaras
+i befintligt historikarkiv, helst i samma commit. Ingen ny arkivstruktur eller hård radgräns krävs.
 
 Skilj planerat, implementerat, automatiskt verifierat, deployat, manuellt verifierat, blockerat,
 känt begränsat och ersatt. Påstå aldrig färdigstatus utan evidens. Runtime-/testuppgifter ska
@@ -111,8 +115,9 @@ ha datum och scope; historik bevisar inte aktuellt tillstånd. Registrera nya ve
 begränsningar och uppskjutna funktioner som inte löses i uppdraget. Backlog blir klar först vid
 verifierad DoD; BB-ID:n är unika och andra posters status/prioritet ändras inte utan evidens.
 
-Skapa/uppdatera sanerad rapport och rapportkatalog när separat checkpointevidens behövs för review;
-små workflow-/dokumentändringar behöver ingen parallell rapport. Fullare lokala rapporter får
+Skapa/uppdatera separat sanerad rapport och rapportkatalog när beslut, risk, teknisk evidens
+eller spårbarhet faktiskt motiverar det; små workflow-/dokumentändringar behöver ingen parallell
+rapport. Fullare lokala rapporter får
 vara intern evidens, men relevant sanerad kunskap ska publiceras i GitHub. Publicera aldrig
 hemligheter, interna identiteter, privata adresser, råa känsliga loggar, känsliga paths eller förbjudna data.
 
@@ -121,17 +126,38 @@ hemligheter, interna identiteter, privata adresser, råa känsliga loggar, käns
 | Klass | Betydelse |
 | --- | --- |
 | P0 | Kritisk brist; stoppar merge. |
-| P1 | Blockerande brist, exempelvis brutet obligatoriskt krav eller otillräcklig nödvändig verifiering. |
+| P1 | Blockerande avvikelse: konkret, evidensbaserad avvikelse från ett tillämpligt obligatoriskt krav, acceptanskriterium eller säkerhetsvillkor. |
 | P2 | Icke-blockerande brist som kan hanteras separat om acceptanskriterier och säkerhetskrav är uppfyllda. |
 | P3 | Framtida förbättring, refaktorering eller alternativ arkitektur. |
+
+För P1 anger granskaren kravets auktoritativa källa (exempelvis DoD, ADR, AGENTS,
+modulkontrakt, säkerhetsgräns eller ägarbeslut), berörd komponent, konkret fel- eller riskscenario
+och konsekvens. Ange reproduktion när den är möjlig; annars beskriv ett tekniskt motiverat
+scenario stegvis. Fynd utan identifierad auktoritativ kravkälla är normalt P2 och får inte
+automatiskt blockera merge. Misstänkta kritiska säkerhetsbrister får dock eskaleras för särskild
+bedömning även när befintlig dokumentation är ofullständig.
+
+Granskaren rekommenderar blockering. Produktägaren beslutar om kvarstående risk får accepteras
+inom tillämpliga säkerhetsgränser och bindande beslut. Riskacceptans upphäver inte obligatoriska
+krav utan ett uttryckligt ändringsbeslut.
 
 Normalt högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
 om fortsatt avgränsat arbete, minskat scope, uppskjutning eller stopp. Verifierade P0/P1 får aldrig
 kringgås för att nå en rundgräns; fortsatt nödvändig verifiering är inte förbjuden. Klassificeringen
 ersätter inte befintliga säkerhets-, Finance-, blocker- eller godkännanderegler.
+Andra varvet fokuserar på tidigare blockerare och tillkommande diff. Nyupptäckta verkliga P0/P1
+får inte nedklassificeras enbart för att koden är oförändrad. Nya P2/P3 i oförändrad kod öppnar
+inte nya iterationsloopar. Tvåvarvstaket begränsar automatiska granskningsloopar, inte obligatorisk
+säkerhetsverifiering.
 P2/P3 öppnar inte automatiskt nya Codex-iterationer. Vid uppfylld DoD och riskmotiverad verifiering
 ska arkitekten normalt rekommendera godkännande/merge. Ingen sen arkitekturomprövning utan
 konkret blockerande evidens eller uttrycklig ägarbegäran. Review ändrar inte scope automatiskt.
+
+För längre, osäkra eller kostsamma uppdrag kan ägaren sätta en kredit- eller resursram.
+När ramen nås rapporterar agenten genomfört arbete, kvarstående obligatoriska kontroller,
+uppskattad återstående kostnad (med osäkerheter) och handlingsalternativ. Ägaren beslutar om
+fortsatt resursåtgång. Resursramen får aldrig användas för att beskriva ej genomförd obligatorisk
+verifiering som godkänd eller för att kringgå säkerhetskrav.
 
 När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från
 GitHub, jämföra med accepterad main-baseline och läsa relevant diff, rapport, evidens, status,

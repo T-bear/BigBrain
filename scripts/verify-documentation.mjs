@@ -31,8 +31,10 @@ for (const field of ["Senast uppdaterad:", "Verifierad mot commit:", "Runtime se
 }
 
 const agents = readFileSync(resolve(root, "AGENTS.md"), "utf8");
-// Structural/presence guard, not a substitute for independent semantic rule review.
-// Normalize wrapping so ordinary Markdown line reflow does not change the contract.
+// Keep section structure and complete critical rule clauses, not a keyword-only check.
+// Ordinary guidance is deliberately not wording-locked; semantic changes still need review.
+// Normalize wrapping so line reflow does not change the contract. This guard cannot prove
+// that arbitrary prose is equivalent or detect every contradiction in surrounding text.
 const agentSections = [
   ["1. Roller och auktoritet", [
     "Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.",
@@ -40,12 +42,10 @@ const agentSections = [
     "Owner UX approval registreras endast efter uttryckligt ägargodkännande.",
   ]],
   ["2. KISS och uppgiftsstyrd kontext", [
-    "Läs alltid AGENTS.md och verifiera Git-baslinje och working tree.",
     "Förenkling får inte försämra säkerhet, korrekthet, tillförlitlighet eller underhållbarhet.",
   ]],
   ["3. Riskbaserad arbetsinsats", [
     "| LOW |", "| MEDIUM |", "| HIGH |",
-    "Återanvänd giltig evidens när relevant tree/kod, beroenden och antaganden är oförändrade.",
     "Compute Economy tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview, fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.",
   ]],
   ["4. Scope och Definition of Done", [
@@ -78,13 +78,13 @@ const agentSections = [
   ["7. Review och blockerare", [
     "| P0 |", "| P1 |", "| P2 |", "| P3 |",
     "Verifierade P0/P1 får aldrig kringgås för att nå en rundgräns;",
-    "P2/P3 öppnar inte automatiskt nya Codex-iterationer.",
+    "Riskacceptans upphäver inte obligatoriska krav utan ett uttryckligt ändringsbeslut.",
+    "Resursramen får aldrig användas för att beskriva ej genomförd obligatorisk verifiering som godkänd eller för att kringgå säkerhetskrav.",
     "När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från GitHub, jämföra med accepterad main-baseline",
   ]],
   ["8. Git och Review Checkpoints", [
     "Ingen reset, rebase, amend, squash, force push eller historieskrivning av reviewhistorik.",
     "Skriv inte över eller återställ befintliga ändringar.",
-    "**REVIEW CHECKPOINT:**", "**MERGE CANDIDATE:**",
     "**ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.",
     "Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och relevanta required checks.",
     "Avvikelse kräver STOP/re-review.",
@@ -92,7 +92,6 @@ const agentSections = [
   ]],
   ["9. Avbrott och blockerad implementation", [
     "Vid avbrott: bevara giltigt working-tree-arbete; kasta eller gör inte om det.",
-    "INTERRUPTED — SAFE TO RESUME", "INTERRUPTED — MANUAL REVIEW REQUIRED",
     "BLOCKER HANDOFF — NOT MERGEABLE", "Blocker-branchen får inte mergas;",
     "Korrigering kräver separat uttryckligen auktoriserad checkpoint från verifierad main.",
   ]],
@@ -101,13 +100,12 @@ const agentSections = [
     "En kritisk process får aldrig lämnas utan säker fel-/avbrottshantering.",
   ]],
   ["11. Kort sluthandoff", [
-    "exakt verifierad remote-SHA/tree", "PASS/FAIL/PENDING/SKIP",
-    "Vid beslut: ange exakt godkännande som behövs; begär inte redan givet godkännande.",
     "Misslyckade/ej körda kontroller får aldrig beskrivas som gröna.",
   ]],
   ["12. Befintliga frysningar och beslut", [
     "[Frysningsregistret](docs/operations/freezes.md)",
     "Historiska fortsättningsinstruktioner upphäver inte senare ägarbeslut.",
+    "det ger inte automatiskt merge-, deployment- eller exekveringsauktoritet.",
     "Upptining kräver nytt uttryckligt ägarbeslut och ny auktoriserad scope/DoD;",
     "Befintlig drift lämnas orörd utan separat beslut.",
   ]],
