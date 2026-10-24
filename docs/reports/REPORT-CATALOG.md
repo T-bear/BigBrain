@@ -1,5 +1,7 @@
 # Project Report Catalog
 
+- [DOC-2B Backlog/Roadmap inventory, 2026-10-24](documentation/doc-2b-backlog-roadmap-inventory-20261024.md): phase A only; 315 traced sections, freezes and open requirements preserved; proposed destinations and phase B decisions, no consolidation.
+
 - [DOC-2A Recovery/Status inventory, 2026-10-24](documentation/doc-2a-recovery-status-inventory-20261024.md): 184-section inventory and owner-authorized phase B consolidation; lossless archives, visible U1–U3 limits, documentation Merge Candidate.
 
 - [Family school meals preparation, 2026-10-23](features/family/school-meals-preparation-20261023.md): source preparation history and offline Skollunch v1 review evidence; owner-supplied Rosenfeldt RSS, Musikugglan HTML parser; both originals verified offline; v2 default-off HTTP/cache implementation in review, no external access or deployment.
