@@ -63,3 +63,10 @@ promotes branch code or a proposed decision above accepted architecture. See the
 - [Shopping List knowledge](../knowledge/shopping-list.md)
 - [Design system](../design-system/theme-contract-v1.md)
 - [Early sprint history](../history/early-sprints.md)
+
+## Historiska status- och recoveryförlopp
+
+- [Status före DOC-2A](../history/status-before-doc-2a-20261024.md) och
+  [Recovery före DOC-2A](../history/codex-recovery-before-doc-2a-20261024.md): historisk evidens, inte aktuella körorder.
+- [DOC-2A inventering och destinationer](../reports/documentation/doc-2a-recovery-status-inventory-20261024.md#fas-b--godkänd-konsolidering-2026-10-24).
+  Aktuella ingångar är fortsatt STATUS och codex-recovery; auktoritetsordningen ovan är oförändrad.

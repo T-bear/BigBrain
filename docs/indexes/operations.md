@@ -1,5 +1,7 @@
 # Operations Index
 
+- [Aktiv Codex-recovery](../operations/codex-recovery.md) och [historiskt recoveryarkiv före DOC-2A](../history/codex-recovery-before-doc-2a-20261024.md).
+
 - [BB-158 — frozen by owner decision](../operations/bb158-freeze-20261023.md)
 
 
