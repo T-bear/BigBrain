@@ -1,6 +1,10 @@
 # Project Report Catalog
 
-- [DOC-2C Testing/index inventory, 2026-10-24](documentation/doc-2c-testing-index-inventory-20261024.md): phase A REVIEW CHECKPOINT; 85-heading TESTING inventory, index/link review, preserved safety/freeze/manual gates and proposed lossless consolidation. No active test-guide changes or phase B.
+Entries describe dated checkpoint evidence, not necessarily current product status. See
+[STATUS](../STATUS.md) for accepted implementation/verification and [TESTING](../../TESTING.md)
+for current methods. Historical review/deployment labels do not supersede later decisions.
+
+- [DOC-2C Testing/index inventory, 2026-10-24](documentation/doc-2c-testing-index-inventory-20261024.md): phase A inventory and owner-authorized phase B; 85 sections and 12 embedded areas preserved in a fulltext archive, compact active methods/gates, minimal index clarification. Documentation Merge Candidate; no application tests, merge or deployment.
 
 - [DOC-2B Backlog/Roadmap inventory, 2026-10-24](documentation/doc-2b-backlog-roadmap-inventory-20261024.md): phase A inventory and owner-authorized phase B consolidation; 315 losslessly archived sections, visible open requirements/freezes and U1–U3 uncertainty; documentation Merge Candidate.
 

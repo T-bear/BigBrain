@@ -338,3 +338,202 @@ credentials, privata adresser, råloggar eller privata medie-/serveridentiteter 
 Nästa steg är oberoende GitHub-granskning av exakt publicerad SHA; ägaren måste separat auktorisera
 fas B och eventuell senare merge. Följ AGENTS, verifiera då main/review och working tree igen,
 återanvänd oförändrad evidens. Inget aktivt implementationsavbrott skapas av denna inventering.
+
+
+## Fas B — förlustfri konsolidering 2026-10-24
+
+Produktägaren har efter fas A godkänt D1–D4. All text ovan är bevarad som fas A:s
+inventering och dåtida beslutspunkt; formuleringarna ”inte genomfört” och ”nästa steg” där
+är historiska, inte aktuella fortsättningsorder. Denna del redovisar utförd fas B.
+
+- Status: **MERGE CANDIDATE — endast dokumentation**, inväntar oberoende review och separat exakt SHA-godkännande.
+- Baslinje: `875c03330d2e5363ac587e5fbca975b8caa56073`, verifierad oförändrad efter fetch.
+- Branch: `docs/doc-2c-testing-index-inventory`; fas A `f9a31b0740081c31b2185b20c4e54533f8a6149e` bevaras som förälder.
+- Publiceringsidentifierare: `docs: consolidate testing guide and indexes losslessly for DOC-2C`.
+  Exakt SHA/tree är commitmetadata, inte en självreferens i dokumentet.
+- Ingen implementation, acceptans, merge, deployment, extern åtkomst eller driftinspektion.
+
+### Ändrade filer och omfattning
+
+1. `TESTING.md`: kort aktiv metod-/grindkarta med konfigurationsverifierade kommandon.
+2. `docs/history/testing-before-doc-2c-20261024.md`: hela originalet plus arkivförklaring och reversibla länkjusteringar.
+3. `docs/indexes/documentation.md`: aktuell metod/historik särskiljs; BB-130-etiketten datumscopas. Auktoritetsordningen oförändrad.
+4. `docs/indexes/operations.md`: metod/status/frysningar skiljs från procedurens egna godkännanden.
+5. `docs/indexes/reports.md`: äldre urval länkas till katalog, aktuell status och testmetod; historiska länkar bevaras.
+6. `docs/reports/REPORT-CATALOG.md`: uppdaterad DOC-2C-post och förklaring av datumscopade katalogetiketter.
+7. Denna rapport: separat fas B-tillägg; inga ändringar i fas A:s text eller tabeller.
+
+Aktiv TESTING: **1286 → 156 rader**. Arkivet: **1293 rader = 7 förklaringsrader +
+1286 originalrader**, inklusive 85 rubriker och alla 12 orubricerade områden.
+Originalblob: `478bfd31db93dd35d65d9b21a5a9f8d1b67ee931`.
+Återskapad originaltext har SHA-256
+`fec4ad655dcabda05ef685d21f63b277c412481c776bb829a85d2dafb82be827`.
+
+### Fulltextintegritet och faktiska destinationer
+
+Arkivets första sju rader tas bort, därefter löses varje relativ Markdown-länks sökväg
+från `docs/history/` tillbaka till repositoryroten. Absoluta URL:er och rena fragment lämnas
+orörda. Resultatet jämförs byte för byte med `git show 875c03330d2e5363ac587e5fbca975b8caa56073:TESTING.md`
+och med fas A:s blob/SHA-256. Ingen prose, kodfence, BB-ID, datum, SHA, rubrik, DoD eller
+misslyckat resultat ändras. Kodexempel/backtickpaths är originaltext, inte uppdaterade körorder.
+Rubrikernas ordning/ankare bevaras; varje originalrad N återfinns på arkivrad N+7 efter
+reversibel länkjustering. Inventeringens T001–T085 partitionerar därmed hela originalet.
+
+Tre äldre plattformsrapporter länkar till TESTING:s D1-toolchain-ankare. Det behålls som en
+kort explicit vidarehänvisning till arkivet; historiska rapporter behöver inte skrivas om.
+
+| Fas A-ID | Originalrader | Faktisk destination och arkivrader |
+| --- | --- | --- |
+| T001 | 1–2 | [Arkiv 8–9](../../history/testing-before-doc-2c-20261024.md#testa-bigbrain) |
+| T002 | 3–13 | [Arkiv 10–20](../../history/testing-before-doc-2c-20261024.md#bb-132e-model-free-prospective-verification--2026-10-03) |
+| T003 | 14–30 | [Arkiv 21–37](../../history/testing-before-doc-2c-20261024.md#bb-132d-model-free-observation-checks--2026-10-02) |
+| T004 | 31–50 | [Arkiv 38–57](../../history/testing-before-doc-2c-20261024.md#bb-132c-real-finite-research-sequence--2026-10-02) |
+| T005 | 51–71 | [Arkiv 58–78](../../history/testing-before-doc-2c-20261024.md#bb-132c--local-session-compatibility-review-2026-10-01) |
+| T006 | 72–94 | [Arkiv 79–101](../../history/testing-before-doc-2c-20261024.md#bb-132b--finite-model-free-research-session-2026-10-01) |
+| T007 | 95–115 | [Arkiv 102–122](../../history/testing-before-doc-2c-20261024.md#bb-132a-final-version-bound-acceptance--2026-10-01) |
+| T008 | 116–130 | [Arkiv 123–137](../../history/testing-before-doc-2c-20261024.md#bb-132a-rc04-model-free-characterization--2026-10-01) |
+| T009 | 131–144 | [Arkiv 138–151](../../history/testing-before-doc-2c-20261024.md#bb-132a-rc03-verification--2026-10-01) |
+| T010 | 145–156 | [Arkiv 152–163](../../history/testing-before-doc-2c-20261024.md#bb-132a-rc02-diagnostic-verification--2026-09-30) |
+| T011 | 157–171 | [Arkiv 164–178](../../history/testing-before-doc-2c-20261024.md#bb-132a-rc01-verification-state--2026-09-30) |
+| T012 | 172–193 | [Arkiv 179–200](../../history/testing-before-doc-2c-20261024.md#bb-131f-local-runtime-control--2026-09-29) |
+| T013 | 194–215 | [Arkiv 201–222](../../history/testing-before-doc-2c-20261024.md#bb-131e-local-reasoner-contract--2026-09-28) |
+| T014 | 216–225 | [Arkiv 223–232](../../history/testing-before-doc-2c-20261024.md#bb-131d-architecture-verification--2026-09-28) |
+| T015 | 226–239 | [Arkiv 233–246](../../history/testing-before-doc-2c-20261024.md#bb-131c-ledger-verification--2026-09-22) |
+| T016 | 240–256 | [Arkiv 247–263](../../history/testing-before-doc-2c-20261024.md#bb-131b-synthetic-contractreplay-verification--2026-09-22) |
+| T017 | 257–273 | [Arkiv 264–280](../../history/testing-before-doc-2c-20261024.md#bb-131a-architecturerecovery-verification--2026-09-21) |
+| T018 | 274–294 | [Arkiv 281–301](../../history/testing-before-doc-2c-20261024.md#bb-130-final-exit-assessment--2026-09-21) |
+| T019 | 295–323 | [Arkiv 302–330](../../history/testing-before-doc-2c-20261024.md#bb-130d2-frontend-formatter-ci-gate--2026-09-21) |
+| T020 | 324–378 | [Arkiv 331–385](../../history/testing-before-doc-2c-20261024.md#bb-130d2-frontend-formatter-cleanup--2026-09-20) |
+| T021 | 379–406 | [Arkiv 386–413](../../history/testing-before-doc-2c-20261024.md#accepted-publication--2026-09-21) |
+| T022 | 407–431 | [Arkiv 414–438](../../history/testing-before-doc-2c-20261024.md#bb-130d2-formatter-tooling--2026-09-17) |
+| T023 | 432–453 | [Arkiv 439–460](../../history/testing-before-doc-2c-20261024.md#bb-130d2-dependency-maintenance--2026-09-16) |
+| T024 | 454–483 | [Arkiv 461–490](../../history/testing-before-doc-2c-20261024.md#bb-130d2-dependency-triage--2026-09-15) |
+| T025 | 484–511 | [Arkiv 491–518](../../history/testing-before-doc-2c-20261024.md#bb-130d2-frontend-characterization--2026-09-14) |
+| T026 | 512–532 | [Arkiv 519–539](../../history/testing-before-doc-2c-20261024.md#bb-130d-backend-format-ci-gate--2026-09-14) |
+| T027 | 533–559 | [Arkiv 540–566](../../history/testing-before-doc-2c-20261024.md#bb-130d-backend-whitespace-cleanup--2026-09-14) |
+| T028 | 560–589 | [Arkiv 567–596](../../history/testing-before-doc-2c-20261024.md#bb-130d1-backend-quality-gate-baseline--2026-09-14) |
+| T029 | 590–604 | [Arkiv 597–611](../../history/testing-before-doc-2c-20261024.md#bb-130c-exit-approved--2026-09-09) |
+| T030 | 605–624 | [Arkiv 612–631](../../history/testing-before-doc-2c-20261024.md#bb-130c-e2-campaign-sqlite-replayreload--accepted-merged-and-ci-verified-2026-09-09) |
+| T031 | 625–643 | [Arkiv 632–650](../../history/testing-before-doc-2c-20261024.md#bb-130c-e1-robustness-identity-correction--accepted-merged-and-ci-verified-2026-09-09) |
+| T032 | 644–664 | [Arkiv 651–671](../../history/testing-before-doc-2c-20261024.md#bb-130c-backtest-readers-and-exit-assessment--accepted-merged-and-ci-verified-2026-09-08) |
+| T033 | 665–680 | [Arkiv 672–687](../../history/testing-before-doc-2c-20261024.md#bb-130c-shared-immutable-backtest-writer--accepted-merged-and-ci-verified-2026-09-08) |
+| T034 | 681–691 | [Arkiv 688–698](../../history/testing-before-doc-2c-20261024.md#bb-130c-finance-persistence-characterization--accepted-merged-and-ci-verified-2026-09-08) |
+| T035 | 692–701 | [Arkiv 699–708](../../history/testing-before-doc-2c-20261024.md#bb-130c-csv-syntactic-tokenizer--accepted-merged-and-ci-verified-2026-09-08) |
+| T036 | 702–713 | [Arkiv 709–720](../../history/testing-before-doc-2c-20261024.md#bb-130c-csv-corporate-action-column-zero-correction--2026-09-08) |
+| T037 | 714–722 | [Arkiv 721–729](../../history/testing-before-doc-2c-20261024.md#bb-130c-intake-quarantine-boundary--2026-09-07) |
+| T038 | 723–731 | [Arkiv 730–738](../../history/testing-before-doc-2c-20261024.md#bb-130c-canonical-productrevision-identity-v2--2026-09-07) |
+| T039 | 732–747 | [Arkiv 739–754](../../history/testing-before-doc-2c-20261024.md#bb-130c-revision-identity-audit--2026-09-07) |
+| T040 | 748–756 | [Arkiv 755–763](../../history/testing-before-doc-2c-20261024.md#bb-130c-backtest-identity--merged-and-ci-verified-2026-09-07) |
+| T041 | 757–768 | [Arkiv 764–775](../../history/testing-before-doc-2c-20261024.md#bb-130c-research-detail-characterization--2026-09-06) |
+| T042 | 769–778 | [Arkiv 776–785](../../history/testing-before-doc-2c-20261024.md#bb-130c-observation-lifecycle-characterization--2026-09-06) |
+| T043 | 779–791 | [Arkiv 786–798](../../history/testing-before-doc-2c-20261024.md#bb-130b-loading-verification--2026-09-06) |
+| T044 | 792–803 | [Arkiv 799–810](../../history/testing-before-doc-2c-20261024.md#bb-130a-continuity-verification--2026-09-05) |
+| T045 | 804–810 | [Arkiv 811–817](../../history/testing-before-doc-2c-20261024.md#bb-128c-finance-asyncdegraded-design-system-conformance) |
+| T046 | 811–827 | [Arkiv 818–834](../../history/testing-before-doc-2c-20261024.md#bb-128b-finance-last-known-good-resilience) |
+| T047 | 828–842 | [Arkiv 835–849](../../history/testing-before-doc-2c-20261024.md#bb-128a-alpaca-activation-readiness) |
+| T048 | 843–862 | [Arkiv 850–869](../../history/testing-before-doc-2c-20261024.md#bb-127-owner-research-capabilities-and-xlsx) |
+| T049 | 863–876 | [Arkiv 870–883](../../history/testing-before-doc-2c-20261024.md#googlefinance-goog-first-owner-intake) |
+| T050 | 877–895 | [Arkiv 884–902](../../history/testing-before-doc-2c-20261024.md#bb-126-owner-market-data-drop) |
+| T051 | 896–910 | [Arkiv 903–917](../../history/testing-before-doc-2c-20261024.md#bb-125-zero-cost-historical-market-data-qualification) |
+| T052 | 911–917 | [Arkiv 918–924](../../history/testing-before-doc-2c-20261024.md#bb-124-anti-overfitting-and-oos-governance) |
+| T053 | 918–925 | [Arkiv 925–932](../../history/testing-before-doc-2c-20261024.md#bb-123-transaction-cost-slippage-and-fill-realism) |
+| T054 | 926–932 | [Arkiv 933–939](../../history/testing-before-doc-2c-20261024.md#bb-122-historical-security-identity-evidence-pilot) |
+| T055 | 933–939 | [Arkiv 940–946](../../history/testing-before-doc-2c-20261024.md#bb-121-wiki-forensics-and-stooq-requalification) |
+| T056 | 940–945 | [Arkiv 947–952](../../history/testing-before-doc-2c-20261024.md#bb-120-historical-evidence-source-qualification) |
+| T057 | 946–951 | [Arkiv 953–958](../../history/testing-before-doc-2c-20261024.md#bb-119-finance-readiness-and-governor-reconciliation) |
+| T058 | 952–957 | [Arkiv 959–964](../../history/testing-before-doc-2c-20261024.md#bb-118-finance-source-of-truth-reconciliation) |
+| T059 | 958–964 | [Arkiv 965–971](../../history/testing-before-doc-2c-20261024.md#bb-117-audiobook-final-polish-and-media-handoff) |
+| T060 | 965–971 | [Arkiv 972–978](../../history/testing-before-doc-2c-20261024.md#bb-115r-physical-iphone-sleep-timer-remediation) |
+| T061 | 972–979 | [Arkiv 979–986](../../history/testing-before-doc-2c-20261024.md#bb-115-physical-iphone-artwork-and-continue-listening-timer) |
+| T062 | 980–986 | [Arkiv 987–993](../../history/testing-before-doc-2c-20261024.md#bb-114-audiobook-detail-polish-sleep-timer-and-floating-player-rejection) |
+| T063 | 987–994 | [Arkiv 994–1001](../../history/testing-before-doc-2c-20261024.md#bb-113-audiobook-owner-review-remediation) |
+| T064 | 995–1000 | [Arkiv 1002–1007](../../history/testing-before-doc-2c-20261024.md#bb-112-native-audiobook-playback-and-owner-search-remediation) |
+| T065 | 1001–1010 | [Arkiv 1008–1017](../../history/testing-before-doc-2c-20261024.md#bb-111-routedetail-ux-and-playback-credential-gate) |
+| T066 | 1011–1017 | [Arkiv 1018–1024](../../history/testing-before-doc-2c-20261024.md#bb-110-audiobook-owner-ux-consolidation) |
+| T067 | 1018–1024 | [Arkiv 1025–1031](../../history/testing-before-doc-2c-20261024.md#bb-109-audiobook-owner-ux-remediation) |
+| T068 | 1025–1031 | [Arkiv 1032–1038](../../history/testing-before-doc-2c-20261024.md#bb-108-audiobook-navigation-experiment) |
+| T069 | 1032–1037 | [Arkiv 1039–1044](../../history/testing-before-doc-2c-20261024.md#bb-107-owner-ux-remediation) |
+| T070 | 1038–1043 | [Arkiv 1045–1050](../../history/testing-before-doc-2c-20261024.md#bb-106-consolidated-ux-quality) |
+| T071 | 1044–1050 | [Arkiv 1051–1057](../../history/testing-before-doc-2c-20261024.md#bb-105-audiobookbay-parser-and-literal-author-search) |
+| T072 | 1051–1056 | [Arkiv 1058–1063](../../history/testing-before-doc-2c-20261024.md#bb-104-universal-metadata-aware-audiobook-search) |
+| T073 | 1057–1067 | [Arkiv 1064–1074](../../history/testing-before-doc-2c-20261024.md#bb-103-usable-audiobook-lifecycle) |
+| T074 | 1068–1074 | [Arkiv 1075–1081](../../history/testing-before-doc-2c-20261024.md#bb-102-patched-librarr-provider) |
+| T075 | 1075–1082 | [Arkiv 1082–1089](../../history/testing-before-doc-2c-20261024.md#bb-101-audiobook-acquisition-foundation) |
+| T076 | 1083–1090 | [Arkiv 1090–1097](../../history/testing-before-doc-2c-20261024.md#bb-100-audiobook-platform-foundation) |
+| T077 | 1091–1094 | [Arkiv 1098–1101](../../history/testing-before-doc-2c-20261024.md#bb-099-whole-app-ux-audit) |
+| T078 | 1095–1098 | [Arkiv 1102–1105](../../history/testing-before-doc-2c-20261024.md#bb-098-global-ui-migration) |
+| T079 | 1099–1152 | [Arkiv 1106–1159](../../history/testing-before-doc-2c-20261024.md#bb-097-family-reference-validation) |
+| T080 | 1153–1179 | [Arkiv 1160–1186](../../history/testing-before-doc-2c-20261024.md#automatiska-tester) |
+| T081 | 1180–1267 | [Arkiv 1187–1274](../../history/testing-before-doc-2c-20261024.md#verifieringskarta) |
+| T082 | 1268–1272 | [Arkiv 1275–1279](../../history/testing-before-doc-2c-20261024.md#live-säkerhetsregel) |
+| T083 | 1273–1278 | [Arkiv 1280–1285](../../history/testing-before-doc-2c-20261024.md#bb-090-test-additions) |
+| T084 | 1279–1281 | [Arkiv 1286–1288](../../history/testing-before-doc-2c-20261024.md#bb-091-test-additions) |
+| T085 | 1282–1286 | [Arkiv 1289–1293](../../history/testing-before-doc-2c-20261024.md#bb-129a-campaign-verification) |
+
+### Separat kontroll av orubricerade områden
+
+Alla nedanstående ligger kvar inom [T079:s fulltext](../../history/testing-before-doc-2c-20261024.md#bb-097-family-reference-validation),
+inte omklassificerade till enbart Family. Aktiva ingångar anges med samma G-ID som fas A.
+
+| Område | Originalrader | Arkivrader | Aktiv ingång |
+| --- | --- | --- | --- |
+| BB-092 | 1107–1108 | 1114–1115 | G1/G2 |
+| BB-093 | 1109–1110 | 1116–1117 | G1/G2 |
+| BB-094 | 1111–1112 | 1118–1119 | G1/G2/G4 |
+| BB-095 | 1113–1114 | 1120–1121 | G1/G2 |
+| BB-096 | 1115–1116 | 1122–1123 | G5 |
+| BB-089 | 1117–1122 | 1124–1129 | G1/G2 |
+| BB-088 | 1123–1128 | 1130–1135 | G1/G2 |
+| BB-087 | 1129–1130 | 1136–1137 | G1/G2 |
+| BB-086 | 1131–1135 | 1138–1142 | G0 |
+| BB-085 | 1136–1140 | 1143–1147 | G1/G2/G4 |
+| BB-084 | 1141–1146 | 1148–1153 | G1/G2 |
+| BB-083 | 1147–1150 | 1154–1157 | G4 |
+
+T081:s modulöversikt 1182–1189 finns på arkivrader 1189–1196; Finance-/historikblandningen
+1190–1266 på 1197–1273. Även slutrubrikerna T083–T085 ingår i fulltextkontrollen.
+
+### Aktiva ingångar för G0–G8
+
+G-ID:n är fas A:s spårbarhetsnycklar, inte ett nytt testregister eller nya regler.
+
+| Grind | Aktiv ingång i TESTING | Bevarande |
+| --- | --- | --- |
+| G0 | [Scope och risk](../../../TESTING.md#välj-verifiering-efter-scope-och-risk) | AGENTS/DoD, tillstånd kontra metod/resultat, separata merge-/deploymentbeslut och statusnivåer. |
+| G1 | [Frysningar](../../../TESTING.md#frysningar-före-testval) | Finance/BB-158, RESEARCH / 0 SEK / NONE, G3a BLOCKED, G3b NOT RUN; inga återaktiverade grants eller körorder. |
+| G2 | [Finance-integritet](../../../TESTING.md#finance-integritet-och-exekveringsauktoritet) | Science, lineage, temporalitet, immutable receipts, concurrency/avbrott, rättigheter och ärvd retention; inga fabricerade PASS. |
+| G3 | [Exekveringsauktoritet](../../../TESTING.md#finance-integritet-och-exekveringsauktoritet) | Version/admission, journals/budget, auth/revokering, OS-/resurs-/nätverksgränser; proof/CI inte native acceptance. |
+| G4 | [Sentinel och host](../../../TESTING.md#sentinel-host-backup-och-säkerhet) | Protokoll/säkerhet, fysisk hostgrind, dataintegritet/recovery och O7 UNCERTAIN. |
+| G5 | [Manuell acceptans](../../../TESTING.md#manuell-fysisk-och-operativ-acceptans) | Tre teman, touch/fokus/dock, BB-097-undantag, iPhone/PWA/Tizen, ratad floating player och O5 UNCERTAIN. |
+| G6 | [Kommandon och CI](../../../TESTING.md#kommandon-och-ci) | Statiskt verifierade arbetskataloger, format/build/test/docs/secrets; ingen påstådd färsk app-PASS eller tvåpassrutin. |
+| G7 | [Säkerhetsgrindar](../../../TESTING.md#sentinel-host-backup-och-säkerhet) | Pentest/auth/negativprov, striktare kontrakt oförändrade; CI inte hela securitybaseline. |
+| G8 | [Media och Family](../../../TESTING.md#media-och-family) | Live-mutationer/progress skyddas, idempotens/ABS/no-overwrite, destruktiv Download Controls-grind, Family-datagränser och default-off skollunch. |
+
+### Verkställande och kvarstående osäkerheter
+
+- **D1:** ett fulltextarkiv och en kort aktiv guide; 85/85 intervall plus 12/12 delområden har faktiska destinationer ovan.
+- **D2:** gamla checkpointbundna fullsvits-, next-, maintenance- och fortsättningsinstruktioner ligger som historik. Invariants och negativa resultat bevaras; ingen ny körningsrätt.
+- **D3:** O5 fysisk/designacceptans och O7 backup-/runbookgodkännanden förblir **UNCERTAIN** och synliga i guiden. Runbooks, kontrakt och ägaracceptans är oförändrade.
+- **D4:** endast befintliga ingångar för metod, status, procedur och evidens justeras. Historiska katalog-/rapportlänkar och auktoritetsordningen bevaras; inget parallellt kontrakt.
+
+O10:s äldre temanamn i manual-guiden redovisas som instruktionsdrift utan att den ändras;
+externa baselineartefakter och faktisk runtime är fortfarande overifierade. Dessa frågor
+stängs inte av DOC-2C och kräver eget avgränsat underlag/beslut vid framtida användning.
+Ingen P0/P1 för själva förlustfria dokumentationsflytten har identifierats; detta är ingen
+säkerhetscertifiering, produktacceptans eller värdering av aktuella produktionsblockerare.
+
+### Verifiering av fas B
+
+- **PASS:** `node scripts/verify-documentation.mjs`: 284 Markdown-filer, 53 unika aktiva backlog-ID. Validatorn och CI-workflows är oförändrade.
+- **PASS:** `git diff --check`.
+- **PASS:** mekanisk Python-kontroll: omvänd länkombasering → byteidentisk originaltext, samma Git-blob (`git hash-object --stdin`) och SHA-256 som fas A. Original 1286 rader, arkiv 1293, aktiv guide 156.
+- **PASS:** 85/85 rubrikintervall verifierade mot originalpositioner och faktiska arkivdestinationer; 12/12 orubricerade områden separat verifierade. Alla originalrader täcks, även T081:s blandfall och T083–T085.
+- **PASS:** G0–G8 har nio aktiva ingångar; innehåll och auktoritativa hänvisningar jämförda med fas A:s grindlista. Ingen grind eller osäker acceptansfråga stängd.
+- **PASS:** riktad lokal länk-/ankarkontroll av 18 ändrade/berörda dokument och 593 relativa Markdown-länkar, inklusive de tre inkommande historiska D1-länkarna. Rubriksluggar/dubblettsuffix och explicita ankare kontrollerade.
+- **PASS:** sju Markdown-filer inom scope; fas A:s hela rapporttext är oförändrat prefix. Dokumentauktoritetens ordning, STATUS/Backlog/Roadmap, kanoniska frysningar, runbooks, kod, tester och konfiguration är oförändrade. Orelaterade ospårade filer lämnas utanför checkpointen.
+- **PASS:** riktad sekretesskontroll av publiceringsfilerna för privata nycklar, token-/credentialmönster samt manuell diffgranskning. Ingen rå driftinformation tillförd. Detta är inte en ny fullständig säkerhetscertifiering.
+- **SKIP:** applikationstester/build, Finance-/BB-158-körningar, externa URL-kontroller och produktionsinspektion; ingen kod- eller runtimedelta och inga sådana körningar auktoriserade. Historisk evidens återanvänds endast som historik, inte aktuellt PASS.
+- **SKIP:** ny GitHub Actions-körning för denna checkpoint; workflow triggas av main-push/PR, ingen merge eller PR ingår i publiceringen. Lokala dokumentationsresultat ovan ersätter inte framtida required checks vid merge.
+
+Nästa åtgärd är oberoende GitHub-granskning av publicerad SHA. Ingen merge, deployment,
+fryst körning eller nästa DOC-sprint följer av publiceringen.
