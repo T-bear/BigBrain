@@ -1,6 +1,6 @@
 # Project Report Catalog
 
-- [DOC-2B Backlog/Roadmap inventory, 2026-10-24](documentation/doc-2b-backlog-roadmap-inventory-20261024.md): phase A only; 315 traced sections, freezes and open requirements preserved; proposed destinations and phase B decisions, no consolidation.
+- [DOC-2B Backlog/Roadmap inventory, 2026-10-24](documentation/doc-2b-backlog-roadmap-inventory-20261024.md): phase A inventory and owner-authorized phase B consolidation; 315 losslessly archived sections, visible open requirements/freezes and U1–U3 uncertainty; documentation Merge Candidate.
 
 - [DOC-2A Recovery/Status inventory, 2026-10-24](documentation/doc-2a-recovery-status-inventory-20261024.md): 184-section inventory and owner-authorized phase B consolidation; lossless archives, visible U1–U3 limits, documentation Merge Candidate.
 

@@ -1,1427 +1,138 @@
 # BigBrain Backlog
 
-**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
-inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
-är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
-
-
-## Media — Mediekontroll review gate, 2026-10-17
-
-Remaining: independent exact-checkpoint review and owner iPhone/PWA verification of the new
-Mediekontroll cards, separate pages, focus, history and legacy bookmarks. No merge/deployment yet.
-[Bounded scope, acceptance checks and compatibility](reports/features/media/media-control-20261017.md).
-Prior integrated audiobook search is merged/deployed; owner iPhone/PWA acceptance was explicitly
-reported on 2026-10-17. Its former deployment/UX review gates are complete for that release only.
-The adapter's existing catalog bound (50 recent library entries, 25 discovery entries) remains;
-whole-catalog search and BB-155/156/157 are unchanged and outside this task.
-
-
-## Historical Qwen operational gate
-
-Historical integration is implemented for review; no real inference/grant/journal/profile is activated.
-Remaining: separate approval of the exact historical source commitment and I1/E1/T3/C64/W33s grant,
-protected authority provisioning, approved pinned model profile and reviewed deployment. Ordinary30s
-completion is unverified; a failure consumes its reservation and does not permit retry/refund.
-[Contract and operator sequence](architecture/finance/research-learning-contract.md#historical-qwen-admission--implementation-checkpoint-2026-10-16).
-No generic follow-up sprint or second research platform is proposed.
-
-
-## Finance recurring research implementation and release gate
-
-**MERGE CANDIDATE; implementation verified, no operational activation.** The prior unconditional
-production stop is replaced by protected journal matching. Normal restart and older Finance rollback
-have distinct outcomes within the explicit root-custody/restore-exclusion model.
-[Current implementation evidence](reports/features/finance/recurring-research-implementation-20261014.md#final-release-implementation--protected-recurring-authority--2026-10-15).
-Remaining operational gates: reviewed release SHA, independently provisioned append-only journal and
-actual host protection preflight, exact scientifically eligible data/mapping/cohort dates, finite grant,
-local profile/resources, separate deployment and inference approval. No automatic grant renewal.
-General disaster recovery, privileged whole-host rollback including authority, witness loss and automated
-repair remain outside this release; old grants cannot be reenabled without trustworthy current history.
-No generic preparation sprint or new recovery exercise is queued.
-
-## BB-132H — versioned observation mapping
-
-**MERGE CANDIDATE / REVIEW ONLY; NOT ACCEPTED.** Bounded version selection and immutable
-assertion persistence implemented; [evidence and limitations](reports/features/finance/bb-132h-versioned-observation-mapping-20261010.md).
-Separate future decisions: operational adoption and truthful current mapping verification;
-closing an adopted open-ended snapshot/material identity changes; cross-version SHADOW compatibility;
-version/manifest capacity beyond the explicit fail-closed bounds. None is activated by publication.
-
-## BB-132F1 — controlled activation and deployment gate
-
-**ACCEPTED / MERGED / CI VERIFIED.** NOT DEPLOYED / NOT ACTIVATED. Bounded one-shot uses accepted Finance receipts while runtime remains disabled. Actual deployment/service readiness, reviewed mapping/credentials and first real request remain separate operational gates; no unattended activation.
-[Exact acceptance/merge/CI evidence and remaining operational gates](reports/features/finance/bb-132f1-controlled-activation-gate-20261004.md#accepted-publication--2026-10-04).
-
-## BB-132F — live market observation runtime
-
-**ACCEPTED / MERGED / CI VERIFIED.** Bounded, disabled-by-default unattended Alpaca daily
-collection through existing Finance receipts, with restart/revisions and trusted knowledge preserved.
-[Exact acceptance evidence](reports/features/finance/bb-132f-live-market-observation-runtime-20261003.md#accepted-publication--2026-10-03) and remaining operational limits in that report.
-Live activation, owner-selected mappings/credentials, cross-host coordination, long-outage backfill,
-projection-capacity expansion and automatic scientific evaluation remain outside this checkpoint.
-No next sprint, trading, model or deployment authority.
-
-## BB-132E — prospective shadow evaluation
-
-**ACCEPTED / MERGED / CI VERIFIED.**
-Owner explicitly accepted private Alpaca data-use/retention uncertainty; the prior implementation
-blocker is resolved without asserting a provider guarantee. Completed: native historical daily
-receipt, versioned eligibility, immutable trusted freeze, sealed future-only projection, close/direction
-result, restart/revisions/concurrency and no-lookahead checks.
-[Exact acceptance and main-CI evidence](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#accepted-publication--2026-10-03).
-[Evidence, exact limitations and current review identity](reports/features/finance/bb-132e-prospective-shadow-compatibility-20261002.md#owner-accepted-daily-shadow-implementation--2026-10-03).
-Live activation and any broader strategy/source/automation work remain outside this candidate.
-Known later deletion obligations require fail-closed reconciliation; no trading/grant renewal/inference.
-
-## BB-132D — real market observation foundation, 2026-10-02
-
-**MERGE CANDIDATE / IMPLEMENTED / AUTOMATICALLY VERIFIED / REVIEW CANDIDATE ONLY.** D ends at immutable acquired evidence
-and deterministic point-in-time replay. Receipt/reopen/identity, duplicate/conflict, future noninterference, untrusted transport and full
-regression gates passed. Owner acceptance is pending; no live call is required.
-[Evidence and remaining gates](reports/features/finance/bb-132d-market-observation-foundation-20261002.md).
-Known limits:1000-receipt bounded projection; one-minute raw snapshots only; explicit revision lineage;
-no symbol master or final-bar guarantee. Twelve Data live rights, compatible retention/deletion and
-backup treatment remain unfulfilled activation gates. Prospective/shadow evaluation and BB-132E
-are NOT STARTED / NOT AUTHORIZED. Finance RESEARCH / 0 SEK / NONE.
-
-
-## BB-132C real finite research sequence — 2026-10-02
-
-**ACCEPTED / MERGED / CI VERIFIED.** The two
-owner-authorized compatibility corrections compose the runtime deadline with bounded cleanup and
-describe only the existing supplied Finance history. No parser/admission/grammar, projected history,
-scientific grant, model parameters or isolation change.
-The single real C session completed: Qwen N → Admitted → one deterministic evaluation → native
-persistence → reopen → sanctioned history → real Qwen N+1 → BudgetExceeded. Exactly2 invocations,
-1 evaluator start,3 trials,36 underlying runs; zero second evaluation. Both owned workers exited0;
-no timeout/OOM/retry/refund. The real allowance is consumed; NO further inference is authorized.
-Model-free gates before inference: API920 PASS/8 controlled-model SKIP, Sentinel32 PASS; focused255
-PASS/1 SKIP; Release build/format/docs/secrets PASS. Post-session API920/8 SKIP and Sentinel32
-PASS again; exact commands and sanitized real evidence are in the checkpoint report below. Earlier dated compatibility-stop statements are historical.
-Finance RESEARCH / 0 SEK / NONE. No deployment, trading, cloud, scheduler, public endpoint or BB-132D.
-Owner approved exact candidate `78517da41e8d4e7642029daebde544a951da092d`; unchanged merge `2ff64718b561c9520ab1d3568649f10ec7f70596`.
-Merge CI[36954159147](https://github.com/T-bear/BigBrain/actions/runs/36954159147) passed backend, frontend,
-documentation and secrets, including both formatter steps. Exact identities and final-main CI
-resolution are in the checkpoint report. No new inference during publication.
-Next: STOP for independent post-merge review. BB-132D NOT STARTED / NOT AUTHORIZED.
-
-## BB-132C — local-session compatibility review, 2026-10-01
-
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.** C is now authorized from fetched
-main `cab482c49d2187a3f39c13528a5fb88d899f6b8f`; prior dated C-not-authorized entries are history.
-[Exact baseline/tree, model-free integration evidence and remaining decision](reports/features/finance/bb-132c-local-sequence-compatibility-20261001.md).
-Existing finite session can bind IResearchReasoner/LocalReasonerRuntime directly without a second
-orchestration path. Model-free proof connects owned BRF1 child, N evaluation/native persistence,
-reopen, N+1 bounded history and no second evaluation. Production implementation remains unchanged.
-
-Compatibility stop before inference: B's fixed30s parent deadline overrides A's controlled180s
-runtime; A's historical successful reply took50.458s. Native prompt still unconditionally asserts
-empty history, contradicting evaluated N+1's existing projection. No performance prediction or
-pre-existing science defect claimed. No deadline/prompt/history/parser fix made without review.
-Next: review narrowly scoped deadline/prompt compatibility before consuming the conditional real
-session. Real session NOT CREATED; real invocations0/2; A grants/journals untouched.
-Verification results are maintained in the report. Finance **RESEARCH / 0 SEK / NONE**.
-No inference/model/provider/cloud/GPU, trading/broker/orders/capital/deployment or BB-132D.
-
-
-## BB-132B — finite model-free research session, 2026-10-01
-
-**ACCEPTED / MERGED / CI VERIFIED.**
-Baseline `2caf2eb898acaafa759c6287d02442a90bb666db`; same branch `bb-132b/persistent-research-loop`.
-The owner/architect resolved the first review's intentional v1 boundary: a separate explicitly
-created finite grant permits two reasoner invocations and at most one evaluation (N only),
-three trials/64 underlying calls, concurrency one and no retries/refunds.
-[Ownership, exact publication identity, projection policy and evidence](reports/features/finance/bb-132b-research-loop-boundary-20261001.md).
-
-Finance migration95 adds an empty session table in the existing database; it does not seed a grant
-or convert old v1 state. Explicit creation requires an uninitialized v1 scientific slot. Existing
-enrolled/spent v1 rows cannot acquire this grant. First invocation reservations commit together;
-existing admission/evaluator/result stores and scientific ledger remain authoritative.
-N+1 receives only a versioned, bounded reference-validation outcome and sanitized operational
-history. Protected holdout/selection/classifications/IDs are excluded. A second proposal fails
-BudgetExceeded; NoUsefulProposal is normal. Failure/uncertainty never refunds or permits retry.
-Focused model-free B/C/E/F/B-session suite: **227 PASS**. Full API906 PASS/7 model skips;
-Sentinel32 PASS; restore/Release build/format/docs/scope/secrets PASS. No model was invoked.
-
-This is an internal synthetic, finite API: no runtime registration/public endpoint, daemon or
-real-model integration. General adaptive history/overlap, real-market eligibility and runtime
-validation remain future work. No Qwen, tuning/download/cloud/GPU/provider/trading/deployment/BB-132C.
-Finance **RESEARCH / 0 SEK / NONE**. Earlier A-era B-not-authorized statements are dated history;
-this authorization is model-free only and does not revive consumed inference allowances.
-
-Owner explicitly approved independently reviewed candidate `8df4541fdcd300b0d334d519c221e4189dd32084`.
-Merged unchanged as `b2da9e7ee46b2722fc9f696fbdfe9097afa0caab`; candidate/merge tree identical.
-[Accepted identities and merge CI36918069527](reports/features/finance/bb-132b-research-loop-boundary-20261001.md#accepted-publication--2026-10-01):
-backend restore/format/Release build/tests, frontend install/format/tests/build, documentation and
-Gitleaks jobs/actual steps SUCCESS. Final docs reconciliation is verified by its own exact-SHA CI;
-its identity is resolved in the report. No implementation or model invocation during publication.
-**BB-132C NOT STARTED / NOT AUTHORIZED.** Next: STOP for independent post-merge review/planning.
-
-## BB-132A final local-model result — 2026-10-01
-
-**ACCEPTED / MERGED / CI VERIFIED.**
-Owner-authorized minimal producer correction pins finance-research-learning-v1 in BOTH grammar
-alternatives. No Finance parser/admission/vocabulary, prompt, other field or isolation change.
-The LAST1.7B acceptance invocation completed: **Proposal / Finance Admitted,1 PASS/0 FAIL**.
-Runtime50,458ms, native exit0, no OOM/cleanup, zero scientific engine calls. Model rationale remains
-unproven metadata, not evidence. All15 prior evidence files unchanged; no ledger refund/reset.
-No model allowance remains. [Exact SHA/tree resolution, provenance, measurements and verification](reports/features/finance/bb-132a-local-model-preflight-20260929.md#final-bb-132a--2026-10-01).
-Final solution restore/build/format PASS; API874 PASS/7 model skips, Sentinel32 PASS.
-Owner explicitly approved independently reviewed candidate `960a12ddb04349fd54b5b90a550b9e1e4be9419c`.
-Merged unchanged as `4c0e451cc3af0de23ddbf5edd6336e9cc7589f37` from baseline
-`739beab55a494068edcf23d3c905aa6601b99dc0`; candidate/merge tree identical.
-[Exact identities, green merge CI 36818875959 and final reconciliation resolution](reports/features/finance/bb-132a-local-model-preflight-20260929.md#accepted-publication--2026-10-01).
-Backend/frontend/documentation/secrets jobs and actual formatter/build/test steps SUCCESS.
-No inference or implementation change during publication. Next: STOP for post-merge review/planning.
-Finance RESEARCH / 0 SEK / NONE. No deployment/cloud/PAPER/LIVE/AUTO/broker/orders/capital.
-BB-132B NOT STARTED / NOT AUTHORIZED. Earlier entries are historical; no old invocation grant revives.
-
-
-## BB-132A RC04 — model-free contract characterization, 2026-10-01
-
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
-Proven static gap: Finance requires exact finance-research-learning-v1; worker prompt correctly says
-copy it, but both GBNF branches leave version as a broad identity string. Grammar permits wrong
-versions yielding UnsupportedContract; it also permits the correct version. No wrong value is forced.
-RC03 raw value remains unknown; synthetic witnesses do not reconstruct it. Fourteen new model-free
-cases traverse actual source grammar terminals and .NET BRF1/parser/pure admission, with no engine.
-[RC04 exact SHA/tree resolution, proof and limitations](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc04--2026-10-01).
-No production correction, worker rebuild, inference, ledger rewrite or consumption of final acceptance.
-Next: publish RC04 and STOP for independent review; proposed future grammar-only version binding
-requires a new bounded decision before implementation/inference. Finance RESEARCH /0 SEK /NONE.
-Earlier entries retain their dated scope. No merge, deployment, trading, cloud or BB-132B.
-
-
-## BB-132A RC03 — real diagnostic evidence, 2026-10-01
-
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
-Owner-authorized single diagnostic1.7B invocation completed: **InvalidReply / UnsupportedContract**.
-Complete BRF1 reply, native exit0, terminal30,820ms, no OOM or controller cleanup; engine/admission0.
-No raw reply retained/published or field-level cause guessed. Prompt/grammar/artifact/parser/controls
-unchanged. All13 earlier evidence files remain byte-identical; no ledger refund/reset.
-One test-only opt-in added; build/format PASS,196 model-free tests PASS/6 model skips.
-Actual real diagnostic test:0 PASS/1 FAIL; diagnostic category captured, no proposal acceptance.
-No correction/retry/second invocation. Separate conditional final acceptance remains UNUSED.
-[Exact RC03 SHA/tree resolution, measurements and provenance](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc03--2026-10-01).
-Next: RC03 publication then STOP for independent review and a bounded continuation/end decision.
-Finance RESEARCH /0 SEK /NONE. No merge/deploy/trading/cloud/BB-132B. Earlier entries are history.
-
-
-## BB-132A RC02 — sanitized rejection diagnostics, 2026-09-30
-
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
-Same branch/baseline; RC01 `0788e14a297c238f1eff6d3a622fd96a9978c25d` remains preserved.
-[RC02 exact SHA/tree resolution, scope and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc02--2026-09-30).
-Implemented: existing Finance rejection enum now survives runtime InvalidReply in exception/audit and
-controlled acceptance journal. No parser/admission/worker/rules relaxation or raw reply logging.
-Release build PASS/0warnings/errors;196 model-free focused tests PASS/5 model skips.
-Blocker: previous complete reply and inner parser reason were never retained. Historical exact reason
-remains UNKNOWN; new diagnostics cannot reconstruct absent data. No cause-specific fix or model run.
-All13 prior evidence hashes unchanged; the conditional last acceptance allowance remains UNUSED.
-Next: publish RC02 and STOP for review/decision on obtaining missing diagnostic evidence within
-bounded scope. No implicit diagnostic inference authorization. Full BB-132A acceptance remains incomplete.
-Finance RESEARCH / 0 SEK / NONE. No merge, deployment, cloud, trading, capital or BB-132B.
-Earlier entries retain their dated scope.
-
-
-## BB-132A Review Checkpoint RC01 — 2026-09-30
-
-**REVIEW CHECKPOINT / INCOMPLETE / NOT A MERGE CANDIDATE.**
-Baseline `739beab55a494068edcf23d3c905aa6601b99dc0`; branch `bb-132a/first-local-language-model`.
-[Authoritative report, exact commit/tree resolution, inventory and evidence](reports/features/finance/bb-132a-local-model-preflight-20260929.md#review-checkpoint-rc01--2026-09-30).
-RC01 publishes preserved BB-132A work plus the owner-authorized Review Checkpoint workflow.
-Main remains accepted source of truth; the branch records ongoing, unaccepted work.
-
-Real Qwen3-1.7B produced a complete BRF1 response in30.2s, native exit0, no OOM. The unchanged
-Finance reply parser rejected it as InvalidReply; exact inner rejection reason was not retained.
-Admission/engine were not reached. Earlier4B failures and1.7B failure/diagnostic evidence remain
-unchanged; no ledger refund/reset. Preserved196 focused tests PASS,5 intentional model skips;
-Release build PASS/0warnings/errors. Real corrected acceptance failed; full final gates unfinished.
-No new model invocation or source/test change during this publication step.
-
-Next: RC01 publication then STOP for independent review. Authorized next bounded work on this SAME
-branch: sanitized rejection diagnostics, exact cause identification, in-scope correction only, then
-at mostONE further1.7B acceptance<=180s only if its conditions are met. Not an automatic retry.
-No4B, model swap, GPU/CUDA, weaker parser/isolation or cloud fallback. Finance RESEARCH /0 SEK /NONE.
-No merge/deployment/PAPER/LIVE/AUTO/broker/orders/capital or BB-132B. Acceptance remains incomplete.
-Earlier entries below are historical evidence, not current publication restrictions.
-
-## BB-131F local runtime control — 2026-09-29
-
-**ACCEPTED / MERGED / CI VERIFIED**.
-Owner-authorized from `ddcf8011aefae4bd6df708421f02d6ede293fdcc`; the explicit architecture
-clarification permits only the runtime's owned child lifecycle. ADR 0040 is **Accepted**.
-[Implementation, exact evidence and limitations](reports/features/finance/bb-131f-local-reasoner-runtime-isolation-20260929.md).
-The Brain library adds disabled-by-default local control, inherited framed pipes, receive limits,
-exclusive reservation, cancellation/deadline and retained-pidfd termination of its own proof child.
-No generic process authority, Sentinel change, API registration, Finance engine/ledger/schema change,
-model/provider/SDK, external export or deployment. The deterministic executable exists only in tests.
-Operational records are sanitized; durable audit integration and hard CPU/RAM/GPU/native sandboxing
-remain first-model gates. Finance **RESEARCH / 0 SEK / NONE**. No paid AI dependency or cloud fallback.
-A–E remain accepted, BB-130 closed. No model or next-checkpoint authority follows from publication.
-Earlier authorization/status statements below retain their dated scope.
-
-F was independently reviewed and explicitly owner-approved at the exact candidate SHA recorded in the report.
-Deferred: durable authenticated audit, deployment/native sandbox/resource policy, first-model
-provenance/selection/use rights and explicit invocation approval. No other priority is changed.
-
-
-## BB-131E local reasoner contract — 2026-09-28
-
-**ACCEPTED / MERGED / CI VERIFIED.**
-Owner-authorized from `e2f9cd761d0c8ed7569939b9ada908e6de37cf3f` on
-`bb-131e/local-reasoner-contract`. [Implementation and evidence](reports/features/finance/bb-131e-local-reasoner-contract-20260928.md).
-A minimal Brain contract library references Finance's existing development input and closed reply.
-Finance owns the shared B parser and unchanged scientific admission; C still reserves invocation,
-trials/exposure and execution. Only test code implements the reasoner and orchestration.
-No API registration/reference to Brain, model, inference, external SDK/provider/export or deployment.
-Finance **RESEARCH / 0 SEK / NONE**. ADR 0038/0039 remain Accepted; BB-130 closed; A/B/C/D accepted.
-E is accepted and merged as a contract foundation, not runtime-authorized. Auth/audit/transport/resource/kill-switch isolation,
-model provenance/capacity and first-invocation review remain prerequisites. No paid AI dependency
-or cloud fallback. No subsequent checkpoint is authorized. Older D authorization statements below
-are dated history and do not override this separately authorized E scope.
-
-
-## Current BB-131 planning — 2026-09-28
-
-### BB-131 – Finance Research Learning foundation
-
-- Scope: reasoner proposes; existing deterministic Finance proves; risk may veto. No execution authority.
-- Status: **A ACCEPTED / MERGED / CI VERIFIED**; **B ACCEPTED / MERGED / CI VERIFIED**;
-  **C ACCEPTED / MERGED / CI VERIFIED**; **D ACCEPTED / MERGED / CI VERIFIED**;
-  **E ACCEPTED / MERGED / CI VERIFIED**.
-- Authority: owner authorized A analysis/documentation only from `7747b8f715204dc3ccf753f170238b40238d1b11`.
-- A DoD: source-backed reuse map, structured versioned contract, anti-overfitting/holdout governance,
-  input/output boundary, replay/failure/security model and smallest fixture-first implementation plan.
-- [Contract and A DoD](architecture/finance/research-learning-contract.md);
-  [evidence/report](reports/features/finance/bb-131a-research-learning-architecture-20260921.md);
-  [ADR 0038 — Accepted](adr/0038-finance-research-learning-authority-contract.md).
-- B separately owner-authorized from `b0459b1e09be777f2ce11dd33a570af8a06c447a`; recovery reconciled.
-  Synthetic fake reasoner, pure validation, three-trial momentum20 plan, bounded budget/exposure,
-  existing deterministic evaluator and isolated immutable persistence/replay proof.
-  [B DoD evidence/limits](reports/features/finance/bb-131b-synthetic-contract-replay-proof-20260922.md).
-- B DoD: strict typed admission; canonical fingerprint; development-only input; 5/10/20 accounting;
-  duplicate/exposure/risk/degradation proofs; existing SQLite reopen/replay; complete backend checks.
-  Production adaptive ledger/auth/rights are excluded, not implicitly completed.
-- C separately owner-authorized from `cb520994f3ae4222bab1ba31d8cc683abbc28991`: existing Finance migration 94,
-  persistent synthetic protocol/family commitment, atomic budget/exposure/start reservation,
-  retained negative history and exact result-reference recovery. [C evidence/DoD](reports/features/finance/bb-131c-persistent-learning-ledger-20260922.md).
-  DoD verified locally: migration/reopen/rollback, persisted budget/exposure, concurrency, no retry/refund,
-  unchanged B/scientific machinery, native result binding/replay, backend and publication checks.
-  C is accepted on main as bounded synthetic governance, not a general real-data/adaptive ledger or deployed service.
-- Future prerequisites: multi-protocol/adaptive admission review, source/holdout independence,
-  retained negative history, rights/export decision and application authentication/security. Existing
-  data-bound/DSR/PBO limitations remain; no new performance/significance claim.
-- C changes only the bounded Finance governance schema; no provider/SDK/key/network integration, trading, capital, deployment or next sprint.
-- D owner-authorized design only from `269fbd7e786a09ba2bf39fe77492d62d8056a52a`.
-  [D contract](architecture/finance/local-first-reasoner-boundary.md),
-  [Accepted ADR 0039](adr/0039-local-first-research-reasoner-boundary.md) and
-  [DoD/evidence](reports/features/finance/bb-131d-local-first-reasoner-boundary-20260923.md).
-  D DoD: source-backed local-first ownership, projection/locality/auth/output/injection/resource/audit/
-  failure/disable design, threat matrix and separate local/external invocation gates. No runtime implementation.
-- Remaining prerequisites: verified host capacity, model/runtime provenance and local isolation,
-  authorized projection/use rights, scoped principal/audit, limits/cancellation and adversarial tests.
-  Optional external export/terms/credentials/cost review must not block qualified local-only use.
-  No paid API dependency, automatic cloud fallback or relaxation for weak model output.
-- Next: STOP — return accepted E main to owner/architect for independent post-merge verification
-  and planning of the next bounded checkpoint. No model invocation; no subsequent checkpoint authorized.
-- Finance: **RESEARCH / 0 SEK / NONE**. BB-130 remains COMPLETE / EXIT APPROVED;
-  existing deferred debt and unrelated backlog priorities remain unchanged.
-
-## BB-130 final exit assessment — 2026-09-21
-
-**COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED — no exit blocker.**
-Baseline `f941f4553fabaffcea8736ccd7f0e5d22233a976`; branch `bb-130d/final-exit-assessment`.
-Accepted conclusion: **A COMPLETE; B COMPLETE; C COMPLETE / EXIT APPROVED;
-D COMPLETE / EXIT APPROVED; BB-130 COMPLETE / EXIT APPROVED** for the accepted stabilization
-scope. BB-130 is closed on main after exact-candidate owner/architect approval and successful
-merge CI 35607620156. This does not mean all technical debt is solved.
-Exact-main CI #223 / 35542340223 reverified SUCCESS for all four jobs, including actual
-backend and frontend formatter steps. Prettier 3.9.6; 83/83 conform; current audit zero.
-B latency/fan-out and C's explicitly accepted refactor/schema/reader debt remain deferred.
-Lint, security/auth/Sentinel prerequisites and release/device work remain separately scoped;
-no deployment or new scientific/Finance authority. Finance **RESEARCH / 0 SEK / NONE**.
-No interrupted BB-130 work remains. **STOP — BB-130 is closed.** Return to the owner/architect
-for selection and authorization of the next BigBrain sprint; do not start it.
-[A–D criteria matrix, accepted evidence and debt classification](reports/features/platform/bb-130-final-exit-assessment-20260921.md).
-
-The dated checkpoint ledger below preserves historical states. Older NOT STARTED, pending
-maintenance/cleanup/gate and D IN PROGRESS text describes its date, not a competing current state.
-
-
-## BB-130D2 frontend formatter CI gate — 2026-09-21
-
-**ACCEPTED / MERGED / CI VERIFIED.** Baseline
-`1e3552c5142ee3360e6a96036e8f7ed86b4f4d57`; branch `bb-130d/frontend-formatter-ci-gate`.
-One frontend CI step adds `npm run format:check` after npm ci, before tests/build.
-Pinned Prettier 3.9.6, accepted config/scripts and scope remain unchanged. Positive checks
-pass 83/83; temporary whitespace violation exits 1, exact restoration exits 0. Baseline
-and post-edit npm ci, 199/199 tests in 26 files, build and audit zero pass.
-Application/test/backend/package/runtime files unchanged; backend/docs/secrets CI unchanged.
-[Commands, negative characterization and limitations](reports/features/platform/bb-130d2-frontend-formatter-ci-gate-20260921.md).
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS.
-
-Owner/architect approved exact candidate `fde82cfc65e5e303f814c048d9032d6bd4f27f34`,
-merged unchanged as `d1b1dde14071fdcb646d99b383bf0a1819bbd0ca` from baseline
-`1e3552c5142ee3360e6a96036e8f7ed86b4f4d57` (one candidate commit).
-[Merge CI 35542112456](https://github.com/T-bear/BigBrain/actions/runs/35542112456):
-backend/frontend/documentation/secrets SUCCESS. Actual frontend steps npm ci →
-**npm run format:check SUCCESS** → npm test -- --run → npm run build all passed.
-Backend restore → dotnet format --verify-no-changes --no-restore → Release build → tests
-all passed. Both formatter gates are now enabled/enforced on main, check-only.
-Post-merge local format:check: exit 0, 83/83; audit: exit 0, zero findings.
-Prettier remains 3.9.6 dev-only; package/lock/config/scripts/source/backend/runtime unchanged.
-Candidate tests remain 199/199 in 26 files and build PASS; hosted test/build steps also pass.
-Negative characterization remains candidate evidence, not a new production mutation.
-No write mode, two-pass workaround or auto-fix exists in CI. Historical ThemeControl.test.tsx
-convergence remains cleanup history only. No deployment. Finance RESEARCH / 0 SEK / NONE.
-BB-130D remains IN PROGRESS. Proposed next action: **BB-130D final reconciliation / exit
-assessment**, requiring separate authorization; no lint or agent-neutral workflow work starts.
-
-## BB-130D2 frontend formatter cleanup — 2026-09-20
-
-**ACCEPTED / MERGED / CI VERIFIED — not deployed.**
-Baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`, verified equal to `origin/main` before
-and immediately before publication; branch `bb-130d/frontend-formatter-cleanup`.
-Agent handoff **Codex → Claude**: the Codex session was interrupted by an exhausted usage
-limit having created only the branch; Git evidence proved no tracked change existed and that
-formatter write mode had not run. Claude reproduced the contract and baseline independently.
-
-The accepted formatter write operation rewrote exactly the **80** characterized nonconforming
-files of the **83**-file scope (15 `.ts`, 65 `.tsx`; 12,873 insertions, 2,498 deletions). The
-changed set equals the characterized set exactly, and the three already-clean files
-`src/main.tsx`, `src/test/setup.ts` and `vite.config.ts` remain untouched. No application
-source was hand-edited and no package, config, CI, backend, CSS, JS or runtime file changed.
-
-**Discovered deviation, owner-accepted and deliberately preserved.** `format:check` did not
-exit 0 after one write pass: `src/ThemeControl.test.tsx` is not a Prettier 3.9.6 fixed point
-after one pass. A second pass converges and a third is a no-op; a sweep of all 83 files shows
-exactly 82 of 83 reach a fixed point on pass 1. The change is member-chain line breaking in a
-test setup block with no token, argument or literal change. Work was halted under the
-checkpoint stop rule. The owner approved option (a) on 2026-09-20: accept the converged
-two-pass result as the cleanup candidate baseline with the deviation documented. This does
-**not** establish running Prettier twice as the normal workflow; the committed source is at
-the stable fixed point, and future formatter CI must verify that committed source is already
-conforming and must **not** depend on a second write pass.
-
-Verification: `format:check` exit 0 with 83/83 conforming and a further `npm run format` is a
-no-op; tests **199/199** in 26 files; focused Finance **46/46**; production build exit 0 with
-70 modules transformed; `npm audit --json` exit 0 with zero findings. Semantic verification
-used Prettier 3.9.6's own bundled TypeScript parser, because TypeScript 7.0.2 here is the
-native port with no JavaScript compiler API. All 83 files parsed without error and every
-semantic invariant is identical across all 80 reformatted files: identifiers, imports,
-exports, numbers, regexes, templates, JSX element names, JSX props, rendered JSX children,
-operators, object keys, executable statements, member paths and comments. Differences are
-representation only: JSX text re-wrapping with identical collapsed text, 28 `{' '}` separators
-whose only literal delta is the added space, and one ASI-guard `EmptyStatement`. Production
-artifacts: CSS, icons and manifest byte-identical; `index.html` differs only in the
-content-hashed asset name; the JS bundle differs by 81 bytes, proven to be adjacent JSX
-text-child splits only, with concatenated literals byte-identical at 82,558 bytes and
-literal-elided code skeletons byte-identical at 332,891 bytes.
-[Method, limitations and full evidence](reports/features/platform/bb-130d2-frontend-formatter-cleanup-20260920.md).
-
-Finance: no backend file changed at all, so deterministic identities, checksums, lineage,
-dataset/revision, campaign, holdout/OOS, robustness, cost, entitlement/fail-closed and
-NOT EVALUABLE semantics cannot have been affected. Four of six Finance frontend files have
-byte-identical normalized ASTs, preserving BB-128B/C cache, stale/degraded and single-loader
-semantics and BB-130C selected-result identity. Finance remains **RESEARCH / 0 SEK / NONE**.
-
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1, backend cleanup and the backend
-format gate remain accepted and enabled; D2 characterization, triage, dependency maintenance
-and formatter tooling remain accepted. The **frontend formatter CI gate remains NOT STARTED /
-NOT ENABLED** and lint remains deferred. No deployment, runtime, device or owner UX approval
-is claimed. The exact candidate was subsequently owner/architect-approved and published as
-recorded below.
-
-### Accepted publication — 2026-09-21
-
-Owner/architect approved candidate `b547219473c7ef12cec81b6778bd454a2ce33058`,
-exactly one commit above baseline `5cb179d2558fb9bddc8f256d0fcc06251826a1f5`.
-Codex merged it unchanged as `8e966404b2b7055acf21ccedabaa883ecaf225ca`; the merge
-file tree equals the approved candidate. Claude implemented the cleanup; Codex performed
-only this approved merge/publication, without formatter write mode.
-[Merge CI 35540892280](https://github.com/T-bear/BigBrain/actions/runs/35540892280):
-SUCCESS for backend, frontend, documentation and secrets. Backend restore → actual
-`dotnet format BigBrain.slnx --verify-no-changes --no-restore` → Release build → tests
-all passed. Frontend ran only `npm ci`, `npm test -- --run`, `npm run build`.
-
-Fresh post-merge local commands: `npm ci`, `npm run format:check`, `npm test -- --run`,
-`npm run build`, `npm audit --json` all exit 0: 83/83 conforming, 199/199 tests in 26 files,
-production build PASS (70 modules), zero audit findings. Prettier remains exactly 3.9.6,
-dev-only. Scope comparison confirms exactly the accepted 80-file debt set; the three
-already-clean files, package/lock, formatter config/scripts, CI, backend, CSS, excluded JS
-and runtime/deployment configuration are unchanged. The focused Finance 46/46 and semantic/
-artifact comparisons above remain evidence from Claude's reviewed candidate, not new runs.
-The owner-approved ThemeControl.test.tsx historical two-pass convergence remains documented;
-the committed source is already conforming and no write-mode operation was run for publication.
-
-Cleanup is ACCEPTED / MERGED / CI VERIFIED. A/B COMPLETE; C COMPLETE / EXIT APPROVED;
-D IN PROGRESS. Frontend formatter CI gate NOT STARTED / NOT ENABLED; lint deferred.
-Finance RESEARCH / 0 SEK / NONE. No deployment, runtime, device, UX or scientific behavior
-change. Next proposed checkpoint: **BB-130D2 — Frontend Formatter CI Gate**, separately
-authorized; neither it nor the agent-neutral workflow/recovery improvement starts here.
-
-## BB-130D2 formatter tooling — 2026-09-17
-
-**ACCEPTED / MERGED / CI VERIFIED.** Baseline
-`d7785b4ef2fea271cb78f0019c486b60acdad210`; branch `bb-130d/frontend-formatter-tooling`.
-Prettier 3.9.6 pinned dev-only; accepted config and explicit TS/TSX scripts installed.
-Exactly 83 selected, 80 nonconforming; repeated check exit 1 expected for historical debt.
-No write formatting or source/test changes. npm ci, 199/199 tests, build and audit zero verified;
-fresh post-merge verification on 2026-09-17 confirms the same results.
-[Scope proof, commands and limits](reports/features/platform/bb-130d2-frontend-formatter-tooling-20260917.md).
-A/B complete; C complete/exit approved; D in progress. Prior D1/backend cleanup/gate and D2
-characterization/triage/maintenance accepted; backend gate enabled. Tooling accepted;
-frontend cleanup/gate NOT STARTED / NOT COMPLETE, lint deferred. No deployment/CI/runtime
-or scientific behavior change. Finance RESEARCH / 0 SEK / NONE. Next proposed checkpoint: BB-130D2 — Frontend Formatter Cleanup, separately authorized;
-80-file formatting requires semantic/JSX review and strong regression verification. Earlier dated entries retain historical scope.
-
-
-Owner/architect approved exact candidate `d71ab8553871d9c5eb89c151ad8cb0392e0de08a`,
-merged unchanged as `ba0037ee41f16476e74037f090e83e2e3a78f205`.
-[Merge CI 35190196135](https://github.com/T-bear/BigBrain/actions/runs/35190196135): SUCCESS
-for backend/frontend/documentation/secrets. Backend restore → actual dotnet format check →
-Release build → tests passed. Frontend npm ci/test/build passed; no frontend formatter CI gate.
-Post-merge local npm ci/test/build/audit: exit 0, 199/199 tests, production build, audit zero.
-Prettier 3.9.6 dev-only, config/scripts unchanged; exact scope 83, 80 nonconforming,
-format:check exit 1 expected, output identical to characterization. No write formatting.
-
-## BB-130D2 dependency maintenance — 2026-09-16
-
-**ACCEPTED / MERGED / CI VERIFIED.** Baseline
-`914d35e596cd066b846e4f6d1c59632b1be84137`; branch `bb-130d/frontend-dependency-maintenance`.
-Vitest 4.1.11 (+ seven aligned family packages), PostCSS 8.5.23, nanoid 3.3.18,
-undici 7.29.0; no other version upgrades or persistent overrides. Tests 199/199 and
-production build pass; audit 5 findings → 0, all eight prior GHSAs remediated by installed
-patched dependencies on accepted main. Production inventory: 70 modules, none affected.
-[Exact graph, tooling limitations, commands and rollback](reports/features/platform/bb-130d2-frontend-dependency-maintenance-20260916.md).
-No source/tests/CI/runtime changes, deployment, formatting or lint tooling. Finance RESEARCH / 0 SEK / NONE.
-A/B complete; C complete/exit approved; D in progress. D1/backend cleanup/gate and D2
-characterization/triage remain accepted; backend gate enabled. Maintenance accepted; frontend cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
-Owner/architect approved exact candidate `b043bffe21c3cc05f2c57c087d6aac3f26fa0e84`, merged unchanged as
-`55b5b5d7e4e982f7d1a194cdab554a4bf419a471`. [Merge CI 35124925562](https://github.com/T-bear/BigBrain/actions/runs/35124925562)
-SUCCESS: backend/frontend/documentation/secrets. Backend restore → format → Release build →
-tests all executed successfully; frontend npm ci/test/build passed, no formatter/linter gate.
-Post-merge npm audit --json exit 0, zero findings; installed graph verifies all target versions
-and all eight prior GHSAs remain outside their assessed affected installed ranges.
-Earlier dated entries are historical. Next proposed checkpoint: BB-130D2 — Frontend Formatter Tool Installation, separately
-authorized after publication review; cleanup and CI activation remain separate bounded decisions.
-
-
-## BB-130D2 dependency triage — 2026-09-15
-
-**Dependency triage ACCEPTED / MERGED / CI VERIFIED.**
-Approved candidate `ed57dba99d82eb47357b2b7d080baa9d72daf3d4` merged unchanged as
-`73b7bdfe3befe8bb8505897d1d9480184d3e82ba`;
-[CI 34993322513](https://github.com/T-bear/BigBrain/actions/runs/34993322513) SUCCESS for
-backend/frontend/documentation/secrets. Actual backend formatter step 5 passed after restore 4,
-before build/test 6/7; frontend npm ci/test/build passed with no lint/format gate.
-Original baseline `bcf69191b92b9257627cd3c9814c02758b4ae8ae`;
-branch `bb-130d/frontend-dependency-triage`. [Advisory evidence](reports/features/platform/bb-130d2-frontend-dependency-triage-20260914.md).
-Dated audit reproduces 5 affected packages / 3 moderate / 2 high, eight distinct GHSAs.
-Six classified C (affected dependency, vulnerable path not used currently); Vitest/mocker and
-PostCSS classified D (dev/test/build boundary, current exploit prerequisites absent).
-70-module production inventory includes none of the affected packages and matches baseline
-JS/CSS bytes. This is repository/build evidence, not deployed-image or blanket security approval.
-No reachable current BigBrain product defect requiring blocker handoff established. No advisory
-FIXED: patch maintenance recommended in a separately authorized dependency checkpoint.
-Baseline 199/199 Web tests and production build pass; unchanged-source evidence reused on resume.
-No dependencies/source/tests/CI changed, no Prettier or formatter execution, no deployment.
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; backend format gate enabled.
-D1, backend whitespace cleanup and backend formatter gate ACCEPTED / MERGED / CI VERIFIED;
-backend gate ENABLED. D2 characterization and dependency triage ACCEPTED / MERGED / CI VERIFIED.
-D2 dependency maintenance and formatter cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
-Finance RESEARCH / 0 SEK / NONE; no runtime/device/UX/scientific behavior or authority change.
-Next: **BB-130D2 — Minimal Frontend Dependency Maintenance**, separately reviewed/authorized.
-Proposed, untested targets: Vitest 4.1.10 → 4.1.11; PostCSS 8.5.22 → 8.5.23;
-Nanoid 3.3.16 → 3.3.18; Undici 7.28.0 → 7.29.0. No correction or npm audit fix occurred.
-Earlier sections retain historical states. Final documentation reconciliation requires its own
-exact-main CI; resolution is in the canonical recovery note. No next checkpoint starts here.
-
-## BB-130D2 frontend characterization — 2026-09-14
-
-**BB-130D2 characterization ACCEPTED / MERGED / CI VERIFIED.**
-Owner/architect approved candidate `01129fc54bdd3871b61eeda47e5cadbadc3ad81c` unchanged.
-Merge/main `9181f2c75b8ffc12520ce497b7067e60527f459f` passed
-[CI 34877864965](https://github.com/T-bear/BigBrain/actions/runs/34877864965):
-backend, frontend, documentation and secrets SUCCESS. Backend formatter step 5 actually
-passed after restore and before build/test. Frontend npm ci/test/build all passed;
-no frontend formatter/linter gate exists. D2 cleanup/tool installation/gate NOT STARTED / NOT COMPLETE.
-Baseline `1d824f6d2a9b4e6e2fc679705bd357860042ddbb`; branch
-`bb-130d/frontend-quality-characterization`. [Characterization evidence](reports/features/platform/bb-130d2-frontend-quality-characterization-20260914.md).
-83 tracked TS/TSX files: pinned ephemeral Prettier 3.9.6 check flags 80 files, exit 1,
-repeatable. Proposed formatter-only scope/config; no source/dependency/config/CI changes.
-Existing frontend baseline: npm ci, 199/199 tests (26 files), TypeScript/Vite build pass.
-Large wrapping/normalization debt requires separately authorized cleanup batches and later
-CI activation. CSS/JS asset-test contracts need separate assessment; lint is deferred.
-Registry audit reports five dependency findings (3 moderate, 2 high); applicability/exploitability
-is unverified. Dependency advisories: TRIAGE REQUIRED; no audit fix or reproduced product defect.
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS. D1/backend cleanup accepted;
-backend format baseline CLEAN and formatter gate ENABLED ON MAIN. Previous final-main
-[CI 34842836925](https://github.com/T-bear/BigBrain/actions/runs/34842836925) is now verified
-SUCCESS for exact baseline, including actual formatter step 5 after restore/before build/test.
-Historical sections below retain their checkpoint state; D2 characterization is current here.
-Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device/UX/scientific behavior change.
-Next: separately authorize dependency triage and any later cleanup/gate work. No next checkpoint
-starts here. The separate documentation reconciliation requires its own exact-main CI;
-final publication resolution is recorded in the canonical recovery note.
-
-## BB-130D backend format CI gate — 2026-09-14
-
-**ACCEPTED / MERGED / CI VERIFIED — ENABLED / ENFORCED ON MAIN.**
-Owner/architect approved exact candidate `332bc90975f6479d25622635f13d4b5567f82634`
-from baseline `e6fca47d87bc77bce153e77c98251d3b7d5e546b`.
-Merged unchanged as `47542cc9815b4f95c2dbb1c73dc8538dd29d0240`;
-[CI 34842088867](https://github.com/T-bear/BigBrain/actions/runs/34842088867)
-passed backend, frontend, documentation and secrets. Backend step 5 actually executed
-`dotnet format BigBrain.slnx --verify-no-changes --no-restore` and passed after restore
-(step 4), before Release build/test (steps 6/7). [Gate evidence](reports/features/platform/bb-130d-backend-format-ci-gate-20260914.md).
-Accepted-main local restore/format/build/test all exit 0; format baseline CLEAN,
-zero build warnings/errors, API 664/664 and Sentinel 32/32 passed with none skipped.
-The historical 59-file / 22,573-location D1 debt was cleaned by the accepted cleanup;
-historical D1/cleanup sections below describe those checkpoints, not current gate status.
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS; D1/cleanup ACCEPTED / MERGED / CI VERIFIED.
-D2 NOT STARTED. Finance RESEARCH / 0 SEK / NONE; no deployment/runtime/device approval
-or scientific behavior change. No formatter write mode or source changes in this publication.
-The separate documentation reconciliation commit must pass its own exact-SHA CI,
-including the formatter step; final publication resolution is in the recovery note.
-Next checkpoint requires separate authorization; stop before D2 or any other work.
-
-## BB-130D backend whitespace cleanup — 2026-09-14
-
-**ACCEPTED / MERGED / CI VERIFIED.**
-Owner/architect approved exact candidate `8a795b16be87c97319705e9536b90472c83920aa`.
-Merged unchanged as `c090a4fbb9450d1e94a0613a2cf8eb0ef5877150`;
-[merge CI 34806580492](https://github.com/T-bear/BigBrain/actions/runs/34806580492)
-passed backend, frontend, documentation and secrets on 2026-09-14.
-Accepted-main `dotnet restore BigBrain.slnx` and
-`dotnet format BigBrain.slnx --verify-no-changes --no-restore` both exit 0.
-Backend format baseline: CLEAN; historical D1 debt (59 files / 22,573 locations) is cleaned on main.
-Baseline `ce31f343851b71a77f3464ef3f2938f9574edbdf`; branch
-`bb-130d/backend-whitespace-cleanup`. [Cleanup evidence](reports/features/platform/bb-130d-backend-whitespace-cleanup-20260914.md).
-Pre-check exactly reproduced D1: 59 files / 22,573 WHITESPACE locations. One formatter
-write changed only those 59 C# files. Exact token/literal/trivia and full-tree comparison
-passed; full-solution format verification now exits 0. Pre/post Release builds have zero
-warnings/errors; pre/post API 664/664 and Sentinel 32/32 tests pass. No manual source edits.
-
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS, D1 ACCEPTED. Backend format
-CI gate STILL NOT ENABLED; activation requires the next separately authorized checkpoint.
-Frontend/D2 NOT STARTED. Historical D1 evidence below remains pre-cleanup evidence;
-the accepted main formatting baseline is now clean.
-No CI configuration, packages, schema semantics, scientific behavior or runtime changes.
-Finance RESEARCH / 0 SEK / NONE. No deployment, runtime/device or owner UX approval.
-Next: verify exact-final-main CI for the separate documentation reconciliation, then return
-to ChatGPT and stop. Final commit lookup is recorded in the canonical recovery note.
-No CI gate, D2, Research Learning or Finance feature work is authorized by this publication.
-
-## BB-130D1 backend quality-gate baseline — 2026-09-14
-
-**ACCEPTED / MERGED / CI VERIFIED — evidence checkpoint; no new CI gate.**
-Owner/architect approved exact candidate `ccd7f7906b8d460a5060711e4a5f2b99039492cf`.
-Merged unchanged as `81baaf4f5667310e00e83cccb19da3daf9cb790b`;
-[merge CI 34786050596](https://github.com/T-bear/BigBrain/actions/runs/34786050596)
-passed backend, frontend, documentation and secrets on 2026-09-14.
-A/B COMPLETE; C COMPLETE / EXIT APPROVED; D IN PROGRESS / D1 ACCEPTED.
-Earlier dated D NOT STARTED entries below describe their historical authorization state.
-
-[Sanitized D1 report](reports/features/platform/bb-130d1-backend-quality-gate-baseline-20260914.md): SDK 10.0.302 restore/Release build pass with zero
-warnings/errors; API 664/664 and Sentinel 32/32 pass. Two check-only format runs exit 2
-with identical 22,573 WHITESPACE locations across 59 files. No source or CI/configuration
-changes; no mass formatting or weaker analyzer policy. Backend format debt remains deferred
-to separately authorized cleanup. Frontend tooling was inspected only; D2 needs a fresh
-check-only characterization before any gate or cleanup. D2 is not started.
-
-Backend formatter gate: NOT ENABLED — blocked by characterized pre-existing whitespace
-debt, not correctness failure. Cleanup requires separate authorization. D2: NOT STARTED.
-Next: verify the separate final reconciliation commit's exact-main CI, then stop for ChatGPT
-review; no cleanup, D2 or final D acceptance follows. Finance RESEARCH / 0 SEK / NONE.
-No deployment, runtime/device approval, provider/broker/capital or scientific behavior change.
-Final publication identity and exact-SHA CI lookup are recorded in the canonical recovery note.
-
-## BB-130C exit approved — 2026-09-09
-
-Owner and architect explicitly approved **BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**
-after review of `00a1fb1ab58a7db8ed1d05ff159f8cebd13b5359` and successful
-[CI 34338386364](https://github.com/T-bear/BigBrain/actions/runs/34338386364).
-BB-130A COMPLETE; BB-130B COMPLETE; BB-130C COMPLETE / EXIT APPROVED;
-BB-130D NOT STARTED and requires separate authorization.
-E1 and E2 remain ACCEPTED / MERGED / CI VERIFIED. No currently-known C blocking checkpoint remains.
-Broader persistence/naming, composition/DI, sole schema/DDL authority, initialization/recovery,
-structural hardening, reader extraction and other accepted post-BB-130 debt remain DEFERRED,
-not implemented. C exit does not claim all original aspirational refactors were delivered.
-No deployment, physical-device/runtime approval or new Finance authority is implied.
-Finance RESEARCH / 0 SEK / NONE. Next: independent verification of this reconciliation in ChatGPT;
-do not start D, Research Learning or Live Market Shadow.
-
-## BB-130C E2 campaign SQLite replay/reload — accepted, merged and CI verified, 2026-09-09
-
-[Responsibility map and isolated evidence](reports/features/finance/bb-130c-campaign-sqlite-replay-characterization-20260909.md).
-Baseline `04a7a9c1f5d4d9afb02f313a272b6c4369709f5a`; branch
-`bb-130c/campaign-sqlite-replay-characterization`. **OUTCOME A / ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
-Approved candidate `c59f0200cf73bb936fb6f83ceaf603c0e1cf9d40` merged as
-`f8f5df5f0c91688c58b2466cb276dda0dfa8c346`; [merge CI 34337618297](https://github.com/T-bear/BigBrain/actions/runs/34337618297)
-passed backend, frontend, documentation and secrets on 2026-09-09.
-
-One new persistence/reconstruction/replay test; existing BB-127 fixture reused. Production unchanged.
-One campaign / six unique attempts / two dataset revisions and 124 research observations remain
-identical after fresh store/reader reload and replay. Six NOT EVALUABLE outcomes, null BacktestRunId;
-no scientific fallback. Campaign 10/10, related Finance 129/129, full API 664/664, Sentinel 32/32;
-Release build zero warnings/errors. Publication gates and commands in report.
-E1 and E2 are accepted. No currently-known C blocking checkpoint remains.
-**BB-130C COMPLETE — ARCHITECT/OWNER EXIT APPROVED**.
-C exit was approved by architect/owner on 2026-09-09. BB-130D remains NOT STARTED; accepted post-BB-130 debt
-remains deferred, not implemented. Next action: independent publication verification; D requires separate authorization.
-No production data, schema change, provider work or deployment. Finance RESEARCH / 0 SEK / NONE.
-
-## BB-130C E1 robustness identity correction — accepted, merged and CI verified, 2026-09-09
-
-[Correction contract and verification](reports/features/finance/bb-130c-robustness-selected-result-identity-fix-20260909.md).
-Baseline `87d53241439b6fcbd97a07cd5a3986b59653eab9`; branch
-`bb-130c/robustness-selected-result-identity-fix`. **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
-Approved candidate `b34178aa40024cb8e7e953c72706bd88b3dda688` merged as `1204322a8764df33c0182db5b1e98d3cd6912d81`.
-[Main CI run 34312516174](https://github.com/T-bear/BigBrain/actions/runs/34312516174)
-passed backend, frontend, documentation and secrets on 2026-09-09.
-Selected catalog evaluationId/checksum now gates visible detail; effect-lifetime guards exclude
-obsolete success/failure. Pending/error shows no stale detail; existing reselection behavior remains.
-E1 tests **8/8**, FinanceObservation **43/43**, full Web **199/199**; production Web build passed.
-Documentation/diff/secrets publication evidence is recorded in the report.
-Blocker `508cec3baceba4452df3431e7e0eab87dce50a3f` remains **NOT MERGEABLE** and is not ancestry.
-E1 identity defect resolved and accepted; E2 is now accepted above. C is complete / exit approved on 2026-09-09. D NOT STARTED. Accepted debt deferrals unchanged.
-No deployment, runtime or device UX approval is implied.
-Only Web presentation/request ownership changed. No backend/schema/scientific change, production
-access or deployment. Finance **RESEARCH / 0 SEK / NONE**.
-
-
-## BB-130C backtest readers and exit assessment — accepted, merged and CI verified, 2026-09-08
-
-[Reader map, evidence and exit plan](reports/features/finance/bb-130c-backtest-reader-exit-assessment-20260908.md).
-Baseline `6bfcd011a655a7d9f225bc9c023063738d10db3b`; branch `bb-130c/backtest-reader-exit-assessment`.
-**DO NOT EXTRACT**: one shared JSON read implementation; catalog projection and initialization
-ownership make another helper unjustified now. Two new isolated ordering/malformed-JSON tests;
-existing exact reload/identity/writer evidence reused. Focused **84/84**, full API **663/663**, Sentinel **32/32**, zero failures/skips; Release **0 warnings/errors**.
-**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
-Approved candidate `e868b601d511e17554452c24ac7ed9d591bf051f` merged as
-`796459be0f6a71fd3855a0cf2bc76f1bb2df68d5`; [main CI run 34275678369](https://github.com/T-bear/BigBrain/actions/runs/34275678369)
-passed backend, frontend, documentation and secrets on 2026-09-08.
-No production/schema change, deployment or runtime verification.
-At the reader checkpoint the accepted C exit plan identified E1 robustness identity and E2
-campaign SQLite replay/reload. E1 and E2 are now accepted above; no currently-known C blocking
-checkpoint remains. C is complete / exit approved; no E2 blocker was reproduced.
-The report's non-blocking debt, including further extraction, sole schema authority and composition,
-is explicitly accepted for deferral beyond BB-130, not completed. That acceptance did not authorize E1/E2; the separately approved E1 and E2 merges are recorded above;
-BB-130D remains NOT STARTED.
-Finance RESEARCH / 0 SEK / NONE. No production data, providers or scientific behavior changed.
-
-
-## BB-130C shared immutable backtest writer — accepted, merged and CI verified, 2026-09-08
-
-[Boundary and deterministic evidence](reports/features/finance/bb-130c-backtest-persistence-writer-20260908.md).
-From `4ec675864d76f6da11d747026d917491f085f9e7` on `bb-130c/backtest-persistence-writer`.
-FinanceBacktestPersistence now owns only the immutable four-table write across reference,
-robustness and research-dataset callers. Schema, connections, readers and calculations stay put.
-Pre-move characterization 4/4; post-move focused 82/82. full API **661/661**, Sentinel **32/32**, zero failures/skips; Release **0 warnings / 0 errors**.
-**ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
-Approved candidate `6463a407221a0e6c47c5b429766f3398a1231994` merged as
-`e28b9850b0ee40f12a68d508f65c9e4c65d57085`; [main CI run 34247876050](https://github.com/T-bear/BigBrain/actions/runs/34247876050)
-passed backend, frontend, documentation and secrets on 2026-09-08.
-No deployment or production runtime verification.
-Finance RESEARCH / 0 SEK / NONE; no schema change, production access or deployment.
-Other persistence, intake, composition/schema and BB-130D work remains separately scoped.
-
-
-## BB-130C Finance persistence characterization — accepted, merged and CI verified, 2026-09-08
-
-- [Responsibility and evidence map](reports/features/finance/bb-130c-finance-persistence-characterization-20260908.md): tests/docs only from `bb-130c/finance-persistence-characterization`; **ACCEPTED / MERGED TO MAIN / CI VERIFIED**.
-- Merge `e16c0c9b62f486955483b0ce782167f53e687714`; main CI run `34226093232` passed all four jobs.
-- The recommended shared writer scope is accepted, merged and CI verified as documented above.
-- Gaps remain in whole-initializer concurrency, campaign SQL replay and broader legacy initialization coverage. These are unverified scenarios, not reproduced defects.
-- No migration, new database, production access, provider activation, deployment or next implementation.
-
-## BB-130C CSV syntactic tokenizer — accepted, merged and CI verified, 2026-09-08
-
-- [Bounded tokenization extraction](reports/features/finance/bb-130c-intake-csv-syntactic-parser-20260908.md): **ACCEPTED / MERGED TO MAIN / CI VERIFIED** from `bb-130c/intake-csv-syntactic-parser`.
-- Merge `a0f1ff2031016df72744574c5a4e2ee0810b3116`; main CI run `34192468991` passed all four jobs.
-- Only raw line tokenization moved. Reading/header/value ownership, domain validation/comparison, acquisition, promotion and lifecycle/persistence remain separately scoped.
-- No deployment or new checkpoint; historical blocker remains NOT MERGEABLE and production incidence UNKNOWN.
-
-## BB-130C CSV optional-column correction — accepted, merged and CI verified, 2026-09-08
-
-- [Bounded correction/evidence](reports/features/finance/bb-130c-csv-corporate-action-column-zero-fix-20260907.md)
-  on `bb-130c/csv-corporate-action-column-zero-fix`, from `81c80d1c7e361086b5871de512b5ef3855a70f49`.
-- Preserve present index-zero ex-dividend/split_ratio values; absent/nonzero behavior and canonical
-  v2 identity remain intact. **ACCEPTED / MERGED TO MAIN / CI VERIFIED**;
-  merge `946eb98f139824e65780bf93d41686ea3724c1a3`, main CI run `34188274546` passed all four jobs.
-- Blocker SHA `6ad73c53e2d2e87df99a8ab2840ab20d73106d5b` remains NOT MERGEABLE and is not ancestry.
-- Production incidence UNKNOWN; no historical audit/repair, schema change or deployment authorized.
-  Parsing extraction and remaining C/D work stay separate; no new BB ID.
-
-## BB-130C intake responsibility extraction #1 — merged and CI verified, 2026-09-07
-
-- [Quarantine path/payload-lifetime extraction](reports/features/finance/bb-130c-intake-safe-artifact-boundary-20260907.md) on
-  `bb-130c/intake-safe-artifact-boundary` from `44dec9ce720a7b0d19d7ef18cc6cb1f3e9acf01e`.
-- Four new characterization tests pass before/after with the existing identity/research suites.
-  Candidate scope is one concrete filesystem collaborator; no schema/identity/API changes.
-- Approved candidate `ef89c5e288085e3c2f717731f00b82bdce169ce3` merged as
-  `5a775b9f54784ea2f8562ea73299618ea7b0889f`; main CI run `34157988954` passed all required jobs.
-- No deployment or next checkpoint.
-- Remaining: acquisition, artifact recording, parsing/validation, promotion and lifecycle/catalog
-  persistence; schema authority and other C/D work remain separate. A possible next bounded
-  task is CSV parsing characterization, only after separate scope approval. No new BB ID.
-
-
-## BB-130C canonical product/revision v2 — merged and CI verified, 2026-09-07
-
-- [Bounded implementation](reports/features/finance/bb-130c-canonical-product-revision-identity-v2-20260907.md)
-  resolves the future v2 contract: explicit validated product, source/product/content
-  hash and storage scope, stable cross-candidate counts, immutable legacy replay.
-- Approved candidate `90cdc22f4f4cde06bc957f816abab2f6b437d7e0` merged to main as
-  `09cf880dc6b34416d6b1cc8e6cdd50f30e5280e1`; main CI run `34140339378` passed. Previous blocker branches
-  remain NOT MERGEABLE and are not implementation ancestors. No new BB ID.
-- Remaining: legacy WIKI compatibility UNKNOWN; no cross-version alias/dedup layer. No historical
-  rekeying or migration. Intake extraction and other BB-130C/D work remain separately scoped.
-- No deployment, provider activation or scientific change. Canonical product never proves rights.
-
-## BB-130C canonical identity blocker and bounded audit — 2026-09-07
-
-- **BLOCKED — CULTURE-DEPENDENT REVISION IDENTITY**. Synthetic evidence at
-  `8b597d1f95fe2dff109d378afe0a81433801c79a` is accepted as evidence; its branch is
-  **BLOCKER HANDOFF — NOT MERGEABLE**, not an implementation baseline.
-- [Accepted read-only audit](reports/features/finance/bb-130c-dataset-revision-identity-audit-20260907.md)
-  is merged and main-CI verified; Option B is the approved direction (explicit future
-  invariant algorithm version; all legacy IDs preserved), not an implemented correction.
-  Existing WIKI compatibility is UNKNOWN; no cross-provider duplicate guarantee is claimed.
-  No historical rekeying is authorized and no alias layer is justified by current evidence.
-- Next, only after authorization: settle the versioned identity/replay/duplicate contract,
-  optionally completing one bounded original-artifact recomputation. Reuse completed
-  inventory; no historical rekeying or speculative aliases. No new BB ID assigned.
-- Intake extraction remains stopped; remaining C and D are incomplete. No fix or deployment
-  follows automatically from audit publication or acceptance.
-
-## BB-130C backtest result identity — merged and CI verified, 2026-09-07
-
-- Approved review branch `bb-130c/backtest-result-identity` was merged to main as
-  `f0b4dbd73c50047c078227edff0bf9c0d5aa7bde`; main CI run `34082759615` passed all required jobs.
-  Full Web 191/191, build and repository gates pass.
-- The result-specific area now prevents summary/curve identity mixing, shows loading
-  while B is pending, handles failure with retry, and ignores stale A/B completions.
-- Robustness detail has analogous coupling but is intentionally untouched.
-- Next: continue with the separately scoped next BB-130C checkpoint only after planning and
-  branch creation from the CI-verified main; robustness coupling remains outside this checkpoint.
-
-
-## Finance source evidence update — 2026-09-06
-
-- Alpaca's six private storage/research questions are answered by [owner-supplied support
-  evidence](reports/features/finance/finance-alpaca-owner-support-evidence-20260906.md).
-  BB-125/128A historical unanswered wording below is superseded for those questions.
-  Activation remains blocked pending terms/plan/feed revalidation, unaddressed lifecycle
-  scopes, reviewed policy/technical mapping and separate owner approval; no implementation.
-- Future intent, unnumbered/unprioritized: Investopedia educational/reference and hypothesis
-  context only. [Finance role and authority](modules/finance.md#future-investopedia-educationalhypothesis-role--planned-only).
-  DoD for future planning: review source-use/provenance and define a bounded hypothesis
-  path through existing deterministic evidence/robustness/risk gates. No scraper or
-  Knowledge Layer now; no new BB ID or sprint priority is assigned.
-
-
-### BB-130 – Platform stabilization, performance and continuity
-
-- Owner priority: stabilize before further Finance features. Baseline `7fd89a5ccbe9be82699dc70950f461d3fbb6589c`.
-- Status 2026-09-21: A/B COMPLETE; C COMPLETE / EXIT APPROVED; D and BB-130 COMPLETE / EXIT APPROVED / ACCEPTED / MERGED / CI VERIFIED on main. No exit blocker; accepted deferred debt is not claimed delivered.
-- Scope/DoD and exact order: [BB-130A–D plan](architecture/bb-130-stabilization.md).
-- A: continuity, review, adaptive reasoning and source-of-truth reconciliation.
-- B: measure Home/Finance/affected Media, classify priorities, improve request triggers and verify before/after.
-- C: characterize and refactor Finance UI/intake/persistence, composition and structural schema authority.
-- D: deterministic quality gates, full regressions and final reconciliation.
-- Safety: RESEARCH / 0 SEK / NONE; no scientific change, new provider, datastore, trading or infrastructure.
-- C bounded evidence: [observation lifecycle characterization and extraction](reports/features/finance/bb-130c-observation-lifecycle-20260906.md), 56 focused pre/post and 187 full Web tests passed; build passed.
-- Published checkpoint `4cdf1ff2fc3de420f9a7207fbf929dddda5a4c1e` / CI 34047595837 passed: [research-detail characterization](reports/features/finance/bb-130c-research-detail-characterization-20260906.md), 59 focused tests pass; extraction deferred.
-- Resolved debt: selected backtest summary, status and curve now share one result identity with deterministic pending/error/stale-response behavior. Robustness identity was subsequently reproduced as a blocker; its separately authorized correction is now accepted/merged/CI verified above. The blocker branch was never merged.
-- Next: STOP — BB-130 is closed. Owner/architect selects and authorizes the next sprint separately; no subsequent implementation is authorized.
-- B remaining: investigate intermittent Finance reads exceeding the initial 45-second sample; nine simultaneous explicitly opened detail reads and large payloads remain. No scientific rewrite or new endpoint is justified yet.
-- B evidence: [request graphs, priorities and limitations](reports/features/platform/bb-130b-loading-20260906.md). No B owner/mobile approval is claimed.
-- Evidence: [baseline review](reports/documentation/bb-130-architecture-code-review-20260905.md).
-
-
-## BB-128C — Finance Design-System Conformance for Async & Degraded States
-
-- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED / OWNER VISUAL VERIFIED** (`8499797347e5bd41849d5ff184f9278ea4dc4707`, evidence `fac75dc3bb16291bd9cd0a0c5fcb33691da1bb11`, Actions `33715603341`).
-- Finance reuses shared loading and busy-button primitives; cached stale content, one-in-flight retry, foreground/online recovery and first-load failure semantics are unchanged.
-- The degraded strip is compact and calm, while stale state, fetch time and failure remain explicit. Label and time wrap independently without a literal separator.
-- Web image `sha256:39389c5…`, Web/API/Sentinel health and Finance read are runtime verified. Initial CI exposed and resolved one timezone-coupled test expectation; follow-up CI passed. This was the initial deployment. The later single-loader micro-fix (71badae, deployment evidence 5e0e1ab) was explicitly owner approved on physical iPhone/PWA; see the BB-128C report. Finance remains `RESEARCH / 0 SEK / NONE`.
-
-## BB-128B — Finance Read-Only Resilience & Last-Known-Good UX
-
-- Status 2026-09-03: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / DEPLOYED / RUNTIME VERIFIED / OWNER UX VERIFIED** (`6eabbafed72c5df9a7484167a98acb0249c8a39d`, Actions `33657212798`).
-- Versioned bounded display-only Finance observation cache, stale-while-revalidate, manual in-place retry, visibility/online recovery and detail-request deferral are implemented.
-- Cache data is never backend authority and cannot enable acquisition, entitlement, PAPER/LIVE/AUTO, broker/orders or capital allocation. Finance remains `RESEARCH / 0 SEK / NONE`.
-- Owner evidence: during a natural transient iPhone/PWA failure, cached Finance remained visible, one manual retry was available and Finance recovered normally. Visual polish was not approved in that first review; BB-128C subsequently obtained explicit owner approval after its micro-fix.
-
-## BB-128A — Alpaca Live Market Data Activation Readiness
-
-- Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / CI VERIFIED / ACTIVATION BLOCKED PENDING EXTERNAL ENTITLEMENT CONFIRMATION**.
-- Reuses the existing live observation, entitlement and prospective shadow contracts. Read-only activation metadata identifies Basic/IEX as real-time single-exchange US stock/ETF coverage with a documented 30-symbol WebSocket limit; it cannot masquerade as SIP or consolidated US data.
-- Acquisition stays fail-closed through unchanged `MarketDataEntitlementEvaluator` policy. Its BB-128A evidence/reason has not yet incorporated the new support record; runtime metadata is not the updated documentary assessment. No adapter/network client, credential, data or trading capability was added.
-- Update 2026-09-06: storage/research clarification received; see current evidence above. Revalidate remaining lifecycle/terms/feed scopes and review policy before any separately approved activation; live provider-processing timestamp remains `UNKNOWN`.
-- Publication: implementation `646078efe77dfb4c8876afb7c65c4cdcdd421a95`; GitHub Actions run `33651291772` passed all four jobs.
-
-## BB-127 — Owner Research Dataset Capabilities & XLSX Intake
-
-- Status 2026-09-02: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**.
-- Reuses BB-084/126 quarantine and the existing deterministic backtest engine. Adds purpose-specific immutable research eligibility and bounded cached-value XLSX intake; it does not add a second datastore, importer, backtester or promotion path.
-- Canonical promotion remains independently fail-closed. Owner approval does not verify provider rights, RAW/adjusted semantics, corporate actions or historical identity; explicit external denial blocks research and schema/semantic limitations constrain the permitted purpose.
-- Supplied GOOGLEFINANCE workbook: 18 historical sheets, 154,349 source observations, four rejected inconsistent OHLC rows and 154,345 accepted research observations. Support/current-metadata sheets are excluded from historical use. Zero canonical rows were added.
-- Runtime: all 18 revisions are eligible-with-limitations for at least one compatible purpose; close-only context/FX remains ineligible for OHLCV backtests. GOOG revision `research-a7f1880044c83ede` replayed deterministically as existing-engine run `backtest-75a9d3296e3f9228`; the workbook candidate and prior GOOG canonical candidate retain zero promoted rows.
-- Publication: implementation `bc728e93ed73dfdf59f58fe5b26e7760faf0b342`, runtime evidence `ffda7c2dc3a1567708b009741e626586191a8bd5`; GitHub Actions run `33586792133` passed all four jobs.
-- Remaining: independently resolve external rights, historical identity, price-basis and corporate-action evidence before any canonical decision or accurate adjusted/total-return claim. Existing close-only research is context/exploratory only until a separately suitable experiment consumes it.
-
-## GOOGLEFINANCE GOOG owner-intake follow-up
-
-- Status 2026-09-01: **QUARANTINED / INSPECTED / PROMOTION BLOCKED**; 3,126 accepted rows and zero canonical rows.
-- Owner policy decision is durably `APPROVED_BY_OWNER`; external provider/storage/reuse rights remain `UNKNOWN`. RAW basis and NASDAQ venue are owner declarations only.
-- Exact blocker: establish authoritative historical GOOG identity/venue validity and independently resolve external rights/price-basis/corporate-action semantics before any new explicit promotion review. Do not weaken `dataset-promotion-v1` or infer identity from ticker text.
-- Publication: implementation `057c2f07bd10f2ff21d35d981028b262e0d07cd8`; GitHub Actions run `33528970337` passed all four jobs.
-
-## BB-126 — Owner Market-Data Drop Folder & Quarantine Inspection
-
-- Status 2026-09-01: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**.
-- Owner workflow: place one `.csv` or `.zip`, optional same-basename `.metadata.json`, then an empty `<filename>.ready` marker in the configured local drop folder. The API claims only stable regular files and copies them into BB-084 quarantine.
-- Safety: symlinks, traversal, unsafe ZIPs, excessive sizes/file counts, malformed schemas and suspicious sidecars fail closed. Unknown identity, provenance or rights cannot promote. No automatic canonical promotion exists; all-pass inspection stops for an explicit later review.
-- Publication: implementation `48755ee0ec27fed8f38132ddca050c2d2654e6ca`; GitHub Actions run `33492668713` passed all four jobs.
-
-## BB-125 — Zero-Cost Historical Market Data Qualification
-
-- Status 2026-09-01: **QUALIFIED FAIL-CLOSED / NO STATE A / NO ACQUISITION**.
-- SimFin Free remains `HUMAN CONFIRMATION REQUIRED`; Alpaca has the six-use support clarification
-  recorded above but is not activated or pilot-approved. No account or inquiry was created/sent
-  by this checkpoint. Yahoo Finance and yfinance are rejected for automated canonical intake under the
-  current permission/client evidence. Tiingo Starter is rejected for persistent intake because its
-  Terms expressly prohibit durable storage.
-- Current limitation: no new zero-cost source improves the short/biased canonical evidence. EODHD
-  Free and WIKI remain independent; provider stitching remains prohibited.
-- Next source decision: optionally pursue SimFin separately; for Alpaca review the supplied
-  support record and remaining gates rather than resending answered questions. No pilot or
-  account action is authorized.
-
-## BB-122 — Historical Security Identity Evidence Pilot
-
-- Status 2026-08-31: **RESEARCH VERIFIED / STATE B / NO MAPPING / NO PROMOTION**. Baseline `78736af9153ef28c435ca1a70b1971ae38677540`; no production code, schema, WIKI acquisition, canonical data or deployment change.
-- Deterministic 30-ticker result: 3 VERIFIED, 17 PARTIAL, 5 AMBIGUOUS, 5 UNRESOLVED. Public SEC/issuer/exchange evidence can prove selected intervals, but complete venue/identity validity and ticker-reuse adjudication remain manual; current symbol directories are not historical evidence.
-- Future decision: approve or reject a narrow source-document-backed historical identity evidence design before any additional WIKI mapping. Do not build a generic security master or promote from ticker text. Stooq remains `HUMAN CONFIRMATION REQUIRED / NO ACQUISITION`.
-
-## BB-121 — Nasdaq WIKI Historical Recovery & Stooq Requalification
-
-- Status 2026-08-31: **FORENSICALLY VERIFIED / STATE A / NO ACQUISITION / NO PROMOTION**. Baseline `98c9bdb040ef5f1f7f22e40dac759dfcd62f42b7`; no code, schema, runtime data or deployment change.
-- WIKI: the retained 235,562,224-byte/3,186-ticker artifact is a partial 2014–2016 snapshot, not decades/final 2018 history. Its five canonical symbols already contain every available snapshot session; SPY/QQQ/IWM are absent. The other 3,181 ticker strings are price evidence without approved canonical/historical identity, venue, listing/delisting or point-in-time-universe evidence.
-- Promotion scope: the implementation intentionally selects `EodhdCatalog.Watchlist`; all 13 gates passed for the candidate, while canonical insertion was bounded to safely mapped rows. Additional immutable revisions from the same artifact are technically possible only after a new candidate identity plus explicit mapping evidence, but are not justified by current security-master evidence.
-- Nasdaq: public-domain rights remain supported; current docs require a free account/API key and state that full-database bulk export is unavailable for free datasets. Preserve the local artifact; do not redownload.
-- Stooq: **HUMAN CONFIRMATION REQUIRED**. Current first-party material does not establish automation, persistent storage, private backtesting/derived rights, retention, rate limits or adjustment/delisting semantics. No protected route was probed or bypassed. Use the BB-121 inquiry draft before any future acquisition.
-
-## BB-120 — Historical Evidence Expansion & Source Qualification
-
-- Status 2026-08-31: **SOURCE-QUALIFIED / FAIL-CLOSED / DOCUMENTATION VERIFIED**. Baseline `940afa78932bf22019f2f45e3ef640afc2c9b5f3`; no code, schema, runtime data or deployment change.
-- Existing capability: BB-084+ already supports bounded multi-year CSV/ZIP intake, durable quarantine, OHLCV-v1, 13 mandatory promotion gates, cross-source-comparison-v1, immutable provider revisions, idempotent recovery and canonical-safe cleanup. No parallel abstraction is needed.
-- Qualification result: EODHD Free remains 0 SEK, 20 calls/day and about one year; deeper history and Bulk EOD require paid plans. Free delisted/corporate-action access is `UNKNOWN`. SEC EDGAR and Eurostat are qualified first-party zero-cost evidence candidates for separate filings/reference or macro/statistics needs, not a longer-OHLCV pilot. Prior FRED/ALFRED, Riksbank, ECB, WIKI and BB-086 decisions remain authoritative.
-- Pilot: none. No new source cleared every rights/provenance/technical gate, so acquisition and promotion remained fail-closed and canonical Finance evidence is unchanged.
-- Remaining need: locate or rights-clear a first-party/public-domain daily-OHLCV artifact with adequate historical identity, delisting, corporate-action, session and point-in-time classification. Paid candidates remain informational and require explicit future owner approval.
-
-## BB-119 — Finance Readiness & Resource-Governor Reconciliation
-
-- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED**. Implementation `a0699d841f118d2eccb247e2a9f58c3e522e1da8`; GitHub Actions `33393820120` passed.
-- Root causes: non-session date was incorrectly evaluated as an exact-session 0/8 requirement; operations reduced unknown/latest journal reasons to vague `READY`; Sentinel could not restart over its own stale persistent Unix socket, leaving resource evidence unavailable.
-- Remediation: explicit historical/current-session/feature-lineage semantics shared by scheduler and operations; non-research day is `NOT_REQUIRED`, not 0/8; Sentinel removes its stale configured socket before bind. Existing scheduler and governor fail-closed gates remain unchanged.
-- Definition of Done: pinned 8/8, incomplete universe, feature-lineage, non-research-day, restart/socket and governor allow/defer/block tests; affected-service deployment; coherent sanitized runtime evidence; CI and documentation publication.
-- Runtime: historical evidence available; current session and feature lineage explicitly not required on the inspected non-research day; no 0/8 claim; operations agrees; governor `ALLOW/resource.ready`; Sentinel/API/Web healthy; 0 research runs and experiments.
-
-## BB-118 — Finance Source-of-Truth Reconciliation & Runtime Baseline
-
-- Status 2026-08-31: **RECONCILED READ-ONLY / DOCUMENTATION VALIDATED**. No Finance source, configuration or data mutation.
-- Current authority: `RESEARCH / 0 SEK / NONE`; no broker, orders, PAPER, LIVE or AUTO trading.
-- Runtime: scheduler enabled/not running; latest opportunity skipped as non-research day; 10 opportunities, 0 autonomous runs and 0 experiments. Current scheduler readiness says `universeIncomplete` 0/8 while operations says `READY`; governor says `DEFER / metricsUnavailable`. Reconcile these read models before trusting unattended-run eligibility.
-- Evidence counts: 105 market revisions; 29,890 observations; 16 feature revisions; latest feature revision 44,520 values (aggregate values not exposed); 797 backtest runs; 25 robustness evaluations; 288 shadow predictions; 240 outcomes; 240 research-risk evaluations; schema v93.
-- Next owner decision, not implementation: A) strengthen scientific evidence/anti-overfitting first (recommended), or B) continue execution-grade Hard Risk Engine foundation while remaining RESEARCH-only.
-
-## BB-117 — Audiobook Final Polish, Media Decision Freeze & Finance Handoff
-
-- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW APPROVED**. The owner physically reviewed iPhone/PWA and explicitly stated “I am satisfied.” Published implementation `601896619b29b2b487be8e840a48d3ea132891ad` and final interaction-width fix `29cb505804c07b6413c057f134ec0175f08a7d99`; GitHub Actions `33385591024` and `33386467803` passed.
-- Definition of Done: met, including explicit physical owner acceptance. Production gold-crescent timer, shared deadline/status/expiry behavior and approved Detail Hero remain the accepted BB-117 baseline.
-- Owner-approved principle: **Media / Audiobook / Detail Hero** uses back navigation above and a compact two-column mobile hero with cover left and title/author/series hierarchy right. This approval does not extend to the primary playback action, full player or whole detail page.
-- Rejected: tiny white clock trigger, broad/form-like timer disclosure and persistent floating mini-player. New production direction: gold crescent plus compact polished timer interaction.
-- Media status: **PLANNED PAUSE — FUNCTIONAL WORK STABLE / DEFERRED UX & DISCOVERY BACKLOG PRESERVED**. BB-155/156/157 remain open; UX/UI Lab review continues and Design System v1 is not globally owner-approved.
-
-# BB-116A — Admin UX/UI Lab Foundation & Production Component Inventory
-
-- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING**.
-- Definition of Done: permanent Admin route, stable real-component inventory, safe specimens, review vocabulary, shared sleep-timer candidate, focused/full Web tests, production build, viewport QA, canonical report, deployment and CI evidence.
-- BigBrain Design System v1 remains **OWNER REVIEW IN PROGRESS**. No component may become `OWNER GODKÄND` without explicit owner feedback.
-- Deferred: production audiobook grid migration; search/discovery candidate; BB-157; broad consolidation of local checkbox, navigation, dialog and domain-card markup.
-
-## BB-157 — Media Release Availability Search
-
-- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
-- When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
-- Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
-
-## BB-158 — Media URL Import & Audio Extraction
-
-- Status: **FROZEN / OWNER DECISION REQUIRED TO RESUME**, hela BB-158 från2026-10-23.
-- [Kanonisk bevarande- och återupptagningspunkt](operations/bb158-freeze-20261023.md).
-  Accepterad direktimport bevaras; YouTube/ISBN är inte färdigt. Ingen felsökning, testning, merge
-  eller deployment utan nytt ägarbeslut. Följande avsikter är historisk scope, inte aktiv plan.
-- Future intent: accept an untrusted media URL, analyze only an explicitly supported source, verify that retrieval/import is permitted, present available metadata, lawfully extract/transcode audio where appropriate, normalize filename/metadata/artwork and import through existing Media/job/import architecture without silent overwrite.
-- Rights boundary: the user must own or otherwise have permission to retrieve the content. Provider terms and lawful access require separate investigation. Never bypass DRM, authentication, paywalls or other access controls; public playback does not approve YouTube or any other provider automatically. External access belongs behind adapters and no separate downloader service is justified without evidence.
-- Security boundary: future design must fail closed on SSRF, redirects, DNS rebinding, private-network/file targets, MIME/type and size limits, timeouts, resource exhaustion and malicious media. Never construct arbitrary shell commands from input or expose cookies/tokens/secrets to the frontend. Evaluate FFmpeg only for lawful bounded transcoding; preserve source/transformation provenance and collision-safe imports.
-
-## BB-115R — Physical iPhone Sleep-Timer Remediation
-
-- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** 2026-08-31.
-- BB-115 physical owner review failed: the pre-session timer icon was disabled and silent, while absolute active status overlaid progress/time. BB-115R provides a visible start-playback path and an in-flow status row while retaining one shared AppShell timer.
-- Full player and audiobook library remain unchanged. Future UX/UI Lab may study Storytel's current public high-level hierarchy, cover density, wrapping, spacing, touch targets and filtering placement only; never copy/scrape its CSS, DOM, source, class names, tokens, assets, icons or implementation.
-- Publication: implementation `c6519e059fc87faec92243271e26d0d9bf06d37e`, native-disclosure correction `a4139e46820a46b78c628d1db976a150d26adf98`; GitHub Actions runs `33337614697` and `33337917824` passed. Web-only deployment and three-viewport runtime QA passed; physical owner re-verification remains open.
-
-## BB-156 — Module Runtime Latency & Reliability
-
-- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
-- Instrument and diagnose end-to-end module load latency and reliability, separating Web, API, module, database and external-service delays. Measure before optimization instead of blindly increasing timeouts.
-- Investigate slow endpoints, blocking dependencies, sequential calls, container behavior, dashboard aggregation, timeout classification and partial/widget-level loading so one slow dependency does not unnecessarily block an entire module.
-
-## BB-115 — Physical iPhone Artwork Remediation & Continue-Listening Sleep Timer
-
-- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER VERIFICATION PENDING** 2026-08-30.
-- The obsolete audiobook-detail mobile cascade is removed; the one canonical detail hero constrains fetched artwork and BigBrain-B to the same 2:3, 40 vw / 180 px geometry. Browser QA cannot replace physical iPhone/PWA verification for this regression.
-- Continue Listening exposes the existing AppShell-scoped sleep timer through a compact accessible quick action. Presets, local clock, active state, change and cancellation use the same provider deadline as detail.
-- Full player visual design remains owner-review pending. UX/UI Lab remains the next planned design sprint; neither was implemented here.
-- Publication: implementation `6917ed16b1fedbebaf26b06e36352d4627959d33`; GitHub Actions run `33328144299` passed. Web-only deployment is healthy; browser widths are 156/172/180 px at 390×844/430×932/1440×900.
-
-## BB-155 — Canonical Book Metadata Resolver
-
-- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented and no provider selected.
-- Start with Audiobooks only. Audiobookshelf remains authoritative for local media, playback, sessions, duration and progress. BigBrain may later build a cached canonical normalized audiobook metadata record, with ISBN/ISBN-13 as the strongest external identity when available.
-- Candidate enrichment fields: title, subtitle, author, series/number, language, publication year, publisher, description, ISBN, subjects/genres and high-quality cover artwork. Books without ISBN may use cautious title + author + series + language matching with explicit confidence thresholds.
-- Uncertain matches must never silently overwrite trustworthy data. Retain field-level provenance where appropriate and cache resolved data rather than fetching on every page view.
-- Before implementation, investigate provider/API terms, rate limits, artwork/image rights, licensing and cache conditions. Do not prematurely create a generic all-Media metadata platform.
-
-## BB-114 — Audiobook Detail Polish, Sleep Timer & Floating Player Rejection
-
-- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / OWNER UX REVIEW PENDING** 2026-08-30.
-- Delivered locally: responsive detail-only artwork, redundant LJUDBOK removal, healthy-state Audiobookshelf-link removal, mapped metadata presentation, client-lifetime 15/30/45/60/custom-clock sleep timer, and removal of the global floating player UI while AppShell playback lifetime remains.
-- Owner decision: persistent floating audiobook mini-player UI is **REJECTED** after physical mobile testing; navigation-surviving playback is **RETAINED**. No replacement global player is introduced.
-- Evidence: 565 API, 156 Web and 32 Sentinel tests passed; Release/Vite, documentation and Compose gates passed. Deployed 390×844/430×932/1440×900 detail matrix and playback/navigation/timer smoke passed; only API/Web were recreated.
-- Publication: implementation `2607d6f804efd6bbc49bdc2c2f9e721655692a68`; GitHub Actions run `33326376331` passed backend, frontend, documentation and secrets.
-- BB-155 is registered as backlog only. External metadata/artwork providers, UX/UI Lab, Library/search/language redesign, chapters and speed remain outside BB-114.
-
-## BB-113 — Audiobook Player Affordance, Detail Layout & Artwork Remediation
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-29.
-- Delivered: compact direct Continue Listening play/pause plus authoritative derived time; explicit playback-availability hierarchy; intrinsic-safe detail hero; exact verified Audiobookshelf legacy-placeholder recognition with canonical BigBrain fallback; no-cache Web shell/manifest; API/Web-only healthy deployment and 3×3 viewport/theme QA.
-- Publication: implementation `5d829fdcf64541e49b8cf355004bea90d2a372d3`; GitHub Actions run `33269194506` passed all four jobs.
-- Remaining: physical iPhone/PWA owner review only. Chapters, speed, mini-player redesign and Library redesign remain out of scope.
-
-## BB-112 — Native Audiobook Playback + Owner Search/Result UX Remediation
-
-- Status: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-29.
-- Delivered: separate server-side playback identity, authoritative Continue Listening, same-origin bounded session/Range/progress API, native player, route-surviving mini-player, long-title remediation, compact language confidence and documented live provider variability.
-- Remaining: physical iPhone/PWA owner review of player, mini-player, Library hierarchy and long-title cards. Chapters/speed are future enhancements. A future multi-user auth model must bind authenticated users to playback identities.
-
-## BB-111 — Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice
-
-- Status UX: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `686f621937ae0e376bcc55003077769fff8b4351`; GitHub Actions run `33187236677` passerade.
-- Levererat lokalt: modality-aware route-heading focus utan falsk pointer/touch-ring; forward detail till `scrollY=0` och back-restoration till collection; audiobook-lokal **Bibliotek**-länk/navigation row; kompakt 2:3-säker detail hero; okänt valfritt språk utelämnas. Bounded overview, 24-posters collection, whole-row detail, discovery → library → downloads, scroll-top och presentation-only failed history bevaras.
-- Artworkbeslut: detail använder 88 px cover på mobil och collection 68 px genom lokala canonical storlekar. Den gemensamma 2:3-placeholder-/cover-principen bevaras; ingen global artwork-token ändras utan bredare modulförevidens.
-- **BLOCKED native playback:** befintlig nyckel är sanerat verifierad som aktiv begränsad service/user-identitet utan ägarprogress/sessioner. Den är inte root men är fel playbackidentitet. En separat server-side per-user playbacknyckel för rätt Audiobookshelf-användare krävs; skapa/borrowa/exponera ingen token. Först efter verifiering får same-origin session/Range/progress-sync, Continue Listening, native player och mini-player implementeras.
-- Automatisk DoD: Compose/docs/security/diff, 28 focused/151 full Web, 558 API, 32 Sentinel, Release/Vite, nio viewport/theme-fall, Web-only deploy och health passerar. Fysisk owner UX review återstår. Audiobook-navigationen är inte globalt antagen.
-
-## BB-110 — Audiobook Owner UX Consolidation & Native Playback Foundation
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28. Implementation `76b3c9eda56230e6cf570353ea5f1ca4e579a07c`; slutlig testfix `87d8528791a32a0e4d0e66de400d5ca4d5c392c9`; GitHub Actions run `33180923644` passerade.
-- UX: kanonisk sekundär **Bibliotek**-kontroll; reducerad discovery/library-copy; sektioner i ordningen discovery → library → downloads; hela semantiska bokraden navigerar; mobil hämtning använder titel → status → orsak; gamla terminala attention-rader kan döljas lokalt utan dataradering.
-- Button-inventering: `BBButton` har den kompletta aktuella varianten primary/secondary/tertiary/icon/danger/contextual och gemensamma busy/disabled/focus/press-kontrakt. Media-avvikelsen kom från lokal accentfärg och förstorad chevron ovanpå tertiary-varianten. Orelaterade legacy `<button>`-användningar kvarstår som dokumenterad design-systemskuld; BB-110 gör ingen global visuell omskrivning.
-- **BLOCKED playback architecture:** definiera autentiserad BigBrain user → Audiobookshelf playback identity, säker server-side credential lifecycle/authorization och same-origin session/Range/progress-sync. Serviceidentiteten och ägarens playbackidentitet får inte sammanblandas. Ingen native player byggs före beslutet.
-
-## BB-109 — Audiobook Owner UX Remediation & Native Playback Investigation
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-28.
-- Levererat: standardiserad **Bibliotek**-affordance utan dominant count; tydligt separerad ny-book discovery och lokal library-filter; lugnare collection-rubrik; dock-safe reducerad-motion scroll-till-top; aktiva jobb, åtgärdsbehov och bounded presentation-only historik.
-- Datafix: ett providerjobb som saknas efter fem minuters registreringsgrace övergår från stale aktiv status till `failed/Kräver åtgärd`. Ingen provider/audit/media-data rensas.
-- **BLOCKED owner/systemarkitektbeslut:** Audiobookshelf-progress och playback-sessioner tillhör användaridentiteten. Commissioning-servicekontot har 0 progress medan owner-identiteten har faktisk progress. Native player får inte implementeras med fel identitet eller browserexponerad token. Välj canonical playback identity och same-origin session/Range-proxygräns i en separat godkänd arkitekturslice.
-- BB-108:s bounded overview → collection är positiv owner-evidens men inte global standard. BB-109 inväntar fysisk owner UX review.
-
-## BB-108 — Audiobook Navigation UX Experiment
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER REVIEW: POSITIVE EVIDENCE + NEEDS ITERATION** 2026-08-28.
-- Audiobook-localt experiment: Media visar endast progressbaserad lyssningskontinuitet och en tydlig collection-affordance. `/media/audiobooks` är en separat, bounded samlingsroute och `/media/audiobooks/{id}` en separat detaljroute med History API, deep-link, fokus och reducerad rörelse.
-- Experimentet är inte en global navigationsstandard. FAB utelämnas eftersom collection-navigation inte är en create/add-åtgärd. Det globala dockbeteendet ändras inte.
-- Känd begränsning: Audiobookshelf-responsen ger säker progress men nuvarande BigBrain-kontrakt exponerar inte lyssningsrecency. Översikten visar därför endast faktisk påbörjad bok och ersätter den inte med nyligen tillagt.
-- Automatisk DoD är verifierad med full regression/build, route-/mobile-QA och Web-only deploy. GitHub CI verifieras på publicerad SHA; fysisk owner UX review återstår och endast ägaren får godkänna experimentet.
-
-## BB-107 — Owner UX Remediation after BB-106
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / DEPLOYED / OWNER UX REVIEW PENDING** 2026-08-27.
-- Home: BBButton-innehållets wrapper deltog felaktigt som en enda gridcell och pressade texten till en smal kolumn. Den gemensamma contextual-row-kompositionen låter nu ikon, text och affordance använda de avsedda responsiva gridkolumnerna.
-- Media request: en Arr-skrivning kunde lyckas före ett timeout-/responsefel medan API:t frigav requesten och Web skapade en ny idempotensnyckel vid retry. Web behåller nu samma actionnyckel och API:t avstämmer en tvetydig skrivning mot exakt foreign ID innan den svarar eller tillåter säker retry.
-- Media UX: den gemensamma dimensionsstabila busy-knappen används utan separat engelsk statusrad. Audiobook-starten är en kompakt översikt med Continue Listening och högst fyra nyligen tillagda omslag; sök/sortering/paginering finns först i **Alla ljudböcker**. BigBrain-B-placeholder och gemensam strokeikonografi används konsekvent.
-- BB-106 owner review krävde denna remediation och är inte owner-godkänd. BB-107 inväntar separat owner UX review. Finance, scheduler, governor och Sentinel är oförändrade.
-
-## BB-106 — Consolidated UX / Quality Fix Sprint
-
-- Status: **IMPLEMENTED / AUTOMATICALLY VERIFIED / WEB DEPLOYED / OWNER UX REVIEW FOUND REMEDIATION REQUIRED** 2026-08-27; uppföljning sker i BB-107.
-- Levererat: gemensam overflow/dock-safe-area-cascade, standardiserade loading-/fält-/media-placeholder-/radprimitiver, kompakt paginerad audiobook acquisition-historik, sök-/sorteringsbar paginerad ljudbokshylla, kort normal confirmation, lokala kalenderlägen för passerat/i dag/framtid och tydligare Home-hierarki.
-- **PARTIAL:** full inbyggd Audiobookshelf pause/resume/seek/chapter-navigation kräver ett separat granskat playback-session/streamingkontrakt; befintlig BigBrain-adapter äger fortsatt bibliotek, cover, metadata, progress, continue/detail och säker uppspelningsstart via owner-länk. Modulrespons har standardiserad väntan/säkra fel och befintlig bounded cancellation/SSE-reconnect; bred latencyinstrumentering är kvarstående verifieringsarbete och globala timeouter höjdes inte.
-- Säkerhet: inga acquisitionjobb/mediafiler raderades, avbröts eller startades. Finance, scheduler, governor, Sentinel och backendintegrationer ändrades inte. BB-099 förblir **TECHNICALLY COMPLETE / OWNER UX REVIEW PENDING**.
-
-## BB-105 — AudioBookBay Parser & Literal Author Search Remediation
-
-- Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** 2026-08-24; GitHub Actions run `32769320392` passed.
-- Root cause: AudioBookBay's current DOM places the English language text immediately before a nested metadata label. Upstream's flattened `.Text()` produced `EnglishKeywords:`, so all nine otherwise valid `pirateaba` rows failed the English-only gate.
-- Implementerat: pinned `bigbrain-librarr:1208254-bb6`, sanitized DOM-boundary parser fixture and stage counters, literal author-query reservation, and correct Swedish/English/All ranking without destructive filtering of `und`.
-- Runtime: AudioBookBay exposed 9 rows, parsed 9, Librarr retained 9 and BigBrain displayed 9 sanitized candidates for literal `pirateaba`; title-only variants remained zero. Acquisition-job count stayed 10 and no acquisition was created.
-- Bevarade gränser: no indexer/Prowlarr/source-policy/acquisition/qBittorrent/import/Finance change; explicit owner confirmation, opaque candidate IDs and no-overwrite remain authoritative.
-- Uppföljning 2026-08-24: **IMPLEMENTED / DEPLOYED / RUNTIME VERIFIED / CI VERIFIED** through GitHub Actions run `32777190573`. Proven case-sensitive AudioBookBay discovery is fixed in `bigbrain-librarr:1208254-bb7` by lowercasing only that source's request parameter. Five casing regressions pass; deployed read-only QA returned 9 candidates for all five approved variants, with 12 jobs before/after and Ghostsong unchanged.
-
-## BB-104 — Universal Metadata-Aware Audiobook Search
-
-- Status: **TECHNICALLY COMPLETE / DEPLOYED / RUNTIME VERIFIED** 2026-08-24.
-- Implementerat: provider-neutralt metadataresolver-kontrakt, server-side Open Library-adapter, lokal ISBN-10/13-validering, fri-text/sannolik-ASIN-klassificering, högst två deduplicerade discovery seeds, metadataassociation och konservativ release-deduplicering bakom befintlig Librarr-provider.
-- Känd begränsning: Open Library ger inte tillförlitlig uppläsarmetadata eller en komplett ASIN-crosswalk. Narrator-sökning är därför ärligt deklarerad som unsupported tills en separat metadataförmåga har godkänts; ingen ny provider läggs till i BB-104.
-- Bevarade gränser: ingen indexer/source-policy/qBittorrent/Finance/Sentinel-ändring, ingen acquisition och inga ändringar i BB-102/103:s explicita bekräftelse, opaque kandidater, no-overwrite eller completion-reconciliation.
-
-## BB-103 — First Usable Audiobook Flow
-
-- Status: **TECHNICALLY COMPLETE / FIRST REAL ACQUISITION VERIFIED** 2026-08-24. Den ägarvalda Narnia-releasen är nedladdad, säkert importerad, indexerad, synlig och öppningsbar via BigBrain.
-- Implementerat: explicit utgåvebekräftelse, beständigt sanerat importfel, fail-closed jobbavstämning mot Librarrs exakta import-ID och Audiobookshelf-indexering, lokaliserade jobbstatusar samt library refresh efter bekräftad completion.
-- Runtime: Librarr/Audiobookshelf/provider är healthy och verklig sökning visar valbara Prowlarr-kandidater. Svenska är fortsatt preferens; samtliga observerade kandidater saknade auktoritativ språkmetadata och förblev därför `und/unknown`.
-- Runtime-verifiering: exakt import-hash, unik normaliserad Audiobookshelf-match och fungerande owner-deeplink verifierades. Provider/Audiobookshelf är `configuredHealthy`; **FIRST REAL ACQUISITION VERIFIED: YES.**
-- Discovery-policy 2026-08-24: `bigbrain-librarr:1208254-bb5` litar på audiobook-källmängden i exakt pinnad upstream-revision, med fail-closed revision/source-set-kontroll. Prowlarr, AudioBookBay, LibriVox och The Pirate Bay audiobook är aktiva; BookTracker audiobook saknar separat runtime-konfiguration. Ett read-only `The Wandering Inn`-prov gav noll träffar från samtliga aktiva källor och startade ingen acquisition.
-
-## BB-100 — Audiobooks Platform Foundation
-
-- Status: Tekniskt implementerad, publicerad, CI-verifierad, deployad och commissionad 2026-08-23. Audiobookshelf och BigBrains läsflöde är `configuredHealthy`; anskaffningsleverantören är separat och sanningsenligt `NotConfigured`.
-- Scope: Audiobookshelf library/progress/continue listening, BigBrain-owned API and premium Media/Ljudböcker UX, normalized language and edition contracts, secure cover proxy, persisted language preference and provider abstraction.
-- Provider decision: `None`. Official Readarr is retired. Chaptarr, Librarr/Librarry and resurrected forks remain too immature or operationally/security-sensitive for an unattended dependency in this slice.
-- Safety: no acquisition/download request exists; Prowlarr and qBittorrent are unchanged. BB-099 remains owner-review pending.
-
-## BB-101 — Audiobook Acquisition & Automation
-
-- Status: Provider-neutral foundation tekniskt komplett, publicerad, CI-verifierad och deployad 2026-08-23 i `1ef411a99a6b57e057099597366aaa64004bc801`. Ingen anskaffningsleverantör är vald eller aktiverad; providerbeslutet är nästa ägargate.
-- Scope: BigBrain-owned sök-/utgåvemodell, beständiga jobb, providerstatus, request/status/cancel-kontrakt, säkra API-gränser och ett mobilanpassat Media/Ljudböcker-flöde. Provider `None` skapar aldrig falska jobb eller progress.
-- Import boundary: framtida provideroutput får endast lösas relativt den serverstyrda importroten; traversal och överskrivning av befintligt innehåll avvisas. Automatisk flytt/rescan kräver en faktisk godkänd provider och är inte simulerad.
-- Gate: en provider måste erbjuda underhållen och autentiserad API/Docker-distribution, tydlig språk-/utgåve-/uppläsarmetadata, säkert status/cancel-flöde, Prowlarr/qBittorrent-orkestrering och kontrollerad output till importroten. Ägarbeslut och säkerhetsgranskning krävs före installation.
-
-## BB-102 — Librarr acquisition provider
-
-- Status: **TECHNICALLY COMPLETE / FIRST ACQUISITION VERIFIED VIA BB-103** 2026-08-24. Ägaren har valt `JeremiahM37/librarr`; discovery använder Prowlarr preferred plus den revision-bundna native audiobook-källmängden.
-- Ägaren godkände 2026-08-23 en minimal BigBrain-patch/image. Upstream commit `1208254c20b31fbf217558c0fb987f779fed1cf8` är pinnad och patchen stoppar overwrite, katalog-/filkollisioner, partiella bokdestinationer och path escape; 59 organizer-tester passerar (11 patchregressioner).
-- Implementerat och verifierat: intern-only Compose-service, dedikerad qBittorrent-kategori/path, provider-neutral adapter, opaque kandidater, sanerad proveniens, statusmappning, säker `CanCancel=false` och aktuell image `1208254-bb5`. Exakt upstream-revision och audiobook-source-set verifieras fail-closed; framtida revisioner/källor aktiveras inte implicit. Första verkliga acquisitionen verifierades senare i BB-103.
-
-### BB-089 – M5 Hard Risk Engine foundation
-
-- Modul: Finance / Risk
-- Status: Implementerad, automatiskt verifierad, deployad, restart-verifierad och publicerad
-  2026-08-16; GitHub Actions run #48 grön
-- Resultat: central `research-eod-v1` policy, immutable evaluations, fail-closed temporal/data/
-  lineage/health/instrument/price/volatility/liquidity/exposure gates, simulated daily-loss/
-  drawdown/loss-streak breakers, durable audited halt and read-only API/UI.
-- Avgränsning: RESEARCH only; no PAPER, broker, order, LIVE/AUTO, real portfolio or self-learning.
-
-### Finance – M5 policy maturation
-
-- Status: Framtida förbättring, ej godkänd för implementation
-- Scope: trustworthy sector/spread evidence, hypothetical portfolio aggregation and exchange-calendar
-  refinement after their dependencies exist. Do not fabricate these values.
-
-### Finance – Avanza public-data/MCP entitlement research
-
-- Status: MANUAL_REVIEW / RIGHTS_UNKNOWN; framtida kandidat, ej godkänd för integration
-- Scope: establish automated-access, storage, retention and private-research rights from authoritative
-  Avanza evidence or direct permission. An MIT integration license does not grant market-data rights.
-
-### BB-088 – Prospective daily cadence and Finance UI v1.0 information hierarchy
-
-- Modul: Finance
-- Status: Klar 2026-08-15; implementerad, deployad, runtime/restart-verifierad och GitHub Actions-grön
-- Resultat: bounded weekday EODHD cadence, automatic feature/shadow/outcome cycle, read-only overview/cadence API and `Market today → BigBrain now → Prospective result → Details & research` UI. Weekend/no-session is healthy; anti-backfill and RESEARCH-only boundaries remain.
-- Definition of Done: full local regression, weekend/restart drill, publication and GitHub Actions run #46 passed.
-
-### BB-087 – Prospective shadow observation foundation
-
-- Modul: Finance
-- Status: Klar 2026-08-15; implementerad, deployad, runtime/restart-verifierad och GitHub Actions-grön
-- Resultat: EODHD-specific prediction journal with immutable knowledge cutoff and lineage, append-only next-session outcomes, exactly-once/recovery/clock/anti-backfill gates and read-only scorecard/UI. Historical backtests remain distinct. No execution authority.
-- Definition of Done: complete only after full regression, bounded real-provider drill, restart persistence, publication and green CI are recorded.
-
-### Finance – prospective multi-real-session evidence observation
-
-- Modul: Finance
-- Status: Planerad efter BB-088; observation/evidence gate, not a daily manual task
-- Omfattning: allow the deployed cadence to accumulate and verify multiple genuine future EOD sessions before strategy-quality claims. No PAPER/order authority and no implicit source stitching.
-
-### BB-084 – Public-domain historical dataset intake, quarantine and validation
-
-- Status: Klar; implemented, automatically verified, deployed and restart-verified 2026-08-15.
-- Resultat: WIKI 2016 snapshot promoted for five mapped watchlist symbols; Zenodo failed closed
-  to manual review; immutable source-specific features/backtests/robustness persisted.
-- Definition of Done: verified by BB-084 research and implementation/runtime reports.
-
-### BB-085 – Provider-tagged Finance backup and quarantine cleanup drill
-
-- Status: Klar; implemented and runtime-drilled 2026-08-15.
-- Scope: backup/restore public-domain WIKI independently of EODHD deletion, exercise rejected
-  and manual-review cleanup without canonical deletion, measure restore integrity and document
-  rollback. No universe expansion, source stitching, broker, PAPER or LIVE.
-- Resultat: atomic `finance-provider-backup-v1`, isolated restore and corruption rejection,
-  provider-tagged inventory/API/UI and conservative rejected-payload cleanup with retained
-  manifests. Exact evidence is in the BB-085 implementation report.
-
-### BB-086 – Legitimate zero-cost ETF historical coverage
-
-- Status: Klar; fail-closed research completed 2026-08-15.
-- Scope: seek explicitly licensed, provenance-verifiable history for SPY, QQQ and IWM; reuse
-  BB-084 quarantine and BB-085 data-protection gates. No stitching, provider-rights shortcut,
-  broker, PAPER, order or LIVE execution.
-- Resultat: eight candidates reviewed. Existing WIKI contains no target ETF; Stooq remains behind
-  a browser proof-of-work control; mirror/deposit licenses do not clear underlying market-data
-  provenance. Zero acquisitions, promotions or runtime changes. See the BB-086 reports.
-
-### BigBrain security and penetration-testing baseline
-
-- Modul: Cross-cutting Security; status: Planerad; identifier awaits normal product prioritization.
-- Beslut: implement continuous CI-oriented secret/dependency/SAST/container/API/header/
-  supply-chain/configuration checks and controlled black-/grey-box testing of Web, API,
-  authentication/authorization, IDOR, injection, XSS, CSRF, CORS, malformed input, traversal,
-  resource exhaustion, containers/ports/volumes/host privilege, Sentinel transport/request proof/
-  replay, Finance CSV/ZIP/provenance/revision/mode gates, recovery/persistence tampering and supply
-  chain. Potentially destructive tests must use isolated test environments/data.
-- Gate: mandatory before real-money LIVE eligibility and a strong prerequisite before meaningful
-  PAPER/execution authority. This item is planning only; BB-086 implements none of it.
-
-## Future Family View & Family Coordination epic
-
-- Status: future umbrella epic, planning only; not prioritized or approved for implementation.
-- Goal: reduce family logistics the user must remember and manually compare by coordinating facts
-  owned by Calendar, school sources, Meal Planner, Shopping List, activities, reminders and
-  household/member context.
-- Principle: Family View is a coordination layer, not another independent-widget dashboard or a
-  competing source of truth. Source modules retain ownership; future coordination consumes
-  versioned capabilities and may normalize references without cloning or editing source records.
-- Scope captured: member association, school schedules/calendars/holidays/study days, attendance,
-  Family Context, hard/soft/information evaluation, Family Day/Week, provenance/freshness, manual
-  override, privacy/security and sparse notification relationships.
-- Consolidated existing work: the existing school-meals and school-aware menu requirements below
-  are members of this epic while Meal Planner and Shopping List retain module ownership.
-- Referenced dependencies: BB-029 Calendar/external sync, BB-036 shared-data real-time capability,
-  BB-027 profiles/roles/layouts, authentication hardening and the Home Calendar/swipe investigation.
-- Canonical planning baseline and full inventory:
-  [Family View & Family Coordination](architecture/family-view-family-coordination.md).
-- Priority guardrail: BB-091 remains complete; current Finance direction toward
-  `FINANCE AUTONOMOUS RESEARCH v1` is unchanged. No Family sprint or implementation starts here.
-
-## Future product, UX, authentication and Meal Planner capture
-
-These entries preserve product intent without changing the active Finance direction. They await
-normal prioritization and therefore have no BB identifiers. Detailed boundaries and the repository-
-wide duplicate assessment are recorded in the [2026-08-17 planning record](reports/documentation/product-ux-auth-school-meals-backlog-capture-20260817.md).
-
-### BigBrain-wide design system and less-is-more hierarchy
-
-- Module: BigBrain Web; status: future UX/consolidation candidate, not approved for implementation.
-- Intent: evolve the existing token/theme foundation into consistent typography, text hierarchy,
-  controls, surfaces, spacing, radii, icons, status and interaction states, responsive behavior and
-  accessible focus states. `Obsidian Gold` is the product owner's preferred candidate direction,
-  with a dark foundation and restrained gold for focus/action/emphasis rather than decoration; it
-  is not an approved final visual specification.
-- Product principle: the interface should not explain what is already self-evident. Prefer one
-  heading per real information level, data/content first, short contextual labels and progressive
-  disclosure of secondary or technical evidence. Apply this BigBrain-wide; do not redesign Finance
-  in this item.
-- Definition of Done: an owner-approved cross-module specification, accessible component/token
-  contracts and responsive/manual verification criteria exist before any rollout.
-
-### Passwordless authentication, trusted devices and step-up investigation
-
-- Module: BigBrain-wide Identity/Security; status: future consolidation/security investigation.
-- Intent: evaluate standards-based WebAuthn/passkeys, passwordless and trusted-device enrollment,
-  naming, management, revocation, recovery/bootstrap and lost-device handling, platform
-  authenticators and cross-device/phone-assisted QR or proximity authentication.
-- Security boundary: MAC addresses are not authentication identities. BigBrain never receives or
-  stores Face ID, Touch ID or equivalent biometric data; local biometrics may only unlock a device's
-  cryptographic credential. No custom biometric protocol is permitted.
-- Authorization: trusted low-risk reads should minimize friction, while sensitive administration,
-  device enrollment/removal and any separately approved future high-risk Finance operation may
-  require fresh step-up authentication. A dashboard session grants no Finance execution authority.
-- Scope: investigate device/use roles such as owner or adult personal device, shared family tablet,
-  kitchen/kiosk display and service device without hardcoding family members. Tailscale/device
-  identity or an equivalent private-network layer may complement, but never replace, application
-  user identity and authorization.
-- Roadmap: place this in the future BigBrain consolidation/security and authentication hardening
-  phase according to the current roadmap; do not change the evidenced pentest or Finance ordering.
-
-### Existing Family-epic member: External school meals in Meal Planner
-
-- Owner priority 2026-10-23: [source preparation and bounded implementation proposal](reports/features/family/school-meals-preparation-20261023.md).
-  Skollunch v1 and v2 plan merged. Default-off v2 HTTP/cache/API/Family implementation in review; no deployment.
-  Both owner-provided original RSS/HTML files verified offline; five-day fixtures complete. External access remains MANUAL_REVIEW.
-  No deployment, live-data acceptance or completion of the two-school live goal.
-
-- Module: Meal Planner; status: future enhancement, source rights `MANUAL_REVIEW` until verified.
-- Initial use case: weekday Lunch within the existing weekly Meal Planner shows authoritative meals
-  for Rosenfeldtskolan and Musikugglan in Karlskrona; Calendar remains unrelated and school meals
-  are not a separate Home module. Weekend Lunch remains the household's planned lunch.
-- Architecture direction: a generic external meal-source concept may later represent school,
-  preschool, workplace or another institution, with source identity, provider and provenance.
-  Rosenfeldtskolan and Musikugglan must not be assumed to share a provider.
-- Acquisition gate: before implementation, establish each official source, structured API/feed or
-  endpoint, automated-access rights and retention/caching terms. Prefer official structured access
-  over HTML scraping. Unclear rights remain `MANUAL_REVIEW`; no automation starts. Later acquisition
-  should approximate provider-appropriate weekly cadence, bounded retries and isolated truthful
-  unavailable states without fabricated menus or disruption to household planning.
-
-### Existing Family-epic member: School-aware household menu generation
-
-- Module: Meal Planner / Shopping List; status: future Meal Planner intelligence.
-- Intent: household weekly generation considers all relevant school sources alongside household
-  preferences, meal history, variation, leftovers, budget, supported available ingredients and
-  shopping-list integration. Avoid materially similar home food most strongly on the same day,
-  strongly around adjacent days and more softly farther away; exact weights remain future design.
-- Similarity: reason over protein, carbohydrate/base, dish type, preparation, sauce/style and broad
-  flavor/cuisine family rather than dish-name strings alone. This task authorizes no classifier.
-- Control: similarity is a soft optimization constraint across every relevant external source;
-  manual household choice wins. Generated household meals may create shopping requirements, but
-  school meals never add their own ingredients to the household shopping list.
-
-### Referenced Home/Calendar work: past-day presentation and mobile swipe investigation
-
-- Module: BigBrain Web / Home; status: future UX enhancement/investigation.
-- Calendar intent: Calendar is a module in Home, not a standalone view. Past days should visually
-  recede so current/upcoming days are immediately understandable. Exact styling remains open and
-  must not rely on color or opacity alone; reduced emphasis or appropriate strike-through may be
-  evaluated with accessible state semantics.
-- Swipe intent: evaluate mobile-first touch navigation only between appropriate BigBrain views or
-  contexts. It must coexist with browser/system back gestures and horizontal controls, retain
-  visible and keyboard/mouse navigation, preserve accessibility and avoid accidental destructive
-  actions. This is not an approved interaction specification.
-
-### BB-083 – Appliance lifecycle and crash recovery baseline
-
-- Modul: Platform / Operations / Finance safety; prioritet P0.
-- Status: implementerad och container-runtime-verifierad 2026-08-12; hostinstall,
-  Docker-daemon restart/reboot blocked by interactive sudo; physical power-cycle pending.
-- Delivered: ADR 0026, clean/unclean journal, recovery/storage/disk/clock gate, explicit job
-  policies, interrupted EODHD safety, API/UI, Compose grace/readiness, systemd and scripts.
-- Evidence: API PID-1 crash returned healthy/`UNCLEAN`; Finance stayed at 16 requests,
-  4,016 raw observations and 16 immutable revisions.
-- Report: `docs/reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md`.
-
-Senast uppdaterad: 2026-08-12
-
-Detta dokument samlar verifierade buggar, teknisk skuld och framtida förbättringar som ännu inte är implementerade.
-
-### BB-039 – Media Controller – serie-, säsongs- och avsnittsstatus
-
-- Modul: Media
-- Typ: Framtida funktion
-- Prioritet: P3
-- Status: Ny
-- Upptäckt: 2026-08-09
-
-En framtida Media Controller ska via normaliserade Media/Arr-kontrakt visa antal släppta,
-lokalt tillgängliga, saknade och kommande avsnitt, per-season breakdown och status på
-avsnittsnivå. En framtida uttrycklig ”Sök saknade”-capability kräver eget säkert
-mutationskontrakt. Funktionen får inte byggas på Download Controls presentation state.
-
-#### Definition of Done
-
-- Släppta, lokalt tillgängliga, saknade och kommande avsnitt normaliseras från verifierade källor.
-- Serie-, säsongs- och avsnittsnivå är konsekventa och testade.
-- ”Sök saknade” har separat auktorisering, preview/audit och versionsverifierad Arr-adapter.
-- Ingen direkt koppling till Download Control-UI eller rå providerpayload finns.
-
-Prioritet:
-
-- P0 – kritiskt fel eller risk för dataförlust
-- P1 – blockerande eller tydligt störande fel
-- P2 – viktigt men arbetet kan fortsätta
-- P3 – förbättring eller lågprioriterad teknisk skuld
-
-Status:
-
-- Ny
-- Bekräftad
-- Planerad
-- Pågår
-- Klar
-- Avvisad
-
-### BB-040 – Download Control – snabb navigation vid många färdiga nedladdningar
-
-- Modul: Media / Download Control
-- Typ: UX / navigation / responsivitet
-- Prioritet: P2
-- Status: Pågår
-- Upptäckt: 2026-08-10
-
-När historiken innehåller många färdiga nedladdningar blir Download Control mycket lång.
-Användaren måste scrolla långt mellan aktiva eller problematiska poster, relevanta
-kontroller och färdiga poster; problemet är särskilt tydligt på mobil.
-
-Önskat resultat är snabb och begriplig navigation oavsett historikens längd. Lösningen
-ska utredas utifrån beteendet och får inte låsas till en viss komponent. Kollapsbar
-sektion, ”Visa fler”, statusfilter, separat historikvy, snabbnavigation eller en
-kombination kan utvärderas. Befintlig batchhantering och dess säkerhetsgränser ska
-bevaras.
-
-#### Definition of Done
-
-- Användaren behöver inte scrolla genom en lång lista med klara nedladdningar för att nå relevanta kontroller.
-- Lösningen fungerar väl på mobil och desktop samt med tangentbord och skärmläsare.
-- Aktiva och problematiska nedladdningar prioriteras visuellt.
-- Färdiga nedladdningar är fortsatt enkla att hitta och komma åt.
-- Urval, filtrering och befintlig batchhantering fungerar fortsatt utan ändrad mutationsgräns.
-- Vald lösning har automatiska regressionstester och manuell responsiv verifiering.
-
-#### Sprint 3 implementation 2026-08-10
-
-Standardvyn grupperar i ordningen fel/problem, aktiva, köade/pausade och klara.
-Klara är kollapsad som standard när alla statusar visas, med antal och en tillgänglig
-Visa/Dölj-kontroll; filtret Klara visar fortsatt hela gruppen direkt. Filter, urvalets
-filtrerade scope, batchverktyg och objektsåtgärder ligger kvar ovanför historiken.
-Lösningen är implementerad, testad med 30 klara poster, production-byggd och Web-deployad
-2026-08-10. Sprint 3-leveransen är stängd efter teknisk runtimeverifiering och omedelbar
-produktägaracceptans utan blockerande fynd. BB-040 är ändå inte Klar eftersom dess fulla
-DoD kräver längre kvalitativ mobil-, desktop-, tangentbords- och overflowverifiering.
-Den uppföljningen sker i BB-041 och blockerar inte den stängda sprinten.
-
-### BB-041 – Download Control – post-release UX-utvärdering efter Sprint 3
-
-- Modul: Media / Download Control
-- Typ: UX validation / post-release evaluation
-- Prioritet: P3
-- Status: Ny
-- Upptäckt: 2026-08-10
-
-Sprint 3 är implementerad, automatiskt verifierad, production-byggd, Web-deployad och
-tekniskt accepterad utan kända blockerande regressioner. Produktägaren behöver använda
-den nya presentationen över tid innan en slutlig kvalitativ bedömning kan göras av
-statusgruppering, kompakt historik, vardagsnavigation, skillnaden mellan Nedladdningskö
-och Medieflöde samt mobil- och desktopflöde.
-
-Detta är post-release validation, inte en Sprint 3-blockerare, känd defekt eller
-misslyckad verifiering. Ingen implementation ingår i kortet om faktisk användning inte
-identifierar ett separat verifierat förbättringsbehov.
-
-#### Definition of Done
-
-- Produktägaren har använt den deployade UX:en under en representativ period.
-- Statusgruppering, kompakt historik och navigation bedöms på mobil och desktop.
-- Skillnaden och den avsiktliga överlappningen mellan Nedladdningskö och Medieflöde är begriplig.
-- Eventuella verifierade fynd registreras som separata backloggposter; avsaknad av fynd dokumenteras också.
-- BB-040 och BB-033 bedöms mot sina återstående DoD-punkter med daterad evidens.
-
----
-
-## BigBrain Finance – policy-governed autonomous trading
-
-All Finance items are planning unless explicitly marked complete. No trading mode,
-broker connection or live authority exists. Dependencies refer to BB items and the
-[Finance master roadmap](architecture/finance/master-roadmap.md).
+Avstämd 2026-10-24 i DOC-2B mot accepterad main `ab6a84b3bde807fe5ec38bfcba35ae9b85c130c5`.
+Detta är ingången till kvarstående arbete, DoD, beroenden och acceptansgrindar. Produktinriktning
+finns i [Roadmap](../ROADMAP.md), verifierat tillstånd i [STATUS](STATUS.md), avbrott i
+[recovery](operations/codex-recovery.md). Ingen prioritet ändras och ingen post stängs genom konsolideringen.
+
+Statusord Ny/Bekräftad/Planerad/Pågår behåller sitt befintliga scope; ACTIVE betyder kvarstående
+arbete, inte en startorder. BLOCKED anger en konkret grind, UNCERTAIN otillräcklig evidens,
+FROZEN ett kanoniskt ägarbeslut. Uppskjutet arbete kräver separat prioritering. Klar/Avvisad är
+historiska dispositioner i [fulltextarkivet](history/backlog-before-doc-2b-20261024.md), inte nya beslut.
+P0/P1/P2/P3 behåller befintlig innebörd och prioritet. Tester/CI, merge, deployment och manuell
+acceptans är olika saker. Källhänvisningarnas B-nummer pekar på DOC-2B:s ursprungliga avsnitt.
+
+## Frysningar och kvarstående operativa grindar
+
+### BB-158 — Media URL Import & Audio Extraction
+
+**FROZEN / OWNER DECISION REQUIRED TO RESUME sedan 2026-10-23**, hela BB-158:
+direkt MP3/M4A, YouTube, extraktion/konvertering, DOI/ISBN, Librarr-import, API/Web, tester och deployment.
+[Kanoniskt beslut och återupptagning](operations/bb158-freeze-20261023.md) styr, inte gamla launchpaket
+eller fortsättningsinstruktioner. Accepterad direktimport/valfri DOI/Sonarr-fix är inte bevis för
+aktuell drift: images, aktivering, importer, backup, biblioteksintegritet och recoveryutfall är UNKNOWN / NOT REVERIFIED.
+YouTube/ISBN/konvertering är inte implementerade; kontrollerad egress och verktygs-/resurs-/avbrottsisolering
+är ofullständigt verifierade. Ingen ny säkerhetsutredning följer av denna not.
+
+Kvarstående skydd: rätt att hämta, inga DRM-/auth-/betalväggsgenvägar, SSRF/DNS/redirect-/privat-IP-skydd,
+format-/storleks-/tids-/resursgränser, scannerisolering, rättigheter till filer, atomär reservation utan
+överskrivning, import-ID/SHA/ABS-avstämning, separat bekräftelse och bevarad DOI/proveniens.
+Inga secrets eller godtyckliga shellkommandon från indata. Osäkra importer får inte automatiskt återställas
+eller köras om; backup/rollback, aktivitet och sessionsoberoende recovery måste senare verifieras.
+Befintlig drift och media lämnas orörda. [Ursprunglig post](history/backlog-before-doc-2b-20261024.md#bb-158--media-url-import--audio-extraction).
+
+<a id="bigbrain-finance--policy-governed-autonomous-trading"></a>
+
+## Finance — fryst arbete och kvarstående krav
+
+**FROZEN sedan 2026-10-16. RESEARCH / 0 SEK / NONE.**
+[Finance-frysningen](operations/finance-freeze-20261016.md) är kanonisk. G1/G2 är dokumenterat PASS,
+**G3a BLOCKED / G3b NOT RUN**. Ingen ny källa, grant, inferens, forskningssession, PAPER/LIVE/AUTO,
+brokerkoppling, deployment eller upptining. Befintlig drift lämnas orörd utan separat beslut.
+
+### Rättigheter, integritet och vetenskap
+
+- Rättigheter är källa/produkt/marknad/capability-specifika; unknown/expired/mismatched scope avvisas.
+  Twelve Data Personal-besked gäller inte Basic eller andra användningar. Alpaca-riskacceptans är ingen
+  providergaranti; de sex besvarade frågorna ska inte skickas igen, men villkor/feed/lifecycle och policy/mapping
+  måste vara giltiga. SimFin/Stooq och Avanza har kvarvarande rättighetsgrindar; Yahoo/yfinance och beständig
+  Tiingo Starter-intake är inte generellt tillåtna. Ingen skyddad nedladdningskontroll får kringgås.
+- Retention/deletion/backup ärvs av raw, härledd evidens och audit. EODHD får inte behandlas som WIKI:s
+  public-domain-minne. BB-132K:s faktiska privata disposal-frist är okänd; frysningen förlänger inga frister.
+  Dokumenterad plaintext-avvikelse är inte ett secure-erase/no-exposure-bevis. Se [F/G i frysdokumentet](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
+- Quarantine/drop/promotion ska behålla symlink-/traversal-/ZIP-/storleks-/schemagrindar och explicit
+  promotionsreview. BB-122:s identitets-/venueintervall och ticker-reuse är inte lösta av nutida symbolregister;
+  BB-127:s GOOG-identity/rights/price-basis/corporate-actions kräver evidens. Ingen generell security master,
+  tickerbaserad promotion eller provider stitching. WIKI-snapshotens 2014–2016-scope är inte decennier/final 2018.
+- BB-045/073 har historiskt levererade syntetiska och senare avgränsade EODHD-grunder, inte stängd full DoD.
+  Behåll licensed versioned datasets, immutable revision/correction/deletion, timezone/DST/session/gap,
+  canonical identity, corporate actions, quality/duplicates, measured store/backup och exakt replay/proveniens.
+  Alla provider-/received-/knowledge-tider, prospective prediction identity och senare utfall ska vara ärliga;
+  inget historiskt backfill som prospektiv evidens.
+- BB-048/049 är klara endast för daglig research via BB-123/124. Partial fills/volymtak och intraday/spread/
+  sector/portfolio-exponering är inte fullständigt utvärderbara. Kort/biased historik, survivorship och okänd
+  tidigare exponering begränsar slutsatser; BB-129A:s 24 INCONCLUSIVE/NOT EVALUABLE är inte lönsamhetsbevis.
+  DSR/PBO är NOT_EVALUABLE. Orörd holdout, embargo, trial-population/all-attempt accounting, native evaluator,
+  negativkontroller och avvisning av leakage/noise/regimfragilitet kvarstår. Ingen modellstyrd risk-/sciencepolicy.
+- BB-131/132:s delade ledger, adaptiv testhistorik, versionsbundet modellkontrakt, framtida auth/audit/export
+  och lokalt ägd worker är bindande gränser. Nya hypoteser får inte bli kod/plugins eller egen exekveringsauktoritet.
+  Genuine multi-real-session/multistrategy-evidens återstår; datakvalitet kan inte ersättas av mer modellkörning.
+- BB-130B:s uppskjutna Finance-latensfråga kvarstår: intermittenta reads bortom 45-sekundersprovet,
+  nio samtidiga explicit öppnade detaljreads och stora payloads. Ingen B owner/mobile approval är styrkt;
+  BB-130:s avslut ger inte rätt till nytt endpoint-/sciencearbete. BB-119 har korrigerat BB-118:s dåtida readinessfel,
+  men dagens runtime verifieras inte här.
+
+Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-evidence-update--2026-09-06),
+[B112](history/backlog-before-doc-2b-20261024.md#bb-045--m2-historical-market-data-ingestion-and-provenance),
+[B117](history/backlog-before-doc-2b-20261024.md#bb-073--live-market-observation-and-prospective-shadow-learning),
+[B128–129](history/backlog-before-doc-2b-20261024.md#bb-048--transaction-cost-slippage-and-fill-simulation),
+[BB-131](history/backlog-before-doc-2b-20261024.md#bb-131--finance-research-learning-foundation),
+[BB-090–095](history/backlog-before-doc-2b-20261024.md#bb-090--fred-macro-and-finance-correctness-stabilization).
+
+### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
+
+**FROZEN / full DoD inte stängd.** BB-045 prioritet P2, beroenden BB-044/046 och accepterad ADR0021;
+BB-073 prioritet P2, beroende BB-045 samt BB-071 och separat ägarbeslut för externa data.
+De gamla globala providerblocken är delvis ersatta av senare avgränsad EODHD-aktivering, inte av
+generellt tillstånd eller bevis för dagens drift. Bevara följande DoD utöver gränserna ovan:
+
+- BB-045: licensed, versionsbundna dataset med source/timezone/corporate-action/quality/gap/duplicate-prov;
+  okänd/utgången/odeklarerad användning avvisas; correction/deletion/backup är explicit och testat.
+  Kvarstående production-store/backup-benchmarks, rikare kvalitetsaggregation, källrättigheter och extern
+  acceptans ska disponeras med exakt senare evidens, inte antas färdiga från syntetiska benchmarktal.
+- BB-073: exakt auktoriserat feed normaliseras och lagras entitlement-aware; immutable version-isolerade
+  prediction/outcome och no-lookahead; prospektiva mått omfattar costs/tail risk utan execution capability.
+  Rikare calibration/drawdown/regime/instrument/horizon-mått och resterande strategi-/feature-scope
+  måste bedömas mot senare leveranser innan stängning. Förberett experiment är ingen körorder.
+- BB-131: multi-protocol/adaptive admission, oberoende source/holdout, retained negative history,
+  authorized projection/use/export, scoped principal/audit, verifierad hostkapacitet och model/runtime-
+  provenance, limits/cancellation och adversarial-prov kvarstår. Extern credentials/cost-review får inte
+  blockera kvalificerad lokal-only användning; svagt modellutfall medger ingen säkerhetslättnad.
+- M5 policy maturation: tillförlitlig sector/spread-evidens, hypotetisk portfolioaggregation och
+  exchange-calendar-förfining först när beroenden finns; inga fabricerade värden.
+- Prospektiv multi-real-session-evidens är en framtida observationsgrind, inte ett dagligt manuellt
+  uppdrag under frysningen. Genuine future EOD-sessioner före kvalitetsanspråk, ingen source stitching.
+- BB-082, P1: längre nollkostnadshistorik kräver namngiven verifierbar källa eller normalt stödd
+  bulk/API-väg med automation/lagring/proveniens klarlagd; budget och åtkomstkontroller består.
+
+Källor: [BB-045](history/backlog-before-doc-2b-20261024.md#bb-045--m2-historical-market-data-ingestion-and-provenance),
+[BB-073](history/backlog-before-doc-2b-20261024.md#bb-073--live-market-observation-and-prospective-shadow-learning),
+[BB-131](history/backlog-before-doc-2b-20261024.md#bb-131--finance-research-learning-foundation),
+[BB-082](history/backlog-before-doc-2b-20261024.md#bb-082--longer-zero-cost-historical-market-memory).
+
+### Historisk Qwen, recurring research och observation
+
+Kod är mergad, men faktisk slutlig hostisolering, artefakt-/loader-custody, root-skydd, enrollment,
+oberoende append-only-journal/restore-exkludering och RecurringAuthorityMatched saknar samlad PASS.
+Korrekt källdata/mapping/cohort, ändlig grant och pinnad modellprofil/resursram måste granskas separat.
+I1/E1/T3/C64/W33s och 30s inferens är historisk ram, inte körbar auktorisation. Failure/uncertain kan
+förbruka reservation; inget retry/refund eller automatisk grantförnyelse. Gamla A/B/C-grants får inte återanvändas.
+Review-only MountFlags=private löser inte ärvda mounts; bred allowlist eller gissad maskering är inte tillåten.
+
+BB-132D/E/F/F1/H behåller separata grindar för live-readiness, verkliga credentials/mapping, trusted freeze,
+framtida förseglade utfall och korrekt revisionslineage. Current mapping-verifiering, stängning av adopted
+open-ended snapshot/material identity change och cross-version SHADOW är egna beslut. Receipt1000,
+journal64/128KiB och mappingversioner4 är fail-closed-gränser, inte godkänd kapacitetsutökning.
+Cross-host coordination, lång-outage-backfill och automatisk vetenskaplig utvärdering är inte fria fortsättningar.
+Whole-host rollback inklusive authority, witness loss och automatisk repair ingår inte i releasebeviset;
+gamla grants får inte återaktiveras utan betrodd aktuell historik. [B003–009](history/backlog-before-doc-2b-20261024.md#historical-qwen-operational-gate).
+
+### Fryst forsknings- och exekveringsplan
+
+Följande öppna BB-ID:n behåller sina ursprungliga prioriteringar, DoD och beroenden. Alla omfattas
+av FROZEN oavsett äldre Planerad/Pågår. De är inga nya sprintuppdrag. BB-042:s epic kvarstår,
+BB-082:s längre rättighetsklarerade historik är inte löst för alla instrument, och BB-053 är partiell.
+[Domänroadmap](architecture/finance/master-roadmap.md) styr sekvensen; rättigheter och skydd ovan gäller före varje steg.
 
 ### BB-042 – Epic: BigBrain Finance – policy-governed autonomous trading
 
@@ -1437,455 +148,15 @@ manual, limited and policy-governed automatic trading. Preserve capital, seek po
 net expectancy after costs, control drawdown and permit zero-trade days. Automatic
 trading is the eventual destination, never the starting state or a guaranteed return.
 
+[Fulltext B108](history/backlog-before-doc-2b-20261024.md#bb-042--epic-bigbrain-finance--policy-governed-autonomous-trading).
+
 #### Definition of Done
 
 - M0–M15 meet their individual DoD and evidence gates.
 - Live modes have current legal/operational review and explicit owner approval.
 - Risk cannot be bypassed; emergency controls, audit and reconciliation are proven.
 
-### BB-043 – Finance M0 architecture and safety baseline
-
-- Modul: Finance / Architecture
-- Typ: Planning / documentation
-- Prioritet: P1
-- Status: Klar
-- Beroenden: none.
-- Definition of Done: master roadmap, module/architecture, threat model, ADRs, runbooks,
-  test plan and granular backlog are validated and published. Completed 2026-08-10.
-
-### BB-044 – M1 Finance domain skeleton and read-only module
-
-- Modul: Finance
-- Typ: Architecture / implementation
-- Prioritet: P2
-- Status: Klar
-- Beroenden: BB-043 and ADR 0017 review.
-- Definition of Done: versioned money/instrument/time, signal and portfolio primitives,
-  module registration and read-only fakes have unit/property tests; no broker or order path.
-- Slutförd: 2026-08-10. Finance registreras read-only som Research; decimal-/UTC-typer,
-  provider-neutral observation/strategy, risk/policy, journal, paper-domain records och en
-  fixture-only reference pipeline är implementerade och testade. Ingen executor, extern
-  provider, broker, credential, Finance-write-endpoint, persistence, UI eller deployment finns.
-
-### BB-045 – M2 historical market-data ingestion and provenance
-
-- Modul: Finance / Market Data
-- Typ: Implementation
-- Prioritet: P2
-- Status: Pågår – synthetic acquisition + manifest/persistence benchmark foundation verifierad
-- Syfte: build a reusable local market-data memory whose exact inputs and permitted uses
-  remain reproducible and enforceable.
-- Scope: entitlement/allowed-use model, provenance envelope, canonical raw OHLCV and
-  corporate actions, immutable dataset revisions, quality/correction handling, measured
-  self-hosted persistence and a provider adapter only after authorization.
-- Beroenden: BB-044, BB-046 and Accepted ADR 0021. Provider-neutral types/fixture tests are
-  not blocked; provider activation and persistence of real provider data are blocked by
-  BB-071.
-- Risk: license laundering through normalized/derived copies, silent correction, bias,
-  stale/gapped data, backup over-retention and premature database choice.
-- Definition of Done: licensed, versioned datasets normalize reproducibly with source,
-  timezone, corporate-action, quality, gap and duplicate tests; policy denies unknown,
-  expired or undeclared use; correction/deletion/backup behavior is explicit and tested.
-- Verification: synthetic unit/property/integration fixtures prove entitlement,
-  provenance, lineage, deterministic replay, correction supersession and deletion scope;
-  owner-reviewed BB-071 evidence is required before any external-data acceptance test.
-- Evidens 2026-08-10: allowed-use enums, provider/product-scoped policy and stable
-  fail-closed results, retention/deletion metadata, immutable dataset revisions,
-  provenance quality/classification and derived parent lineage are implemented. Synthetic
-  tests cover explicit allowed/denied/unknown, missing/expired/mismatched policy,
-  persistence, post-subscription retention and determinism. Full solution: 291/291 tests.
-- Evidens 2026-08-11: stable canonical Equity/ETF identity and inclusive effective-date
-  provider symbol mappings distinguish MIC venues and preserve identity across renames.
-  Synthetic decimal daily OHLCV, raw/adjusted basis, cash dividends, exact rational splits,
-  stable findings and duplicate/conflict handling normalize deterministically while
-  preserving dataset revision and entitlement policy. Full solution: 305/305 tests.
-- Evidens 2026-08-11 (session/replay): fixture-only Trading/Closed/Unknown sessions use an
-  explicit timezone and reject invalid/ambiguous DST times. Expected closure, unknown
-  session, generic missing observation, explicit provider gap and invalid observation stay
-  distinct. Replay binds one immutable revision, orders events deterministically, exposes
-  observations only at supplied availability time, resolves historical symbols and emits
-  dividend/split events without rewriting raw bars. Full solution: 318/318 tests.
-- Evidens 2026-08-11 (revision assembly): immutable snapshots inherit ordered membership
-  through an explicit parent chain. Corrections bind original/replacement member IDs,
-  reason/evidence and inclusive availability; catalog as-of selection cannot expose a
-  future correction. Old revisions remain directly reproducible and linear supersession,
-  cycle/reference/scope/future-member invariants fail closed. Corporate-action and
-  session/gap evidence retain source revision and policy. Full solution: 336/336 tests.
-- Evidens 2026-08-11 (synthetic acquisition): provider-neutral request/batch/observation,
-  pagination, completeness, provenance and correction contracts feed the existing canonical
-  normalizer and immutable revision assembler. The gate requires explicit analysis,
-  backtest, derived-metric, long-term-storage and persistence permission before adapter
-  invocation. `SyntheticFixture` cannot masquerade as real authorization. Identical retry/
-  overlap is deterministic, conflicts fail, and the immutable journal records policy,
-  retention/deletion, counts, findings, failure and resulting revision without secrets.
-  Twelve focused tests passed; full solution: 348/348 tests.
-- Evidens 2026-08-11 (synthetic persistence): immutable manifests bind dataset/revision,
-  coverage/counts, SHA-256 content identity, acquisition/policy/provenance, storage version
-  and retention/deletion obligations. The provider-neutral contract and in-memory reference
-  prove atomic complete-only append, exact/range/action/gap/lineage reads, idempotency,
-  conflict rejection, integrity and policy-scoped auditable deletion. A repeatable JSONL/
-  SQLite benchmark measured 2,520, 126,000 and 1,260,000 fixture rows. Large-case JSONL was
-  155,992,420 bytes and queried 100 instrument rows in 153.477 ms; SQLite was 356,208,640
-  bytes and 0.053 ms, with slower initial write (9,674.985 ms versus 793.331 ms). This
-  supports a provisional immutable-file + SQLite catalog/index direction, not activation.
-  Twelve focused tests passed; full solution: 360/360 tests.
-- Kvar: production-store/backup benchmarks and implementation, richer quality aggregation,
-  entitlement evidence for an
-  eligible source, authorized provider adapter and external acceptance. Actual
-  provider ingestion/persistence remains blocked by BB-071.
-
-### BB-046 – Market-data licensing, retention and provider research
-
-- Modul: Finance / Governance
-- Typ: Research / legal-operational gate
-- Prioritet: P2
-- Status: Klar
-- Beroenden: BB-043.
-- Definition of Done: owner-reviewed provider/API usage, licensing, retention and
-  redistribution constraints are documented without unsupported legal conclusions.
-- Slutförd: 2026-08-10. Eight candidates were compared using public provider sources.
-  Twelve Data is the primary Nordic/global EOD candidate, Tiingo the US EOD specialist
-  and Massive the US-depth alternative. No activation is authorized because long-term
-  local retention and post-cancellation rights remain uncertain; BB-071 is the explicit
-  confirmation gate. Daily raw OHLCV plus separate corporate actions is the M2 baseline.
-
-### BB-071 – Confirm market-data storage and retention entitlement
-
-- Modul: Finance / Market Data Governance
-- Typ: Licensing confirmation / implementation gate
-- Prioritet: P1
-- Status: Klar – Twelve Data Personal entitlement verifierat; provider selection/activation separat
-- Upptäckt: 2026-08-10
-- Beroenden: BB-046 and Accepted ADR 0021.
-- Syfte/scope: establish the exact provider/product/market entitlement that may govern
-  BB-045 raw, normalized, corporate-action and derived evidence.
-- Risk: inferring permission from API access, free pricing or silence would make stored
-  evidence unusable and may violate provider/exchange terms.
-
-Obtain written confirmation for the exact intended individual/personal product and
-markets before creating an account or ingestion adapter. Confirmation must cover local
-storage/caching duration, deterministic backtesting, derived metrics/reports, corporate
-actions, retention after cancellation, non-redistribution, Swedish residence and any
-exchange-specific terms. Compare Twelve Data with Tiingo/Massive where scope differs.
-
-#### Definition of Done
-
-- Product owner reviews dated provider responses/terms for the selected dataset.
-- Permitted instruments, intervals, storage duration, derived use and cancellation
-  behavior are explicit; uncertainty blocks ingestion.
-- Required subscription/exchange fees and credential class are documented without secrets.
-- One provider/product scope is approved for BB-045, or selection is explicitly rejected.
-- Verification: dated first-party terms or written provider response is mapped to each
-  allowed use, retention/deletion class, market and product; unknown remains fail-closed.
-
-Research update 2026-08-10: public terms confirm personal/internal use in differing
-scopes, but they do not grant BigBrain's complete required retention. Twelve Data states
-that data is retained only for the subscription-permitted duration and deleted within
-30 days after termination. Tiingo requires prompt permanent deletion on termination and
-written approval for derived-data creation/retention. Massive requires use to cease and
-all market data to be deleted on termination, and its individual terms restrict
-non-display/derived use. BB-071 therefore remains open. The ready-to-send questions are
-in `docs/architecture/finance/provider-retention-inquiry.md`.
-
-Gate update 2026-08-11: Twelve Data Basic is the conditional technical lead for a small
-US-only experiment, but public evidence still leaves durable retention, forward testing,
-retained derived artifacts and exchange/termination scope unresolved. Nasdaq Nordic's
-delayed files require prior approval for value-added use. BB-071 remains open; every
-unchecked item in the published exact-product checklist denies ingestion.
-
-Resolution attempt 2026-08-11: public Twelve Data Basic evidence closes technical US
-historical/current access, internal processing/non-display, compliant derived creation and
-the 30-day termination deletion rule. It does not close local retention duration,
-replay/backtest, forward/shadow evidence, strategy training, provenance or post-termination
-derived retention. Status remains **Pågår – väntar på leverantörsbekräftelse**. The narrowed
-ready-to-send inquiry is `docs/architecture/finance/provider-retention-inquiry.md`; a free
-account is required only for later API access, not for sending the inquiry.
-
-Human evidence update 2026-08-11: Liam at Twelve Data confirmed in writing that the
-submitted private, self-hosted, non-commercial and non-redistributed BigBrain use may use a
-Personal plan. Local storage/retention, testing/research, post-termination retention,
-derived data, audit metadata and use for investment decisions involving only the owner's
-own funds are supported for that scope. Basic is evaluation/trial-symbol access and is not
-authorized for the intended operation; a paid Personal plan is required. BB-071's Twelve
-Data entitlement question is therefore resolved, but no provider is selected or activated.
-Commercial/paying-subscriber, redistribution, third-party/customer, unknown-market or
-materially changed use remains denied pending renewed review. Cost-first selection now
-continues with Alpaca Basic/free IEX entitlement research before any paid decision. Evidence:
-`docs/reports/features/finance/finance-twelve-data-human-entitlement-confirmation-20260811.md`.
-
-### BB-072 – FREE HISTORICAL DATA INGESTION preparation and source research
-
-- Modul: Finance / Market Data Governance
-- Typ: Research / future ingestion gate
-- Prioritet: P2
-- Status: Klar – research verifierad; ingen gratis källa auktoriserad
-- Upptäckt: 2026-08-11
-- Beroenden: BB-045 provider-neutral foundation; BB-071 before any real-data ingestion/storage.
-- Syfte/scope: compare zero-cost historical sources without activating one. Evaluate cost,
-  license/ToS, local retention, personal backtesting rights, reproducible acquisition,
-  rate limits, coverage, survivorship/delisted instruments, corporate actions, raw/adjusted
-  prices, symbol history and quality.
-- Non-goals: account, API key, adapter, download, provider payload, persistence or purchase.
-- Definition of Done: dated first-party evidence and synthetic contract-fit analysis identify
-  whether any free source is legally and technically eligible; Unknown remains fail-closed.
-  Any recommended activation still requires explicit product-owner review and BB-071-class
-  entitlement evidence for the exact source/product/market/use.
-- Slutförd 2026-08-11: ten exact source/product paths were compared using dated first-party
-  evidence. None verified the complete durable-retention and personal non-display
-  backtesting grant. EODHD Free Starter is the best conditional evaluation lead but has
-  one year of free history and a post-expiry deletion duty. Twelve Data Basic is the best
-  Nordic technical lead but exact retention/derived-use rights remain unresolved.
-  Massive prohibits the required default non-display/strategy-derived use, FMP requires
-  prior written download/derivative approval and Stooq rights remain unknown. Result:
-  **DO NOT INGEST YET**. No account, key, adapter, download, purchase or persistence was
-  created. Evidence: `docs/reports/features/finance/free-historical-data-source-research-20260811.md`.
-
-### BB-073 – Live market observation and prospective shadow learning
-
-- Modul: Finance / Market Observer / Strategy Research
-- Typ: M2/M3 provider-neutral implementation and entitlement research
-- Prioritet: P2
-- Status: Pågår – synthetic live-observation/shadow-learning foundation verifierad; external feed blocked
-- Upptäckt: 2026-08-11
-- Beroenden: BB-045 foundations; BB-071 and explicit product-owner approval before external data.
-- Syfte/scope: build a broker-free forward evidence stream with explicit event/provider/
-  received/knowledge time, honest freshness, deterministic observation/gap/outage/correction
-  handling, immutable versioned shadow predictions, later outcomes and prospective metrics.
-- Non-goals: provider adapter/account/key, external payload, broker, order, PAPER/LIVE/AUTO,
-  profitability claim, self-modifying strategy/risk or runtime deployment.
-- Definition of Done: an authorized exact feed can be normalized and entitlement-aware
-  persisted, shadow evaluation cannot look ahead, predictions/outcomes remain immutable and
-  version-isolated, prospective metrics include costs/tail risk, and no execution capability
-  exists. Provider activation requires separate owner approval.
-- Evidens 2026-08-11: `LiveMarketObservation` and deterministic synthetic feed model four
-  clocks, delay, session/missing/outage, duplicates and corrections. A fail-closed live gate
-  requires analysis/walk-forward/training/derived/storage rights. The explicit non-production
-  fixture rule appends immutable predictions and later outcomes and computes version-isolated
-  return/excursion/volatility/cost metrics. Sixteen focused tests passed; full suite count is
-  recorded in STATUS/report after publication. Free-live research reviewed Twelve Data Basic,
-  Alpaca Basic/IEX, EODHD Free and Alpha Vantage Free. Twelve Basic is the best conditional
-  technical candidate at that review point, but later human evidence established that Basic
-  is insufficient and a paid Personal plan is required.
-- Consolidated evidence 2026-08-11: the historical/live scorecard, capacity estimate and
-  Twelve Data Basic checklist are published in
-  `docs/reports/features/finance/finance-free-market-data-provider-evaluation-20260811.md`.
-  It authorizes no provider. FIRST AUTHORIZED MARKET DATA INGESTION requires written
-  entitlement evidence and a separate explicit product-owner approval.
-- Entitlement update 2026-08-11: Twelve Data is an entitlement-cleared paid fallback for
-  the submitted personal use, not a free or active provider. Basic is insufficient. Alpaca
-  Basic/free IEX is the next cost-first candidate, with entitlement unresolved and no
-  account, key, SDK, adapter or inquiry claimed.
-- Prepared, not authorized: an eight-symbol US-only 15-minute REST/EOD experiment with a
-  356/800-credit hard daily plan and no WebSocket, provider call, broker or order. Evidence:
-  `docs/reports/features/finance/finance-bb071-entitlement-resolution-20260811.md`.
-- Kvar: entitlement evidence and owner approval; authorized adapter/local live memory; richer
-  calibration/drawdown/regime/instrument/horizon metrics; feature engine and strategy research.
-
-### BB-074 – Early read-only Finance market observation UI
-
-- Modul: Finance / Web / Market Observer
-- Typ: M2 read-only implementation
-- Prioritet: P2
-- Status: Klar – implementerad, automatiskt verifierad, deployad och tekniskt runtime-verifierad 2026-08-11; ej manuellt produktägarverifierad
-- Beroenden: BB-044 and provider-neutral BB-045/BB-073 foundations; BB-071 before real data.
-- Scope: versioned provider-neutral snapshot, fail-closed production reader, research
-  watchlist, Finance view, empty/synthetic/stale/gap/session/quality states, memory panel
-  and accessible chart.
-- Non-goals: provider account/key/SDK/adapter, real payload, feed, broker, order, PAPER/LIVE/
-  AUTO, portfolio/risk/execution controls or deployment.
-- Definition of Done: navigable responsive UI, prominent RESEARCH/no-real-money and BB-071
-  denial, explicit fixtures, green API/UI/full regressions/build/docs gates.
-- Evidence: `docs/reports/features/finance/finance-read-only-market-observation-ui-foundation-20260811.md`.
-- Deployment evidence: `docs/reports/features/finance/finance-read-only-market-observation-ui-deployment-20260811.md`.
-- Roadmap semantics: early M2 research observation; BB-059/M8 remains planned for trading UI.
-
-### BB-075 – Zero-cost real market-data activation gate
-
-- Modul: Finance / Market Data Governance
-- Typ: Research / entitlement / conditional activation
-- Prioritet: P1
-- Status: Klar – fail-closed research publicerad; ingen 0-SEK-källa auktoriserad
-- Upptäckt: 2026-08-11
-- Budgetkrav: externa Finance market-data-tjänster = exakt 0 SEK tills nytt explicit
-  produktägarbeslut.
-- Scope: fresh first-party review of Alpaca Basic/IEX, Stooq, Yahoo/yfinance, Nasdaq Data
-  Link, EODHD Free, Alpha Vantage Free, Finnhub Free, FMP Basic and credible direct/open
-  alternatives; implement only if the exact automation/storage/research gate passes.
-- Definition of Done: provider matrix maps exact product/cost/market/automation/storage/
-  retention/termination/replay/derived/audit/own-funds/exchange rights; unknown fails closed;
-  adapter/runtime only if every required right is verified.
-- Evidence 2026-08-11: no source passed. Alpaca and EODHD require human clarification;
-  Stooq, Nasdaq Data Link and Finnhub lack complete exact evidence; Yahoo/yfinance and Alpha
-  Vantage are incompatible; FMP requires prior written download/derivative approval. Twelve
-  Data Personal remains an entitlement-cleared paid fallback inactive under the zero budget.
-- Runtime correction: the no-provider observation projection now reports
-  `ZERO-COST ENTITLEMENT GATE`, not superseded `BB-071 / STATE B`; ingestion/storage remain false.
-- Report: `docs/reports/features/finance/finance-zero-cost-real-market-data-gate-20260811.md`.
-- Kvar: obtain exact written Alpaca answers; then EODHD only if needed. No account/key/adapter
-  or provider request before a complete affirmative answer.
-
-### BB-076 – Pragmatic zero-cost personal-research activation
-
-- Modul: Finance / Market Data Governance
-- Typ: Policy / entitlement / conditional activation
-- Prioritet: P1
-- Status: Klar – policy implementerad och verifierad; aktivering fail-closed vid teknisk gate
-- Upptäckt: 2026-08-11
-- Scope: capability-specifik ägaracceptans av residual osäkerhet för legitima 0-SEK-källor,
-  endast privat, read-only, icke-kommersiell personlig research utan identifierat förbud.
-- Evidens: ADR 0022 och policytypen skiljer explicit provider grant, owner-accepted personal
-  research, human confirmation och denied. Negativa villkor, betalning, förhandsgodkännande
-  och tekniska åtkomstkontroller kan inte åsidosättas.
-- Aktiveringsresultat: Stooq daily history nådde ägaraccepterad evidensklass, men den
-  officiella CSV-ytan returnerade en JavaScript-verifieringskontroll. Ingen bypass, adapter,
-  riktig observation, lokal memory, replay eller deployment skapades.
-- Kvar: få en normalt stödd Stooq-automationsväg eller välj en separat clearad källa med
-  konto/key och implementerbar retention/termination-livscykel.
-- Report: `docs/reports/features/finance/finance-bb-076-owner-accepted-zero-cost-policy-20260811.md`.
-
-### BB-077 – EODHD Free real-data activation
-
-- Modul: Finance / Market Data
-- Typ: Implementation / entitlement / retention
-- Prioritet: P1
-- Status: Klar vid credential-gränsen; runtimeuppföljningen är levererad av BB-078
-- Upptäckt: 2026-08-11
-- Entitlement: current `Free` (€0) permits private non-commercial storage/manipulation/
-  analysis while active; all copies must be deleted within one month after expiry.
-- Levererat: server-side EOD adapter, eight-symbol mapping, bounded rate/retry, SQLite WAL,
-  content-addressed payloads, immutable revisions, acquisition journal, real read model/UI,
-  deterministic replay and preview-confirm-delete receipt workflow.
-- Säker default: provider är fortsatt disabled utan `FINANCE__EODHD__APITOKEN`, explicit
-  active-account state och enable flag. Ingen trading capability skapades.
-- Uppföljning: konto/secret, real bootstrap, restart/idempotens, exact-revision replay och UI
-  verifierades senare i BB-078; BB-077-rapporten bevaras som historisk credential-bound evidens.
-- Reports: `docs/reports/features/finance/finance-eodhd-free-entitlement-revalidation-20260811.md`
-  and `docs/reports/features/finance/finance-eodhd-credential-bound-activation-20260811.md`.
-
-### BB-078 – First real Finance market data activation
-
-- Modul: Finance / Market Data
-- Typ: Runtime activation / verification
-- Prioritet: P1
-- Status: Klar; implementerad, deployad och runtime-verifierad 2026-08-11
-- Evidens: credential verifierades endast som `present`; åtta av åtta bounded EODHD Free-
-  anrop lyckades utan retry för SPY, QQQ, IWM, AAPL, MSFT, JPM, XOM och JNJ.
-- Resultat: 2 008 reala daily OHLCV-observationer, åtta content-addressed payloads och åtta
-  immutable revisioner täcker 2025-08-11–2026-08-10 i beständig lokal SQLite-memory.
-- Verifierat: API/UI REAL EOD, aktiv retention, exakt-revision deterministic replay,
-  restartöverlevnad och dagens skip/idempotens utan ytterligare provideranrop.
-- Avgränsning: Finance är fortsatt RESEARCH; ingen live feed, broker, order eller trading.
-- Report: `docs/reports/features/finance/finance-bb-078-first-real-market-data-activation-20260811.md`.
-
-### BB-079 – First real feature / indicator engine
-
-- Modul: Finance / Research features
-- Typ: Implementation / persistence / runtime verification
-- Prioritet: P1
-- Status: Klar; implementerad, deployad och runtime-verifierad 2026-08-11
-- Resultat: provider-neutral `core-daily-v1` beräknade 42 168 immutable feature-värden
-  (39 616 available, 2 552 warmup, 0 quality issues) från exakt åtta reala EODHD-
-  marknadsrevisioner utan nytt provideranrop.
-- Verifierat: kända formelsvar, deterministic checksum/idempotens, causal no-lookahead,
-  correction lineage, SQLite reopen/restart, bounded API, responsiv UI och retention/deletion
-  scope för beroende features.
-- Avgränsning: raw close/OHLC och providerklassificerad volym; inga signaler, strategier,
-  portfolio/order/PAPER/LIVE eller brokerfunktioner.
-- Report: `docs/reports/features/finance/finance-bb-079-first-real-feature-engine-20260811.md`.
-
-### BB-047 – M3 deterministic backtest engine
-
-- Modul: Finance / Backtesting
-- Typ: Implementation
-- Prioritet: P2
-- Status: Klar genom BB-080; implementerad, automatiskt verifierad, deployad och runtime-verifierad 2026-08-12
-- Beroenden: BB-045 och BB-079.
-- Definition of Done: versioned datasets/parameters replay deterministically with order
-  and portfolio simulation, benchmarks, gross/net metrics and reproducible reports.
-
-### BB-080 – First deterministic real-data backtest engine
-
-- Modul: Finance / Backtesting / Web
-- Typ: Implementation / persistence / runtime evidence
-- Prioritet: P1
-- Status: Klar 2026-08-12
-- Resultat: immutable exact-revision runs för buy-and-hold, SMA10/20 och momentum20 med next-session-open, whole-share portfolio, zero/conservative costs, journal, fills, curves, metrics, benchmark, read-only API/UI och EODHD deletion lineage.
-- Verifierat: golden/no-lookahead/determinism/cost/edge/retention tests, real BB-078/079 offline run, idempotent restart, build/deploy/runtime. Ingen trading capability.
-- Report: `docs/reports/features/finance/finance-bb-080-deterministic-real-data-backtest-20260812.md`.
-
-### BB-081 – Robustness / out-of-sample strategy evaluation foundation
-
-- Modul: Finance / Strategy Lab / Web
-- Typ: Implementation / immutable evidence / runtime verification
-- Prioritet: P1
-- Status: Klar 2026-08-12
-- Resultat: versionerad exact-lineage evaluation plan, kronologiska splits och embargo, expanding walk-forward, bounded parameter/cost sensitivity, transparent score, hård insufficiency override, immutable SQLite evidence samt read-only API/UI.
-- Verifierat: 70 reala underliggande runs över buy-and-hold/SMA/momentum, no-leakage/determinism/cost/split/retention tests, persistence/restart och runtime. Alla verdict är korrekt `INSUFFICIENT_DATA`; ingen PAPER/LIVE/trading.
-- Report: `docs/reports/features/finance/finance-bb-081-robustness-out-of-sample-20260812.md`.
-
-### BB-082 – Longer zero-cost historical market memory
-
-- Modul: Finance / Market Data / Strategy Lab
-- Typ: Provider research / entitlement / conditional implementation
-- Prioritet: P1
-- Status: Blockerad 2026-08-12 – legitimt stoppvillkor; ingen ny data ingested
-- Budget: 0 SEK.
-- Resultat: aktuell kontroll av Stooq, EODHD Free, Alpha Vantage Free och Nasdaq Data Link
-  fann ingen implementerbar nollkostnadskälla som materiellt förlänger den nuvarande
-  US-equity/ETF-historiken. Stooqs villkors- och CSV-ytor kräver JavaScript-verifiering;
-  kontrollen kringgicks inte. EODHD Free stannar vid cirka ett år, Alpha Vantage full daily
-  history är premium och Nasdaq Data Links relevanta US EOD-produkt är premium.
-- Bevarat: all BB-078–081-evidens, EODHD daily acquisition och Finance `RESEARCH` är
-  oförändrade. Inga feature-revisioner, backtests eller robustness-evaluations skapades.
-- Nästa nollkostnadsväg: begär en normalt stödd Stooq bulk/API-väg med uttrycklig
-  automations- och lagringsklarhet, eller utvärdera en namngiven offentlig/open-datafil med
-  verifierbar redistribution/provenance; ändra inte budget eller kringgå åtkomstkontroll.
-- Report: `docs/reports/features/finance/finance-bb-082-zero-cost-history-reassessment-20260812.md`.
-
-### BB-048 – Transaction-cost, slippage and fill simulation
-
-- Modul: Finance / Backtesting
-- Typ: Implementation / validation
-- Prioritet: P1
-- Status: **Klar för nuvarande dagliga research-scope genom BB-123 / kända databundna begränsningar explicita**
-- Beroenden: BB-047.
-- Definition of Done: applicable fees, spread, slippage, FX, delay, partial fill and
-  rejection are modeled; a strategy negative after costs fails validation.
-- Resultat 2026-08-31: BB-123 återanvänder BB-080/081 och levererar versionsatt fast,
-  per-aktie/minimi- och proportionell avgift, antagen spread, adverse slippage, exakt nästa
-  sessions-open, whole shares/kassa samt explicita fill/rejection-skäl och mått. FX är inte
-  tillämpligt på nuvarande USD-scope. Partial fills/volymtak är inte vetenskapligt motiverade av
-  daglig aggregatvolym och är därför explicit kända begränsningar, inte implicit full realism.
-  Äldre v1-runs bevaras; bounded v2-jämförelse är monotont kostnadskänslig och fortsatt
-  `INSUFFICIENT_DATA`. Ingen trading- eller exekveringsauktoritet skapades.
-
-### BB-049 – Anti-overfitting and out-of-sample validation
-
-- Modul: Finance / Strategy Lab
-- Typ: Statistical validation
-- Prioritet: P1
-- Status: **Klar för nuvarande dagliga research-scope genom BB-124 / kända databundna begränsningar explicita**
-- Beroenden: BB-047, BB-048.
-- Syfte/scope: prevent research selection from being mistaken for durable expectancy by
-  governing split design, repeated testing, parameter/regime sensitivity and sequence risk.
-- Risk: overfitting, survivorship/look-ahead/data leakage, selection and multiple-testing
-  bias, regime change and underestimated costs/slippage.
-- Definition of Done: look-ahead/data leakage guards, in/validation/out-of-sample splits,
-  sensitivity, regime/cost stress and useful walk-forward/sequence-risk tests are evidenced.
-- Verification: seeded negative controls and synthetic biased datasets must be rejected;
-  reports disclose trial population, dataset/version, costs and untouched holdout scope.
-- Resultat 2026-09-01: BB-124 utökar samma BB-081-motor med versionsatt 60/20/20
-  train/validation/holdout, dubbla 50-sessioners embargo, validation-only parameterurval,
-  komplett trial-population och en beständig holdout-livscykel. Tidigare använd holdout blir
-  `CONTAMINATED`; otillräcklig historik blir `INSUFFICIENT_DATA`. En konservativ family-breadth-
-  regel synliggör upprepade hypoteser utan fabricerade p-värden. Seedade negativa kontroller,
-  leakage-, noise-selection- och regime-fragile-kontroller avvisas/nedgraderas; positiv syntetisk
-  kontroll är uttryckligen endast engineering evidence. DSR/PBO förblir `NOT_EVALUABLE`.
-  Längre och mindre biased data är fortfarande framtida evidensarbete, inte en ofärdig kodgate.
-  BB-125 requalified four zero-cost candidates without acquisition: SimFin Free and Alpaca Basic
-  remain `HUMAN CONFIRMATION REQUIRED`; Yahoo/yfinance and persistent Tiingo Starter intake are
-  rejected for the intended automated archive. No new historical source is activated, so the
-  current short/biased-evidence limitation remains open.
+[Fulltext B109](history/backlog-before-doc-2b-20261024.md#definition-of-done-3).
 
 ### BB-050 – M4 versioned deterministic strategy contract and candidates
 
@@ -1897,6 +168,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: each momentum, trend, breakout, mean-reversion and volume/liquidity
   candidate is independently testable and produces versioned StrategySignal evidence.
 
+[Fulltext B130](history/backlog-before-doc-2b-20261024.md#bb-050--m4-versioned-deterministic-strategy-contract-and-candidates).
+
 ### BB-051 – Market-regime classification
 
 - Modul: Finance / Strategy Engine
@@ -1906,6 +179,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-045, BB-050.
 - Definition of Done: versioned regimes and uncertainty can enable, disable or weight
   strategies; abnormal volatility or poor liquidity can result in no trade.
+
+[Fulltext B131](history/backlog-before-doc-2b-20261024.md#bb-051--market-regime-classification).
 
 ### BB-052 – Multi-strategy candidate decision model
 
@@ -1917,6 +192,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: multiple versioned signals create an explainable Candidate Trade;
   tests prove agreement is evidence and cannot authorize execution.
 
+[Fulltext B132](history/backlog-before-doc-2b-20261024.md#bb-052--multi-strategy-candidate-decision-model).
+
 ### BB-053 – M5 hard Risk Engine and policy evaluation
 
 - Modul: Finance / Risk
@@ -1926,6 +203,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-044, BB-047; ADR 0018 review.
 - Definition of Done: all documented capital, exposure, loss, liquidity, spread, hours,
   data/volatility and health limits are server-enforced and bypass/invariant tested.
+
+[Fulltext B133](history/backlog-before-doc-2b-20261024.md#bb-053--m5-hard-risk-engine-and-policy-evaluation).
 
 ### BB-054 – Portfolio engine, sizing and bidirectional compounding
 
@@ -1937,6 +216,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: cash, positions, exposure and current-equity sizing reconcile;
   percentage risk never rises through compounding and sizes shrink after losses.
 
+[Fulltext B134](history/backlog-before-doc-2b-20261024.md#bb-054--portfolio-engine-sizing-and-bidirectional-compounding).
+
 ### BB-055 – Exit management, circuit breakers and emergency control
 
 - Modul: Finance / Risk
@@ -1946,6 +227,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-053, BB-054.
 - Definition of Done: position-opening exit invariant, forced exits, STOP ALL TRADING,
   HALTED behavior, safe-exit policy and resume authorization pass failure drills.
+
+[Fulltext B135](history/backlog-before-doc-2b-20261024.md#bb-055--exit-management-circuit-breakers-and-emergency-control).
 
 ### BB-056 – M6 Strategy Lab, metrics and lifecycle governance
 
@@ -1963,6 +246,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Verification: tests prove new evidence cannot mutate/promote an active version and that
   every transition checks current evidence, Risk policy and owner authorization.
 
+[Fulltext B136](history/backlog-before-doc-2b-20261024.md#bb-056--m6-strategy-lab-metrics-and-lifecycle-governance).
+
 ### BB-057 – M7 restart-safe paper trading engine
 
 - Modul: Finance / Paper Trading
@@ -1972,6 +257,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-045, BB-050, BB-053, BB-056.
 - Definition of Done: persistent simulated cash/positions/orders/fills/P&L/costs support
   delay, partial/rejected orders, restart and daily strategy-attributed summaries.
+
+[Fulltext B137](history/backlog-before-doc-2b-20261024.md#bb-057--m7-restart-safe-paper-trading-engine).
 
 ### BB-058 – Paper-trading soak and evidence acceptance
 
@@ -1983,6 +270,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: representative owner-accepted evidence covers regimes, costs,
   drawdown, operations and failures; success is not defined by profitable-day count.
 
+[Fulltext B138](history/backlog-before-doc-2b-20261024.md#bb-058--paper-trading-soak-and-evidence-acceptance).
+
 ### BB-059 – M8 Finance dashboard and accessible PAPER/LIVE UI
 
 - Modul: Finance / Web
@@ -1992,6 +281,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-053, BB-056, BB-057.
 - Definition of Done: portfolio, P&L, mode/risk, positions/orders, signals, journal,
   warnings and emergency state are responsive/accessibility tested; PAPER/LIVE is unmistakable.
+
+[Fulltext B139](history/backlog-before-doc-2b-20261024.md#bb-059--m8-finance-dashboard-and-accessible-paperlive-ui).
 
 ### BB-060 – Swedish/EU legal, tax and operational live-trading research
 
@@ -2003,6 +294,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: qualified sources and owner review cover broker terms, automated-
   trading restrictions, account/tax/reporting, market-data/API and instrument constraints.
 
+[Fulltext B140](history/backlog-before-doc-2b-20261024.md#bb-060--swedisheu-legal-tax-and-operational-live-trading-research).
+
 ### BB-061 – M9 broker evaluation and owner-approved selection
 
 - Modul: Finance / Broker
@@ -2012,6 +305,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-046, BB-060.
 - Definition of Done: candidates are compared on Sweden/API/sandbox/instruments/costs,
   data/orders/fractions/limits/security/reliability/terms; no convenience-only selection.
+
+[Fulltext B141](history/backlog-before-doc-2b-20261024.md#bb-061--m9-broker-evaluation-and-owner-approved-selection).
 
 ### BB-062 – Broker abstraction and credential-security boundary
 
@@ -2023,6 +318,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: typed adapter passes fake/sandbox contracts; paper/live secrets use
   least-privilege injection, rotation/revocation and never reach Git, Web, AI or logs.
 
+[Fulltext B142](history/backlog-before-doc-2b-20261024.md#bb-062--broker-abstraction-and-credential-security-boundary).
+
 ### BB-063 – Execution verification, idempotency and reconciliation
 
 - Modul: Finance / Execution
@@ -2032,6 +329,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-055, BB-062; ADR 0019 review.
 - Definition of Done: immutable previews and idempotency prevent duplicates; broker truth
   resolves uncertain/partial/rejected results and material mismatch suspends automation.
+
+[Fulltext B143](history/backlog-before-doc-2b-20261024.md#bb-063--execution-verification-idempotency-and-reconciliation).
 
 ### BB-064 – M10 Trading Controller and manual approval mode
 
@@ -2043,6 +342,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: exact current previews show evidence/risk/cost/size/exit/impact and
   only explicit bound approval can execute once, followed by independent verification.
 
+[Fulltext B144](history/backlog-before-doc-2b-20261024.md#bb-064--m10-trading-controller-and-manual-approval-mode).
+
 ### BB-065 – M11 limited live automation
 
 - Modul: Finance / Trading
@@ -2052,6 +353,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: BB-058, BB-063, BB-064; explicit owner promotion.
 - Definition of Done: tiny exposure/universe/loss limits, mandatory exits, anomaly stop,
   notification and daily reconciliation are verified with accepted bounded evidence.
+
+[Fulltext B145](history/backlog-before-doc-2b-20261024.md#bb-065--m11-limited-live-automation).
 
 ### BB-066 – M12 long-duration limited-live validation
 
@@ -2063,6 +366,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: representative net expectancy, drawdown, regime, drift, incident and
   reconciliation evidence is accepted; elapsed time alone is insufficient.
 
+[Fulltext B146](history/backlog-before-doc-2b-20261024.md#bb-066--m12-long-duration-limited-live-validation).
+
 ### BB-067 – M13 policy-governed AUTO
 
 - Modul: Finance / Trading
@@ -2073,6 +378,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Definition of Done: policy-bounded autonomous entry/management/exit and suspension pass
   independent invariant, circuit-breaker, reconciliation and emergency review.
 
+[Fulltext B147](history/backlog-before-doc-2b-20261024.md#bb-067--m13-policy-governed-auto).
+
 ### BB-068 – M14 BigBrain Autonomic Finance capabilities
 
 - Modul: Finance / BigBrain.Brain
@@ -2082,6 +389,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 - Beroenden: stable BB-063/BB-067 capabilities and security review.
 - Definition of Done: OBSERVE–DIAGNOSE–DECIDE–POLICY–ACT–VERIFY uses the normal Trading
   Controller; adversarial tests prove AI cannot access credentials or bypass policy.
+
+[Fulltext B148](history/backlog-before-doc-2b-20261024.md#bb-068--m14-bigbrain-autonomic-finance-capabilities).
 
 ### BB-069 – M15 continuous strategy governance and drift control
 
@@ -2098,6 +407,8 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
   controls keep every active strategy version owned, current and reversible.
 - Verification: soak/failure tests prove collection only emits evidence/proposals; live
   changes require the full review/promotion gate and explicit owner action.
+
+[Fulltext B149](history/backlog-before-doc-2b-20261024.md#bb-069--m15-continuous-strategy-governance-and-drift-control).
 
 ### BB-070 – Decision journal, observability and failure injection
 
@@ -2120,71 +431,137 @@ continues with Alpaca Basic/free IEX entitlement research before any paid decisi
 
 ---
 
-## Buggar
+[Fulltext B150](history/backlog-before-doc-2b-20261024.md#bb-070--decision-journal-observability-and-failure-injection).
 
-### BB-037 – Sprint 1-deployment tappade runtimekonfiguration och kalenderkoppling
+Övrig vilande produktavsikt: Investopedia endast utbildnings-/hypoteskontext efter källrättighets- och
+proveniensgranskning genom befintliga deterministiska grindar; ingen scraper/Knowledge Layer.
+Avanza/MCP är RIGHTS_UNKNOWN / MANUAL_REVIEW; macro-/FX-/råvaru-/fundamental-/point-in-time-datapaket
+är separata framtida frågor. Ingen ny prioritet. [B045](history/backlog-before-doc-2b-20261024.md#finance-source-evidence-update--2026-09-06),
+[B083–084](history/backlog-before-doc-2b-20261024.md#finance--m5-policy-maturation),
+[BB-090](history/backlog-before-doc-2b-20261024.md#bb-090--fred-macro-and-finance-correctness-stabilization).
 
-- Modul: Deployment / Media / Kalender
-- Typ: P0-regression / konfiguration / persistence
-- Prioritet: P0
-- Status: Klar
-- Upptäckt: 2026-08-07
+## Säkerhet, drift och arkitekturgrindar
 
-En deployment från en ren käll-export kördes utan repositoryts runtimekonfiguration och från en commit som ännu saknade den deployade kalendermodulen. API-containern fick tomma integrationsvärden och kalenderns named volume monterades inte. Volymen raderades aldrig; databasen verifierades med `integrity=ok`, 39 händelser och 2 importer före återanslutning.
+### BigBrain security and penetration-testing baseline
 
-#### Definition of Done
+- Modul: Cross-cutting Security; status: Planerad; identifier awaits normal product prioritization.
+- Beslut: implement continuous CI-oriented secret/dependency/SAST/container/API/header/
+  supply-chain/configuration checks and controlled black-/grey-box testing of Web, API,
+  authentication/authorization, IDOR, injection, XSS, CSRF, CORS, malformed input, traversal,
+  resource exhaustion, containers/ports/volumes/host privilege, Sentinel transport/request proof/
+  replay, Finance CSV/ZIP/provenance/revision/mode gates, recovery/persistence tampering and supply
+  chain. Potentially destructive tests must use isolated test environments/data.
+- Gate: mandatory before real-money LIVE eligibility and a strong prerequisite before meaningful
+  PAPER/execution authority. This item is planning only; BB-086 implements none of it.
 
-- Deployment använder avsedd runtimekonfiguration utan att secrets publiceras.
-- Kalender-, mat-, shopping- och settingsvolymer är explicit monterade och verifierade.
-- Kalenderdata och importhistorik kan läsas efter API-omstart.
-- Integrationerna klassas åter som konfigurerade.
-- API/Web är healthy och externa tjänster behåller identitet och data.
-- Produktägaren har manuellt verifierat kalender och integrationer.
+[Fulltext B091](history/backlog-before-doc-2b-20261024.md#bigbrain-security-and-penetration-testing-baseline).
 
-Slutstatus 2026-08-07: konfiguration och kalendervolym är återanslutna; kalender-API visar befintliga importer/händelser och integrationskonfigurationen är åter laddad. Produktägaren har manuellt verifierat och godkänt den återställda installationen.
+R015:s kvarstående auth-design-gate gäller broker/trading, Docker-/kamerakontroll,
+high-impact Home Assistant och bredare nätverksexponering. Kontrollerad destruktiv testning sker
+isolerat. Striktare PAPER-krav i accepterade domänkontrakt får inte försvagas av ordet stark;
+aktuell generell pentestbaseline är fortfarande planerad, inte genomförd.
 
-### BB-038 – Delat persistent tema mellan mobil och webb
+### BB-083 – Appliance lifecycle and crash recovery baseline
 
-- Modul: Settings / BigBrain Web
-- Typ: P0-regression / UX / persistence
-- Prioritet: P0
-- Status: Klar
-- Upptäckt: 2026-08-07
+- Modul: Platform / Operations / Finance safety; prioritet P0.
+- Status: implementerad och container-runtime-verifierad 2026-08-12; hostinstall,
+  Docker-daemon restart/reboot blocked by interactive sudo; physical power-cycle pending.
+- Delivered: ADR 0026, clean/unclean journal, recovery/storage/disk/clock gate, explicit job
+  policies, interrupted EODHD safety, API/UI, Compose grace/readiness, systemd and scripts.
+- Evidence: API PID-1 crash returned healthy/`UNCLEAN`; Finance stayed at 16 requests,
+  4,016 raw observations and 16 immutable revisions.
+- Report: `docs/reports/features/resilience/bigbrain-bb-083-appliance-resilience-20260812.md`.
 
-Temat lagrades endast per webbläsare i `localStorage`; ThemeProvider, SettingsService och Theme API saknades. Mobil och desktop kunde därför ha olika teman.
+[Fulltext B099](history/backlog-before-doc-2b-20261024.md#bb-083--appliance-lifecycle-and-crash-recovery-baseline).
 
-#### Definition of Done
+### BB-009 – Klassificera Proposed ADR 0002 och 0006–0009
 
-- Ett versionssatt Theme API läser och skriver ett allowlistat tema.
-- ThemeProvider använder serverns persistenta värde som auktoritativ källa.
-- Befintligt lokalt tema kan säkert seeda en tidigare okonfigurerad serverinställning.
-- Ogiltiga teman avvisas med Problem Details och lokal UI-state återställs vid skrivfel.
-- Inställningen överlever API-omstart och delas mellan klienter.
-- Frontend-/backendtester, build och produktägarens mobil-/desktopverifiering är godkända.
+- BB-130A review 2026-09-05 extends this existing follow-up to ADR 0005 conformance:
+  fixed allowlist/proof checks do not establish signed-overlay lifecycle; certificate
+  validity/EKU and lifecycle tests, complete response validation/bounds, truthful
+  identity/policy/timing/completion audit, and container/in-process privilege/host-semantics
+  evidence remain incomplete. Status: **OPEN / SECURITY REVIEW REQUIRED**, no waiver.
+- DoD extension: owner/architect-reviewed disposition of each gap, isolated negative/
+  compatibility/security tests and truthful runtime scope before full acceptance.
+  New privilege or security semantics require a separate Proposed ADR; no hardening
+  implementation is smuggled into BB-130A. Local ADR 0006–0009 stay unpublished.
 
-Slutstatus 2026-08-07: API, dedikerad settingsvolym och ThemeProvider är implementerade, testade, deployade och manuellt godkända av produktägaren på mobil och webb.
+- Modul: Arkitektur
+- Typ: ADR-review
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-03
+- Beskrivning: Granska om förslagen ska accepteras, ersättas eller förbli Proposed.
+- Motiv: Långvarigt Proposed-läge gör auktoriteten oklar.
+- Avgränsning: Status ändras endast genom explicit arkitekturreview.
+- Risk: Implementation och föreslaget beslut divergerar.
+- Definition of Done: Varje ADR har dokumenterat reviewbeslut och evidens.
+- Relaterade dokument: `docs/adr/0002-sentinel-exclusive-system-access.md`, `docs/adr/0006-sentinel-local-transport-identity-and-request-proof.md`, `docs/adr/0007-sentinel-v1-system-metrics-schemas-and-compatibility.md`, `docs/adr/0008-sentinel-system-metrics-policy-classification-and-audit.md`, `docs/adr/0009-sentinel-system-metrics-packaging-privilege-and-supply-chain.md`.
 
-### BB-028 – Kalender – Heroma-schemaimport och veckovis arbetsöversikt
+[Fulltext B258](history/backlog-before-doc-2b-20261024.md#bb-009--klassificera-proposed-adr-0002-och-00060009).
 
-- Modul: Kalender
-- Typ: Funktion / extern filimport
-- Prioritet: P1
-- Status: Klar
-- Upptäckt: 2026-08-05
+## Family, hushåll och uppskjuten samordning
 
-#### Definition of Done
+<a id="future-family-view--family-coordination-epic"></a>
 
-- Flera verifierade Heroma-filer kan förhandsgranskas och importeras med partiell framgång.
-- Faktiskt `.xlsx`-format, datum, tider, dag/kväll, utbildning, samverkan, semester, okända typer och flera poster per datum parsas säkert.
-- Kalenderdata och importhistorik persisterar server-side.
-- Hem visar aktuell vecka; förstorat läge visar hela månaden med tider i varje relevant dag och läsbar mobilpresentation.
-- Exakt dubblett blockeras; omimport erbjuder Replace, Merge och Cancel; konflikter skrivs inte över.
-- Backend/frontend/build/dokumentations- och säkerhetsgrindar är gröna.
-- Endast API och Web deployas och är healthy.
-- Produktägaren verifierar privat flerfilsimport, reload, dubblett, omimport och mobilvy.
-- Sanerad rapport, dokumentation, avsedda commits och push är publicerade; HEAD matchar `origin/main` och CI är grön eller tydligt pågående.
+### Family View och Family Coordination
 
-Slutstatus: backend, import, persistence, veckovy och mobil layout är deployade. Produktägaren har verifierat korrekt arbetsvecka, bevarad importerad schemadata och återställd kalender efter remediationen. Automatiska tester, dokumentation, commit och push är publicerade.
+Framtida umbrella-epik, inte generellt prioriterad eller auktoriserad genom Skollunch v2.
+Family är ett koordinationslager, inte en ny datakälla eller konkurrerande widgetdashboard.
+Calendar, skolor, Meal Planner, Shopping List, aktiviteter och hushåll/member context äger sina data.
+Versionssatta capabilities får normalisera referenser, inte klona/ändra källposter.
+Kvar: member association, skolschema/kalender/lov/studiedagar, attendance, Family Context,
+hard/soft/information evaluation, Day/Week, provenance/freshness, manuellt override, privacy/security
+samt sparsamma notiser. Beroenden BB-029, BB-036, BB-027, auth-hardening och Home Calendar/swipe.
+[Normativ planeringsgräns](architecture/family-view-family-coordination.md),
+[ursprungligt produktmål](history/backlog-before-doc-2b-20261024.md#future-family-view--family-coordination-epic).
+Äldre Finance-före-Family-prioritet är historisk; detta skapar ingen ny prioritering.
+
+### Skollunch — kvarstående livegrindar
+
+**BLOCKED för extern aktivering/liveacceptans.** V1 och v2-plan är mergade; v2-implementation är
+mergad via `c8aaba15ac6382b6934591acfa6f615505c95819` och CI40004794277 SUCCESS enligt
+[STATUS](STATUS.md#family--skollunch). Offline-original/fixtures, RSS/HTML-parser, read-only API,
+hämtning vid behov och sex timmars minnescache är verifierade för den revisionen.
+Det bevisar inte deployment, produktionsinställning, källrättigheter eller fysisk iPhone/PWA-acceptans.
+
+Kvarstående DoD: verifierade rättigheter/villkor för automatisering och cache för båda faktiska
+leverantörerna, separat aktiverings-/deploymentbeslut, verkliga veckomenyer och ägaracceptans.
+Källidentitet, originaltext/alternativ, datum/ISO-vecka, härlett kontra verifierat år, freshness,
+timeout/HTTP/ogiltig/saknad/stale meny ska vara sanningsenliga. Ingen fabricerad lovstatus eller
+fixture som live; ingen godtycklig URL, scheduler, databas eller påverkan på hushållsmiddagar/inköp.
+Endast källstödda veckor. Hushållets planerade helglunch och modulägarskap bevaras.
+[Fulltext B096](history/backlog-before-doc-2b-20261024.md#existing-family-epic-member-external-school-meals-in-meal-planner),
+[käll-/implementationsrapport](reports/features/family/school-meals-preparation-20261023.md).
+
+### Existing Family-epic member: School-aware household menu generation
+
+- Module: Meal Planner / Shopping List; status: future Meal Planner intelligence.
+- Intent: household weekly generation considers all relevant school sources alongside household
+  preferences, meal history, variation, leftovers, budget, supported available ingredients and
+  shopping-list integration. Avoid materially similar home food most strongly on the same day,
+  strongly around adjacent days and more softly farther away; exact weights remain future design.
+- Similarity: reason over protein, carbohydrate/base, dish type, preparation, sauce/style and broad
+  flavor/cuisine family rather than dish-name strings alone. This task authorizes no classifier.
+- Control: similarity is a soft optimization constraint across every relevant external source;
+  manual household choice wins. Generated household meals may create shopping requirements, but
+  school meals never add their own ingredients to the household shopping list.
+
+[Fulltext B097](history/backlog-before-doc-2b-20261024.md#existing-family-epic-member-school-aware-household-menu-generation).
+
+### Referenced Home/Calendar work: past-day presentation and mobile swipe investigation
+
+- Module: BigBrain Web / Home; status: future UX enhancement/investigation.
+- Calendar intent: Calendar is a module in Home, not a standalone view. Past days should visually
+  recede so current/upcoming days are immediately understandable. Exact styling remains open and
+  must not rely on color or opacity alone; reduced emphasis or appropriate strike-through may be
+  evaluated with accessible state semantics.
+- Swipe intent: evaluate mobile-first touch navigation only between appropriate BigBrain views or
+  contexts. It must coexist with browser/system back gestures and horizontal controls, retain
+  visible and keyboard/mouse navigation, preserve accessibility and avoid accidental destructive
+  actions. This is not an approved interaction specification.
+
+[Fulltext B098](history/backlog-before-doc-2b-20261024.md#referenced-homecalendar-work-past-day-presentation-and-mobile-swipe-investigation).
 
 ### BB-029 – Kalender – externa synkar och personliga kalenderfunktioner
 
@@ -2196,187 +573,21 @@ Slutstatus: backend, import, persistence, veckovy och mobil layout är deployade
 
 Omfattar framtida Google/Apple/ICS-synk, familje- och manuella händelser, påminnelser, per-user kalender, pushnotiser, AI-planeringsförslag och arbetstidsstatistik. Funktionerna kräver separata ägarskaps-, behörighets-, konflikt- och integritetsbeslut och ingår inte i Heroma-MVP:n.
 
+[Fulltext B158](history/backlog-before-doc-2b-20261024.md#bb-029--kalender--externa-synkar-och-personliga-kalenderfunktioner).
+
 #### Definition of Done
 
 - En prioriterad del har verifierat användarbehov och separat arkitekturbeslut.
 - Ägarskap, per-user-scope, sync-konflikter, auktorisering och retention är dokumenterade och testade.
 
-### BB-030 – Dashboardinställningar under kugghjulsmeny
-
-- Modul: BigBrain Web / Dashboard
-- Typ: UX / navigering och inställningar
-- Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-05
-
-#### Beskrivning
-
-Kontrollerna Tema, Redigera och Widgetbibliotek visas permanent högst upp i varje dashboardvy. De tar mycket vertikalt utrymme på mobil och är sekundära inställningsfunktioner snarare än primärt innehåll.
-
-#### Önskat beteende
-
-- Visa en tydlig kugghjulsknapp för dashboardinställningar.
-- Tema, Redigera och Widgetbibliotek öppnas därifrån.
-- Menyn gäller aktuell dashboardvy.
-- Aktivt redigeringsläge framgår fortfarande tydligt.
-- Tema förblir globalt om det är det nuvarande kontraktet.
-- Funktionerna försvinner inte och blir inte svårare att nå.
-- Menyn fungerar med touch, tangentbord, Escape, fokusfälla och fokusåterställning.
-- Lösningen fungerar i alla teman och på mobil och desktop.
-
-#### Avgränsning
-
-Ingen ändring av widgetpersistens, moduldata, dashboardprofiler eller backend.
-
-#### Definition of Done
-
-- Tema, Redigera och Widgetbibliotek ligger bakom en tydlig kugghjulskontroll.
-- Dashboardens primära innehåll börjar högre upp på mobil.
-- Alla tre funktionerna är fullt åtkomliga.
-- Menyn har korrekt tillgänglighetssemantik.
-- Aktivt redigeringsläge är tydligt.
-- Verifierat i Ljust, Mörkt och Obsidian Gold.
-- Regressionstester och manuell mobilverifiering finns.
-
-#### Manuell evidens
-
-På iPhone i Obsidian Gold tar Tema-väljaren samt knapparna Redigera och Widgetbibliotek en stor del av den övre dashboardytan.
-
-#### Lösning och verifiering
-
-Tema, redigeringsläge och widgetbibliotek samlas i en tillgänglig inställningspanel bakom ett kugghjul. Escape och klick utanför stänger panelen med fokusåterställning. Implementationen verifierades 2026-08-07 med komponenttester, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 i samtliga tre teman. Fixen är deployad och manuellt godkänd av produktägaren på mobil och desktop.
-
-### BB-031 – Download Control orsakar horisontell overflow på mobil
-
-- Modul: Media / Download Control
-- Typ: Bugg / mobil layout / overflow
-- Prioritet: P1
-- Status: Klar
-- Upptäckt: 2026-08-05
-
-#### Beskrivning
-
-När widgeten Nedladdningar är öppen på mobil blir delar av Download Control bredare än widgeten och viewporten. Informationsrutor, filter, åtgärdsknappar och långa torrentnamn kan fortsätta utanför högerkanten.
-
-#### Nuvarande beteende
-
-- Uppdateringsknappen kapas eller hamnar delvis utanför.
-- Filterraden fortsätter utanför widgetens bredd.
-- Torrentkort och Hantera-knappar kan bli bredare än tillgängligt utrymme.
-- Långa namn pressar layouten horisontellt.
-- Innehåll döljs bakom viewportens högra kant.
-
-#### Förväntat beteende
-
-- Ingen sida- eller widgetövergripande horisontell scroll.
-- Allt innehåll håller sig inom widgetens inre bredd.
-- Långa torrentnamn radbryts eller trunkeras kontrollerat.
-- Filter får radbrytas eller ligga i en avsiktlig intern scrollrad utan att hela sidan expanderar.
-- Knappar anpassas till mobilbredd.
-- Progressindikator och metadata håller sig inom kortet.
-- Desktoplayouten försämras inte.
-
-#### Tekniska kontrollpunkter
-
-- `min-width: 0` på grid- och flexbarn.
-- `overflow-wrap` och `word-break` för långa release-namn.
-- Fasta bredder och `width: max-content`.
-- `flex-wrap` för header och filter.
-- `max-width: 100%`.
-- `box-sizing`.
-- Eventuell `overflow-x` på fel container.
-
-#### Definition of Done
-
-- Ingen horisontell dokument-scroll vid 320, 375 och 390 px.
-- Header, filter, torrentkort och knappar ryms.
-- Mycket långa torrentnamn förstör inte layouten.
-- Download Control är användbart i alla teman.
-- Regressionstest använder representativt långt torrentnamn.
-- Manuell verifiering genomförs på iPhone.
-
-#### Manuell evidens
-
-På Media-vyn i mobilformat går uppdateringsknappen, filterraden och torrentinformationen utanför widgetens högra kant.
-
-#### Lösning och verifiering
-
-Grundorsaken var intrinsic sizing i gridbarn, header, åtgärdsknapp och långa texter. Berörda containers har nu explicita `min-width: 0`/`max-width: 100%`, radbrytning och enkolumnslayout på mobil utan att dölja informationsinnehåll. Implementationen verifierades 2026-08-07 med komponent-/CSS-regressionstest, production build och headless Chromium vid 390×844, 768×1024 och 1440×1000 utan dokument- eller widgetoverflow. Fixen är deployad och manuellt godkänd av produktägaren på mobil.
-
-### BB-032 – Kalenderns Heroma-importdialog orsakar horisontell scroll
-
-- Modul: Kalender / Heroma-import
-- Typ: Bugg / mobil modal / overflow
-- Prioritet: P1
-- Status: Klar
-- Upptäckt: 2026-08-05
-
-#### Beskrivning
-
-När dialogen Importera Heroma-schema öppnas på mobil visas en horisontell scrollbar längst ned. Dialogens innehåll är bredare än den visuella viewporten.
-
-#### Nuvarande beteende
-
-- Importdialogen kan scrollas horisontellt.
-- Delar av dialogen sträcker sig utanför skärmen.
-- Filväljaren, knappen Förhandsgranska eller dialogens inre panel misstänks skapa en för stor minsta bredd.
-- Problemet är särskilt tydligt i mörkt tema på iPhone.
-
-#### Förväntat beteende
-
-- Dialogen är aldrig bredare än mobilens visuella viewport.
-- Endast vertikal scroll används när innehållet är långt.
-- Filväljare, statusrad, förhandsgranskningsknapp och stängknapp ryms inom dialogen.
-- Långa filnamn radbryts eller trunkeras säkert.
-- Safe-area-insets respekteras.
-- Dialogen fungerar även med flera valda filer och långa filnamn.
-
-#### Tekniska kontrollpunkter
-
-- `width` och `max-width` med hänsyn till viewport och safe area.
-- `min-width: 0` på dialogens barn.
-- Native `input[type=file]`.
-- `box-sizing`.
-- Padding plus border.
-- `100vw` kontra `100dvw`.
-- Långa filnamn och flex-/gridbarn.
-- `overflow-x` på dialog, overlay och body.
-
-#### Definition of Done
-
-- Ingen horisontell scrollbar vid 320, 375 och 390 px.
-- Dialogen ryms inom viewporten i alla teman.
-- Flera filer och långa filnamn förstör inte layouten.
-- Endast avsedd vertikal dialogscroll används.
-- Bakgrundssidan förblir låst.
-- Escape, fokusfälla och fokusåterställning fungerar fortsatt.
-- Regressionstest och manuell iPhone-verifiering finns.
-
-#### Manuell evidens
-
-På iPhone visas en tydlig horisontell scrollbar längst ned i dialogen Importera Heroma-schema.
-
-#### Lösning och verifiering
-
-Kalenderdialogen använder ett vertikalt mobilflöde, breddbegränsade barn, säker radbrytning och safe-area-kompensation. Regressionstest och product-owner-verifiering på mobil godkändes 2026-08-07.
+[Fulltext B159](history/backlog-before-doc-2b-20261024.md#definition-of-done-8).
 
 ### BB-001 – Ingen synlig återkoppling när en dubblettvara stoppas
 
-- Modul: Inköpslista
-- Typ: UX / felhantering
 - Prioritet: P2
 - Status: Bekräftad
-- Upptäckt: 2026-08-02
 
-#### Beskrivning
-
-När användaren försöker lägga till en vara som redan finns i inköpslistan skapas ingen dubblett, vilket är korrekt. Däremot visas inget synligt meddelande eller någon dubblettdialog för användaren.
-
-#### Nuvarande beteende
-
-- API eller datalager stoppar dubbletten.
-- Ingen extra vara läggs till.
-- Användaren får ingen tydlig förklaring.
+Öppen återkopplingsbugg för en redan stoppad exakt dubblett. Ändra inte dubblettregel eller datamodell; BB-034:s likhetskontroll stänger inte denna post.
 
 #### Förväntat beteende
 
@@ -2386,10 +597,6 @@ Användaren ska få en tydlig återkoppling, exempelvis:
 - möjlighet att öka antal;
 - möjlighet att visa den befintliga varan;
 - möjlighet att avbryta och fortsätta skriva.
-
-#### Risk
-
-Användaren kan tro att knapptryckningen inte fungerade och försöka flera gånger.
 
 #### Avgränsning
 
@@ -2404,29 +611,14 @@ Ingen ändring av dubblettregeln eller datamodellen krävs. Felsök frontendens 
 - Fungerar på mobil och desktop.
 - Regressionstest finns.
 
----
+[Fulltext B183–B189](history/backlog-before-doc-2b-20261024.md#bb-001--ingen-synlig-återkoppling-när-en-dubblettvara-stoppas).
 
 ### BB-002 – Bakgrundssidan kan scrollas bakom handlingsläget
 
-- Modul: Inköpslista
-- Typ: Mobil UX / modalhantering
 - Prioritet: P2
 - Status: Ny
-- Upptäckt: 2026-08-02
 
-#### Beskrivning
-
-När Inköpslistas fullskärmsläge är öppet går det ibland att scrolla innehållet bakom fullskärmsytan.
-
-#### Nuvarande beteende
-
-- Bakgrundsinnehållet kan ibland förflyttas.
-- Felet verkar vara intermittent.
-- Det är ännu inte fastställt vilka steg som alltid reproducerar det.
-
-#### Förväntat beteende
-
-När handlingsläget är öppet ska endast inköpslistans interna innehåll kunna scrollas. Sidan bakom ska vara helt låst.
+Intermittent bakgrundsscroll i handlingsläget, reproduktionssekvens ännu osäker. Endast listans interna innehåll ska scrolla.
 
 #### Misstänkta utlösare
 
@@ -2444,29 +636,14 @@ När handlingsläget är öppet ska endast inköpslistans interna innehåll kunn
 - Verifierat i riktig Chromium och manuellt på iPhone.
 - Regressionstest eller reproducerbar browserkontroll finns.
 
----
+[Fulltext B190–B195](history/backlog-before-doc-2b-20261024.md#bb-002--bakgrundssidan-kan-scrollas-bakom-handlingsläget).
 
 ### BB-003 – Scrollindikator visas trots att listan verkar rymmas
 
-- Modul: Inköpslista
-- Typ: Mobil layout / overflow
 - Prioritet: P3
 - Status: Ny
-- Upptäckt: 2026-08-02
 
-#### Beskrivning
-
-I handlingsläget kan en scrollbar eller scrollindikator ibland visas på höger sida trots att listans innehåll inte ser ut att kräva scrollning.
-
-#### Nuvarande beteende
-
-- Scrollindikatorn visas intermittent.
-- Det är oklart om en liten dold overflow faktiskt finns.
-- Felet kan vara kopplat till viewporthöjd, tangentbord eller fokus.
-
-#### Förväntat beteende
-
-Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
+Intermittent scrollindikator/falsk overflow; faktisk orsak ännu okänd. Ingen indikator när innehållet ryms.
 
 #### Tekniska kontrollpunkter
 
@@ -2484,26 +661,14 @@ Ingen intern scrollindikator ska visas när hela innehållet ryms i viewporten.
 - Samma beteende vid 320×844 och 390×844.
 - Tangentbord, radmeny och dialog orsakar inte falsk overflow.
 
----
+[Fulltext B196–B201](history/backlog-before-doc-2b-20261024.md#bb-003--scrollindikator-visas-trots-att-listan-verkar-rymmas).
 
 ### BB-016 – Ofta köpt visar varor som redan finns i inköpslistan
 
-- Modul: Inköpslista
-- Typ: UX / filtrering
 - Prioritet: P2
 - Status: Ny
-- Upptäckt: 2026-08-04
 
-#### Beskrivning
-
-Sektionen ”Ofta köpt” visar varor som redan finns i den aktiva inköpslistan. När en vara läggs till från sektionen kan förslaget dessutom ligga kvar trots att det inte längre är relevant.
-
-#### Nuvarande beteende
-
-- En vara kan visas samtidigt under ”Ofta köpt” och ”Att köpa”.
-- Ett förslag kan ligga kvar efter att användaren har lagt till varan.
-- Användaren kan få intrycket att samma vara fortfarande behöver läggas till.
-- Gränssnittet använder utrymme till förslag som inte längre kan hjälpa användaren.
+Ofta köpt-filtrering kvarstår; BB-035:s kontrastfix stänger inte denna post.
 
 #### Förväntat beteende
 
@@ -2513,10 +678,6 @@ Sektionen ”Ofta köpt” visar varor som redan finns i den aktiva inköpslista
 - En borttagen vara kan återkomma när den fortfarande kvalificerar sig som ofta köpt.
 - Filtreringen använder samma namnnormalisering som dubblettkontrollen.
 - Sektionen visas inte som en tom eller irrelevant förslagsyta när inga förslag återstår.
-
-#### Risk
-
-Dubbel information skapar visuell oreda och kan leda till förvirring eller upprepade försök att lägga till en vara som redan finns i listan.
 
 #### Avgränsning
 
@@ -2534,129 +695,161 @@ Denna backlogregistrering bestämmer inte om filtreringen slutligen ska ske i fr
 - Beteendet fungerar på mobil och desktop.
 - Regressionstester finns för relevant filtreringslogik och användarflöde.
 
-#### Manuell evidens
+[Fulltext B202–B208](history/backlog-before-doc-2b-20261024.md#bb-016--ofta-köpt-visar-varor-som-redan-finns-i-inköpslistan).
 
-På mobilvyn observerades att ”Mjölk” visades både under ”Ofta köpt” och i den aktiva listan ”Att köpa”.
+### BB-027 – Dashboardprofiler, synkronisering och avancerade widgetlayouter
 
----
-
-### BB-017 – Smart Shuffle kan inte starta uppspelning på verifierad Samsung Tizen-TV
-
-- Modul: Media / Smart Shuffle
-- Typ: Produktionsbugg / Jellyfin remote playback
-- Prioritet: P1
-- Status: Klar
-- Upptäckt: 2026-08-04
-
-#### Beskrivning
-
-Smart Shuffle kan läsa Jellyfin-biblioteket, visa serier och identifiera en verifierad och fjärrstyrbar Samsung Smart TV via Jellyfin for Tizen. När användaren trycker ”Starta på TV” startas ingen uppspelning och BigBrain visar det sanerade felet ”Jellyfin kunde inte utföra Smart Shuffle-åtgärden.”
-
-#### Reproduktionssteg
-
-1. Öppna Jellyfin-appen på Samsung-TV:n.
-2. Kontrollera att vanlig manuell uppspelning fungerar.
-3. Öppna BigBrain → Media → Smart Shuffle.
-4. Välj minst två serier.
-5. Välj Samsung Smart TV.
-6. Tryck ”Starta på TV”.
-7. Observera att ingen uppspelning startar och att BigBrain visar standardfelet.
-
-#### Förväntat beteende
-
-- BigBrain revaliderar vald TV-session.
-- BigBrain väljer korrekt nästa osedda eller påbörjade episod.
-- BigBrain skickar ett versionskorrekt PlayNow-kommando.
-- Rätt avsnitt startar på exakt vald TV.
-- BigBrain verifierar att samma avsnitt blir NowPlayingItem.
-- Smart Shuffle-sessionen övergår till aktiv status.
-
-#### Verifierad grundorsak
-
-Det tidigare UI-styrda försöket nådde aldrig PlayNow. En sekventiell episodfråga timeoutade mot Jellyfin efter den generella tresekundersgränsen och `TaskCanceledException` lämnade Smart Shuffle-felmodellen som ett ohanterat 500-svar.
-
-#### Fix och verifiering
-
-Episodkontrollen körs parallellt med en avgränsad Smart Shuffle-timeout. TV-session, användare och fjärrstyrbarhet revalideras precis före ett versionskorrekt PlayNow-anrop. Accepterad uppspelning skiljs från inväntad och bekräftad uppspelning, med en begränsad verifieringsperiod anpassad för Tizen. Säkra felkategorier, startspärr mot dubbelklick och regressionstester har lagts till.
-
-Ett verkligt UI-styrt knapptryck på den slutliga versionen gav exakt ett startkommando, Jellyfin svarade `204`, rätt avsnitt blev `NowPlayingItem` och BigBrain-sessionen blev `active`. Användaren bekräftade att allt fungerade på Samsung-TV:n. Även användarstyrda hopp till nästa avsnitt accepterades och bekräftades utan terminalbaserad uppspelning.
-
-Testbevis: 186 API-tester och 32 Sentinel-tester godkända; 76 frontendtester och production build godkända. Permanent rapport: `/home/enigma/BigBrain/reports/features/smart-shuffle/smart-shuffle-p1-playback-start-fix-20260804-153939.txt`.
-
-#### Definition of Done
-
-- Exakt grundorsak identifierad.
-- Jellyfin 10.11.11-kontraktet verifierat.
-- Session, användare och episod revalideras precis före start.
-- Rätt session-ID och item-ID används internt.
-- Query-parametrar och requestformat är versionskorrekta.
-- Upstream-status och säker felkategori loggas utan hemligheter.
-- Användarens UI-klick startar rätt avsnitt på Samsung-TV:n.
-- NowPlayingItem verifieras efter start.
-- Dubbelklick kan inte orsaka dubbla starter.
-- Automatiska tester täcker grundorsaken och relevanta fel.
-- Permanent verifieringsrapport skapad.
-- Buggen markeras som löst först efter verklig UI-styrd TV-verifiering.
-
----
-
-### BB-018 – Smart Shuffle – Jellyfins ”Nästa avsnitt” visas missvisande mellan serier
-
-- Modul: Media / Smart Shuffle
-- Typ: UX / Jellyfin-klientintegration
+- Modul: BigBrain Web / Dashboard
+- Typ: Framtida arkitektur och funktion
 - Prioritet: P3
 - Status: Ny
 - Upptäckt: 2026-08-04
+- Beskrivning: Utred nästa dashboardfas med per-user och delade dashboards, mallar, profiler, rollbaserade layouter, användarvalda widgetstorlekar, verkställda widgetbehörigheter och serversynkronisering. Phase 1 är avsiktligt lokal och enhetsbunden.
+- Avgränsning: Ingen backendpersistens, identitetsmodell, synkkonfliktlösning eller behörighetsmotor införs innan separata kontrakt och faktisk användarmodell finns.
+- Definition of Done: Godkänd ägarskaps- och identitetsmodell, versionssatt synkkontrakt, konflikt- och migreringsstrategi, behörighetstester, tillgänglig storleksredigering, offlinebeteende, säkerhetsgranskning och manuell fleranvändarverifiering.
+- Relaterade dokument: `docs/architecture/dashboard-widget-framework.md`, ADR 0014.
 
-#### Beskrivning
+[Fulltext B265](history/backlog-before-doc-2b-20261024.md#bb-027--dashboardprofiler-synkronisering-och-avancerade-widgetlayouter).
 
-När ett avsnitt avslutas under Smart Shuffle visar Jellyfin for Tizen den vanliga ”Nästa avsnitt”-rutan för nästa avsnitt i samma serie. Smart Shuffle väljer däremot nästa serie enligt sin rättvisa shufflealgoritm. Funktionen fortsätter att fungera, men Jellyfins förslag blir missvisande och visuellt störande.
+### BB-036 – BigBrain – realtidssynkronisering av delad familjedata
 
-#### Förväntat beteende
+- Prioritet: P1
+- Status: Ny
 
-Smart Shuffle och Jellyfins klientgränssnitt ska ge en begriplig och konsekvent övergång mellan serier. Jellyfins normala nästa-avsnitt-funktion ska fortsatt fungera vid vanlig Jellyfin-uppspelning utanför Smart Shuffle.
+Delad familjedata uppdateras inte automatiskt i redan öppen klient. Inköpslista är första konsument; ingen separat synkplattform beslutad.
 
-#### Utredningspunkter
+#### Arkitekturriktning och omfattning
 
-- Verifiera om Jellyfin 10.11.11 eller Jellyfin for Tizen dokumenterar ett sessionsavgränsat sätt att stänga av eller undvika klientens vanliga ”Nästa avsnitt”-ruta.
-- Utred om ett annat dokumenterat playbackflöde kan göra Smart Shuffle-övergången tydligare utan att störa vanlig Jellyfin-användning.
-- Om klientbeteendet inte säkert kan påverkas, utred dokumentation av begränsningen eller en tydlig förklaring i Smart Shuffle-gränssnittet.
-- Inför inte odokumenterade Jellyfin-endpoints eller klienthack.
-
-#### Avgränsning
-
-Ingen global Jellyfin-inställning får försämra eller stänga av den normala nästa-avsnitt-funktionen utanför Smart Shuffle. Implementationen ska föregås av verifiering av installerad serverversion, Tizen-klientens beteende och dokumenterade kontrakt. Ingen kod-, runtime-, Compose-, Jellyfin- eller Tizen-konfigurationsändring ingår i denna backlogregistrering.
+- Utred i första hand ASP.NET Core SignalR/WebSockets i linje med `ARCHITECTURE.md`; aggressiv polling ska inte bli standard utan dokumenterat skäl.
+- Ett separat ADR krävs före implementation för transport, kontrakt, modulägarskap, eventversionering, återhämtning, konfliktmodell, authorization, säkerhet och fallback.
+- Första integrationen ska synka skapad, uppdaterad, borttagen och avbockad/återställd vara i Inköpslista.
+- Kontraktet ska hantera automatisk reconnect, återhämtning efter avbrott, stale-client-resync, flera samtidiga klienter, ordning/versionering, idempotens och definierade konflikter.
+- Framtida möjliga konsumenter är Matlista, Kalender, Påminnelser, Mediajobb, Download Control samt AI-jobb/notiser och andra delade familjemoduler.
+- Framtida authorization ska följa faktisk användarmodell. Secrets och interna identifierare får inte exponeras i onödan.
+- Normal målsättning på lokalt nät är synlig uppdatering inom cirka 1–2 sekunder utan reload, navigation eller manuell refresh.
+- UI kan diskret visa live/ansluten, återansluter och offline.
 
 #### Definition of Done
 
-- Installerad Jellyfin-version och Jellyfin for Tizen-beteendet verifieras.
-- Det dokumenterade Jellyfin-kontraktet för completion, autoplay, PlayNext och nästa-avsnitt-UI undersöks.
-- Det fastställs om klientens ruta kan påverkas per Smart Shuffle-session.
-- Ingen global Jellyfin-inställning ändras utan separat uttryckligt beslut.
-- Vanlig manuell Jellyfin-uppspelning påverkas inte.
-- Smart Shuffles automatiska seriebyte fortsätter att fungera.
-- Ingen odokumenterad eller versionsosäker endpoint används.
-- Automatisk övergång, skip och stop regressionstestas.
-- Lösningen verifieras manuellt på Samsung Smart TV.
-- Relevant dokumentation och permanent verifieringsrapport uppdateras.
+- Ett gemensamt, versionssatt realtidskontrakt och tillhörande ADR är godkända och dokumenterade.
+- Inköpslista är första integrerade konsument och create/update/delete/check-state synkas.
+- Automatisk reconnect och stale-state-resync fungerar.
+- Konflikt-, ordnings-, versions- och idempotensmodeller är definierade och testade.
+- Flera samtidiga klienter är integrationstestade.
+- Fallback- och offlinebeteende är dokumenterat; lösningen använder ingen onödig polling.
+- Authorization, informationsminimering och övrig säkerhet är granskade.
+- Integrationstester, relevant dokumentation och runbook finns.
 
----
+[Fulltext B276–B279](history/backlog-before-doc-2b-20261024.md#bb-036--bigbrain--realtidssynkronisering-av-delad-familjedata).
+
+## Media — öppet arbete och separat acceptans
+
+### Mediekontroll
+
+Merge `3375e83c871e5ce333238e4447de7e3edc143435` är accepterad. Daterad deployment finns enligt
+[STATUS](STATUS.md#media), men separat fysisk acceptans av kort, undersidor, fokus, history/back/forward,
+legacybokmärken och iPhone/PWA är inte styrkt. Den 17 oktober godkända integrerade sökningen är en
+annan leverans. Kataloggränser 50 senaste biblioteksposter/25 discoveryposter består; whole-catalog
+search och BB-155/156/157 är inte levererade genom navigationen.
+[Fulltext B002](history/backlog-before-doc-2b-20261024.md#media--mediekontroll-review-gate-2026-10-17).
+
+### BB-039 – Media Controller – serie-, säsongs- och avsnittsstatus
+
+- Prioritet: P3
+- Status: Ny
+
+Framtida Media Controller ska använda normaliserade Media/Arr-kontrakt, inte Download Controls presentation state.
+
+#### Definition of Done
+
+- Släppta, lokalt tillgängliga, saknade och kommande avsnitt normaliseras från verifierade källor.
+- Serie-, säsongs- och avsnittsnivå är konsekventa och testade.
+- ”Sök saknade” har separat auktorisering, preview/audit och versionsverifierad Arr-adapter.
+- Ingen direkt koppling till Download Control-UI eller rå providerpayload finns.
+
+[Fulltext B100–B101](history/backlog-before-doc-2b-20261024.md#bb-039--media-controller--serie--säsongs--och-avsnittsstatus).
+
+### BB-040 – Download Control – snabb navigation vid många färdiga nedladdningar
+
+- Prioritet: P2
+- Status: Pågår
+
+Pågår: Sprint 3 levererade grupperad/kollapsad historik. Full kvalitativ mobil-, desktop-, tangentbords- och overflowverifiering kvarstår via BB-041; ingen stängning av full DoD.
+
+#### Definition of Done
+
+- Användaren behöver inte scrolla genom en lång lista med klara nedladdningar för att nå relevanta kontroller.
+- Lösningen fungerar väl på mobil och desktop samt med tangentbord och skärmläsare.
+- Aktiva och problematiska nedladdningar prioriteras visuellt.
+- Färdiga nedladdningar är fortsatt enkla att hitta och komma åt.
+- Urval, filtrering och befintlig batchhantering fungerar fortsatt utan ändrad mutationsgräns.
+- Vald lösning har automatiska regressionstester och manuell responsiv verifiering.
+
+[Fulltext B102–B103](history/backlog-before-doc-2b-20261024.md#bb-040--download-control--snabb-navigation-vid-många-färdiga-nedladdningar).
+
+### BB-041 – Download Control – post-release UX-utvärdering efter Sprint 3
+
+- Prioritet: P3
+- Status: Ny
+
+Kvalitativ post-release-uppföljning, inte en verifierad defekt eller ny implementation. Nytt förbättringsarbete kräver separat fynd/scope.
+
+#### Definition of Done
+
+- Produktägaren har använt den deployade UX:en under en representativ period.
+- Statusgruppering, kompakt historik och navigation bedöms på mobil och desktop.
+- Skillnaden och den avsiktliga överlappningen mellan Nedladdningskö och Medieflöde är begriplig.
+- Eventuella verifierade fynd registreras som separata backloggposter; avsaknad av fynd dokumenteras också.
+- BB-040 och BB-033 bedöms mot sina återstående DoD-punkter med daterad evidens.
+
+[Fulltext B105–B106](history/backlog-before-doc-2b-20261024.md#bb-041--download-control--post-release-ux-utvärdering-efter-sprint-3).
+
+### BB-033 – Media – tydliggör skillnaden mellan Nedladdningar och Mediajobb
+
+- Prioritet: P2
+- Status: Pågår
+
+Pågår: Sprint 3 gav namnen Nedladdningskö/Medieflöde men full DoD kvarstår via BB-041. Download Control hanterar torrentlivscykeln och är den smala mutationsytan; Media Jobs är read-only och förklarar vägen från önskemål till bibliotek. Avsiktlig överlappning under nedladdning får inte förväxlas med dubbla ansvar.
+
+#### Önskat resultat
+
+- Användaren förstår direkt att den ena modulen hanterar själva nedladdningskön och
+  att den andra följer mediets väg till biblioteket.
+- Utred bättre användarnamn, exempelvis ”Nedladdningskö” för Download Control och
+  ”Biblioteksjobb” eller ”Bearbetning” för Media Jobs, utan att föregripa beslutet.
+- Utred korta beskrivande undertitlar, särskiljande ikonografi och begripliga
+  statusbeskrivningar utan krav på teknisk tjänstekunskap.
+- Utred om modulerna bör visualisera en gemensam men sanningsenlig pipeline, exempelvis
+  `Hittad → Nedladdning → Import/bearbetning → Klar i Jellyfin`, inklusive hur
+  ”beställd”, ”söker”, fel, paus, kö och okänd status representeras.
+- Behåll tekniska providerdetaljer som valfri fördjupning och förklara överlappningen
+  när samma nedladdningsfas visas i båda modulerna.
+- Ingen funktionalitet eller befintlig säkerhetsgräns får försvinna.
+
+#### Definition of Done
+
+- Den faktiska ansvarsskillnaden och datakällorna ovan återspeglas i namn,
+  beskrivningar och statusetiketter.
+- Slutanvändaren behöver inte känna till qBittorrent, Sonarr eller Radarr för att
+  förstå vilken modul som visar livscykel respektive hanterar nedladdningskön.
+- Namn, undertitlar, ikonografi och eventuell pipeline är konsekventa med verklig
+  funktion och vilseleder inte om import- eller Jellyfin-status.
+- Avsiktlig överlappning under nedladdningsfasen förklaras utan att dubblera eller
+  ta bort funktionalitet.
+- Mobil och desktop är visuellt och funktionellt verifierade.
+- Tillgängliga namn, rubrikhierarki, aria-labels, statusmeddelanden och
+  skärmläsarkontext är verifierade.
+- Relevanta tester samt modul-, status- och UX-dokument uppdateras när lösningen
+  implementeras.
+
+[Fulltext B233–B236](history/backlog-before-doc-2b-20261024.md#bb-033--media--tydliggör-skillnaden-mellan-nedladdningar-och-mediajobb).
 
 ### BB-019 – BigBrain saknar säker borttagning av oönskad nedladdning
 
-- Modul: Media / Download Control
-- Typ: Funktion / säker extern mutation
 - Prioritet: P2
 - Status: Pågår
-- Upptäckt: 2026-08-04
 
-#### Beskrivning
-
-BigBrain saknade ett objektspecifikt och bekräftat sätt att avbryta ett oönskat qBittorrent-jobb utan att exponera rå torrentidentitet eller riskera andra jobb och media.
-
-#### Implementerad MVP
-
-Listning, opaka kortlivade ID:n, live-revalidering, filbevarande standardborttagning, separat riskgrindad destruktiv borttagning, Arr-varning, säkra fel och automatiska fake-baserade tester är implementerade och deployade. Användaren har genom BigBrains UI bekräftat att minst ett fastnat jobb togs bort från qBittorrent med filerna bevarade. Full manuell verifiering av `deleteFiles=true`, samtliga destruktiva riskscenarier och konsekvenser för importerad media/Arr återstår; status förblir därför Pågår.
+BLOCKED för full destruktiv acceptans. Filbevarande borttagning har ägarverifiering; deleteFiles=true och riskerna för importerad media/Arr saknar full manuell verifiering.
 
 #### Manuell status och kvarvarande verifiering
 
@@ -2676,35 +869,14 @@ Listning, opaka kortlivade ID:n, live-revalidering, filbevarande standardborttag
 - Verklig UI-styrd testborttagning verifieras på uttryckligt testjobb.
 - Permanent rapport publiceras och indexeras.
 
----
+[Fulltext B223–B227](history/backlog-before-doc-2b-20261024.md#bb-019--bigbrain-saknar-säker-borttagning-av-oönskad-nedladdning).
 
 ### BB-020 – Download Control – säker masshantering
 
-- Modul: Media / Download Control
-- Typ: Funktion / UX / säker extern mutation
 - Prioritet: P1
 - Status: Pågår
-- Upptäckt: 2026-08-04
 
-#### Bakgrund och verifierat nuläge
-
-Download Control listar qBittorrents aktuella torrentjobb men kan endast öppna och
-hantera ett jobb åt gången. Det blir ineffektivt när flera jobb har fel, har fastnat,
-är pausade, behöver startas om eller tas bort, eller är färdiga och kan rensas.
-
-Detta är den befintliga backlogposten för samma behov; den konkretiserades och höjdes
-från P3 till P1 den 2026-08-07 efter verifierat användarbehov. Ingen ny dubblettpost
-skapades. Objektspecifika Retry och Pausa/Återuppta i BB-023 respektive BB-024 är
-förutsättningar eller relaterade capabilities. Koordinerad Sonarr/Radarr-recovery
-förblir separat i BB-021; den ersatta dubbletten BB-025 ändrar inte denna gräns.
-Säker rensning av avslutade jobb och retention definieras fortsatt i BB-022, och
-diagnostik i BB-026.
-
-Sprint 2-slutstatus 2026-08-10: urval, ”markera alla” i filtrerad vy, vald-räknare,
-avmarkering och begränsad partiell batch för pause, resume och retry är implementerade,
-automatiskt verifierade, deployade och manuellt godkända av produktägaren. Destruktiv
-batch, rensning och retention ingår inte i den godkända delmängden; posten förblir
-Pågår eftersom hela Definition of Done inte är uppfylld.
+Pågår: Sprint 2:s pause/resume/retry-batch är separat accepterad delmängd. Destruktiv batch, rensning och retention är inte godkända genom den. Beroenden/relaterat: BB-023/024, BB-021, BB-022, BB-026; BB-025 är avvisad dubblett av BB-021.
 
 #### Önskad UX
 
@@ -2758,85 +930,7 @@ Pågår eftersom hela Definition of Done inte är uppfylld.
   övriga qBittorrent-, Sonarr-, Radarr- och medieobjekt var oförändrade.
 - Relevant modul-, status-, ADR-, test- och runbookdokumentation är uppdaterad.
 
----
-
-### BB-033 – Media – tydliggör skillnaden mellan Nedladdningar och Mediajobb
-
-- Modul: Media / MediaDashboard
-- Typ: UX / informationsarkitektur
-- Prioritet: P2
-- Status: Pågår
-- Upptäckt: 2026-08-07
-
-#### Bakgrund och verifierad ansvarsskillnad
-
-Media-vyn visar både ”Nedladdningar” och den kollapsbara modulen ”Pågående” med
-undertiteln ”Pågående aktivitet” (Media Jobs). Gränssnittet förklarar inte varför båda
-finns, och Media Jobs kan dessutom sammanfatta flera aktiva poster som ”pågående
-nedladdningar”.
-
-- **Nedladdningar / Download Control** representerar qBittorrents aktuella torrentkö.
-  Den läser den fulla kön via Download Control-kontraktet, normaliserar torrentstatus,
-  hastighet, storlek, köposition, kategori och Arr-ägarskapsvarning och är den
-  avsiktligt smala mutationsytan för objektspecifik, preview-/bekräftelsestyrd
-  borttagning. Livscykeln är begränsad till torrentjobbet: aktiv, köad, pausad, fel,
-  klar eller okänd.
-- **Pågående / Media Jobs** är en separat read-only livscykelvy för ett medieönskemål
-  genom flera system. Den aggregerar Sonarrs och Radarrs registrerade bibliotek och
-  köer, en begränsad qBittorrent-lista och Jellyfins bibliotekskatalog. Poster
-  normaliseras och kan grupperas från beställd/sökning/kö/nedladdning via
-  stannad/fel och färdig nedladdning/import till tillgänglig i Jellyfin.
-- Funktionerna överlappar därför avsiktligt under nedladdningsfasen: samma
-  qBittorrentjobb kan synas i båda. De har inte samma ansvar. Download Control visar
-  och hanterar torrentjobbet; Media Jobs förklarar mediets end-to-end-status och är
-  inte en mutationsyta.
-
-Det är främst presentationen och de nuvarande namnen, inte de verifierade
-ansvarsgränserna, som är otydliga för en användare utan kunskap om qBittorrent,
-Sonarr eller Radarr.
-
-#### Önskat resultat
-
-- Användaren förstår direkt att den ena modulen hanterar själva nedladdningskön och
-  att den andra följer mediets väg till biblioteket.
-- Utred bättre användarnamn, exempelvis ”Nedladdningskö” för Download Control och
-  ”Biblioteksjobb” eller ”Bearbetning” för Media Jobs, utan att föregripa beslutet.
-- Utred korta beskrivande undertitlar, särskiljande ikonografi och begripliga
-  statusbeskrivningar utan krav på teknisk tjänstekunskap.
-- Utred om modulerna bör visualisera en gemensam men sanningsenlig pipeline, exempelvis
-  `Hittad → Nedladdning → Import/bearbetning → Klar i Jellyfin`, inklusive hur
-  ”beställd”, ”söker”, fel, paus, kö och okänd status representeras.
-- Behåll tekniska providerdetaljer som valfri fördjupning och förklara överlappningen
-  när samma nedladdningsfas visas i båda modulerna.
-- Ingen funktionalitet eller befintlig säkerhetsgräns får försvinna.
-
-#### Definition of Done
-
-- Den faktiska ansvarsskillnaden och datakällorna ovan återspeglas i namn,
-  beskrivningar och statusetiketter.
-- Slutanvändaren behöver inte känna till qBittorrent, Sonarr eller Radarr för att
-  förstå vilken modul som visar livscykel respektive hanterar nedladdningskön.
-- Namn, undertitlar, ikonografi och eventuell pipeline är konsekventa med verklig
-  funktion och vilseleder inte om import- eller Jellyfin-status.
-- Avsiktlig överlappning under nedladdningsfasen förklaras utan att dubblera eller
-  ta bort funktionalitet.
-- Mobil och desktop är visuellt och funktionellt verifierade.
-- Tillgängliga namn, rubrikhierarki, aria-labels, statusmeddelanden och
-  skärmläsarkontext är verifierade.
-- Relevanta tester samt modul-, status- och UX-dokument uppdateras när lösningen
-  implementeras.
-
-#### Sprint 3 implementation 2026-08-10
-
-Nedladdningskö beskriver nu vardagligt att den hanterar själva nedladdningen och
-hänvisar till Medieflöde för vägen till biblioteket. Medieflöde beskriver sökning,
-nedladdning, bearbetning och bibliotek samt varför samma titel kan synas i båda vyerna.
-Rubriker, undertitlar och skärmläsarregioner är automatiskt verifierade utan nya
-providerbegrepp i förklaringen. Web är deployad och Sprint 3 är stängd efter teknisk
-acceptans utan blockerande fynd. Posten förblir Pågår tills den längre kvalitativa
-mobil-/desktopverifieringen i BB-041 uppfyller hela Definition of Done.
-
----
+[Fulltext B228–B232](history/backlog-before-doc-2b-20261024.md#bb-020--download-control--säker-masshantering).
 
 ### BB-021 – Download Control – koordinerad Sonarr/Radarr-recovery
 
@@ -2850,6 +944,8 @@ mobil-/desktopverifieringen i BB-041 uppfyller hela Definition of Done.
 
 ---
 
+[Fulltext B238](history/backlog-before-doc-2b-20261024.md#bb-021--download-control--koordinerad-sonarrradarr-recovery).
+
 ### BB-022 – Download Control – säker rensning och retention för avslutade jobb
 
 - Modul: Media / Download Control
@@ -2862,13 +958,14 @@ mobil-/desktopverifieringen i BB-041 uppfyller hela Definition of Done.
 
 ---
 
+[Fulltext B239](history/backlog-before-doc-2b-20261024.md#bb-022--download-control--säker-rensning-och-retention-för-avslutade-jobb).
+
 ### BB-023 – Download Control – Försök igen (Retry)
 
-- Modul: Media / Download Control
-- Typ: Funktion
 - Prioritet: P2
 - Status: Pågår
-- Upptäckt: 2026-08-04
+
+BLOCKED för manuell slutverifiering i väntan på ett naturligt felande, säkert testobjekt. Implementation/test/deployment är daterad evidens; ingen ny defekt antas.
 
 #### Beskrivning
 
@@ -2895,249 +992,7 @@ Verifieringsstatus 2026-08-10: implementation och automatiska backend-/frontendt
 felande eller problematisk nedladdning finns. Avsaknaden av ett säkert realistiskt
 testobjekt är inte en konstaterad defekt och blockerar inte Sprint 2-stängningen.
 
----
-
-### BB-024 – Download Control – Pausa / Återuppta
-
-- Modul: Media / Download Control
-- Typ: Funktion
-- Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-04
-
-#### Beskrivning
-
-BigBrain ska kunna pausa och återuppta en enskild nedladdning.
-
-#### Definition of Done
-
-- Pausa fungerar.
-- Återuppta fungerar.
-- Status uppdateras direkt.
-- Ingen massoperation används.
-- Endast ett jobb påverkas.
-- Tester och dokumentation är uppdaterade.
-
-Slutstatus 2026-08-10: implementerad, automatiskt verifierad, deployad och manuellt
-godkänd av produktägaren, både objektspecifikt och inom Sprint 2:s säkra batchgräns.
-
----
-
-### BB-025 – Download Control – Arr Recovery
-
-- Modul: Media / Download Control
-- Typ: Funktion
-- Prioritet: P3
-- Status: Avvisad
-- Upptäckt: 2026-08-04
-
-#### Beskrivning
-
-Skapa ett separat återställningsflöde för nedladdningar som ägs av Sonarr eller Radarr.
-
-Exempel på åtgärder:
-
-- ta bort torrent;
-- valfri blocklist;
-- starta ny sökning;
-- visa tydligt vad som kommer att hända innan något utförs.
-
-Detta ska vara ett eget arbetsflöde och inte blandas ihop med vanlig borttagning.
-
-Posten är en dubblett av BB-021 och ersätts av den mer preciserade posten där. Ingen
-implementation eller historik har tagits bort.
-
-#### Definition of Done
-
-- Preview finns.
-- Bekräftelse krävs.
-- Säker rollback vid fel finns.
-- End-to-end-test finns.
-- Dokumentationen är uppdaterad.
-
----
-
-### BB-026 – Download Control – Diagnostik (”Varför laddar den inte ner?”)
-
-- Modul: Media / Download Control
-- Typ: UX / funktion
-- Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-04
-
-#### Beskrivning
-
-BigBrain ska analysera varför en nedladdning inte gör framsteg och ge användaren en begriplig förklaring i stället för enbart rå status.
-
-Exempel på diagnoser:
-
-- inga seeders;
-- tracker svarar inte;
-- torrent pausad;
-- väntar på metadata;
-- disk full;
-- Sonarr/Radarr väntar;
-- fel autentisering;
-- timeout;
-- nätverksproblem.
-
-För varje diagnos ska BigBrain även föreslå en lämplig åtgärd.
-
-#### Definition of Done
-
-- Diagnoser visas med mänskligt språk.
-- Felsökningen bygger på verifierad data.
-- Ingen rå intern information exponeras.
-- Tester finns.
-- Dokumentationen är uppdaterad.
-
-Slutstatus 2026-08-10: deterministisk, sanerad diagnostik är implementerad,
-automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
-
----
-
-## Dokumentationsstyrning
-
-### BB-004 – Arkivera ARR-incidentens mellanrapporter
-
-- Modul: Dokumentation/Operations
-- Typ: Dokumentationsskuld
-- Prioritet: P2
-- Status: Ny
-- Upptäckt: 2026-08-03
-- Beskrivning: Arkivera mellanrapporter additivt med manifest och checksummor.
-- Motiv: Skilja slutrapport och aktiv diagnostik från historisk evidens.
-- Avgränsning: Ingen radering; flytt kräver separat review och godkännande.
-- Risk: Brutna referenser eller förlorad spårbarhet.
-- Definition of Done: Godkänt manifest, checksummor, uppdaterade index och verifierade länkar.
-- Relaterade dokument: `docs/indexes/documentation.md`, ADR 0010, extern `arr-incident-index.txt`.
-
-### BB-005 – Revidera README mot aktuell implementation
-
-- Modul: Projektdokumentation
-- Typ: Dokumentationsskuld
-- Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-03
-- Beskrivning: Uppdatera funktioner, läsordning och länkar efter faktagranskning.
-- Motiv: README speglar inte hela verifierade implementationen.
-- Avgränsning: Ingen arkitekturändring eller ny funktion.
-- Risk: Felaktig onboarding.
-- Definition of Done: Kort, kodverifierad README med auktoritativa länkar.
-- Relaterade dokument: `README.md`, `docs/indexes/documentation.md`, `docs/history/early-sprints.md`.
-- Slutförd: 2026-08-04; långlivad produktöversikt verifierad och relevant tidig historik bevarad separat.
-
-### BB-006 – Dela upp och korta STATUS.md
-
-- Modul: Projektdokumentation
-- Typ: Informationsarkitektur
-- Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-03
-- Beskrivning: Begränsa STATUS till aktuellt läge och placera historisk verifiering efter review.
-- Motiv: Filen blandar sprintlogg, runtimeevidens, problem och produktstatus.
-- Avgränsning: Bevara historik; inga flyttar utan review.
-- Risk: Förlust av evidens eller dubbla sanningar.
-- Definition of Done: Definierat ansvar, indexerad historik och verifierade länkar.
-- Relaterade dokument: `docs/STATUS.md`, `docs/reports/REPORT-CATALOG.md`, ADR 0010.
-- Slutförd: 2026-08-04; kompakt modulstatus skiljer implementation, test, deployment och manuell verifiering.
-
-### BB-007 – Besluta om en enda produktroadmap
-
-- Modul: Produktstyrning
-- Typ: Governance
-- Prioritet: P2
-- Status: Klar — BB-130A documentation verification, 2026-09-05
-- Upptäckt: 2026-08-03
-- Beskrivning: Fastställ ROADMAP.md:s ansvar och relation till backlog och stabiliseringsplan.
-- Motiv: Parallella planeringsytor skapar otydlig prioritet.
-- Avgränsning: Ingen reprioritering före produktägarreview.
-- Risk: Konkurrerande planer styr arbetet.
-- Definition of Done: En normativ roadmap med ägare, scope och länkar.
-- Relaterade dokument: `ROADMAP.md`, `docs/BACKLOG.md`, `STABILIZATION_PLAN.md`.
-
-- BB-130A evidence: ROADMAP.md now declares owner, scope, links and delegation to the Finance roadmap; START-HERE defines authority versus STATUS/BACKLOG. No competing roadmap was created.
-
-### BB-008 – Aktivera eller avveckla CHANGELOG-policy
-
-- Modul: Releasehantering
-- Typ: Governance
-- Prioritet: P3
-- Status: Ny
-- Upptäckt: 2026-08-03
-- Beskrivning: Besluta om CHANGELOG ska underhållas och definiera trigger och format.
-- Motiv: En tom eller oägd changelog ger falska förväntningar.
-- Avgränsning: Ingen retroaktiv historik utan verifierbar källa.
-- Risk: Releaseförändringar blir svåra att följa.
-- Definition of Done: Dokumenterad policy och första tillämpning, eller tydlig avveckling.
-- Relaterade dokument: `CHANGELOG.md`, `ROADMAP.md`.
-
-### BB-009 – Klassificera Proposed ADR 0002 och 0006–0009
-
-- BB-130A review 2026-09-05 extends this existing follow-up to ADR 0005 conformance:
-  fixed allowlist/proof checks do not establish signed-overlay lifecycle; certificate
-  validity/EKU and lifecycle tests, complete response validation/bounds, truthful
-  identity/policy/timing/completion audit, and container/in-process privilege/host-semantics
-  evidence remain incomplete. Status: **OPEN / SECURITY REVIEW REQUIRED**, no waiver.
-- DoD extension: owner/architect-reviewed disposition of each gap, isolated negative/
-  compatibility/security tests and truthful runtime scope before full acceptance.
-  New privilege or security semantics require a separate Proposed ADR; no hardening
-  implementation is smuggled into BB-130A. Local ADR 0006–0009 stay unpublished.
-
-- Modul: Arkitektur
-- Typ: ADR-review
-- Prioritet: P2
-- Status: Ny
-- Upptäckt: 2026-08-03
-- Beskrivning: Granska om förslagen ska accepteras, ersättas eller förbli Proposed.
-- Motiv: Långvarigt Proposed-läge gör auktoriteten oklar.
-- Avgränsning: Status ändras endast genom explicit arkitekturreview.
-- Risk: Implementation och föreslaget beslut divergerar.
-- Definition of Done: Varje ADR har dokumenterat reviewbeslut och evidens.
-- Relaterade dokument: `docs/adr/0002-sentinel-exclusive-system-access.md`, `docs/adr/0006-sentinel-local-transport-identity-and-request-proof.md`, `docs/adr/0007-sentinel-v1-system-metrics-schemas-and-compatibility.md`, `docs/adr/0008-sentinel-system-metrics-policy-classification-and-audit.md`, `docs/adr/0009-sentinel-system-metrics-packaging-privilege-and-supply-chain.md`.
-
-### BB-010 – Flytta TESTING.md till rätt runbookstruktur
-
-- Modul: Kvalitet
-- Typ: Dokumentationsstruktur
-- Prioritet: P3
-- Status: Klar
-- Upptäckt: 2026-08-03
-- Beskrivning: Separera testpolicy från körinstruktioner och senare placera dem rätt.
-- Motiv: Normativ policy och procedur bör vara tydligt åtskilda.
-- Avgränsning: Ingen flytt i denna fas; länkar granskas först.
-- Risk: Brutna länkar eller otydlig Definition of Done.
-- Definition of Done: Godkänd målstruktur, bevarad historik och gröna länkar.
-- Relaterade dokument: `TESTING.md`, `docs/operations/runbooks/dashboard-widget-framework-verification.md`.
-- Slutförd: 2026-08-04; rotfilen är en testkarta och Dashboard-proceduren har en verifierad runbook.
-
-### BB-011 – Konsolidera STABILIZATION_PLAN
-
-- Modul: Produktstyrning
-- Typ: Dokumentationsskuld
-- Prioritet: P2
-- Status: Ny
-- Upptäckt: 2026-08-03
-- Beskrivning: Separera roadmap, teknisk skuld och verifierade buggar.
-- Motiv: En plan ska inte fungera som osorterad felinkorg.
-- Avgränsning: Inget stängs eller flyttas utan evidens och review.
-- Risk: Prioriteringar och problemstatus misstolkas.
-- Definition of Done: Varje punkt har rätt hemvist, ägare och status.
-- Relaterade dokument: `STABILIZATION_PLAN.md`, `ROADMAP.md`, `docs/BACKLOG.md`.
-
-### BB-012 – Införa återkommande baseline-review
-
-- Modul: Operations/Dokumentation
-- Typ: Governance
-- Prioritet: P2
-- Status: Ny
-- Upptäckt: 2026-08-03
-- Beskrivning: Definiera intervall, scopeägare och current-post per baselinetyp.
-- Motiv: Daterad evidens får inte bli odaterad sanning.
-- Avgränsning: Ingen automation innan retention och secret-scan godkänts.
-- Risk: Föråldrade baselines styr felsökning och beslut.
-- Definition of Done: Godkänd kalender, ägare, statusmodell och indexuppdatering per scope.
-- Relaterade dokument: `docs/indexes/baselines.md`, ADR 0010.
+[Fulltext B240–B242](history/backlog-before-doc-2b-20261024.md#bb-023--download-control--försök-igen-retry).
 
 ### BB-013 – Persist Smart Shuffle sessions
 
@@ -3151,6 +1006,8 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 - Avgränsning: Ingen databas eller distribuerad låsning införs utan verifierat behov och nytt arkitekturbeslut.
 - Definition of Done: Godkänd persistensmodell, säkert återupptagande, idempotenta övergångar och multi-replika-test.
 - Relaterade dokument: `docs/modules/media.md`, ADR 0011.
+
+[Fulltext B262](history/backlog-before-doc-2b-20261024.md#bb-013--persist-smart-shuffle-sessions).
 
 ### BB-014 – Smart Shuffle – manuell TV-verifiering och MVP-härdning
 
@@ -3172,6 +1029,77 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
   - En slutlig, sekretessgranskad verifieringsrapport skapas.
 - Relaterade dokument: `docs/modules/media.md`, `docs/STATUS.md`, ADR 0011.
 
+[Fulltext B263](history/backlog-before-doc-2b-20261024.md#bb-014--smart-shuffle--manuell-tv-verifiering-och-mvp-härdning).
+
+### BB-018 – Smart Shuffle – Jellyfins ”Nästa avsnitt” visas missvisande mellan serier
+
+- Prioritet: P3
+- Status: Ny
+
+Jellyfins vanliga nästa-avsnitt-ruta kan vara missvisande när Smart Shuffle väljer annan serie. Bevara normal Jellyfin-uppspelning; inget odokumenterat klienthack.
+
+#### Utredningspunkter
+
+- Verifiera om Jellyfin 10.11.11 eller Jellyfin for Tizen dokumenterar ett sessionsavgränsat sätt att stänga av eller undvika klientens vanliga ”Nästa avsnitt”-ruta.
+- Utred om ett annat dokumenterat playbackflöde kan göra Smart Shuffle-övergången tydligare utan att störa vanlig Jellyfin-användning.
+- Om klientbeteendet inte säkert kan påverkas, utred dokumentation av begränsningen eller en tydlig förklaring i Smart Shuffle-gränssnittet.
+- Inför inte odokumenterade Jellyfin-endpoints eller klienthack.
+
+#### Avgränsning
+
+Ingen global Jellyfin-inställning får försämra eller stänga av den normala nästa-avsnitt-funktionen utanför Smart Shuffle. Implementationen ska föregås av verifiering av installerad serverversion, Tizen-klientens beteende och dokumenterade kontrakt. Ingen kod-, runtime-, Compose-, Jellyfin- eller Tizen-konfigurationsändring ingår i denna backlogregistrering.
+
+#### Definition of Done
+
+- Installerad Jellyfin-version och Jellyfin for Tizen-beteendet verifieras.
+- Det dokumenterade Jellyfin-kontraktet för completion, autoplay, PlayNext och nästa-avsnitt-UI undersöks.
+- Det fastställs om klientens ruta kan påverkas per Smart Shuffle-session.
+- Ingen global Jellyfin-inställning ändras utan separat uttryckligt beslut.
+- Vanlig manuell Jellyfin-uppspelning påverkas inte.
+- Smart Shuffles automatiska seriebyte fortsätter att fungera.
+- Ingen odokumenterad eller versionsosäker endpoint används.
+- Automatisk övergång, skip och stop regressionstestas.
+- Lösningen verifieras manuellt på Samsung Smart TV.
+- Relevant dokumentation och permanent verifieringsrapport uppdateras.
+
+[Fulltext B217–B222](history/backlog-before-doc-2b-20261024.md#bb-018--smart-shuffle--jellyfins-nästa-avsnitt-visas-missvisande-mellan-serier).
+
+## UX, metadata och osäker manuell acceptans
+
+**U2: UNCERTAIN där ägarbeskedets omfattning inte kan styrkas.** Teknisk completion/deployment
+är inte fysisk acceptans. BB-096–099:s migrerade moduler och senare BB-107–114 har överlappande
+acceptanspunkter. Ingen generell stängning. Fullspelare/primär playback, Library/sökning, artwork,
+long-title-kort, routes/fokus/scroll och sammanlagd tillgänglighet kräver respektive scope-evidens.
+BB-097 Family är accepterad riktning, inte automatiskt varje senare detalj/remediation.
+BB-117:s specifika timer/Detail Hero och BB-128B/C:s resilience/korrigerade Finance-visualisering
+är godkända bara inom sina egna gränser. Döljandet av inbyggd ljudboks-UI godkänner inte dess design.
+
+**Avvisat:** persistent floating mini-player, tiny white clock trigger och broad/form-like timer.
+Navigation-surviving AppShell playback-livslängd behålls separat; inget globalt ersättningsoverlay.
+Bevara kompakt tvåkolumns mobil-Detail Hero med back-navigation ovanför, cover vänster och titel/
+författare/serie höger. BB-116A UX/UI Lab och Design System v1 saknar samlad owner approval;
+komponenter får inte märkas OWNER GODKÄND utan explicit besked. BB-112:s framtida fleranvändar-
+playbackidentitet måste bindas till autentiserad användare; serviceidentitet är inte owner progress.
+Inga tokens i browser, ingen tyst dataradering när presentation-only historik döljs.
+
+Äldre osäkra krav finns samlat i följande exakta källor, behålls öppna och får inte tolkas som
+stängda vid en framtida produktbedömning:
+
+| Scope | Kvarstående verifiering / original |
+| --- | --- |
+| BB-114 — Audiobook Detail Polish, Sleep Timer & Floating Player Rejection | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B067](history/backlog-before-doc-2b-20261024.md#bb-114--audiobook-detail-polish-sleep-timer--floating-player-rejection). |
+| BB-113 — Audiobook Player Affordance, Detail Layout & Artwork Remediation | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B068](history/backlog-before-doc-2b-20261024.md#bb-113--audiobook-player-affordance-detail-layout--artwork-remediation). |
+| BB-112 — Native Audiobook Playback + Owner Search/Result UX Remediation | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B069](history/backlog-before-doc-2b-20261024.md#bb-112--native-audiobook-playback--owner-searchresult-ux-remediation). |
+| BB-111 — Audiobook Route/Detail UX Fixes & Native Playback Vertical Slice | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B070](history/backlog-before-doc-2b-20261024.md#bb-111--audiobook-routedetail-ux-fixes--native-playback-vertical-slice). |
+| BB-110 — Audiobook Owner UX Consolidation & Native Playback Foundation | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B071](history/backlog-before-doc-2b-20261024.md#bb-110--audiobook-owner-ux-consolidation--native-playback-foundation). |
+| BB-109 — Audiobook Owner UX Remediation & Native Playback Investigation | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B072](history/backlog-before-doc-2b-20261024.md#bb-109--audiobook-owner-ux-remediation--native-playback-investigation). |
+| BB-108 — Audiobook Navigation UX Experiment | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B073](history/backlog-before-doc-2b-20261024.md#bb-108--audiobook-navigation-ux-experiment). |
+| BB-107 — Owner UX Remediation after BB-106 | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B074](history/backlog-before-doc-2b-20261024.md#bb-107--owner-ux-remediation-after-bb-106). |
+| BB-096 — BigBrain UX Sprint v1 / Unified Design System | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B286](history/backlog-before-doc-2b-20261024.md#bb-096--bigbrain-ux-sprint-v1--unified-design-system). |
+| BB-097 — Premium UX Reference: Family / Obsidian Gold | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B287](history/backlog-before-doc-2b-20261024.md#bb-097--premium-ux-reference-family--obsidian-gold). |
+| BB-098 — Global Premium UI Rollout | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B288](history/backlog-before-doc-2b-20261024.md#bb-098--global-premium-ui-rollout). |
+| BB-099 — Whole-App UX Audit & Premium Composition Pass | UNCERTAIN: fysisk/visuell scopeacceptans; [Fulltext B289](history/backlog-before-doc-2b-20261024.md#bb-099--whole-app-ux-audit--premium-composition-pass). |
+
 ### BB-015 – Design system v1 – manuell visuell och Tizen-verifiering
 
 - Modul: BigBrain Web / Media
@@ -3185,194 +1113,157 @@ automatiskt verifierad, deployad och manuellt godkänd av produktägaren.
 - Relaterade dokument: `docs/design-system/manual-verification.md`, `themes/jellyfin/compatibility.md`, ADR 0012.
 - Sprint 1-bedömning 2026-08-07: automatisk synk med BigBrains aktuella tema implementeras inte. Jellyfin laddar manuellt installerad server-CSS i en separat origin och klientlivscykel och kan inte läsa BigBrains `data-theme` eller localStorage. Dynamisk koppling skulle bryta ADR 0012:s fristående adaptergräns. Posten förblir öppen för den redan definierade manuella variantinstallationen och Tizen-verifieringen.
 
-### BB-027 – Dashboardprofiler, synkronisering och avancerade widgetlayouter
+[Fulltext B264](history/backlog-before-doc-2b-20261024.md#bb-015--design-system-v1--manuell-visuell-och-tizen-verifiering).
 
-- Modul: BigBrain Web / Dashboard
-- Typ: Framtida arkitektur och funktion
+### BB-116A — Admin UX/UI Lab Foundation & Production Component Inventory
+
+- Status 2026-08-31: **IMPLEMENTED / AUTOMATICALLY AND RUNTIME VERIFIED / DEPLOYED / CI VERIFIED / PHYSICAL OWNER REVIEW PENDING**.
+- Definition of Done: permanent Admin route, stable real-component inventory, safe specimens, review vocabulary, shared sleep-timer candidate, focused/full Web tests, production build, viewport QA, canonical report, deployment and CI evidence.
+- BigBrain Design System v1 remains **OWNER REVIEW IN PROGRESS**. No component may become `OWNER GODKÄND` without explicit owner feedback.
+- Deferred: production audiobook grid migration; search/discovery candidate; BB-157; broad consolidation of local checkbox, navigation, dialog and domain-card markup.
+
+[Fulltext B060](history/backlog-before-doc-2b-20261024.md#bb-116a--admin-uxui-lab-foundation--production-component-inventory).
+
+### BB-157 — Media Release Availability Search
+
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
+- When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
+- Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
+
+[Fulltext B061](history/backlog-before-doc-2b-20261024.md#bb-157--media-release-availability-search).
+
+### BB-156 — Module Runtime Latency & Reliability
+
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
+- Instrument and diagnose end-to-end module load latency and reliability, separating Web, API, module, database and external-service delays. Measure before optimization instead of blindly increasing timeouts.
+- Investigate slow endpoints, blocking dependencies, sequential calls, container behavior, dashboard aggregation, timeout classification and partial/widget-level loading so one slow dependency does not unnecessarily block an entire module.
+
+[Fulltext B064](history/backlog-before-doc-2b-20261024.md#bb-156--module-runtime-latency--reliability).
+
+### BB-155 — Canonical Book Metadata Resolver
+
+- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented and no provider selected.
+- Start with Audiobooks only. Audiobookshelf remains authoritative for local media, playback, sessions, duration and progress. BigBrain may later build a cached canonical normalized audiobook metadata record, with ISBN/ISBN-13 as the strongest external identity when available.
+- Candidate enrichment fields: title, subtitle, author, series/number, language, publication year, publisher, description, ISBN, subjects/genres and high-quality cover artwork. Books without ISBN may use cautious title + author + series + language matching with explicit confidence thresholds.
+- Uncertain matches must never silently overwrite trustworthy data. Retain field-level provenance where appropriate and cache resolved data rather than fetching on every page view.
+- Before implementation, investigate provider/API terms, rate limits, artwork/image rights, licensing and cache conditions. Do not prematurely create a generic all-Media metadata platform.
+
+[Fulltext B066](history/backlog-before-doc-2b-20261024.md#bb-155--canonical-book-metadata-resolver).
+
+### BigBrain-wide design system and less-is-more hierarchy
+
+- Module: BigBrain Web; status: future UX/consolidation candidate, not approved for implementation.
+- Intent: evolve the existing token/theme foundation into consistent typography, text hierarchy,
+  controls, surfaces, spacing, radii, icons, status and interaction states, responsive behavior and
+  accessible focus states. `Obsidian Gold` is the product owner's preferred candidate direction,
+  with a dark foundation and restrained gold for focus/action/emphasis rather than decoration; it
+  is not an approved final visual specification.
+- Product principle: the interface should not explain what is already self-evident. Prefer one
+  heading per real information level, data/content first, short contextual labels and progressive
+  disclosure of secondary or technical evidence. Apply this BigBrain-wide; do not redesign Finance
+  in this item.
+- Definition of Done: an owner-approved cross-module specification, accessible component/token
+  contracts and responsive/manual verification criteria exist before any rollout.
+
+[Fulltext B094](history/backlog-before-doc-2b-20261024.md#bigbrain-wide-design-system-and-less-is-more-hierarchy).
+
+### Passwordless authentication, trusted devices and step-up investigation
+
+- Module: BigBrain-wide Identity/Security; status: future consolidation/security investigation.
+- Intent: evaluate standards-based WebAuthn/passkeys, passwordless and trusted-device enrollment,
+  naming, management, revocation, recovery/bootstrap and lost-device handling, platform
+  authenticators and cross-device/phone-assisted QR or proximity authentication.
+- Security boundary: MAC addresses are not authentication identities. BigBrain never receives or
+  stores Face ID, Touch ID or equivalent biometric data; local biometrics may only unlock a device's
+  cryptographic credential. No custom biometric protocol is permitted.
+- Authorization: trusted low-risk reads should minimize friction, while sensitive administration,
+  device enrollment/removal and any separately approved future high-risk Finance operation may
+  require fresh step-up authentication. A dashboard session grants no Finance execution authority.
+- Scope: investigate device/use roles such as owner or adult personal device, shared family tablet,
+  kitchen/kiosk display and service device without hardcoding family members. Tailscale/device
+  identity or an equivalent private-network layer may complement, but never replace, application
+  user identity and authorization.
+- Roadmap: place this in the future BigBrain consolidation/security and authentication hardening
+  phase according to the current roadmap; do not change the evidenced pentest or Finance ordering.
+
+[Fulltext B095](history/backlog-before-doc-2b-20261024.md#passwordless-authentication-trusted-devices-and-step-up-investigation).
+
+## Dokumentationsskuld och osäker disposition
+
+Ingen av följande poster stängs av DOC-2B. BB-004:s separata incidentarkiv är inte detta uppdrag;
+BB-012:s förslag ger inte rätt att införa rutinmässiga granskningsloopar eller ny automation.
+
+### BB-004 – Arkivera ARR-incidentens mellanrapporter
+
+- Modul: Dokumentation/Operations
+- Typ: Dokumentationsskuld
+- Prioritet: P2
+- Status: Ny
+- Upptäckt: 2026-08-03
+- Beskrivning: Arkivera mellanrapporter additivt med manifest och checksummor.
+- Motiv: Skilja slutrapport och aktiv diagnostik från historisk evidens.
+- Avgränsning: Ingen radering; flytt kräver separat review och godkännande.
+- Risk: Brutna referenser eller förlorad spårbarhet.
+- Definition of Done: Godkänt manifest, checksummor, uppdaterade index och verifierade länkar.
+- Relaterade dokument: `docs/indexes/documentation.md`, ADR 0010, extern `arr-incident-index.txt`.
+
+[Fulltext B253](history/backlog-before-doc-2b-20261024.md#bb-004--arkivera-arr-incidentens-mellanrapporter).
+
+### BB-008 – Aktivera eller avveckla CHANGELOG-policy
+
+- Modul: Releasehantering
+- Typ: Governance
 - Prioritet: P3
 - Status: Ny
-- Upptäckt: 2026-08-04
-- Beskrivning: Utred nästa dashboardfas med per-user och delade dashboards, mallar, profiler, rollbaserade layouter, användarvalda widgetstorlekar, verkställda widgetbehörigheter och serversynkronisering. Phase 1 är avsiktligt lokal och enhetsbunden.
-- Avgränsning: Ingen backendpersistens, identitetsmodell, synkkonfliktlösning eller behörighetsmotor införs innan separata kontrakt och faktisk användarmodell finns.
-- Definition of Done: Godkänd ägarskaps- och identitetsmodell, versionssatt synkkontrakt, konflikt- och migreringsstrategi, behörighetstester, tillgänglig storleksredigering, offlinebeteende, säkerhetsgranskning och manuell fleranvändarverifiering.
-- Relaterade dokument: `docs/architecture/dashboard-widget-framework.md`, ADR 0014.
+- Upptäckt: 2026-08-03
+- Beskrivning: Besluta om CHANGELOG ska underhållas och definiera trigger och format.
+- Motiv: En tom eller oägd changelog ger falska förväntningar.
+- Avgränsning: Ingen retroaktiv historik utan verifierbar källa.
+- Risk: Releaseförändringar blir svåra att följa.
+- Definition of Done: Dokumenterad policy och första tillämpning, eller tydlig avveckling.
+- Relaterade dokument: `CHANGELOG.md`, `ROADMAP.md`.
 
-### BB-034 – Shopping List – upptäck snarlika varor innan tillägg
+[Fulltext B257](history/backlog-before-doc-2b-20261024.md#bb-008--aktivera-eller-avveckla-changelog-policy).
 
-- Modul: Inköpslista
-- Typ: Bugg / UX / datakvalitet
-- Prioritet: P1
-- Status: Klar
-- Upptäckt: 2026-08-07
+### BB-011 – Konsolidera STABILIZATION_PLAN
 
-#### Problem och verifierat nuläge
-
-Den befintliga kontrollen använder ett normaliserat namn och stoppar exakta träffar, men fångar inte tillräckligt väl mindre skrivvariationer. I verklig användning kan exempelvis `Lördags godis` och `Lördagsgodis` förekomma samtidigt trots att de sannolikt avser samma vara. BB-001 gäller återkopplingen för en redan stoppad exakt dubblett och täcker därför inte detta fynd; en separat post behövs.
-
-#### Framtida lösningsriktning
-
-- Utred och verifiera normalisering för skiftläge, inledande och avslutande whitespace, flera mellanslag, sammanskrivning kontra mellanslag, bindestreck och relevant diakritik.
-- Komplettera vid behov med enkel fuzzy similarity och en dokumenterad säkerhetsmodell.
-- Vid en sannolik men osäker dubblett ska UI visa exempelvis `Liknande vara finns redan: Lördagsgodis` och erbjuda använd befintlig, lägg till ändå och avbryt.
-- Osäker likhet får inte automatiskt blockera ett tillägg eller skriva över ett befintligt listobjekt.
-- Undvik aggressiv matchning som utan tydlig säkerhetsmodell slår ihop skilda produkter, exempelvis `mjölk` och `havremjölk`.
-
-#### Definition of Done
-
-- En verifierad normaliserings- och säkerhetsstrategi är dokumenterad.
-- Testfall täcker vanliga skrivvariationer, inklusive `Lördags godis`/`Lördagsgodis`, samt negativa närliggande fall.
-- Sannolika dubbletter upptäcks innan tillägg.
-- Användaren kan välja använd befintlig, lägg till ändå eller avbryt när matchningen är osäker.
-- Inga befintliga listobjekt skrivs över.
-- Feedbacken är tillgänglig och fungerar på mobil och desktop.
-- Relevanta frontend- och backendtester finns.
-- Dokumentationen är uppdaterad.
-
-#### Lösning och verifiering
-
-En separat konservativ jämförelsenyckel tar bort whitespace, Unicode-bindestreck och diakritiska markörer. Ingen edit distance, substringmatchning eller annan fuzzy-algoritm används. En sannolik träff visar befintlig vara och kräver uttryckligt val mellan använd befintlig, lägg till ändå och avbryt. `mjölk` och `havremjölk` förblir olika. Frontend-, API- och storetester samt production build verifierar beteendet. API-/Web-fixen är deployad och manuellt godkänd av produktägaren.
-
-### BB-035 – Shopping List – förbättra läsbarheten för Ofta köpt
-
-- Modul: Inköpslista
-- Typ: Bugg / UX / tillgänglighet
+- Modul: Produktstyrning
+- Typ: Dokumentationsskuld
 - Prioritet: P2
-- Status: Klar
-- Upptäckt: 2026-08-07
+- Status: UNCERTAIN (U1); tidigare Ny, inte stängd
+- Upptäckt: 2026-08-03
+- Beskrivning: Separera roadmap, teknisk skuld och verifierade buggar.
+- Motiv: En plan ska inte fungera som osorterad felinkorg.
+- Avgränsning: Inget stängs eller flyttas utan evidens och review.
+- Risk: Prioriteringar och problemstatus misstolkas.
+- Definition of Done: Varje punkt har rätt hemvist, ägare och status.
+- Relaterade dokument: `STABILIZATION_PLAN.md`, `ROADMAP.md`, `docs/BACKLOG.md`.
 
-#### Problem och verifierat nuläge
+[Fulltext B260](history/backlog-before-doc-2b-20261024.md#bb-011--konsolidera-stabilization_plan).
 
-Kapselknapparna under ”Ofta köpt” använder en textfärg som kan ge otillräcklig kontrast mot knappytan, så flera knappar ser nästan tomma ut. BB-016 behandlar vilka förslag som visas och täcker inte läsbarhet eller tillståndsstyling; en separat post behövs.
+STABILIZATION_PLAN.md saknas på main och får inte återskapas som parallell roadmap.
+Separat dispositionsbevis för samtliga kvarstående krav behövs innan stängning.
 
-#### Omfattning
+### BB-012 – Införa återkommande baseline-review
 
-Kontrollera Ljust, Mörkt och Obsidian Gold samt default, hover, focus, active, disabled och selected state. Läsbarhet, fokusmarkering och mobil layout ska verifieras utan att försämra knappens träffyta eller begriplighet.
-
-#### Definition of Done
-
-- Texten är tydligt läsbar i alla stödda teman och tillstånd.
-- WCAG-relevant kontrast är mätt, dokumenterad och uppfylld för text och nödvändiga visuella indikatorer.
-- Knapptext försvinner inte i default, hover, focus, active, disabled eller selected state.
-- Synlig fokusmarkering fungerar med tangentbord.
-- Mobil layout, radbrytning och touchyta fungerar.
-- Snapshot-, komponent- eller motsvarande regressionstest skyddar samtliga relevanta tillstånd och teman.
-- Dokumentationen är uppdaterad.
-
-#### Lösning och verifiering
-
-Knapparna använder nu semantiska surface/text-, primary/contrast-, focus- och disabled-tokens i stället för inverse-text på en vanlig surface. Default, hover, focus, active/selected och disabled skyddas av regressionstest. Production build och headless Chromium i Ljust, Mörkt och Obsidian Gold vid mobilbredd godkändes 2026-08-07. Web-fixen är deployad och manuellt godkänd av produktägaren i relevanta teman och states.
-
-### BB-036 – BigBrain – realtidssynkronisering av delad familjedata
-
-- Modul: BigBrain-plattformen / första konsument Inköpslista
-- Typ: Arkitektur / funktion / realtid
-- Prioritet: P1
+- Modul: Operations/Dokumentation
+- Typ: Governance
+- Prioritet: P2
 - Status: Ny
-- Upptäckt: 2026-08-07
+- Upptäckt: 2026-08-03
+- Beskrivning: Definiera intervall, scopeägare och current-post per baselinetyp.
+- Motiv: Daterad evidens får inte bli odaterad sanning.
+- Avgränsning: Ingen automation innan retention och secret-scan godkänts.
+- Risk: Föråldrade baselines styr felsökning och beslut.
+- Definition of Done: Godkänd kalender, ägare, statusmodell och indexuppdatering per scope.
+- Relaterade dokument: `docs/indexes/baselines.md`, ADR 0010.
 
-#### Problem och användningsfall
+[Fulltext B261](history/backlog-before-doc-2b-20261024.md#bb-012--införa-återkommande-baseline-review).
 
-En redan öppen klient uppdateras inte automatiskt när en familjemedlem ändrar inköpslistan från en annan klient. Användaren måste ladda om eller navigera om. Första konkreta användningsfallet är Inköpslista, men behovet ska utredas som ett gemensamt realtidskontrakt för BigBrain och inte som ett modulspecifikt specialfall. BB-027 gäller dashboardprofiler och serversynkroniserad layout och täcker inte server push för delad familjedata.
+## Historik och bevarande
 
-#### Arkitekturriktning och omfattning
-
-- Utred i första hand ASP.NET Core SignalR/WebSockets i linje med `ARCHITECTURE.md`; aggressiv polling ska inte bli standard utan dokumenterat skäl.
-- Ett separat ADR krävs före implementation för transport, kontrakt, modulägarskap, eventversionering, återhämtning, konfliktmodell, authorization, säkerhet och fallback.
-- Första integrationen ska synka skapad, uppdaterad, borttagen och avbockad/återställd vara i Inköpslista.
-- Kontraktet ska hantera automatisk reconnect, återhämtning efter avbrott, stale-client-resync, flera samtidiga klienter, ordning/versionering, idempotens och definierade konflikter.
-- Framtida möjliga konsumenter är Matlista, Kalender, Påminnelser, Mediajobb, Download Control samt AI-jobb/notiser och andra delade familjemoduler.
-- Framtida authorization ska följa faktisk användarmodell. Secrets och interna identifierare får inte exponeras i onödan.
-- Normal målsättning på lokalt nät är synlig uppdatering inom cirka 1–2 sekunder utan reload, navigation eller manuell refresh.
-- UI kan diskret visa live/ansluten, återansluter och offline.
-
-#### Definition of Done
-
-- Ett gemensamt, versionssatt realtidskontrakt och tillhörande ADR är godkända och dokumenterade.
-- Inköpslista är första integrerade konsument och create/update/delete/check-state synkas.
-- Automatisk reconnect och stale-state-resync fungerar.
-- Konflikt-, ordnings-, versions- och idempotensmodeller är definierade och testade.
-- Flera samtidiga klienter är integrationstestade.
-- Fallback- och offlinebeteende är dokumenterat; lösningen använder ingen onödig polling.
-- Authorization, informationsminimering och övrig säkerhet är granskade.
-- Integrationstester, relevant dokumentation och runbook finns.
-# BB-090 — FRED macro and Finance correctness stabilization
-
-**Status:** COMPLETE (finalization evidence 2026-08-16). The actual BB-090 implementation commit is `6f6cc743b91b9d0c2cb52fb297d0215fd7125b50`; `fb55537aa77dd54c7a5929e3f29084bb5f86252e` published the initial report, `ef5b090b84b498c68304021e7e57426466b2c4b4` published closure stabilization and `0f2ba9c3e7d5e7b3bf088c9094bdd79b3a35db1e` published the vintage proof. Secure FRED configuration reports only `fredApiKeyConfigured=true`; official bounded CPIAUCSL/UNRATE `output_type=2` evidence promoted 72 point-in-time observations in immutable revisions `fred-9300bb944c8c319d` and `fred-5800c2de8f2ef185`; the existing 58,196 revised-history observations remain separate and unchanged. Quarantine, temporal as-of semantics, no-fallback protection, repeated acquisition idempotence, restarts, evidence counts and Sunday truthfulness passed. Production retains 25 market revisions, 9,746 observations, 48 shadow predictions (24 valid PENDING plus 24 INVALIDATED audit rows), 0 outcomes and 0 risk evaluations. GitHub Actions run 55 passed backend, frontend, documentation and secrets. No key value belongs in source, logs, SQLite or chat.
-
-- Deferred data packs: Riksbanken/Sweden, ECB/European FX, commodities, corporate actions, point-in-time universes, fundamentals and additional legitimate OHLCV archives.
-- Avanza remains `MANUAL_REVIEW / RIGHTS_UNKNOWN`.
-- Security/Pentest remains mandatory before PAPER; PAPER is not approved.
-
-# BB-091 — Sweden / Europe macro and FX
-
-**Status:** COMPLETE (2026-08-17). Provider-neutral implementation, verified production backup/migration, bounded official Riksbank/ECB promotion, exact retry idempotence, preservation/restart/full regression and GitHub Actions run 31997421033 are green in implementation commit `dc42d47f8712023984d653b0c34977145476b2e3`.
-
-- Initial Riksbank pack: `SECBREPOEFF`, `SEKEURPMI`, `SEKUSDPMI`.
-- Initial ECB pack: `EXR.D.USD.EUR.SP00.A`, `EXR.D.SEK.EUR.SP00.A`, `FM.D.U2.EUR.4F.KR.MRR_FR.LEV`.
-- All bootstrap evidence is conservatively `REVISED_HISTORY_EXPLORATORY`; causal as-of never falls back.
-- Deferred: unattended acquisition and `FINANCE AUTONOMOUS RESEARCH v1` orchestration. No PAPER, broker, order, LIVE/AUTO or self-learning.
-
-# BB-092 — Finance Autonomous Research v1 foundation
-
-**Status:** COMPLETE (2026-08-22). Implementation commit `8f8358c990b871c986bf0ee30ce434cb68a2394e` passed GitHub Actions run 32587285183 (backend, frontend, documentation and secrets).
-
-The bounded deterministic hypothesis/challenger loop, versioned signal library, immutable attempt registry, family accounting, complexity and fail-closed Research Integrity gate are implemented over BB-079–081 evidence. The UI is read-only. DSR and PBO/CSCV are explicitly `NOT_EVALUABLE`; seeded negative control, stronger multiple-testing statistics, continuous scheduler, resource governor and operations/recovery orchestrator are future bounded work. No PAPER, broker, order, champion promotion, LIVE/AUTO or self-modification is authorized.
-
-**Remediation/finalization (2026-08-22): COMPLETE.** Commit `4f5e2b3272c92b3ad072bc13849b374824f50299` implements interrupted-run recovery, durable global single-flight, explicit run↔experiment audit lineage, immutable actual attempt counts, target/horizon consistency, distinct verdict totals and bounded historical query APIs. Regression passed 461 API, 32 Sentinel and 114 frontend tests plus all applicable local build/documentation/configuration gates; GitHub Actions run 32589143795 passed all four required jobs. This remains BB-092; it does not create BB-093 or start the Scheduler/Orchestrator.
-
-**Final evidence-selection remediation (2026-08-22): COMPLETE.** Commit `6796953533fb72cb12e5546964033e2939cf74c0` makes Autonomous Research use only the exact current robustness-build generation, require both approved strategy versions with complete feature/market lineage, and fail closed without stale fallback. Regression passed 465 API, 32 Sentinel and 114 frontend tests plus all applicable local gates; GitHub Actions run 32590079318 passed all four required jobs. This remains BB-092.
-
-# BB-093 — Finance Research Scheduler / Orchestrator v1
-
-**Status:** COMPLETE (2026-08-22). Implementation commit `0f952f88e3ec630b0a000e3d7565dd6274f63c09`; GitHub Actions run 32591633284 passed backend, frontend, documentation and secrets.
-
-Add one disabled-by-default, UTC-scheduled, durable and idempotent research opportunity per eligible market session over the existing BB-092 path. Persist scheduler decisions, expose bounded read-only status/history and keep market acquisition, prospective shadow, Resource Governor, Hard Risk and execution authority separate. No missed-window backfill, provider polling, PAPER, broker, order, LIVE/AUTO or champion promotion belongs in this slice.
-
-Local regression passed 475 API, 32 Sentinel and 115 frontend tests plus all applicable build, documentation, Compose, diff and sanitized secret-pattern gates. The next recommended bounded slice is Finance Resource & Safety Governor; it is not implemented here.
-
-**Readiness remediation (2026-08-22): COMPLETE.** Commit `adf930a6aacbfab2e314f558a0307b7643edb7e0` requires complete current-session coverage across the exact eight-instrument research watchlist plus a matching feature revision with exact normalized canonical source lineage and per-instrument feature presence. Partial/stale/unknown evidence defers without a research run. Older deferred opportunities are explicitly superseded instead of remaining zombies. Regression passed 479 API, 32 Sentinel and 115 frontend tests plus Release, frontend, API-image, documentation, Compose, diff and sanitized secret-review gates. GitHub Actions run 32592856198 passed backend, frontend, documentation and secrets. This remains BB-093 and does not start the Resource Governor.
-
-# BB-094 — Finance Resource & Safety Governor v1
-
-**Status (2026-08-22): COMPLETE.** Commit `8f6e83904aa3b0a9e6995c22c699a7344777739d` adds the versioned snapshot-based operational gate before scheduled BB-092 work. It reuses trusted CPU, memory and configured-disk metrics, fails closed on unavailable critical evidence and persists compact decisions with deterministic `Block > Defer > Allow` precedence. Local verification passed 486 API, 32 Sentinel and 115 frontend tests plus Release, frontend, API-image, documentation, Compose, diff and sanitized secret-pattern gates. GitHub Actions run 32595755361 passed backend, frontend, documentation and secrets. Temperature/service activity, adaptive budgets, Hard Risk changes and all trading authority are excluded. The scheduler remains disabled by default. The next planned slice is Finance Autonomous Research Operations / Recovery Hardening.
-
-# BB-095 — Finance Autonomous Research Operations & Recovery Hardening v1
-
-**Status (2026-08-22): COMPLETE.** A derived operational lifecycle, deterministic startup reconciliation, deduplicated true-operational incident streaks, stale/persistent-wait visibility, explicit maintenance pause, read-only operations API/UI and lawful compact-metadata backup are implemented. Local verification passed 495 API, 32 Sentinel and 115 frontend tests plus Release, frontend, API-image, documentation, Compose, diff and sanitized secret-pattern gates. Implementation commit `31c11865b430a137b7eb5be77681158d1d6adb1f` passed GitHub Actions run 32597319341 (backend, frontend, documentation and secrets). Scientific rejection remains healthy research. Scheduler stays default-off and Finance remains `RESEARCH / 0 SEK / NONE` with no execution authority. The reviewed foundation is eligible for a separate explicit deployment decision enabling continuous unattended RESEARCH; it is not enabled by this item.
-
-**Commissioning evidence (2026-08-22):** the appliance deployment override now enables the scheduler while source defaults remain off. Recovery/governor/authority checks passed. The first deterministic opportunity safely deferred on incomplete feature lineage with zero runs/experiments; one controlled restart retained identical counts. Provider cadence and restricted EODHD backup policy are unchanged. Narrow operations-status correction `5cc35f415c5314f702c719f0114979ac3f8a3821` records the same defer reason truthfully and passed GitHub Actions run 32598337042; no new BB item or Finance capability was introduced.
-
-# BB-096 — BigBrain UX Sprint v1 / Unified Design System
-
-**Status (2026-08-22): COMPLETE.** One semantic token/component system now serves Obsidian Gold, Arctic Wind and Forest Night. Obsidian Gold is the default; explicit selection persists through the existing Settings contract with local cache/offline fallback. A reusable mobile-first AppShell provides Hem, Familj, Media, Finance and Mer as primary destinations, with AI/Admin secondary. Existing module actions and Finance research/safety evidence remain present; technical Finance evidence uses progressive disclosure. The supplied local mockups were visual references and are intentionally not publication artifacts. Implementation commit `1293d36a04013bb65469ca2191f2f1683d52a50d` passed GitHub Actions run 32600293268 (backend, frontend, documentation and secrets).
-
-**Deployment evidence (2026-08-23):** repository HEAD `27b67450cee61f0283a8eaaf7748a0d57274ea1c` is deployed on the appliance. Real-browser mobile/desktop checks verified all three themes, persistence, primary/secondary navigation and representative module surfaces without overflow. Recovery and read-only API smoke checks passed; Finance remained `RESEARCH / 0 SEK / NONE` with no duplicated opportunity, run or experiment. Owner subjective UX review remains the next step and is not marked complete by commissioning.
-
-# BB-097 — Premium UX Reference: Family / Obsidian Gold
-
-**Status (2026-08-23): TECHNICALLY COMPLETE — owner visual approval pending.** Implementation commits `d29f0f88253752809042d0c5687e6d1b2d6b1d1a` and `cb9c9caa0efc66119616767bc3d9507d9a83562b` passed GitHub Actions runs 32618788138 and 32619102449. The latter Web image was deployed without touching volumes, API, Sentinel, Finance or external services; deployed Obsidian Gold Family checks passed at 390 × 844, 430 × 932 and 1440 × 900. This status does not constitute product-owner visual approval and authorizes no rollout to another module.
-
-BB-096 established the shared shell, navigation, themes and semantic token contract, but its Family view retained the legacy dashboard information architecture: four generic widgets, stacked accordion/module wrappers, nested cards, repeated borders and mechanically repeated headings. The result was predominantly a reskin. BB-097 makes Family the single canonical design-reference candidate and replaces that presentation architecture without changing Family APIs or backend behavior.
-
-Definition of Done includes functional parity for meal planning, meal library, generation, saved menus, week navigation, meal replacement, shopping, calendar, reminders and dashboard settings; repeated 390 × 844 visual comparison against the supplied Obsidian Gold mockup; 430 × 932 and 1440 × 900 checks; automated validation; Finance safety confirmation; green CI; preserved-data appliance deployment; deployed PWA screenshot review; and an explicit owner approval gate. Technical completion never implies visual approval.
-
-**Premium art-direction refinement (2026-08-23):** owner feedback accepted the BB-097 Family architecture but not its premium feeling. The same work item therefore adds a semantic material system and a visual pass for Obsidian Gold and Forest Night while preserving Family structure and behavior. The acceptance evidence uses only the three original local mockups plus real browser renders; no generated image is a design source. Technical completion requires two normal-viewport comparison iterations per dark theme, deployed 390 × 844 verification for both, green CI and unchanged Finance safety. Owner visual approval remains a separate pending gate and no other module rollout is authorized.
-
-**Refinement evidence (2026-08-23): TECHNICALLY COMPLETE — owner visual approval pending.** Implementation commit `4da8de726963b59dfa467c1f73d1aaf876b9d9d3` passed GitHub Actions run 32624929631 across backend, frontend, documentation and secrets. Web image `sha256:bc92125c7b5613dcc9db9b9661bd97f04e01db5119feeb2394463b37f7beff52` is deployed and healthy. Deployed Obsidian Gold and Forest Night passed opened 390 × 844 and 430 × 932 viewport review; Arctic Wind remained readable at 390 × 844. Finance remained `RESEARCH / 0 SEK / NONE`, and API, Sentinel, volumes and settings were preserved.
-
-**Owner-directed polish (2026-08-23): TECHNICALLY COMPLETE — owner visual approval not granted.** Real-iPhone evidence supersedes the previous headless artifact conclusion: `FULL-PAGE IOS SAFARI SCREENSHOT ARTIFACT: STILL REPRODUCIBLE` for both dark themes and is absent during normal use. Family architecture and functionality remain frozen. Exactly two controlled normal-viewport iterations refined Obsidian material/gold, Forest environment/material, typography hierarchy, meal density/separators, Today, tabs, Shopping hierarchy and dock detail. Implementation commit `cdad8fcca5ed5742d97aadbb07b54b4628b0b867` passed GitHub Actions run 32626737721 across backend, frontend, documentation and secrets. Web image `sha256:a4c89f10d3e54c97d4d4fe91118f5235e96d858a49c32ff10311f2c145ed0fa4` was deployed alone and is healthy; opened deployed top and normal-scroll frames passed at 390 × 844 for both dark themes, both passed 430 × 932, and Arctic Wind remained readable at 390 × 844. API, Sentinel, volumes and settings were preserved; recovery remained healthy/clean and Finance remained `RESEARCH / 0 SEK / NONE`. Owner visual approval remains a separate pending gate.
-
-**Final Family craftsmanship pass (2026-08-23): TECHNICALLY COMPLETE — owner visual approval pending.** The accepted Family architecture, hierarchy, theme directions, material tokens and dock concept remain unchanged. One primary implementation pass replaced the generic inline Byt button block with a compact meal-anchored semantic material panel, added explicit primary/secondary/dismiss hierarchy, local meal context, initial focus, Escape dismissal and 180 ms open motion. Shared 100 ms press and 180 ms component-motion tokens now govern Family controls; tabs, week arrows, settings, Shopping input/actions, Calendar action/rows and dock received touch/focus/alignment polish. One correction pass replaced a clipped global focus halo with an accessible inset focus indicator. Commit `d9091574fad84d156d22d719d2286a0db473f465` passed GitHub Actions run 32629227326 across backend, frontend, documentation and secrets. Web image `sha256:3538f738ef44690aacc61d70e6752c008a7ce4ee60403403be65477db18f2ad1` is deployed and healthy; opened deployed 390 × 844 and 430 × 932 frames for both dark themes passed with Söndag/Idag/Smashed Burgers/Byt open, all actions, initial focus, no overflow and dock separation. Arctic Wind passed a deployed 390 × 844 smoke render. API and Sentinel remained healthy and were not recreated; Finance remained `RESEARCH / 0 SEK / NONE`. The iOS full-page artifact remains reproducible by owner evidence. Owner visual approval remains pending.
-
-# BB-098 — Global Premium UI Rollout
-
-**Status (2026-08-23): COMPLETE — migrated modules pending owner review.** The owner approved BB-097 Family as BigBrain's golden design direction. BB-098 migrated the remaining current routes—Home, Media, Finance, More/Settings, AI and Admin—to the same semantic materials, typography, controls, interaction timing and responsive shell without changing Family behavior or Finance semantics. Arctic Wind received a complete cold, light material identity rather than a readability-only fallback. Commits through `bdfef76335e6f218899d2be8a02deb9dc105e715` passed GitHub Actions run 32632208758; only Web was rebuilt/recreated and image `sha256:5410d787fadfd368587c1113675c2801e558c41c43aced8512bd94e984d3aa8e` is healthy. API, Sentinel, volumes and settings data were preserved. Finance remains `RESEARCH / 0 SEK / NONE`; the scheduler remains enabled and unchanged. Family remains the approved direction, while the newly migrated modules still require owner review.
-
-# BB-099 — Whole-App UX Audit & Premium Composition Pass
-
-**Status (2026-08-23): TECHNICALLY COMPLETE — OWNER UX REVIEW PENDING.** All seven registered views, embedded Settings and important interaction states were audited against Family as the golden reference. Home provides independently resolving real information instead of duplicating the dock; Media controls receive shared dock/safe-area clearance and progressive technical disclosure; Finance prioritizes market, current research, prospective evidence and risk while preserving all advanced evidence. Local validation passed 121 frontend, 495 API and 32 Sentinel tests plus both builds, documentation, Compose and diff checks. GitHub Actions runs 32643858026 and 32644787645 passed. Only Web was recreated; image `sha256:ae1d52afd99e5dfd3b680dcae19c69e15fa5b76a0d7d0dd27d8d7b52a325c14c` is healthy. Appliance route/theme/reachability smoke passed. Finance remains `RESEARCH / 0 SEK / NONE`, with scheduler enabled and unchanged. No migrated view is owner-approved by technical completion.
-## BB-129A — Multi-Dataset Strategy Research Campaign
-
-- Status: Complete — implemented, automatically/CI verified, API-only deployed, runtime verified and one bounded research campaign executed without retuning; owner review not requested.
-- Scope: immutable bounded grouping, deterministic allowlisted population, all-attempt accounting, fail-closed BB-127 eligibility, categorical scorecard, independent instrument lineage and read-only APIs.
-- Definition of Done: publish/deploy verified API/docs, runtime-check safety/read APIs, then execute exactly one fixed-definition campaign if safe. Zero robust candidates is valid.
+Alla 290 ursprungsavsnitt, även tidigare Klar/Avvisad, finns i
+[Backlog-arkivet](history/backlog-before-doc-2b-20261024.md). Inga BB-ID:n eller DoD raderas ur historiken.
+[DOC-2B:s destinationsmappning](reports/documentation/doc-2b-backlog-roadmap-inventory-20261024.md#fas-b--förlustfri-konsolidering-2026-10-24)
+visar källpositioner, arkivdestinationer, U1–U3 och synliga K1–K7-krav. Kanoniska kontrakt och
+frysningsbeslut har oförändrad auktoritet; arkivets current/next är inte aktuella körorder.
