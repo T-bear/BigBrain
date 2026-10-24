@@ -1,5 +1,11 @@
 # Reports Index
 
+Listan är ett urval av daterad evidens. [Rapportkatalogen](../reports/REPORT-CATALOG.md) är
+ingång till rapportbiblioteket; [STATUS](../STATUS.md) beskriver aktuellt accepterat tillstånd
+och [TESTING](../../TESTING.md) aktuell testmetod. Äldre review-/PASS-etiketter är tidsbundna,
+inte aktuell produktstatus. [TESTING-arkivet](../history/testing-before-doc-2c-20261024.md)
+bevarar tidigare testresultat och instruktioner utan att auktorisera nya körningar.
+
 - [BB-128C Finance Design-System Conformance for Async & Degraded States](../reports/features/finance/finance-bb-128c-design-system-conformance-20260903.md)
 - [BB-128B Finance Read-Only Resilience & Last-Known-Good UX](../reports/features/finance/finance-bb-128b-read-only-resilience-20260902.md)
 - [GOOGLEFINANCE GOOG First Owner Intake](../reports/features/finance/finance-googlefinance-goog-owner-intake-20260901.md)

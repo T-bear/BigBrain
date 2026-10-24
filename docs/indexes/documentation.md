@@ -28,14 +28,15 @@ When sources disagree, use this order and resolve the inconsistency explicitly:
 
 - [Start here / continuity](../START-HERE.md): uppgiftsstyrd läsguide och hänvisning till beständig handoff.
 - [Product roadmap](../../ROADMAP.md): direction and domain-roadmap delegation.
-- [BB-130 ordered stabilization plan](../architecture/bb-130-stabilization.md): phase scope and DoD.
+- [BB-130 ordered stabilization plan](../architecture/bb-130-stabilization.md): historical phase scope and DoD; not a current sprint order.
 
 - [README](../../README.md): product overview and development entry point.
 - [STATUS](../STATUS.md): compact current reality and verification level.
 - [BACKLOG](../BACKLOG.md): remaining work and acceptance criteria.
 - [AGENTS](../../AGENTS.md): working, safety and completion rules.
 - [ARCHITECTURE](../../ARCHITECTURE.md): normative system boundaries.
-- [TESTING](../../TESTING.md): testing map.
+- [TESTING](../../TESTING.md): current risk-based test methods and gates; no execution authority.
+- [TESTING history before DOC-2C](../history/testing-before-doc-2c-20261024.md): dated evidence and former instructions, not current PASS or run orders.
 - [ADR index](adr.md), [knowledge index](knowledge.md), [operations index](operations.md) and [reports index](reports.md).
 
 Local reports under `/home/enigma/BigBrain/reports/` are fuller internal evidence and
