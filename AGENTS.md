@@ -1,304 +1,233 @@
 # BigBrain – permanenta arbetsregler
 
-## Roller
+## 1. Roller och auktoritet
 
-- Produktägare: användaren.
-- Systemarkitekt och granskare: ChatGPT.
-- Lead Developer: Codex.
+- Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.
+- ChatGPT är systemarkitekt och oberoende granskare; Codex är Lead Developer som implementerar,
+  verifierar, committar och pushar inom auktoriserat scope samt genomför separat godkänd merge.
+- Arbeta endast inom detta repository. Följ accepterad `ARCHITECTURE.md` och ADR:er.
+  Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.
+- GitHub main är source of truth för accepterat arbete; aktiv checkpoint-branch för publicerat,
+  ännu ej accepterat arbete. Working tree och recovery beskriver opublicerade avvikelser.
+  Publicering, tester eller review innebär aldrig ägaracceptans, merge- eller deploymenttillstånd.
+- Owner UX approval registreras endast efter uttryckligt ägargodkännande.
 
-## Omfattning och arbetssätt
+<a id="kiss--keep-it-simple-stupid"></a>
 
-- Arbeta endast inom detta repository.
-- Inspektera befintlig kod och relevanta dokument innan ändringar görs.
-- Följ den beslutade arkitekturen i `ARCHITECTURE.md` och dokumenterade Architecture Decision Records.
-- Vid oklarheter eller konflikt med arkitekturen: stoppa och fråga innan implementation.
-- Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag.
-- Skapa inte abstraktioner, lager eller generell infrastruktur utan ett konkret och verifierat ansvar.
-- Undvik microservices, message brokers, Redis, Kubernetes och dynamiska plugins tills ett verifierat behov finns och arkitekturbeslutet har dokumenterats.
-- Varje sprint ska ha ett tydligt mål och en tydlig Definition of Done. Om en ny idé uppstår under sprinten och inte krävs för att uppnå sprintmålet ska den dokumenteras som en framtida förbättring i stället för att implementeras direkt.
+## 2. KISS och uppgiftsstyrd kontext
 
-## Kontinuitet och Adaptive Reasoning / Compute Economy
+Läs alltid AGENTS.md och verifiera Git-baslinje och working tree. Använd
+[START-HERE](docs/START-HERE.md) för att välja endast relevant kontext och kontrollera
+[relevanta frysningar](docs/operations/freezes.md). Inspektera befintlig kod och relevanta
+kontrakt före ändring. Utöka läsningen vid konkret risk, osäkerhet, beroende eller konflikt;
+fullständig rutinläsning av dokumenthierarkin krävs inte. Motivera konkret risk, konflikt eller
+större avvikelse, inte varje extra dokumentläsning.
 
-- Läs alltid `AGENTS.md` och minsta auktoritativa kontext som uppgiften kräver.
-  [Start here](docs/START-HERE.md) visar dokumentauktoritet och läsordning för vald kontext;
-  den riskbaserade omfattningen här styr tillämpningen. Läs inte rutinmässigt hela hierarkin
-  vid lokala uppgifter där auktoritet och scope redan är tydliga.
-- **NO UNDOCUMENTED SIGNIFICANT WORK:** betydande arkitektur-, status-, backlog-, roadmap-,
-  runtime-, säkerhets- och återhämtningsbeslut samt viktiga tekniska lärdomar ska dokumenteras
-  i rätt kanoniska dokument. Chatt och terminalhistorik är inte bestående source of truth.
-- Använd lägsta resonemangsnivå som passar uppgiften; eskalera när komplexiteten kräver det.
-  LOW: mekanisk dokumentation, formatering, repetitiva specificerade ändringar, isolerad
-  UI/text och små mekaniska testuppdateringar. MEDIUM: normal implementation, flerfilsrefaktor,
-  integration och vanlig felsökning. HIGH: Finance-korrekthet och beräkningar/modeller,
-  marknadsdatasemantik/lineage, arkitekturbeslut, migrationer, säkerhetsgränser, samtidighet,
-  race conditions, svår felsökning, stora riskfyllda refaktorer och kritisk kodreview.
-- Compute economy tar bort redundant arbete, aldrig nödvändiga tester, verifiering, säkerhetsreview,
-  fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.
-  Finance-korrekthet, säkerhet och arkitekturintegritet går före användningsoptimering.
-  Policyn är uppgiftsklassificering, inte ett påstående att verktyget kan byta modellinställning.
+KISS – Keep It Simple, Stupid ska beaktas innan implementationsuppdrag och vid arkitekturreview.
+Föredra den enklaste lösningen som uppfyller ägarens krav. Återanvänd befintliga komponenter
+och integrationer; undvik onödiga beroenden, abstraktioner, lager, tjänster och parallella lösningar.
+Ytterligare komplexitet kräver ett konkret, verifierat ansvar och behov. Undvik microservices,
+message brokers, Redis, Kubernetes och dynamiska plugins tills behovet verifierats och
+arkitekturbeslut dokumenterats. Förenkling får inte försämra säkerhet, korrekthet, tillförlitlighet
+eller underhållbarhet.
 
-### Riskbaserad läsning och verifiering
+## 3. Riskbaserad arbetsinsats
 
-- Inom ägarens auktoriserade scope beslutar ChatGPT/systemarkitekten verifieringsnivå utifrån
-  faktisk risk, ändringens påverkansområde och berörda komponenter. Codex följer nivån och gör
-  samma bedömning när uppdraget inte anger någon. Ansvarskedjan är ägare → systemarkitekt → Codex.
-- Under implementation används i första hand fokuserade tester för den ändrade ytan. Kör inte
-  oförändrade fulla testsviter igen enbart för att en ny commit, push eller checkpoint tillkommit.
-- En Review Checkpoint verifieras proportionellt mot sin delta och risk; full repository-verifiering
-  är inte automatisk. En Merge Candidate får den bredaste verifiering som faktisk risk och
-  påverkansområde motiverar. Mekaniska, dokumentationsbaserade, isolerade eller andra lågriskändringar
-  kräver inte fulla testsviter enbart av processvana.
-- Hög verifieringsnivå kvarstår för Finance-korrekthet/vetenskaplig integritet, marknadsdata-lineage
-  och temporal integritet, databasmigrationer, samtidighet/race conditions, säkerhetsgränser samt
-  PAPER/LIVE/trading/kapitalauktoritet. Historiska tunga Finance-checkpoints visar sin egen risknivå;
-  de är inte ceremonimallar för varje framtida uppgift.
-- Giltig evidens får återanvändas medan relevant tree/kod och antaganden är oförändrade. När exakt
-  godkänt kandidat-tree mergas oförändrat mot förväntad oförändrad main räcker normalt exakt
-  SHA/tree-verifiering och relevant CI; samma lokala verifiering upprepas inte automatiskt.
-- Codex får när som helst utöka läsning/testning vid konkret större påverkansområde, arkitekturell
-  osäkerhet, vetenskaplig risk, säkerhetsrisk eller annat verifierat behov. Ange kort varför.
-  Detta utökar inte uppdragets scope eller befogenheter; arkitekturkonflikt och blockerregler gäller.
+Använd lägsta lämpliga arbetsinsats; eskalera vid konkret behov. Detta klassificerar uppgiften,
+inte ett påstående att agenten kan ändra modellinställningar.
 
-### Processdisciplin och minsta nödvändiga arbetsflöde
+| Nivå | Typisk omfattning |
+| --- | --- |
+| LOW | Mekanisk dokumentation/formatering, isolerad UI/text, små mekaniska teständringar. |
+| MEDIUM | Normal implementation, flerfilsrefaktor, integration och vanlig felsökning. |
+| HIGH | Finance-korrekthet, beräkningar/modeller och vetenskaplig integritet; marknadsdatasemantik/lineage och temporalitet; arkitekturbeslut, migrationer, säkerhetsgränser, samtidighet/race conditions, svår felsökning, stora riskfyllda refaktorer och kritisk kodreview; PAPER/LIVE/trading/kapitalauktoritet. |
 
-Innan ChatGPT formulerar ett Codex-uppdrag och innan Codex utökar ett uppdrag ska följande bedömas
-med stöd av riskreglerna ovan:
+Inom ägarens scope beslutar arkitekten verifieringsnivå efter risk och påverkansområde;
+Codex följer nivån och gör samma bedömning när den inte anges. Ansvarskedjan är ägare → arkitekt → Codex.
+Nya funktioner ska ha relevanta tester. Kör fokuserade tester först; efter en avgränsad korrigering
+verifieras ändringen och berörda beroenden. Utöka vid konkret risk eller obligatoriskt krav.
+Review Checkpoints verifieras proportionellt; Merge Candidates får den bredaste verifiering som
+faktisk risk motiverar, inte rutinmässigt hela repositoryts testsviter.
 
-- Klassificera uppgiftens faktiska risk och påverkansområde.
-- Identifiera obligatoriska kontroller och uttryckliga godkännandegränser enligt source of truth.
-- Återanvänd giltig verifiering när kod, tree och relevanta förutsättningar är oförändrade.
-- Undvik nya kontrollomgångar, separata agentkörningar, vänteloopar och dokumentationssteg som
-  inte tillför nödvändig verifiering.
-- Skilj mellan produktägarbeslut och tekniska arbetsmoment. Ett tekniskt kontrollmoment ska inte
-  automatiskt bli ett nytt godkännandesteg eller ett separat Codex-uppdrag.
-- Varje extra kontroll eller stopp utöver det normala riskbaserade arbetsflödet ska kunna
-  motiveras med en konkret risk, avvikelse eller uttryckligt krav.
+Återanvänd giltig evidens när relevant tree/kod, beroenden och antaganden är oförändrade.
+Ny commit/push kräver inte i sig omtest. Vid oförändrat godkänt kandidatträd och förväntad main
+räcker normalt SHA/tree-verifiering och relevant CI. Historiska tunga Finance-kontroller är
+inte ceremonimallar för andra uppgifter. Rena dokumentändringar behöver inte applikationstester.
+Redovisa körda kommandon/resultat, återanvänd evidens och varför kontroller saknas eller inte gäller.
 
-Denna princip får aldrig kringgå obligatorisk säkerhetsverifiering, arkitekturbeslut, Finance-skydd,
-uttryckligt merge-godkännande av exakt SHA eller separat deployment-auktorisering.
+Compute Economy tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview,
+fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.
+Finance-korrekthet, dataintegritet, säkerhet och arkitektur har företräde framför kreditbesparing.
 
-### Långvariga operationer
+## 4. Scope och Definition of Done
 
-- Ingen aktiv vänteloop: upprepa inte `wait`, polling eller statuskommandon utan ny information,
-  avvikelse eller beslutspunkt. Återuppta aktivt arbete för resultatanalys eller beslut, inte enbart
-  för att kontrollera att processen fortfarande arbetar.
-- Kör långvariga deterministiska processer oberoende av agentens aktiva session när det är tekniskt
-  säkert och inom auktoriserad scope. Anta aldrig att en bakgrundsprocess överlever frånkopplad
-  terminal eller avslutad agentsession; verifiera livslängd, ägarskap, resursgränser och
-  resultatlagring innan den lämnas.
-- Status, slutresultat och fel ska finnas beständigt för nästa session utan omstart av processen.
-  Använd befintliga mekanismer; denna regel motiverar inte ny infrastruktur.
-- Återanvänd redan godkänd, fortsatt giltig verifiering enligt riskreglerna ovan. Omfattande
-  kontroller upprepas endast vid konkret risk, ändrat underlag eller identifierad brist.
-- Säkerhet går före krediter: obligatorisk verifiering, dataintegritet, sekretess, säkerhetskontroller
-  och fail-closed-beteende får aldrig minskas. En kritisk process får inte lämnas utan säker
-  hantering av fel och avbrott.
-- Om pågående exekvering måste lämnas, använd befintlig standard under Interrupted-run recovery
-  för en kort handoff med aktuellt tillstånd, resultatplats, blockerare och nästa beslutspunkt.
-  Publicera inga hemligheter eller känsliga sökvägar.
+Innan ett uppdrag formuleras eller utökas: fastställ mål, scope, faktisk risk, verifierbar DoD,
+obligatoriska kontroller och uttryckliga godkännandegränser. DoD ska vara proportionell utan
+fast antal kriterier. Saknas DoD får agenten undersöka och föreslå den, men implementation
+väntar på ägarens eller arkitektens godkännande inom ägarens auktoriserade scope.
 
-## Säkerhet och data
+Ändra inte mål eller acceptanskriterier med förbättringsidéer under implementation/review.
+Konkreta säkerhetsfel, korrekthetsbrister, arkitekturkonflikter och obligatoriska krav måste
+hanteras; nytt scope kräver ägarbeslut. Dokumentera uppskjutna idéer i befintlig backlog.
+Uppfylld DoD avslutar uppdraget: ingen automatisk nästa sprint, checkpoint eller förbättringsloop.
+
+Uppdrag ska normalt beskriva mål, scope, acceptanskriterier och stoppvillkor, inte upprepa
+permanenta regler. Undvik kontrollomgångar, separata agentkörningar, vänteloopar och
+administration utan nödvändig verifiering. Extra arbete/stopp ska kunna motiveras med konkret
+risk, avvikelse, krav eller ägarbeslut. Ett tekniskt kontrollmoment är inte automatiskt ett
+nytt godkännandesteg eller separat uppdrag. Detta kringgår aldrig obligatoriska skyddsgränser.
+
+## 5. Säkerhet och arkitektur
 
 - Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.
-- Montera aldrig Docker-socketen i API eller Web.
-- Använd minsta möjliga behörighet för processer, containers, API:er och användare.
+- Montera aldrig Docker-socketen i API eller Web. Använd minsta behörighet för processer,
+  containers, API:er och användare.
 - Destruktiva funktioner kräver tydlig auktorisering, uttrycklig bekräftelse och audit.
-- Radera eller skriv aldrig över användardata.
-- Ändra aldrig andra servercontainers eller deras data som bieffekt av utveckling eller test.
+  Radera eller skriv aldrig över användardata.
+- Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag;
+  ändra aldrig andra containers eller deras data som bieffekt av utveckling eller test.
+- Moduler får inte läsa eller skriva andra modulers datalager direkt. Externa tjänster kapslas
+  bakom adapters. Alla publika API:er versionssätts; alla API-fel använder Problem Details.
+- `BigBrain.Brain` innehåller endast AI-orkestrering enligt `ARCHITECTURE.md`, inte generell kod.
+  AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom
+  det vanliga auktoriserade API:t. Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.
+- Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser
+  gäller oförändrat. Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.
 
-## Arkitektur- och API-regler
+## 6. Dokumentation – minsta beständiga sanning
 
-- Moduler får inte läsa eller skriva andra modulers datalager direkt.
-- Externa tjänster kapslas bakom adapters.
-- Alla publika API:er versionssätts.
-- Alla API-fel använder Problem Details.
-- `BigBrain.Brain` innehåller endast AI-orkestrering enligt `ARCHITECTURE.md`; det är inte ett allmänt dumpningslager.
-- AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom det vanliga auktoriserade API:t.
-- Godtycklig tredjepartskod får inte laddas i API-, Web- eller Brain-processen.
+**NO UNDOCUMENTED SIGNIFICANT WORK:** betydande arkitektur-, status-, backlog-, roadmap-, runtime-,
+säkerhets- och återhämtningsbeslut samt viktiga tekniska lärdomar ska bevaras i rätt kanoniskt
+underlag. Chatt och terminalhistorik är inte bestående source of truth. Dokumentation ingår i DoD.
 
-### KISS – Keep It Simple, Stupid
+Uppdatera minsta relevanta status/backlog, kontrakt/ADR, modul-, test-, rapport-, recovery- eller
+runbookunderlag. Läs/uppdatera inte hela dokumentträdet rutinmässigt. Länka till auktoritativ
+information och undvik duplicering där dokumenten inte har skilda ansvar. Ingen rutinmässig
+post-merge-dokumentationscommit; avstäm endast verkligt bestående nya fakta.
 
-KISS är en övergripande arkitekturprincip för hela BigBrain och ska beaktas vid
-arkitekturgranskning och innan implementationsuppdrag. Föredra den enklaste lösningen som
-uppfyller produktägarens krav och återanvänd befintliga komponenter och integrationsmöjligheter.
-Undvik onödiga beroenden, abstraktioner, tjänster och parallella lösningar; ytterligare komplexitet
-ska motiveras av ett konkret behov enligt reglerna ovan. Förenkling får aldrig försämra säkerhet,
-korrekthet, tillförlitlighet eller underhållbarhet.
+Skilj planerat, implementerat, automatiskt verifierat, deployat, manuellt verifierat, blockerat,
+känt begränsat och ersatt. Påstå aldrig färdigstatus utan evidens. Runtime-/testuppgifter ska
+ha datum och scope; historik bevisar inte aktuellt tillstånd. Registrera nya verifierade buggar,
+begränsningar och uppskjutna funktioner som inte löses i uppdraget. Backlog blir klar först vid
+verifierad DoD; BB-ID:n är unika och andra posters status/prioritet ändras inte utan evidens.
 
-## Kvalitet och redovisning
+Skapa/uppdatera sanerad rapport och rapportkatalog när separat checkpointevidens behövs för review;
+små workflow-/dokumentändringar behöver ingen parallell rapport. Fullare lokala rapporter får
+vara intern evidens, men relevant sanerad kunskap ska publiceras i GitHub. Publicera aldrig
+hemligheter, interna identiteter, privata adresser, råa känsliga loggar, känsliga paths eller förbjudna data.
 
-- Nya funktioner ska ha relevanta tester.
-- Kör build och tester enligt den riskbaserade verifieringsnivån ovan. Redovisa också återanvänd
-  evidens och varför en kontroll inte är tillämplig; dokumentationsändringar behöver inte kodtester.
-- Redovisa exakt vilka filer och beteenden som ändrats samt vilka build- och testkommandon som körts.
-- Om build eller test inte kan köras ska orsaken redovisas tydligt.
+## 7. Review och blockerare
 
-### Systemarkitektens review-trigger
+| Klass | Betydelse |
+| --- | --- |
+| P0 | Kritisk brist; stoppar merge. |
+| P1 | Blockerande brist, exempelvis brutet obligatoriskt krav eller otillräcklig nödvändig verifiering. |
+| P2 | Icke-blockerande brist som kan hanteras separat om acceptanskriterier och säkerhetskrav är uppfyllda. |
+| P3 | Framtida förbättring, refaktorering eller alternativ arkitektur. |
 
-När ägaren säger **"Codex är klar"** ska ChatGPT behandla det som en review-trigger, inte som tillräcklig färdigevidens. ChatGPT ska själv hämta den aktiva checkpoint-branchens exakta Review Checkpoint SHA och tree, jämföra med rätt accepterad main-baseline och läsa rapport, diff, evidens, status, backlog och testunderlag från GitHub och därefter ge ägaren en förenklad systemarkitektgranskning: vad som gjorts, vad som är partiellt eller återstår, problem/risker, vad ägaren bör verifiera manuellt och rekommenderat nästa steg. Owner UX approval får endast registreras efter ägarens uttryckliga godkännande.
+Normalt högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
+om fortsatt avgränsat arbete, minskat scope, uppskjutning eller stopp. Verifierade P0/P1 får aldrig
+kringgås för att nå en rundgräns; fortsatt nödvändig verifiering är inte förbjuden. Klassificeringen
+ersätter inte befintliga säkerhets-, Finance-, blocker- eller godkännanderegler.
+P2/P3 öppnar inte automatiskt nya Codex-iterationer. Vid uppfylld DoD och riskmotiverad verifiering
+ska arkitekten normalt rekommendera godkännande/merge. Ingen sen arkitekturomprövning utan
+konkret blockerande evidens eller uttrycklig ägarbegäran. Review ändrar inte scope automatiskt.
 
-## Git
+När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från
+GitHub, jämföra med accepterad main-baseline och läsa relevant diff, rapport, evidens, status,
+backlog och testunderlag. Det är en oberoende review-trigger, inte färdigbevis. Ge ägaren en kort
+bedömning av levererat/återstående, risker, manuella kontroller och rekommenderat nästa steg.
+Ägaren ska inte behöva kopiera terminalhistorik. UX-acceptans kräver fortfarande uttryckligt beslut.
 
-- Ägarens permanenta Review Checkpoint-auktorisering nedan tillåter commit/push av sammanhängande arbete inom en redan auktoriserad checkpoint. Merge kräver separat explicit godkännande av exakt SHA. Ingen reset, rebase, force push eller historieskrivning; orelaterat arbete bevaras.
-- Skriv inte över eller återställ användarens befintliga ändringar.
+<a id="permanent-checkpoint-branch-workflow"></a>
 
-## Interrupted-run recovery
+## 8. Git och Review Checkpoints
 
-Om en körning avbryts innan avgränsat arbete är klart ska giltiga working-tree-ändringar bevaras och inte göras om eller kastas. Sammanhängande ofullständigt arbete får publiceras som REVIEW CHECKPOINT enligt den permanenta auktoriseringen nedan; det får inte kallas MERGE CANDIDATE utan uppfyllda acceptance criteria och genomförd riskmotiverad verifiering. Skriv när möjligt en sanerad återhämtningsnot enligt `docs/operations/codex-recovery.md` med baseline/source-of-truth-SHA, git status, ändrade filer, exakt klart/återstående arbete, körda test/build-resultat, blockerare/antaganden och nästa exakta åtgärd. Använd endast denna enda plats och statusen `INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
+En bounded checkpoint-branch från verifierad `origin/main`; fortsätt samma branch genom review,
+inte en parallell implementation. Bevara orelaterat arbete och användarens ändringar. Ingen reset,
+rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skriv inte över eller
+återställ befintliga ändringar.
 
-En senare Codex-session ska läsa `AGENTS.md`, synka/verifiera GitHub, inspektera working tree och återhämtningsnoten, säkerställa att orelaterade ändringar bevaras och fortsätta giltigt verifierat arbete utan onödig omkörning. Slutför ursprunglig scope före nytt arbete. Om repositoryt och noten motsäger varandra: stoppa och rapportera konflikten i stället för att gissa. Återhämtningsnoten får aldrig innehålla hemligheter, credentials, privata adresser, råa känsliga loggar eller förbjudna identifierare/data. GitHub main är source of truth för accepterat arbete; den aktiva checkpoint-branchens publicerade Review Checkpoints är source of truth för pågående, ännu ej accepterat arbete. Working tree och återhämtningsnoten beskriver uttryckligen opublicerade avvikelser och avbrott.
+- **REVIEW CHECKPOINT:** permanent auktorisering till commit/push av sammanhängande arbete inom
+  redan auktoriserat scope för oberoende review. Kan vara ofullständigt, blockerat eller innehålla
+  misslyckade experiment; naturlig reviewpunkt, experimentfel, beslut eller STOP ska vara beständigt.
+- **MERGE CANDIDATE:** checkpoint vars acceptanskriterier och riskmotiverade verifiering är uppfyllda.
+- **ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren
+  uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
 
-## Documentation and publication completion rule
+Kontrollera scope/secrets, publicera kod, tester och nödvändig dokumentation tillsammans,
+rapportera enligt avsnitt 11 och **STOPPA**. Publicering är aldrig acceptance, merge-, deployment-,
+utökat scope-, nästa checkpoint- eller tradingtillstånd. Fortsättning kräver continue-beslut inom
+auktoriserad scope; lägg nya commits ovanpå historiken till nästa reviewpunkt eller avslut.
 
-Dokumentation är en del av Definition of Done. Bedöm uppdateringsbehov utifrån uppgiftens delta
-och risk; uppdatera minsta kanoniska underlag som framtida utvecklare behöver. Det kan vara
-status/backlog, arkitektur/ADR, modulkontrakt, testinstruktion, rapport, recovery eller runbook.
-Läs eller uppdatera inte hela dokumentträdet rutinmässigt. Duplicera inte samma status/evidens över
-STATUS, BACKLOG, roadmap, moduldokument, recovery och rapport om de inte har skilda ansvar; länka
-till den auktoritativa uppgiften. Betydande fakta får fortfarande inte lämnas enbart i chatten.
+Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och relevanta required checks.
+Avvikelse kräver STOP/re-review. Pusha kontrollerad merge och verifiera relevant main-CI för exakt
+SHA; återanvänd giltig lokal evidens. Deployment kräver separat uttrycklig auktorisering.
+Om bestående fakta kräver en separat reconciliation-commit ska relevant CI verifieras för dess SHA.
 
-Skapa ingen rutinmässig post-merge reconciliation-commit. Avstäm dokumentation endast när
-acceptansen skapar en bestående source-of-truth-faktauppgift som faktiskt kräver en dokumentändring.
+Verifiera `origin/main` före och efter push och att remote HEAD matchar publicerad lokal HEAD.
+Inga orelaterade ändringar får följa med. Dokumentationsändringar verifieras, committas separat
+när endast dokumentation ändrats och pushas; lämna dem inte lokalt för att kod saknas.
+Om kod inte får pushas uppdateras relevant dokumentation lokalt och samtliga väntande filer redovisas.
+Commit/tree hämtas ur Gitmetadata för publiceringscommiten, inte genom självrefererande SHA i texten.
+Checkpointevidensen ska kunna identifieras entydigt även efter senare reviewcommits.
 
-### Statusprincip
+## 9. Avbrott och blockerad implementation
 
-- Skilj uttryckligen mellan planerat, implementerat, automatiskt verifierat, deployat, manuellt verifierat, blockerat, känt begränsat och ersatt.
-- Beskriv aldrig något som färdigt utan faktisk evidens.
-- Daterad runtime- eller testinformation ska ha datum och scope; historisk evidens ersätter inte aktuell status.
+Vid avbrott: bevara giltigt working-tree-arbete; kasta eller gör inte om det. Sammanhängande
+ofullständigt arbete får publiceras som REVIEW CHECKPOINT, aldrig som obestyrkt Merge Candidate.
+Använd endast [codex-recovery](docs/operations/codex-recovery.md) för återhämtningsnoten, med
+`INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
+Noten ska när möjligt ange baseline/SHA, git status, filer, klart/återstående, tester/build,
+blockerare/antaganden och nästa exakta åtgärd. Inga hemligheter eller känsliga driftuppgifter.
 
-### Backlogprincip
+Nästa session läser AGENTS, synkar GitHub, inspekterar working tree och relevant recovery,
+bevarar orelaterat arbete och återanvänder giltiga resultat. Slutför ursprungligt scope före nytt
+arbete; vid konflikt mellan repo och not, stoppa och rapportera i stället för att gissa.
+En publicerad ofullständig checkpoint är inte automatiskt ett avbrott. Vid publicering avstäms
+berörd recovery mot faktiskt tillstånd; lämna ingen falsk aktiv avbrottsstatus eller acceptansuppgift.
 
-- Registrera nya verifierade buggar, begränsningar och uppskjutna funktioner när de inte löses i samma uppdrag.
-- Markera en post som klar först när dess Definition of Done är verifierad.
-- BB-ID:n ska vara unika. Ändra inte andra posters prioritet eller status utan evidens.
+Vid reproducerbar **befintlig** korrekthets-, säkerhets-, vetenskaps- eller lineage-defekt som
+kräver stopp får en avgränsad blocker-branch publiceras med endast säkra karakteriseringstester
+och sanerad evidens: **BLOCKER HANDOFF — NOT MERGEABLE**. Avsiktligt felande test är tillåtet
+endast med tydligt fel/resultat; det får aldrig kallas grön implementation. Ingen produktionsfix
+eller refaktor får följa med. Rapportera verifierad remote-SHA och stoppa för arkitektreview.
+Korrigering kräver separat uttryckligen auktoriserad checkpoint från verifierad main.
+Blocker-branchen får inte mergas; main förblir accepterad auktoritet. Inget deploymenttillstånd
+eller Git-undantag följer. Vanlig ofullständig implementation är inte automatiskt denna felkategori.
 
-### Rapportprincip
+## 10. Långvariga processer
 
-Bevara långsiktigt relevant kunskap i rätt befintlig kanonisk dokumentation. Skapa/uppdatera en
-sanerad rapport och rapportkatalog när separat checkpoint-evidens behövs för oberoende review;
-en liten workflow-/dokumentändring behöver inte en parallell rapport. Lokala fullrapporter får
-behållas som intern evidens, men relevant sanerad kunskap ska finnas i GitHub. Hemligheter, interna
-identiteter, privata adresser, råloggar och känsliga paths får inte publiceras.
+Ingen aktiv vänteloop: upprepa inte wait, polling eller statuskommandon utan ny information,
+avvikelse eller beslutspunkt. Återuppta för analys/beslut, inte bara för att se att arbete pågår.
+Kör långvariga deterministiska processer sessionsoberoende när säkert och auktoriserat.
+Verifiera livslängd, ägarskap, resursgränser och beständig resultatlagring innan processen lämnas;
+anta inte att en bakgrundsprocess överlever frånkoppling. Status, resultat och fel ska kunna läsas
+av nästa session utan omstart. Använd befintliga mekanismer, inte ny infrastruktur av processvana.
+En kritisk process får aldrig lämnas utan säker fel-/avbrottshantering. Om körning måste lämnas,
+ge sanerad recovery enligt avsnitt 9 med tillstånd, resultatplats, hinder och nästa beslutspunkt.
 
-### Commit- och pushprincip
+## 11. Kort sluthandoff
 
-- Repositoryts publicerade dokumentation och Git-historik är source of truth mellan agentsessioner; en ny agent ska kunna återskapa aktuell status utan terminalhistorik.
-- Dokumentationspublicering innebär aldrig deployment eller runtimeändring. Sådana åtgärder kräver separat uttrycklig auktorisering.
-- Kod, tester och tillhörande dokumentation publiceras tillsammans vid en sammanhängande reviewpunkt, även vid misslyckad acceptance eller blocker. Klassificera REVIEW CHECKPOINT eller, först efter genomförd riskmotiverad verifiering och uppfyllda acceptance criteria, MERGE CANDIDATE. Publication är aldrig acceptance.
-- Om endast dokumentation ändrats ska den verifieras, få en separat dokumentationscommit och pushas. Dokumentation får inte lämnas lokalt enbart för att ingen kod ändrades.
-- Om kod inte får pushas ska relevant dokumentation ändå uppdateras lokalt och samtliga väntande filer redovisas.
-- Inga orelaterade ändringar får följa med. Ingen force push. `origin/main` ska verifieras före och efter push.
-- Vid ren analys eller read-only-verifiering där ingen dokumentation behöver ändras ska slutsvaret ange att dokumenten granskats utan uppdateringsbehov.
+Ge en kort evidensbaserad handoff, normalt cirka tio rader med länkar till fördjupad evidens.
+Ange mål/status, branch, accepterad baseline, exakt verifierad remote-SHA/tree, ändrade filer och
+beteenden, kontroller med PASS/FAIL/PENDING/SKIP, återanvänd evidens, kvarstående risker/blockerare
+och nästa beslut. Ange dokumentationsändringar/skuld eller att dokumenten granskats utan behov
+av uppdatering. Vid beslut: ange exakt godkännande som behövs; begär inte redan givet godkännande.
 
-### Kompakt ägargodkännande vid stopp
+Publicerat GitHub-underlag ska räcka för att återskapa checkpointens mål, scope/non-goals,
+implementationstillstånd, verifiering, betydande experiment och fel, relevanta invariants och
+artefakt-/runtime-/modellproveniens. Anpassa omfattningen efter risk; inga obligatoriska långa
+rapportblock, särskild sista mening eller parallella rapporter. Betydande fakta måste ändå vara
+beständiga enligt avsnitt 6. Innan godkännande begärs ska granskningsunderlaget vara färdigt och
+nödvändig teknisk återhämtningsstatus finnas i den enda recovery-noten; duplicera inte publicerad
+evidens där. Misslyckade/ej körda kontroller får aldrig beskrivas som gröna.
 
-### Blocker handoff — not mergeable
+## 12. Befintliga frysningar och beslut
 
-Vid en reproducerbar befintlig korrekthets-, säkerhets-, vetenskaps- eller lineage-defekt
-som kräver stopp får Codex publicera en avgränsad blocker-branch med endast säkra
-karakteriseringstester och sanerad dokumentation/evidens. Status ska vara
-**BLOCKER HANDOFF — NOT MERGEABLE**. Avsiktligt felande karakterisering är tillåten
-om felet och testresultatet tydligt redovisas; det får aldrig kallas grön implementation.
-Ingen produktionskorrigering eller refaktor får följa med. Rapportera exakt verifierad
-remote-SHA och stoppa. ChatGPT/systemarkitekten granskar GitHub-underlaget; ägaren
-ska inte behöva klistra in terminalhistorik. En korrigering kräver ett separat uttryckligen
-auktoriserat checkpoint från verifierad main. Blocker-branchen får inte mergas till main.
-Main förblir accepterad source of truth; blocker-evidens ersätter den inte. Ingen force
-push och inget deployment-tillstånd följer av detta undantag. Orelaterat arbete bevaras.
-
-### Permanent checkpoint-branch workflow
-
-`main` är source of truth för owner/architect-accepterat, mergat arbete. Den aktiva
-bounded checkpoint-branchen är dessutom source of truth för publicerat pågående,
-ännu ej accepterat arbete. En branch per checkpoint från verifierad `origin/main`;
-fortsätt samma branch genom reviewvarv, skapa ingen parallell implementation.
-
-- **REVIEW CHECKPOINT:** commit/push av aktuellt sammanhängande checkpoint-tillstånd
-  för oberoende review. Får vara ofullständigt, blockerat eller ha misslyckade experiment.
-  Naturlig reviewpunkt, experimentfel, blocker, beslut eller STOP får inte lämna ägaren
-  beroende av terminalutskrift. Ägaren auktoriserar sådan commit/push inom befintlig scope.
-- **MERGE CANDIDATE:** en Review Checkpoint där all riskmotiverad checkpoint-verifiering
-  genomförts och acceptance criteria bedöms uppfyllda. Publication innebär fortfarande inte acceptance.
-- **ACCEPTED SHA:** exakt Merge Candidate SHA som ChatGPT granskat mot rätt main-baseline,
-  ägaren uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
-
-Review-loop: bounded arbete → scope-/secrets-kontroll → commit/push med kod, tester,
-rapport och handoff → rapportera branch, exakt remote SHA, tree, baseline, reviewstatus
-samt kort granskningsorsak → **STOP**. Ägaren behöver bara skriva **"Codex är klar"**;
-ChatGPT hämtar själv GitHub-underlaget. Misslyckade eller ej körda checks redovisas exakt,
-aldrig som gröna. Hemligheter, rå känslig data och orelaterat arbete får aldrig publiceras.
-
-Vid continue-beslut: fortsätt auktoriserat arbete på SAMMA branch, lägg nya commits ovanpå
-publicerad historik och publicera nästa exakta Review Checkpoint. Ingen amend, squash,
-rebase eller force push av reviewhistorik. Loopen pågår tills Merge Candidate, explicit
-avslut eller ersättande owner/architect-beslut. Granskning ändrar inte scope automatiskt.
-
-Före merge: verifiera exakt godkänd branch-SHA, oförändrad förväntad main och relevanta
-required checks. Avvikelse kräver STOP/re-review. Efter kontrollerad merge pushas main,
-relevant main-CI verifieras för exakt SHA. Återanvänd giltig lokal evidens enligt riskregeln ovan.
-Dokumentation/recovery ändras bara vid faktiskt bestående uppdateringsbehov; om en separat
-reconciliation-commit behövs verifieras dess relevanta CI för dess eget SHA. Ingen automatisk nästa checkpoint.
-
-GitHub-underlaget anpassas till uppgiftens risk och relevans, utan onödiga parallella dokument.
-Det ska självt räcka för att fastställa checkpoint-ID/mål, baseline, branch, review-SHA,
-tree, reviewstatus, aktuellt implementationstillstånd, ändrade filer, tester/resultat,
-experiment, konkreta fel/blockers, artefakt-/runtime-/modellprovenance, invariants,
-dokumentationsstatus, uttryckliga non-goals och nästa beslut/arbete. Checkpointens rapport
-bär specifik evidens/historik; `docs/operations/codex-recovery.md` stöder avbrott och
-opublicerad delta. Commit/tree-identiteter hämtas ur Git/GitHub-metadata för rapportens
-publiceringscommit (ingen omöjlig självrefererande SHA i dess eget innehåll); rapporten
-ska ge en entydig identifierare/resolution även efter senare reviewcommits.
-
-REVIEW CHECKPOINT ger inte merge approval, acceptance, deployment-, scope-, nästa
-checkpoint- eller tradingbehörighet. Säkerhets-, science-, risk-, provider- och
-kapitalgränser gäller oförändrat. Regeln om pre-existing blocker handoff ovan gäller
-fortsatt dess snäva felkategori; vanlig ofullständig implementation får publiceras som
-Review Checkpoint utan att felaktigt klassificeras som en befintlig defekt.
-
-När fortsatt arbete kräver ägarens godkännande ska det granskningsbara underlaget först
-vara färdigt och full teknisk återhämtningsstatus finnas i `docs/operations/codex-recovery.md`.
-Avsluta godkännandefrågan med följande kompakta block, endast dessa fält (utelämna
-Finance/safety-fältet när det inte är tillämpligt). Lägg det efter DOCUMENTATION STATUS
-men före den obligatoriska sista dokumentationsmeningen. Begär inte redan givet godkännande igen.
-
-```text
-OWNER APPROVAL BLOCK
-
-- Task/checkpoint:
-- Baseline SHA:
-- What changed:
-- Tests/result:
-- Important discovered behavior or risk:
-- Finance/safety invariants:
-- Publication state:
-- Exact approval requested:
-```
-
-Blocket är en kort beslutsöversikt, inte en andra recovery-not. Ägaren ska inte behöva
-kopiera terminaltranskript: publicerad GitHub-historik/dokumentation är fortsatt source
-of truth, och den enda recovery-noten beskriver fullständigt opublicerat arbete.
-Befintliga krav på uttryckligt Git-godkännande, sanering och verifiering gäller oförändrat.
-
-### Obligatoriskt slutblock
-
-Varje framtida uppdrag ska avslutas med:
-
-```text
-DOCUMENTATION STATUS
-
-- Documentation reviewed: yes/no
-- Documentation updated: yes/no
-- Status updated: yes/no/not applicable
-- Backlog updated: yes/no/not applicable
-- Architecture or ADR updated: yes/no/not applicable
-- Reports updated: yes/no/not applicable
-- Documentation committed: yes/no
-- Documentation pushed: yes/no
-- Published commit: <SHA eller ej tillämpligt>
-- Updated document locations:
-  - <path eller none>
-- Remaining documentation debt:
-  - none eller konkret lista
-```
-
-Den absolut sista meningen i varje framtida Codex-svar ska vara `Dokumenten är uppdaterade: <kommaseparerad lista med faktiska sökvägar>.` Om inga dokument behövde ändras ska den vara exakt `Dokumenten är granskade och inga uppdateringar behövdes.` Den sista meningen får inte utelämnas.
+[Frysningsregistret](docs/operations/freezes.md) är ingång till kanoniska ägarbeslut, inte en ny
+auktoritet. Kontrollera relevanta beslut innan arbete och följ deras omfattning och
+återupptagningsprotokoll. Historiska fortsättningsinstruktioner upphäver inte senare ägarbeslut.
+Upptining kräver nytt uttryckligt ägarbeslut och ny auktoriserad scope/DoD; det ger inte automatiskt
+merge-, deployment- eller exekveringsauktoritet. Befintlig drift lämnas orörd utan separat beslut.
+Rapportera konflikter i stället för att anta att ett projekt får fortsätta.

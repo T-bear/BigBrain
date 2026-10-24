@@ -1,80 +1,55 @@
-# Start here — BigBrain continuity
+# Start here — uppgiftsstyrd läsguide
 
-**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
-inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
-är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](operations/bb158-freeze-20261023.md).
+BigBrain är ett modulärt hemserversystem med React/TypeScript, ASP.NET API, externa adapters
+och separat Sentinel-gräns. Läs minsta kontext som uppgiften kräver; historiska rapporter är
+inte rutinmässigt obligatorisk läsning.
 
+## Alltid före arbete
 
-BigBrain is a modular home-server control plane, with first-party React/TypeScript
-views, an ASP.NET Core API, external-service adapters and a separate Sentinel
-boundary. The owner decides product priority and UX/behavior acceptance; ChatGPT
-reviews architecture independently; Codex implements and maintains evidence.
+Läs [AGENTS.md](../AGENTS.md), fetch/verifiera GitHub main, aktiv branch, exakt SHA och working tree.
+Bevara opublicerat och orelaterat arbete. Identifiera uppdragets scope, risk och verifierbara DoD,
+samt kontrollera [relevanta frysningar](operations/freezes.md). Om main har ändrats, bedöm relevant
+delta innan äldre underlag används. Saknas DoD: undersök vid behov och föreslå den, men invänta
+ägarens eller arkitektens godkännande inom auktoriserat scope före implementation.
 
-## Mandatory read order and authority
+## Välj kontext efter uppgift
 
-1. Read [AGENTS.md](../AGENTS.md) fully: working rules, safety, documentation and publication.
-2. Fetch GitHub, inspect `origin/main`, HEAD and the working tree, then read the
-   [canonical recovery note](operations/codex-recovery.md). GitHub main is the
-   source of truth for accepted work; the active checkpoint branch is source of truth
-   for published, ongoing unaccepted work. Preserve unpublished work;
-   compare it with the note before resuming. If an expected baseline moved, assess
-   the delta before using an old plan. Never reset another person's work.
-3. Read [ARCHITECTURE](../ARCHITECTURE.md) and applicable [ADRs](indexes/adr.md):
-   accepted requirements and reasons, with current, historical and proposed scope distinguished.
-4. Read [STATUS](STATUS.md) for current documented reality and dated verification,
-   then [BACKLOG](BACKLOG.md) for incomplete work and Definition of Done.
-5. Read [ROADMAP](../ROADMAP.md) for owner-owned long-term direction and links to
-   domain plans. It does not replace backlog priority or current runtime evidence.
-6. Read [report conventions](reports/README.md), [report catalog](reports/REPORT-CATALOG.md),
-   relevant reports, module contracts, runbooks, [TESTING](../TESTING.md), and affected
-   code/tests. Follow the [documentation index](indexes/documentation.md) for discovery.
-
-Authority is question-specific: accepted ADRs constrain permitted architecture;
-code establishes implemented behavior; dated evidence establishes what was actually
-tested or deployed. Code does not retroactively accept a proposal, and an ADR does
-not prove deployment. Apply the existing documentation-index hierarchy within the
-same scope. Report contradictions explicitly; stop for architectural conflicts.
-Owner UX approval requires explicit owner evidence and cannot be inferred from CI.
-Apply the overarching [KISS principle](../AGENTS.md#kiss--keep-it-simple-stupid)
-before implementation assignments and during architecture review.
-
-## Continuity contract for significant work
-
-Record these fields in the relevant sprint/report/status entry, linking rather than
-copying whole documents. This entry point must never become another STATUS or BACKLOG.
-
-| Field | Required meaning |
+| Uppgiftstyp | Minsta relevanta dokumentation |
 | --- | --- |
-| WHY | Concrete problem, intended outcome and reason to do it now |
-| BASELINE | Exact published source SHA and any preserved unpublished work |
-| SCOPE | Included work, exclusions and safety boundaries |
-| STATE | Planned, in progress, implemented, automatically verified, CI verified, deployed, runtime verified, owner verified, blocked, known limited or superseded — independently evidenced |
-| EVIDENCE | Exact commands/results, CI commit/run, dated runtime scope and explicit owner/manual evidence |
-| DECISIONS | Accepted decisions, owner/architect authority, rationale and applicable ADRs |
-| REMAINING | Exact unfinished work, limitations and missing verification/publication |
-| NEXT | Smallest safe next action and any real prerequisite |
+| Lokal dokumentation eller text | Berört kanoniskt dokument och dess länk-/publiceringskrav; ingen rutinmässig kod- eller historikläsning. |
+| Implementation eller felsökning | Berörd kod/tester, modulkontrakt, relevanta STATUS/BACKLOG-poster, tillämplig arkitektur/ADR och vid UI designsystemet. |
+| Arkitektur eller integrationsgräns | ARCHITECTURE, berörda accepterade ADR:er och modul-/API-kontrakt; relevanta beslut och beroenden. |
+| Finance | Kanoniskt frysningsbeslut först; endast vid auktoriserat scope berörda science-, lineage-, säkerhets-, rättighets- och testkontrakt. |
+| Review eller merge | Exakt checkpoint och main-baseline, diff, relevant rapport/evidens, status/backlog och tester/required checks enligt [reviewreglerna](../AGENTS.md#7-review-och-blockerare). |
+| Deployment eller runtime | Separat ägarauktorisering, accepterad revision, berörd runbook, verifierad runtimeidentitet, säkerhets-/backup-/återhämtningskrav. |
+| Recovery eller fortsättning | [Enda recovery-noten](operations/codex-recovery.md), Git/working tree, checkpointens evidens och exakt återstående scope. Konflikt med repo kräver stopp. |
+| Fryst eller återupptaget projekt | [Frysningsregistret](operations/freezes.md), kanoniskt beslut och återupptagningsprotokoll; nytt uttryckligt ägarbeslut och auktoriserad scope/DoD före teknisk fortsättning. |
 
-## NO UNDOCUMENTED SIGNIFICANT WORK
+Utöka läsning vid konkret risk, osäkerhet, beroende eller konflikt. Tabellen är en urvalsguide,
+inte ett nytt fullständigt läskrav. [Dokumentationsindexet](indexes/documentation.md) hjälper till
+att hitta källor; [TESTING](../TESTING.md) hjälper till att välja riskmotiverad verifiering.
 
-Significant work materially changes architecture, status, backlog, roadmap,
-deployment/runtime, security, operational recovery, or important technical findings
-and lessons. It must not exist only in chat or terminal history. Publish sanitized
-durable knowledge with the relevant code/tests; no credentials, private identities,
-private addresses or raw sensitive logs belong in reports.
+## Dokumentauktoritet
 
-Follow the [permanent Review Checkpoint workflow](../AGENTS.md#permanent-checkpoint-branch-workflow):
-publish coherent in-progress work, failed experiments and blockers as **REVIEW CHECKPOINT**,
-then stop for independent review. **MERGE CANDIDATE** additionally requires completed acceptance
-and full verification. Only an independently reviewed, explicitly owner-approved exact SHA may
-merge after pre-merge identity/check verification. Publication never implies acceptance or deployment.
-Continue on the same branch with additive commits; preserve prior review SHAs without force push.
+Behåll [indexets auktoritetsordning](indexes/documentation.md#authority-order): accepterad ADR →
+normativ arkitektur → kod och commitbunden baseline → modulkontrakt → godkänd runbook → aktuell
+STATUS → sanerad verifieringsrapport → diagnostik → föreslagen ADR → historiskt dokument.
 
-The checkpoint report carries durable evidence/history and an unambiguous GitHub commit/tree
-identity resolution. The owner need not transfer terminal output. Recovery remains the single
-location for interruption state and unpublished delta; preserve valid work and exact remaining
-steps. A published Review Checkpoint can be incomplete without being an interrupted local session.
-When publication completes, reconcile the active recovery entry against that review state; do not
-leave a false active interruption or claim the entire checkpoint is accepted.
+Auktoritet är frågespecifik: accepterade kontrakt begränsar tillåtna lösningar, kod visar
+implementerat beteende och daterad evidens visar vad som faktiskt verifierats eller driftsatts.
+Kod accepterar inte ett förslag retroaktivt; en ADR bevisar inte deployment. Ägarbeslut styr om
+arbete är auktoriserat och om UX accepterats. Rapportera konflikter uttryckligen. Publication av
+reviewarbete innebär inte acceptans; main och review har olika status.
 
-The [BB-130 plan](architecture/bb-130-stabilization.md) applies this contract to the
-current stabilization sprint; current progress belongs in STATUS and BACKLOG.
+## Kontinuitet och avslut
+
+Följ [AGENTS avsnitt 11](../AGENTS.md#11-kort-sluthandoff) för kort handoff och
+[avsnitt 6](../AGENTS.md#6-dokumentation--minsta-beständiga-sanning) för beständig dokumentation.
+För betydande arbete ska nödvändiga kontinuitetsfakta normalt rymmas i cirka tio rader med länkar
+till fördjupad evidens; ingen separat åttafältsmall krävs. Chatt ersätter inte kanonisk dokumentation.
+Recovery används för avbrott/opublicerad delta, inte som en parallell statusrapport.
+
+Uppfylld DoD avslutar uppdraget. Ingen automatisk fortsättning, ny sprint eller aktivering.
+Review och P0/P1 följer [AGENTS avsnitt 7](../AGENTS.md#7-review-och-blockerare);
+merge kräver exakt SHA-godkännande och deployment separat auktorisering enligt
+[avsnitt 8](../AGENTS.md#8-git-och-review-checkpoints).
