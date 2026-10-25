@@ -962,3 +962,59 @@ is per database; this must not be represented as an atomic multi-database househ
 Any non-SQLite files require explicit inventory and a safe consistency method before copying.
 That work was not attempted after the permission stop. Documentation validator and diff/scope
 checks pass; no application tests, backup mutation, deployment or production restore occurred.
+
+### Prepared operator backup script — 2026-10-25
+
+Owner-authorized preparation only; **production backup remains NOT RUN**, not PASS.
+Main remains `485aeda2ec5819ffc7f433b51ac867c55157c19f`. Owner's inventory identifies six
+SQLite databases across the five authorized mounts, including active lifecycle WAL/SHM.
+No production database or container was accessed by the new script during preparation.
+
+The bounded script is [backup-school-lunch-api.py](../../../../scripts/backup-school-lunch-api.py).
+Run once from the repository root, in the owner's local terminal:
+
+```sh
+sudo /usr/bin/python3 -I scripts/backup-school-lunch-api.py
+```
+
+It checks the expected healthy API image, resolves only the five selected named volumes through
+local Docker inspect, rejects overlapping sources/nested mounts/symlinks and inventories every
+entry. Only the six named databases and their WAL/SHM companions are accepted. Unexpected files,
+subdirectories, journals, missing files or changed source identities block completion. Finance,
+Sentinel and identity contents are excluded. Root access is provided solely by local sudo;
+no permission changes or privilege workaround is installed.
+
+Each source uses SQLite `mode=ro` plus query_only and the online backup API. No WAL checkpoint,
+migration or source SQL mutation. Backups are consistent per database, not an atomic snapshot
+across six databases. Source ownership, mode, inode and timestamps are recorded in the private
+manifest. Online-backup output is standalone SQLite; WAL/SHM are not separately copied.
+
+Every execution creates a unique timestamp/UUID directory under `/var/backups/bigbrain-school-lunch`,
+outside production volumes, root-owned 0700 directories and 0600 files. Existing sets are never
+reused or deleted. The initial fsynced manifest is INCOMPLETE. It becomes PASS only after six
+successful copies, integrity_check, foreign_key_check, readable schemas, SHA-256, isolated
+read-only reopen/checksum comparison, final inventory and unchanged container/mount identity.
+Limits: 256 MiB per source file/snapshot, conservative free-space gate, 120-second backup deadline
+and 180-second process alarm. A limit or runtime drift blocks rather than silently weakening checks.
+Catchable failures retain INCOMPLETE artifacts and print only a safe error category; abrupt process
+termination before final publication leaves the initial/incremental INCOMPLETE manifest. If failure
+prevents manifest publication itself, absence of a valid PASS manifest is always BLOCKED.
+
+Success prints `PASS: 6/6 databases`, the private backup/manifest locations and manifest SHA-256.
+No database rows, schema text, credentials or source host paths are printed. Manifest source paths
+and volume identities remain in the protected backup, never in Git. The same script's `--verify`
+mode accepts a retained set beneath that backup root and validates its six files/checksums/schemas
+without Docker or production-source reads. This permits later evidence verification without a
+second production backup; do not publish the raw private manifest. Operator execution and receipt
+verification remain pending. No production restore or deployment is implied by backup PASS.
+
+[Offline tests](../../../../tests/deployment/test_school_lunch_backup.py): 19/19 PASS using
+synthetic databases only. Covered active WAL with committed and uncommitted rows, read-only
+source enforcement, unchanged source main/WAL bytes, all six paths, restrictive permissions,
+foreign-key/corruption failures, unexpected/new/missing files, symlink and excluded-mount alias
+rejection, space/deadline gates, interruption including abrupt child exit, separate repeat sets,
+checksum tampering and backup-only reverification. Live SHM bookkeeping is not asserted byte-stable.
+Command: `python3 -B -W error::ResourceWarning tests/deployment/test_school_lunch_backup.py`.
+Documentation validator and diff/scope checks PASS. No application suite, external source call,
+production backup, restart, merge, deployment or school-flag change. STOP for operator execution
+and independent review; no additional policy approval for the already authorized backup is requested.
