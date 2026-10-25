@@ -786,3 +786,116 @@ is requested. Existing deployment intent does not waive these gates.
 Documentation-only validation: `node scripts/verify-documentation.mjs`, `git diff --check`,
 changed-file and sanitized-diff review; application tests and builds intentionally not run.
 No runtime or manual iPhone/PWA acceptance is claimed. Unrelated local work remains untouched.
+
+### Targeted import-job and storage assessment — 2026-10-25
+
+Scope: only the eight nonterminal acquisition jobs and API storage protection. Main and
+checkpoint baseline remain unchanged. No job reconciliation, backup creation/copy, database
+inspection, build, restart, deployment or Finance data access was performed. Existing CI and
+historical backup integrity evidence above are reused, not rerun.
+
+#### Eight jobs: stored state versus provider evidence
+
+Identifiers below are the first 12 hexadecimal characters of SHA-256 of the API job ID;
+titles, provider hashes and credentials are omitted. Timestamps are last persisted API updates
+(UTC), not evidence of a continuously running process.
+
+| Safe identifier | Stored state | Last persisted update | Current provider observation |
+| --- | --- | --- | --- |
+| a7b1309a759f | queued | 2026-10-23 20:47:51 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+| a72206b1f701 | downloading | 2026-10-21 19:56:15 | Matching Librarr download, downloading, 0 B/s at observation; progress not supplied. Active transfer not established; stalled/waiting remains possible. |
+| 4956647a6857 | queued | 2026-10-17 15:59:28 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+| 5e6a5499b357 | downloading | 2026-10-17 10:38:55 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+| 5797d3d8c829 | downloading | 2026-10-17 10:38:55 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+| f424fa68ab35 | downloading | 2026-10-17 10:38:55 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+| f1f876d62eb3 | indexing | 2026-10-17 10:38:55 | Absent from Librarr downloads; ABS indexing/completion UNKNOWN. |
+| 3fbbb9c24feb | downloading | 2026-10-17 10:38:55 | Absent from Librarr downloads; actual disposition UNKNOWN. |
+
+Read-only GETs: API acquisition collection (40 total, all covered), Librarr `/api/downloads`
+(one entry) and `/api/activity?limit=500&offset=0` (500 of 27,278 events). No matching event
+for these eight IDs occurs in that bounded activity window; absence does not prove completion
+or abandonment. No broad pagination was performed. Librarr image remains
+`sha256:2431e564d944b048450ab99c94722cdbd10ca95af5e2e24a120cb0ec1bf33b6a`.
+
+Handler review used the available local patched Librarr source and repository adapter/patch
+contracts: downloads reads the manager/client queues; activity executes SELECT/count. The
+manager suppresses individual torrent-client errors, so an empty/missing entry is not proof
+of a complete successful queue read. Local source inspection is not a new binary attestation.
+API collection reads stored rows only. Individual acquisition GET would reconcile and UPDATE,
+and was not used. No start/cancel/retry/inspection endpoint was called.
+
+Restart impact: code places torrent transfer and import watching in qBittorrent/Librarr, and
+indexing in ABS, not in the API acquisition collection. An isolated API/Web replacement does
+not stop those processes. API downtime interrupts UI/status requests and could interrupt an
+in-flight acquisition submission or status write; a persisted label alone proves neither such
+a request nor a restart hazard. These eight labels therefore do not independently justify
+requiring every external torrent to finish. No job was declared abandoned or completed. Missing
+information is a successful provider-level outcome for the seven absent IDs, ABS outcome for
+the indexing entry, and absence of in-flight API mutations at the deployment boundary. A local
+operator can inspect these exact jobs in existing provider interfaces without clearing them,
+and pause user submissions during the bounded replacement. Do not use the mutating API job GET
+as a read-only diagnostic. Unknown provider history need not be repaired merely to deploy
+SchoolLunch if independence and no in-flight API mutations are established.
+
+#### Storage: replacement preservation is not corruption recovery
+
+Docker inspect verified existing local named volumes and the private service-specific Compose
+files: API-only definition, ten mounts; Web-only definition, no mounts; both image references
+match current running images. No Compose invocation or configuration change occurred.
+
+| API destination | Ownership/content | Protection and remaining gap |
+| --- | --- | --- |
+| /data | Meal Planner SQLite and Media acquisition SQLite | Named volume survives container replacement if the exact mount is retained. Only the historical acquisition capture above is verified; no current Meal Planner backup established. |
+| /shopping-data | Shopping List SQLite | Named volume; no verified current backup/restore evidence located. |
+| /calendar-data | Calendar SQLite | Named volume; no verified current backup/restore evidence located. |
+| /settings-data | Settings SQLite | Named volume; no verified current backup/restore evidence located. |
+| /lifecycle-data | Recovery/lifecycle SQLite | Named volume; no verified current backup/restore evidence located. |
+| /run/bigbrain | Shared Sentinel runtime socket | Existing local volume, ephemeral runtime state; preserve mount, do not treat as a business-database backup. |
+| /run/bigbrain/identity | Read-only client identity bind | Preserve exact binding and access; credentials were not read or published. Recovery availability not established. |
+| /host-timesync | Read-only host clock-state bind | Preserve binding; not an application dataset. |
+| /finance-data and its read-only drop bind | Frozen Finance storage | Mount metadata only; no contents inspected, copied or verified. Preserve unchanged. This assessment gives no Finance backup or execution authorization. |
+
+Relevant non-Finance database paths were verified against runtime environment. Targeted lookup
+of existing deployment-artifact locations found the previously verified Media capture manifests,
+not a fresh all-volume backup set. This is a bounded search, not proof that no other operator
+backup exists. The backup runbook explicitly records no approved restore drill for household
+and lifecycle volumes. No new universal restore-drill requirement is introduced here: the
+owner's existing deployment condition requires usable backup/recovery evidence, which is still
+missing. Read-only checks of a supplied manifest and integrity report could satisfy evidence
+review without a production restore. New backup creation or an isolated restore exercise
+requires separate authorization under this read-only task.
+
+Git delta from running revision to accepted main contains SchoolLunch changes, with no changes
+to the existing Meal Planner store, Calendar, Settings, Shopping List, Media or shared hosting
+sources. No new database migration is introduced by this delta. This reduces schema/downgrade
+risk but does not prove that existing data is backed up. Exact retained named mounts protect
+against normal container replacement; they do not protect against corruption, wrong-mount
+selection or application writes. Web has no persistent mounts. Automatic data restore or image
+downgrade remains inappropriate in an uncertain state.
+
+#### Decision and minimum next steps
+
+**BLOCKED**, specifically on backup/recovery evidence required by the owner's deployment gate.
+P1 source: the explicit requirement to verify usable backups/recovery before deployment, plus
+AGENTS sections 5 and 10 (user-data preservation and safe interruption handling). Consequence:
+if replacement exposes corruption or incorrect storage, an old image alone cannot recover
+current household/import data. This is an evidence gap, not a detected corrupt database.
+
+1. Operator supplies the existing non-Finance backup manifest/location, capture consistency,
+   coverage/date and integrity/restore evidence for the persistent datasets above. If absent,
+   owner authorizes a narrowly scoped backup and isolated verification; no production restore.
+   Do not copy live WAL databases as standalone files or expand into frozen Finance operations.
+2. Establish no in-flight API mutations during a short owner-controlled pause. Inspect provider
+   outcome only where needed for restart safety; do not require cleanup of stale job labels,
+   alter queues or revive BB-158. Keep qBittorrent, Librarr and ABS running unchanged.
+3. At the separately authorized deployment boundary, use fresh accepted-revision API/Web inputs
+   and the existing bounded session-independent execution pattern, API before Web, with exact
+   mount/config preservation and phase-aware recovery. No old package may be rerun as-is.
+
+No application correction, migration or new backup platform is demonstrated necessary. A fresh
+operational plan and usable evidence are necessary; whether an isolated backup check must be
+prepared depends on the operator's existing backup artifacts. No additional broad preflight or
+provider repair is prescribed. STOP if coverage/integrity is unproven, a mutating request cannot
+be safely drained, mounts/config drift, or bounded recovery cannot be established. All school
+sources remain off. Documentation validator, diff/scope and sanitized-content checks are the
+only checks run for this report; no application test suite or operational mutation.
