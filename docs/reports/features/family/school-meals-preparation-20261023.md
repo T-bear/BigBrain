@@ -1109,3 +1109,32 @@ execution/recovery and no-in-flight-mutation gate before building/replacing API 
 These remaining steps have not been verified or performed in this stopped run. Earlier job
 labels do not require clearing or completion. No new source-integrity test, backup or broad
 preflight is prescribed. Document validator and diff/scope checks PASS; unrelated files preserved.
+
+### Manifest gate resolved; execution permission gate — 2026-10-25
+
+Owner supplied the local result: backup PASS, six databases, container/image identity True and
+volume mappings True, together with the already verified manifest SHA-256
+`6533c1c1bba7368a9a431e0231488ca699c225701fe57bdf0a0fbedf4ac949de`. This resolves the prior manifest
+identity gate as operator-verified evidence; no repeat backup or verification was requested.
+Fetch confirms main `485aeda2ec5819ffc7f433b51ac867c55157c19f`. Read-only runtime inspection confirms
+the same API/Web container IDs and old image IDs, running/healthy, zero restarts; API's five
+selected mounts remain writable named volumes, Web has no data mounts.
+
+**BLOCKED before build/replacement on execution permission.** `sudo -n -l /usr/bin/systemd-run`
+requires a password. A separate read-only Polkit check for `org.freedesktop.systemd1.manage-units`
+requires authentication too. No transient unit was created. Thus neither tested access path
+allows this agent to provision the existing system-manager-owned bounded worker/recovery
+required by the documented interruption-safety procedure. Owner's local permission does not
+transfer to this session. No Docker privilege workaround, login-bound fallback, sudoers change
+or repair of bigbrain.service is authorized or attempted.
+
+Remaining execution must be launched by the locally authenticated operator using a freshly
+prepared and verified API/Web-only procedure with immutable built inputs; another permission
+probe or new backup would not remove this boundary. No executable deployment command is yet
+validated because those candidate images and current-run inputs have not been prepared. The
+no-in-flight-mutating-request gate and concrete recovery execution also remain unverified;
+no claim of inactivity follows from old job labels or healthy containers. The present run stops
+at the actual permission gate as requested, rather than stopping services from an interactive
+shell. Existing deployment authorization is retained; no new policy approval is requested.
+No build, container change, production database operation, Finance/BB-158 action or school-source
+activation occurred. Documentation validator and diff/scope checks PASS; only this report changed.
