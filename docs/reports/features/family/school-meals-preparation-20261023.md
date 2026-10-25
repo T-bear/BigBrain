@@ -1138,3 +1138,117 @@ at the actual permission gate as requested, rather than stopping services from a
 shell. Existing deployment authorization is retained; no new policy approval is requested.
 No build, container change, production database operation, Finance/BB-158 action or school-source
 activation occurred. Documentation validator and diff/scope checks PASS; only this report changed.
+
+### Operator-controlled deployment preparation — 2026-10-25
+
+**REVIEW CHECKPOINT — PREPARED, NOT DEPLOYED.** Same `ops/school-lunch-v2-deployment` branch,
+accepted main `485aeda2ec5819ffc7f433b51ac867c55157c19f` unchanged. This task authorizes preparation,
+candidate builds and offline fault tests only. Independent review and separate deployment
+clearance are required before the command below. Backup PASS and manifest/container/volume
+identity evidence from the preceding owner verification are reused, not rerun.
+
+[Bounded runner](../../../../scripts/deploy-school-lunch-v2.py) and
+[offline fault tests](../../../../tests/deployment/test_school_lunch_deployment.py) reuse the
+existing Compose and system-manager oneshot/ExecStopPost pattern. They do not change the
+historically failed `bigbrain.service`, sudoers, Polkit, application code or any source flags.
+No old deployment package is executed or edited.
+
+**Built inputs:** both real Docker builds exited 0 while production remained running. The build
+context is `git archive` of accepted main; all 714 archived regular files were compared byte for
+byte with the retained build context. Existing successful main CI run `40123886908` is reused for
+unchanged application tests; no full application suite was repeated. Build processes were
+session-independent, bounded to 1,800 seconds per image plus 30 seconds kill grace, with private
+persisted process/log/exit evidence. The Web static artifact was read from a never-started,
+network-none temporary container without production mounts; only that test container was removed.
+
+| Role | Built candidate image ID |
+| --- | --- |
+| API | `sha256:b0bb52d525770660d059dd15f97a11d24eeafb667da14360637507b7e1c509aa` |
+| Web | `sha256:a77aa1c05a9dc63a402ca9639689a971d26dc3a9a804587ae1f930ffc434416f` |
+
+Both carry accepted revision labels. The private retained package is
+`data/school-lunch-v2-a1655c2ba44149dd9c507d82de615fe7` (ignored by Git, directory mode 0700).
+It contains old container configurations, exact original Compose hashes, pinned images,
+release Compose, build evidence and the runner. These private configuration files contain
+credentials and must never be printed or committed. Reviewed `package.json` SHA-256:
+`dec853d2a1b2e1d401a4b351cc194463cdb257c6bcccafac1e3b4c832d372333`.
+The manifest covers `runner.py`, `plan.json` and `release.compose.json`; changing any input blocks
+execution. Do not rebuild unchanged candidates or regenerate this plan after an attempted run.
+
+**Read-only preparation checks PASS:** original API/Web IDs/images/start times/configuration
+remain unchanged and healthy; the ten other running containers retain captured identities,
+images, configuration and start times. API's five selected data mounts and all six database
+file device/inode identities match the plan. No production SQL or backup operation was performed.
+Actual Compose rendering preserves the complete API/Web environment. Startup command, user,
+working directory, mounts, full HostConfig and network membership are bound to the old containers;
+only image and revision labels are intentionally changed. SchoolMeals environment overrides are
+absent; accepted code defaults all three flags to false. Effective v2 `offline` responses remain
+post-replacement checks, not a claim about the older currently running API. Available build-host
+space was 389 GiB. No supplier HTTP request was made.
+
+**Operator procedure, only after review and deployment clearance:** pause all user/API clients
+and automated writers for the maintenance window. The `--users-paused` assertion is required;
+three TCP observations reject connections to API port 8080, including keepalive/read connections.
+This is a conservative socket gate, not SQL transaction instrumentation: disconnected/background
+work cannot be proven absent by sockets alone. Earlier persisted Media job labels do not authorize
+writes and need not be cleared; the previously documented separation of external workers is reused.
+Do not proceed if another client/writer cannot be paused or its activity is uncertain.
+From the repository root, the exact proposed start command is:
+
+```sh
+/usr/bin/python3 -I data/school-lunch-v2-a1655c2ba44149dd9c507d82de615fe7/runner.py launch data/school-lunch-v2-a1655c2ba44149dd9c507d82de615fe7 dec853d2a1b2e1d401a4b351cc194463cdb257c6bcccafac1e3b4c832d372333 --users-paused
+```
+
+The launcher rechecks remote main, package/config/runtime identities, read-only household hash,
+URL-import safety state and quiescence, then requests local `sudo -v`. It verifies only the known
+backup manifest hash with privilege and submits one system-manager unit under the existing Docker
+operator UID/GID. No password is read by Python or persisted. The unit is
+`school-lunch-v2-a1655c2ba44149dd9c507d82de615fe7.service`, oneshot, start timeout 480 seconds,
+stop/recovery timeout 180 seconds, KillMode control-group, Restart=no, UMask=0077. No deployment at
+boot or automatic retry is installed. `QUEUED` is not completion; a failed/ambiguous submission
+retains its marker and requires unit inspection rather than reuse of the run ID.
+
+The worker rechecks inputs and quiescence before any stop, then uses graceful API stop and scoped
+Compose `up -d --no-deps --no-build --pull never api`, verifies it, and repeats for Web only.
+There is no build/pull inside the replacement window. Docker stop has no forced SIGKILL; the CLI
+wait is bounded to 90 seconds, Compose to 120 seconds and health polling to 100 seconds per role.
+The global systemd deadline can interrupt an overrunning operation. Killing the CLI does not cancel
+an outstanding Docker daemon operation. Phase records are fsynced **before** stop/replacement.
+An exclusive operation lock, run ID, systemd invocation and cgroup checks prevent stale reuse.
+
+**Recovery:** before possible replacement, ExecStopPost may restart only the exact old container
+with unchanged image/config/mounts and clean exit, after resolving any pending stop. Repeated
+completed recovery is harmless. Old recovery images remain the API/Web images recorded above
+in the runtime inventory. After `replacement-possible`, missing identity, unclean exit or unresolved
+Docker operation: record manual review/no restore. Never automatically downgrade, recreate,
+restore a database or delete data. Preserve every receipt; do not blindly rerun. A partial run
+may leave a service unavailable and requires operator inspection with the preserved old/new
+identities before any separately justified action. Availability after an unknown daemon/host
+failure is not guaranteed. The original private Compose files remain unchanged; after success,
+the retained release Compose is the effective API/Web configuration and must be preserved.
+
+**Results:** inspect the unit without starting/restarting it:
+
+```sh
+systemctl show school-lunch-v2-a1655c2ba44149dd9c507d82de615fe7.service -p ActiveState -p SubState -p Result -p ExecMainStatus
+```
+
+Read only `queued.json`, `state.json`, `failure.json`, `api-deployed.json`, `web-deployed.json`,
+`complete.json` and `recovery.json` in the package, not the private plan/config. Success requires
+`complete.json: COMPLETED`, exact candidate identities, `schoolSources: OFF`, both deployed
+receipts and `recovery.json: COMPLETE_NO_ACTION`, plus unit success. Completion checks `/health`,
+unchanged read-only household response, both disabled school endpoints directly and through Web,
+Web artifact hash, six database file identities, configuration and other-container invariance.
+This does not replace later iPhone/PWA acceptance and does not enable live school menus.
+
+**Verification:** 19/19 offline tests PASS via
+`python3 -B -W error::ResourceWarning tests/deployment/test_school_lunch_deployment.py`.
+Coverage includes strict service scope, reordered versus changed mounts, flag activation,
+IPv4/IPv6 activity, preflight blocking, ordered replacement/write-ahead markers, API failure
+preventing Web replacement, clean-old restart, pending-stop handling, idempotent recovery,
+ambiguous replacement/no restore, stale invocation, package tampering, main drift, bounded
+system-manager submission and failed-launch/no-retry receipts. All Docker/HTTP/systemd effects
+are mocked in these tests. No actual systemd launch, disconnect drill or production replacement
+was performed; offline tests do not claim those operational results. Package preflight passed
+against unchanged production metadata. Documentation validator, diff/scope and targeted secret
+checks PASS. No merge, production restart, database change or school activation occurred.
