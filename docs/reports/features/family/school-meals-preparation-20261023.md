@@ -854,3 +854,88 @@ Finance/BB-158 action occurred. Actual supplier response/cache compatibility, li
 v3 Family View rendering and physical iPhone acceptance remain NOT RUN. Do not report LIVE_READY.
 Only this existing report is updated; no application tests are repeated after the successful
 main CI. Documentation validator and diff/scope checks are recorded with the publication result.
+
+### Skollunch v3 — current-runtime backup and built deployment inputs, 2026-10-25
+
+**REVIEW CHECKPOINT — BLOCKED awaiting local backup execution; production remains v2/OFF.**
+Continues the preceding permission checkpoint on `ops/school-lunch-v3-deployment` with the same
+approved main `ff17bf46c7882ff3d046b07a037409ca59de3523`. Deployment and both-source activation
+remain expressly authorized; this is an administrative execution boundary, not a request for
+another policy decision. Unrelated untracked files and all older packages/backups are preserved.
+
+[Backup script](../../../../scripts/backup-school-lunch-api.py) and
+[offline tests](../../../../tests/deployment/test_school_lunch_backup.py) reuse the reviewed
+`2cc6bbe2611a9a67d4dad35b66a898ec2d9c00c8` operational implementation. The image pin is updated
+from pre-v2 to the actual v2 API image. A required SHA-256-bound private runtime plan now also
+pins the initial container ID, revision and the five selected volume mappings before any copying,
+and verifies them again afterward. The manifest records those selected identities. This avoids
+accepting a different volume/container merely because it remained stable during one backup.
+SQLite online backup, read-only source connections, WAL handling, six-file allowlist, exclusions,
+permissions, deadlines, integrity/FK/schema/hash checks and isolated reopen remain unchanged.
+A new unique output directory is created for each attempt; failures retain INCOMPLETE artifacts.
+Failures before output creation report BLOCKED without claiming any backup. No production backup
+has been executed by Codex. Earlier 06:13/06:21 sets are not current backup evidence.
+
+**Offline verification: 28/28 PASS** with
+`python3 -B -W error::ResourceWarning tests/deployment/test_school_lunch_backup.py`.
+Includes all 24 previous synthetic/WAL cases and four runtime-plan regressions: reordered mounts
+accepted, initial container/volume drift rejected, changed revision rejected and plan tampering
+rejected. Tests prohibit Docker calls and use synthetic databases only. The private runtime plan
+also matches a fresh Docker metadata inspection; this comparison reads no production DB contents.
+
+**Built inputs, not deployed:** a new private directory/run ID
+`data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d` retains build context, bounded independent
+build process/log/exit, image IDs, private before-container metadata, backup plan and prospective
+release/rollback Compose files. Directory mode 0700; private inputs 0600. No private configuration,
+credentials or source-volume paths are committed. All 714 source files match `git archive` of the
+approved revision byte for byte. Both real Docker builds exited 0, with per-image 1,800-second
+limits and persisted final status. Main CI already verified above is reused; no full app rerun.
+
+| Role | New v3 candidate image (not running) |
+| --- | --- |
+| API | `sha256:f9b08f2b58664d6d1fb8e2b5d037f3b0e0fe371ecad83f156b2ee8e9257202e7` |
+| Web | `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679` |
+
+Both image labels identify approved `ff17bf46c7882ff3d046b07a037409ca59de3523`. Current v2 images
+listed above remain available as recovery inputs. Prospective Compose rendering PASS: exactly API
+and Web, external existing volumes/networks, no build/dependency startup, complete effective
+environments preserved except the three authorized API flags set true. Only image/revision labels
+and those flags differ from the retained v2 recovery configuration. Entrypoint/user/command/workdir
+are compatible with the existing runtime. No Compose up/stop/start was invoked.
+
+An initial ad-hoc unchanged-container comparison rejected mount-list ordering; targeted comparison
+confirmed identical mount sets. A separate preparation assertion treated a null Compose entrypoint
+as an explicit override; inspecting actual values confirmed both images use the same entrypoint.
+Using the established order-independent mount comparison and null/default semantics resolves both
+check errors without runtime changes. Final verification: all twelve original containers retain
+IDs, images, configurations, mount sets and start times. No actual drift was observed.
+
+**Exact next operator step — backup only:** run this block locally from the server terminal.
+It checks the retained script checksum, requests sudo locally and executes the six-database online
+backup with the reviewed runtime-plan digest. It does not deploy, restart, activate or restore.
+
+```sh
+cd /home/enigma/BigBrain/apps/bigbrain && printf '%s\n' '88ccb8ec063d0bcaad6adabefc2e2e4250bd1f7bf28e7e7c3891143d0807b1da  data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d/backup.py' | sha256sum -c - && sudo /usr/bin/python3 -I data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d/backup.py --runtime-plan /home/enigma/BigBrain/apps/bigbrain/data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d/backup-runtime.json 04115e6031b2df6334690bbe15f44282a5f5fa17f053b4995931662154ca2625
+```
+
+Expected: checksum OK, `PASS: 6/6 databases; integrity, foreign keys, schema, SHA-256 and isolated
+readback PASS`, a new backup directory/manifest and manifest SHA-256. Return those summary lines;
+never paste database contents or the private manifest. On any checksum error, BLOCKED, INCOMPLETE,
+interruption or missing PASS: stop, preserve results and do not launch deployment. This command
+was syntax/input-hash checked; its privileged production execution is deliberately NOT RUN here.
+Backup consistency is per database, not an atomic six-database transaction; isolated reopen is
+not a production restore drill. Retained backups can later be reverified with the script's
+`--verify` mode without reading production databases.
+
+**Remaining deployment gate:** `preparation.json` explicitly says `INPUTS_PREPARED_NOT_LAUNCHABLE`.
+There is no queued deployment or executable v3 launch command. Bind the fresh verified backup
+manifest, adapt/test the existing systemd worker's expected v3 environment/live-source checks and
+phase-aware recovery to these inputs, then check paused clients/no-in-flight writes immediately
+before replacement. Old v2 runner assumptions (single-service original Compose, flags OFF and old
+backup identity) must not be reused unchanged. Verify recovery at the relevant phase; no blind
+image downgrade, database restore or rerun after ambiguous replacement. The prepared rollback
+Compose is configuration evidence, not authorization to execute it without those checks.
+A supplier error must remain visible and cannot become fabricated menu data or automatic retries
+outside the existing six-hour policy. Live HTTP/cache compatibility, v3 UI and owner iPhone/PWA
+acceptance remain NOT RUN. No supplier request, Finance/BB-158 operation or production mutation
+occurred. Documentation validator, diff/scope and targeted secret review PASS; no merge.
