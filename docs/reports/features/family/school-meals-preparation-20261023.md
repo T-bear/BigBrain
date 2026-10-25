@@ -939,3 +939,100 @@ A supplier error must remain visible and cannot become fabricated menu data or a
 outside the existing six-hour policy. Live HTTP/cache compatibility, v3 UI and owner iPhone/PWA
 acceptance remain NOT RUN. No supplier request, Finance/BB-158 operation or production mutation
 occurred. Documentation validator, diff/scope and targeted secret review PASS; no merge.
+
+### Skollunch v3 — sealed operator deployment, 2026-10-25
+
+**BLOCKED on local privileged execution; package PREPARED, production NOT DEPLOYED.** Owner
+reports new backup `20261025T182326Z-9479fced116f4ab58ba97219372faaa1`, six databases PASS for
+integrity, foreign keys, schema, SHA-256 and isolated readback; manifest SHA-256
+`09ccfdd17da297d307f8a76b0af69a2dfafaf16c77fcf56ce1eab167f8aec209`. This is operator evidence.
+Codex independently attempted to read the manifest and received PermissionError; noninteractive
+sudo for Python/systemd-run also requires authentication. Therefore privileged re-verification
+is NOT claimed complete. The launch command below performs it as a mandatory pre-stop gate.
+No repeat backup or production restore is needed or performed.
+
+The existing [bounded worker](../../../../scripts/deploy-school-lunch-v3.py) is adapted from
+v2's reviewed systemd/Compose mechanism, with a narrow
+[backup binding helper](../../../../scripts/verify-school-lunch-v3-backup.py) and
+[37 offline fault tests](../../../../tests/deployment/test_school_lunch_v3_deployment.py).
+It uses the already built v3 images above; no rebuild or application-code change. Main remains
+`ff17bf46c7882ff3d046b07a037409ca59de3523`; successful main CI is reused. Only approved images,
+revision labels and the three SchoolMeals flags change. All other API/Web environment, mounts,
+HostConfig, user, command and network membership remain bound to the current v2 configuration.
+Original private Compose files and old v2 images are preserved.
+
+**Sealed package:** `data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d`, SHA-256 of
+`package.json`: `866f13c28e2de9e295aa45bdbb955aa1096a9c8f695ed9e4d9068eeb1f5b264c`.
+Seven hashed inputs cover worker, plan, release/rollback Compose, existing backup verifier,
+initial runtime plan and privileged binding helper. `ready.json: PREPARED_AWAITING_OPERATOR`
+supersedes the earlier preparation-only record. No queued/state or deployment completion exists.
+Runtime preflight PASS: candidates/revision, original configurations, five volume mappings,
+six database file identities (stat only), read-only household response hash, URL-import safety
+states and other-service fingerprints. Three socket samples found no inbound API connections;
+this is not proof of absence of background transactions or future clients. The operator must
+pause users/integrations for the window. Healthy services or old job labels do not satisfy that
+assertion. All twelve production IDs/images/configurations/mount sets/start times remain unchanged.
+
+**Local start — existing deployment/activation approval applies.** pause all users/API writers,
+then run this command as the normal Docker operator, not a root shell. It requests sudo locally,
+never reads/logs a password, and rechecks backup and runtime before creating the unit.
+
+```sh
+cd /home/enigma/BigBrain/apps/bigbrain && /usr/bin/python3 -I data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d/runner.py launch data/school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d 866f13c28e2de9e295aa45bdbb955aa1096a9c8f695ed9e4d9068eeb1f5b264c --users-paused
+```
+
+The privileged helper verifies the exact manifest/hash/method, calls the existing retained-backup
+routine (all six integrity/FK/schema/hash/reopen checks), and compares its runtime to both current
+Docker and the pinned five-volume/container plan. It reads backup data, not production database
+rows. Only sanitized PASS/hash/runtime-match JSON returns to the launcher. Failure prevents unit
+submission. The launcher rechecks preflight and quiescence after authentication/backup; the worker
+requires the backup receipt and repeats runtime/activity gates immediately before stopping API.
+
+Unit `school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d.service` is system-manager-owned, runs under
+the operator UID/GID, has finite start/recovery deadlines (480/180 seconds), KillMode control-group,
+Restart=no, UMask 0077 and ExecStopPost. It uses the existing shared deployment lock and requires
+matching systemd invocation/cgroup. Write-ahead phase receipts precede every stop/replacement.
+API then Web are stopped gracefully (no forced SIGKILL), replaced with scoped
+`up -d --no-deps --no-build --pull never`, and checked for health, exact configuration, unchanged
+DB identities/household response, real school endpoint status and new Web artifact. No broad stack
+operation or database restore occurs. External requests use the accepted API adapter/cache only.
+Results distinguish published menus from unavailable/invalid/cachePolicy/notPublished responses;
+source failure is recorded rather than fabricated as successful menu delivery. `COMPLETED` with
+`schoolSources: ON` means component deployment, not automatically successful dishes or owner UX.
+
+**Results:** `backup-verified.json`, `queued.json`, `state.json`, `api-deployed.json`,
+`web-deployed.json`, `complete.json`, `failure.json`, `recovery.json` are retained. `QUEUED` alone
+is never success. Inspect the unit read-only:
+
+```sh
+systemctl show school-lunch-v3-dee40eebf77147579f90a0e1612c7e1d.service -p ActiveState -p SubState -p Result -p ExecMainStatus
+```
+
+On BLOCKED/error/ambiguous queue: stop and preserve results; do not rerun the launch or change
+package hashes. On successful deployment, inspect sourceResults for each school through API and
+Web and perform the owner's iPhone/PWA check. Actual live responses and effective stale/cache
+behavior remain NOT RUN until this procedure executes. Offline tests are not live evidence.
+
+**Recovery:** before possible replacement, automatic recovery restarts only the exact old container
+with unchanged image/configuration and clean exit, after resolving an outstanding stop. After
+possible replacement, unknown/unhealthy/data-drift conditions require manual review and no restore.
+A separate explicit `launch-rollback` action is prepared for known, healthy, fully identifiable
+v2/v3 configurations only. It rechecks retained backup integrity without falsely asserting the old
+container ID still exists, current DB file identities, household data hash, import/connection gates
+and other services. Its distinct `-rollback` unit/receipts then gracefully replaces API followed by
+Web with the pinned v2 images and original flags OFF, verifying old Web content and unchanged data.
+It is never invoked automatically or blindly after an ambiguous Docker operation. Do not use it
+when its preflight fails. Interrupted rollback before replacement may restart only its exact clean
+stopped target; after replacement uncertainty it records manual review. No branch of recovery
+writes/restores database files. Package/run IDs cannot be requeued after an attempted launch.
+
+**Verification:** `python3 -B -W error::ResourceWarning
+ tests/deployment/test_school_lunch_v3_deployment.py`: **37 PASS** (Docker/systemd/HTTP mocked).
+Includes original 19 deployment/recovery cases plus flags/config protection, fixture/offline
+rejection, source errors, backup tamper/runtime/integrity failure, backup receipt requirement,
+post-auth activity recheck, explicit rollback ordering/scoping, separate rollback unit/receipts and
+rollback interruption. Initial test adaptation overmatched a mocked sudo command; narrowed matching
+restored the failed-submission regression and all tests passed. Prior 28 backup tests remain valid
+because backup.py is unchanged. Real read-only package/Compose/runtime preflight PASS; no privileged
+helper or actual systemd execution is claimed. Documentation/diff/scope/targeted secret checks PASS.
+Only operational scripts/tests and this report changed; no merge, activation or production mutation.
