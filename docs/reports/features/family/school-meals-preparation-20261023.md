@@ -1052,3 +1052,60 @@ Documentation validator and diff/scope checks PASS. Changes limited to the backu
 offline tests and this existing report. Main remains `485aeda2ec5819ffc7f433b51ac867c55157c19f`.
 STOP for independent review before a new operator run. No production backup, Finance access,
 container action, deployment or merge; unrelated untracked files remain untouched.
+
+### Deployment authorization — protected manifest gate, 2026-10-25
+
+**BLOCKED before build or container replacement.** Owner reports successful creation and
+separate backup-only verification of set `20261025T062133Z-e7bf8fcc0d444b1baaf8e4e3a4cbbba5`,
+manifest SHA-256 `6533c1c1bba7368a9a431e0231488ca699c225701fe57bdf0a0fbedf4ac949de`.
+Reuse the reported six-database integrity/foreign-key/schema/checksum/readback PASS; this is
+operator evidence, not a newly agent-inspected manifest or a full production restore test.
+
+Fetch confirms main `485aeda2ec5819ffc7f433b51ac867c55157c19f`. API/Web container IDs, old images
+and revision match the previously recorded baseline; both running/healthy. Neither environment
+contains SchoolMeals overrides. No deployment or flag activation occurred. Direct manifest read
+returned PermissionError; noninteractive sudo for Python still requires local authentication.
+No Docker-based bypass was attempted. The missing comparison is the protected manifest's source
+volume/database mapping against current mounts, not a request to recreate the backup.
+
+The following local operator command performs only that comparison and prints a sanitized
+receipt. Run from the repository root. It reuses the owner's checksum-bound verification,
+reads no production database and performs no backup, restore, Docker mutation or permission
+change. This is not a deployment launcher. No new policy approval is requested.
+
+```sh
+sudo /usr/bin/python3 -I - <<'PY'
+import hashlib, importlib.util, json
+from pathlib import Path
+spec = importlib.util.spec_from_file_location('backup', Path('scripts/backup-school-lunch-api.py').resolve())
+b = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(b)
+p = b.BASE / '20261025T062133Z-e7bf8fcc0d444b1baaf8e4e3a4cbbba5' / 'manifest.json'
+b.no_symlinks(p)
+raw = p.read_bytes()
+sha = hashlib.sha256(raw).hexdigest()
+assert sha == '6533c1c1bba7368a9a431e0231488ca699c225701fe57bdf0a0fbedf4ac949de'
+m = json.loads(raw)
+assert m['status'] == 'PASS' and len(m['files']) == 6
+c = b.inspect()
+assert m['runtime']['containerId'] == c['Id'] and m['runtime']['image'] == c['Image']
+roots = b.sources(c)
+expected = {target + '/' + name for target, names in b.EXPECTED.items() for name in names}
+assert {f['source'] for f in m['files']} == expected
+for f in m['files']:
+    target, name = f['source'].rsplit('/', 1)
+    root, volume = roots[target]
+    assert f['hostSource'] == str(root / name) and f['volume'] == volume
+    assert all(f['checks'][k] == 'PASS' for k in ('integrity', 'foreignKeys', 'schema'))
+    assert f['isolatedReadback'] == 'PASS'
+print(json.dumps({'status': 'PASS', 'check': 'manifest-and-current-mount-identity',
+                  'manifestSha256': sha, 'databases': 6, 'productionDatabaseReads': False}))
+PY
+```
+
+Command syntax checked offline; not executed with privilege by Codex. Existing script source
+validation is reused. The next step is review of this receipt, then the still-required bounded
+execution/recovery and no-in-flight-mutation gate before building/replacing API followed by Web.
+These remaining steps have not been verified or performed in this stopped run. Earlier job
+labels do not require clearing or completion. No new source-integrity test, backup or broad
+preflight is prescribed. Document validator and diff/scope checks PASS; unrelated files preserved.
