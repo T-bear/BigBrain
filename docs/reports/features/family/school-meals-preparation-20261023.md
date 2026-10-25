@@ -899,3 +899,66 @@ provider repair is prescribed. STOP if coverage/integrity is unproven, a mutatin
 be safely drained, mounts/config drift, or bounded recovery cannot be established. All school
 sources remain off. Documentation validator, diff/scope and sanitized-content checks are the
 only checks run for this report; no application test suite or operational mutation.
+
+### Authorized backup attempt — access gate, 2026-10-25
+
+**BLOCKED before copying; backup set NOT CREATED.** Owner authorized a bounded consistent
+backup and isolated verification, but required STOP on insufficient permissions. Main remains
+`485aeda2ec5819ffc7f433b51ac867c55157c19f`; API remains healthy on the previously recorded image.
+All five requested destinations are existing writable named-volume mounts. The agent cannot
+read or traverse any host source: enumeration returned PermissionError for /data, /shopping-data,
+/calendar-data, /settings-data and /lifecycle-data. `sudo -n -l /usr/bin/python3` requires a local
+password. Approximately 388 GiB is free at the proposed workspace destination; source sizes
+and exact file inventory could not be established. No Docker privilege workaround was used.
+
+No backup directory, snapshot, copy, manifest, checksum validation or isolated restore was
+created/performed. There is no current backup identifier or approved backup location to report;
+the earlier historical Media backup does not satisfy this task. Existing containers, databases,
+permissions, configuration and flags remain unchanged. Finance contents were not accessed.
+
+Minimum operator action: run the following bounded read-only inventory in the owner's local
+terminal with normal sudo authentication. This does not create a backup, change permissions,
+grant Codex sudo access or authorize deployment. It reports only expected database presence,
+size and entry counts, not rows, credentials or private host paths. Unexpected entries or
+symlinks require review before selecting their backup method. Do not send passwords or raw
+private data. Existing backup authorization remains valid; no repeated owner policy decision
+is needed merely to perform the authorized backup once access and consistency are established.
+
+```sh
+sudo /usr/bin/python3 - <<'PY'
+import json, os, stat, subprocess
+c = json.loads(subprocess.check_output([
+    'docker', 'inspect', 'bigbrain-sprint1-api-1']))[0]
+assert c['Image'] == 'sha256:8b92e5ea802f215427456e670875df07760e2eff5694bd4ef24d6ad6ed32aa5c'
+assert c['State']['Running'] and c['State']['Health']['Status'] == 'healthy'
+expected = {
+    '/data': ['meal-planner.db', 'audiobook-acquisition.db'],
+    '/shopping-data': ['shopping-list.db'],
+    '/calendar-data': ['calendar.db'],
+    '/settings-data': ['settings.db'],
+    '/lifecycle-data': ['lifecycle.db'],
+}
+for target, names in expected.items():
+    matches = [m for m in c['Mounts'] if m['Destination'] == target]
+    assert len(matches) == 1 and matches[0]['Type'] == 'volume'
+    root = matches[0]['Source']
+    with os.scandir(root) as entries:
+        entries = list(entries)
+    print(target, 'entries', len(entries), 'symlinks', sum(e.is_symlink() for e in entries))
+    for name in names:
+        path = os.path.join(root, name)
+        try:
+            s = os.lstat(path)
+            print(name, 'regular', stat.S_ISREG(s.st_mode), 'bytes', s.st_size)
+        except FileNotFoundError:
+            print(name, 'MISSING')
+PY
+```
+
+After that inventory, the selected SQLite method must use read-only source connections and
+SQLite online backup into restricted files outside production volumes, with separate schema,
+integrity and checksum verification of the copies. No live main-file-only copying. Consistency
+is per database; this must not be represented as an atomic multi-database household snapshot.
+Any non-SQLite files require explicit inventory and a safe consistency method before copying.
+That work was not attempted after the permission stop. Documentation validator and diff/scope
+checks pass; no application tests, backup mutation, deployment or production restore occurred.
