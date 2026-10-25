@@ -665,6 +665,8 @@ Gitleaks **PASS**, no leaks. Unrelated untracked work and accepted Finance/BB-15
 
 ## Skollunch v3 — actual-dish presentation and offline verification, 2026-10-25
 
+Status at the implementation checkpoint; the later [merge preparation](#skollunch-v3--merge-preparation-and-owner-reported-permission-2026-10-25) records updated owner evidence.
+
 **REVIEW CHECKPOINT — PARTIAL; LIVE SOURCE ACCESS REMAINS BLOCKED.** Branch
 `family/school-lunch-v3`, accepted baseline `485aeda2ec5819ffc7f433b51ac867c55157c19f`.
 The owner reports v2 deployed; this implementation task neither inspects production nor independently
@@ -749,3 +751,47 @@ Musikugglan's actual publication year cannot be proved by its current HTML forma
 No real-source end-to-end success, current dishes, physical iPhone acceptance, new runtime health,
 merge or deployment is claimed. No new database, cache policy, scheduler, dependency or migration.
 Finance, BB-158, household planning, Shopping List and production configuration remain untouched.
+
+
+### Skollunch v3 — merge preparation and owner-reported permission, 2026-10-25
+
+**MERGE CANDIDATE — DEFAULT-OFF CODE; AWAITING EXACT-SHA APPROVAL.** The owner now reports that
+both Skolmat.info and Tant Grön permit automated fetching approximately every six hours and
+transient caching for up to 24 hours. This is **owner-reported provider permission**, not terms,
+correspondence or permission independently inspected by Codex. No supplier was contacted and no
+external menu or robots resource was requested. The historical access observations above remain
+historical; this update does not claim that robots.txt changed or independently resolve its wording.
+The previously missing owner confirmation of frequency/cache permission is now recorded for both
+sources. It is not production activation authorization or evidence of a successful live fetch.
+
+Merge preparation verified main `485aeda2ec5819ffc7f433b51ac867c55157c19f` and the reviewed input
+checkpoint `1899c55d1ec448c91ce6a6f4eb77c0e6f5c0dc37`, tree
+`e73c676b3554286d6b8a943bf5c436f7e7cd4019`. Input ancestry was one commit ahead, zero behind.
+Only this existing report changes in the preparation commit; all five code/test file blobs remain
+identical to that tested checkpoint. The cumulative candidate still changes exactly these six files:
+
+- `docs/reports/features/family/school-meals-preparation-20261023.md`
+- `src/BigBrain.Api/MealPlanner/MusikugglanSchoolMeals.cs`
+- `src/BigBrain.Web/src/meal-planner/SchoolLunch.tsx`
+- `src/BigBrain.Web/src/meal-planner/SchoolLunch.test.tsx`
+- `tests/BigBrain.Api.Tests/SchoolMealLiveTests.cs`
+- `tests/BigBrain.Api.Tests/SchoolMealsTests.cs`
+
+Reused unchanged-code evidence: **71 backend tests PASS, 22 frontend tests PASS, frontend build
+PASS**, plus targeted formatting. No application test rerun is warranted by this documentation-only
+delta. Documentation validator, diff/scope, report-anchor and targeted secret checks **PASS**.
+GitHub returned zero Actions runs and zero commit statuses for the input candidate. The configured
+workflow runs on PRs and pushes to main, not ordinary branch pushes: candidate CI is **SKIP / NOT
+RUN**, not PASS or a running PENDING job. Baseline main run
+[40123886908](https://github.com/T-bear/BigBrain/actions/runs/40123886908) is completed/success for
+exact main SHA above; it does not test v3. GitHub's main-branch response reports protection disabled
+and no required status contexts. Applicable checks must be verified again at the actual merge;
+this report does not waive any subsequently applied rules.
+
+No known P0/P1 blocks merging the bounded, offline-tested, default-off code. The new documentation
+commit changes the candidate SHA: obtain explicit owner approval of its published remote HEAD,
+not the previous input SHA. Final commit/tree identities resolve from this preparation commit's Git
+metadata. No merge has occurred. All source flags remain false by default; deployment, restart,
+source activation, actual HTTP/cache compatibility and physical iPhone/PWA acceptance are separate.
+Musikugglan still provides no source year; explicitly derived dates are not source-verified dates.
+Finance/BB-158 remain frozen; unrelated untracked work is preserved.
