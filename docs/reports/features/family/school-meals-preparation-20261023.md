@@ -721,3 +721,68 @@ inputs; no executable production launch command can honestly be supplied at this
 STOP before build or mutation. Backup usability, current import/database activity and concrete
 new-run recovery remain UNVERIFIED, not failed or waived. No school-provider requests, flag
 changes, container changes, application tests or Finance/BB-158 actions occurred.
+
+### Read-only deployment gate completion — 2026-10-25
+
+**BLOCKED before mutation.** Main remains `485aeda2ec5819ffc7f433b51ac867c55157c19f`;
+reuse its previously verified CI run 40123886908 (Backend, Frontend, Documentation and Secrets
+success). No build, deployment, restart, restore, source request or configuration change occurred.
+The following observations replace no historical evidence and authorize no operational action.
+
+| Requirement | Result and evidence |
+| --- | --- |
+| Runtime identity and health | PASS: all 12 production containers running; API/Web healthy, revision `712679fda646aced2a417adf696e59d4a7c0f57b`, exact image IDs recorded above unchanged. Other stopped/created local test containers were not treated as production services or modified. |
+| Historical Media backup integrity | PASS for the existing 2026-10-20 17:17 UTC capture only: SHA-256 `88eb418c8905ebb2ea3309f2f05f91ad23b914aefcac09e78e259a87318aa5d3` matches capture and verification manifests. Archive contains one 53,248-byte acquisition SQLite database. Deserialized entirely into an in-memory SQLite connection: integrity_check = ok, foreign_key_check = zero violations. No extraction, production database access or restore. |
+| Fresh, sufficient backup and restore coverage | BLOCKED: that historical capture does not prove current data coverage or restore readiness. API also mounts persistent shopping, calendar, settings and lifecycle storage; their host sources are not readable by the current user. Existing backup runbook explicitly records no approved restore drill for these modules. No fresh complete manifest/restore evidence was established. Finance storage was not inspected or copied. |
+| Import activity | BLOCKED / actual activity UNKNOWN: read-only acquisition list reports total 40, including queued 2, downloading 5, indexing 1, failed 31 and completed 1. These are persisted labels, not proof of live transfer or restart safety. URL-import list is empty (endpoint limit 200). Media jobs reports degraded, Sonarr and Radarr unavailable, qBittorrent and Jellyfin online, one qBittorrent downloading display entry. No conclusion of idle operation is supported. |
+| Other database operations | UNKNOWN: successful list reads do not prove absence of concurrent writers, maintenance or unsafe in-flight operations. No active-database integrity claim is made. |
+| School sources | Existing verified configuration evidence reused: no SchoolMeals overrides; accepted defaults Enabled, RosenfeldtEnabled and MusikugglanEnabled are false. No settings changed or school source contacted. Effective v2 disabled response remains a post-deployment check because current images predate v2. |
+| Execution and bounded recovery | BLOCKED: owner reports local systemd-run permission check exit 0; this is not evidence of agent privilege or a validated new-run recovery procedure. Old images remain the known recovery candidates, not authorization for downgrade. No new accepted-revision candidate or current-input execution plan was built/validated in this read-only task. |
+
+The acquisition collection endpoint delegates to a database SELECT-only list. Individual job
+GET instead reconciles provider status and updates the stored job; it was deliberately not
+called. No start, inspect, cancel, preview or confirmation endpoint was called. Provider
+unavailability was observed at BigBrain's boundary; its cause was not investigated or asserted.
+A persisted nonterminal job may be stale: clearing/reclassifying it or treating it as harmless
+would exceed this verification. The existing Media backup covers neither these jobs' latest
+state nor all API volumes.
+
+#### Scoped procedure and remaining operator prerequisites
+
+Existing local operational precedent uses pinned service-specific Compose definitions and
+systemd-managed bounded execution with durable state and recovery. Inspection only: no old
+package, launch command or run ID was executed or modified. In particular the old optional-DOI
+package captures only Media storage and contains a POST verification; it is not a verified
+SchoolLunch deployment procedure and must not be reused as-is.
+
+The appropriate future sequence remains: verify current identities and idle/safe activity;
+verify sufficient current backups and recovery coverage; build immutable API/Web candidates
+from the accepted revision while production stays running; validate a fresh, unique-run,
+session-independent API/Web-only execution plan; replace API only, verify health, revision,
+unchanged mounts/settings and disabled school responses; then replace Web only and verify it.
+Use existing Compose service scoping (`--no-deps --no-build --pull never`) with verified pinned
+inputs, never a whole-stack start. Preserve all three school flags as false and all unrelated
+configuration. This describes required scope, not an executable launch command.
+
+No involvement of `bigbrain.service` is required by service-scoped Compose replacement. Its
+historical failed state does not justify restarting or repairing the appliance unit. No active
+matching deployment systemd service appeared in the inspected unit list; this is not proof
+against every possible unmanaged process.
+
+Recovery must be phase-aware: safe restart of the exact unchanged old container only when
+verified state permits it; after possible replacement, preserve state and stop for inspection
+rather than automatically downgrade an image or restore data. Do not reuse old run IDs or
+alter their results. API's shared process makes unverified in-flight activity relevant even
+though source changes are limited to SchoolLunch; no Finance action is authorized.
+
+No production operator launch command is supplied because backup coverage, activity safety
+and current-input bounded recovery are not verified. Minimum next action after independent
+review: provide current scoped backup/restore evidence and establish provider-backed status
+of the eight nonterminal acquisition jobs plus unavailable queue information, using an
+explicitly read-only method. Then validate fresh deployment inputs and recovery before a new
+operational clearance. Owner authentication occurs locally only; no password or sudoers change
+is requested. Existing deployment intent does not waive these gates.
+
+Documentation-only validation: `node scripts/verify-documentation.mjs`, `git diff --check`,
+changed-file and sanitized-diff review; application tests and builds intentionally not run.
+No runtime or manual iPhone/PWA acceptance is claimed. Unrelated local work remains untouched.
