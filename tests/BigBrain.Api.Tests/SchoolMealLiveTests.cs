@@ -47,6 +47,65 @@ public sealed class SchoolMealLiveTests
         Assert.Equal(0, handler.Calls);
     }
 
+    [Theory]
+    [InlineData(false, false, false)]
+    [InlineData(false, true, true)]
+    [InlineData(true, false, false)]
+    [InlineData(true, true, false)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, true)]
+    public async Task BothSchoolsRespectGlobalAndIndividualFlags(bool enabled, bool rss, bool html)
+    {
+        var handler = new Handler();
+        using var service = Service(handler, new Clock(), new()
+        {
+            SchoolMeals = new() { Enabled = enabled, RosenfeldtEnabled = rss, MusikugglanEnabled = html }
+        });
+        foreach (var school in new[] { SchoolMeals.Rosenfeldt, SchoolMeals.Musikugglan })
+        {
+            var permitted = enabled && (school == SchoolMeals.Rosenfeldt ? rss : html);
+            var before = handler.Calls;
+            var result = await service.GetAsync(school, 2026, 43, TestContext.Current.CancellationToken);
+            Assert.Equal(permitted ? 1 : 0, handler.Calls - before);
+            if (!permitted)
+            {
+                Assert.Equal("offline", result.Status);
+                Assert.All(result.Days, day => Assert.Empty(day.Dishes));
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SourceModifiedAndFetchTimesStayDistinctOnCacheHitAndFailure()
+    {
+        var clock = new Clock();
+        var modified = clock.Now.AddDays(-1);
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+            {
+                var response = Rss();
+                response.Content.Headers.LastModified = modified;
+                return Task.FromResult(response);
+            }
+        };
+        using var service = Service(handler, clock);
+        var first = await Get(service);
+        Assert.Equal(modified, first.SourceUpdatedAtUtc);
+        Assert.Equal(clock.Now, first.FetchedAtUtc);
+        clock.Now = clock.Now.AddHours(1);
+        var cached = await Get(service);
+        Assert.Equal(first, cached);
+        Assert.Equal(1, handler.Calls);
+        clock.Now = clock.Now.AddHours(5);
+        handler.Reply = (_, _) => throw new HttpRequestException();
+        var stale = await Get(service);
+        Assert.True(stale.IsStale);
+        Assert.Equal(modified, stale.SourceUpdatedAtUtc);
+        Assert.Equal(first.FetchedAtUtc, stale.FetchedAtUtc);
+        Assert.Equal(clock.Now, stale.LastCheckedAtUtc);
+    }
+
     [Fact]
     public async Task ConcurrentRequestsShareOneFetchAndSixHourInterval()
     {

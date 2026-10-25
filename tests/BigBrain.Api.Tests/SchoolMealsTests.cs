@@ -136,6 +136,7 @@ public sealed class SchoolMealsTests
     [Theory]
     [InlineData("</table>", "</table><p>Unexpected content</p>")]
     [InlineData("Matsedel v. 44", "Ny rubrik")]
+    [InlineData("Matsedel v. 44", "Matsedel v. ٤٤")]
     [InlineData("Mellanmål v. 44", "Mellanmål v. 43")]
     [InlineData("</table>", "")]
     [InlineData("<td>Tisdag</td>", "<td>Måndag</td>")]
