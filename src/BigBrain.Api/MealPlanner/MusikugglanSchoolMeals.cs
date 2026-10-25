@@ -33,13 +33,13 @@ public static class MusikugglanSchoolMeals
             const string blank = @"(?:\s|&nbsp;|&#160;|&#x[aA]0;)*";
             html = Regex.Replace(html, @"<strong\b[^>]*>" + blank + "</strong>", "", Options, MatchTimeout);
             html = Regex.Replace(html, @"<p\b[^>]*>" + blank + "</p>", "", Options, MatchTimeout);
-            var headings = Regex.Matches(html, HeadingStart + @"Matsedel\s+v\.\s*(?<week>\d{1,2})" + HeadingEnd, Options, MatchTimeout);
+            var headings = Regex.Matches(html, HeadingStart + @"Matsedel\s+v\.\s*(?<week>[0-9]{1,2})" + HeadingEnd, Options, MatchTimeout);
             if (headings.Count != 1) return Result("invalid");
             var heading = headings[0];
             var sourceWeek = int.Parse(heading.Groups["week"].Value, CultureInfo.InvariantCulture);
             if (sourceWeek is < 1 or > 53) return Result("invalid");
             var remainder = html[(heading.Index + heading.Length)..];
-            var snack = Regex.Match(remainder, HeadingStart + @"Mellanmål\s+v\.\s*(?<week>\d{1,2})" + HeadingEnd, Options, MatchTimeout);
+            var snack = Regex.Match(remainder, HeadingStart + @"Mellanmål\s+v\.\s*(?<week>[0-9]{1,2})" + HeadingEnd, Options, MatchTimeout);
             if (!snack.Success || int.Parse(snack.Groups["week"].Value, CultureInfo.InvariantCulture) != sourceWeek) return Result("invalid");
             var fragment = remainder[..snack.Index].Trim();
             if (!Regex.IsMatch(fragment, @"\A<table\b[^>]*>.*</table>\z", Options, MatchTimeout)) return Result("invalid");

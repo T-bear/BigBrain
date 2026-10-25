@@ -662,3 +662,90 @@ implementation checkpoint remain separate identities.
 Publication scope: 19 files, limited to school-meal API/Web/tests and six existing canonical documents.
 Documentation validator **PASS** (274 Markdown / 91 backlog IDs), staged whitespace **PASS**, staged
 Gitleaks **PASS**, no leaks. Unrelated untracked work and accepted Finance/BB-158 content are preserved.
+
+## Skollunch v3 — actual-dish presentation and offline verification, 2026-10-25
+
+**REVIEW CHECKPOINT — PARTIAL; LIVE SOURCE ACCESS REMAINS BLOCKED.** Branch
+`family/school-lunch-v3`, accepted baseline `485aeda2ec5819ffc7f433b51ac867c55157c19f`.
+The owner reports v2 deployed; this implementation task neither inspects production nor independently
+verifies that deployment. Previous operational checkpoints are preserved on their separate branch;
+none of their backup/deployment scripts is included here. Publication is not merge or activation.
+
+### Bounded implementation and evidence
+
+The existing v2 read-only route, DTOs, fixed-source HTTP client, cache, per-source flags and Family
+component already support real dish text. No second school-meal module or new access mechanism is
+needed. All three flags remain false by default; no configuration, data store or registration changes.
+
+- `MusikugglanSchoolMeals.cs`: restrict both lunch/snack week captures to ASCII digits, matching the
+  verified source format. The previous regex `\d` accepted characters that invariant `int.Parse`
+  cannot parse, so malformed upstream headings could throw instead of returning `invalid`.
+  A regression using a modified offline heading failed before the correction (1 failed / 8 passed),
+  then passed. The original five lunches, whitespace/entities, literal slash-separated wording,
+  lunch/snack boundary and explicit `htmlWeekRequestedYear` provenance remain unchanged.
+- `SchoolLunch.tsx`: show each lunch's calendar date beside its weekday, without converting a
+  date-only value into the phone's local date. Show the existing `sourceUpdatedAtUtc` separately
+  from fetch/check times when supplied. This represents the source's HTTP Last-Modified claim,
+  not independently verified publication time. No timestamp is invented when it is absent.
+  Existing per-school results, stale warning, source links, missing-day text and development-only
+  historical preview remain. Theme/layout contracts and other Family sections are unchanged.
+- `SchoolMealsTests.cs`, `SchoolMealLiveTests.cs`, `SchoolLunch.test.tsx`: add malformed week,
+  both-school/global/individual flag coverage, source-versus-fetch timestamp preservation through
+  cache/error, calendar/ISO-year boundary rendering, missing days, duplicate dish order and literal
+  rendering of hostile markup. Synthetic boundary/security inputs are tests, not new real menus.
+
+Existing owner-derived offline fixtures are used: Rosenfeldtskolan's five RSS days for 2026-W43,
+Musikugglan's five HTML lunches for week44 with no source year. They are already embedded in the
+parsers and retain their historical labels. No original file was newly downloaded, no new real-menu
+text invented and no fixture is exposed as current production content. RSS GUID dates/ISO year,
+entities, multiple and identical alternatives, missing days, XML/DTD rejection, HTML structure
+changes and unknown HTML year are exercised by the focused existing tests. Both schools can render
+independently; the two historical source weeks are never relabelled as the same current week.
+
+### Access evidence and exact remaining confirmations
+
+No external school-resource, robots, API or terms request was made in this task. Reuse the dated
+[source-access findings](#åtkomstvillkor--blockerare-före-liveaktivering); those observations are not
+claimed to be freshly verified terms. Technical reachability and a manual download are not permission
+for repeated automated access. Only the supplied offline examples are used for this verification.
+
+| Source | Remaining confirmation before any external activation |
+| --- | --- |
+| Rosenfeldtskolan / Skolmat.info | Official published terms or provider/municipality confirmation that the exact facility RSS endpoint may be fetched automatically for a private self-hosted family display, including how this is compatible with the previously observed `Disallow: /`. Confirm permitted frequency and memory-cache/stale-display terms. `ttl=5`, an RSS link or third-party code alone does not establish this. |
+| Musikugglan / Tant Grön | Official terms or source-owner confirmation permitting automated reads of `/matsedel/` and family display, frequency and memory-cache/stale-display terms. The previously recorded `/admin` robots restriction does not itself establish permission. Source HTML supplies week only; owner acceptance of explicitly derived year/date is still required, or the source must provide year evidence. |
+
+The proposed request is one on-demand fetch per enabled source at most every six hours in a stable
+API process, including errors (normally at most four attempts per source/day). There is no scheduler.
+Restart loses memory/cooldown and may cause another attempt, so this is not a persistent daily quota.
+Confirm whether retaining a valid menu for up to 24 hours and showing it explicitly stale after a
+failed refresh is allowed. Stricter HTTP cache policy still blocks display rather than increasing
+request frequency. Neither provider's ongoing-use permission has been established by this task.
+
+Minimum next action: obtain that source-specific written/public evidence, then independent review
+and explicit owner authorization for the appropriate source flags and any required API restart.
+Approval for one school does not enable the other. No activation, supplier contact or further
+investigation is started automatically. Until then this is **not a completed live-menu delivery**.
+After authorized activation, verify real headers/content/current week and iPhone/PWA presentation;
+Musikugglan's actual publication year cannot be proved by its current HTML format alone.
+
+### Verification and limits
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlannerApiTests' -v quiet`: **71 PASS**,
+  zero failed/skipped. Includes RSS/HTML, timeout for headers/body, six-hour cache/concurrency,
+  stale expiry, conditional requests, wrong week, Stockholm/ISO year rollover, invalid responses,
+  disabled-source zero-call assertions and unchanged household meals across school API reads.
+  External transport is stubbed; test stores are isolated. No Finance/BB-158 tests run.
+- From `src/BigBrain.Web`: `npm test -- --run src/meal-planner/SchoolLunch.test.tsx
+  src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`: **22 PASS**. School requests are
+  mocked; hostile text stays text rather than executable DOM. Existing Meal Planner and offline
+  UX Lab regressions pass. No changes to household writes or Shopping List code/API occur.
+- `npm run build`: **PASS** (TypeScript/Vite); advisory CSS-plugin timing message only.
+- Targeted Prettier and C# whitespace verification, `node scripts/verify-documentation.mjs`,
+  `git diff --check` and changed-file scope/link checks: **PASS**. Targeted diff review and
+  secret-pattern checks: **PASS**; no standalone Gitleaks binary is installed, so no local
+  Gitleaks run is claimed.
+
+No real-source end-to-end success, current dishes, physical iPhone acceptance, new runtime health,
+merge or deployment is claimed. No new database, cache policy, scheduler, dependency or migration.
+Finance, BB-158, household planning, Shopping List and production configuration remain untouched.

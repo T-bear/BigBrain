@@ -16,6 +16,9 @@ const statusText: Record<string, string> = {
   cachePolicy: 'Källans cachevillkor behöver granskas innan menyn kan visas.',
 }
 const checkedTime = (value: string) => new Date(value).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' })
+// API dates are calendar dates, not instants in the device's time zone.
+const lunchDate = (value: string) =>
+  new Date(`${value}T00:00:00Z`).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', timeZone: 'UTC' })
 
 export function SchoolLunch({
   allowFixture = import.meta.env.DEV,
@@ -99,7 +102,15 @@ export function SchoolLunch({
                   {menu.status === 'published' &&
                     weekdays.map((day, index) => (
                       <div className="school-lunch-day" key={day}>
-                        <h4>{day}</h4>
+                        <h4>
+                          {day}
+                          {menu.days[index] && (
+                            <>
+                              {' · '}
+                              <time dateTime={menu.days[index].date}>{lunchDate(menu.days[index].date)}</time>
+                            </>
+                          )}
+                        </h4>
                         {menu.days[index]?.status === 'published' ? (
                           <ul>
                             {menu.days[index].dishes.map((dish, order) => (
@@ -121,6 +132,9 @@ export function SchoolLunch({
                   {menu.lastCheckedAtUtc && <p>Senast kontrollerat: {checkedTime(menu.lastCheckedAtUtc)}.</p>}
                   {menu.fetchedAtUtc && (
                     <p>Menyn hämtad: {checkedTime(menu.fetchedAtUtc)}. Hämtningstid är inte källans publiceringstid.</p>
+                  )}
+                  {menu.sourceUpdatedAtUtc && (
+                    <p>Källans angivna ändringstid: {checkedTime(menu.sourceUpdatedAtUtc)}.</p>
                   )}
                 </>
               )}

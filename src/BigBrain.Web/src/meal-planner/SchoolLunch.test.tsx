@@ -141,4 +141,45 @@ describe('SchoolLunch', () => {
     })
     await waitFor(() => expect(screen.queryByText('SEN TESTDATA')).not.toBeInTheDocument())
   })
+  it('shows calendar dates across ISO year boundaries and renders source text without executing markup', async () => {
+    const unsafeText = '<img src=x onerror="alert(1)"><script>alert(1)</script>'
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+      schoolId: id,
+      schoolName: id === 'rosenfeldt' ? 'Rosenfeldtskolan' : 'Musikugglan',
+      sourceName: id === 'rosenfeldt' ? 'Skolmat.info' : 'Tant Grön',
+      sourceUrl: id === 'rosenfeldt' ? 'https://www.skolmat.info' : 'https://www.tantgron.nu/matsedel/',
+      year: 2026,
+      week: 53,
+      status: id === 'rosenfeldt' ? 'published' : 'offline',
+      dateBasis: id === 'rosenfeldt' ? 'sourceGuid' : 'unknown',
+      fetchedAtUtc: id === 'rosenfeldt' ? '2026-12-28T08:00:00Z' : null,
+      sourceUpdatedAtUtc: id === 'rosenfeldt' ? '2026-12-27T12:00:00Z' : null,
+      isFixture: false,
+      days: [
+        { date: '2026-12-28', status: 'published', dishes: [unsafeText, 'Pasta med spenat och ostsås'] },
+        { date: '2026-12-29', status: 'missing', dishes: [] },
+        { date: '2026-12-30', status: 'missing', dishes: [] },
+        { date: '2026-12-31', status: 'missing', dishes: [] },
+        { date: '2027-01-01', status: 'published', dishes: ['Kockens val', 'Kockens val'] },
+      ],
+    }))
+    const { container } = render(<SchoolLunch allowFixture={false} />)
+    expect(await screen.findByText(unsafeText)).toBeInTheDocument()
+    expect(container.querySelector('img, script')).toBeNull()
+    expect(screen.getByRole('heading', { name: 'Måndag · 28 december' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fredag · 1 januari' })).toBeInTheDocument()
+    expect(container.querySelector('time[datetime="2027-01-01"]')).toHaveTextContent('1 januari')
+    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan · vecka 53, 2026' })).toBeInTheDocument()
+    expect(screen.getByText(/^Källans angivna ändringstid:/)).toHaveTextContent('2026-12-27')
+    expect(screen.getByText(/^Menyn hämtad:/)).toHaveTextContent('2026-12-28')
+    expect(screen.getAllByText('Meny saknas för dagen. Det betyder inte att skolan är stängd.')).toHaveLength(3)
+    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual([
+      unsafeText,
+      'Pasta med spenat och ostsås',
+      'Kockens val',
+      'Kockens val',
+    ])
+    expect(screen.getByText('Extern hämtning är avstängd.')).toBeInTheDocument()
+    expect(screen.queryByText(/TESTDATA/)).not.toBeInTheDocument()
+  })
 })
