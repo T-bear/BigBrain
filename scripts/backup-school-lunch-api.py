@@ -76,6 +76,22 @@ def sources(c):
     return selected
 
 
+def runtime_identity(c):
+    require(c['Image'] == IMAGE and c['State']['Running']
+            and c['State'].get('Health', {}).get('Status') == 'healthy', 'RuntimeDrift')
+    sources(c)  # Retain source, symlink, overlap and nested-mount protections.
+    # Docker's mount-list order and metadata on unrelated mounts are not identity.
+    selected = {
+        m['Destination']: {key: m[key] for key in ('Type', 'Name', 'Source', 'Driver', 'RW')}
+        for m in c['Mounts'] if m['Destination'] in EXPECTED
+    }
+    return {'containerId': c['Id'], 'image': c['Image'], 'volumes': selected}
+
+
+def verify_runtime(before, after):
+    require(runtime_identity(before) == runtime_identity(after), 'RuntimeChanged')
+
+
 def inventory(roots):
     result = {}
     total = 0
@@ -245,7 +261,7 @@ def main():
     roots = sources(before)
     def final_check():
         after = inspect()
-        require(after['Id'] == before['Id'] and after['Mounts'] == before['Mounts'], 'RuntimeChanged')
+        verify_runtime(before, after)
     folder = run_backup(roots, BASE, {'containerId': before['Id'], 'image': before['Image']}, final_check)
     signal.alarm(0)
     print('PASS: 6/6 databases; integrity, foreign keys, schema, SHA-256 and isolated readback PASS')

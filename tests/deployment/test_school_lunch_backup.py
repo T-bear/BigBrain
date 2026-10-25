@@ -1,5 +1,6 @@
 """Offline regression tests; no Docker, network or production database access."""
 from contextlib import closing
+import copy
 import importlib.util
 import json
 import os
@@ -206,6 +207,77 @@ class BackupTests(unittest.TestCase):
         self.base.symlink_to(self.roots['/data'][0], target_is_directory=True)
         with self.assertRaisesRegex(b.Blocked, 'SymlinkRejected'):
             self.run_backup()
+
+    def runtime(self):
+        return {
+            'Id': 'synthetic-api', 'Image': b.IMAGE,
+            'State': {'Running': True, 'Health': {'Status': 'healthy'}},
+            'Mounts': [
+                {'Destination': target, 'Source': str(root), 'Name': volume, 'Type': 'volume',
+                 'Driver': 'local', 'RW': True, 'Mode': 'rw', 'Propagation': ''}
+                for target, (root, volume) in self.roots.items()
+            ] + [{'Destination': '/unrelated', 'Source': str(self.root / 'unrelated'),
+                  'Type': 'bind', 'Mode': 'ro', 'RW': False}],
+        }
+
+    def test_mount_order_and_irrelevant_metadata_do_not_block(self):
+        before = self.runtime()
+        after = copy.deepcopy(before)
+        after['Mounts'].reverse()
+        after['Mounts'][0]['Source'] = str(self.root / 'other-unrelated')
+        after['Mounts'][1]['Mode'] = 'rw,z'
+        after['State']['Health']['Log'] = [{'Output': 'synthetic'}]
+        self.assertNotEqual(before['Mounts'], after['Mounts'])  # Old check rejects this.
+        b.verify_runtime(before, after)
+
+    def test_required_runtime_fields_block(self):
+        before = self.runtime()
+        for field, value in [('Id', 'replacement'), ('Image', 'different-image')]:
+            after = copy.deepcopy(before)
+            after[field] = value
+            with self.subTest(field=field), self.assertRaises(b.Blocked):
+                b.verify_runtime(before, after)
+        for state in [{'Running': False, 'Health': {'Status': 'healthy'}},
+                      {'Running': True, 'Health': {'Status': 'unhealthy'}},
+                      {'Running': True}]:
+            after = copy.deepcopy(before)
+            after['State'] = state
+            with self.subTest(state=state), self.assertRaises(b.Blocked):
+                b.verify_runtime(before, after)
+
+    def test_selected_volume_identity_changes_block(self):
+        before = self.runtime()
+        replacement = self.root / 'replacement-source'
+        replacement.mkdir()
+        for index in range(5):
+            for field, value in [('Name', 'different-volume'), ('Source', str(replacement)),
+                                 ('Destination', '/different-target'), ('Type', 'bind'),
+                                 ('Driver', 'different-driver'), ('RW', False)]:
+                after = copy.deepcopy(before)
+                after['Mounts'][index][field] = value
+                with self.subTest(index=index, field=field), self.assertRaises(b.Blocked):
+                    b.verify_runtime(before, after)
+
+    def test_missing_duplicate_or_nested_selected_mount_blocks(self):
+        before = self.runtime()
+        for kind in ('missing', 'duplicate', 'nested'):
+            after = copy.deepcopy(before)
+            if kind == 'missing':
+                after['Mounts'].pop(0)
+            elif kind == 'duplicate':
+                after['Mounts'].append(copy.deepcopy(after['Mounts'][0]))
+            else:
+                after['Mounts'].append({'Destination': '/data/nested', 'Source': str(self.root / 'nested'), 'Type': 'bind'})
+            with self.subTest(kind=kind), self.assertRaises(b.Blocked):
+                b.verify_runtime(before, after)
+
+    def test_real_final_runtime_failure_keeps_set_incomplete(self):
+        before = self.runtime()
+        after = copy.deepcopy(before)
+        after['Mounts'][0]['Name'] = 'replacement'
+        with self.assertRaisesRegex(b.Blocked, 'RuntimeChanged'):
+            self.run_backup(lambda: b.verify_runtime(before, after))
+        self.incomplete()
 
 
 if __name__ == '__main__':

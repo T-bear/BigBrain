@@ -1018,3 +1018,37 @@ Command: `python3 -B -W error::ResourceWarning tests/deployment/test_school_lunc
 Documentation validator and diff/scope checks PASS. No application suite, external source call,
 production backup, restart, merge, deployment or school-flag change. STOP for operator execution
 and independent review; no additional policy approval for the already authorized backup is requested.
+
+### RuntimeChanged correction — 2026-10-25
+
+Owner reports that the first operator backup ended INCOMPLETE / RuntimeChanged. Subsequent
+inspections found the expected healthy API image, zero restarts and identical container/mount
+lists two seconds apart. Those observations are post-failure, not the before/after snapshots
+used by the failed execution. The incomplete set was neither read, changed nor deleted here.
+
+Confirmed code cause of the error category: the final check required both container ID equality
+and exact equality of the entire Docker Mounts list. Image/running/health failures would instead
+raise RuntimeDrift. Thus RuntimeChanged means ID or full mount-list inequality at that final
+comparison, assuming the published script was executed. List-order changes or metadata changes
+outside the five backup volumes are reproducible false positives. The actual differing field
+in the owner's run remains UNKNOWN: the script did not persist both inspection snapshots.
+Post-failure equality does not establish equality during the backup. Ordering is a plausible
+explanation, not a confirmed incident root cause.
+
+Minimal correction: replace full-list equality with destination-keyed identity for the five
+selected mounts, comparing Type, Name, Source, Driver and RW plus container ID and expected image.
+Running/healthy status remains mandatory. Existing symlink, duplicate/missing mount, nested mount
+and overlapping-source protections are rechecked; ignoring an unrelated mount's metadata does
+not allow it to overlap a backup source. No database-copy, checksum, manifest-status or restore
+logic changed. The previous INCOMPLETE set is not retroactively approved.
+
+Offline regression command:
+`python3 -B -W error::ResourceWarning tests/deployment/test_school_lunch_backup.py` — **24/24 PASS**.
+Five added tests cover irrelevant order/metadata, container/image/health changes, identity/type/
+source/driver/access-mode changes for each selected volume, missing/duplicate/nested mounts and
+retention of INCOMPLETE on a real final runtime mismatch. Existing 19 backup/WAL/error tests
+remain PASS. No Docker calls or production-source reads were made by these tests.
+Documentation validator and diff/scope checks PASS. Changes limited to the backup script, its
+offline tests and this existing report. Main remains `485aeda2ec5819ffc7f433b51ac867c55157c19f`.
+STOP for independent review before a new operator run. No production backup, Finance access,
+container action, deployment or merge; unrelated untracked files remain untouched.
