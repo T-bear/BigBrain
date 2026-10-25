@@ -795,3 +795,62 @@ metadata. No merge has occurred. All source flags remain false by default; deplo
 source activation, actual HTTP/cache compatibility and physical iPhone/PWA acceptance are separate.
 Musikugglan still provides no source year; explicitly derived dates are not source-verified dates.
 Finance/BB-158 remain frozen; unrelated untracked work is preserved.
+
+### Skollunch v3 — authorized deployment stopped before mutation, 2026-10-25
+
+**BLOCKED — v3 NOT DEPLOYED; both sources OFF.** Owner explicitly authorized deployment and
+activation of both schools for main `ff17bf46c7882ff3d046b07a037409ca59de3523`. Fetch verified that
+exact remote main. [Main CI run 40199482649](https://github.com/T-bear/BigBrain/actions/runs/40199482649)
+finished with Backend, Frontend, Documentation and Secrets all completed/success for that SHA.
+Provider permission remains owner-reported as described above; no additional policy approval is
+being requested and no supplier HTTP request was made in this run.
+
+Read-only Docker inspection and retained v2 receipts now independently confirm v2 production
+revision `485aeda2ec5819ffc7f433b51ac867c55157c19f`, rather than merely the earlier owner report:
+
+| Component | Actual running image | Health |
+| --- | --- | --- |
+| API | `sha256:b0bb52d525770660d059dd15f97a11d24eeafb667da14360637507b7e1c509aa` | running / healthy, zero restarts |
+| Web | `sha256:a77aa1c05a9dc63a402ca9639689a971d26dc3a9a804587ae1f930ffc434416f` | running / healthy, zero restarts |
+
+The existing v2 package has `complete.json: COMPLETED` at that revision, `schoolSources: OFF`,
+matching API/Web image receipts and `recovery.json: COMPLETE_NO_ACTION`. All twelve containers
+are running; containers without configured health checks are not asserted healthy. API retains
+five selected writable named data volumes; Web has no data mounts. No configuration was printed
+or altered. Direct API and Web-proxied school endpoints each returned HTTP 200 with `offline`
+for both schools, ISO 2026-W43. Both `/health` endpoints returned HTTP 200. The three
+`MealPlanner__SchoolMeals__Enabled`, `MealPlanner__SchoolMeals__RosenfeldtEnabled` and
+`MealPlanner__SchoolMeals__MusikugglanEnabled` environment overrides are absent; accepted code
+defaults them to false and the actual offline responses corroborate disabled fetching.
+
+**Concrete execution blockers:** noninteractive `sudo -n -l /usr/bin/python3` and
+`sudo -n -l /usr/bin/systemd-run` both require a password in this agent session. Directory reads
+for all five selected Docker-volume host sources fail with PermissionError. Thus a current
+six-database online backup cannot be created through the authorized host method, and the existing
+system-manager deployment/recovery mechanism cannot be submitted here. Local operator sudo
+success does not grant this session access. No Docker privilege workaround was attempted.
+Available filesystem capacity was approximately 389 GiB; capacity is not the blocker.
+
+The [existing operational checkpoint](https://github.com/T-bear/BigBrain/tree/2cc6bbe2611a9a67d4dad35b66a898ec2d9c00c8)
+contains the previously tested backup and API/Web-only deployment procedures. Its backup script
+pins the pre-v2 API image `sha256:8b92e5ea802f215427456e670875df07760e2eff5694bd4ef24d6ad6ed32aa5c`;
+executing it unchanged against current v2 would correctly stop with RuntimeDrift. The completed
+v2 deployment package likewise binds old identities and an already-used run ID: do not edit or
+rerun it. The older operator-verified backup remains historical evidence, not a newly verified
+snapshot of current data or current container identity. No existing backup was altered.
+
+**Minimum continuation:** prepare current-runtime-pinned inputs using those same bounded
+procedures, locally authenticate the operator for the six-database online backup, and verify
+its new manifest. Build exact approved v3 images while production runs; bind a fresh API/Web-only
+systemd run to current configuration/mounts, the three explicitly authorized flag changes and
+phase-aware recovery. Recheck the maintenance/no-in-flight-write gate before replacement.
+The earlier client-pause condition cannot be inferred from healthy containers or old Media job
+labels. No executable v3 launch command is claimed ready here: old commands fail their identity
+checks and must not be suggested as a working shortcut. Existing owner deployment/activation
+authorization remains valid within scope; administrative execution is the missing prerequisite.
+
+No build, new backup, container stop/replacement, activation, rollback, database operation or
+Finance/BB-158 action occurred. Actual supplier response/cache compatibility, live dishes,
+v3 Family View rendering and physical iPhone acceptance remain NOT RUN. Do not report LIVE_READY.
+Only this existing report is updated; no application tests are repeated after the successful
+main CI. Documentation validator and diff/scope checks are recorded with the publication result.
