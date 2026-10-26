@@ -864,3 +864,106 @@ Final documentation validator and `git diff --check`: **PASS**. Targeted .NET fo
 this is not a full secrets audit (standalone gitleaks is unavailable locally). No UI code changes;
 frontend build/tests **SKIP**, application-wide tests **SKIP**. No live cache-policy fix is claimed:
 the bounded diagnostics/status correction is ready for independent review only.
+
+### Skollunch reliability — runtime diagnosis and cache expiry, 2026-10-26
+
+**REVIEW CHECKPOINT — partial improvement, live cachePolicy cause still bounded/unknown.**
+Branch `fix/school-lunch-cache-expiry`, accepted main baseline
+`b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; publication SHA/tree resolve from this section's
+commit metadata. No merge, deployment, provider request, production cache clearing or flag change.
+Finance/BB-158 and the blocked API-only deployment contract remain untouched.
+
+#### Implemented versus actually running
+
+Main contains v3 via `ff17bf46c7882ff3d046b07a037409ca59de3523` and the diagnostic/status-ordering
+merge `4647cd8119edb5b7cd0872639fd79ba26a38b0d3`. Current read-only Docker inspection on
+2026-10-26 verified both containers running/healthy with container **and image** revision labels
+`ff17bf46c7882ff3d046b07a037409ca59de3523`:
+
+| Component | Observed immutable image ID | Observed start UTC |
+| --- | --- | --- |
+| API | `sha256:f9b08f2b58664d6d1fb8e2b5d037f3b0e0fe371ecad83f156b2ee8e9257202e7` | 2026-10-25T18:54:49Z |
+| Web | `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679` | 2026-10-25T18:55:02Z |
+
+The API container environment has `MealPlanner__SchoolMeals__Enabled`, `RosenfeldtEnabled` and
+`MusikugglanEnabled` all `true`. This verifies configured environment values, not a new effective
+configuration endpoint response. No SchoolMeals GET was made: it may initiate a source request.
+The bounded read of the last 30,000 API log lines within 48 hours succeeded and found **zero**
+`SchoolMealSourceResponse` formatted events. It is not proof of no past traffic. The observed
+runtime revision predates that event's implementation, so missing header diagnostics are expected.
+No raw logs, private environment values, credentials, container identifiers or source bodies
+are published. No other service was inspected or changed for this task.
+
+#### Evidence-based fault separation
+
+| Condition | Evidence and remaining uncertainty |
+| --- | --- |
+| Disabled source flags | All three container environment flags are true; default-off code remains unchanged. Earlier owner-observed `cachePolicy` also differs from the `offline` result of disabled sources. |
+| HTTP error versus cache rejection | Deployed v3 checks cache headers before HTTP status. Thus a 429/other error with restrictive cache headers can misleadingly become `cachePolicy`. Main already corrects this; actual production status/headers remain unavailable. |
+| Intentional cache gate | For successful 200/304, no-store, no-cache, insufficient remaining max-age or early Expires intentionally reject content. No override is introduced. Owner-reported six-hour fetching/24-hour cache permission is not evidence of the actual HTTP headers or an override of them. |
+| Parsing and source week | In deployed v3, a `cachePolicy` return happens before parsing. It cannot establish whether that response contained valid XML/HTML or current-week dishes. Existing fixtures verify parser behavior only. Current source week/content and holiday availability are **UNKNOWN**. |
+| Freshness/revalidation code defects | The two independent defects below reproduce offline for both schools. They are not asserted to explain the owner's observed production `cachePolicy`. |
+
+The existing structured event on main remains the required evidence at the next ordinary,
+permitted source attempt after separately authorized safe deployment. It distinguishes HTTP
+status, normalized cache fields and rejection reason without exposing sensitive headers. Until
+then, neither provider is blamed and no speculative cache-policy relaxation is made.
+
+#### Bounded correction and preserved contracts
+
+1. `SchoolMealService` previously hid a failed menu after 24 hours but retained its content and
+   ETag/Last-Modified indefinitely until replacement. After a long Retry-After it could send those
+   expired validators and revive the retained menu with 304. The corrected service evicts the
+   menu, validators, validation timestamp and stale permission **on the next read** after the
+   existing inclusive 24-hour limit. It never changes `NextAttempt` or `CheckedAt` during eviction.
+   A retained entry may physically remain in idle process memory until accessed; no background
+   timer, scheduler, persistence or claim of secure memory erasure is introduced.
+2. A 304 previously marked an existing menu as freshly validated even if neither ETag nor
+   Last-Modified was available/sent. It now requires a cached menu and at least one request
+   validator. Otherwise source status is `invalid`; an eligible old menu remains explicitly stale
+   within the existing limit, never revalidated by that unsolicited response. An expired menu
+   cannot reappear. Ordinary conditional304 still preserves original fetch time and advances
+   successful validation time as before.
+
+A small Entry.ClearMenu method reuses the same clearing semantics for expiry, week rollover
+and cachePolicy. Both schools keep independent entries/semaphores. No HTTP client/header rules,
+parser, endpoint/DTO, Web code, configuration defaults or provider permissions change. Six-hour
+attempt spacing, longer Retry-After, must-revalidate, no-store/no-cache and ISO-week guards remain.
+There is no household-store/Shopping-List dependency or write path in the changed service.
+
+#### Verification
+
+- Before correction, the four new cases (two regressions × two schools) **FAILED as expected**
+  against accepted main code. This demonstrates code defects, not live-source behavior.
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlannerApiTests' -v quiet`:
+  **97 PASS, zero failed/skipped**, including build/analyzers. In-memory HTTP handlers only;
+  local API tests use temporary stores and verify household meals unchanged. No Finance tests,
+  model runs, live source calls or production database access were performed.
+- New tests cover both verified historical source formats, conditional validators, 24-hour boundary,
+  48-hour Retry-After, no premature fetch, no expired-content revival and honest stale/invalid state.
+  Existing tests cover source isolation, flag combinations, dates/ISO rollover, RSS/HTML parsing,
+  headers/status diagnostics, timeouts, cache restrictions, missing menus and fixture gating.
+- From `src/BigBrain.Web`, `npm test -- --run src/meal-planner/SchoolLunch.test.tsx
+  src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`: **22 PASS** with mocked API;
+  `npm run build`: **PASS**. Existing tests verify separate schools, original dish order/duplicates,
+  safe external-text rendering, missing/stale states and explicit historical fixtures. No live
+  browser or physical iPhone/PWA acceptance is claimed.
+- Documentation validator, `git diff --check`, three-file scope and targeted secrets review:
+  **PASS**. Full application suites and production/provider verification: **NOT RUN**.
+
+#### Minimum next step toward actual meals
+
+Independent review of this checkpoint; any merge requires exact-SHA approval. Main's already
+accepted diagnostics still need a separately authorized, verified deployment path. API-only
+remains blocked in the approved wrapper; this task neither enables that contract nor substitutes
+the API+Web worker. Establish a safe provider-interval window (restart loses process-local cooldown),
+backup/runtime/recovery gates and a reviewed narrow execution path before any later deployment.
+Do not clear caches, restart or force a source read merely to collect headers.
+
+Then observe `SchoolMealSourceResponse` at the next ordinary permitted request for **each** school.
+If headers allow current policy, verify parser/week results and actual dishes through API/Family
+View, followed by owner iPhone acceptance. If headers remain incompatible, seek a provider-backed
+compatible feed/cache instruction or a separately reviewed solution; do not bypass restrictions.
+Current supplier responses and the production cachePolicy cause remain the concrete evidence gap.
+This checkpoint does **not** claim that current meals are now working in production.
