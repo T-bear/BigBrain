@@ -1,0 +1,6 @@
+# DRAFT ONLY. Administrator: validate with visudo; install only after explicit approval.
+# Literal arguments, no wildcard, no shell/interpreter/systemd/docker grants.
+enigma ALL=(root) NOPASSWD: NOSETENV: /usr/local/sbin/bigbrain-approved-ops verify-backup
+enigma ALL=(root) NOPASSWD: NOSETENV: /usr/local/sbin/bigbrain-approved-ops backup-approved
+enigma ALL=(root) NOPASSWD: NOSETENV: /usr/local/sbin/bigbrain-approved-ops start-approved
+enigma ALL=(root) NOPASSWD: NOSETENV: /usr/local/sbin/bigbrain-approved-ops status

@@ -1,0 +1,455 @@
+#!/usr/bin/python3.13 -IS
+"""Fixed approval gateway, not a deployment engine. Never execute this from a checkout with sudo."""
+import contextlib
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import signal
+import stat
+import subprocess
+import sys
+import time
+import types
+
+OPERATIONS = ('verify-backup', 'backup-approved', 'start-approved', 'status')
+CONFIG = Path('/etc/bigbrain-approved-ops')
+STATE = Path('/var/lib/bigbrain-approved-ops')
+BACKUPS = Path('/var/backups/bigbrain-school-lunch')
+SELF = Path('/usr/local/sbin/bigbrain-approved-ops')
+SUPPORT = Path('/usr/local/libexec/bigbrain-approved-ops/backup_support.py')
+SUPPORT_SHA256 = '2e4ffda2c26a3932f0722b145e4083dfd0dd71a343c5da1a03448f239016fdef'
+PYTHON = '/usr/bin/python3.13'
+DOCKER = '/usr/bin/docker'
+SYSTEMD = '/usr/bin/systemd-run'
+COMPOSE = '/usr/libexec/docker/cli-plugins/docker-compose'
+DEPENDENCIES = (PYTHON, DOCKER, SYSTEMD, COMPOSE)
+ENV = {'PATH': '/usr/bin', 'HOME': '/var/empty', 'LANG': 'C.UTF-8',
+       'DOCKER_HOST': 'unix:///var/run/docker.sock',
+       'DOCKER_CONFIG': '/etc/bigbrain-approved-ops/docker'}
+# Compiled into the root-installed wrapper, never loaded from caller/package JSON.
+# Registry entries describe reviewed worker interfaces, not deployment authorizations.
+# All values are immutable; enabling a new contract requires code review + admin install.
+CONTRACTS = types.MappingProxyType({
+    'school-lunch-v3-systemd-v1': types.MappingProxyType({
+        'enabled': True,
+        'services': ('api', 'web'),
+        'files': ('runner.py', 'plan.json', 'release.compose.json', 'rollback.compose.json',
+                  'backup.py', 'backup-runtime.json', 'verify-backup.py'),
+        'prefix': 'school-lunch-v3-',
+        'worker': 'runner.py',
+        'actions': ('work', 'recover'),
+        'timeouts': (480, 180),
+        'verification': ('exact-runtime-and-backup', 'external-volumes-and-networks',
+                         'api-before-web', 'quiescence-and-clean-stop', 'health-config-and-data-identity',
+                         'other-services-unchanged'),
+        'recovery': 'exact-old-clean-stop-only; replacement-possible requires manual review; no restore',
+        'external_gates': ('owner-paused-consumers', 'school-source-checks-explicitly-authorized',
+                           'supplier-fetch-interval-established-before-replacement'),
+        'evidence': ('7971fa2c8cb2345d6bcd71627923a7d2e33417b9', 'scripts/deploy-school-lunch-v3.py'),
+    }),
+    'api-only-diagnostics-v1': types.MappingProxyType({
+        'enabled': False,
+        'services': ('api',),
+        # No invented package/entrypoint/recovery procedure for this blocked entry.
+        'files': (), 'prefix': None, 'worker': None, 'actions': (), 'timeouts': (),
+        'verification': ('api-only-config-and-health', 'web-and-other-services-unchanged',
+                         'source-flags-and-cache-policy-unchanged', 'no-forced-source-fetch'),
+        'recovery': 'UNVERIFIED: no existing API-only worker/package in the diagnostics checkpoint',
+        'external_gates': ('latest-source-attempts-or-verified-six-hour-no-fetch-window',
+                           'current-backup-and-phase-aware-recovery-verified'),
+        'evidence': ('f631f09bb315b356d7681bdecd80e14b88af89c5',
+                     'docs/reports/features/family/school-meals-preparation-20261023.md'),
+    }),
+})
+HEX32 = re.compile(r'[0-9a-f]{32}')
+HEX40 = re.compile(r'[0-9a-f]{40}')
+HEX64 = re.compile(r'[0-9a-f]{64}')
+BACKUP_ID = re.compile(r'[0-9]{8}T[0-9]{6}Z-[0-9a-f]{32}')
+LIMIT = 4 * 1024 * 1024
+
+
+class Denied(Exception):
+    """Only fixed, non-sensitive error codes cross the command-line boundary."""
+
+
+def need(value, code):
+    if not value:
+        raise Denied(code)
+
+
+def matches(pattern, value):
+    return isinstance(value, str) and pattern.fullmatch(value) is not None
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def decode(data):
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            need(key not in result, 'DuplicateKey')
+            result[key] = value
+        return result
+    return json.loads(data, object_pairs_hook=unique)
+
+
+def keys(value, required):
+    need(isinstance(value, dict) and set(value) == set(required), 'InvalidSchema')
+
+
+def deployment_contract(identifier):
+    need(isinstance(identifier, str) and identifier in CONTRACTS, 'UnknownContract')
+    contract = CONTRACTS[identifier]
+    need(contract['enabled'], 'ContractUnavailable')
+    return contract
+
+
+class ProtectedFiles:
+    """Descriptor-relative traversal; no following symlinks, no untrusted writable ancestors.
+
+    Production always uses uid 0 and /. Alternate roots/uid exist solely for offline unit tests.
+    A hostile root (including a Docker-socket user) is outside this filesystem trust boundary.
+    """
+    def __init__(self, base=Path('/'), uid=0):
+        self.base, self.uid = base, uid
+
+    def check(self, info, directory=False, private=False):
+        kind = stat.S_ISDIR if directory else stat.S_ISREG
+        need(kind(info.st_mode) and info.st_uid == self.uid
+             and not info.st_mode & (0o077 if private else 0o022)
+             and (directory or info.st_nlink == 1), 'UnprotectedPath')
+
+    @contextlib.contextmanager
+    def directory(self, path, private=False):
+        need(path.is_absolute() and path.is_relative_to(self.base), 'InvalidPath')
+        parts = path.relative_to(self.base).parts
+        need(all(x not in ('.', '..') for x in parts), 'InvalidPath')
+        fd = os.open(self.base, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            self.check(os.fstat(fd), directory=True)
+            for part in parts:
+                nxt = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+                os.close(fd)
+                fd = nxt
+                self.check(os.fstat(fd), directory=True)
+            self.check(os.fstat(fd), directory=True, private=private)
+            yield fd
+        finally:
+            os.close(fd)
+
+    def read(self, path, limit=LIMIT, private=True):
+        with self.directory(path.parent) as parent:
+            fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
+            try:
+                self.check(os.fstat(fd), private=private)
+                need(os.fstat(fd).st_size <= limit, 'FileTooLarge')
+                with os.fdopen(os.dup(fd), 'rb') as stream:
+                    data = stream.read(limit + 1)
+                need(len(data) <= limit, 'FileTooLarge')
+                return data
+            finally:
+                os.close(fd)
+
+    def create(self, path, data):
+        with self.directory(path.parent, private=True) as parent:
+            fd = os.open(path.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                         0o600, dir_fd=parent)
+            try:
+                with os.fdopen(os.dup(fd), 'wb') as stream:
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            finally:
+                os.close(fd)
+            os.fsync(parent)
+
+    def mkdir(self, path):
+        with self.directory(path.parent, private=True) as parent:
+            os.mkdir(path.name, 0o700, dir_fd=parent)
+            os.fsync(parent)
+
+    @contextlib.contextmanager
+    def lock(self, path):
+        with self.directory(path.parent, private=True) as parent:
+            fd = os.open(path.name, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK,
+                         0o600, dir_fd=parent)
+        try:
+            self.check(os.fstat(fd), private=True)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise Denied('Busy') from None
+            yield
+        finally:
+            os.close(fd)
+
+
+def command(args, timeout=20):
+    # Output goes to bounded pipes; terminate the entire child group on timeout/overflow.
+    import selectors
+    with subprocess.Popen(args, env=ENV, cwd='/', stdin=subprocess.DEVNULL,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          start_new_session=True) as child:
+        output = bytearray()
+        total = 0
+        deadline = time.monotonic() + timeout
+        try:
+            with selectors.DefaultSelector() as poll:
+                poll.register(child.stdout, selectors.EVENT_READ)
+                poll.register(child.stderr, selectors.EVENT_READ)
+                while poll.get_map():
+                    need(time.monotonic() < deadline, 'CommandTimeout')
+                    for key, _ in poll.select(min(0.1, max(0, deadline - time.monotonic()))):
+                        block = os.read(key.fileobj.fileno(), 65536)
+                        if not block:
+                            poll.unregister(key.fileobj)
+                            continue
+                        total += len(block)
+                        need(total <= LIMIT, 'CommandOutputLimit')
+                        if key.fileobj is child.stdout:
+                            output.extend(block)
+                child.wait(timeout=max(0.01, deadline - time.monotonic()))
+            need(child.returncode == 0, 'CommandFailed')
+            return bytes(output)
+        except BaseException:
+            # A descendant may keep a pipe open after its parent has exited.
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            child.wait()
+            raise
+
+
+class Operations:
+    def __init__(self, files, support, config=CONFIG, state=STATE, backups=BACKUPS, run=command):
+        self.fs, self.support = files, support
+        self.config, self.state, self.backups, self.run = config, state, backups, run
+
+    def approval(self, operation):
+        a = decode(self.fs.read(self.config / (operation + '.json'), limit=65536))
+        common = {'schema', 'operation', 'id', 'expiresAt'}
+        extra = {'verify-backup': {'backupId', 'manifestSha256'},
+                 'backup-approved': {'revision', 'runtime'},
+                 'start-approved': {'revision', 'services', 'packageSha256', 'backupId',
+                                    'manifestSha256', 'dependencies', 'contract', 'usersPaused'}}[operation]
+        keys(a, common | extra)
+        need(a['schema'] == 1 and a['operation'] == operation and matches(HEX32, a['id']), 'InvalidApproval')
+        need(type(a['expiresAt']) is int and time.time() < a['expiresAt'] <= time.time() + 86400,
+             'ExpiredApproval')
+        if 'revision' in a:
+            need(matches(HEX40, a['revision']), 'InvalidRevision')
+        if 'backupId' in a:
+            need(matches(BACKUP_ID, a['backupId']) and matches(HEX64, a['manifestSha256']), 'InvalidBackup')
+        return a
+
+    def claim(self, a):
+        # O_EXCL + fsync before any operation: failure/interrupt never re-arms approval.
+        need(time.time() < a['expiresAt'], 'ExpiredApproval')
+        self.fs.create(self.state / 'claims' / (a['id'] + '.json'),
+                       json.dumps({'approval': a, 'approvalSha256': sha(json.dumps(a, sort_keys=True).encode())}).encode())
+
+    def inspect(self):
+        values = decode(self.run([DOCKER, '--host', ENV['DOCKER_HOST'], 'inspect', 'bigbrain-sprint1-api-1']))
+        need(isinstance(values, list) and len(values) == 1, 'RuntimeUnavailable')
+        c = values[0]
+        need(c['State']['Running'] is True and c['State'].get('Health', {}).get('Status') == 'healthy'
+             and not c['State'].get('OOMKilled', False), 'RuntimeUnhealthy')
+        return c
+
+    def identity(self, c):
+        self.support.sources(c)  # Existing overlap, nested mount and symlink checks.
+        return {'containerId': c['Id'], 'image': c['Image'], 'volumes': {
+            m['Destination']: {key: m[key] for key in ('Type', 'Name', 'Source', 'Driver', 'RW')}
+            for m in c['Mounts'] if m['Destination'] in self.support.EXPECTED}}
+
+    def verify(self, a):
+        folder = self.backups / a['backupId']
+        with self.fs.directory(folder, private=True):
+            pass
+        raw = self.fs.read(folder / 'manifest.json')
+        need(sha(raw) == a['manifestSha256'], 'ManifestChanged')
+        # Never use manifest-supplied paths for traversal. Exact retained set only.
+        expected = {'manifest.json'}
+        for target, names in self.support.EXPECTED.items():
+            sub = folder / target.lstrip('/')
+            with self.fs.directory(sub, private=True):
+                need(set(os.listdir(sub)) == set(names), 'UnexpectedBackupFiles')
+            expected.add(sub.name)
+            for name in names:
+                with self.fs.directory(sub) as fd:
+                    info = os.stat(name, dir_fd=fd, follow_symlinks=False)
+                    self.fs.check(info, private=True)
+        need(set(os.listdir(folder)) == expected, 'UnexpectedBackupFiles')
+        need(self.support.verify_set(folder) == a['manifestSha256'], 'BackupVerificationFailed')
+        return decode(raw)
+
+    def backup(self, a):
+        c = self.inspect()
+        need(self.identity(c) == a['runtime'] and
+             c['Config']['Labels'].get('org.opencontainers.image.revision') == a['revision'], 'RuntimeChanged')
+        self.claim(a)
+        def final_check():
+            current = self.inspect()
+            need(self.identity(current) == a['runtime'] and
+                 current['Config']['Labels'].get('org.opencontainers.image.revision') == a['revision'], 'RuntimeChanged')
+        folder = self.support.run_backup(self.support.sources(c), self.backups, a['runtime'], final_check)
+        self.fs.create(self.state / ('backup-' + a['id'] + '.json'),
+                       json.dumps({'status': 'PASS', 'backupId': folder.name,
+                                   'manifestSha256': self.support.digest(folder / 'manifest.json')}).encode())
+        return {'operation': 'backup-approved', 'status': 'PASS', 'databases': 6}
+
+    def package(self, a):
+        contract = deployment_contract(a['contract'])
+        need(a['services'] == list(contract['services']) and a['usersPaused'] is True
+             and matches(HEX64, a['packageSha256']), 'DeploymentScope')
+        files, services = contract['files'], set(contract['services'])
+        keys(a['dependencies'], DEPENDENCIES)
+        for name, expected in a['dependencies'].items():
+            need(matches(HEX64, expected) and sha(self.fs.read(Path(name), limit=128 * 1024 * 1024, private=False)) == expected,
+                 'DependencyChanged')
+        source = self.config / 'packages' / a['id']
+        with self.fs.directory(source, private=True):
+            need(set(os.listdir(source)) == set(files) | {'package.json'}, 'PackageFiles')
+        manifest = self.fs.read(source / 'package.json')
+        need(sha(manifest) == a['packageSha256'], 'PackageChanged')
+        hashes = decode(manifest)
+        keys(hashes, files)
+        blobs = {'package.json': manifest}
+        for name in files:
+            blobs[name] = self.fs.read(source / name)
+            need(matches(HEX64, hashes[name]) and sha(blobs[name]) == hashes[name], 'PackageChanged')
+        plan = decode(blobs['plan.json'])
+        need(plan.get('contract') == a['contract'], 'ContractMismatch')
+        need(plan['run'] == a['id'] and plan['revision'] == a['revision']
+             and set(plan['targets']) == services and set(plan['candidates']) == services, 'PlanScope')
+        for role in contract['services']:
+            need(matches(HEX64, plan['targets'][role]['Id'])
+                 and matches(re.compile(r'sha256:[0-9a-f]{64}'), plan['targets'][role]['Image'])
+                 and matches(re.compile(r'sha256:[0-9a-f]{64}'), plan['candidates'][role]), 'ImageIdentity')
+        for name in ('release.compose.json', 'rollback.compose.json'):
+            cfg = decode(blobs[name])
+            need(set(cfg) <= {'services', 'volumes', 'networks', 'name'} and set(cfg['services']) == services, 'ComposeScope')
+            need(all(v.get('external') is True for v in [*cfg.get('volumes', {}).values(), *cfg.get('networks', {}).values()]), 'ComposeStorage')
+            for role, service in cfg['services'].items():
+                expected_image = plan['candidates'][role] if name == 'release.compose.json' else plan['targets'][role]['Image']
+                need(service.get('image') == expected_image, 'ComposeImageChanged')
+                need(not set(service) & {'build', 'depends_on', 'extends', 'profiles', 'env_file', 'label_file', 'configs', 'secrets', 'develop'}, 'ComposeExternalInput')
+        # originalConfigHashes is comparison-only in the reviewed worker, never executed.
+        # All code comes from these bytes. Administrator review of runner/dependencies
+        # remains mandatory: a hash grants integrity, not semantic safety to arbitrary code.
+        return blobs, plan, contract
+
+    def start(self, a):
+        blobs, plan, contract = self.package(a)
+        backup = self.verify(a)
+        c = self.inspect()
+        need(backup['runtime'] == self.identity(c) and c['Id'] == plan['targets']['api']['Id']
+             and c['Image'] == plan['targets']['api']['Image'], 'BackupRuntimeChanged')
+        self.claim(a)
+        # Permanent interlock across wrapper exit/systemd lifetime. Only administrator
+        # can retire it after checking worker + recovery receipts; never auto-clear it.
+        self.fs.create(self.state / 'active.json', json.dumps({'id': a['id'], 'contract': a['contract']}).encode())
+        root = self.state / 'runs' / (contract['prefix'] + a['id'])
+        self.fs.mkdir(root)
+        for name, data in blobs.items():
+            self.fs.create(root / name, data)
+        self.fs.create(root / 'backup-verified.json', json.dumps({'status': 'PASS', 'manifestSha256': a['manifestSha256'], 'runtimeMatches': True}).encode())
+        # Existing worker contract, including its cgroup assertion and recovery entrypoint.
+        runner = str(root / contract['worker'])
+        unit = contract['prefix'] + a['id']
+        work, recover = contract['actions']
+        start_timeout, stop_timeout = contract['timeouts']
+        self.run([SYSTEMD, '--quiet', '--no-block', '--unit=' + unit, '--uid=0', '--gid=0', '--service-type=oneshot',
+                  '--property=TimeoutStartSec=' + str(start_timeout), '--property=TimeoutStopSec=' + str(stop_timeout),
+                  '--property=KillMode=control-group', '--property=Restart=no', '--property=UMask=0077',
+                  '--property=StandardOutput=null', '--property=StandardError=null',
+                  '--property=WorkingDirectory=/', '--property=LimitCORE=0',
+                  '--property=Environment=PATH=/usr/bin HOME=/var/empty DOCKER_CONFIG=/etc/bigbrain-approved-ops/docker LANG=C.UTF-8',
+                  '--property=ExecStopPost=' + PYTHON + ' -IS ' + runner + ' ' + recover + ' ' + str(root) + ' ' + a['packageSha256'],
+                  PYTHON, '-IS', runner, work, str(root), a['packageSha256']], timeout=30)
+        self.fs.create(root / 'submitted.json', b'{"status":"SUBMITTED"}')
+        return {'operation': 'start-approved', 'status': 'SUBMITTED'}
+
+    def status(self):
+        try:
+            active = decode(self.fs.read(self.state / 'active.json', limit=1024))
+        except FileNotFoundError:
+            return {'operation': 'status', 'deployment': 'NO_WRAPPER_RUN'}
+        keys(active, {'id', 'contract'})
+        need(matches(HEX32, active['id']), 'InvalidState')
+        contract = deployment_contract(active['contract'])
+        root = self.state / 'runs' / (contract['prefix'] + active['id'])
+        result = 'CLAIMED_MANUAL_REVIEW_REQUIRED'
+        for name, field, accepted, label in (
+            ('submitted.json', 'status', {'SUBMITTED'}, 'SUBMITTED'),
+            ('complete.json', 'status', {'COMPLETED'}, 'COMPLETION_RECORDED'),
+            ('recovery.json', 'status', {'BLOCKED_NO_RESTORE', 'MANUAL_REVIEW_REQUIRED', 'MANUAL_REVIEW_NO_RESTORE'}, 'MANUAL_REVIEW_REQUIRED')):
+            try:
+                value = decode(self.fs.read(root / name, limit=65536))
+            except FileNotFoundError:
+                continue
+            if value.get(field) in accepted and (name == 'submitted.json' or value.get('run') == active['id']):
+                result = label
+        try:
+            decode(self.fs.read(root / 'failure.json', limit=65536))
+            result = 'MANUAL_REVIEW_REQUIRED'
+        except FileNotFoundError:
+            pass
+        return {'operation': 'status', 'deployment': result}
+
+    def dispatch(self, operation):
+        need(operation in OPERATIONS, 'InvalidOperation')
+        with self.fs.lock(self.state / 'lock'):
+            if operation == 'status':
+                return self.status()
+            a = self.approval(operation)
+            if operation == 'verify-backup':
+                self.verify(a)
+                return {'operation': operation, 'status': 'PASS', 'databases': 6}
+            need(not (self.state / 'active.json').exists(), 'DeploymentInterlock')
+            if operation == 'backup-approved':
+                return self.backup(a)
+            return self.start(a)
+
+
+def main():
+    need(os.geteuid() == 0 and len(sys.argv) == 2 and sys.argv[1] in OPERATIONS, 'InvalidInvocation')
+    os.umask(0o077)
+    os.chdir('/')
+    os.environ.clear()
+    os.environ.update(ENV)
+    files = ProtectedFiles()
+    # Interpreter and stdlib are trusted OS prerequisites, before Python can validate itself.
+    files.read(SELF, private=False)
+    code = files.read(SUPPORT, private=False)
+    need(sha(code) == SUPPORT_SHA256, 'SupportChanged')
+    for executable in (PYTHON, DOCKER, SYSTEMD, COMPOSE):
+        files.read(Path(executable), limit=128 * 1024 * 1024, private=False)
+    with files.directory(CONFIG / 'docker', private=True):
+        need(not os.listdir(CONFIG / 'docker'), 'DockerConfigNotEmpty')
+    support = types.ModuleType('approved_backup_support')
+    support.__file__ = str(SUPPORT)
+    exec(compile(code, str(SUPPORT), 'exec'), support.__dict__)
+    def interrupted(*_):
+        raise Denied('Interrupted')
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGALRM):
+        signal.signal(sig, interrupted)
+    signal.alarm(180)
+    result = Operations(files, support).dispatch(sys.argv[1])
+    signal.alarm(0)
+    print(json.dumps(result, sort_keys=True))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except BaseException:
+        # No paths, source contents, subprocess output, traceback or arbitrary exception text.
+        print('{"status":"BLOCKED","reason":"approval, integrity, busy or execution check failed; administrator review required"}', file=sys.stderr)
+        sys.exit(1)

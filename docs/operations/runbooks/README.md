@@ -1,6 +1,7 @@
 # Runbooks
 
 - [BigBrain appliance lifecycle](bigbrain-appliance-lifecycle.md)
+- [Restricted approved operations wrapper](approved-operations.md) — review only, not installed
 
 - [Dashboard and Widget Framework verification](dashboard-widget-framework-verification.md)
 - [Download Control safe removal](download-control-safe-removal.md)
