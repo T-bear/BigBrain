@@ -184,7 +184,10 @@ def runtime_snapshot():
         return {}
     values = json.loads(run(['/usr/bin/docker', 'inspect', *ids]).stdout)
     # Read-only identity/config evidence; never print env, mounts, names or raw inspect.
-    return {c['Id']: digest(json.dumps([c['Image'], c['Config'], c['HostConfig'], c['Mounts'],
+    # Docker may reorder Mounts between inspections. Preserve every field and duplicate;
+    # only this collection's order is immaterial. Other configuration arrays stay ordered.
+    return {c['Id']: digest(json.dumps([c['Image'], c['Config'], c['HostConfig'],
+             sorted(c['Mounts'], key=lambda mount: json.dumps(mount, sort_keys=True)),
              c['State']['StartedAt'], c['RestartCount'], c['State']['Running']], sort_keys=True).encode())
             for c in values}
 
@@ -293,7 +296,10 @@ def install(stage, manifest_hash):
         for args in (['unknown'], ['status', 'extra']):
             p = run([str(WRAPPER), *args], ok=False)
             require(p.returncode == 1 and json.loads(p.stderr).get('status') == 'BLOCKED', 'InvocationAcceptance')
-        require(policy_snapshot() == policy and runtime_snapshot() == runtime, 'PhaseADrift')
+        # Evaluate both checks; report only booleans, never policy or inspect contents.
+        report['phaseAChecks'] = {'policyUnchanged': policy_snapshot() == policy,
+                                 'runtimeUnchanged': runtime_snapshot() == runtime}
+        require(all(report['phaseAChecks'].values()), 'PhaseADrift')
         report['phase'] = 'B-activating'
         write_new(stage/'phase-a-pass.json', json.dumps({'phaseA': 'PASS'}).encode(), 0o600)
         run(['/usr/sbin/visudo', '-c', '-f', str(stage/'sudoers.example')])

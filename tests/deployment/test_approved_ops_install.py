@@ -1,6 +1,7 @@
 """Offline only: synthetic filesystem and mocked privileged commands; never install on host."""
 import base64
 import contextlib
+import copy
 import io
 import hashlib
 import importlib.util
@@ -160,8 +161,76 @@ class PackageTests(unittest.TestCase):
             write.assert_not_called()
 
 
+class RuntimeSnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.container = {'Id': 'synthetic-container', 'Image': 'synthetic-image',
+                          'Config': {'Env': ['ONE=1', 'TWO=2']},
+                          'HostConfig': {'Binds': ['one:/one', 'two:/two']},
+                          'Mounts': [{'Type': 'volume', 'Name': 'one', 'Source': '/vol/one',
+                                      'Destination': '/one', 'RW': True},
+                                     {'Type': 'bind', 'Source': '/vol/two',
+                                      'Destination': '/two', 'RW': False}],
+                          'State': {'StartedAt': 'synthetic-start', 'Running': True},
+                          'RestartCount': 0}
+
+    def snapshot(self, containers):
+        responses = [subprocess.CompletedProcess([], 0,
+                     ' '.join(c['Id'] for c in containers).encode(), b'')]
+        if containers:
+            responses.append(subprocess.CompletedProcess([], 0, json.dumps(containers).encode(), b''))
+        with patch.object(m, 'run', side_effect=responses) as run:
+            result = m.runtime_snapshot()
+            self.assertEqual(run.call_args_list[0].args[0],
+                             ['/usr/bin/docker', 'ps', '-aq', '--no-trunc'])
+            if containers:
+                self.assertEqual(run.call_args_list[1].args[0],
+                                 ['/usr/bin/docker', 'inspect', *[c['Id'] for c in containers]])
+            return result
+
+    def test_mount_and_container_order_do_not_change_identity(self):
+        other = copy.deepcopy(self.container); other['Id'] = 'second'
+        before = self.snapshot([self.container, other])
+        changed = copy.deepcopy(self.container); changed['Mounts'].reverse()
+        self.assertEqual(before, self.snapshot([other, changed]))
+
+    def test_every_mount_field_and_membership_remain_protected(self):
+        before = self.snapshot([self.container])
+        for field, value in [('Type', 'bind'), ('Name', 'different'), ('Source', '/different'),
+                             ('Destination', '/different'), ('RW', False), ('NewField', 'value')]:
+            changed = copy.deepcopy(self.container); changed['Mounts'][0][field] = value
+            with self.subTest(field=field): self.assertNotEqual(before, self.snapshot([changed]))
+        for operation in ('remove', 'duplicate', 'field-remove'):
+            changed = copy.deepcopy(self.container)
+            if operation == 'remove': changed['Mounts'].pop()
+            elif operation == 'duplicate': changed['Mounts'].append(changed['Mounts'][0])
+            else: del changed['Mounts'][0]['Name']
+            with self.subTest(operation=operation): self.assertNotEqual(before, self.snapshot([changed]))
+
+    def test_runtime_identity_restart_and_configuration_drift_detected(self):
+        before = self.snapshot([self.container])
+        for path, value in [(('Id',), 'other'), (('Image',), 'other'), (('RestartCount',), 1),
+                            (('State', 'Running'), False), (('State', 'StartedAt'), 'later'),
+                            (('Config', 'Env'), ['TWO=2', 'ONE=1']),
+                            (('HostConfig', 'Binds'), ['two:/two', 'one:/one'])]:
+            changed = copy.deepcopy(self.container); target = changed
+            for key in path[:-1]: target = target[key]
+            target[path[-1]] = value
+            with self.subTest(path=path): self.assertNotEqual(before, self.snapshot([changed]))
+        self.assertNotEqual(before, self.snapshot([]))
+
+    def test_volatile_health_log_is_not_configuration_drift(self):
+        before = self.snapshot([self.container])
+        changed = copy.deepcopy(self.container)
+        changed['State']['Health'] = {'Status': 'healthy', 'Log': ['new probe']}
+        self.assertEqual(before, self.snapshot([changed]))
+
+    def test_malformed_inspection_does_not_produce_valid_snapshot(self):
+        changed = copy.deepcopy(self.container); del changed['Mounts']
+        with self.assertRaises(KeyError): self.snapshot([changed])
+
+
 class PhaseTests(unittest.TestCase):
-    def run_install(self, fail=None):
+    def run_install(self, fail=None, policy_drift=False, runtime_drift=False):
         with tempfile.TemporaryDirectory() as td, contextlib.ExitStack() as stack:
             root=Path(td); stage=root/'stage'; stage.mkdir(mode=0o700)
             for name in m.FILES | {'manifest.json'}:
@@ -178,8 +247,11 @@ class PhaseTests(unittest.TestCase):
             stack.enter_context(patch.object(m.pwd,'getpwnam',return_value=type('User',(),{'pw_uid':1000})()))
             policy={'old':('hash',0o440,0,0)}
             expected={**policy,str(m.SUDOERS):(m.PINNED['sudoers.example'],0o440,0,0)}
-            stack.enter_context(patch.object(m,'policy_snapshot',side_effect=[policy,policy,expected]))
-            stack.enter_context(patch.object(m,'runtime_snapshot',return_value={'container':'identity'}))
+            stack.enter_context(patch.object(m,'policy_snapshot',side_effect=[
+                policy, {'changed': 'private-policy'} if policy_drift else policy, expected]))
+            runtime = {'container': 'identity'}
+            stack.enter_context(patch.object(m,'runtime_snapshot',side_effect=[
+                runtime, {'container': 'private-runtime'} if runtime_drift else runtime, runtime]))
             calls=[]
             def answer(args,**kw):
                 calls.append(args)
@@ -214,6 +286,18 @@ class PhaseTests(unittest.TestCase):
         rc,report,rule,phaseA=self.run_install('A')
         self.assertEqual(rc,1); self.assertEqual(report['phase'],'A-installing')
         self.assertFalse(rule);self.assertFalse(phaseA)
+
+    def test_phase_a_drift_reports_both_checks_without_secrets_or_activation(self):
+        for policy_drift, runtime_drift in ((True, False), (False, True), (True, True)):
+            with self.subTest(policy=policy_drift, runtime=runtime_drift):
+                rc, report, rule, phaseA = self.run_install(
+                    policy_drift=policy_drift, runtime_drift=runtime_drift)
+                self.assertEqual(rc, 1)
+                self.assertEqual(report['reason'], 'PhaseADrift')
+                self.assertEqual(report['phaseAChecks'], {
+                    'policyUnchanged': not policy_drift, 'runtimeUnchanged': not runtime_drift})
+                self.assertFalse(rule); self.assertFalse(phaseA)
+                self.assertNotIn('private-', json.dumps(report))
 
     def test_phase_b_failure_retains_partial_install_no_blind_rollback(self):
         rc,report,rule,phaseA=self.run_install('B')

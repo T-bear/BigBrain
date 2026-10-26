@@ -1,6 +1,6 @@
 # Approved operations — one-time installation package
 
-Status: **REVIEW CHECKPOINT — PREPARED, NOT INSTALLED**. Source baseline:
+Status: **REVIEW CHECKPOINT — CORRECTION OFFLINE-VERIFIED, NOT INSTALLED**. Source baseline:
 `b23e00d20a24bdeb459949ab335c8b9cd3599bd3`. Installer branch:
 `ops/approved-wrapper-installation`; exact publication commit/tree are Git metadata.
 The accepted [wrapper runbook](../../docs/operations/runbooks/approved-operations.md)
@@ -12,7 +12,12 @@ It copies the accepted wrapper, backup support and sudoers example byte-for-byte
 no approvals, deployment packages or systemd units and never opens a production database.
 API-only remains disabled. Finance, BB-158 and SchoolMeals are unchanged.
 
-## Exact operator command — only after installation approval
+## Exact operator command — fresh installation only, after approval
+
+**Do not run this command on the existing partial installation.** The administrator's earlier
+attempt stopped during phase A; retain its files and protected staging. This corrected package
+does not resume, adopt, overwrite or clean up that installation. Recovery requires inspection
+of the protected result and installed bytes, followed by a separately authorized bounded action.
 
 Run as **enigma**, in the local BigBrain terminal, with this reviewed branch checked out and
 package files present at the stated repository location. Do not prefix this command with sudo.
@@ -20,7 +25,7 @@ Obtain this command and its pins from the independently reviewed GitHub checkpoi
 an untrusted edited local README. The OS Python interpreter/stdlib are trusted prerequisites.
 
 ```bash
-/usr/bin/python3.13 -ISB -c 'import hashlib,pathlib; p=pathlib.Path("/home/enigma/BigBrain/apps/bigbrain/scripts/approved-ops-install"); b=(p/"install.py").read_bytes(); assert hashlib.sha256(b).hexdigest()=="e24a8aca80763488b2557321a0f32fb5a87f8b9bb4f99def18c006d4939d0cf6", "Installer hash mismatch"; n={"__name__":"verified_installer"}; exec(compile(b,"verified_installer","exec"),n); f=n["launch"]; raise SystemExit(f(p,"1dcc25d5bd07279760d5c6f621d596c5090b159a1bcf08155ca691863c8412fa"))'
+/usr/bin/python3.13 -ISB -c 'import hashlib,pathlib; p=pathlib.Path("/home/enigma/BigBrain/apps/bigbrain/scripts/approved-ops-install"); b=(p/"install.py").read_bytes(); assert hashlib.sha256(b).hexdigest()=="07797634a5b1b4a380c070929720490a699db0092fb9f47dde838a850af8b12b", "Installer hash mismatch"; n={"__name__":"verified_installer"}; exec(compile(b,"verified_installer","exec"),n); f=n["launch"]; raise SystemExit(f(p,"e85676c6d7cd85881eb89b86b3e092c199abf3c6dc2c60294f123f1862f4b95f"))'
 ```
 
 The command pins installer bytes **before executing even unprivileged installer code**.
@@ -38,8 +43,8 @@ No dependency installation, network fetch or Git command runs in the privileged 
 ## Artifact identities
 
 - Accepted source revision: `b23e00d20a24bdeb459949ab335c8b9cd3599bd3`.
-- Installer SHA-256: `e24a8aca80763488b2557321a0f32fb5a87f8b9bb4f99def18c006d4939d0cf6`.
-- Manifest SHA-256: `1dcc25d5bd07279760d5c6f621d596c5090b159a1bcf08155ca691863c8412fa`.
+- Installer SHA-256: `07797634a5b1b4a380c070929720490a699db0092fb9f47dde838a850af8b12b`.
+- Manifest SHA-256: `e85676c6d7cd85881eb89b86b3e092c199abf3c6dc2c60294f123f1862f4b95f`.
 - `manifest.json` covers all four executable/configuration payload files: installer, wrapper,
   support and sudoers example. The manifest cannot hash itself; its digest is anchored in the
   command above. README and offline tests are review documentation, not installation payloads.
@@ -79,6 +84,10 @@ Verify installed hashes/modes, `status = NO_WRAPPER_RUN`, three missing-approval
 unknown-operation and extra-argument denial. Status/testing creates the wrapper's private
 empty lock file; it creates no claim, active marker or approval. Docker inspection compares
 container identity/configuration/restart/start-time fingerprints, never printing raw inspection.
+Mount records are compared as an order-independent multiset of their complete contents; no
+mount field or duplicate is discarded. Other configuration arrays retain their ordering.
+Phase A records separate `phaseAChecks.policyUnchanged` and `runtimeUnchanged` booleans in
+its result, evaluating both checks before deciding `PhaseADrift`. Neither snapshot is published.
 
 ## Phase B — four literal NOPASSWD operations
 
@@ -143,13 +152,59 @@ node scripts/verify-documentation.mjs
 git diff --check
 ```
 
-Installer suite: **20 PASS**. Synthetic two-phase success, A failure preventing B, B failure
+Installer suite: **26 PASS**. Synthetic two-phase success, A failure preventing B, B failure
 retaining partial state, exclusive destinations, concurrency lock, malformed/tampered/resealed
 sources, traversal/symlinks/hardlinks/ACLs, exact sudoers scope, bootstrap hash denial, sanitized
 acceptance and cache-independent sudo commands. Privileged commands and host paths are mocked
 in phase tests; actual filesystem tests use temporary directories. No root installation occurred.
 The first full-flow offline run exposed a local `fcntl` import shadowing the lock implementation;
-this was corrected before the passing run. No failed host operation occurred.
+this was corrected before the original passing run. That original offline result did not
+predict or validate the later administrator-run installation.
 
-Reused accepted wrapper suite: 40 offline tests. Host root/sudo acceptance is **NOT RUN** until
-the administrator executes the reviewed package. No installer test authorizes production work.
+Accepted wrapper suite rerun unchanged: **40 PASS**. Documentation validator (286 Markdown files,
+53 unique backlog IDs), `git diff --check`, sudoers syntax and exact accepted payload checks:
+**PASS**. Scope and targeted secrets inspection cover only the four changed files; this is not
+a full repository secrets audit. Host root/sudo acceptance is **NOT RUN** until
+the administrator completes a separately reviewed installation/recovery. No installer test
+authorizes production work.
+
+## PhaseADrift follow-up — 2026-10-26
+
+The administrator reported `A-installing / PhaseADrift / BLOCKED` from installer checkpoint
+`be47b4732711653c72a723f3bcb054deb3825735`; systemd acceptance and production operations were
+NOT RUN. Read-only inspection confirmed the installed wrapper's accepted hash and root:root
+0755, protected library/config/state directories, and absence of the final and temporary
+installer sudoers entries. Protected support bytes, directory contents and staging receipts
+could not be read by the agent. `sudo -n -l` still required a password. These observations
+do not prove that the complete partial installation or prior sudo policy is unchanged.
+
+**Confirmed defect:** two read-only Docker inspections of the same 15 containers, two seconds
+apart, differed only in mount-list ordering for three containers. The original fingerprint used
+`sort_keys=True`, which canonicalizes dictionary keys but not list order. It therefore reported
+runtime drift for semantically identical mount records. The new offline ordering regression
+also fails against the original function and passes with the correction. An initial ad-hoc
+historical-function comparison failed because its copied globals escaped the Docker mock and
+performed a read-only inspection. The harness binding was corrected and the comparison repeated
+entirely with mocked Docker. No privileged or mutating operation was executed. The committed
+regression tests use the module globals with mocked command execution throughout.
+
+**Historical cause remains uncertain:** the original `policy_snapshot() == policy and
+runtime_snapshot() == runtime` short-circuited and emitted only `PhaseADrift`; before/after
+snapshots were not retained. Mount ordering is a demonstrated explanation, not proof that the
+administrator's specific failure involved runtime only. Policy drift, or both, cannot be
+excluded from available evidence. The correction retains the fail-closed condition and makes
+future completed checks distinguish policy-only, runtime-only and simultaneous drift using
+booleans in the protected result. If a snapshot cannot be read, installation still stops.
+
+Regression coverage includes mount order, all mount fields, additions/removals/duplicates,
+container identity, image, restart count, start time, running state and ordered configuration
+arrays. Volatile health-probe log changes remain outside the configuration fingerprint, as
+before; this is not a new container-health acceptance test. Policy-only, runtime-only and both
+changes prevent phase B without logging policy/configuration values. Accepted wrapper/support/
+sudoers payloads, privilege boundaries and absent-destination checks are unchanged.
+
+Remaining operational gate: local administrator inspection of retained protected evidence and
+installed identities, then a separately reviewed recovery decision. No reinstall, sudoers
+activation, deletion, database access or deployment was performed by this correction. Systemd
+acceptance and completed host installation remain **NOT RUN / BLOCKED**; offline PASS does not
+satisfy those host gates. Do not use the fresh-install command as a recovery command.
