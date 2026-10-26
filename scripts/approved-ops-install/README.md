@@ -208,3 +208,133 @@ installed identities, then a separately reviewed recovery decision. No reinstall
 activation, deletion, database access or deployment was performed by this correction. Systemd
 acceptance and completed host installation remain **NOT RUN / BLOCKED**; offline PASS does not
 satisfy those host gates. Do not use the fresh-install command as a recovery command.
+
+## One-attempt recovery after PhaseADrift — prepared 2026-10-26
+
+**REVIEW CHECKPOINT; preparation and offline tests only. Recovery has NOT RUN.**
+The owner authorized preparation of a recovery tool for the specific original attempt, not
+execution by Codex. This section supersedes the earlier absence of a prepared recovery path;
+it does not supersede the fresh installer's refusal to adopt existing destinations.
+
+[recover.py](recover.py) reuses the exact corrected installer from checkpoint
+`d57c211b2d99bc3e626b1a93330a22da6490b0a4` as a hash-pinned helper. It does not invoke `install()`
+or rewrite installed wrapper files. The accepted wrapper/support/sudoers bytes and their
+upstream identities above are unchanged. [recovery-manifest.json](recovery-manifest.json)
+covers only `recover.py` and `install.py`, bound to the accepted source revision and original
+installation commit. The old package is read and hash-verified, never executed.
+
+### Explicit current-state acceptance boundary
+
+The old failure's policy/runtime snapshots do not exist. Recovery reports `historicalDrift:
+UNKNOWN` permanently; it cannot certify what changed during that historical attempt. Instead,
+the owner's permitted separate current-state acceptance is implemented with all of these gates:
+
+1. The fixed original root-staging directory must contain exactly the original package,
+   manifest, progress and result. All paths must be root-owned, protected, no symlinks or extra
+   ACLs. The original manifest digest is pinned to the original commit, and each payload is
+   verified. Progress and result must exactly describe the reported phase-A `PhaseADrift`
+   failure with no systemd or production operations. Duplicate receipt fields are rejected.
+   Missing, contradictory or extra evidence blocks; the operator cannot select another path.
+2. Both installed program files must match accepted hashes and modes. All required directories
+   must be root:root 0700. Library contents must be exact. Packages, Docker configuration,
+   claims and runs must be empty; no approval or active marker is permitted. The existing
+   wrapper lock must be an empty protected regular file and available. No file is repaired.
+3. Python isolation, protected dependencies, loaded libraries, UID, backup-root metadata,
+   local policy include restrictions and full sudoers syntax are rechecked. Backup data is not
+   read. The final sudoers entry and the installer's dot-prefixed pending file must be absent.
+4. `cvtsudoers -c /dev/null -e -f json /etc/sudoers` parses the local policy and includes.
+   Current-state acceptance conservatively allows only ordinary password-authorized
+   `root`, `%sudo` and/or `enigma` ALL:ALL/ALL rules and the global Defaults `env_reset`,
+   `mail_badpass`, `use_pty` (true) and protected `secure_path`. Unknown rules/defaults,
+   passwordless rules, scoped Defaults or other authority are **BLOCKED**, not adopted.
+   Standard root-owned `/bin` and `/sbin` aliases resolve to protected canonical paths.
+   This is a recovery-specific acceptance check, not a change to the server's sudo policy.
+   It may deliberately block an otherwise legitimate server policy requiring separate review.
+5. Fresh read-only Docker fingerprints must be nonempty and remain identical during recovery.
+   Only mount order is normalized; complete mount/configuration/identity/start/restart/running
+   fields remain protected. No claim about historical deployment, database content or application
+   health follows from this comparison. Recovery does not mutate Docker or certify a deployment.
+6. Root wrapper status/missing-approval/unknown/extra-argument tests run against the verified
+   installed code. Before activation, cached-credential-independent sudo tests must deny all
+   four operations, generic `true`, extra arguments and environment overrides. Installed state,
+   policy and runtime are rechecked before phase B. An exclusive phase-A receipt records only
+   acceptance labels and policy/runtime digests; no raw configuration is published.
+
+These gates establish that the intended installation subset is correct **now** and that this
+recovery leaves unrelated runtime and existing policy unchanged. They cannot attest that other
+administrative changes did not occur since the original attempt. Root administrators must not
+change policy, files or runtime concurrently. Enigma's Docker access remains root-equivalent;
+the gateway is not OS isolation. No past drift is excused as proven harmless.
+
+### Single operator command — after independent review and execution authorization
+
+Run as enigma in the local terminal. Obtain the command/pins from the independently reviewed
+checkpoint, not an untrusted edited checkout. Do not prefix it with sudo. The command verifies
+recovery bytes before execution, captures and verifies all input bytes before sudo, and then
+uses trusted OS Python to create fresh root-protected recovery staging and reverify bytes before
+execution. Sudo reads the password interactively from the controlling terminal; no chat password,
+argument, file, `-S` or askpass is supported. No Git command runs as root.
+
+```bash
+/usr/bin/python3.13 -ISB -c 'import hashlib,pathlib; p=pathlib.Path("/home/enigma/BigBrain/apps/bigbrain/scripts/approved-ops-install"); b=(p/"recover.py").read_bytes(); assert hashlib.sha256(b).hexdigest()=="31213d6230752c90cdbfda44650fd64fd923f9e5782cfef5e73b782bad322d18", "Recovery hash mismatch"; n={"__name__":"verified_recovery"}; exec(compile(b,"verified_recovery","exec"),n); f=n["launch"]; raise SystemExit(f(p,"fdd4723b50a4dfd4306a95d89452347cbda2ae84019728035aaa6232fc4f3570"))'
+```
+
+- Recovery code SHA-256: `31213d6230752c90cdbfda44650fd64fd923f9e5782cfef5e73b782bad322d18`.
+- Recovery manifest SHA-256: `fdd4723b50a4dfd4306a95d89452347cbda2ae84019728035aaa6232fc4f3570`.
+- Helper SHA-256: `07797634a5b1b4a380c070929720490a699db0092fb9f47dde838a850af8b12b`.
+- Original manifest SHA-256: `1dcc25d5bd07279760d5c6f621d596c5090b159a1bcf08155ca691863c8412fa`.
+
+### Mutation boundary, receipts and interrupted recovery
+
+The same installation-directory flock prevents concurrent installer/recovery processes. Once
+historical evidence and initial current-state gates pass, an exclusive `recovery-attempt.json`
+is added to the original staging. Original files are never overwritten. This new marker binds
+the recovery manifest and new protected staging, consuming this one attempt. Root wrapper tests
+may lock the existing empty wrapper lock but create no approval, claim or production operation.
+
+Only after revalidation may phase B install the exact four-command sudoers example through the
+existing atomic no-overwrite helper. Its newly created dot-prefixed temporary hardlink is the
+only file removed; no pre-existing file is deleted. Full `visudo -c`, exact policy-file delta,
+wrapper tests as enigma and sudo-denial tests must pass. Final runtime and installed-state checks
+remain mandatory. No broader NOPASSWD rule is added. No backup, worker, systemd unit, deployment
+or provider request is started. API-only remains disabled by the unchanged accepted wrapper.
+
+A successful run prints `PASS / recovery-complete`, phase A/B PASS, `CURRENT_STATE_ONLY`,
+`EXACT_FOUR_OPERATIONS`, historical drift UNKNOWN and systemd/production NOT RUN. It reports the
+new protected evidence directory holding progress, phase-A acceptance and final result. Confirm
+these exact labels and retain the result; this is installation acceptance, not operation approval.
+
+Any other outcome is **BLOCKED**. Errors before a verified recovery staging may produce only a
+fixed error; interruption or disk failure may leave no final receipt. Treat missing completion
+as UNKNOWN/BLOCKED. After an attempt marker, rule or pending file exists, retries fail closed.
+No automatic deletion, policy rollback or reinstallation occurs. A phase-B failure may retain
+an installed sudoers rule; report/evidence do not promise that the rule is absent. The administrator
+must inspect retained artifacts and actual policy before a separately approved recovery/revocation.
+Do not delete markers to retry, rerun the original installer, or assume a missing PASS means no
+mutation. Existing backups, installed program bytes and running services remain untouched.
+
+### Recovery offline evidence
+
+```sh
+/usr/bin/python3.13 -ISB -m unittest discover -s tests/deployment -p test_approved_ops_recovery.py -q
+/usr/bin/python3.13 -ISB -m unittest discover -s tests/deployment -p test_approved_ops_install.py -q
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p test_approved_operations.py -q
+node scripts/verify-documentation.mjs
+git diff --check
+```
+
+Recovery: **19 tests PASS** with synthetic original staging/installed state, mocked host commands
+and real temporary filesystem writes/locks. Includes valid recovery with shuffled mounts,
+wrong installed hashes, missing/tampered/contradictory history, duplicate receipt fields,
+existing/pending sudoers, approvals/claims/runs/extra files, active locks, real configuration
+and policy drift, current-policy rejection, before/after-activation interruption, protected
+path denial, pinned bootstrap and caller input checks. Actual `cvtsudoers` is exercised only
+against synthetic temporary policy, proving includes are parsed and NOPASSWD is rejected.
+The existing installer suite additionally covers all mount fields, membership, identity,
+start/restart/running fields, ordered arrays, ACLs, symlinks, hardlinks and exclusive writes.
+
+Installer: **26 PASS**; unchanged accepted wrapper: **40 PASS**. Documentation, scoped diff,
+manifest/payload identity and targeted secrets checks: **PASS**. No production inspection or
+privileged execution is part of these tests. Host recovery and systemd acceptance: **NOT RUN**.
+Protected original receipts/support bytes and actual current sudo policy remain unverified until
+the operator's reviewed command passes its gates. No claim of successful host recovery is made.

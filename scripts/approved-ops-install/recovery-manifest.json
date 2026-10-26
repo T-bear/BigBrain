@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "sourceRevision": "b23e00d20a24bdeb459949ab335c8b9cd3599bd3",
+  "originalCommit": "be47b4732711653c72a723f3bcb054deb3825735",
+  "files": {
+    "recover.py": "31213d6230752c90cdbfda44650fd64fd923f9e5782cfef5e73b782bad322d18",
+    "install.py": "07797634a5b1b4a380c070929720490a699db0092fb9f47dde838a850af8b12b"
+  }
+}
