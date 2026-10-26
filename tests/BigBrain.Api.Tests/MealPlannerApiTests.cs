@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BigBrain.Api.Tests;
 
@@ -163,7 +164,7 @@ public sealed class MealPlannerApiTests : IDisposable
         await using var factory = Factory().WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<SchoolMealService>();
-            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock), clock));
+            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock, NullLogger<SchoolMealSourceClient>.Instance), clock));
         }));
         using var client = factory.CreateClient();
         var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);
