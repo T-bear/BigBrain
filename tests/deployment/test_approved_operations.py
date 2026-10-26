@@ -32,6 +32,8 @@ support = load('backup_support', ROOT / 'scripts/approved-ops/backup_support.py'
 REV = 'a' * 40
 IMAGE = 'sha256:' + 'b' * 64
 RUN = 'c' * 32
+CONTRACT = 'school-lunch-v3-systemd-v1'
+FILES = ops.CONTRACTS[CONTRACT]['files']
 
 
 class OperationsTests(unittest.TestCase):
@@ -103,13 +105,13 @@ class OperationsTests(unittest.TestCase):
         folder, digest = self.backup()
         # New independently approved operation, never reuse backup claim.
         run = 'e' * 32
-        plan = {'revision': REV, 'run': run, 'targets': {'api': self.container, 'web': {'Id': 'f' * 64, 'Image': IMAGE}},
+        plan = {'contract': CONTRACT, 'revision': REV, 'run': run, 'targets': {'api': self.container, 'web': {'Id': 'f' * 64, 'Image': IMAGE}},
                 'candidates': {'api': IMAGE, 'web': IMAGE}}
         cfg = {'services': {'api': {'image': IMAGE}, 'web': {'image': IMAGE}},
                'networks': {'default': {'external': True}}, 'volumes': {'data': {'external': True}}}
         root = self.config / 'packages' / run
         root.mkdir(mode=0o700)
-        files = {name: b'# synthetic, never executed\n' for name in ops.FILES}
+        files = {name: b'# synthetic, never executed\n' for name in FILES}
         files.update({'plan.json': json.dumps(plan).encode(),
                       'release.compose.json': json.dumps(cfg).encode(),
                       'rollback.compose.json': json.dumps(cfg).encode(),
@@ -136,7 +138,7 @@ class OperationsTests(unittest.TestCase):
         return a, root
 
     def reseal(self, a, root):
-        self.write(root / 'package.json', {name: ops.sha((root / name).read_bytes()) for name in ops.FILES})
+        self.write(root / 'package.json', {name: ops.sha((root / name).read_bytes()) for name in FILES})
         a['packageSha256'] = ops.sha((root / 'package.json').read_bytes())
         self.write(self.config / 'start-approved.json', a)
 
@@ -181,7 +183,7 @@ class OperationsTests(unittest.TestCase):
         self.assertTrue(any(x.startswith('--property=ExecStopPost=') and ' recover ' in x for x in command))
         root = self.state / 'runs' / ('school-lunch-v3-' + a['id'])
         self.assertTrue((root / 'submitted.json').exists())
-        for name in (*ops.FILES, 'package.json'):
+        for name in (*FILES, 'package.json'):
             self.assertEqual((root / name).read_bytes(), (source / name).read_bytes())
         self.assertEqual(command[-5:], ['-IS', str(root / 'runner.py'), 'work', str(root), a['packageSha256']])
 
@@ -326,6 +328,76 @@ class OperationsTests(unittest.TestCase):
         self.write(path, cfg); self.reseal(a, root)
         with self.assertRaisesRegex(ops.Denied, 'ComposeImageChanged'):
             self.engine.dispatch('start-approved')
+
+    def test_unknown_and_blocked_contracts_rejected_before_privileged_calls(self):
+        a, _ = self.prepare_package()
+        for name in ('unknown', '../school-lunch-v3-systemd-v1', 'api-only-diagnostics-v1'):
+            a['contract'] = name
+            self.write(self.config / 'start-approved.json', a)
+            self.calls.clear()
+            with self.subTest(contract=name), self.assertRaises(ops.Denied):
+                self.engine.dispatch('start-approved')
+            self.assertEqual(self.calls, [])
+            self.assertFalse((self.state / 'active.json').exists())
+
+    def test_api_web_package_cannot_be_used_for_api_only(self):
+        a, _ = self.prepare_package()
+        a.update(contract='api-only-diagnostics-v1', services=['api'])
+        self.write(self.config / 'start-approved.json', a)
+        self.calls.clear()
+        with self.assertRaisesRegex(ops.Denied, 'ContractUnavailable'):
+            self.engine.dispatch('start-approved')
+        self.assertEqual(self.calls, [])
+        self.assertFalse((self.state / 'claims' / (a['id'] + '.json')).exists())
+
+    def test_api_web_contract_cannot_be_narrowed_or_expanded_by_approval(self):
+        a, _ = self.prepare_package()
+        for services in (['api'], ['web'], ['api', 'web', 'sonarr'], ['web', 'api']):
+            a['services'] = services
+            self.write(self.config / 'start-approved.json', a)
+            with self.subTest(services=services), self.assertRaisesRegex(ops.Denied, 'DeploymentScope'):
+                self.engine.dispatch('start-approved')
+
+    def test_plan_contract_confusion_rejected_even_if_resealed(self):
+        a, root = self.prepare_package()
+        for identifier in ('api-only-diagnostics-v1', 'unknown', None):
+            path = root / 'plan.json'
+            plan = json.loads(path.read_text())
+            plan['contract'] = identifier
+            self.write(path, plan); self.reseal(a, root)
+            with self.subTest(identifier=identifier), self.assertRaisesRegex(ops.Denied, 'ContractMismatch'):
+                self.engine.dispatch('start-approved')
+
+    def test_api_only_plan_cannot_masquerade_as_api_web_contract(self):
+        a, root = self.prepare_package()
+        path = root / 'plan.json'; plan = json.loads(path.read_text())
+        del plan['targets']['web']; del plan['candidates']['web']
+        self.write(path, plan); self.reseal(a, root)
+        with self.assertRaisesRegex(ops.Denied, 'PlanScope'):
+            self.engine.dispatch('start-approved')
+
+    def test_contract_registry_cannot_be_supplied_by_approval_or_package(self):
+        a, root = self.prepare_package()
+        a['contracts'] = {'api-only-diagnostics-v1': {'enabled': True}}
+        self.write(self.config / 'start-approved.json', a)
+        with self.assertRaisesRegex(ops.Denied, 'InvalidSchema'):
+            self.engine.dispatch('start-approved')
+        del a['contracts']; self.write(self.config / 'start-approved.json', a)
+        self.write(root / 'contracts.json', {'enabled': True})
+        with self.assertRaisesRegex(ops.Denied, 'PackageFiles'):
+            self.engine.dispatch('start-approved')
+        with self.assertRaises(TypeError):
+            ops.CONTRACTS['api-only-diagnostics-v1']['enabled'] = True
+        with self.assertRaises(TypeError):
+            ops.CONTRACTS['new'] = {}
+
+    def test_status_rejects_unknown_or_missing_contract_without_fallback(self):
+        for value in ({'id': RUN}, {'id': RUN, 'contract': 'unknown'},
+                      {'id': RUN, 'contract': 'api-only-diagnostics-v1'}):
+            self.write(self.state / 'active.json', value)
+            with self.subTest(value=value), self.assertRaises(ops.Denied):
+                self.engine.dispatch('status')
+        self.assertEqual(self.calls, [])
 
     def test_dependency_changed_rejected(self):
         _, _ = self.prepare_package()
