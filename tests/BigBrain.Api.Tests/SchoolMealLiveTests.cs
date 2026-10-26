@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using BigBrain.Api.MealPlanner;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BigBrain.Api.Tests;
 
@@ -33,7 +34,7 @@ public sealed class SchoolMealLiveTests
         SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true }
     };
     private static SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null) =>
-        new(options ?? Enabled, new SchoolMealSourceClient(new HttpClient(handler), clock), clock);
+        new(options ?? Enabled, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock);
     private static Task<SchoolMealWeek> Get(SchoolMealService service) => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
 
     [Fact]

@@ -795,3 +795,72 @@ metadata. No merge has occurred. All source flags remain false by default; deplo
 source activation, actual HTTP/cache compatibility and physical iPhone/PWA acceptance are separate.
 Musikugglan still provides no source year; explicitly derived dates are not source-verified dates.
 Finance/BB-158 remain frozen; unrelated untracked work is preserved.
+
+### Skollunch v3 — bounded HTTP diagnostics and status ordering, 2026-10-26
+
+**REVIEW CHECKPOINT — NO MERGE OR DEPLOYMENT.** Branch
+`fix/school-lunch-cache-diagnostics`, accepted baseline
+`ff17bf46c7882ff3d046b07a037409ca59de3523`. Exact publication SHA/tree resolve from this
+section's commit metadata. Scope is source-response diagnostics and HTTP-error classification;
+no source request, runtime inspection/change, cache clearing or supplier activation is performed.
+
+Confirmed in baseline code: the cache-policy check precedes HTTP-status handling. A429 with
+no-cache/no-store can therefore return `cachePolicy` before its Retry-After is processed.
+This is a reproduced code defect, **not evidence of the actual production response headers**.
+Owner-reported permission for six-hour fetching/24-hour transient caching above remains distinct
+from HTTP cache instructions; this change introduces no override or new permission assumption.
+
+Changes:
+
+- `src/BigBrain.Api/MealPlanner/SchoolMealSourceClient.cs` emits one structured Information event
+  `SchoolMealSourceResponse` (event ID1) per received response, using the existing typed client's
+  logger and generated LoggerMessage support. No global logging configuration changes. Fields:
+  local school ID, UTC check time, numeric HTTP status, normalized Cache-Control, Age seconds,
+  Date/Expires UTC and the selected decision reason. Cache-Control projects only fixed flags
+  (no-store, no-cache, must/proxy-revalidate, private/public), numeric max-age/s-maxage and an
+  extension-presence boolean. Extension names/values and field-name lists are omitted.
+  Typed numbers/dates and fixed vocabulary structurally bound each value below512 characters;
+  no raw-header truncation is used. Missing/unparseable scalar headers are `missing`/`invalid`.
+  Unknown Cache-Control extensions are represented only by the presence flag; this is intentionally
+  not a lossless dump. No URLs, query strings, reason phrases, cookies, keys, bodies or exceptions
+  enter this event. Transport failures have no response-header event.
+- HTTP429 is `unavailable` with the existing Retry-After parsing; other non200/non304 responses
+  are `unavailable`. Error bodies are not read. This prevents an error response's cache headers
+  from masking HTTP status or suppressing Retry-After. Previously cached menu data follows the
+  existing service's HTTP-error/stale policy, not the error body's cache directives.
+- HTTP200/304 retain the same ordered rejection conditions: no-store, no-cache, remaining max-age
+  below six hours, or Expires below six hours when max-age is absent. Decision reasons are
+  `noStore`, `noCache`, `insufficientFreshness`, `expiresTooSoon`, `rateLimited`, `httpError`,
+  `cacheAccepted`. The last denotes only passing this header gate, not successful body validation.
+  Six-hour cooldown, 24-hour stale boundary, original menu must-revalidate, flags, fixed URLs,
+  redirects/cookies restrictions, five-second deadline and size/encoding checks remain unchanged.
+- `tests/BigBrain.Api.Tests/SchoolMealSourceDiagnosticsTests.cs` supplies in-memory HTTP responses
+  and a capturing logger. Existing `SchoolMealLiveTests.cs` and `MealPlannerApiTests.cs` constructors
+  receive NullLogger; their assertions are preserved. No production or supplier traffic is needed.
+
+Verification and remaining evidence:
+
+- Focused backend build/test command: `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter 'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlannerApiTests'`.
+- Build iterations rejected ordinary/inline logging with CA1848/CA1873 and test array literals with
+  CA1861; implementation uses generated logging, an explicit enabled-level guard and static test
+  constants. No analyzer suppression was added. The first completed test run was92 PASS /1 FAIL:
+  the test incorrectly expected malformed Expires to be ignored. .NET maps it to MinValue/expired;
+  the existing cache rejection is preserved and the diagnostic labels this sentinel `invalid`.
+  This is offline evidence, not proof that either supplier sent malformed Expires.
+- Final focused backend build/tests: **PASS, 93/93, zero skipped**. Tests cover cache reasons/boundaries on200/304,
+  missing/malformed headers, HTTP errors,429 Retry-After date/delta/invalid/missing, cooldown without
+  extra requests, and bounded structured/rendered logs with synthetic sensitive-value canaries.
+- No actual supplier headers have been collected. The live triggering condition remains unknown;
+  diagnostics must first be independently reviewed, merged and separately approved for deployment.
+  Observe the next ordinary permitted on-demand fetch after deployment; do not clear cache or
+  trigger an extra fetch. Deployment/process restart itself resets the existing in-memory cooldown,
+  so the operator must preserve the supplier interval when planning that separately authorized step.
+- Finance/BB-158 and unrelated untracked work remain untouched. No new endpoint, scheduler,
+  database, package, UI change or cache-policy relaxation. UI/full repository tests and production
+  checks are outside this focused backend change; candidate Actions runs only on PR/main events.
+
+Final documentation validator and `git diff --check`: **PASS**. Targeted .NET formatting verification:
+**PASS**. Five-file scope review and targeted credential-pattern/manual diff review: **PASS**;
+this is not a full secrets audit (standalone gitleaks is unavailable locally). No UI code changes;
+frontend build/tests **SKIP**, application-wide tests **SKIP**. No live cache-policy fix is claimed:
+the bounded diagnostics/status correction is ready for independent review only.
