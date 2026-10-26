@@ -864,3 +864,70 @@ Final documentation validator and `git diff --check`: **PASS**. Targeted .NET fo
 this is not a full secrets audit (standalone gitleaks is unavailable locally). No UI code changes;
 frontend build/tests **SKIP**, application-wide tests **SKIP**. No live cache-policy fix is claimed:
 the bounded diagnostics/status correction is ready for independent review only.
+
+### Skollunch diagnostics — deployment preflight blocked, 2026-10-26
+
+**BLOCKED BEFORE MUTATION — existing production preserved.** The owner authorized deployment
+of merged diagnostics revision `4647cd8119edb5b7cd0872639fd79ba26a38b0d3`, retaining all source
+flags and the supplier minimum interval. Remote main matches that revision; its tree
+`51330a4d054cd7d65ce46ae43deb450b69319c97` is identical to the reviewed diagnostics candidate.
+[Main CI40264602851](https://github.com/T-bear/BigBrain/actions/runs/40264602851) completed with
+backend, frontend, documentation and secrets all success. No application test rerun was needed.
+This bounded operational checkpoint is `ops/school-lunch-diagnostics-deployment`; only this
+existing report changes. There is no newly prepared deployment package or executable launch order.
+
+Read-only Docker verification at approximately 2026-10-26 03:37 UTC:
+
+| Component | Actual runtime revision / image | State |
+| --- | --- | --- |
+| API | `ff17bf46c7882ff3d046b07a037409ca59de3523` / `sha256:f9b08f2b58664d6d1fb8e2b5d037f3b0e0fe371ecad83f156b2ee8e9257202e7` | running, healthy, zero restarts; started 2026-10-25 18:54:49 UTC |
+| Web | `ff17bf46c7882ff3d046b07a037409ca59de3523` / `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679` | running, healthy, zero restarts; started 2026-10-25 18:55:02 UTC |
+
+Both container IDs match the prior observed v3 deployment. All twelve production services are
+running; services without a configured healthcheck are not described as health-verified. API's
+five selected household/Media mounts remain named read/write volumes. All three
+`MealPlanner__SchoolMeals__{Enabled,RosenfeldtEnabled,MusikugglanEnabled}` values are true.
+No logging-level environment override was found; accepted configuration has Default Information
+and System.Net.Http.HttpClient Warning. The new typed-client Information event is therefore
+configured to be eligible after deployment, but has not been observed in production.
+
+**Interval gate: BLOCKED.** The retained completed v3 receipt records `cachePolicy` for both
+sources, `schoolSources: ON`, and `recovery.json: COMPLETE_NO_ACTION`. Last documented attempt
+timestamps are Rosenfeldt 2026-10-25T18:54:56.6168858Z and Musikugglan
+2026-10-25T18:54:57.4329493Z. They show those historical attempts, not the latest possible
+production attempts or successful menu fetches. Available API logs since container start contain
+zero SchoolMealSourceResponse, SchoolMealSourceClient-category or supplier-host matches.
+Absence of these logs is **not evidence of no later fetch**. The old client has no response-header
+event; service CheckedAt/NextAttempt are process-local. A school-meals GET can update that state
+and fetch upstream, so no such diagnostic request was made. API recreation loses cooldown and
+could permit a request less than six hours after an unobserved recent attempt.
+
+**Backup/recovery evidence boundaries:** retained backup-verified.json says PASS for manifest
+SHA-256 `09ccfdd17da297d307f8a76b0af69a2dfafaf16c77fcf56ce1eab167f8aec209`. This is historical
+pre-v3-deployment evidence, not a newly verified backup for the current API identity. Direct
+read of the protected manifest was denied with PermissionError; no sudo or Docker bypass was
+attempted. Current backup usability/freshness and replacement recovery have not been certified
+for this run. Existing v3 worker is tied to prior v2 identities, replaces API and Web and actively
+queries school endpoints in functional checks. Re-executing it unchanged would violate this
+run's scope/no-extra-fetch constraint. Old receipts/package remain untouched.
+
+**Minimum safe continuation:** establish an operator-controlled pause of all school-meal consumers
+(including direct API clients/integrations) while keeping the current API running. Record when
+any already in-flight source attempt has finished, then maintain a verifiable no-fetch window of
+at least six hours before replacement, unless equally reliable evidence of the latest attempt for
+both sources is already available. Do not obtain that evidence by refreshing Family View or
+calling the school endpoint. Mere age of the old receipt, healthy status or one idle socket sample
+is insufficient. No pause/window has been claimed established by this preflight.
+
+Once that gate is established, reverify the retained backup through the authorized local operator
+routine and bind a new API-only invocation of the existing Compose/systemd mechanism to current
+v3 configuration and recovery image. Preserve Web and all flags; omit forced school-source checks.
+Use component health/configuration checks, then observe only an ordinary permitted source fetch.
+No new general deployment mechanism or application development is proposed. No runnable command
+is supplied until its interval, backup and recovery prerequisites are verified.
+
+No build, deployment, restart, cache clearing, supplier request, database access/mutation, rollback
+or frozen-module operation was performed. Actual HTTP cacheheaders and iPhone acceptance remain
+unobserved. Documentation/scope checks are the only new local verification; production remains
+on the healthy v3 images listed above. The owner-authorized deployment is safely blocked, not
+completed or rolled back; no additional implementation or investigation starts automatically.
