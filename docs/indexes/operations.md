@@ -10,6 +10,7 @@ körningstillstånd. Kontrollera [frysningar](../operations/freezes.md) före op
 
 
 - [BigBrain appliance lifecycle](../operations/runbooks/bigbrain-appliance-lifecycle.md)
+- [Restricted approved operations wrapper](../operations/runbooks/approved-operations.md) — review only, not installed
 
 - [Operations overview](../operations/README.md)
 - [Runbook index](../operations/runbooks/README.md)
