@@ -967,3 +967,71 @@ View, followed by owner iPhone acceptance. If headers remain incompatible, seek 
 compatible feed/cache instruction or a separately reviewed solution; do not bypass restrictions.
 Current supplier responses and the production cachePolicy cause remain the concrete evidence gap.
 This checkpoint does **not** claim that current meals are now working in production.
+
+
+### SchoolLunch level 1 delivery — runtime and deployment gate, 2026-10-27
+
+**BLOCKED before deployment; no live-menu or iPhone acceptance claimed.** This is a new
+owner-authorized level 1 task after policy activation, baseline
+`65ed713649f7d47ec5787efde6bf15745b72c0f0`. PR #8 is merged and its exact
+[main CI 40594854043](https://github.com/T-bear/BigBrain/actions/runs/40594854043) is completed/success.
+This permits technical delivery within scope, not bypass of administrator-held approvals.
+
+Read-only observations at approximately 22:35–22:39 UTC:
+
+- API and Web are running/healthy, each with restart count zero and image revision
+  `ff17bf46c7882ff3d046b07a037409ca59de3523`. API image is
+  `sha256:f9b08f2b58664d6d1fb8e2b5d037f3b0e0fe371ecad83f156b2ee8e9257202e7`;
+  Web image is `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679`.
+  All three SchoolMeals environment flags are true. All five expected API data mounts are
+  present as writable named volumes; this is mount inspection, not database integrity evidence.
+- Main includes the diagnostic/status-ordering correction and cache-expiry candidate `12fe4ef`
+  (merged via `3e0fed4`), plus API+Web worker `22ae923` (merged via `82fd7bb`). These newer
+  application corrections are **not running**. Older report statements that they await merge
+  describe their historical checkpoints. The unmerged operations follow-up `aa5db2a` records
+  those merges; it contains documentation only. Installation recovery remains a separate branch.
+- The bounded last-30,000-line/48-hour API log read found zero `SchoolMealSourceResponse`
+  names and zero formatted `School meal source ` messages. The running revision predates
+  this logging, so this cannot prove absence of requests or establish supplier waiting times.
+  No raw logs were published. No SchoolMeals endpoint was called: its GET can initiate HTTP.
+- Installed wrapper bytes equal main (SHA-256
+  `1a512f21c1cfa1ca868aabe473874bad2f463341bfd14e1bde4ae8beee124055`). The four fixed
+  NOSETENV/NOPASSWD commands are present. `status` returned `NO_WRAPPER_RUN`.
+  One `verify-backup` call exited 1 with the sanitized reason
+  `approval, integrity, busy or execution check failed; administrator review required`.
+  Protected approval/state directories are unreadable by the agent. Missing/expired approval,
+  integrity failure or contention cannot be distinguished from this result; none is asserted
+  as the proven internal cause. No backup/start/recovery operation was attempted.
+
+For **each school**, actual current HTTP status/cache headers, parsing result, week and dishes
+remain UNKNOWN. Previously owner-observed cachePolicy is historical. The deployed code can mask
+HTTP errors with that status; main fixes ordering. Intentional cache restrictions are unchanged.
+No speculative parser/cache correction or additional supplier request is justified by this evidence.
+
+Minimum continuation uses the existing
+[administrator approval procedure](../../../operations/runbooks/approved-operations.md#administrators-one-time-actions--only-after-separate-approval)
+and [maintenance gate](../../../operations/runbooks/approved-operations.md#supplier-interval-and-maintenance-gate):
+
+1. Administrator inspects the protected verify-backup approval and retained evidence to identify
+   the exact denial; binds a current valid backup approval to actual runtime/mounts, or enables
+   the existing fresh six-database backup operation and verifies its result. Do not infer PASS
+   from old backups or blindly retry the failed command.
+2. Establish the required harmless systemd acceptance and root-sealed package/recovery review.
+   Their current satisfaction is UNVERIFIED; wrapper status is not acceptance evidence. The
+   accepted API+Web worker can be used with exact accepted images and configuration. No new
+   gateway, sudo right or API-only contract is needed or authorized.
+3. Independently evidence a continuous six-hour no-fetch maintenance window, paused consumers
+   and both schools' longer Retry-After bounds; unknown backoff cannot be entered as zero.
+   Bind this evidence to the current API identity and fresh deployment approval. The agent
+   cannot create these administrator approvals. Do not restart to obtain missing diagnostics.
+
+No build, restart, deployment, cache clearing, database read/write, source request or rollback
+was performed. Other services, Finance, BB-158, gateway, ACLs and household data were not changed.
+The distinct level 2 database-deployment backup gate remains BLOCKED; this task makes no database
+change, but its existing deployment contract still requires a verified current backup.
+
+Existing 97 focused backend tests, 22 frontend tests/build and exact main CI are reused because
+no application/worker code changed. New verification is documentation/link/scope/secrets review
+and diff validation, recorded in this checkpoint's handoff. No new application test or production
+acceptance PASS is inferred. Next action is administrator evidence through the existing gateway,
+not another general deployment permission or application development sprint.

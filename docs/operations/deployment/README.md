@@ -88,7 +88,15 @@ Mål: högst två extra ägaringrepp totalt för fem deploymenter. Notera blocke
 containerbyte är ingen deployment och fyller inte en av de fem platserna. En verklig deployment
 med rollback räknas och markeras som sådan. Mätmålet kringgår inga bindande kontroller.
 
-Startstatus: **NOT STARTED; 0/5 deploymenter efter ikraftträdande**, ännu inga mätresultat.
+Uppföljning 2026-10-27: **0/5 verkliga deploymenter; ett blockerat leveransförsök** efter
+ikraftträdandet. Det nya nivå 1-uppdraget SchoolLunch stoppades före build/containerbyte:
+`verify-backup` nekades av installerad gateway och underhålls-/backoffunderlag kunde inte styrkas.
+[Sanerad runtime- och grindverifiering](../../reports/features/family/school-meals-preparation-20261023.md#schoollunch-level-1-delivery--runtime-and-deployment-gate-2026-10-27).
+Ingen deploymentrevision eller run-ID skapades; faktisk runtime är fortsatt `ff17bf46`.
+Rollbacks: 0. Extra manuella ingrepp: en administratörsinsats begärd för befintliga skyddade
+godkännanden och grindbevis, ännu inte utförd; om ägaren utför den ska den räknas som extra
+ägaringrepp. Genomförda extra ägaringrepp i detta försök: 0. iPhone/PWA-acceptans: NOT RUN,
+redovisas separat. Ingen leveransplats förbrukas av stoppet och inget mätmål upphäver grinden.
 Ingen historisk deployment räknas retroaktivt. Tidigare verifiering visar SchoolLunch v3 på
 `ff17bf46` och senare korrigeringar mergade i `82fd7bba`; se
 [daterad operationsuppföljning](https://github.com/T-bear/BigBrain/blob/aa5db2a418654ad3dd8c0e3c6c8355fcea974e73/docs/operations/runbooks/approved-operations.md#approved-merges-completed-root-backup-gate-blocked--2026-10-27).
