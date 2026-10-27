@@ -17,10 +17,18 @@ Före ett separat uttryckligt ägarbeslut med ikraftträdande revision krävs ex
 för merge och separat deploymentauktorisering på alla nivåer. Dokumentationspublicering eller
 merge aktiverar inte delegeringen. Efter ikraftträdandet får nivå 1 och 2 autonom teknisk leverans
 inom godkänt uppdrag med relevanta kontroller; nivå 2-databasdeployment kräver separat granskning
-tills backupgrinden är verifierad. Nivå 3 kräver faktisk oberoende granskning och behåller exakt
-SHA-godkännande samt separat deploymentauktorisering. Installerade skydd, sekretess, ekonomiska
-gränser och frysningar gäller oförändrat. Högst två ordinarie reviewvarv och två automatiska
-reparationsförsök ersätter inte obligatorisk verifiering. Obligatorisk iPhone/PWA-acceptans
+tills backupgrinden är verifierad. Även nivå 3 får efter ikraftträdandet autonom merge och
+deployment inom på förhand godkänt uppdrag och riskram, först efter godkänd faktisk oberoende
+granskning av exakt kandidat-SHA/tree mot rätt main-baslinje. Inget nytt manuellt ägargodkännande
+av varje SHA eller deployment krävs inom ramen. Utökad ekonomisk risk, nya kostnader, utökning
+utanför mandatet, hävning av frysningar och andra reserverade beslut kräver separat ägarbeslut.
+Installerade skydd, driftkontrakt, sekretess, ekonomiska gränser och frysningar gäller oförändrat.
+Högst två ordinarie reviewvarv och två avgränsade automatiska reparationsförsök ersätter inte
+obligatorisk verifiering. Efter ikraftträdandet ska kvarstående fel efter högst två försök leda
+till säker rollback enligt driftkontraktet om den kan verifieras utan dataförlust eller brott mot
+bindande skydd; annars stoppar Codex, bevarar tillståndet och rapporterar hindret. Före
+ikraftträdandet gäller befintliga godkännandekrav och stoppregeln i AGENTS avsnitt 7.
+Obligatorisk iPhone/PWA-acceptans
 redovisas separat och kan endast godkännas av ägaren.
 
 ## Frysningar före testval

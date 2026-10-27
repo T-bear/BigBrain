@@ -180,8 +180,13 @@ Andra varvet fokuserar på tidigare blockerare och tillkommande diff. Nyupptäck
 får inte nedklassificeras enbart för att koden är oförändrad. Nya P2/P3 i oförändrad kod öppnar
 inte nya iterationsloopar. Tvåvarvstaket begränsar automatiska granskningsloopar, inte obligatorisk
 säkerhetsverifiering.
-Högst två automatiska reparationsförsök per godkänt uppdrag. Kvarstår felet därefter: stoppa,
-redovisa försök, evidens och kvarstående kontroller och invänta ägarens beslut om fortsättningen.
+Högst två avgränsade automatiska reparationsförsök per godkänt uppdrag. Efter policyns uttryckliga
+ikraftträdande ska Codex, om felet kvarstår efter högst två försök, genomföra säker rollback
+enligt befintligt driftkontrakt om den kan verifieras utan dataförlust eller brott mot bindande
+skydd. Kan säker rollback inte styrkas: stoppa, bevara tillståndet och rapportera hindret.
+Redovisa försök, evidens, rollbackutfall och kvarstående kontroller; starta ingen ny reparationsloop.
+Före ikraftträdandet gäller befintlig auktorisering; kvarstår felet efter två försök: stoppa och
+invänta ägarens beslut om fortsättningen. Regeln ger inget nytt drifttillstånd genom publicering.
 Ett nytt reviewvarv nollställer inte räknaren. Taket ger inte tillstånd till blinda driftomförsök,
 kringgående av säkerhetsgrindar eller att kalla ej genomförd verifiering godkänd.
 P2/P3 öppnar inte automatiskt nya Codex-iterationer. Vid uppfylld DoD och riskmotiverad verifiering
@@ -231,11 +236,11 @@ rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skr
   misslyckade experiment; naturlig reviewpunkt, experimentfel, beslut eller STOP ska vara beständigt.
 - **MERGE CANDIDATE:** checkpoint vars acceptanskriterier och riskmotiverade verifiering är uppfyllda.
 
-### Befintlig godkännandeväg före ikraftträdande och fortsatt för nivå 3
+### Befintlig godkännandeväg före ikraftträdande
 
-Följande exakta SHA-/stopp-/godkännanderegler gäller alla uppdrag före ikraftträdandet och
-fortsätter gälla nivå 3 efteråt. Nivå 3 kräver faktisk, dokumenterad oberoende granskning av
-kandidaten; agentens egen kontroll eller CI ersätter inte den granskningen.
+Följande exakta SHA-/stopp-/godkännanderegler gäller alla uppdrag före ikraftträdandet.
+Efter ikraftträdandet gäller den delegerade modellen nedan även nivå 3; agentens egen
+kontroll eller CI ersätter aldrig dess krav på faktisk oberoende kandidatgranskning.
 
 - **ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren
   uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
@@ -252,16 +257,20 @@ Om bestående fakta kräver en separat reconciliation-commit ska relevant CI ver
 
 ### Delegerad teknisk leverans efter uttryckligt ikraftträdande
 
-Det godkända uppdragets scope och risknivå avgränsar leveransen. För nivå 1 och 2 ersätter
+Det på förhand godkända uppdragets scope, risknivå och riskram avgränsar leveransen. För nivå 1–3 ersätter
 ikraftträdandebeslutet tillsammans med uppdragsauktoriseringen rutinmässigt separat exakt
 mergegodkännande, deploymentgodkännande och STOP efter checkpoint. Det ger inte rätt att starta
-ett nytt uppdrag. Saknas auktorisering för berörd åtgärd eller ändras scope krävs nytt beslut.
+ett nytt uppdrag. Nivå 3 kräver dessutom godkänd faktisk oberoende granskning av den exakta
+kandidaten enligt tabellen. Inget nytt manuellt ägargodkännande av varje SHA eller deployment
+krävs inom denna ram. Separat ägarbeslut krävs vid utökad ekonomisk risk, nya kostnader, utökning
+utanför mandatet, hävning av frysningar och andra uttryckligen reserverade beslut. Saknas
+auktorisering för berörd åtgärd eller ändras scope krävs nytt beslut innan åtgärden utförs.
 
 | Risknivå | Delegering inom godkänt uppdrag efter ikraftträdande |
 | --- | --- |
 | 1 | Autonom teknisk leverans, inklusive merge och deployment, med fokuserad verifiering, relevanta CI-kontroller och befintliga drift-/leverantörsgrindar. |
 | 2 | Autonom teknisk leverans med relevanta data-, åtkomst-, säkerhets- och återhämtningskontroller. Databasdeployment kräver separat granskning tills nivå 2-backupgrinden i avsnitt 3 är verifierad; grinden är fortsatt BLOCKED enligt backupunderlaget. |
-| 3 | Ingen autonom ersättning av gransknings- eller godkännandestegen ovan: faktisk oberoende granskning, exakt ägargodkänd SHA och separat deploymentauktorisering krävs. Finance är alltid nivå 3 och förblir fryst. |
+| 3 | Autonom merge och deployment inom på förhand godkänt uppdrag och riskram, först efter godkänd faktisk oberoende granskning av exakt kandidat-SHA/tree mot rätt main-baslinje. Granskningsutfall och kandidatidentitet dokumenteras; ändrad kandidat kräver ny tillämplig granskning. Ingen ny manuell SHA- eller deploymentauktorisering från ägaren krävs inom ramen. Finance är alltid nivå 3 och förblir fryst. |
 
 Även delegerad merge ska binda exakt kandidat-SHA/tree till verifierad main-baslinje, kontrollerad
 diff och tillämpliga required checks. Verifiera oförändrade identiteter omedelbart före merge;
