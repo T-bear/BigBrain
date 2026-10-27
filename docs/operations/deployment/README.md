@@ -20,28 +20,61 @@ runtime-evidence command to verify counts/replay without printing the token or r
 
 Grundstruktur. Ingen ny normativ deploymentprocedur införs i denna fas.
 
+## Ägarbeslut om riskpolicyns ikraftträdande – 2026-10-27
+
+Produktägaren har den **27 oktober 2026 uttryckligen beslutat att aktivera** den redan accepterade
+riskbaserade delegeringsmodellen. Detta registrerar ett fattat beslut, inte ett nytt policyförslag.
+Auktoritativ policyrevision är **`cb7d1e70bc28cc3c4db4c15aa872f426f82d09f8`**;
+[AGENTS avsnitt 3, 7 och 8 vid denna revision](https://github.com/T-bear/BigBrain/blob/cb7d1e70bc28cc3c4db4c15aa872f426f82d09f8/AGENTS.md)
+styr nivåer, granskning och delegering. Policyn accepterades ursprungligen via
+[PR #6](https://github.com/T-bear/BigBrain/pull/6), kandidat
+`0ba2845226a016d9ab73bd445981ee0309001e12`; AGENTS och TESTING är oförändrade mellan kandidaten
+och angiven policyrevision.
+
+**Ikraftträdandevillkor:** beslutet får tillämpas först när denna beslutsdokumentation har mergats
+till main och relevant main-CI för just den mergecommiten är godkänd. Verifiera publicerad merge-SHA
+och workflowens motsvarande `head_sha`; `backend`, `frontend`, `documentation` och `secrets` ska
+alla vara `completed/success`. Publicering, PR-CI eller tidigare main-CI uppfyller inte detta villkor.
+När båda villkoren är uppfyllda gäller beslutet utan ett nytt allmänt policybeslut. GitHub-merge
+och CI-kvitton fastställer den faktiska ikraftträdandetidpunkten; denna checkpoint påstår inte
+att merge eller ikraftträdande redan har skett.
+
+Beslutet gäller **endast nya, uttryckligen auktoriserade uppdrag från denna tidpunkt**, inom deras
+godkända scope och riskram. Ingen retroaktiv eller generell auktorisering av äldre uppdrag följer.
+Tidigare giltiga driftbeslut behåller sin ursprungliga omfattning men får ingen utökad delegering.
+
+- Nivå 1: autonom teknisk leverans inom godkänt scope och befintliga kontroller.
+- Nivå 2: autonom leverans med relevanta kontroller; [backupgrinden](../backup-restore/README.md#nivå-2-grind--evidens-och-återstående-verifiering)
+  för autonoma databasdeploymenter förblir **BLOCKED**. Separat granskning krävs tills faktisk
+  daglig backup och ett lyckat isolerat återställningsprov från verklig backup har verifierats.
+- Nivå 3: autonom merge/deployment inom på förhand godkänt uppdrag och riskram först efter
+  godkänd faktisk oberoende granskning av exakt kandidat-SHA/tree mot rätt main-baslinje.
+  Inget nytt rutinmässigt ägargodkännande av varje SHA/deployment krävs inom denna ram.
+
+Finance och hela BB-158 förblir [frysta](../freezes.md). Utökad ekonomisk risk, nya kostnader,
+mandatutökning, hävning av frysningar och andra reserverade beslut kräver separat ägarbeslut.
+Gateway, admin-ACL, root-approvals, säkerhetsgränser, leverantörsvillkor och användardata lämnas
+oförändrade; ingen produktionsåtgärd följer av registreringen. P1-reglerna, två ordinarie reviewvarv,
+högst två avgränsade reparationsförsök, verifierat säker rollback eller bevarat tillstånd vid hinder,
+resursram och sekretess gäller enligt policyn. Obligatorisk iPhone/PWA-acceptans förblir ägarens
+separata manuella acceptans och ersätts inte av CI eller teknisk leverans.
+
+**Övergångsregel för denna aktiverings-PR:** befintligt krav på uttryckligt ägargodkännande av
+exakt kandidat-SHA gäller. Aktiveringsbeslutet är inte ett förhandsgodkännande av en okänd kandidat.
+[Ruleset 25987490](https://github.com/T-bear/BigBrain/rules/25987490) verifierades aktivt 2026-10-27:
+PR, uppdaterad main och de fyra CI-kontrollerna krävs; force-push och deletion skyddas, inga
+bypass-aktörer finns. GitHub kräver noll numeriska review approvals, vilket inte ersätter policyns
+krav på faktisk oberoende granskning där den gäller. Reglerna ändras inte och ska kontrolleras
+vid merge. Repositoryts förbud mot squash/rebase gäller även om rulesetet tekniskt tillåter dem.
+
 ## Uppföljning av riskpolicyn
 
-**REVIEW CHECKPOINT, 2026-10-27 — policyn är inte antagen eller driftsatt genom publicering.**
-Branch `docs/risk-policy-levels`, baseline `82fd7bba0dfe41196902bba200d05426f1af2bde`.
-Införandet omfattar uppdragets sex uttryckliga policykorrigeringar. De hänvisade 43 tidigare
-policybesluten saknas i tillgängligt underlag; fullständig avstämning mot dem återstår före
-slutligt antagande. Nuvarande merge-/deploymentregler gäller. Oktober-gatewayen, admin-ACL:er,
-frysningar och runtime är oförändrade. Vid kompletteringen efter checkpoint `017ae25` har
-TESTING.md:s generella godkännanderegel anpassats till AGENTS avsnitt 8: befintliga krav före
-ikraftträdandet, delegerad leverans enligt risknivå först efter separat uttryckligt ägarbeslut
-med exakt ikraftträdande revision. Oberoende review identifierade denna lucka i första checkpointen.
-Inget ikraftträdandebeslut registreras här; backupgrinden är fortsatt BLOCKED. Faktisk oberoende
-granskning för nivå 3, högst två reviewvarv/reparationsförsök och separat iPhone-acceptans bevaras.
-CI för denna review-publicering: **PENDING (inte körd)**; ordinarie workflow triggas av PR/main,
-inte push till denna branch. Detta är inte ett påstående att en GitHub-körning har startat.
-Policygranskningen behandlas som nivå 3/HIGH eftersom kritiska privilegie- och auktoritetsgränser
-berörs; inga faktiska privilegier ändras. Dokumentationsvalidator, diffkontroll, riktad kontroll av
-länkar/ankare, tabeller, bevarade befintliga skyddsregler och sanerad diff: PASS. Gitleaks finns
-inte tillgängligt lokalt; riktad sekretesskontroll ersätter inte en full secrets-skanning.
-Applikations-/drifttester: SKIP, ren dokumentationsändring. Ingen pilot eller ny backup körd.
+Tidigare checkpointstatus och verifieringshistorik bevaras i
+[dokumentet före beslutsregistreringen](https://github.com/T-bear/BigBrain/blob/cb7d1e70bc28cc3c4db4c15aa872f426f82d09f8/docs/operations/deployment/README.md#uppföljning-av-riskpolicyn).
+Historiska formuleringar om ännu ej fattat policybeslut eller väntande granskning är inte aktuella
+stoppvillkor; det daterade ägarbeslutet och dess ikraftträdandevillkor ovan gäller.
 
-Efter uttryckligt ikraftträdandebeslut enligt [AGENTS avsnitt 8](../../../AGENTS.md#8-git-och-review-checkpoints), inte dokumentationsmerge,
+Efter uppfyllda ikraftträdandevillkor ovan, inte enbart dokumentationsmerge,
 registreras de fem första verkliga deploymenterna här, med länkar till befintliga driftkvitton.
 Ingen ny rapportserie eller mätinfrastruktur behövs. För varje leverans anges revision/run-ID,
 risknivå, datum, utfall, antal extra ägaringrepp och deras orsak, blockerade försök samt rollbacks.
@@ -62,8 +95,8 @@ Ingen historisk deployment räknas retroaktivt. Tidigare verifiering visar Schoo
 Detta är återanvänd historisk runtimeevidens, inte en ny driftkontroll. Kontrollera aktuell
 runtime före en verklig nivå 1-pilot av skolmat. Om avsedd version redan körs görs ingen
 konstgjord redeployment. Databas- eller privilegieändringar får inte ingå under nivå 1-etiketten.
-Pilot startar först efter uttryckligt ikraftträdandebeslut och verifierade befintliga driftgrindar, med giltiga
-tidigare godkännanden och leverantörsvillkor bevarade. Inget installerat skydd får kringgås.
+Pilot får starta som ett nytt uttryckligen auktoriserat uppdrag efter uppfyllda ikraftträdandevillkor
+och verifierade befintliga driftgrindar. Leverantörsvillkor bevaras; inget installerat skydd får kringgås.
 
 ## Controlled Finance daily acquisition / API revision
 
