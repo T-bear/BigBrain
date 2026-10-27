@@ -61,3 +61,14 @@ Vid ett faktiskt nytt avbrott används denna fil enligt AGENTS: ange rätt avbro
 baseline/branch, opublicerad delta, giltig evidens, återstående arbete och säker nästa åtgärd.
 Den [historiska mallen](../history/codex-recovery-before-doc-2a-20261024.md#recovery-note-template)
 bevaras som historik; aktuella handoffkrav finns i AGENTS, inte i en ny parallell process.
+
+## Skollunch — publicerad driftförberedelse, 2026-10-27
+
+Ingen avbruten produktionsoperation. `ops/school-lunch-approved-worker` utgår från main
+`b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; exakt checkpoint hämtas ur branchens Gitmetadata.
+Den granskade applikationskandidaten `12fe4ef71ac6a0158a3a40530e47a731a99af249` är oförändrad
+på `fix/school-lunch-cache-expiry`. Merge och deployment är inte utförda.
+[Worker, tester, observerad runtime och kvarstående godkännanden](runbooks/approved-operations.md#checkpoint-evidence-and-next-decision)
+är det bestående underlaget. Nästa steg är exakt mergegodkännande och oberoende granskning av
+worker-koden före root-godkännande; inga färdiga produktionspaket eller godkännanden finns här.
+Orelaterade oregistrerade filer har bevarats. Återanvänd testresultaten när motsvarande kod är oförändrad.
