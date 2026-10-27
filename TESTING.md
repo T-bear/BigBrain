@@ -12,7 +12,16 @@ Verifiera revision, miljö, scope och förutsättningar innan tidigare evidens �
 Implementerat, testat, CI-verifierat, mergat, deployat och manuellt accepterat är olika tillstånd.
 [STATUS](docs/STATUS.md) anger accepterad implementation och verifieringsnivå;
 [rapportkatalogen](docs/reports/REPORT-CATALOG.md) innehåller daterad evidens, inte färska PASS.
-Merge kräver exakt SHA-godkännande och deployment separat auktorisering enligt AGENTS.
+Merge- och deploymentauktorisering styrs av [AGENTS avsnitt 8](AGENTS.md#8-git-och-review-checkpoints).
+Före ett separat uttryckligt ägarbeslut med ikraftträdande revision krävs exakt SHA-godkännande
+för merge och separat deploymentauktorisering på alla nivåer. Dokumentationspublicering eller
+merge aktiverar inte delegeringen. Efter ikraftträdandet får nivå 1 och 2 autonom teknisk leverans
+inom godkänt uppdrag med relevanta kontroller; nivå 2-databasdeployment kräver separat granskning
+tills backupgrinden är verifierad. Nivå 3 kräver faktisk oberoende granskning och behåller exakt
+SHA-godkännande samt separat deploymentauktorisering. Installerade skydd, sekretess, ekonomiska
+gränser och frysningar gäller oförändrat. Högst två ordinarie reviewvarv och två automatiska
+reparationsförsök ersätter inte obligatorisk verifiering. Obligatorisk iPhone/PWA-acceptans
+redovisas separat och kan endast godkännas av ägaren.
 
 ## Frysningar före testval
 

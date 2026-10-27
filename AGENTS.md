@@ -4,7 +4,7 @@
 
 - Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.
 - ChatGPT är systemarkitekt och oberoende granskare; Codex är Lead Developer som implementerar,
-  verifierar, committar och pushar inom auktoriserat scope samt genomför separat godkänd merge.
+  verifierar, committar och pushar inom auktoriserat scope samt genomför merge enligt avsnitt 8.
 - Arbeta endast inom detta repository. Följ accepterad `ARCHITECTURE.md` och ADR:er.
   Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.
 - GitHub main är source of truth för accepterat arbete; aktiv checkpoint-branch för publicerat,
@@ -180,6 +180,10 @@ Andra varvet fokuserar på tidigare blockerare och tillkommande diff. Nyupptäck
 får inte nedklassificeras enbart för att koden är oförändrad. Nya P2/P3 i oförändrad kod öppnar
 inte nya iterationsloopar. Tvåvarvstaket begränsar automatiska granskningsloopar, inte obligatorisk
 säkerhetsverifiering.
+Högst två automatiska reparationsförsök per godkänt uppdrag. Kvarstår felet därefter: stoppa,
+redovisa försök, evidens och kvarstående kontroller och invänta ägarens beslut om fortsättningen.
+Ett nytt reviewvarv nollställer inte räknaren. Taket ger inte tillstånd till blinda driftomförsök,
+kringgående av säkerhetsgrindar eller att kalla ej genomförd verifiering godkänd.
 P2/P3 öppnar inte automatiskt nya Codex-iterationer. Vid uppfylld DoD och riskmotiverad verifiering
 ska arkitekten normalt rekommendera godkännande/merge. Ingen sen arkitekturomprövning utan
 konkret blockerande evidens eller uttrycklig ägarbegäran. Review ändrar inte scope automatiskt.
@@ -208,6 +212,15 @@ bedömning av levererat/återstående, risker, manuella kontroller och rekommend
 
 ## 8. Git och Review Checkpoints
 
+### Ikraftträdande och gemensamma Git-skydd
+
+Den delegerade modellen nedan är **INTE AKTIV** genom publicering eller merge av denna
+dokumentation. Den träder i kraft först genom ett separat uttryckligt ägarbeslut som anger
+exakt ikraftträdande revision (Git-SHA för policytexten). Beslutet ska dokumenteras beständigt
+med revision och omfattning i befintlig deploymentdokumentation. Saknas ett verifierbart sådant
+beslut gäller befintliga merge- och deploymentkrav för samtliga risknivåer. Detta uppdrag och
+dess publicering aktiverar inte modellen. Tidigare giltiga godkännanden bevaras inom sin scope.
+
 En bounded checkpoint-branch från verifierad `origin/main`; fortsätt samma branch genom review,
 inte en parallell implementation. Bevara orelaterat arbete och användarens ändringar. Ingen reset,
 rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skriv inte över eller
@@ -217,6 +230,13 @@ rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skr
   redan auktoriserat scope för oberoende review. Kan vara ofullständigt, blockerat eller innehålla
   misslyckade experiment; naturlig reviewpunkt, experimentfel, beslut eller STOP ska vara beständigt.
 - **MERGE CANDIDATE:** checkpoint vars acceptanskriterier och riskmotiverade verifiering är uppfyllda.
+
+### Befintlig godkännandeväg före ikraftträdande och fortsatt för nivå 3
+
+Följande exakta SHA-/stopp-/godkännanderegler gäller alla uppdrag före ikraftträdandet och
+fortsätter gälla nivå 3 efteråt. Nivå 3 kräver faktisk, dokumenterad oberoende granskning av
+kandidaten; agentens egen kontroll eller CI ersätter inte den granskningen.
+
 - **ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren
   uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
 
@@ -229,6 +249,34 @@ Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och rel
 Avvikelse kräver STOP/re-review. Pusha kontrollerad merge och verifiera relevant main-CI för exakt
 SHA; återanvänd giltig lokal evidens. Deployment kräver separat uttrycklig auktorisering.
 Om bestående fakta kräver en separat reconciliation-commit ska relevant CI verifieras för dess SHA.
+
+### Delegerad teknisk leverans efter uttryckligt ikraftträdande
+
+Det godkända uppdragets scope och risknivå avgränsar leveransen. För nivå 1 och 2 ersätter
+ikraftträdandebeslutet tillsammans med uppdragsauktoriseringen rutinmässigt separat exakt
+mergegodkännande, deploymentgodkännande och STOP efter checkpoint. Det ger inte rätt att starta
+ett nytt uppdrag. Saknas auktorisering för berörd åtgärd eller ändras scope krävs nytt beslut.
+
+| Risknivå | Delegering inom godkänt uppdrag efter ikraftträdande |
+| --- | --- |
+| 1 | Autonom teknisk leverans, inklusive merge och deployment, med fokuserad verifiering, relevanta CI-kontroller och befintliga drift-/leverantörsgrindar. |
+| 2 | Autonom teknisk leverans med relevanta data-, åtkomst-, säkerhets- och återhämtningskontroller. Databasdeployment kräver separat granskning tills nivå 2-backupgrinden i avsnitt 3 är verifierad; grinden är fortsatt BLOCKED enligt backupunderlaget. |
+| 3 | Ingen autonom ersättning av gransknings- eller godkännandestegen ovan: faktisk oberoende granskning, exakt ägargodkänd SHA och separat deploymentauktorisering krävs. Finance är alltid nivå 3 och förblir fryst. |
+
+Även delegerad merge ska binda exakt kandidat-SHA/tree till verifierad main-baslinje, kontrollerad
+diff och tillämpliga required checks. Verifiera oförändrade identiteter omedelbart före merge;
+vid avvikelse eller blockerande kontroll: stoppa. Bevara historiken, verifiera publicerad main och
+relevant CI för exakt merge-SHA före deployment. Dokumentera faktiskt levererad revision och
+verifieringsresultat. Ingen rätt följer att kringgå GitHub-skydd, installerad gateway, root-approvals,
+backup/recovery, leverantörsgränser eller bindande P0/P1. Oktober-gatewayen och admin-ACL:er ändras
+inte genom delegeringen. Ekonomiska gränser, sekretess och samtliga frysningar gäller oförändrat.
+
+Teknisk leverans är inte manuell produktacceptans. Obligatorisk iPhone/PWA-acceptans utförs av
+ägaren och redovisas separat som återstående tills uttryckligt godkänd; CI eller autonoma
+kontroller får inte registrera den som PASS. Två reviewvarv, två automatiska reparationsförsök
+och resursramen i avsnitt 7 gäller även delegerad leverans.
+
+### Publicering och spårbarhet för båda godkännandevägarna
 
 Verifiera `origin/main` före och efter push och att remote HEAD matchar publicerad lokal HEAD.
 Inga orelaterade ändringar får följa med. Dokumentationsändringar verifieras, committas separat

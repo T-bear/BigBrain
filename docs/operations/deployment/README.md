@@ -27,15 +27,21 @@ Branch `docs/risk-policy-levels`, baseline `82fd7bba0dfe41196902bba200d05426f1af
 Införandet omfattar uppdragets sex uttryckliga policykorrigeringar. De hänvisade 43 tidigare
 policybesluten saknas i tillgängligt underlag; fullständig avstämning mot dem återstår före
 slutligt antagande. Nuvarande merge-/deploymentregler gäller. Oktober-gatewayen, admin-ACL:er,
-frysningar och runtime är oförändrade. TESTING.md har granskats: inga direkt motstridiga
-formuleringar identifierades, därför lämnas filen och dess CI-/acceptanskrav oförändrade.
+frysningar och runtime är oförändrade. Vid kompletteringen efter checkpoint `017ae25` har
+TESTING.md:s generella godkännanderegel anpassats till AGENTS avsnitt 8: befintliga krav före
+ikraftträdandet, delegerad leverans enligt risknivå först efter separat uttryckligt ägarbeslut
+med exakt ikraftträdande revision. Oberoende review identifierade denna lucka i första checkpointen.
+Inget ikraftträdandebeslut registreras här; backupgrinden är fortsatt BLOCKED. Faktisk oberoende
+granskning för nivå 3, högst två reviewvarv/reparationsförsök och separat iPhone-acceptans bevaras.
+CI för denna review-publicering: **PENDING (inte körd)**; ordinarie workflow triggas av PR/main,
+inte push till denna branch. Detta är inte ett påstående att en GitHub-körning har startat.
 Policygranskningen behandlas som nivå 3/HIGH eftersom kritiska privilegie- och auktoritetsgränser
 berörs; inga faktiska privilegier ändras. Dokumentationsvalidator, diffkontroll, riktad kontroll av
 länkar/ankare, tabeller, bevarade befintliga skyddsregler och sanerad diff: PASS. Gitleaks finns
 inte tillgängligt lokalt; riktad sekretesskontroll ersätter inte en full secrets-skanning.
 Applikations-/drifttester: SKIP, ren dokumentationsändring. Ingen pilot eller ny backup körd.
 
-Efter faktiskt antagande av [AGENTS riskpolicy](../../../AGENTS.md#3-riskbaserad-arbetsinsats)
+Efter uttryckligt ikraftträdandebeslut enligt [AGENTS avsnitt 8](../../../AGENTS.md#8-git-och-review-checkpoints), inte dokumentationsmerge,
 registreras de fem första verkliga deploymenterna här, med länkar till befintliga driftkvitton.
 Ingen ny rapportserie eller mätinfrastruktur behövs. För varje leverans anges revision/run-ID,
 risknivå, datum, utfall, antal extra ägaringrepp och deras orsak, blockerade försök samt rollbacks.
@@ -49,14 +55,14 @@ Mål: högst två extra ägaringrepp totalt för fem deploymenter. Notera blocke
 containerbyte är ingen deployment och fyller inte en av de fem platserna. En verklig deployment
 med rollback räknas och markeras som sådan. Mätmålet kringgår inga bindande kontroller.
 
-Startstatus: **NOT STARTED; 0/5 deploymenter efter antagande**, ännu inga mätresultat.
+Startstatus: **NOT STARTED; 0/5 deploymenter efter ikraftträdande**, ännu inga mätresultat.
 Ingen historisk deployment räknas retroaktivt. Tidigare verifiering visar SchoolLunch v3 på
 `ff17bf46` och senare korrigeringar mergade i `82fd7bba`; se
 [daterad operationsuppföljning](https://github.com/T-bear/BigBrain/blob/aa5db2a418654ad3dd8c0e3c6c8355fcea974e73/docs/operations/runbooks/approved-operations.md#approved-merges-completed-root-backup-gate-blocked--2026-10-27).
 Detta är återanvänd historisk runtimeevidens, inte en ny driftkontroll. Kontrollera aktuell
 runtime före en verklig nivå 1-pilot av skolmat. Om avsedd version redan körs görs ingen
 konstgjord redeployment. Databas- eller privilegieändringar får inte ingå under nivå 1-etiketten.
-Pilot startar först efter antagen policy och verifierade befintliga driftgrindar, med giltiga
+Pilot startar först efter uttryckligt ikraftträdandebeslut och verifierade befintliga driftgrindar, med giltiga
 tidigare godkännanden och leverantörsvillkor bevarade. Inget installerat skydd får kringgås.
 
 ## Controlled Finance daily acquisition / API revision
