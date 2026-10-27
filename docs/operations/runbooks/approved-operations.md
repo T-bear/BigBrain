@@ -423,3 +423,50 @@ for merge, and independently review this operations checkpoint before privileged
 Then bind the accepted merge/CI, exact built images, fresh backup and verified maintenance/backoff
 facts in the existing administrator-approved package. No final production approval/package is
 present, no source timing is invented, and no working live meals or owner iPhone acceptance is claimed.
+
+### Follow-up deployment authorization and actual stop — 2026-10-27
+
+The owner subsequently explicitly authorized full SchoolLunch API+Web production deployment.
+That deployment decision remains valid; do not request it again. The same instruction expressly
+retained exact-SHA merge approval, independent privileged-code review and administrator gates.
+
+The resulting agent run performed **read-only checks only**: fetch, exact branch/tree/scope checks,
+PR and PR-CI queries, API/Web identity/health/environment inspection, and the fixed wrapper status
+call. Main remained `b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; application candidate `12fe4ef`
+and worker candidate `be88112` were unchanged. Runtime still reported `ff17bf46`, healthy API/Web,
+all three source flags true, and `NO_WRAPPER_RUN`. Neither school's current menu was requested or
+verified. These are observations from that run, not renewed runtime checks by this documentation update.
+
+No implementation or tracked local delta was produced, so there was no new code to publish.
+The previous worker implementation/tests were already pushed at
+`be88112e122ab237f956352019a23fc8a92a5816`. The subsequent deployment authorization and stop were
+reported only in chat; this follow-up records them persistently. No new technical investigation or
+application/worker test run is required for this documentation-only publication.
+
+The immediate stop was missing explicit merge approval of application SHA
+`12fe4ef71ac6a0158a3a40530e47a731a99af249` under AGENTS section 8. No independently approved
+security review of worker `be88112` was established. The author's own verification is not that
+independent approval. PR searches returned no matches and the connector returned no PR-triggered
+CI runs. **No PR creation or branch-protection check was attempted**; this is unfinished work,
+not evidence of a GitHub permission failure or a failed required check.
+
+Remaining sequence, with the existing deployment authorization retained:
+
+1. Obtain exact application merge approval and independent review/exact approval of the worker
+   code. This documentation commit changes neither worker nor application bytes; code-test evidence
+   above remains reusable. Check applicable branch protection/CI, prepare PRs and perform only
+   explicitly approved merges against verified baselines.
+2. Complete administrator-only harmless systemd acceptance and seal the separately reviewed,
+   root-protected operation approvals. Build/bind the accepted images and exact current configuration;
+   create and verify the six-database backup using the existing gateway. None of those operations
+   was attempted in the stopped run: they are **NOT RUN**, not failed or approved by inference.
+3. Establish the documented continuous maintenance window and both schools' backoff bounds.
+   No current evidence for that window was obtained. Unknown Retry-After must not be recorded as zero.
+   Seal the exact package only when these gates and recovery inputs are verified, then deploy through
+   the existing wrapper under the owner's already given deployment authorization.
+4. Verify runtime/data identities and observe the next ordinary permitted source request for each
+   school; diagnose actual HTTP/cache/parse/week results and complete Family View/iPhone acceptance.
+
+No new deployment permission, alternative gateway, speculative cache-policy change or root bypass
+is the remedy. No deployment, backup, systemd start, source request, merge or production mutation
+was performed. The end-to-end production objective remains **BLOCKED / NOT VERIFIED**.
