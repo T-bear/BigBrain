@@ -280,3 +280,193 @@ OS dependency audit and each production worker's root-mode/side-effect review re
 Documentation/scope/secrets checks are recorded in the checkpoint handoff; application test suites
 are not relevant to this host-tool-only change. Independent security review is required before
 merge/installation. This checkpoint changes no runtime or permissions.
+
+## SchoolLunch maintenance worker — review preparation, 2026-10-27
+
+This section is **REVIEW CHECKPOINT, not a production approval**. The earlier installation
+status at the top is historical. A read-only fixed `sudo -n ... status` call on 2026-10-26 UTC
+returned `NO_WRAPPER_RUN`; it does not certify installation acceptance, current backup or systemd.
+
+The bounded [worker](../../../scripts/approved-ops/school_lunch_worker.py) adapts the API+Web
+routine at `7971fa2` to the **existing** `school-lunch-v3-systemd-v1` interface. Both services
+are replaced, API first; it is not an API-only package. The installed gateway, its four operations,
+sudoers example and disabled API-only entry are unchanged. Worker code must be independently
+reviewed and approved before an administrator seals its bytes in a root-protected package.
+No execution of this script from an agent-writable checkout with sudo is permitted.
+
+Changes from that routine: revision/old images/backup identity come from the root-approved plan,
+not an obsolete v3 activation run. All environment values, including the three source flags, are
+preserved. The worker uses the fixed Compose binary and gateway's protected Docker configuration,
+with the accepted bounded subprocess implementation. It preserves ordered configuration arrays,
+compares the complete running non-target set, and checks all five backup mounts. Health, household
+read hashes, static Web content and six database inode identities are checked without SQL writes.
+The existing URL-import list is a bounded read-only SELECT, used only to reject unsafe in-flight
+imports; no job is started, synchronized, cancelled or cleared. No Finance endpoint/data is read.
+
+### Private package inputs and review
+
+After an accepted application merge and separate preparation/deployment authorization:
+
+1. Pin the accepted main SHA and successful CI. Build API **and** Web from its clean Git export
+   using the existing Dockerfiles/build procedure. Record immutable image IDs and revision labels.
+   No final deployment revision/images are claimed before that merge/build exists.
+2. Obtain a fresh, separately authorized six-database backup through `backup-approved`, then verify
+   it through `verify-backup`. An administrator binds the exact manifest hash, actual API identity
+   and five mounts. Existing per-database consistency and no-production-restore limitations apply.
+3. In a private directory prepare the existing `plan.json`, `release.compose.json`,
+   `rollback.compose.json`, `backup-runtime.json` from current inspected configuration, never
+   guessed defaults. Preserve the existing plan's `targets`, `candidates`, `project`, `others`,
+   `expectedServices`, `databases`, `mealsHash`, `webIndexHash`, `originalConfigHashes`, `run` and
+   `revision`. Add `contract: school-lunch-v3-systemd-v1`, `backupManifestSha256` and `sourceGate` below.
+   Rollback Compose contains the exact old images/environment/revision and identical mounts/networks.
+   Runtime/environment/Compose contents are private and must not be committed or printed.
+4. Assemble a **new** directory with the unprivileged
+   [package assembler](../../../scripts/approved-ops/prepare_school_lunch_package.py), passing only
+   those private input/output directories. It writes seven interface files plus their hash manifest;
+   it does not inspect production, build, approve, install or execute anything. `backup.py` is the
+   exact accepted support core; `verify-backup.py` refuses standalone execution. These legacy slots
+   are not invoked by this worker: the installed gateway performs backup verification before work.
+5. Independent review must cover executable bytes, effective Compose settings, backup and external
+   gates. An administrator stages the reviewed files root-only, independently checks hashes, and
+   seals one expiring `start-approved` approval using the existing procedure above. **Assembly is
+   not readiness or approval.** Perform the previously required harmless systemd acceptance first.
+   No real package, approval, image build or installation is supplied by this review checkpoint.
+
+### Supplier interval and maintenance gate
+
+API restart clears both process-local cooldowns, including a longer Retry-After. Before approval,
+all API/Web consumers (including direct clients/integrations) must remain paused, with no outstanding
+source request. An administrator must independently verify a continuous **six-hour no-fetch window**
+and any longer provider Retry-After; unknown timing blocks deployment. No source call or cache
+clearing is authorized to manufacture this evidence. A last HTTP log line alone is not proof.
+
+The hashed plan's `sourceGate` contains the exact API `containerId`, integer UTC epoch `quietSince`,
+`validUntil`, SHA-256 of the administrator's retained private maintenance evidence (`evidenceSha256`),
+and `retryAfterUntil` for **both** `rosenfeldt` and `musikugglan`. Zero means independently verified
+absence of a longer restriction, never unknown. Both bounds must have elapsed. The window is at
+least six and at most 24 hours old, unexpired and bound to that runtime. The administrator attests
+its meaning through package approval; the worker checks binding and timing, **not** continuous
+external client behaviour or the evidence document's truth. `usersPaused: true` alone is inadequate.
+Maintain the pause through completion/recovery. This is a concrete prerequisite, not an implemented
+network lock. If it cannot be evidenced, do not seal an approval or start the worker.
+
+The worker checks this gate before preflight, each replacement and any old-API restart. Three
+socket samples and an immediate pre-stop repeat conservatively reject active connections. They
+supplement the maintenance boundary, not eliminate its race with an unpaused client. Docker stop
+uses unlimited grace; timeout/unclean stop does not authorize SIGKILL of the container.
+
+### Verification, recovery and remaining acceptance
+
+No SchoolMeals endpoint is called during preflight, work or recovery. `COMPLETED` records verified
+API/Web replacement with source flags `UNCHANGED` and source verification `NOT_RUN`, **not working
+menus**. After authorized completion and release of maintenance, observe the next ordinary Family
+request's sanitized `SchoolMealSourceResponse`; do not force requests for both direct API and Web.
+Check each school's HTTP/cache/parse/week status and final iPhone/PWA UX separately. Existing event
+fields do not include Retry-After; unknown provider backoff must not be inferred from their absence.
+
+Recovery retains the accepted contract: restart only the exact original cleanly stopped container
+before replacement could have occurred, and only while the source gate remains valid. After the
+`replacement-possible` marker, preserve state and report `MANUAL_REVIEW_NO_RESTORE`, even if the old
+container no longer exists. No automatic Compose rollback, DB restore, approval retirement or
+rerun is allowed. The retained rollback configuration supports a separately reviewed operator
+recovery decision; it is not a new executable bypass of the gateway. A completed run is rechecked
+without changing it. Source verification or product acceptance is never inferred from completion.
+
+### Checkpoint evidence and next decision
+
+Branch `ops/school-lunch-approved-worker`, baseline
+`b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; publication SHA/tree are the commit containing this
+section. Changed files: this runbook, the recovery handoff, `school_lunch_worker.py`,
+`prepare_school_lunch_package.py` and `tests/deployment/test_school_lunch_approved_worker.py`.
+No installed wrapper, sudoers, contract registry, application, freeze or workflow code changed.
+
+The separate application candidate was reverified at exactly
+`12fe4ef71ac6a0158a3a40530e47a731a99af249`, tree `da7a8cc36febb0643daa2930a0518a79c4f17e1e`,
+branch `fix/school-lunch-cache-expiry`: one ahead, zero behind main, exactly the three reviewed
+files (SchoolMealService, SchoolMealLiveTests and school-meals report). Its
+[unchanged review evidence](https://github.com/T-bear/BigBrain/blob/12fe4ef71ac6a0158a3a40530e47a731a99af249/docs/reports/features/family/school-meals-preparation-20261023.md#skollunch-reliability--runtime-diagnosis-and-cache-expiry-2026-10-26)
+records **97 backend tests, 22 frontend tests and frontend build PASS**, reused here because its
+code/tree and assumptions are unchanged. The reviewed code clears expired menu/validators on read,
+rejects unsolicited 304, and preserves the six-hour interval, Retry-After and independent schools.
+It is **not merged**. This operations branch intentionally leaves that candidate unchanged.
+GitHub returned no PR-triggered workflow runs or commit statuses for its SHA: observed PR CI
+**NOT RUN**, not PASS. The connector filters PR runs and cannot certify main-push CI. Required
+branch checks/protection must still be checked before separately approved merge.
+
+Read-only observation on 2026-10-26 at approximately 22:00 UTC (2026-10-27 locally): API and Web
+were healthy/running, unchanged container identities and revision
+`ff17bf46c7882ff3d046b07a037409ca59de3523`. API image
+`sha256:f9b08f2b58664d6d1fb8e2b5d037f3b0e0fe371ecad83f156b2ee8e9257202e7`; Web image
+`sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679`.
+All three SchoolMeals container environment flags were true. No school endpoint, production
+DB or private backup manifest was read. Actual supplier HTTP/cache/week/dish results remain
+**UNKNOWN for both schools**; the running revision predates main's diagnostic event. A future
+`COMPLETED` receipt must not be interpreted as evidence of current menus or physical acceptance.
+
+Offline verification (no real Docker/systemd/HTTP):
+
+- `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p
+  test_school_lunch_approved_worker.py -q`: **32 PASS**. Covers package/gateway compatibility,
+  integrity/service scope, five-volume coverage, flags/environment, ordered arguments, source
+  timing/backoff/unknown evidence, no extra source fetch, active connections, API-before-Web,
+  failed health, interrupted stop, exact-old recovery and missing old container after replacement.
+- Same command with `test_approved_operations.py`: **40 PASS**, including synthetic SQLite/WAL,
+  tampered packages/approvals, concurrency and the disabled API-only entry.
+- `node scripts/verify-documentation.mjs`, targeted local-link/anchor verification,
+  `git diff --check` and targeted scope/secrets review: **PASS** at publication. An initial bad
+  relative documentation link was detected and corrected before the successful rerun.
+- Application test/build rerun: **SKIP**, unchanged candidate evidence above reused. Host systemd
+  acceptance, production deployment, backup and source verification: **NOT RUN**.
+
+Minimum next decision: explicitly approve application SHA `12fe4ef71ac6a0158a3a40530e47a731a99af249`
+for merge, and independently review this operations checkpoint before privileged-code approval.
+Then bind the accepted merge/CI, exact built images, fresh backup and verified maintenance/backoff
+facts in the existing administrator-approved package. No final production approval/package is
+present, no source timing is invented, and no working live meals or owner iPhone acceptance is claimed.
+
+### Follow-up deployment authorization and actual stop — 2026-10-27
+
+The owner subsequently explicitly authorized full SchoolLunch API+Web production deployment.
+That deployment decision remains valid; do not request it again. The same instruction expressly
+retained exact-SHA merge approval, independent privileged-code review and administrator gates.
+
+The resulting agent run performed **read-only checks only**: fetch, exact branch/tree/scope checks,
+PR and PR-CI queries, API/Web identity/health/environment inspection, and the fixed wrapper status
+call. Main remained `b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; application candidate `12fe4ef`
+and worker candidate `be88112` were unchanged. Runtime still reported `ff17bf46`, healthy API/Web,
+all three source flags true, and `NO_WRAPPER_RUN`. Neither school's current menu was requested or
+verified. These are observations from that run, not renewed runtime checks by this documentation update.
+
+No implementation or tracked local delta was produced, so there was no new code to publish.
+The previous worker implementation/tests were already pushed at
+`be88112e122ab237f956352019a23fc8a92a5816`. The subsequent deployment authorization and stop were
+reported only in chat; this follow-up records them persistently. No new technical investigation or
+application/worker test run is required for this documentation-only publication.
+
+The immediate stop was missing explicit merge approval of application SHA
+`12fe4ef71ac6a0158a3a40530e47a731a99af249` under AGENTS section 8. No independently approved
+security review of worker `be88112` was established. The author's own verification is not that
+independent approval. PR searches returned no matches and the connector returned no PR-triggered
+CI runs. **No PR creation or branch-protection check was attempted**; this is unfinished work,
+not evidence of a GitHub permission failure or a failed required check.
+
+Remaining sequence, with the existing deployment authorization retained:
+
+1. Obtain exact application merge approval and independent review/exact approval of the worker
+   code. This documentation commit changes neither worker nor application bytes; code-test evidence
+   above remains reusable. Check applicable branch protection/CI, prepare PRs and perform only
+   explicitly approved merges against verified baselines.
+2. Complete administrator-only harmless systemd acceptance and seal the separately reviewed,
+   root-protected operation approvals. Build/bind the accepted images and exact current configuration;
+   create and verify the six-database backup using the existing gateway. None of those operations
+   was attempted in the stopped run: they are **NOT RUN**, not failed or approved by inference.
+3. Establish the documented continuous maintenance window and both schools' backoff bounds.
+   No current evidence for that window was obtained. Unknown Retry-After must not be recorded as zero.
+   Seal the exact package only when these gates and recovery inputs are verified, then deploy through
+   the existing wrapper under the owner's already given deployment authorization.
+4. Verify runtime/data identities and observe the next ordinary permitted source request for each
+   school; diagnose actual HTTP/cache/parse/week results and complete Family View/iPhone acceptance.
+
+No new deployment permission, alternative gateway, speculative cache-policy change or root bypass
+is the remedy. No deployment, backup, systemd start, source request, merge or production mutation
+was performed. The end-to-end production objective remains **BLOCKED / NOT VERIFIED**.
