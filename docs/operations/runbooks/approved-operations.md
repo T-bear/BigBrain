@@ -470,3 +470,44 @@ Remaining sequence, with the existing deployment authorization retained:
 No new deployment permission, alternative gateway, speculative cache-policy change or root bypass
 is the remedy. No deployment, backup, systemd start, source request, merge or production mutation
 was performed. The end-to-end production objective remains **BLOCKED / NOT VERIFIED**.
+
+### Approved merges completed; root backup gate blocked — 2026-10-27
+
+The owner explicitly approved application `12fe4ef71ac6a0158a3a40530e47a731a99af249` and
+worker `22ae923c136a747eac020d8716cdbe92306d7376`. GitHub reported main unprotected, no required
+status contexts and no rulesets. Candidate check runs/statuses were absent, not PASS. Existing
+local test evidence was reused. Normal no-ff merges were created in an isolated worktree and
+pushed using the existing SSH identity; no PR was required and no 403 bypass was attempted.
+
+- Application merge: `3e0fed4e4d7033649bfba0a63e0b019dca263dc9`, parents baseline `b23e00d2`
+  and exact approved `12fe4ef7`; tree equals the application candidate.
+- Worker merge/current verified main: `82fd7bba0dfe41196902bba200d05426f1af2bde`, parents
+  `3e0fed4e4d7033649bfba0a63e0b019dca263dc9` and `22ae923c136a747eac020d8716cdbe92306d7376`.
+  Three application and five worker files are disjoint; all eight final blobs match the respective
+  approved candidates. No unrelated file, freeze or workflow change was included.
+- Main CI: [application merge run 40478814985](https://github.com/T-bear/BigBrain/actions/runs/40478814985)
+  and [combined main run 40478875650](https://github.com/T-bear/BigBrain/actions/runs/40478875650).
+  Both completed with conclusion success for their exact merge SHAs. Backend, Frontend,
+  Documentation and Secrets each completed/success in both runs: **CI PASS**.
+
+Read-only runtime reinspection still found healthy API/Web on `ff17bf46` and the same immutable
+image IDs listed above; all three SchoolMeals flags remain true. Wrapper status returned
+`NO_WRAPPER_RUN`. The installed sudo policy exposes the four exact NOSETENV/NOPASSWD operations;
+it does not grant the agent root approval installation or unrestricted systemd execution.
+
+One `verify-backup` invocation and one `backup-approved` invocation each exited 1 with the fixed
+sanitized denial: `approval, integrity, busy or execution check failed; administrator review required`.
+Root approval-file metadata is inaccessible to this agent. The specific internal cause is
+**UNKNOWN**; absent/expired approvals, integrity failure or lock state must not be asserted without
+administrator evidence. No successful new backup is established; preserve any private failure
+artifacts because generic denial alone does not prove that no backup state was written.
+No retry, start-approved, systemd start, provider fetch or container replacement was performed.
+
+**Deployment BLOCKED at the root gate, not at owner merge/deployment approval.** The administrator
+must inspect the existing protected approvals/receipts, dependencies and interlock according to
+this runbook, resolve only the verified cause, and seal the scoped backup/verification approvals
+for the current runtime. Preserve existing backup sets and claims. Then complete harmless systemd
+acceptance, backup verification, accepted-revision images/package/recovery and evidenced supplier
+quiet/backoff gates before the separately sealed start approval. The owner's existing deployment
+approval remains valid. Actual meals for both schools are still unverified. This follow-up is
+documentation only on the operations branch; it is not another merge or production change.

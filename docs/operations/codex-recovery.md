@@ -66,9 +66,11 @@ bevaras som historik; aktuella handoffkrav finns i AGENTS, inte i en ny parallel
 
 Ingen avbruten produktionsoperation. `ops/school-lunch-approved-worker` utgår från main
 `b23e00d20a24bdeb459949ab335c8b9cd3599bd3`; exakt checkpoint hämtas ur branchens Gitmetadata.
-Den granskade applikationskandidaten `12fe4ef71ac6a0158a3a40530e47a731a99af249` är oförändrad
-på `fix/school-lunch-cache-expiry`. Merge och deployment är inte utförda.
-[Worker, tester, observerad runtime och kvarstående godkännanden](runbooks/approved-operations.md#checkpoint-evidence-and-next-decision)
-är det bestående underlaget. Nästa steg är exakt mergegodkännande och oberoende granskning av
-worker-koden före root-godkännande; inga färdiga produktionspaket eller godkännanden finns här.
+Applikationskandidat `12fe4ef71ac6a0158a3a40530e47a731a99af249` och worker
+`22ae923c136a747eac020d8716cdbe92306d7376` är nu ägargodkänt mergade; verifierad main är
+`82fd7bba0dfe41196902bba200d05426f1af2bde`. Deployment är inte genomförd.
+[Mergebevis och root-blockerare](runbooks/approved-operations.md#approved-merges-completed-root-backup-gate-blocked--2026-10-27)
+är det bestående underlaget. Både verify-backup och backup-approved nekades; intern orsak är
+okänd utan administratörens granskning av skyddade underlag. Inga blinda omförsök. Befintligt
+deploymentgodkännande gäller; nästa steg är administratörens avgränsade kontroll enligt runbooken.
 Orelaterade oregistrerade filer har bevarats. Återanvänd testresultaten när motsvarande kod är oförändrad.
