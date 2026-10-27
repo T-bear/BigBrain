@@ -33,8 +33,35 @@ eller underhållbarhet.
 
 ## 3. Riskbaserad arbetsinsats
 
+### Risknivå för uppdraget
+
+Risknivå anges i uppdraget utifrån faktisk konsekvens och berörd behörighetsgräns.
+Vid osäkerhet används den högre nivån. Codex får inte själv sänka risknivån för att undvika
+granskning. Ett bekvämlighetsmål gör inte en databas- eller privilegieändring till nivå 1.
+
+| Risknivå | Omfattning och gräns |
+| --- | --- |
+| 1 – hemmabekvämlighet | Begränsad presentation och bekvämlighetsfunktion, exempelvis läsbaserad skollunchvisning, utan ändrad datalagring, åtkomstkontroll eller privilegieökning. Befintliga leverantörs-, säkerhets- och driftvillkor gäller. |
+| 2 – data/åtkomst | Ändringar som påverkar beständiga data, databasstruktur eller åtkomst till data, utan nivå 3-konsekvens. Dataintegritet, återhämtning och avgränsad åtkomst ska verifieras. |
+| 3 – Finance/pengar/kritiska privilegier | Finance är alltid nivå 3. Pengar, handels-/kapitalauktoritet och kritiska privilegier kräver motsvarande hög verifiering och oberoende granskning. Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar är alltid nivå 3. |
+
+Tillfällig nivå 2-grind: självständig deployment av databasändringar får inte aktiveras förrän
+verifierad daglig backup av viktiga databaser och minst ett lyckat isolerat återställningsprov
+från en verklig backup finns dokumenterade i [backupunderlaget](docs/operations/backup-restore/README.md#nivå-2-grind--evidens-och-återstående-verifiering).
+Tills dess krävs separat granskning av sådan deployment. Syntetiska tester eller enstaka
+backupkörningar bevisar inte daglig backup. Godkänd grind ersätter inte andra driftvillkor.
+
+Risknivå är inte ett merge-, deployment-, root- eller upptiningsgodkännande. Befintliga
+giltiga godkännanden ska återanvändas inom sin omfattning; installerade skydd och aktuella
+kontrakt får inte kringgås. Oktober-gatewayen lämnas oförändrad; att behålla, förenkla eller
+ersätta den kräver separat beslut. Admin-ACL:er ändras inte; personer och enheter med
+administratörsåtkomst är ännu inte beslutade. Inga nya betaltjänster eller handelsrättigheter följer.
+
+### Proportionell arbetsinsats och verifiering
+
 Använd lägsta lämpliga arbetsinsats; eskalera vid konkret behov. Detta klassificerar uppgiften,
-inte ett påstående att agenten kan ändra modellinställningar.
+inte ett påstående att agenten kan ändra modellinställningar. LOW/MEDIUM/HIGH nedan beskriver
+arbetsinsats, inte de tre risknivåerna eller rätt att sänka ett uppdrags granskning.
 
 | Nivå | Typisk omfattning |
 | --- | --- |
@@ -93,6 +120,10 @@ nytt godkännandesteg eller separat uppdrag. Detta kringgår aldrig obligatorisk
   det vanliga auktoriserade API:t. Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.
 - Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser
   gäller oförändrat. Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.
+- Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar kräver
+  nivå 3, oberoende granskning, avgränsade och återkallbara rättigheter samt sanerad loggning.
+  Docker-gruppåtkomst till rootful Docker är root-ekvivalent; en wrapper gör inte användaren
+  OS-isolerad. Ägargodkännande ersätter inte teknisk verifiering av privilegiegränsen.
 
 ## 6. Dokumentation – minsta beständiga sanning
 
@@ -141,7 +172,7 @@ Granskaren rekommenderar blockering. Produktägaren beslutar om kvarstående ris
 inom tillämpliga säkerhetsgränser och bindande beslut. Riskacceptans upphäver inte obligatoriska
 krav utan ett uttryckligt ändringsbeslut.
 
-Normalt högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
+Högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
 om fortsatt avgränsat arbete, minskat scope, uppskjutning eller stopp. Verifierade P0/P1 får aldrig
 kringgås för att nå en rundgräns; fortsatt nödvändig verifiering är inte förbjuden. Klassificeringen
 ersätter inte befintliga säkerhets-, Finance-, blocker- eller godkännanderegler.
@@ -158,6 +189,14 @@ När ramen nås rapporterar agenten genomfört arbete, kvarstående obligatorisk
 uppskattad återstående kostnad (med osäkerheter) och handlingsalternativ. Ägaren beslutar om
 fortsatt resursåtgång. Resursramen får aldrig användas för att beskriva ej genomförd obligatorisk
 verifiering som godkänd eller för att kringgå säkerhetskrav.
+
+Efter policyinförandet följs de fem första verkliga deploymenterna upp i den
+[befintliga deploymentdokumentationen](docs/operations/deployment/README.md#uppföljning-av-riskpolicyn).
+Registrera extra ägaringrepp, blockerade leveranser och rollbacks med faktisk evidens; obligatorisk
+iPhone/PWA-acceptans räknas separat. Målet är högst två extra ägaringrepp totalt över fem
+deploymenter, aldrig ett skäl att kringgå en grind eller dölja ett stopp. Ingen konstgjord
+redeployment för mätning. Kontrollera först verklig runtime för en SchoolLunch-pilot och utför
+den först efter antagen policy och uppfyllda driftgrindar inom redan giltig auktorisering.
 
 När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från
 GitHub, jämföra med accepterad main-baseline och läsa relevant diff, rapport, evidens, status,

@@ -20,6 +20,45 @@ runtime-evidence command to verify counts/replay without printing the token or r
 
 Grundstruktur. Ingen ny normativ deploymentprocedur införs i denna fas.
 
+## Uppföljning av riskpolicyn
+
+**REVIEW CHECKPOINT, 2026-10-27 — policyn är inte antagen eller driftsatt genom publicering.**
+Branch `docs/risk-policy-levels`, baseline `82fd7bba0dfe41196902bba200d05426f1af2bde`.
+Införandet omfattar uppdragets sex uttryckliga policykorrigeringar. De hänvisade 43 tidigare
+policybesluten saknas i tillgängligt underlag; fullständig avstämning mot dem återstår före
+slutligt antagande. Nuvarande merge-/deploymentregler gäller. Oktober-gatewayen, admin-ACL:er,
+frysningar och runtime är oförändrade. TESTING.md har granskats: inga direkt motstridiga
+formuleringar identifierades, därför lämnas filen och dess CI-/acceptanskrav oförändrade.
+Policygranskningen behandlas som nivå 3/HIGH eftersom kritiska privilegie- och auktoritetsgränser
+berörs; inga faktiska privilegier ändras. Dokumentationsvalidator, diffkontroll, riktad kontroll av
+länkar/ankare, tabeller, bevarade befintliga skyddsregler och sanerad diff: PASS. Gitleaks finns
+inte tillgängligt lokalt; riktad sekretesskontroll ersätter inte en full secrets-skanning.
+Applikations-/drifttester: SKIP, ren dokumentationsändring. Ingen pilot eller ny backup körd.
+
+Efter faktiskt antagande av [AGENTS riskpolicy](../../../AGENTS.md#3-riskbaserad-arbetsinsats)
+registreras de fem första verkliga deploymenterna här, med länkar till befintliga driftkvitton.
+Ingen ny rapportserie eller mätinfrastruktur behövs. För varje leverans anges revision/run-ID,
+risknivå, datum, utfall, antal extra ägaringrepp och deras orsak, blockerade försök samt rollbacks.
+Extra ägaringrepp är begärd ytterligare manuell ägaråtgärd efter det ursprungliga auktoriserade
+uppdraget, inklusive upprepade beslut och nödvändiga operatörsåtgärder om ägaren utför dem.
+Obligatorisk iPhone/PWA-acceptans redovisas separat. Administratörsåtgärd utförd av annan person
+redovisas som sådan, inte som ett ägaringrepp. Antalet får inte döljas genom omklassificering.
+
+Mål: högst två extra ägaringrepp totalt för fem deploymenter. Notera blockerade leveransförsök
+även om deployment ännu inte genomförts; de får inte försvinna ur mätningen. Ett stopp före
+containerbyte är ingen deployment och fyller inte en av de fem platserna. En verklig deployment
+med rollback räknas och markeras som sådan. Mätmålet kringgår inga bindande kontroller.
+
+Startstatus: **NOT STARTED; 0/5 deploymenter efter antagande**, ännu inga mätresultat.
+Ingen historisk deployment räknas retroaktivt. Tidigare verifiering visar SchoolLunch v3 på
+`ff17bf46` och senare korrigeringar mergade i `82fd7bba`; se
+[daterad operationsuppföljning](https://github.com/T-bear/BigBrain/blob/aa5db2a418654ad3dd8c0e3c6c8355fcea974e73/docs/operations/runbooks/approved-operations.md#approved-merges-completed-root-backup-gate-blocked--2026-10-27).
+Detta är återanvänd historisk runtimeevidens, inte en ny driftkontroll. Kontrollera aktuell
+runtime före en verklig nivå 1-pilot av skolmat. Om avsedd version redan körs görs ingen
+konstgjord redeployment. Databas- eller privilegieändringar får inte ingå under nivå 1-etiketten.
+Pilot startar först efter antagen policy och verifierade befintliga driftgrindar, med giltiga
+tidigare godkännanden och leverantörsvillkor bevarade. Inget installerat skydd får kringgås.
+
 ## Controlled Finance daily acquisition / API revision
 
 [BB-132F1 operator gate](../runbooks/finance-controlled-acquisition.md) defines the exact-revision
