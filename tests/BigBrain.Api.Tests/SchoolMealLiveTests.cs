@@ -213,6 +213,98 @@ public sealed class SchoolMealLiveTests
     }
 
     [Theory]
+    [InlineData(SchoolMeals.Rosenfeldt)]
+    [InlineData(SchoolMeals.Musikugglan)]
+    public async Task ExpiredMenuCannotBeRevivedBy304AfterLongRetryAfter(string school)
+    {
+        var html = school == SchoolMeals.Musikugglan;
+        var week = html ? 44 : 43;
+        var clock = new Clock { Now = new(2026, 10, html ? 26 : 19, 10, 0, 0, TimeSpan.Zero) };
+        var started = clock.Now;
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+            {
+                var response = html
+                    ? new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html") }
+                    : Rss();
+                response.Headers.ETag = new("\"original-menu\"");
+                response.Content.Headers.LastModified = started.AddHours(-1);
+                return Task.FromResult(response);
+            }
+        };
+        using var service = Service(handler, clock);
+        Task<SchoolMealWeek> Read() => service.GetAsync(school, 2026, week, TestContext.Current.CancellationToken);
+        Assert.Equal("published", (await Read()).Status);
+        clock.Now = started.AddHours(6);
+        handler.Reply = (_, _) =>
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+            response.Headers.RetryAfter = new(TimeSpan.FromHours(48));
+            return Task.FromResult(response);
+        };
+        Assert.True((await Read()).IsStale);
+        clock.Now = started.AddHours(24);
+        Assert.True((await Read()).IsStale); // Preserve the existing inclusive stale boundary.
+        clock.Now = clock.Now.AddSeconds(1);
+        var expired = await Read();
+        Assert.Equal("unavailable", expired.Status);
+        Assert.False(expired.IsStale);
+        Assert.All(expired.Days, day => Assert.Empty(day.Dishes));
+        Assert.Equal(2, handler.Calls); // Eviction never shortens Retry-After or triggers a fetch.
+        clock.Now = started.AddHours(54);
+        handler.Reply = (request, _) =>
+        {
+            Assert.Empty(request.Headers.IfNoneMatch);
+            Assert.Null(request.Headers.IfModifiedSince);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+        };
+        var unvalidated = await Read();
+        Assert.Equal("invalid", unvalidated.Status);
+        Assert.False(unvalidated.IsStale);
+        Assert.All(unvalidated.Days, day => Assert.Empty(day.Dishes));
+        Assert.Equal(3, handler.Calls);
+        await Read();
+        Assert.Equal(3, handler.Calls);
+    }
+
+    [Theory]
+    [InlineData(SchoolMeals.Rosenfeldt)]
+    [InlineData(SchoolMeals.Musikugglan)]
+    public async Task Unsolicited304DoesNotValidateMenuWithoutRequestValidators(string school)
+    {
+        var html = school == SchoolMeals.Musikugglan;
+        var week = html ? 44 : 43;
+        var clock = new Clock { Now = new(2026, 10, html ? 26 : 19, 10, 0, 0, TimeSpan.Zero) };
+        var handler = new Handler
+        {
+            Reply = (_, _) => Task.FromResult(html
+                ? new HttpResponseMessage(HttpStatusCode.OK)
+                { Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html") }
+                : Rss())
+        };
+        using var service = Service(handler, clock);
+        Task<SchoolMealWeek> Read() => service.GetAsync(school, 2026, week, TestContext.Current.CancellationToken);
+        var first = await Read();
+        Assert.Equal("published", first.Status);
+        handler.Reply = (request, _) =>
+        {
+            Assert.Empty(request.Headers.IfNoneMatch);
+            Assert.Null(request.Headers.IfModifiedSince);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+        };
+        clock.Now = clock.Now.AddHours(6);
+        var failed = await Read();
+        Assert.Equal("invalid", failed.SourceStatus);
+        Assert.True(failed.IsStale);
+        Assert.Equal(first.FetchedAtUtc, failed.FetchedAtUtc);
+        Assert.False(failed.IsFixture);
+        await Read();
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Theory]
     [InlineData("no-store")]
     [InlineData("no-cache")]
     [InlineData("max-age=300")]

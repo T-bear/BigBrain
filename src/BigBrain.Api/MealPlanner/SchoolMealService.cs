@@ -23,6 +23,14 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
         public DateTimeOffset? Modified;
         public string Status = "unavailable";
         public bool AllowStale;
+        public void ClearMenu()
+        {
+            Menu = null;
+            ValidatedAt = null;
+            ETag = null;
+            Modified = null;
+            AllowStale = false;
+        }
         public void Dispose() => Gate.Dispose();
     }
     private readonly Entry rosenfeldt = new();
@@ -51,11 +59,15 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
             var now = clock.GetUtcNow();
             if (entry.Menu is { } previous && (previous.Year != year || previous.Week != week))
             {
-                entry.Menu = null;
+                entry.ClearMenu();
                 entry.Status = "notPublished";
-                entry.ValidatedAt = null;
-                entry.ETag = null;
-                entry.Modified = null;
+            }
+            if (entry.Menu is not null && now - entry.ValidatedAt > TimeSpan.FromHours(24))
+            {
+                // Expire content and its validators on access, even during a long Retry-After.
+                // Keep NextAttempt/CheckedAt: eviction must never authorize another source call.
+                entry.ClearMenu();
+                if (entry.Status == "published") entry.Status = "unavailable";
             }
             if (now >= entry.NextAttempt)
             {
@@ -66,13 +78,11 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
                 if (response.RetryAt > entry.NextAttempt) entry.NextAttempt = response.RetryAt.Value;
                 if (response.Status == "cachePolicy")
                 {
-                    entry.Menu = null;
-                    entry.ETag = null;
-                    entry.Modified = null;
+                    entry.ClearMenu();
                 }
                 else if (response.Status == "notModified")
                 {
-                    if (entry.Menu is null) entry.Status = "invalid";
+                    if (entry.Menu is null || (entry.ETag is null && entry.Modified is null)) entry.Status = "invalid";
                     else
                     {
                         entry.Status = entry.Menu.Status;
