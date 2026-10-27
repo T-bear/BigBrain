@@ -4,7 +4,7 @@
 
 - Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.
 - ChatGPT är systemarkitekt och oberoende granskare; Codex är Lead Developer som implementerar,
-  verifierar, committar och pushar inom auktoriserat scope samt genomför separat godkänd merge.
+  verifierar, committar och pushar inom auktoriserat scope samt genomför merge enligt avsnitt 8.
 - Arbeta endast inom detta repository. Följ accepterad `ARCHITECTURE.md` och ADR:er.
   Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.
 - GitHub main är source of truth för accepterat arbete; aktiv checkpoint-branch för publicerat,
@@ -33,8 +33,35 @@ eller underhållbarhet.
 
 ## 3. Riskbaserad arbetsinsats
 
+### Risknivå för uppdraget
+
+Risknivå anges i uppdraget utifrån faktisk konsekvens och berörd behörighetsgräns.
+Vid osäkerhet används den högre nivån. Codex får inte själv sänka risknivån för att undvika
+granskning. Ett bekvämlighetsmål gör inte en databas- eller privilegieändring till nivå 1.
+
+| Risknivå | Omfattning och gräns |
+| --- | --- |
+| 1 – hemmabekvämlighet | Begränsad presentation och bekvämlighetsfunktion, exempelvis läsbaserad skollunchvisning, utan ändrad datalagring, åtkomstkontroll eller privilegieökning. Befintliga leverantörs-, säkerhets- och driftvillkor gäller. |
+| 2 – data/åtkomst | Ändringar som påverkar beständiga data, databasstruktur eller åtkomst till data, utan nivå 3-konsekvens. Dataintegritet, återhämtning och avgränsad åtkomst ska verifieras. |
+| 3 – Finance/pengar/kritiska privilegier | Finance är alltid nivå 3. Pengar, handels-/kapitalauktoritet och kritiska privilegier kräver motsvarande hög verifiering och oberoende granskning. Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar är alltid nivå 3. |
+
+Tillfällig nivå 2-grind: självständig deployment av databasändringar får inte aktiveras förrän
+verifierad daglig backup av viktiga databaser och minst ett lyckat isolerat återställningsprov
+från en verklig backup finns dokumenterade i [backupunderlaget](docs/operations/backup-restore/README.md#nivå-2-grind--evidens-och-återstående-verifiering).
+Tills dess krävs separat granskning av sådan deployment. Syntetiska tester eller enstaka
+backupkörningar bevisar inte daglig backup. Godkänd grind ersätter inte andra driftvillkor.
+
+Risknivå är inte ett merge-, deployment-, root- eller upptiningsgodkännande. Befintliga
+giltiga godkännanden ska återanvändas inom sin omfattning; installerade skydd och aktuella
+kontrakt får inte kringgås. Oktober-gatewayen lämnas oförändrad; att behålla, förenkla eller
+ersätta den kräver separat beslut. Admin-ACL:er ändras inte; personer och enheter med
+administratörsåtkomst är ännu inte beslutade. Inga nya betaltjänster eller handelsrättigheter följer.
+
+### Proportionell arbetsinsats och verifiering
+
 Använd lägsta lämpliga arbetsinsats; eskalera vid konkret behov. Detta klassificerar uppgiften,
-inte ett påstående att agenten kan ändra modellinställningar.
+inte ett påstående att agenten kan ändra modellinställningar. LOW/MEDIUM/HIGH nedan beskriver
+arbetsinsats, inte de tre risknivåerna eller rätt att sänka ett uppdrags granskning.
 
 | Nivå | Typisk omfattning |
 | --- | --- |
@@ -93,6 +120,10 @@ nytt godkännandesteg eller separat uppdrag. Detta kringgår aldrig obligatorisk
   det vanliga auktoriserade API:t. Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.
 - Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser
   gäller oförändrat. Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.
+- Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar kräver
+  nivå 3, oberoende granskning, avgränsade och återkallbara rättigheter samt sanerad loggning.
+  Docker-gruppåtkomst till rootful Docker är root-ekvivalent; en wrapper gör inte användaren
+  OS-isolerad. Ägargodkännande ersätter inte teknisk verifiering av privilegiegränsen.
 
 ## 6. Dokumentation – minsta beständiga sanning
 
@@ -141,7 +172,7 @@ Granskaren rekommenderar blockering. Produktägaren beslutar om kvarstående ris
 inom tillämpliga säkerhetsgränser och bindande beslut. Riskacceptans upphäver inte obligatoriska
 krav utan ett uttryckligt ändringsbeslut.
 
-Normalt högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
+Högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar
 om fortsatt avgränsat arbete, minskat scope, uppskjutning eller stopp. Verifierade P0/P1 får aldrig
 kringgås för att nå en rundgräns; fortsatt nödvändig verifiering är inte förbjuden. Klassificeringen
 ersätter inte befintliga säkerhets-, Finance-, blocker- eller godkännanderegler.
@@ -149,6 +180,15 @@ Andra varvet fokuserar på tidigare blockerare och tillkommande diff. Nyupptäck
 får inte nedklassificeras enbart för att koden är oförändrad. Nya P2/P3 i oförändrad kod öppnar
 inte nya iterationsloopar. Tvåvarvstaket begränsar automatiska granskningsloopar, inte obligatorisk
 säkerhetsverifiering.
+Högst två avgränsade automatiska reparationsförsök per godkänt uppdrag. Efter policyns uttryckliga
+ikraftträdande ska Codex, om felet kvarstår efter högst två försök, genomföra säker rollback
+enligt befintligt driftkontrakt om den kan verifieras utan dataförlust eller brott mot bindande
+skydd. Kan säker rollback inte styrkas: stoppa, bevara tillståndet och rapportera hindret.
+Redovisa försök, evidens, rollbackutfall och kvarstående kontroller; starta ingen ny reparationsloop.
+Före ikraftträdandet gäller befintlig auktorisering; kvarstår felet efter två försök: stoppa och
+invänta ägarens beslut om fortsättningen. Regeln ger inget nytt drifttillstånd genom publicering.
+Ett nytt reviewvarv nollställer inte räknaren. Taket ger inte tillstånd till blinda driftomförsök,
+kringgående av säkerhetsgrindar eller att kalla ej genomförd verifiering godkänd.
 P2/P3 öppnar inte automatiskt nya Codex-iterationer. Vid uppfylld DoD och riskmotiverad verifiering
 ska arkitekten normalt rekommendera godkännande/merge. Ingen sen arkitekturomprövning utan
 konkret blockerande evidens eller uttrycklig ägarbegäran. Review ändrar inte scope automatiskt.
@@ -158,6 +198,14 @@ När ramen nås rapporterar agenten genomfört arbete, kvarstående obligatorisk
 uppskattad återstående kostnad (med osäkerheter) och handlingsalternativ. Ägaren beslutar om
 fortsatt resursåtgång. Resursramen får aldrig användas för att beskriva ej genomförd obligatorisk
 verifiering som godkänd eller för att kringgå säkerhetskrav.
+
+Efter policyinförandet följs de fem första verkliga deploymenterna upp i den
+[befintliga deploymentdokumentationen](docs/operations/deployment/README.md#uppföljning-av-riskpolicyn).
+Registrera extra ägaringrepp, blockerade leveranser och rollbacks med faktisk evidens; obligatorisk
+iPhone/PWA-acceptans räknas separat. Målet är högst två extra ägaringrepp totalt över fem
+deploymenter, aldrig ett skäl att kringgå en grind eller dölja ett stopp. Ingen konstgjord
+redeployment för mätning. Kontrollera först verklig runtime för en SchoolLunch-pilot och utför
+den först efter antagen policy och uppfyllda driftgrindar inom redan giltig auktorisering.
 
 När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från
 GitHub, jämföra med accepterad main-baseline och läsa relevant diff, rapport, evidens, status,
@@ -169,6 +217,15 @@ bedömning av levererat/återstående, risker, manuella kontroller och rekommend
 
 ## 8. Git och Review Checkpoints
 
+### Ikraftträdande och gemensamma Git-skydd
+
+Den delegerade modellen nedan är **INTE AKTIV** genom publicering eller merge av denna
+dokumentation. Den träder i kraft först genom ett separat uttryckligt ägarbeslut som anger
+exakt ikraftträdande revision (Git-SHA för policytexten). Beslutet ska dokumenteras beständigt
+med revision och omfattning i befintlig deploymentdokumentation. Saknas ett verifierbart sådant
+beslut gäller befintliga merge- och deploymentkrav för samtliga risknivåer. Detta uppdrag och
+dess publicering aktiverar inte modellen. Tidigare giltiga godkännanden bevaras inom sin scope.
+
 En bounded checkpoint-branch från verifierad `origin/main`; fortsätt samma branch genom review,
 inte en parallell implementation. Bevara orelaterat arbete och användarens ändringar. Ingen reset,
 rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skriv inte över eller
@@ -178,6 +235,13 @@ rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skr
   redan auktoriserat scope för oberoende review. Kan vara ofullständigt, blockerat eller innehålla
   misslyckade experiment; naturlig reviewpunkt, experimentfel, beslut eller STOP ska vara beständigt.
 - **MERGE CANDIDATE:** checkpoint vars acceptanskriterier och riskmotiverade verifiering är uppfyllda.
+
+### Befintlig godkännandeväg före ikraftträdande
+
+Följande exakta SHA-/stopp-/godkännanderegler gäller alla uppdrag före ikraftträdandet.
+Efter ikraftträdandet gäller den delegerade modellen nedan även nivå 3; agentens egen
+kontroll eller CI ersätter aldrig dess krav på faktisk oberoende kandidatgranskning.
+
 - **ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren
   uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.
 
@@ -190,6 +254,38 @@ Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och rel
 Avvikelse kräver STOP/re-review. Pusha kontrollerad merge och verifiera relevant main-CI för exakt
 SHA; återanvänd giltig lokal evidens. Deployment kräver separat uttrycklig auktorisering.
 Om bestående fakta kräver en separat reconciliation-commit ska relevant CI verifieras för dess SHA.
+
+### Delegerad teknisk leverans efter uttryckligt ikraftträdande
+
+Det på förhand godkända uppdragets scope, risknivå och riskram avgränsar leveransen. För nivå 1–3 ersätter
+ikraftträdandebeslutet tillsammans med uppdragsauktoriseringen rutinmässigt separat exakt
+mergegodkännande, deploymentgodkännande och STOP efter checkpoint. Det ger inte rätt att starta
+ett nytt uppdrag. Nivå 3 kräver dessutom godkänd faktisk oberoende granskning av den exakta
+kandidaten enligt tabellen. Inget nytt manuellt ägargodkännande av varje SHA eller deployment
+krävs inom denna ram. Separat ägarbeslut krävs vid utökad ekonomisk risk, nya kostnader, utökning
+utanför mandatet, hävning av frysningar och andra uttryckligen reserverade beslut. Saknas
+auktorisering för berörd åtgärd eller ändras scope krävs nytt beslut innan åtgärden utförs.
+
+| Risknivå | Delegering inom godkänt uppdrag efter ikraftträdande |
+| --- | --- |
+| 1 | Autonom teknisk leverans, inklusive merge och deployment, med fokuserad verifiering, relevanta CI-kontroller och befintliga drift-/leverantörsgrindar. |
+| 2 | Autonom teknisk leverans med relevanta data-, åtkomst-, säkerhets- och återhämtningskontroller. Databasdeployment kräver separat granskning tills nivå 2-backupgrinden i avsnitt 3 är verifierad; grinden är fortsatt BLOCKED enligt backupunderlaget. |
+| 3 | Autonom merge och deployment inom på förhand godkänt uppdrag och riskram, först efter godkänd faktisk oberoende granskning av exakt kandidat-SHA/tree mot rätt main-baslinje. Granskningsutfall och kandidatidentitet dokumenteras; ändrad kandidat kräver ny tillämplig granskning. Ingen ny manuell SHA- eller deploymentauktorisering från ägaren krävs inom ramen. Finance är alltid nivå 3 och förblir fryst. |
+
+Även delegerad merge ska binda exakt kandidat-SHA/tree till verifierad main-baslinje, kontrollerad
+diff och tillämpliga required checks. Verifiera oförändrade identiteter omedelbart före merge;
+vid avvikelse eller blockerande kontroll: stoppa. Bevara historiken, verifiera publicerad main och
+relevant CI för exakt merge-SHA före deployment. Dokumentera faktiskt levererad revision och
+verifieringsresultat. Ingen rätt följer att kringgå GitHub-skydd, installerad gateway, root-approvals,
+backup/recovery, leverantörsgränser eller bindande P0/P1. Oktober-gatewayen och admin-ACL:er ändras
+inte genom delegeringen. Ekonomiska gränser, sekretess och samtliga frysningar gäller oförändrat.
+
+Teknisk leverans är inte manuell produktacceptans. Obligatorisk iPhone/PWA-acceptans utförs av
+ägaren och redovisas separat som återstående tills uttryckligt godkänd; CI eller autonoma
+kontroller får inte registrera den som PASS. Två reviewvarv, två automatiska reparationsförsök
+och resursramen i avsnitt 7 gäller även delegerad leverans.
+
+### Publicering och spårbarhet för båda godkännandevägarna
 
 Verifiera `origin/main` före och efter push och att remote HEAD matchar publicerad lokal HEAD.
 Inga orelaterade ändringar får följa med. Dokumentationsändringar verifieras, committas separat
