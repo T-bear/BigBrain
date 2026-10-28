@@ -136,7 +136,8 @@ def inbound_connections(text):
 
 
 def quiescent(cid):
-    # Owner must pause users/integrations; sockets conservatively include reads/keepalives.
+    # Short normal drain only; no supplier cooldown or hours-long client pause.
+    # Sockets conservatively include reads/keepalives; graceful stop protects late arrivals.
     for sample in range(3):
         rows = docker('exec', cid, '/bin/cat', '/proc/net/tcp', '/proc/net/tcp6').decode()
         need(inbound_connections(rows) == 0, 'ApiConnectionsPresent')
@@ -154,9 +155,9 @@ def check_other(p):
              and c['State']['Running'] and c['State']['StartedAt'] == old['started'], 'OtherServiceChanged')
 
 
-def compose(root, p, *args, timeout=30):
+def compose(root, p, *args, timeout=30, recovery=False):
     return command([COMPOSE, '--project-name', p['project'], '--project-directory', str(root),
-                  '--env-file', '/dev/null', '-f', str(root / 'release.compose.json'), *args], timeout=timeout)
+                  '--env-file', '/dev/null', '-f', str(root / ('rollback.compose.json' if recovery else 'release.compose.json')), *args], timeout=timeout)
 
 
 def validate_release(p, cfg):
@@ -234,6 +235,8 @@ def validate_rollback(root, p):
         expected['image'] = p['targets'][role]['Image']
         expected['labels']['org.opencontainers.image.revision'] = p['targets'][role]['Config']['Labels']['org.opencontainers.image.revision']
         expected['environment'] = service_config(p['targets'][role])['env']
+        if role == 'api':
+            expected['environment'].update({key: 'false' for key in FLAGS})
         need(cfg['services'][role] == expected, 'RollbackConfigurationChanged')
         need(json.loads(docker('image', 'inspect', p['targets'][role]['Image']))[0]['Id'] == p['targets'][role]['Image'], 'RollbackImageMissing')
     need(cfg.get('volumes') == release.get('volumes') and cfg.get('networks') == release.get('networks'), 'RollbackMountsChanged')
@@ -316,11 +319,35 @@ def recover(root, p):
             matches = c['Image'] == old['Image'] and fingerprint(c) == fingerprint(old)
         action = recovery_action(s['phase'], matches, c['State']['Running'], c['State']['ExitCode'] == 0 and not c['State']['OOMKilled'])
         if action == 'RESTART_EXACT_OLD':
-            source_gate(p)  # Restart also loses the old process's supplier cooldown.
+            source_gate(p)
             check_other(p)
-            docker('start', old['Id'])
-            wait_healthy(old['Id'])
-            outcome = 'EXACT_OLD_RESTARTED'
+            env = service_config(old)['env']
+            if s['role'] == 'api' and any(env.get(key) != 'false' for key in FLAGS):
+                # Old code may not have durable admission. Never restart it with sources ON.
+                # Reuse the already verified rollback Compose, changing only the three flags.
+                validate_rollback(root, p)
+                record(root, p, 'api', 'recovery-replacement-possible')
+                compose(root, p, 'up', '-d', '--no-deps', '--no-build', '--pull', 'never', 'api',
+                        timeout=120, recovery=True)
+                cid = compose(root, p, 'ps', '-q', 'api', recovery=True).decode().strip()
+                restored = wait_healthy(cid)
+                expected = copy.deepcopy(old)
+                expected['Config']['Env'] = [key + '=' + ('false' if key in FLAGS else value)
+                    for key, value in env.items()]
+                need(restored['Image'] == old['Image'] and service_config(restored) == service_config(expected),
+                     'RecoveryConfigDrift')
+                need(restored['Config']['Labels'].get('org.opencontainers.image.revision') ==
+                     old['Config']['Labels'].get('org.opencontainers.image.revision'), 'RecoveryRevisionDrift')
+                need(db_identity(cid) == p['databases'], 'DatabaseIdentityDrift')
+                endpoint('api', '/health')
+                need(hashlib.sha256(endpoint('api', '/api/v1/modules/meal-planner/meals')).hexdigest() == p['mealsHash'],
+                     'HouseholdChanged')
+                check_other(p)
+                outcome = 'OLD_API_RESTORED_SOURCES_OFF'
+            else:
+                docker('start', old['Id'])
+                wait_healthy(old['Id'])
+                outcome = 'EXACT_OLD_RESTARTED'
         else:
             outcome = 'MANUAL_REVIEW_NO_RESTORE'
     save(root / 'recovery.json', {'run': p['run'], 'invocation': os.environ.get('INVOCATION_ID'), 'status': outcome})
@@ -347,24 +374,18 @@ def flags_preserved(before, after):
 
 
 def source_gate(p, now=None):
-    """Root-reviewed external maintenance evidence, not a self-issued permission.
+    """Administrator binds reviewed durable admission code to this exact API image/revision.
 
-    Admin must verify ALL consumers paused continuously since quietSince (including
-    direct API callers), no outstanding outbound fetch, and both Retry-After bounds.
-    Unknown evidence is a stop. A boolean usersPaused or old log timestamp is insufficient.
-    The worker checks timing/binding; it cannot prove external client behaviour.
+    This is not a caller-issued capability claim. The protected package approval covers
+    the evidence hash. Unknown source history stays blocked inside the application.
+    No assertion of elapsed Retry-After or paused household clients is accepted here.
     """
-    now = time.time() if now is None else now
     g = p.get('sourceGate', {})
-    need(set(g) == {'containerId', 'quietSince', 'validUntil', 'evidenceSha256', 'retryAfterUntil'}, 'SourceGateMissing')
-    need(g['containerId'] == p['targets']['api']['Id']
-         and re.fullmatch('[0-9a-f]{64}', g['evidenceSha256']) is not None, 'SourceGateIdentity')
-    need(type(g['quietSince']) is int and type(g['validUntil']) is int
-         and 6 * 3600 <= now - g['quietSince'] <= 24 * 3600
-         and now < g['validUntil'] <= g['quietSince'] + 24 * 3600, 'SourceWindowNotVerified')
-    retry = g['retryAfterUntil']
-    need(set(retry) == {'rosenfeldt', 'musikugglan'}, 'SourceRetryEvidenceMissing')
-    need(all(type(v) is int and 0 <= v <= now for v in retry.values()), 'SourceRetryNotVerified')
+    need(set(g) == {'containerId', 'mode', 'revision', 'apiImage', 'evidenceSha256'}, 'SourceGateMissing')
+    need(g['mode'] == 'meal-planner-sqlite-v1' and g['containerId'] == p['targets']['api']['Id']
+         and g['revision'] == p['revision'] and re.fullmatch('[0-9a-f]{40}', g['revision']) is not None
+         and g['apiImage'] == p['candidates']['api']
+         and re.fullmatch('[0-9a-f]{64}', g['evidenceSha256']) is not None, 'SourceGuardNotVerified')
 
 
 def endpoint(role, path):

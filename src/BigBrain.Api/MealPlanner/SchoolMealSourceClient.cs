@@ -6,7 +6,7 @@ using System.Text;
 namespace BigBrain.Api.MealPlanner;
 
 public sealed record SchoolMealSourceResult(string Status, string? Content = null, string? ETag = null,
-    DateTimeOffset? Modified = null, DateTimeOffset? RetryAt = null, bool AllowStale = true);
+    DateTimeOffset? Modified = null, DateTimeOffset? RetryAt = null, bool AllowStale = true, bool HeadersVerified = false);
 
 // Fixed sources only. No credentials, user URLs, redirects, cookies or executable content.
 public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvider clock, ILogger<SchoolMealSourceClient> logger)
@@ -30,12 +30,25 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
         };
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5), clock);
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, timeout.Token);
+        var headersVerified = false;
+        DateTimeOffset? retryAt = null;
+        SchoolMealSourceResult Result(string status, string? content = null, string? responseEtag = null,
+            DateTimeOffset? responseModified = null, bool allowStale = true) =>
+            new(status, content, responseEtag, responseModified, retryAt, allowStale, headersVerified);
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (etag is not null) request.Headers.IfNoneMatch.Add(EntityTagHeaderValue.Parse(etag));
             if (modified is not null) request.Headers.IfModifiedSince = modified;
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, linked.Token);
+            var retry = response.Headers.RetryAfter;
+            headersVerified = !response.Headers.Contains("Retry-After") || retry is not null;
+            retryAt = retry?.Date;
+            if (retry?.Delta is { } delta && delta > TimeSpan.Zero)
+            {
+                var receivedAt = clock.GetUtcNow();
+                retryAt = delta < DateTimeOffset.MaxValue - receivedAt ? receivedAt + delta : DateTimeOffset.MaxValue;
+            }
             var cache = response.Headers.CacheControl;
             var age = response.Headers.Age ?? TimeSpan.Zero;
             var now = clock.GetUtcNow();
@@ -51,40 +64,36 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
             LogResponse(school, response, cache, now, reason);
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                var retry = response.Headers.RetryAfter;
-                var retryAt = retry?.Date;
-                if (retry?.Delta is { } delta && delta > TimeSpan.Zero)
-                    retryAt = delta < DateTimeOffset.MaxValue - now ? now + delta : DateTimeOffset.MaxValue;
-                return new("unavailable", RetryAt: retryAt);
+                return Result("unavailable");
             }
             if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.NotModified)
-                return new("unavailable");
-            if (reason != "cacheAccepted") return new("cachePolicy", AllowStale: false);
+                return Result("unavailable");
+            if (reason != "cacheAccepted") return Result("cachePolicy", allowStale: false);
             if (response.StatusCode == HttpStatusCode.NotModified)
-                return new("notModified", AllowStale: cache?.MustRevalidate != true);
+                return Result("notModified", allowStale: cache?.MustRevalidate != true);
             var type = response.Content.Headers.ContentType?.MediaType;
             var supported = school == SchoolMeals.Rosenfeldt
                 ? type is "application/rss+xml" or "application/xml" or "text/xml"
                 : type is "text/html";
-            if (!supported || response.Content.Headers.ContentLength > MaximumBytes) return new("invalid");
+            if (!supported || response.Content.Headers.ContentLength > MaximumBytes) return Result("invalid");
             using var stream = await response.Content.ReadAsStreamAsync(linked.Token);
             using var output = new MemoryStream();
             var buffer = new byte[8192];
             int read;
             while ((read = await stream.ReadAsync(buffer, linked.Token)) != 0)
             {
-                if (output.Length + read > MaximumBytes) return new("invalid");
+                if (output.Length + read > MaximumBytes) return Result("invalid");
                 output.Write(buffer, 0, read);
             }
             var charset = response.Content.Headers.ContentType?.CharSet?.Trim('"');
-            if (charset is not null && !charset.Equals("utf-8", StringComparison.OrdinalIgnoreCase)) return new("invalid");
+            if (charset is not null && !charset.Equals("utf-8", StringComparison.OrdinalIgnoreCase)) return Result("invalid");
             var text = new UTF8Encoding(false, true).GetString(output.ToArray()).TrimStart('\uFEFF');
-            return new("ok", text, response.Headers.ETag?.ToString(), response.Content.Headers.LastModified,
-                AllowStale: cache?.MustRevalidate != true);
+            return Result("ok", text, response.Headers.ETag?.ToString(), response.Content.Headers.LastModified,
+                allowStale: cache?.MustRevalidate != true);
         }
-        catch (Exception error) when (error is HttpRequestException or IOException or OperationCanceledException or DecoderFallbackException)
+        catch (Exception error) when (error is HttpRequestException or IOException or OperationCanceledException or DecoderFallbackException or FormatException)
         {
-            return new("unavailable");
+            return Result("unavailable");
         }
     }
 

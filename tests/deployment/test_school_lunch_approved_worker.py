@@ -19,7 +19,7 @@ def container(role, running=True):
     return {'Id': role, 'Name': role, 'Image': 'old-' + role,
             'State': {'Running': running, 'ExitCode': 0, 'OOMKilled': False,
                       'Health': {'Status': 'healthy'}, 'StartedAt': 'before'},
-            'Config': {'Env': [k + '=true' for k in d.FLAGS] if role == 'api' else [],
+            'Config': {'Env': [k + '=false' for k in d.FLAGS] if role == 'api' else [],
                        'Labels': {'org.opencontainers.image.revision': 'a' * 40}},
             'HostConfig': {'Binds': ['b', 'a'], 'Memory': 123},
             'Mounts': [{'Type': 'volume', 'Name': 'v', 'Source': '/synthetic',
@@ -36,9 +36,8 @@ class WorkerTests(unittest.TestCase):
                   'targets': {r: container(r) for r in d.ROLES},
                   'candidates': {r: 'new-' + r for r in d.ROLES},
                   'backupManifestSha256': 'c' * 64,
-                  'sourceGate': {'containerId': 'api', 'quietSince': now - 21601,
-                    'validUntil': now + 1200, 'evidenceSha256': 'e' * 64,
-                    'retryAfterUntil': {'rosenfeldt': 0, 'musikugglan': 0}}}
+                  'sourceGate': {'containerId': 'api', 'mode': 'meal-planner-sqlite-v1',
+                    'revision': 'b' * 40, 'apiImage': 'new-api', 'evidenceSha256': 'e' * 64}}
         d.save(self.root / 'backup-verified.json', {'status': 'PASS', 'manifestSha256': 'c' * 64, 'runtimeMatches': True})
         self.guards = [patch.object(d.subprocess, 'Popen', side_effect=AssertionError('No real process')),
                        patch.object(d.urllib.request, 'build_opener', side_effect=AssertionError('No real HTTP'))]
@@ -180,39 +179,82 @@ class WorkerTests(unittest.TestCase):
         docker.assert_not_called()
         self.assertEqual(json.loads((self.root/'recovery.json').read_text())['status'], 'NO_STOP_RECORDED')
 
-    def test_source_gate_rejects_unknown_early_expired_or_wrong_runtime(self):
-        now = int(time.time())
-        d.source_gate(self.p, now)
-        cases = ('missing', 'short', 'expired', 'future', 'identity', 'evidence', 'retry', 'unknown-retry', 'missing-school')
-        for case in cases:
-            p = copy.deepcopy(self.p); g = p['sourceGate']
-            if case == 'missing': p.pop('sourceGate')
-            if case == 'short': g['quietSince'] = now - 21599
-            if case == 'expired': g['validUntil'] = now
-            if case == 'future': g['quietSince'] = now + 1
-            if case == 'identity': g['containerId'] = 'different'
-            if case == 'evidence': g['evidenceSha256'] = ''
-            if case == 'retry': g['retryAfterUntil']['musikugglan'] = now + 1
-            if case == 'unknown-retry': g['retryAfterUntil']['rosenfeldt'] = None
-            if case == 'missing-school': del g['retryAfterUntil']['rosenfeldt']
-            with self.subTest(case=case), self.assertRaises(d.Blocked): d.source_gate(p, now)
+    def test_durable_gate_needs_exact_reviewed_image_revision_and_evidence_not_client_pause(self):
+        d.source_gate(self.p)
+        for key in ('containerId', 'mode', 'revision', 'apiImage', 'evidenceSha256'):
+            bad = copy.deepcopy(self.p)
+            bad['sourceGate'][key] = 'wrong'
+            with self.subTest(key=key), self.assertRaises(d.Blocked): d.source_gate(bad)
+        for field in ('quietSince', 'retryAfterUntil', 'usersPaused'):
+            bad = copy.deepcopy(self.p); bad['sourceGate'][field] = True
+            with self.subTest(field=field), self.assertRaises(d.Blocked): d.source_gate(bad)
+        # A future supplier retry is handled by the DB guard, never a household outage.
+        self.assertNotIn('quietSince', self.p['sourceGate'])
 
-    def test_both_schools_retry_bounds_must_have_elapsed(self):
-        now = int(time.time())
-        for school in ('rosenfeldt', 'musikugglan'):
-            p = copy.deepcopy(self.p)
-            p['sourceGate']['retryAfterUntil'][school] = now + 3600
-            with self.subTest(school=school), self.assertRaisesRegex(d.Blocked, 'SourceRetryNotVerified'):
-                d.source_gate(p, now)
-        self.p['sourceGate']['quietSince'] = now - 21600
-        d.source_gate(self.p, now)
-
-    def test_recovery_does_not_restart_when_interval_evidence_expires(self):
+    def test_recovery_rejects_unverified_durable_gate(self):
         self.state('old-stopped')
-        self.p['sourceGate']['validUntil'] = int(time.time()) - 1
+        self.p['sourceGate']['evidenceSha256'] = ''
         with patch.object(d, 'inspect', return_value=container('api', False)), patch.object(d, 'docker') as docker:
-            with self.assertRaisesRegex(d.Blocked, 'SourceWindowNotVerified'): d.recover(self.root, self.p)
+            with self.assertRaisesRegex(d.Blocked, 'SourceGuardNotVerified'): d.recover(self.root, self.p)
         docker.assert_not_called()
+
+    def test_rollback_allows_only_three_sources_off_with_original_flags_on(self):
+        p = self.p
+        p['targets']['api']['Config']['Env'] = [key + '=true' for key in d.FLAGS] + ['PRESERVE=value']
+        release = {'services': {}, 'volumes': {}, 'networks': {}}
+        rollback = copy.deepcopy(release)
+        for role in d.ROLES:
+            release['services'][role] = {'image': p['candidates'][role],
+                'environment': d.service_config(p['targets'][role])['env'],
+                'labels': {'org.opencontainers.image.revision': p['revision']}}
+            old = copy.deepcopy(release['services'][role])
+            old['image'] = p['targets'][role]['Image']
+            old['labels']['org.opencontainers.image.revision'] = 'a' * 40
+            if role == 'api': old['environment'].update({key: 'false' for key in d.FLAGS})
+            rollback['services'][role] = old
+        d.save(self.root/'release.compose.json', release)
+        d.save(self.root/'rollback.compose.json', rollback)
+        with patch.object(d, 'docker', side_effect=lambda *args: json.dumps([{'Id': args[-1]}]).encode()):
+            d.validate_rollback(self.root, p)
+            for key in (*d.FLAGS, 'PRESERVE'):
+                bad = copy.deepcopy(rollback)
+                bad['services']['api']['environment'][key] = 'true'
+                d.save(self.root/'rollback.compose.json', bad)
+                with self.subTest(key=key), self.assertRaises(d.Blocked): d.validate_rollback(self.root, p)
+
+    def test_legacy_api_is_recreated_with_sources_off_never_started_on(self):
+        old = self.p['targets']['api']
+        old['Config']['Env'] = [k + '=true' for k in d.FLAGS]
+        stopped = copy.deepcopy(old); stopped['State']['Running'] = False
+        restored = container('api'); restored['Id'] = 'replacement'
+        self.p['databases'] = ['same']
+        self.p['mealsHash'] = hashlib.sha256(b'[]').hexdigest()
+        self.state('old-stopped')
+        with patch.object(d, 'inspect', return_value=stopped), patch.object(d, 'check_other'), \
+             patch.object(d, 'validate_rollback'), patch.object(d, 'compose', return_value=b'replacement') as compose, \
+             patch.object(d, 'wait_healthy', return_value=restored), patch.object(d, 'db_identity', return_value=['same']), \
+             patch.object(d, 'endpoint', return_value=b'[]'), patch.object(d, 'docker') as docker:
+            d.recover(self.root, self.p)
+        docker.assert_not_called()
+        self.assertTrue(all(c.kwargs.get('recovery') for c in compose.call_args_list))
+        self.assertEqual(json.loads((self.root/'recovery.json').read_text())['status'], 'OLD_API_RESTORED_SOURCES_OFF')
+        self.assertEqual(json.loads((self.root/'state.json').read_text())['phase'], 'recovery-replacement-possible')
+        with patch.object(d, 'docker') as docker, patch.object(d, 'compose') as compose:
+            d.recover(self.root, self.p)
+        docker.assert_not_called(); compose.assert_not_called()
+
+    def test_legacy_recovery_uncertainty_never_retries_or_restores_data(self):
+        self.p['targets']['api']['Config']['Env'] = [k + '=true' for k in d.FLAGS]
+        old = copy.deepcopy(self.p['targets']['api']); old['State']['Running'] = False
+        self.state('old-stopped')
+        with patch.object(d, 'inspect', return_value=old), patch.object(d, 'check_other'), \
+             patch.object(d, 'validate_rollback'), patch.object(d, 'compose', side_effect=d.Blocked('timeout')), \
+             patch.object(d, 'docker') as docker:
+            with self.assertRaises(d.Blocked): d.recover(self.root, self.p)
+        docker.assert_not_called()
+        with patch.object(d, 'compose') as compose, patch.object(d, 'docker') as docker:
+            d.recover(self.root, self.p)
+        compose.assert_not_called(); docker.assert_not_called()
 
     def test_release_preserves_all_environment_and_flags(self):
         self.p['targets']['api']['Config']['Env'].append('UNCHANGED=value')

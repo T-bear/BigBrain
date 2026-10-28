@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 
 namespace BigBrain.Api.MealPlanner;
 
-public sealed class MealPlannerStore : IDisposable
+public sealed partial class MealPlannerStore : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly string connectionString;

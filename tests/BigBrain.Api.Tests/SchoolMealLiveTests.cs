@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BigBrain.Api.Tests;
 
-public sealed class SchoolMealLiveTests
+public sealed class SchoolMealLiveTests : IDisposable
 {
     private sealed class Clock : TimeProvider
     {
@@ -33,8 +33,13 @@ public sealed class SchoolMealLiveTests
     {
         SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true }
     };
-    private static SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null) =>
-        new(options ?? Enabled, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock);
+    private readonly SchoolMealTestData data = new();
+    public void Dispose() => data.Dispose();
+    private SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null)
+    {
+        options = data.Options(options ?? Enabled, clock.Now);
+        return new(options, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock, data.Store(options));
+    }
     private static Task<SchoolMealWeek> Get(SchoolMealService service) => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
 
     [Fact]
@@ -409,16 +414,20 @@ public sealed class SchoolMealLiveTests
     }
 
     [Fact]
-    public async Task RestartDropsCacheAndSourcesRemainIndependent()
+    public async Task RestartDropsMenuButPreservesCooldownAndSourcesRemainIndependent()
     {
         var handler = new Handler();
         var clock = new Clock();
-        using (var first = Service(handler, clock)) await Get(first);
-        using var restarted = Service(handler, clock);
-        Assert.Equal("published", (await Get(restarted)).Status);
-        Assert.Equal(2, handler.Calls);
+        var options = data.Options(Enabled, clock.Now);
+        using (var first = Service(handler, clock, options)) await Get(first);
+        using var restarted = Service(handler, clock, options);
+        Assert.Equal("unavailable", (await Get(restarted)).Status);
+        Assert.Equal(1, handler.Calls);
         Assert.Equal("invalid", (await restarted.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken)).Status);
+        Assert.Equal(2, handler.Calls);
+        clock.Now = clock.Now.AddHours(6);
         Assert.Equal("published", (await Get(restarted)).Status);
+        Assert.Equal(3, handler.Calls);
     }
 
     [Theory]

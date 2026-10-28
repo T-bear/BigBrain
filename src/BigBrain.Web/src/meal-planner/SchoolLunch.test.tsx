@@ -109,7 +109,7 @@ describe('SchoolLunch', () => {
     render(<SchoolLunch allowFixture={false} />)
     expect(await screen.findByText('Pasta med spenat och ostsås')).toBeInTheDocument()
     expect(screen.getByText(/Inaktuell meny/)).toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('Skolmenyn kunde inte läsas')
+    expect(screen.getByRole('alert')).toHaveTextContent('Kunde inte uppdatera matsedeln just nu. Försök igen senare.')
     expect(screen.queryByText(/TESTDATA/)).not.toBeInTheDocument()
   })
   it('clears previous dishes on mode change and ignores late responses', async () => {

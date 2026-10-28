@@ -160,11 +160,12 @@ public sealed class MealPlannerApiTests : IDisposable
     {
         var clock = new SchoolClock();
         using var transport = new SchoolHandler();
-        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } };
+        using var data = new SchoolMealTestData();
+        var options = data.Options(new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } }, clock.GetUtcNow());
         await using var factory = Factory().WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<SchoolMealService>();
-            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock, NullLogger<SchoolMealSourceClient>.Instance), clock));
+            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock, NullLogger<SchoolMealSourceClient>.Instance), clock, data.Store(options)));
         }));
         using var client = factory.CreateClient();
         var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);

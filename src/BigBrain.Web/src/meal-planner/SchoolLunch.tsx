@@ -11,9 +11,9 @@ const statusText: Record<string, string> = {
   offline: 'Extern hämtning är avstängd.',
   notPublished: 'Ingen meny tillgänglig för aktuell vecka.',
   missing: 'Meny saknas för dagen. Det betyder inte att skolan är stängd.',
-  invalid: 'Menyn kunde inte tolkas säkert.',
-  unavailable: 'Källan är tillfälligt otillgänglig.',
-  cachePolicy: 'Källans cachevillkor behöver granskas innan menyn kan visas.',
+  invalid: 'Kunde inte uppdatera matsedeln just nu. Försök igen senare.',
+  unavailable: 'Kunde inte uppdatera matsedeln just nu. Försök igen senare.',
+  cachePolicy: 'Kunde inte uppdatera matsedeln just nu. Försök igen senare.',
 }
 const checkedTime = (value: string) => new Date(value).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' })
 // API dates are calendar dates, not instants in the device's time zone.
@@ -88,7 +88,7 @@ export function SchoolLunch({
                 <p role="alert">
                   {fixture
                     ? 'Testmenyn kunde inte läsas. Kontrollera att API körs i utvecklingsläge.'
-                    : 'Skolmenyn kunde inte läsas. Försök igen när du öppnar Family View.'}
+                    : 'Kunde inte uppdatera matsedeln just nu. Försök igen senare.'}
                 </p>
               ) : !menu ? (
                 <p role="status">{offlinePreview ? statusText.offline : 'Läser skolmeny…'}</p>

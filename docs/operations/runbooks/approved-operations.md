@@ -1,8 +1,10 @@
 # Restricted BigBrain operations wrapper
 
-Status: **REVIEW CHECKPOINT — NOT INSTALLED**. Baseline
-`4647cd8119edb5b7cd0872639fd79ba26a38b0d3`; branch `ops/approved-operations-wrapper`.
-Implementation and offline evidence dated 2026-10-26. This document grants no installation,
+Status: **durable SchoolLunch contract amendment — not installed** (2026-10-28).
+The previous wrapper is installed; this amended contract is not. Current implementation baseline:
+`65ed713649f7d47ec5787efde6bf15745b72c0f0`; branch `fix/school-lunch-durable-gate`.
+Original wrapper implementation/evidence dated 2026-10-26 came from baseline
+`4647cd8119edb5b7cd0872639fd79ba26a38b0d3`, branch `ops/approved-operations-wrapper`. This document grants no installation,
 sudoers, deployment, restore or source-fetch permission. Check [freezes](../freezes.md).
 Finance and BB-158 remain frozen. No application/runtime configuration is changed here.
 
@@ -79,7 +81,7 @@ both Compose files must match its service set. An API+Web approval cannot be nar
 
 | Contract | Fixed services / package / execution | Verification, recovery and external gates | Availability |
 | --- | --- | --- | --- |
-| `school-lunch-v3-systemd-v1` | API then Web; seven files listed below; `school-lunch-v3-` prefix; `runner.py work` / `recover`; 480/180 second deadlines | Existing exact-runtime/config/volume/backup checks, quiescence and clean-stop, health/data identity and unchanged other services. Restart exact old cleanly stopped container only before replacement; unknown replacement requires manual review, no DB restore. Consumers paused; source checks separately authorized and supplier interval established. | Interface supported; **not** a production approval |
+| `school-lunch-v3-systemd-v1` | API then Web; seven files listed below; `school-lunch-v3-` prefix; `runner.py work` / `recover`; 480/180 second deadlines | Existing exact-runtime/config/volume/backup checks, quiescence and clean-stop, health/data identity and unchanged other services. Recovery only before replacement: restart exact old Web or API already OFF; otherwise recreate exact old API with only school flags OFF. Unknown replacement requires manual review, no DB restore. Reviewed durable source admission bound to the API image; source checks separately authorized. Old API recovery disables the three school flags. No six-hour client pause. | Interface supported; **not** a production approval |
 | `api-only-diagnostics-v1` | API only; package structure/worker/recovery unverified and deliberately unset | Requires API-only health/config checks, unchanged Web/other services and flags/cache policy, no forced school fetch, verified last attempts or six-hour no-fetch window, current backup and phase-aware recovery. | **BLOCKED / disabled**; rejected before any Docker/systemd call or claim |
 
 Registry requirements describe the existing worker's obligations and administrative review gates;
@@ -147,12 +149,14 @@ keys and unexpected fields; caller has no approval path, SHA, environment or exe
 Approval files are `<operation>.json` for the first three operations. Each has exactly the common
 fields `schema: 1`, `operation`, `id` (32 lower-case hex digits), `expiresAt` (future Unix seconds,
 maximum 24 hours), plus the operation-specific fields below. No real approval is included in Git.
+The amended start approval rejects the obsolete `usersPaused` field: short drain checks are
+performed by the worker, not replaced with an administrator assertion of a long family pause.
 
 | Operation | Additional fields |
 | --- | --- |
 | `verify-backup` | `backupId` (`YYYYMMDDTHHMMSSZ-<32hex>`), `manifestSha256` (64hex) |
 | `backup-approved` | `revision` (40hex), `runtime: {containerId, image, volumes}`. `volumes` maps all five destinations to exact `Type`, `Name`, `Source`, `Driver`, `RW` from current Docker inspect |
-| `start-approved` | `revision`, `services` (exact registered order/set), `packageSha256`, `backupId`, `manifestSha256`, `dependencies`, `contract` (enabled register key), `usersPaused: true` |
+| `start-approved` | `revision`, `services` (exact registered order/set), `packageSha256`, `backupId`, `manifestSha256`, `dependencies`, `contract` (enabled register key) |
 
 `dependencies` maps **exactly** `/usr/bin/python3.13`, `/usr/bin/docker`, `/usr/bin/systemd-run` and
 `/usr/libexec/docker/cli-plugins/docker-compose` to their SHA-256. OS updates require renewed
@@ -318,7 +322,7 @@ After an accepted application merge and separate preparation/deployment authoriz
    guessed defaults. Preserve the existing plan's `targets`, `candidates`, `project`, `others`,
    `expectedServices`, `databases`, `mealsHash`, `webIndexHash`, `originalConfigHashes`, `run` and
    `revision`. Add `contract: school-lunch-v3-systemd-v1`, `backupManifestSha256` and `sourceGate` below.
-   Rollback Compose contains the exact old images/environment/revision and identical mounts/networks.
+   Rollback Compose contains exact old images/revision and identical mounts/networks/environment, except all three SchoolMeals flags are false for old API recovery.
    Runtime/environment/Compose contents are private and must not be committed or printed.
 4. Assemble a **new** directory with the unprivileged
    [package assembler](../../../scripts/approved-ops/prepare_school_lunch_package.py), passing only
@@ -334,43 +338,67 @@ After an accepted application merge and separate preparation/deployment authoriz
 
 ### Supplier interval and maintenance gate
 
-API restart clears both process-local cooldowns, including a longer Retry-After. Before approval,
-all API/Web consumers (including direct clients/integrations) must remain paused, with no outstanding
-source request. An administrator must independently verify a continuous **six-hour no-fetch window**
-and any longer provider Retry-After; unknown timing blocks deployment. No source call or cache
-clearing is authorized to manufacture this evidence. A last HTTP log line alone is not proof.
+The 2026-10-28 owner decision rejects a six-hour pause of API/Web consumers. The revised
+worker uses the application's durable per-school admission guard instead. This source change
+is not installation evidence: the installed gateway and protected worker must be independently
+reviewed and updated by an administrator before this amended contract can be used.
 
-The hashed plan's `sourceGate` contains the exact API `containerId`, integer UTC epoch `quietSince`,
-`validUntil`, SHA-256 of the administrator's retained private maintenance evidence (`evidenceSha256`),
-and `retryAfterUntil` for **both** `rosenfeldt` and `musikugglan`. Zero means independently verified
-absence of a longer restriction, never unknown. Both bounds must have elapsed. The window is at
-least six and at most 24 hours old, unexpired and bound to that runtime. The administrator attests
-its meaning through package approval; the worker checks binding and timing, **not** continuous
-external client behaviour or the evidence document's truth. `usersPaused: true` alone is inadequate.
-Maintain the pause through completion/recovery. This is a concrete prerequisite, not an implemented
-network lock. If it cannot be evidenced, do not seal an approval or start the worker.
+The root-approved plan's `sourceGate` has exactly: `containerId` (original API),
+`mode: meal-planner-sqlite-v1`, `revision` (accepted candidate revision), `apiImage` (exact
+candidate image ID), and `evidenceSha256` (retained review/test evidence for that code/image).
+All are bound by the existing protected package and single-use deployment approval. The
+administrator verifies the code/evidence and actual image identity; a caller-selected mode or
+hash is not proof. The worker checks the binding before preflight and replacements. Do not
+reuse old approvals, old packages or timing claims. No `quietSince`, client-pause assertion
+or invented Retry-After timestamp is accepted as a substitute for durable admission.
 
-The worker checks this gate before preflight, each replacement and any old-API restart. Three
-socket samples and an immediate pre-stop repeat conservatively reject active connections. They
-supplement the maintenance boundary, not eliminate its race with an unpaused client. Docker stop
-uses unlimited grace; timeout/unclean stop does not authorize SIGKILL of the container.
+`SchoolMealFetchGate` in the existing Meal Planner database reserves each outbound attempt
+atomically before HTTP. Pending/unseen response, malformed Retry-After or storage failure
+prevents another attempt for that source. Known outcomes retain at least six hours after
+completion and any later Retry-After. Menus and validators remain process-local and subject
+to the unchanged HTTP/cache/24-hour rules. No DB lock spans HTTP, and school-store failures
+must not change household-store availability. Schema version 2 and household tables remain intact.
+
+Missing source state is UNKNOWN, not an elapsed restriction. Optional, per-school
+`MealPlanner__SchoolMeals__RosenfeldtVerifiedInitialNotBeforeUtc` and
+`MealPlanner__SchoolMeals__MusikugglanVerifiedInitialNotBeforeUtc` may seed **only missing** rows
+from independently established history, including longer Retry-After. They default to null.
+No such production values are supplied by this implementation. They cannot reset existing
+pending rows or shorten an existing wait. A pending unknown outcome needs separately verified
+source history before any authorized repair; this worker never edits those rows.
+Remove bootstrap values after initialization through an authorized configuration change;
+never reuse them as proof after restoring an older database. Database recovery must keep school
+sources OFF until current history is established. Restoring a DB or replacing it is outside
+this deployment contract.
+
+Normal short connection-drain checks remain immediately before stop; active connections
+block that attempt, without starting a long maintenance window. Docker stop uses unlimited
+grace; timeout or unclean stop never authorizes SIGKILL, forced replacement or automatic retry.
+No household-wide six-hour inactivity is needed. Ordinary late requests must be handled by
+normal graceful application shutdown, not by resetting school admission state.
 
 ### Verification, recovery and remaining acceptance
 
 No SchoolMeals endpoint is called during preflight, work or recovery. `COMPLETED` records verified
 API/Web replacement with source flags `UNCHANGED` and source verification `NOT_RUN`, **not working
-menus**. After authorized completion and release of maintenance, observe the next ordinary Family
+menus**. After authorized completion, observe the next ordinary Family
 request's sanitized `SchoolMealSourceResponse`; do not force requests for both direct API and Web.
 Check each school's HTTP/cache/parse/week status and final iPhone/PWA UX separately. Existing event
 fields do not include Retry-After; unknown provider backoff must not be inferred from their absence.
 
-Recovery retains the accepted contract: restart only the exact original cleanly stopped container
-before replacement could have occurred, and only while the source gate remains valid. After the
-`replacement-possible` marker, preserve state and report `MANUAL_REVIEW_NO_RESTORE`, even if the old
-container no longer exists. No automatic Compose rollback, DB restore, approval retirement or
-rerun is allowed. The retained rollback configuration supports a separately reviewed operator
-recovery decision; it is not a new executable bypass of the gateway. A completed run is rechecked
-without changing it. Source verification or product acceptance is never inferred from completion.
+Recovery remains phase-bound. Before replacement, an exact cleanly stopped Web, or API with
+all three school flags already false, can be restarted. An older API with sources enabled is
+never directly restarted: the verified rollback Compose recreates **only API**, using its exact
+old image/configuration/mounts with just the three SchoolMeals flags false. A durable
+`recovery-replacement-possible` marker precedes that operation. Health, old revision, exact
+configuration except flags, six DB identities, household read hash and other services are
+checked afterward. No provider request is made.
+
+After either replacement-possible marker, an interrupted/uncertain operation requires manual
+review; no automatic repeat or database restore occurs. A completed normal deployment is
+rechecked without mutation. This bounded amendment needs independent review and administrator
+installation; it does not grant a general rollback engine, new sudo permissions or authority
+to change other services. Menu availability and iPhone/PWA acceptance remain separate evidence.
 
 ### Checkpoint evidence and next decision
 
