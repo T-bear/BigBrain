@@ -22,6 +22,10 @@ ARG BIGBRAIN_REVISION=UNKNOWN
 LABEL org.opencontainers.image.revision=$BIGBRAIN_REVISION
 WORKDIR /app
 COPY --from=build /app .
+# Publish can preserve restrictive source modes (for example appsettings.json 0600).
+# Keep configuration root-owned and grant only the runtime group read access.
+RUN find /app -maxdepth 1 -type f \( -name 'appsettings*.json' -o -name '*.runtimeconfig.json' -o -name '*.deps.json' \) \
+    -exec chown root:$APP_UID {} + -exec chmod 0440 {} +
 RUN mkdir -p /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data && chown $APP_UID /data /shopping-data /calendar-data /settings-data /finance-data /lifecycle-data
 USER $APP_UID
 EXPOSE 8080
