@@ -967,3 +967,73 @@ View, followed by owner iPhone acceptance. If headers remain incompatible, seek 
 compatible feed/cache instruction or a separately reviewed solution; do not bypass restrictions.
 Current supplier responses and the production cachePolicy cause remain the concrete evidence gap.
 This checkpoint does **not** claim that current meals are now working in production.
+
+
+### 2026-10-28 — durable source admission and bounded deployment correction
+
+Scope authorized by the owner: finish SchoolLunch using existing Meal Planner storage and the
+existing API+Web contract, without a six-hour pause of family use. Baseline
+`65ed713649f7d47ec5787efde6bf15745b72c0f0`; branch `fix/school-lunch-durable-gate`.
+This section supersedes the older process-memory-only/maintenance assumptions for the proposed
+change; historical test and deployment reports above remain historical.
+
+Implementation: two per-school rows in the existing SQLite database, atomic reservation before
+HTTP, completion-bound six-hour minimum plus longer Retry-After, and retained pending state on
+unseen response or failed persistence. A short separate connection/transaction path never holds
+SQLite locks across HTTP or marks the household store unavailable. Existing household tables and
+`user_version=2` remain unchanged. Menu content/validators are not persisted. Unknown initial
+history performs no fetch; optional verified initial bounds can seed missing rows only. There
+are no supplied production bounds, automatic pending-row reset or fabricated timestamps.
+
+HTTP status/cache diagnostics remain sanitized. Retry-After is now retained for received statuses
+including 503 and body failures. Invalid Retry-After and missing response are distinguished from
+verified absence. Cache prohibitions still clear retained menus even when gate completion fails.
+Family View uses the requested simple error text; independent school rendering and stale labeling
+remain. Public endpoint/DTO, source URLs, parsers, default OFF flags and household mutation routes
+are unchanged. No supplier request was made during development.
+
+The existing worker/gateway contract replaces the long source window with administrator-bound
+review evidence for exact durable-guard API code/image. Normal identity, backup, short graceful
+stop, health, household-data and non-target checks remain. Before replacement only, legacy API
+recovery uses its verified old image/configuration with school flags OFF; ambiguous replacement
+is never retried or followed by a DB restore. See the
+[updated existing runbook](../../../operations/runbooks/approved-operations.md#supplier-interval-and-maintenance-gate).
+No sudoers, installed files, ACLs or production configuration have been changed.
+
+Risk: persistent state/schema is level 2; privileged worker/contract is level 3 and requires
+independent exact-candidate review. The database-deployment backup gate remains BLOCKED for
+autonomous deployment without separate review: the owner's verified six-database backup is not
+proof of a daily backup schedule. Reuse that receipt only while its runtime binding and expiry
+remain valid; no new backup was created here.
+
+Read-only production observation during this task: API and Web remain on
+`ff17bf46c7882ff3d046b07a037409ca59de3523`, healthy, all three school flags true, 12 containers
+running. Installed gateway status: `NO_WRAPPER_RUN`. It still needs the reviewed contract update
+and a separately sealed package approval; only the existing four operation commands have
+NOPASSWD authorization. No administrative approvals were self-issued.
+
+Remaining real-data limits: current provider headers/menus are not established by offline tests.
+Unknown old source history remains blocked per school after first deployment; six elapsed hours
+alone cannot prove an unknown longer Retry-After expired. Independently established initial
+bounds are required for first source admission. Uncertain pending outcomes and restored databases
+need verified recovery; changing bootstrap configuration cannot clear a pending row. iPhone/PWA
+acceptance remains the owner's manual test, not a CI result.
+
+
+Verification of this change (offline, no production mutation):
+
+- `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlanner'`: **113 PASS** including RSS/HTML,
+  API/household regression, restart, atomic cross-instance reservation, 503/429 Retry-After,
+  crash/unknown responses, independent schools, schema errors, failed completion and cache
+  prohibition under persistence failure. Synthetic databases/history only.
+- `python3 -m unittest discover -s tests/deployment -p 'test_*approved*.py'`: **75 PASS**,
+  including exact rollback environment with original flags ON, sources-OFF legacy recovery,
+  ambiguous recovery no retry, removed client-pause approval rejection and existing privilege tests.
+- Focused SchoolLunch/MealPlanner/UXLab frontend tests: **22 PASS**; frontend build **PASS**.
+- Scoped .NET formatting verification, changed frontend formatting, documentation validator
+  and `git diff --check`: **PASS**. Required GitHub CI and exact-candidate independent review
+  are recorded on the PR/commit, not inferred from local tests.
+- Review caught a cache-prohibition/persistence-failure interaction before publication; corrected
+  with four regression cases. No live failure recovery, source initialization, root installation,
+  deployment or manual acceptance is claimed.

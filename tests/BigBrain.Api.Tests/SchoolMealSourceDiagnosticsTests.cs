@@ -158,8 +158,10 @@ public sealed class SchoolMealSourceDiagnosticsTests
             return response;
         });
         using var http = new HttpClient(handler);
-        using var service = new SchoolMealService(new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true } },
-            new SchoolMealSourceClient(http, clock, log), clock);
+        using var data = new SchoolMealTestData();
+        var options = data.Options(new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true } }, clock.Now);
+        using var service = new SchoolMealService(options,
+            new SchoolMealSourceClient(http, clock, log), clock, data.Store(options));
         Assert.Equal("unavailable", (await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken)).Status);
         Assert.Equal("rateLimited", Assert.Single(log.Entries)["PolicyReason"]);
         var interval = retry is "delta" or "date" ? 12 : 6;
@@ -169,8 +171,8 @@ public sealed class SchoolMealSourceDiagnosticsTests
         Assert.Single(log.Entries);
         clock.Now = clock.Now.AddSeconds(1);
         await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
-        Assert.Equal(2, handler.Calls);
-        Assert.Equal(2, log.Entries.Count);
+        Assert.Equal(retry == "invalid" ? 1 : 2, handler.Calls);
+        Assert.Equal(retry == "invalid" ? 1 : 2, log.Entries.Count);
     }
 
     [Theory]

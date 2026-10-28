@@ -45,9 +45,9 @@ CONTRACTS = types.MappingProxyType({
         'verification': ('exact-runtime-and-backup', 'external-volumes-and-networks',
                          'api-before-web', 'quiescence-and-clean-stop', 'health-config-and-data-identity',
                          'other-services-unchanged'),
-        'recovery': 'exact-old-clean-stop-only; replacement-possible requires manual review; no restore',
-        'external_gates': ('owner-paused-consumers', 'school-source-checks-explicitly-authorized',
-                           'supplier-fetch-interval-established-before-replacement'),
+        'recovery': 'clean-stop-only; old API sources OFF; replacement-possible requires manual review; no DB restore',
+        'external_gates': ('reviewed-durable-source-admission-bound-to-api-image',
+                           'school-source-checks-explicitly-authorized', 'legacy-api-recovery-sources-off'),
         'evidence': ('7971fa2c8cb2345d6bcd71627923a7d2e33417b9', 'scripts/deploy-school-lunch-v3.py'),
     }),
     'api-only-diagnostics-v1': types.MappingProxyType({
@@ -237,7 +237,7 @@ class Operations:
         extra = {'verify-backup': {'backupId', 'manifestSha256'},
                  'backup-approved': {'revision', 'runtime'},
                  'start-approved': {'revision', 'services', 'packageSha256', 'backupId',
-                                    'manifestSha256', 'dependencies', 'contract', 'usersPaused'}}[operation]
+                                    'manifestSha256', 'dependencies', 'contract'}}[operation]
         keys(a, common | extra)
         need(a['schema'] == 1 and a['operation'] == operation and matches(HEX32, a['id']), 'InvalidApproval')
         need(type(a['expiresAt']) is int and time.time() < a['expiresAt'] <= time.time() + 86400,
@@ -306,8 +306,7 @@ class Operations:
 
     def package(self, a):
         contract = deployment_contract(a['contract'])
-        need(a['services'] == list(contract['services']) and a['usersPaused'] is True
-             and matches(HEX64, a['packageSha256']), 'DeploymentScope')
+        need(a['services'] == list(contract['services']) and matches(HEX64, a['packageSha256']), 'DeploymentScope')
         files, services = contract['files'], set(contract['services'])
         keys(a['dependencies'], DEPENDENCIES)
         for name, expected in a['dependencies'].items():

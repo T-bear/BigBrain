@@ -129,7 +129,7 @@ class OperationsTests(unittest.TestCase):
                           packageSha256=ops.sha((root / 'package.json').read_bytes()),
                           backupId=folder.name, manifestSha256=digest,
                           dependencies={p: ops.sha(Path(p).read_bytes()) for p in self.dependencies},
-                          contract='school-lunch-v3-systemd-v1', usersPaused=True)
+                          contract='school-lunch-v3-systemd-v1')
         a['id'] = run
         self.write(self.config / 'start-approved.json', a)
         self.dep_patch = patch.object(ops, 'DEPENDENCIES', tuple(self.dependencies))
@@ -141,6 +141,13 @@ class OperationsTests(unittest.TestCase):
         self.write(root / 'package.json', {name: ops.sha((root / name).read_bytes()) for name in FILES})
         a['packageSha256'] = ops.sha((root / 'package.json').read_bytes())
         self.write(self.config / 'start-approved.json', a)
+
+    def test_old_client_pause_approval_is_rejected_without_operation(self):
+        a, root = self.prepare_package()
+        a['usersPaused'] = True
+        self.write(self.config / 'start-approved.json', a)
+        with self.assertRaises(ops.Denied): self.engine.approval('start-approved')
+        self.assertFalse((self.state / ('claim-' + a['id'] + '.json')).exists())
 
     def test_backup_all_six_live_wal_readback_and_no_source_changes(self):
         before = [(db.execute('SELECT * FROM parent').fetchall(), db.execute('PRAGMA schema_version').fetchone()) for db in self.live]
