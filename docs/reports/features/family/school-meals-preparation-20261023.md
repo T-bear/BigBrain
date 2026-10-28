@@ -1037,3 +1037,84 @@ Verification of this change (offline, no production mutation):
 - Review caught a cache-prohibition/persistence-failure interaction before publication; corrected
   with four regression cases. No live failure recovery, source initialization, root installation,
   deployment or manual acceptance is claimed.
+
+## API image configuration permissions and mixed-runtime recovery — 2026-10-28
+
+Scope: permanent image-only correction after failed run
+`33d39b9d84da4f71a34dcd13ef3d0c81`; baseline
+`3cf409ea410e1fdbec2cdc9cc451d486b3a245e4`, branch `fix/api-image-config-permissions`.
+Risk level 2 (configuration access), HIGH verification with independent candidate review.
+No privilege increase, database/schema change, gateway change or production action is included.
+
+Confirmed cause: the immutable API image contains `/app/appsettings.json` as root:root 0600,
+unreadable by its actual UID/GID 1654. A disposable container reproduced that failure. The
+administrator's current repair changes ownership only in the running container's writable layer;
+it is not a permanent image fix. The Dockerfile now sets only published top-level
+`appsettings*.json`, `*.runtimeconfig.json` and `*.deps.json` to root:1654 0440.
+The application can read, cannot write, and other users receive no access. No recursive ownership
+change, runtime chmod, database-volume permission change or new dependency is introduced.
+
+Focused image regression:
+
+- Built the actual API Dockerfile from a clean baseline archive plus this Dockerfile correction,
+  with the source `src/BigBrain.Api/appsettings.json` deliberately set to **0600** before build.
+  `docker build --file <context>/src/BigBrain.Api/Dockerfile --build-arg BIGBRAIN_REVISION=UNKNOWN
+  --iidfile <context>/api.iid <context>`: **PASS**. The UNKNOWN label honestly identifies a local
+  uncommitted verification image, not an accepted production release.
+- Verification image: `sha256:164a50f27546f8a09127ceecc6357cdda0dd638c39c2b8ea7f564901465f00d0`.
+- `python3 -B tests/deployment/verify_api_image.py <immutable-image-id>`: **PASS**. Actual image
+  USER 1654, all five matching JSON files readable/root-owned/group-readable 0440, no application
+  write permission, normal entrypoint startup and `/health` HTTP 200, zero restarts.
+- Test containers have no external network, published ports, host/named-volume mounts or production
+  configuration. Data lives only in disposable tmpfs. School sources and Finance scheduling/local
+  reasoner remain disabled; no grants or Finance runs. Only newly created test containers are removed.
+- The same permission regression rejects the original immutable API image, as expected;
+  separate read check confirms root:root 0600 and unreadability. This expected failure is not a
+  passing old image. Application source is unchanged, so previously valid application tests are
+  reused; mandatory PR/main CI is reported separately on the exact GitHub revisions.
+- Python syntax, documentation validator, `git diff --check` and scoped diff/secrets review: **PASS**.
+
+Read-only production observation during this correction:
+
+| Component | Actual revision / image | Observation |
+| --- | --- | --- |
+| API | `3cf409ea410e1fdbec2cdc9cc451d486b3a245e4` / `sha256:de4973f2720a24b691c64a0c46a71f976e58b01df6c6f6a7054dd3472b67266c` | running/healthy, `/health` 200; repaired file UID/GID 1654 and mode 0600; 168 recorded restarts from the failed start/recovery period. This does not prove the repair survives recreation. |
+| Web | `ff17bf46c7882ff3d046b07a037409ca59de3523` / `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679` | running/healthy, `/health` 200; still the old revision. |
+
+Gateway status remains **MANUAL_REVIEW_REQUIRED**. Selected mount mappings and all six database
+inode/device identities match the previous package; other containers retain their images/start
+identities and run normally. These identity checks are not a new database integrity test. No
+production database contents, Finance data or provider endpoints were read. No container was
+restarted, recreated or modified. Protected receipts/claims were not accessible for independent
+inspection by this agent; the administrator-reported repair and gateway status do not replace
+that required inspection.
+
+### Controlled continuation from the mixed runtime
+
+1. Preserve the failed run, claims, receipts and interlock. Under the
+   [existing recovery procedure](../../../operations/runbooks/approved-operations.md#failure-concurrency-and-rollback),
+   an administrator must inspect terminal systemd state, worker/recovery receipts and any unfinished
+   Docker command before retiring the interlock. Never reuse its consumed ID/approval or rerun the
+   old package. No automated interlock reset or database restore is permitted.
+2. After reviewed merge/CI, build the final corrected API image from the accepted revision and
+   run the same image check. Retain the existing Web artifact only if its accepted revision and
+   content remain valid. Capture the **current mixed runtime**, actual configuration/mounts and
+   current databases for the next plan; the original all-ff17 preflight is obsolete.
+3. Existing backup bytes remain preserved, but their original container/image binding no longer
+   matches the replaced API. The current gateway's equality check cannot accept them as current
+   merely because volume/inode identities match. Obtain an approved, verified six-database backup
+   bound to the current runtime through the existing routine before sealing a new package. This
+   task creates no backup or new deployment package. The global daily-backup gate remains BLOCKED.
+4. Verify recovery against usable immutable images: the current API image is still defective;
+   its writable-layer repair is not captured by its image ID. Do not designate it as a working
+   recreation/rollback image. The prior reviewed ff17 image is a possible recovery input only
+   after explicit verification against current data/configuration and school-source OFF safeguards;
+   it is not approved for blind rollback here. If the existing worker cannot represent the chosen
+   safe recovery, stop that deployment rather than weakening its checks.
+5. Only after those conditions, seal a **new unique run/package and separate administrator
+   approval** under the existing API+Web contract. Deploy API then Web only through the separately
+   approved procedure; verify health, accepted identities, preserved data/other services and final
+   SchoolLunch status. Unknown source histories and Retry-After remain unknown; no initial bounds
+   are fabricated. Actual menus and iPhone/PWA acceptance remain unverified.
+
+This correction is an image fix and recovery handoff, not a claim of completed production delivery.
