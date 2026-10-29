@@ -322,7 +322,7 @@ After an accepted application merge and separate preparation/deployment authoriz
    guessed defaults. Preserve the existing plan's `targets`, `candidates`, `project`, `others`,
    `expectedServices`, `databases`, `mealsHash`, `webIndexHash`, `originalConfigHashes`, `run` and
    `revision`. Add `contract: school-lunch-v3-systemd-v1`, `backupManifestSha256` and `sourceGate` below.
-   Rollback Compose contains exact old images/revision and identical mounts/networks/environment, except all three SchoolMeals flags are false for old API recovery.
+   Rollback Compose normally contains exact old images/revisions and identical mounts/networks/environment, except all three SchoolMeals flags are false for API recovery. The bounded corrected-image exception below requires explicit backup-bound administrator review.
    Runtime/environment/Compose contents are private and must not be committed or printed.
 4. Assemble a **new** directory with the unprivileged
    [package assembler](../../../scripts/approved-ops/prepare_school_lunch_package.py), passing only
@@ -399,6 +399,58 @@ review; no automatic repeat or database restore occurs. A completed normal deplo
 rechecked without mutation. This bounded amendment needs independent review and administrator
 installation; it does not grant a general rollback engine, new sudo permissions or authority
 to change other services. Menu availability and iPhone/PWA acceptance remain separate evidence.
+
+### Mixed-runtime corrected API recovery — 2026-10-29
+
+This amendment is **REVIEW CHECKPOINT**, not installed or approved for production. It addresses
+an immutable old API image that cannot start because its configuration is unreadable, despite a
+temporary repair in the running container. That repair is not rollback-image evidence.
+
+The existing API+Web contract may optionally include `plan.apiRecovery` with exactly four fields:
+
+| Field | Required binding |
+| --- | --- |
+| `image` | Exactly `plan.candidates.api`; no arbitrary fallback image. |
+| `revision` | Exactly the package/approval revision and candidate image's OCI revision. |
+| `backupManifestSha256` | Exactly the current plan and root approval's verified six-database manifest hash. |
+| `evidenceSha256` | SHA-256 of retained, independently reviewed recovery evidence for this candidate, configuration and backup. |
+
+Without this record the existing contract is unchanged. With it, only the API rollback image and
+revision may differ from the inspected original; Web still uses its exact original image/revision.
+All original runtime configuration, mounts and environment remain required, with the three API
+SchoolMeals flags OFF during recovery. The gateway binds these bytes to the existing protected
+package and single-use approval. It does not accept a caller-selected recovery command or service.
+The installed gateway must be updated administratively after independent exact-candidate review;
+no sudoers, operation, API-only enablement, ACL or additional privilege is needed.
+
+A digest is an integrity binding, **not evidence that a test ran**. Before an administrator seals
+this exception, the retained evidence must demonstrate:
+
+- Immutable image startup/configuration readability as the actual non-root user; a container-layer
+  repair does not qualify. Compare candidate code/schema with the current API for data compatibility.
+- An approved, verified backup bound to the **current** mixed runtime, and isolated startup/readback
+  using copies of those six backup databases with relevant current configuration. No production mount,
+  published port, external network, supplier fetch, Finance data or production restore is allowed.
+  Verify integrity, foreign keys, schema and household data preservation on the isolated copies.
+  Configuration adjustments needed for isolation must be explicit; synthetic tests alone do not
+  prove compatibility with current household data.
+- Exact candidate, configuration and backup identities; retain private details under administrator
+  protection and publish only sanitized results. Missing or contradictory evidence blocks approval.
+
+Recovery before replacement retains the existing clean-stop/identity gates. An explicit corrected
+API recovery recreates only API with the approved candidate and sources OFF, **even if the original
+flags were already OFF**. It first records `recovery-replacement-possible`, then verifies health,
+image/revision, full runtime configuration, six database identities, household read hash and other
+services. Success is `APPROVED_API_RESTORED_SOURCES_OFF`. This is recovery with the corrected image,
+not a downgrade to the broken old image. Web's clean-stop recovery is unchanged.
+
+After `replacement-possible`, `verified` or `recovery-replacement-possible`, uncertainty still yields
+`MANUAL_REVIEW_NO_RESTORE`: no automatic repeat, blind image switch or database restore. The reviewed
+rollback configuration is an administrative recovery input only after resolving that uncertainty.
+Keep the failed run's claim, active interlock and receipts until the administrator has checked
+terminal systemd state, unfinished commands, actual runtime and data. Retire only the active interlock
+through the existing administrative procedure, preserving evidence; never reuse a consumed ID.
+A fresh runtime-bound backup and new unique package/approval are required for the next deployment.
 
 ### Checkpoint evidence and next decision
 

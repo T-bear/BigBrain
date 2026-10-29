@@ -331,12 +331,24 @@ class Operations:
             need(matches(HEX64, plan['targets'][role]['Id'])
                  and matches(re.compile(r'sha256:[0-9a-f]{64}'), plan['targets'][role]['Image'])
                  and matches(re.compile(r'sha256:[0-9a-f]{64}'), plan['candidates'][role]), 'ImageIdentity')
+        if 'apiRecovery' in plan:
+            recovery = plan['apiRecovery']
+            keys(recovery, {'image', 'revision', 'backupManifestSha256', 'evidenceSha256'})
+            # Root-reviewed recovery evidence belongs to this backup and package.
+            # Only the already approved API candidate is eligible, never an arbitrary image.
+            need(recovery['image'] == plan['candidates']['api']
+                 and recovery['revision'] == a['revision']
+                 and recovery['backupManifestSha256'] == a['manifestSha256']
+                 and plan.get('backupManifestSha256') == a['manifestSha256']
+                 and matches(HEX64, recovery['evidenceSha256']), 'ApiRecoveryScope')
         for name in ('release.compose.json', 'rollback.compose.json'):
             cfg = decode(blobs[name])
             need(set(cfg) <= {'services', 'volumes', 'networks', 'name'} and set(cfg['services']) == services, 'ComposeScope')
             need(all(v.get('external') is True for v in [*cfg.get('volumes', {}).values(), *cfg.get('networks', {}).values()]), 'ComposeStorage')
             for role, service in cfg['services'].items():
                 expected_image = plan['candidates'][role] if name == 'release.compose.json' else plan['targets'][role]['Image']
+                if name == 'rollback.compose.json' and role == 'api' and 'apiRecovery' in plan:
+                    expected_image = plan['apiRecovery']['image']
                 need(service.get('image') == expected_image, 'ComposeImageChanged')
                 need(not set(service) & {'build', 'depends_on', 'extends', 'profiles', 'env_file', 'label_file', 'configs', 'secrets', 'develop'}, 'ComposeExternalInput')
         # originalConfigHashes is comparison-only in the reviewed worker, never executed.

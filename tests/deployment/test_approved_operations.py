@@ -498,6 +498,53 @@ class OperationsTests(unittest.TestCase):
         self.assertNotIn('Traceback', result.stderr)
         self.assertEqual(json.loads(result.stderr)['status'], 'BLOCKED')
 
+    def recovery_package(self):
+        a, root = self.prepare_package()
+        plan = json.loads((root / 'plan.json').read_text())
+        candidate = 'sha256:' + '1' * 64
+        plan['candidates']['api'] = candidate
+        plan['backupManifestSha256'] = a['manifestSha256']
+        plan['apiRecovery'] = {'image': candidate, 'revision': REV,
+            'backupManifestSha256': a['manifestSha256'], 'evidenceSha256': '2' * 64}
+        self.write(root / 'plan.json', plan)
+        for name in ('release.compose.json', 'rollback.compose.json'):
+            cfg = json.loads((root / name).read_text()); cfg['services']['api']['image'] = candidate
+            self.write(root / name, cfg)
+        self.reseal(a, root)
+        return a, root, plan
+
+    def test_recovery_candidate_requires_exact_root_sealed_bindings(self):
+        a, root, plan = self.recovery_package()
+        self.assertEqual(self.engine.package(a)[1], plan)
+        for field in ('image', 'revision', 'backupManifestSha256', 'evidenceSha256', 'extra'):
+            bad = copy.deepcopy(plan); bad['apiRecovery'][field] = 'invalid'
+            self.write(root / 'plan.json', bad); self.reseal(a, root)
+            with self.subTest(field=field), self.assertRaises(ops.Denied): self.engine.package(a)
+        self.assertFalse((self.state / 'claims' / (a['id'] + '.json')).exists())
+
+    def test_recovery_cannot_change_web_or_use_old_defective_api(self):
+        a, root, _ = self.recovery_package()
+        cfg = json.loads((root / 'rollback.compose.json').read_text())
+        for role, image in (('web', 'sha256:' + '3' * 64), ('api', IMAGE)):
+            bad = copy.deepcopy(cfg); bad['services'][role]['image'] = image
+            self.write(root / 'rollback.compose.json', bad); self.reseal(a, root)
+            with self.subTest(role=role), self.assertRaisesRegex(ops.Denied, 'ComposeImageChanged'):
+                self.engine.package(a)
+
+    def test_recovery_candidate_does_not_bypass_backup_integrity(self):
+        a, root, _ = self.recovery_package()
+        backup = self.backups / a['backupId'] / 'data' / 'meal-planner.db'
+        with backup.open('ab') as f: f.write(b'corrupt')
+        with self.assertRaises(Exception): self.engine.dispatch('start-approved')
+        self.assertFalse((self.state / 'claims' / (a['id'] + '.json')).exists())
+        self.assertFalse(any(call[0] == ops.SYSTEMD for call in self.calls))
+
+    def test_recovery_candidate_submits_without_changing_four_operation_boundary(self):
+        a, _, _ = self.recovery_package()
+        self.assertEqual(self.engine.dispatch('start-approved')['status'], 'SUBMITTED')
+        self.assertEqual(ops.OPERATIONS, ('verify-backup', 'backup-approved', 'start-approved', 'status'))
+        self.assertFalse(ops.CONTRACTS['api-only-diagnostics-v1']['enabled'])
+
 
 if __name__ == '__main__':
     unittest.main()

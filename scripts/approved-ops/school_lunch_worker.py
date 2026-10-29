@@ -226,19 +226,37 @@ def verify_service(p, role, c):
         need(db_identity(c['Id']) == p['databases'], 'DatabaseIdentityDrift')
 
 
+def recovery_identity(p, role):
+    old = p['targets'][role]
+    if role != 'api' or 'apiRecovery' not in p:
+        return old['Image'], old['Config']['Labels']['org.opencontainers.image.revision']
+    r = p['apiRecovery']
+    need(isinstance(r, dict) and set(r) == {'image', 'revision', 'backupManifestSha256', 'evidenceSha256'}, 'ApiRecoveryScope')
+    need(r['image'] == p['candidates']['api'] and r['revision'] == p['revision']
+         and r['backupManifestSha256'] == p['backupManifestSha256']
+         and isinstance(r['evidenceSha256'], str)
+         and re.fullmatch('[0-9a-f]{64}', r['evidenceSha256']) is not None, 'ApiRecoveryScope')
+    return r['image'], r['revision']
+
+
 def validate_rollback(root, p):
     cfg = json.loads((root / 'rollback.compose.json').read_text())
     need(set(cfg['services']) == set(ROLES), 'RollbackScope')
     release = json.loads((root / 'release.compose.json').read_text())
     for role in ROLES:
         expected = copy.deepcopy(release['services'][role])
-        expected['image'] = p['targets'][role]['Image']
-        expected['labels']['org.opencontainers.image.revision'] = p['targets'][role]['Config']['Labels']['org.opencontainers.image.revision']
+        image, revision = recovery_identity(p, role)
+        expected['image'] = image
+        expected['labels']['org.opencontainers.image.revision'] = revision
         expected['environment'] = service_config(p['targets'][role])['env']
         if role == 'api':
             expected['environment'].update({key: 'false' for key in FLAGS})
         need(cfg['services'][role] == expected, 'RollbackConfigurationChanged')
-        need(json.loads(docker('image', 'inspect', p['targets'][role]['Image']))[0]['Id'] == p['targets'][role]['Image'], 'RollbackImageMissing')
+        inspected = json.loads(docker('image', 'inspect', image))[0]
+        need(inspected['Id'] == image, 'RollbackImageMissing')
+        if role == 'api' and 'apiRecovery' in p:
+            need(inspected['Config']['Labels'].get('org.opencontainers.image.revision') == revision,
+                 'RecoveryRevisionDrift')
     need(cfg.get('volumes') == release.get('volumes') and cfg.get('networks') == release.get('networks'), 'RollbackMountsChanged')
 
 
@@ -322,9 +340,9 @@ def recover(root, p):
             source_gate(p)
             check_other(p)
             env = service_config(old)['env']
-            if s['role'] == 'api' and any(env.get(key) != 'false' for key in FLAGS):
+            if s['role'] == 'api' and ('apiRecovery' in p or any(env.get(key) != 'false' for key in FLAGS)):
                 # Old code may not have durable admission. Never restart it with sources ON.
-                # Reuse the already verified rollback Compose, changing only the three flags.
+                # Reuse reviewed rollback Compose: sources OFF and, when bound, the approved fixed image.
                 validate_rollback(root, p)
                 record(root, p, 'api', 'recovery-replacement-possible')
                 compose(root, p, 'up', '-d', '--no-deps', '--no-build', '--pull', 'never', 'api',
@@ -334,16 +352,17 @@ def recover(root, p):
                 expected = copy.deepcopy(old)
                 expected['Config']['Env'] = [key + '=' + ('false' if key in FLAGS else value)
                     for key, value in env.items()]
-                need(restored['Image'] == old['Image'] and service_config(restored) == service_config(expected),
+                image, revision = recovery_identity(p, 'api')
+                need(restored['Image'] == image and service_config(restored) == service_config(expected),
                      'RecoveryConfigDrift')
                 need(restored['Config']['Labels'].get('org.opencontainers.image.revision') ==
-                     old['Config']['Labels'].get('org.opencontainers.image.revision'), 'RecoveryRevisionDrift')
+                     revision, 'RecoveryRevisionDrift')
                 need(db_identity(cid) == p['databases'], 'DatabaseIdentityDrift')
                 endpoint('api', '/health')
                 need(hashlib.sha256(endpoint('api', '/api/v1/modules/meal-planner/meals')).hexdigest() == p['mealsHash'],
                      'HouseholdChanged')
                 check_other(p)
-                outcome = 'OLD_API_RESTORED_SOURCES_OFF'
+                outcome = 'APPROVED_API_RESTORED_SOURCES_OFF' if 'apiRecovery' in p else 'OLD_API_RESTORED_SOURCES_OFF'
             else:
                 docker('start', old['Id'])
                 wait_healthy(old['Id'])

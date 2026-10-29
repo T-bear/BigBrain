@@ -451,3 +451,99 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(json.loads((self.root/'state.json').read_text())['phase'], 'stopping-old')
         self.assertFalse((self.root/'complete.json').exists())
         compose.assert_not_called()
+
+
+    def recovery_candidate(self):
+        p = self.p
+        p['apiRecovery'] = {'image': p['candidates']['api'], 'revision': p['revision'],
+            'backupManifestSha256': p['backupManifestSha256'], 'evidenceSha256': 'f' * 64}
+        p['databases'] = ['same']; p['mealsHash'] = hashlib.sha256(b'[]').hexdigest()
+        release = {'services': {}, 'volumes': {}, 'networks': {}}
+        for role in d.ROLES:
+            release['services'][role] = {'image': p['candidates'][role],
+                'environment': d.service_config(p['targets'][role])['env'],
+                'labels': {'org.opencontainers.image.revision': p['revision']}}
+        rollback = copy.deepcopy(release)
+        rollback['services']['web']['image'] = p['targets']['web']['Image']
+        rollback['services']['web']['labels']['org.opencontainers.image.revision'] = 'a' * 40
+        rollback['services']['api']['environment'].update({k: 'false' for k in d.FLAGS})
+        d.save(self.root / 'release.compose.json', release)
+        d.save(self.root / 'rollback.compose.json', rollback)
+        return rollback
+
+    def test_explicit_recovery_accepts_only_candidate_and_backup_bound_evidence(self):
+        self.recovery_candidate()
+        with patch.object(d, 'docker', side_effect=lambda *a: json.dumps([{'Id': a[-1],
+                'Config': {'Labels': {'org.opencontainers.image.revision': self.p['revision']}}}]).encode()):
+            d.validate_rollback(self.root, self.p)
+            for key in ('image', 'revision', 'backupManifestSha256', 'evidenceSha256', 'extra'):
+                bad = copy.deepcopy(self.p); bad['apiRecovery'][key] = 'wrong'
+                with self.subTest(key=key), self.assertRaisesRegex(d.Blocked, 'ApiRecoveryScope'):
+                    d.validate_rollback(self.root, bad)
+        with patch.object(d, 'docker', return_value=json.dumps([{'Id': 'new-api',
+                'Config': {'Labels': {'org.opencontainers.image.revision': 'wrong'}}}]).encode()), \
+             self.assertRaisesRegex(d.Blocked, 'RecoveryRevisionDrift'):
+            d.validate_rollback(self.root, self.p)
+
+    def test_explicit_recovery_keeps_config_mounts_and_sources_off(self):
+        cfg = self.recovery_candidate()
+        for kind in ('environment', 'mount', 'command', 'source', 'old-image'):
+            bad = copy.deepcopy(cfg)
+            if kind == 'environment': bad['services']['api']['environment']['EXTRA'] = 'bad'
+            if kind == 'mount': bad['volumes']['other'] = {'external': True}
+            if kind == 'command': bad['services']['api']['command'] = ['unexpected']
+            if kind == 'source': bad['services']['api']['environment'][d.FLAGS[0]] = 'true'
+            if kind == 'old-image': bad['services']['api']['image'] = 'old-api'
+            d.save(self.root / 'rollback.compose.json', bad)
+            with patch.object(d, 'docker', side_effect=lambda *a: json.dumps([{'Id': a[-1],
+                    'Config': {'Labels': {'org.opencontainers.image.revision': self.p['revision']}}}]).encode()):
+                with self.subTest(kind=kind), self.assertRaises(d.Blocked): d.validate_rollback(self.root, self.p)
+
+    def test_explicit_recovery_uses_fixed_image_even_if_original_flags_off(self):
+        self.recovery_candidate(); self.state('old-stopped')
+        restored = container('api'); restored['Image'] = 'new-api'
+        restored['Config']['Labels']['org.opencontainers.image.revision'] = self.p['revision']
+        with patch.object(d, 'inspect', return_value=container('api', False)), patch.object(d, 'check_other'), \
+             patch.object(d, 'validate_rollback'), patch.object(d, 'compose', return_value=b'new-api') as compose, \
+             patch.object(d, 'wait_healthy', return_value=restored), patch.object(d, 'db_identity', return_value=['same']), \
+             patch.object(d, 'endpoint', return_value=b'[]'), patch.object(d, 'docker') as docker:
+            d.recover(self.root, self.p)
+        docker.assert_not_called()
+        self.assertTrue(all(c.kwargs.get('recovery') for c in compose.call_args_list))
+        self.assertEqual(json.loads((self.root / 'recovery.json').read_text())['status'], 'APPROVED_API_RESTORED_SOURCES_OFF')
+        with patch.object(d, 'docker') as docker, patch.object(d, 'compose') as compose:
+            d.recover(self.root, self.p)
+        docker.assert_not_called(); compose.assert_not_called()
+
+    def test_recovery_failure_never_retries_or_reports_success(self):
+        self.recovery_candidate()
+        for fault in ('health', 'image', 'revision', 'database', 'household', 'other-service'):
+            self.state('old-stopped')
+            restored = container('api'); restored['Image'] = 'new-api'
+            restored['Config']['Labels']['org.opencontainers.image.revision'] = self.p['revision']
+            if fault == 'image': restored['Image'] = 'old-api'
+            if fault == 'revision': restored['Config']['Labels']['org.opencontainers.image.revision'] = 'wrong'
+            other = [None, d.Blocked('OtherServiceChanged')] if fault == 'other-service' else None
+            with patch.object(d, 'inspect', return_value=container('api', False)), \
+                 patch.object(d, 'check_other', side_effect=other), patch.object(d, 'validate_rollback'), \
+                 patch.object(d, 'compose', return_value=b'new-api'), \
+                 patch.object(d, 'wait_healthy', return_value=restored, side_effect=d.Blocked('HealthDeadline') if fault == 'health' else None), \
+                 patch.object(d, 'db_identity', return_value=['changed'] if fault == 'database' else ['same']), \
+                 patch.object(d, 'endpoint', return_value=b'changed' if fault == 'household' else b'[]'):
+                with self.subTest(fault=fault), self.assertRaises(d.Blocked): d.recover(self.root, self.p)
+            self.assertEqual(json.loads((self.root / 'state.json').read_text())['phase'], 'recovery-replacement-possible')
+            with patch.object(d, 'docker') as docker, patch.object(d, 'compose') as compose:
+                d.recover(self.root, self.p)
+            docker.assert_not_called(); compose.assert_not_called()
+            self.assertEqual(json.loads((self.root / 'recovery.json').read_text())['status'], 'MANUAL_REVIEW_NO_RESTORE')
+
+    def test_explicit_recovery_does_not_allow_blind_partial_replacement_retry(self):
+        self.recovery_candidate()
+        for role in ('api', 'web'):
+            for phase in ('replacement-possible', 'verified', 'recovery-replacement-possible'):
+                self.state(phase, role)
+                with patch.object(d, 'inspect', side_effect=AssertionError('No inspection of removed target')), \
+                     patch.object(d, 'docker') as docker, patch.object(d, 'compose') as compose:
+                    d.recover(self.root, self.p)
+                docker.assert_not_called(); compose.assert_not_called()
+                self.assertEqual(json.loads((self.root / 'recovery.json').read_text())['status'], 'MANUAL_REVIEW_NO_RESTORE')
