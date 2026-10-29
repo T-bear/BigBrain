@@ -31,94 +31,89 @@ for (const field of ["Senast uppdaterad:", "Verifierad mot commit:", "Runtime se
 }
 
 const agents = readFileSync(resolve(root, "AGENTS.md"), "utf8");
-// Keep section structure and complete critical rule clauses, not a keyword-only check.
-// Ordinary guidance is deliberately not wording-locked; semantic changes still need review.
-// Normalize wrapping so line reflow does not change the contract. This guard cannot prove
-// that arbitrary prose is equivalent or detect every contradiction in surrounding text.
+// Structural guard plus short, section-scoped core phrases. Ordinary prose is not
+// wording-locked. These checks detect omission, not arbitrary semantic contradiction;
+// review of governing rules remains mandatory.
 const agentSections = [
-  ["1. Roller och auktoritet", [
-    "Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.",
-    "Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.",
-    "Owner UX approval registreras endast efter uttryckligt ägargodkännande.",
-  ]],
-  ["2. KISS och uppgiftsstyrd kontext", [
-    "Förenkling får inte försämra säkerhet, korrekthet, tillförlitlighet eller underhållbarhet.",
-  ]],
-  ["3. Riskbaserad arbetsinsats", [
-    "| LOW |", "| MEDIUM |", "| HIGH |",
-    "Compute Economy tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview, fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.",
-  ]],
-  ["4. Scope och Definition of Done", [
-    "Saknas DoD får agenten undersöka och föreslå den, men implementation väntar på ägarens eller arkitektens godkännande inom ägarens auktoriserade scope.",
-    "nytt scope kräver ägarbeslut.",
-    "Uppfylld DoD avslutar uppdraget: ingen automatisk nästa sprint, checkpoint eller förbättringsloop.",
-  ]],
-  ["5. Säkerhet och arkitektur", [
-    "Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.",
-    "Montera aldrig Docker-socketen i API eller Web.",
-    "Använd minsta behörighet för processer, containers, API:er och användare.",
-    "Destruktiva funktioner kräver tydlig auktorisering, uttrycklig bekräftelse och audit.",
-    "Radera eller skriv aldrig över användardata.",
-    "Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag;",
-    "ändra aldrig andra containers eller deras data som bieffekt av utveckling eller test.",
-    "Moduler får inte läsa eller skriva andra modulers datalager direkt.",
-    "Externa tjänster kapslas bakom adapters.",
-    "Alla publika API:er versionssätts; alla API-fel använder Problem Details.",
-    "`BigBrain.Brain` innehåller endast AI-orkestrering enligt `ARCHITECTURE.md`, inte generell kod.",
-    "AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom det vanliga auktoriserade API:t.",
-    "Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.",
-    "Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser gäller oförändrat.",
-    "Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.",
-  ]],
-  ["6. Dokumentation – minsta beständiga sanning", [
-    "NO UNDOCUMENTED SIGNIFICANT WORK:",
-    "Chatt och terminalhistorik är inte bestående source of truth. Dokumentation ingår i DoD.",
-    "Påstå aldrig färdigstatus utan evidens.",
-  ]],
-  ["7. Review och blockerare", [
-    "| P0 |", "| P1 |", "| P2 |", "| P3 |",
-    "Verifierade P0/P1 får aldrig kringgås för att nå en rundgräns;",
-    "Riskacceptans upphäver inte obligatoriska krav utan ett uttryckligt ändringsbeslut.",
-    "Resursramen får aldrig användas för att beskriva ej genomförd obligatorisk verifiering som godkänd eller för att kringgå säkerhetskrav.",
-    "När ägaren skriver **”Codex är klar”** ska ChatGPT själv hämta exakt checkpoint-SHA och tree från GitHub, jämföra med accepterad main-baseline",
-  ]],
-  ["8. Git och Review Checkpoints", [
-    "Ingen reset, rebase, amend, squash, force push eller historieskrivning av reviewhistorik.",
-    "Skriv inte över eller återställ befintliga ändringar.",
-    "**ACCEPTED SHA:** exakt kandidat-SHA som arkitekten granskat mot rätt main-baseline, ägaren uttryckligen godkänt och som verifierats oförändrad före merge. Ingen annan SHA får mergas.",
-    "Före merge: verifiera exakt godkänd SHA, oförändrad förväntad main och relevanta required checks.",
-    "Avvikelse kräver STOP/re-review.",
-    "Deployment kräver separat uttrycklig auktorisering.",
-  ]],
-  ["9. Avbrott och blockerad implementation", [
-    "Vid avbrott: bevara giltigt working-tree-arbete; kasta eller gör inte om det.",
-    "BLOCKER HANDOFF — NOT MERGEABLE", "Blocker-branchen får inte mergas;",
-    "Korrigering kräver separat uttryckligen auktoriserad checkpoint från verifierad main.",
-  ]],
-  ["10. Långvariga processer", [
-    "Verifiera livslängd, ägarskap, resursgränser och beständig resultatlagring innan processen lämnas;",
-    "En kritisk process får aldrig lämnas utan säker fel-/avbrottshantering.",
-  ]],
-  ["11. Kort sluthandoff", [
-    "Misslyckade/ej körda kontroller får aldrig beskrivas som gröna.",
-  ]],
-  ["12. Befintliga frysningar och beslut", [
-    "[Frysningsregistret](docs/operations/freezes.md)",
-    "Historiska fortsättningsinstruktioner upphäver inte senare ägarbeslut.",
-    "det ger inte automatiskt merge-, deployment- eller exekveringsauktoritet.",
-    "Upptining kräver nytt uttryckligt ägarbeslut och ny auktoriserad scope/DoD;",
-    "Befintlig drift lämnas orörd utan separat beslut.",
-  ]],
+  "1. Roller och auktoritet",
+  "2. KISS och uppgiftsstyrd kontext",
+  "3. Riskbaserad arbetsinsats",
+  "4. Scope och Definition of Done",
+  "5. Säkerhet och arkitektur",
+  "6. Dokumentation – minsta beständiga sanning",
+  "7. Review och blockerare",
+  "8. Git och Review Checkpoints",
+  "9. Avbrott och blockerad implementation",
+  "10. Långvariga processer",
+  "11. Kort sluthandoff",
+  "12. Befintliga frysningar och beslut",
 ];
 const sections = [...agents.matchAll(/^## (.+)\r?\n([\s\S]*?)(?=^## |$(?![\s\S]))/gm)];
-if (JSON.stringify(sections.map((section) => section[1].trim())) !==
-    JSON.stringify(agentSections.map(([heading]) => heading))) {
+if (JSON.stringify(sections.map((section) => section[1].trim())) !== JSON.stringify(agentSections)) {
   failures.push("AGENTS must contain the 12 required sections in order, without duplicates or extra sections");
 }
-for (const [heading, rules] of agentSections) {
-  const content = sections.find((section) => section[1].trim() === heading)?.[2].replace(/\s+/g, " ") ?? "";
-  for (const rule of rules) {
-    if (!content.includes(rule)) failures.push(`AGENTS missing required rule in ${heading}: ${rule}`);
+const agentLines = agents.split(/\r?\n/).length - (agents.endsWith("\n") ? 1 : 0);
+if (agentLines > 160) failures.push(`AGENTS exceeds 160 lines: ${agentLines}`);
+const coreRules = [
+  [3, "Finance fail-closed", [/Finance/, /fail-closed-beteende/, /aldrig nödvändig verifiering/]],
+  [5, "secrets", [/Lägg aldrig hemligheter/, /lösenord/, /tokens/, /API-nycklar/]],
+  [5, "Docker socket", [/Montera aldrig Docker-socketen/, /API eller Web/]],
+  [7, "P0–P3", [/\| P0 \| Kritisk brist/, /\| P1 \| Blockerande avvikelse/, /\| P2 \| Icke-blockerande brist/, /\| P3 \| Framtida förbättring/]],
+  [7, "P1 definition", [/konkret, evidensbaserad avvikelse/, /obligatoriskt krav/, /acceptanskriterium/, /säkerhetsvillkor/, /auktoritativa källa/, /berörd komponent/, /riskscenario och konsekvens/]],
+  [7, "P1 evidence and authority", [/reproduktion när den är möjlig/, /tekniskt motiverat scenario stegvis/, /utan identifierad auktoritativ kravkälla är normalt P2/, /Misstänkta kritiska säkerhetsbrister/, /Riskacceptans upphäver inte obligatoriska krav/, /uttryckligt ändringsbeslut/]],
+  [7, "two review rounds", [/Högst två ordinarie reviewvarv/, /ägaren beslutar/, /Verifierade P0\/P1 får aldrig kringgås/, /tidigare blockerare och tillkommande diff/, /får inte nedklassificeras/, /Nya P2\/P3 i oförändrad kod/, /inte obligatorisk säkerhetsverifiering/]],
+  [8, "no rewritten history", [/Ingen[^.!?]*force push[^.!?]*historieskrivning/, /Skriv inte över eller återställ befintliga ändringar/]],
+  [8, "verified merge identity by risk", [/Ingen merge utan verifierad kandidat-SHA\/tree/, /main-baslinje/, /required checks enligt risknivå/, /nivå 3 kräver faktisk oberoende kandidatgranskning/]],
+  [12, "freezes and thaw", [/Frysningsregistret/, /Upptining kräver nytt uttryckligt ägarbeslut/, /ny auktoriserad scope\/DoD/, /Befintlig drift lämnas orörd/]],
+];
+for (const [number, rule, patterns] of coreRules) {
+  const content = sections.find((section) => section[1].trim() === agentSections[number - 1])?.[2].replace(/\s+/g, " ") ?? "";
+  if (!patterns.every((pattern) => pattern.test(content))) failures.push(`AGENTS missing core rule in section ${number}: ${rule}`);
+}
+
+const policyDocuments = new Map([
+  ["docs/policy/risk-policy.md", ["# Riskpolicy och arbetsinsats", "## 3. Riskbaserad arbetsinsats", "### Risknivå för uppdraget", "### Proportionell arbetsinsats och verifiering"]],
+  ["docs/operations/review-guide.md", ["# Granskarbeteende", "## 7. Granskarbeteende"]],
+  ["docs/operations/checkpoint-workflow.md", ["# Git, checkpoints och återhämtning", "## 8. Git och Review Checkpoints", "## 9. Avbrott och blockerad implementation", "## 10. Långvariga processer", "## Historisk väg"]],
+]);
+for (const [path, headings] of policyDocuments) {
+  const text = existsSync(resolve(root, path)) ? readFileSync(resolve(root, path), "utf8") : "";
+  const lines = text.split(/\r?\n/);
+  if (!headings.every((heading) => lines.filter((line) => line === heading).length === 1)) {
+    failures.push(`${path}: missing or duplicate policy structure`);
+  }
+  if (!agents.includes(`](${path})`)) failures.push(`AGENTS missing policy link: ${path}`);
+}
+
+// Check fragments for all new policy links and inbound links to their retained AGENTS
+// anchors. Do not turn unrelated historical anchor debt into a new global requirement.
+const policyPaths = new Set(["AGENTS.md", ...policyDocuments.keys()].map((path) => resolve(root, path)));
+function anchors(text) {
+  const result = new Set([...text.matchAll(/<a\s+id=["']([^"']+)["']/g)].map((match) => match[1]));
+  const counts = new Map();
+  let fenced = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (/^\s*(`{3,}|~{3,})/.test(line)) { fenced = !fenced; continue; }
+    if (fenced) continue;
+    const heading = line.match(/^#{1,6}\s+(.+?)(?:\s+#+)?$/);
+    if (!heading) continue;
+    const slug = heading[1].toLowerCase().replace(/[^\p{L}\p{M}\p{N}_ -]/gu, "").replace(/ /g, "-");
+    const count = counts.get(slug) ?? 0;
+    result.add(slug + (count ? `-${count}` : "")); counts.set(slug, count + 1);
+  }
+  return result;
+}
+for (const path of markdown) {
+  const source = resolve(root, path);
+  for (const match of readFileSync(source, "utf8").matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+    const link = match[1].trim().replace(/^<|>$/g, "");
+    if (/^(https?:|mailto:)/i.test(link)) continue;
+    const [target, fragment] = link.split("#");
+    const destination = target ? resolve(dirname(source), decodeURIComponent(target)) : source;
+    if (!fragment || !(policyPaths.has(source) || policyPaths.has(destination)) || !existsSync(destination)) continue;
+    if (!anchors(readFileSync(destination, "utf8")).has(decodeURIComponent(fragment))) {
+      failures.push(`${path}: broken policy anchor ${link}`);
+    }
   }
 }
 
