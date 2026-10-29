@@ -4,6 +4,7 @@ Derived from deploy-school-lunch-v3.py at 7971fa2; launch/prepare/rollback CLI r
 Only the installed approval gateway may submit this immutable worker to systemd.
 """
 import copy
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -32,6 +33,8 @@ LIMIT = 4 * 1024 * 1024
 COMPOSE = '/usr/libexec/docker/cli-plugins/docker-compose'
 CONFIG_FIELDS = ('User', 'Cmd', 'Entrypoint', 'WorkingDir', 'Healthcheck', 'StopTimeout', 'StopSignal')
 FLAGS = tuple('MealPlanner__SchoolMeals__' + k for k in ('Enabled', 'RosenfeldtEnabled', 'MusikugglanEnabled'))
+BOOTSTRAP = {school: 'MealPlanner__SchoolMeals__' + name + 'VerifiedInitialNotBeforeUtc'
+             for school, name in (('rosenfeldt', 'Rosenfeldt'), ('musikugglan', 'Musikugglan'))}
 
 class Blocked(Exception):
     pass
@@ -248,9 +251,7 @@ def validate_rollback(root, p):
         image, revision = recovery_identity(p, role)
         expected['image'] = image
         expected['labels']['org.opencontainers.image.revision'] = revision
-        expected['environment'] = service_config(p['targets'][role])['env']
-        if role == 'api':
-            expected['environment'].update({key: 'false' for key in FLAGS})
+        expected['environment'] = recovery_environment(p, role)
         need(cfg['services'][role] == expected, 'RollbackConfigurationChanged')
         inspected = json.loads(docker('image', 'inspect', image))[0]
         need(inspected['Id'] == image, 'RollbackImageMissing')
@@ -340,7 +341,8 @@ def recover(root, p):
             source_gate(p)
             check_other(p)
             env = service_config(old)['env']
-            if s['role'] == 'api' and ('apiRecovery' in p or any(env.get(key) != 'false' for key in FLAGS)):
+            if s['role'] == 'api' and ('apiRecovery' in p or any(key in env for key in BOOTSTRAP.values())
+                                     or any(env.get(key) != 'false' for key in FLAGS)):
                 # Old code may not have durable admission. Never restart it with sources ON.
                 # Reuse reviewed rollback Compose: sources OFF and, when bound, the approved fixed image.
                 validate_rollback(root, p)
@@ -350,8 +352,8 @@ def recover(root, p):
                 cid = compose(root, p, 'ps', '-q', 'api', recovery=True).decode().strip()
                 restored = wait_healthy(cid)
                 expected = copy.deepcopy(old)
-                expected['Config']['Env'] = [key + '=' + ('false' if key in FLAGS else value)
-                    for key, value in env.items()]
+                expected['Config']['Env'] = [key + '=' + value
+                    for key, value in recovery_environment(p, 'api').items()]
                 image, revision = recovery_identity(p, 'api')
                 need(restored['Image'] == image and service_config(restored) == service_config(expected),
                      'RecoveryConfigDrift')
@@ -381,8 +383,78 @@ def host_config(value):
     return result
 
 
+def bootstrap_changes(p, now=None):
+    """Validate facts sealed by the existing root-held, single-use package approval.
+
+    Hashes bind evidence; they do not establish supplier consent or DB state by themselves.
+    No caller arguments, new authority, SQL writes or HTTP requests are introduced.
+    """
+    old = service_config(p['targets']['api'])['env']
+    keys = set(BOOTSTRAP.values())
+    # .NET treats keys case-insensitively and normalizes __ to :. Reject aliases/duplicates.
+    aliases = {key.replace('__', ':').lower() for key in keys}
+    raw = p['targets']['api']['Config']['Env']
+    matching = [entry.split('=', 1)[0] for entry in raw
+                if entry.split('=', 1)[0].replace('__', ':').lower() in aliases]
+    need(all(key in keys for key in matching) and len(matching) == len(set(matching)),
+         'BootstrapAlias')
+    present = keys & old.keys()
+    if 'bootstrap' not in p:
+        need(not present, 'BootstrapRemovalRequired')
+        return {}
+    b = p['bootstrap']
+    need(isinstance(b, dict) and set(b) == {'action', 'run', 'containerId', 'image',
+         'backupManifestSha256', 'evidenceSha256', 'schools'}, 'BootstrapScope')
+    need(b['run'] == p['run'] and b['containerId'] == p['targets']['api']['Id']
+         and b['image'] == p['targets']['api']['Image']
+         and b['backupManifestSha256'] == p['backupManifestSha256']
+         and isinstance(b['evidenceSha256'], str)
+         and re.fullmatch('[0-9a-f]{64}', b['evidenceSha256']) is not None, 'BootstrapIdentity')
+    schools = b['schools']
+    need(isinstance(schools, dict) and bool(schools) and set(schools) <= BOOTSTRAP.keys(),
+         'BootstrapSchools')
+    if b['action'] == 'remove':
+        # Evidence must establish durable initialization of every selected school.
+        need({BOOTSTRAP[s] for s in schools} == present
+             and all(value is None for value in schools.values()), 'BootstrapRemovalScope')
+        return {BOOTSTRAP[s]: None for s in schools}
+    need(b['action'] == 'initialize' and not present, 'BootstrapAction')
+    changes = {}
+    for school, consent in schools.items():
+        need(isinstance(consent, dict) and set(consent) == {'basis', 'consentAtUtc', 'notBeforeUtc'}
+             and consent['basis'] == 'owner-relayed-supplier-initialization-permission', 'BootstrapConsent')
+        def utc(value):
+            need(isinstance(value, str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z', value),
+                 'BootstrapUtc')
+            try:
+                return datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+            except ValueError:
+                raise Blocked('BootstrapUtc') from None
+        granted = utc(consent['consentAtUtc'])
+        boundary = utc(consent['notBeforeUtc'])
+        need(granted <= (now or datetime.now(timezone.utc)) and boundary >= granted, 'BootstrapTime')
+        changes[BOOTSTRAP[school]] = consent['notBeforeUtc']
+    return changes
+
+
 def expected_config(p, role):
-    return service_config(p['targets'][role])
+    result = service_config(p['targets'][role])
+    if role == 'api':
+        for key, value in bootstrap_changes(p).items():
+            if value is None:
+                result['env'].pop(key)
+            else:
+                result['env'][key] = value
+    return result
+
+
+def recovery_environment(p, role):
+    env = service_config(p['targets'][role])['env']
+    if role == 'api':
+        env.update({key: 'false' for key in FLAGS})
+        for key in BOOTSTRAP.values():
+            env.pop(key, None)
+    return env
 
 
 def flags_preserved(before, after):
@@ -396,9 +468,10 @@ def source_gate(p, now=None):
     """Administrator binds reviewed durable admission code to this exact API image/revision.
 
     This is not a caller-issued capability claim. The protected package approval covers
-    the evidence hash. Unknown source history stays blocked inside the application.
+    the evidence hash. Unknown history stays blocked unless an explicit bootstrap is sealed.
     No assertion of elapsed Retry-After or paused household clients is accepted here.
     """
+    bootstrap_changes(p, now)
     g = p.get('sourceGate', {})
     need(set(g) == {'containerId', 'mode', 'revision', 'apiImage', 'evidenceSha256'}, 'SourceGateMissing')
     need(g['mode'] == 'meal-planner-sqlite-v1' and g['containerId'] == p['targets']['api']['Id']

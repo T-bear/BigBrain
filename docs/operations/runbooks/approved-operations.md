@@ -322,7 +322,7 @@ After an accepted application merge and separate preparation/deployment authoriz
    guessed defaults. Preserve the existing plan's `targets`, `candidates`, `project`, `others`,
    `expectedServices`, `databases`, `mealsHash`, `webIndexHash`, `originalConfigHashes`, `run` and
    `revision`. Add `contract: school-lunch-v3-systemd-v1`, `backupManifestSha256` and `sourceGate` below.
-   Rollback Compose normally contains exact old images/revisions and identical mounts/networks/environment, except all three SchoolMeals flags are false for API recovery. The bounded corrected-image exception below requires explicit backup-bound administrator review.
+   Rollback Compose normally contains exact old images/revisions and identical mounts/networks/environment, except all three SchoolMeals flags are false and the two bootstrap settings are absent for API recovery. The bounded corrected-image exception below requires explicit backup-bound administrator review.
    Runtime/environment/Compose contents are private and must not be committed or printed.
 4. Assemble a **new** directory with the unprivileged
    [package assembler](../../../scripts/approved-ops/prepare_school_lunch_package.py), passing only
@@ -362,7 +362,8 @@ must not change household-store availability. Schema version 2 and household tab
 Missing source state is UNKNOWN, not an elapsed restriction. Optional, per-school
 `MealPlanner__SchoolMeals__RosenfeldtVerifiedInitialNotBeforeUtc` and
 `MealPlanner__SchoolMeals__MusikugglanVerifiedInitialNotBeforeUtc` may seed **only missing** rows
-from independently established history, including longer Retry-After. They default to null.
+from independently established history, including longer Retry-After, or the narrowly authorized
+supplier-permission exception below. They default to null.
 No such production values are supplied by this implementation. They cannot reset existing
 pending rows or shorten an existing wait. A pending unknown outcome needs separately verified
 source history before any authorized repair; this worker never edits those rows.
@@ -370,6 +371,74 @@ Remove bootstrap values after initialization through an authorized configuration
 never reuse them as proof after restoring an older database. Database recovery must keep school
 sources OFF until current history is established. Restoring a DB or replacing it is outside
 this deployment contract.
+
+### Supplier-permitted bootstrap configuration — 2026-10-29
+
+The owner reports that **both** Skolmat.info and Tant Grön explicitly permit a new first call
+from the new consent onward despite unknown prior attempts and older Retry-After. This is
+**owner-relayed supplier initialization permission**, not independently verified history or a
+claim that an earlier wait elapsed. This limited exception may seed missing rows only. The
+ordinary history requirements above still apply otherwise; existing rows, pending attempts,
+six-hour admission, future Retry-After and uncertain-response handling are unchanged.
+
+This is a prepared contract change, not an installed worker or production approval. The four
+public gateway operations and permissions are unchanged. Use the existing API+Web package,
+backup/identity/preflight checks, independent executable review and root-sealed single-use
+`start-approved` authorization. No direct Docker/configuration bypass, new API-only contract or
+SQL initialization is allowed. The package's `plan.json` may contain one optional `bootstrap`
+object; the existing package hash and administrator approval must cover that exact object:
+
+| Field | Required meaning |
+| --- | --- |
+| `action` | Exactly `initialize` or `remove`; no replacement/update of an existing value. |
+| `run`, `containerId`, `image` | Exact current plan run and original API container/image. |
+| `backupManifestSha256` | Exact plan backup manifest; gateway verification and current mounts/data identities still apply. |
+| `evidenceSha256` | SHA-256 of retained, administrator-reviewed consent or initialization evidence bound to this operation and runtime. A digest alone is not proof or authority. |
+| `schools` | Nonempty mapping containing only `rosenfeldt` and/or `musikugglan`. |
+
+For `initialize`, each selected school's value has **exactly** `basis`, `consentAtUtc` and
+`notBeforeUtc`. `basis` is `owner-relayed-supplier-initialization-permission`. Both timestamps
+must be actual established UTC values in `YYYY-MM-DDTHH:MM:SSZ` form. The administrator verifies
+that `consentAtUtc` is no earlier than the received supplier permission (use a later observed UTC
+instant if receipt precision is unavailable), not a historical API control time. `notBeforeUtc`
+must be at or after that instant. Future consent assertions, malformed/non-UTC times and earlier
+bounds are rejected. Separate timestamps/evidence may apply per school. No production values or
+approval are supplied by this document or the assembler.
+
+The administrator must establish from read-only current-state evidence that the selected rows
+are missing and that no concurrent restore or initialization can occur, and include that evidence
+with the consent in the protected review underlay. The worker does not create or inspect DB rows;
+the application uses its existing atomic `INSERT OR IGNORE` path on ordinary Family View use.
+Existing waits/pending rows cannot be shortened by these settings. New HTTP responses remain
+subject to normal cache, Retry-After and fail-closed rules. No forced source request is part of
+preflight, verification or removal.
+
+Only these API environment differences are admitted, and only under the sealed `bootstrap` operation:
+
+- `MealPlanner__SchoolMeals__RosenfeldtVerifiedInitialNotBeforeUtc`
+- `MealPlanner__SchoolMeals__MusikugglanVerifiedInitialNotBeforeUtc`
+
+All other API environment values, all Web environment values, source flags, mounts and existing
+service/backup/recovery checks remain unchanged. Key aliases and duplicate bootstrap keys are
+rejected. Initialization requires no bootstrap settings already present. A normal deployment
+cannot silently carry bootstrap settings forward: it must use a separately approved removal.
+For `remove`, `schools` must cover **all currently installed** bootstrap keys, with null values.
+Its reviewed evidence must verify durable initialized rows for those schools in the same current
+database, retaining the applicable wait/pending state. This removal has a new run and approval;
+it removes configuration only, never deletes or updates a gate row. One school's isolated
+initialization/removal does not require fetching the other school's data.
+
+Recovery Compose must have all source flags OFF and **both bootstrap keys absent**, including
+when the original API already had its flags OFF. The worker verifies that environment after
+recovery; it never restarts a stopped old API carrying bootstrap settings directly. Uncertain
+replacement still requires manual review, with no blind retry or database restore.
+Before any separately authorized database restore/replacement, sources must be OFF and bootstrap
+configuration removed; old bootstrap plans/consents cannot be reused after restore. Runtime,
+backup and inode bindings detect identity drift, but do not prove absence of an in-place data
+restore. No such automatic detection is claimed: the administrator must verify continuity and
+fresh authority before sealing a new package. Database restoration remains outside this worker.
+
+### Short drain and source observation
 
 Normal short connection-drain checks remain immediately before stop; active connections
 block that attempt, without starting a long maintenance window. Docker stop uses unlimited

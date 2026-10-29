@@ -337,6 +337,7 @@ class WorkerTests(unittest.TestCase):
             rollback['services'][role] = copy.deepcopy(release['services'][role])
             rollback['services'][role]['image'] = p['targets'][role]['Image']
             rollback['services'][role]['labels']['org.opencontainers.image.revision'] = 'a' * 40
+            rollback['services'][role]['environment'] = d.recovery_environment(p, role)
         p['expectedServices'] = copy.deepcopy(release['services'])
         for destination in ('/shopping-data', '/calendar-data', '/settings-data', '/lifecycle-data'):
             p['targets']['api']['Mounts'].append({**p['targets']['api']['Mounts'][0], 'Destination': destination, 'Name': destination[1:], 'Source': '/synthetic' + destination})
@@ -547,3 +548,150 @@ class WorkerTests(unittest.TestCase):
                     d.recover(self.root, self.p)
                 docker.assert_not_called(); compose.assert_not_called()
                 self.assertEqual(json.loads((self.root / 'recovery.json').read_text())['status'], 'MANUAL_REVIEW_NO_RESTORE')
+
+    def bootstrap(self, action='initialize', schools=('rosenfeldt', 'musikugglan')):
+        p = self.p
+        p['bootstrap'] = {'action': action, 'run': p['run'], 'containerId': p['targets']['api']['Id'],
+            'image': p['targets']['api']['Image'], 'backupManifestSha256': p['backupManifestSha256'],
+            'evidenceSha256': 'd' * 64, 'schools': {s: None if action == 'remove' else {
+                'basis': 'owner-relayed-supplier-initialization-permission',
+                'consentAtUtc': '2026-01-01T12:00:00Z', 'notBeforeUtc': '2026-01-01T12:00:01Z'} for s in schools}}
+        if action == 'remove':
+            p['targets']['api']['Config']['Env'] += [d.BOOTSTRAP[s] + '=2026-01-01T12:00:01Z' for s in schools]
+        return p['bootstrap']
+
+    def test_bootstrap_each_school_and_both_preserve_every_other_setting(self):
+        for schools in (('rosenfeldt',), ('musikugglan',), tuple(d.BOOTSTRAP)):
+            b = self.bootstrap(schools=schools)
+            self.p['targets']['api']['Config']['Env'].append('KEEP=unchanged')
+            before = copy.deepcopy(self.p)
+            d.source_gate(self.p)
+            expected = d.service_config(self.p['targets']['api'])
+            expected['env'].update({d.BOOTSTRAP[s]: b['schools'][s]['notBeforeUtc'] for s in schools})
+            self.assertEqual(d.expected_config(self.p, 'api'), expected)
+            self.assertEqual(d.expected_config(self.p, 'web'), d.service_config(self.p['targets']['web']))
+            self.assertEqual(self.p, before)
+            self.p['targets']['api']['Config']['Env'].pop()
+
+    def test_bootstrap_binding_missing_evidence_and_unapproved_schools_block(self):
+        self.bootstrap()
+        for key in ('run', 'containerId', 'image', 'backupManifestSha256', 'evidenceSha256', 'action'):
+            bad = copy.deepcopy(self.p); bad['bootstrap'][key] = 'wrong'
+            with self.subTest(key=key), self.assertRaises(d.Blocked): d.source_gate(bad)
+        for value in (None, {}, {'other': None}, [], {'rosenfeldt': None}):
+            bad = copy.deepcopy(self.p); bad['bootstrap']['schools'] = value
+            with self.subTest(value=value), self.assertRaises(d.Blocked): d.source_gate(bad)
+        for key in self.p['bootstrap']:
+            bad = copy.deepcopy(self.p); del bad['bootstrap'][key]
+            with self.subTest(missing=key), self.assertRaises(d.Blocked): d.source_gate(bad)
+        bad = copy.deepcopy(self.p); bad['bootstrap']['arbitraryEnvironment'] = {'OTHER': 'bad'}
+        with self.assertRaises(d.Blocked): d.source_gate(bad)
+
+    def test_bootstrap_rejects_fake_history_invalid_utc_and_pre_consent_bounds(self):
+        self.bootstrap()
+        for key, value in [('basis', 'verified-history'), ('basis', ''),
+                           ('consentAtUtc', '2999-01-01T00:00:00Z'),
+                           ('notBeforeUtc', '2026-01-01T11:59:59Z'),
+                           ('notBeforeUtc', '2026-02-30T12:00:00Z'),
+                           ('notBeforeUtc', '2026-01-01T12:00:01+01:00'),
+                           ('notBeforeUtc', '2026-01-01T12:00:01'), ('notBeforeUtc', 0),
+                           ('notBeforeUtc', '2026-01-01T12:00:01Z\nOTHER=value')]:
+            bad = copy.deepcopy(self.p); bad['bootstrap']['schools']['rosenfeldt'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(d.Blocked): d.source_gate(bad)
+        # A future boundary is safe; a future assertion that consent already happened is not.
+        self.p['bootstrap']['schools']['rosenfeldt']['notBeforeUtc'] = '2999-01-01T00:00:00Z'
+        d.source_gate(self.p)
+
+    def test_bootstrap_removal_requires_bound_evidence_and_all_installed_keys(self):
+        self.bootstrap('remove')
+        d.source_gate(self.p)
+        env = d.expected_config(self.p, 'api')['env']
+        self.assertFalse(set(d.BOOTSTRAP.values()) & env.keys())
+        self.assertTrue(all(env[k] == 'false' for k in d.FLAGS))
+        for problem in ('no-approval', 'partial', 'value', 'evidence', 'reinitialize'):
+            bad = copy.deepcopy(self.p)
+            if problem == 'no-approval': del bad['bootstrap']
+            if problem == 'partial': del bad['bootstrap']['schools']['musikugglan']
+            if problem == 'value': bad['bootstrap']['schools']['rosenfeldt'] = 'new-time'
+            if problem == 'evidence': bad['bootstrap']['evidenceSha256'] = ''
+            if problem == 'reinitialize': bad['bootstrap']['action'] = 'initialize'
+            with self.subTest(problem=problem), self.assertRaises(d.Blocked): d.source_gate(bad)
+
+    def test_bootstrap_case_aliases_and_duplicates_block(self):
+        self.bootstrap()
+        key = d.BOOTSTRAP['rosenfeldt']
+        for extra in ([key.lower() + '=x'], [key.replace('__', ':') + '=x'], [key + '=x', key + '=y']):
+            bad = copy.deepcopy(self.p); bad['targets']['api']['Config']['Env'] += extra
+            with self.subTest(extra=extra), self.assertRaises(d.Blocked): d.source_gate(bad)
+
+    def test_bootstrap_verified_candidate_rejects_other_environment_or_web_changes(self):
+        self.bootstrap()
+        self.p['databases'] = ['same']
+        for role in d.ROLES:
+            c = copy.deepcopy(self.p['targets'][role]); c['Image'] = self.p['candidates'][role]
+            c['Config']['Labels'].update({'org.opencontainers.image.revision': self.p['revision'],
+                'com.docker.compose.service': role, 'com.docker.compose.project': self.p['project']})
+            c['Config']['Env'] = [k + '=' + v for k, v in d.expected_config(self.p, role)['env'].items()]
+            with patch.object(d, 'db_identity', return_value=['same']): d.verify_service(self.p, role, c)
+            for extra in ('OTHER=changed', d.FLAGS[0] + '=true', d.BOOTSTRAP['rosenfeldt'] + '=2000-01-01T00:00:00Z'):
+                bad = copy.deepcopy(c); bad['Config']['Env'].append(extra)
+                with self.subTest(role=role, extra=extra), self.assertRaises(d.Blocked): d.verify_service(self.p, role, bad)
+        bad = copy.deepcopy(self.p); del bad['bootstrap']
+        with patch.object(d, 'db_identity', return_value=['same']), self.assertRaises(d.Blocked):
+            # Unapproved added variables on API cannot be made acceptable by expectedServices.
+            c = copy.deepcopy(bad['targets']['api']); c['Image'] = bad['candidates']['api']
+            c['Config']['Env'].append(d.BOOTSTRAP['rosenfeldt'] + '=2026-01-01T12:00:01Z')
+            d.verify_service(bad, 'api', c)
+
+    def test_bootstrap_rollback_strips_values_and_rejects_retained_or_readded_values(self):
+        self.bootstrap('remove')
+        release = {'services': {}, 'networks': {}, 'volumes': {}}
+        rollback = copy.deepcopy(release)
+        for role in d.ROLES:
+            release['services'][role] = {'image': self.p['candidates'][role],
+                'environment': d.expected_config(self.p, role)['env'],
+                'labels': {'org.opencontainers.image.revision': self.p['revision']}}
+            rollback['services'][role] = copy.deepcopy(release['services'][role])
+            rollback['services'][role].update(image=self.p['targets'][role]['Image'],
+                environment=d.recovery_environment(self.p, role),
+                labels={'org.opencontainers.image.revision': 'a' * 40})
+        d.save(self.root/'release.compose.json', release)
+        d.save(self.root/'rollback.compose.json', rollback)
+        with patch.object(d, 'docker', side_effect=lambda *args: json.dumps([{'Id': args[-1]}]).encode()):
+            d.validate_rollback(self.root, self.p)
+            for key in (*d.BOOTSTRAP.values(), *d.FLAGS):
+                bad = copy.deepcopy(rollback); bad['services']['api']['environment'][key] = 'true'
+                d.save(self.root/'rollback.compose.json', bad)
+                with self.subTest(key=key), self.assertRaises(d.Blocked): d.validate_rollback(self.root, self.p)
+
+    def test_bootstrap_recovery_with_old_sources_off_still_removes_bootstrap(self):
+        self.bootstrap('remove')
+        stopped = copy.deepcopy(self.p['targets']['api']); stopped['State']['Running'] = False
+        restored = container('api'); restored['Id'] = 'replacement'
+        self.p['databases'] = ['same']; self.p['mealsHash'] = hashlib.sha256(b'[]').hexdigest()
+        self.state('old-stopped')
+        with patch.object(d, 'inspect', return_value=stopped), patch.object(d, 'check_other'), \
+             patch.object(d, 'validate_rollback'), patch.object(d, 'compose', return_value=b'replacement') as compose, \
+             patch.object(d, 'wait_healthy', return_value=restored), patch.object(d, 'db_identity', return_value=['same']), \
+             patch.object(d, 'endpoint', return_value=b'[]'), patch.object(d, 'docker') as docker:
+            d.recover(self.root, self.p)
+        docker.assert_not_called()
+        self.assertTrue(all(call.kwargs.get('recovery') for call in compose.call_args_list))
+        self.assertEqual(json.loads((self.root/'recovery.json').read_text())['status'], 'OLD_API_RESTORED_SOURCES_OFF')
+        with patch.object(d, 'compose') as compose, patch.object(d, 'docker') as docker:
+            d.recover(self.root, self.p)
+        compose.assert_not_called(); docker.assert_not_called()
+
+    def test_bootstrap_invalid_scope_fails_before_any_preflight_external_read(self):
+        self.bootstrap()['schools']['other'] = None
+        with patch.object(d, 'docker') as docker, patch.object(d, 'endpoint') as endpoint, self.assertRaises(d.Blocked):
+            d.preflight(self.root, self.p)
+        docker.assert_not_called(); endpoint.assert_not_called()
+
+    def test_bootstrap_initialization_passes_real_preflight_and_rejects_runtime_drift(self):
+        self.bootstrap()
+        self.test_preflight_real_checks_with_offline_dependencies()
+
+    def test_bootstrap_removal_passes_real_preflight_and_rejects_runtime_drift(self):
+        self.bootstrap('remove')
+        self.test_preflight_real_checks_with_offline_dependencies()
