@@ -1118,3 +1118,93 @@ that required inspection.
    are fabricated. Actual menus and iPhone/PWA acceptance remain unverified.
 
 This correction is an image fix and recovery handoff, not a claim of completed production delivery.
+
+
+## Mixed-runtime recovery checkpoint — 2026-10-29
+
+**REVIEW CHECKPOINT; production deployment BLOCKED.** Branch
+`ops/school-lunch-mixed-runtime-recovery`, baseline `a68c0247ea7a78ad5fadf6400ed8bc2e22ed35c0`.
+Exact candidate SHA/tree and independent review are attached to the GitHub checkpoint/PR;
+publication is not installation, merge or deployment approval. Risk level 3 / HIGH for the
+privileged worker/gateway boundary. No new operation, sudoers permission or API-only activation.
+
+The accepted main and current production were checked read-only. API remains at `3cf409e`,
+healthy on immutable image `sha256:de4973f2720a24b691c64a0c46a71f976e58b01df6c6f6a7054dd3472b67266c`
+with its temporary writable-layer repair and 168 recorded restarts; Web remains healthy at
+`ff17bf46` on `sha256:d651d216d7aa0e95a4c351d3788c444154cbe20c0dfcc5d7fccc5cafffc27679`, zero restarts.
+Gateway status remains MANUAL_REVIEW_REQUIRED and the failed systemd unit is terminal/failed.
+The failed run, claims, interlock and receipts were neither reset nor modified. Actual current
+configuration matches the previous configuration rendering; fresh container identities, five
+mount mappings, six database inode/device identities and all ten other running services were
+captured privately. Identity checks are not SQLite integrity checks.
+
+### Bounded recovery correction and artifacts
+
+The [existing contract](../../../operations/runbooks/approved-operations.md#mixed-runtime-corrected-api-recovery--2026-10-29)
+now supports optional `apiRecovery`, sealed by the existing administrator approval. It accepts
+only the **same API candidate image and revision** as the approved release, explicitly bound to
+the current backup manifest and independently reviewed recovery evidence. No arbitrary fallback
+image is admitted. API recovery retains current mounts/configuration with source flags OFF; Web
+recovery remains on its exact original image. Legacy packages retain their existing behavior.
+After an uncertain replacement the worker still stops for manual review: no automatic retry,
+image downgrade, interlock clearing or database restore. A digest binds evidence; it does not
+prove that compatibility or restore testing occurred.
+
+Release application revision remains accepted `a68c0247ea7a78ad5fadf6400ed8bc2e22ed35c0`:
+
+- Corrected API image: `sha256:c26a862197ca5d7aca1c87d7cd5bb097f33959c8f303e97a5ae3ff1d160cae44`.
+  Actual non-root USER 1654 and OCI revision rechecked. Reused unchanged isolated permission,
+  startup/health evidence from [PR #10](https://github.com/T-bear/BigBrain/pull/10#issuecomment-6480050343)
+  and its [main CI](https://github.com/T-bear/BigBrain/actions/runs/40763677436).
+  Git comparison from production API `3cf409e` shows only Dockerfile, image test and report changes;
+  application/schema code is identical. This supports compatibility but is not a current-data test.
+- Web image freshly built from a clean Git export of accepted main using its unchanged Dockerfile:
+  `sha256:7250416695f33442f51a4c0a37cdc91963649ad868ce7a196661011cc8045433`.
+  Build PASS, OCI revision matches, actual USER 101. Static index read/hash verified in a disposable
+  read-only container with no external network, production mounts or published ports.
+- A fresh unique private preparation contains `plan.partial.json`, `backup-runtime.json`, release
+  and recovery Compose, plus a preparation manifest. It uses newly inspected mixed runtime, not
+  the consumed plan/run/approval. Both Compose files render correctly with exactly API+Web and
+  actual environment values; recovery source flags are OFF. Missing backup/recovery/source
+  evidence hashes are explicitly null. No `plan.json`, executable package or approval was created.
+  Private runtime values, paths, raw configuration and household data are not published.
+
+### Verification and actual limits
+
+`PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p
+ 'test_*approved*.py' -q`: **84 PASS** (75 existing, nine added). New coverage binds recovery
+image/revision/backup/evidence, rejects Web or configuration/mount/command/supplier-flag drift,
+rejects corrupt backup before claim/submission, uses corrected API even when old flags were OFF,
+and stops on health, revision, data identity, household hash or unrelated-service failures.
+Partial/repeated recovery cannot repeat replacement or restore a database. Docker/systemd/HTTP
+are mocked; synthetic SQLite/WAL checks prove fixture integrity, not current production data.
+Documentation validator, changed-document links/anchors, diff and scoped secret checks are
+recorded with the publication. CI and independent review must be read for the exact candidate;
+no new production test or privileged operation is claimed by offline PASS.
+
+Current-runtime backup and isolated startup/readback against its six database copies are
+**NOT RUN / BLOCKED by the administrative boundary**. The old backup's container/image binding
+is obsolete; it was not reused as current evidence. Protected failed-run receipts and interlock
+also require administrator inspection. Therefore this checkpoint does **not** claim a recovery
+image verified against actual current data, a deployable sealed package or completed delivery.
+Both schools' actual source results/Retry-After remain UNKNOWN; no provider or SchoolMeals
+endpoint was called, no initial timestamp was invented and no source flags were changed.
+
+Minimum remaining administrative sequence after exact independent code review:
+
+1. Inspect the failed unit, protected receipts, actual runtime and unfinished commands; retire only
+   its active interlock when justified, preserving failed claims/results permanently.
+2. Authorize/verify a fresh six-database backup for the current API via the existing gateway and
+   complete isolated current-backup acceptance as specified in the runbook. Record exact evidence;
+   no production restore, Finance data or supplier access. The global daily-backup gate stays BLOCKED.
+3. Install the reviewed gateway change through the existing administrator procedure, without ACL/
+   sudoers expansion. Bind the actual backup/recovery/source evidence and current runtime to the
+   new private inputs, independently review the exact worker/package bytes, then seal a fresh
+   single-use approval. Existing harmless systemd evidence is reusable only if its assumptions hold.
+4. Only a separately approved deployment may replace API then Web. Recheck identities and normal
+   short drain immediately beforehand; preserve mounts/data/other services. Afterward observe
+   ordinary permitted source requests and complete owner iPhone/PWA acceptance.
+
+Changed checkpoint files: gateway, existing SchoolLunch worker, their two offline test files,
+approved-operations runbook, this report and the existing recovery handoff. No application,
+workflow, freeze, database, installed binary, sudoers or production configuration was changed.

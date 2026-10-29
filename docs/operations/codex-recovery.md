@@ -72,3 +72,18 @@ på `fix/school-lunch-cache-expiry`. Merge och deployment är inte utförda.
 är det bestående underlaget. Nästa steg är exakt mergegodkännande och oberoende granskning av
 worker-koden före root-godkännande; inga färdiga produktionspaket eller godkännanden finns här.
 Orelaterade oregistrerade filer har bevarats. Återanvänd testresultaten när motsvarande kod är oförändrad.
+
+
+## SchoolLunch mixed-runtime recovery — 2026-10-29
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED** for production recovery, not a new production attempt.
+Baseline `a68c0247ea7a78ad5fadf6400ed8bc2e22ed35c0`; branch
+`ops/school-lunch-mixed-runtime-recovery`. Exact checkpoint SHA/tree is in Git metadata.
+The [bounded correction, private preparation and evidence](../reports/features/family/school-meals-preparation-20261023.md#mixed-runtime-recovery-checkpoint--2026-10-29)
+retain the failed mixed runtime: API `3cf409e` with temporary repair, Web `ff17bf46`, both healthy;
+active interlock/claims untouched. Corrected accepted API and rebuilt Web artifacts are prepared.
+84 offline tests PASS; current-backup compatibility acceptance and protected receipt review remain
+administratively blocked. The private draft deliberately lacks verified backup/recovery bindings
+and cannot serve as an approved executable package. No local application delta or production action.
+Next: independent exact-candidate review, followed by the report's single administrative recovery
+sequence. No autonomous interlock reset, obsolete backup reuse, deployment or source request.
