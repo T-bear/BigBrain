@@ -64,6 +64,7 @@ cleanup() {
   exit "$code"
 }
 trap cleanup EXIT
+trap 'exit 129' HUP
 trap 'exit 130' INT
 trap 'exit 143' TERM
 

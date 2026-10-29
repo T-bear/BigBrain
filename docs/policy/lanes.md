@@ -2,7 +2,6 @@
 
 Detta är ett T2/T7-granskningsunderlag, inte en aktivering. Gällande policy
 fortsätter styra tills ägarens uttryckliga ersättning har accepterats i main.
-T1–T8 och deras framtida sökvägslistor får bara ändras av produktägaren.
 
 ## STANDARD — Web-only
 
@@ -13,7 +12,8 @@ API-klienter, API-kontrakt, Dockerfile, nginx, Compose, databas, rättigheter,
 nätverk och funktioner som kräver nytt API ingår inte. Sökvägstestet kan inte
 i sig bevisa API-kompatibilitet; nya API-behov får aldrig döljas som UI-ändring.
 
-Efter grön PR-CI kör ägaren ett enda kommando:
+Efter grön PR-CI startar ägaren en `tmux`-session på BigBrain
+(`tmux new -s bigbrain-web-deploy`) och kör där ett enda kommando:
 `scripts/deploy-web-only.sh <PR-nummer>`. Kommandot är godkännandet.
 Det kontrollerar diff och Compose före merge, bygger en kandidat medan gamla
 Web kör, mergar via `gh`, inväntar grön main-CI och byter enbart Web.
