@@ -115,7 +115,7 @@ export function MediaDashboard({
             <div id="queue">
               <p className="media-flow-intro">
                 Följ film och serier genom sökning, nedladdning och bearbetning tills de finns i biblioteket. En titel
-                kan därför synas här samtidigt som själva nedladdningen visas i Nedladdningskö.
+                kan därför synas här samtidigt som nedladdningen visas i Nedladdningskö.
               </p>
               <MediaJobs showHeading={false} />
             </div>
