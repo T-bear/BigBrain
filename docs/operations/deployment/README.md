@@ -88,7 +88,35 @@ Mål: högst två extra ägaringrepp totalt för fem deploymenter. Notera blocke
 containerbyte är ingen deployment och fyller inte en av de fem platserna. En verklig deployment
 med rollback räknas och markeras som sådan. Mätmålet kringgår inga bindande kontroller.
 
-Startstatus: **NOT STARTED; 0/5 deploymenter efter ikraftträdande**, ännu inga mätresultat.
+Uppföljning 2026-10-30: **2/5 verkliga deploymenter** efter ikraftträdandet,
+varav en med rollback och en lyckad. Båda gäller Web-only STANDARD (nivå 1).
+
+- **1/5 – 2026-10-30, PR #17:** [PR](https://github.com/T-bear/BigBrain/pull/17),
+  main-revision `32d2193c9f1bce4051f935943ad5f47b79e541cb`,
+  [main-CI](https://github.com/T-bear/BigBrain/actions/runs/41038495504) godkänd.
+  Kandidaten byggdes och Web-containern startades, men hälsokontrollen
+  misslyckades. Diagnostiken visade att Nginx nekades läsning av
+  `default.conf`. Automatisk **ROLLBACK PASS**; föregående Web-image
+  återställdes och verifierades healthy med HTTP 200 för startsida och ikon.
+  iPhone/PWA-acceptans: inte utförd för den misslyckade kandidaten.
+  Extra ägaringrepp: **minst 3** separata diagnostikkörningar, utöver
+  korrigerings- och publiceringsåtgärder; exakt totalantal inte avstämt.
+  Korrigeringen publicerades i [PR #18](https://github.com/T-bear/BigBrain/pull/18).
+- **2/5 – 2026-10-30, PR #19:** [PR](https://github.com/T-bear/BigBrain/pull/19),
+  main-revision `4719fe1c6cb25dbd370d411355fe41a487e7ed00`,
+  [main-CI](https://github.com/T-bear/BigBrain/actions/runs/41044717981) godkänd.
+  Kandidatbygge, Web-byte, containerhälsa och HTTP-kontroller godkändes;
+  deploy-skriptet rapporterade **PASS**, exitkod 0, utan rollback.
+  Endast Web återskapades enligt skriptets rapport.
+  Extra ägaringrepp efter det auktoriserade uppdraget: **0 rapporterade**.
+  Separat obligatorisk iPhone/PWA-acceptans: **PASS, uttryckligen godkänd av ägaren**.
+
+Runtimeutfallen ovan bygger på ägarens redovisade terminalresultat.
+Separata publicerade runtimekvitton saknas; PR- och CI-länkarna styrker
+kodrevision och automatiska kontroller, inte runtimeutfallet.
+Målet om högst två extra ägaringrepp kan inte redovisas som uppfyllt:
+minst tre är belagda efter första försöket.
+
 Ingen historisk deployment räknas retroaktivt. Tidigare verifiering visar SchoolLunch v3 på
 `ff17bf46` och senare korrigeringar mergade i `82fd7bba`; se
 [daterad operationsuppföljning](https://github.com/T-bear/BigBrain/blob/aa5db2a418654ad3dd8c0e3c6c8355fcea974e73/docs/operations/runbooks/approved-operations.md#approved-merges-completed-root-backup-gate-blocked--2026-10-27).
