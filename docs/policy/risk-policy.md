@@ -18,11 +18,16 @@ granskning. Ett bekvämlighetsmål gör inte en databas- eller privilegieändrin
 | 2 – data/åtkomst | Ändringar som påverkar beständiga data, databasstruktur eller åtkomst till data, utan nivå 3-konsekvens. Dataintegritet, återhämtning och avgränsad åtkomst ska verifieras. |
 | 3 – Finance/pengar/kritiska privilegier | Finance är alltid nivå 3. Pengar, handels-/kapitalauktoritet och kritiska privilegier kräver motsvarande hög verifiering och oberoende granskning. Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar är alltid nivå 3. |
 
-Risknivå är inte ett merge-, deployment-, root- eller upptiningsgodkännande. Befintliga
+Risknivå är inte i sig ett merge-, deployment-, root- eller upptiningsgodkännande. Befintliga
 giltiga godkännanden ska återanvändas inom sin omfattning; installerade skydd och aktuella
-kontrakt får inte kringgås. Oktober-gatewayen lämnas oförändrad; att behålla, förenkla eller
-ersätta den kräver separat beslut. Admin-ACL:er ändras inte; personer och enheter med
-administratörsåtkomst är ännu inte beslutade. Inga nya betaltjänster eller handelsrättigheter följer.
+kontrakt får inte kringgås utom enligt följande uttryckliga ersättning:
+Web-only STANDARD (nivå 1, endast Web-filer enligt `docs/policy/lanes.md`) får
+deployas med `scripts/deploy-web-only.sh` utan oktober-gatewayen.
+Ägarens körning av kommandot är merge- och deploymentgodkännandet.
+Undantaget gäller först när båda filerna har accepterats i `main`.
+Gatewayen behålls för API+Web-deployments och allt STRIKT.
+Admin-ACL:er ändras inte; personer och enheter med administratörsåtkomst är ännu
+inte beslutade. Inga nya betaltjänster eller handelsrättigheter följer.
 
 ### Proportionell arbetsinsats och verifiering
 
