@@ -165,7 +165,7 @@ ci_green "$HEAD" || exit 3
 if [[ "$MODE" == resume ]]; then ci_green "$MERGE_SHA" || exit 3; fi
 
 WORKTREE="$TMP/source"
-git worktree add --detach "$WORKTREE" "$HEAD" >/dev/null
+(umask 022; git worktree add --detach "$WORKTREE" "$HEAD" >/dev/null)
 CANDIDATE="bigbrain-web:candidate-$HEAD"
 echo 'Building candidate while old Web stays running...'
 docker build --file "$WORKTREE/src/BigBrain.Web/Dockerfile" --tag "$CANDIDATE" "$WORKTREE"
