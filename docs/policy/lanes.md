@@ -1,7 +1,7 @@
 # Spår: Web-only (förslag, ej ikraftträtt)
 
-Detta är ett T2/T7-granskningsunderlag, inte en aktivering. Gällande policy
-fortsätter styra tills ägarens uttryckliga ersättning har accepterats i main.
+Detta dokument är aktivt när både PR #15 och riskpolicyns ersättning
+(PR #16) finns i `main`. Fram till dess gäller befintlig riskpolicy.
 
 ## STANDARD — Web-only
 
