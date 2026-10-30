@@ -106,7 +106,7 @@ export function MediaDashboard({
           <SmartShuffle />
           <DownloadControl />
           <CollapsibleModule
-            eyebrow="Följ film och serier från sökning till bibliotek"
+            eyebrow="Följ film och serier från sökning till biblioteket"
             expanded={layoutExpanded['media-jobs']}
             moduleId="media-jobs"
             onToggle={() => toggleModule('media-jobs')}
