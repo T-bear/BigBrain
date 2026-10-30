@@ -10,12 +10,36 @@ export type DemoArticle = {
 }
 
 const topics = [
-  ['pil', 'Ett rum av levande pil', 'Ett växande rum av pil kan vara både en plats för grönska och en skuggig sittplats. Detta är ett fiktivt exempel som demonstrerar hur ett odlingsintresse kan presenteras.'],
-  ['spel', 'En återblick på retrospel', 'Äldre spel och spelkonsoler kan få en egen plats i en personlig tidning. Denna påhittade artikel används för att testa text, rubriker och utrymme.'],
-  ['rymd', 'Intresse för astronomi', 'En tidning kan innehålla artiklar om rymden. Här används enbart demotext för att prova layouten, utan att påstå att någon ny upptäckt har gjorts.'],
-  ['teknik', 'Teknik i vardagen', 'Teknikprojekt kan beskrivas på ett lättläst sätt. I denna prototyp är texten endast demonstrationsmaterial och inte någon verklig nyhetsrapport.'],
-  ['konst', 'Akvarell och formgivning', 'Dämpade färger och lekfulla dekorationer ger ett personligt uttryck. Texten är påhittad för att testa den visuella formen.'],
-  ['bocker', 'Böcker och berättelser', 'Böcker och ljudböcker kan också vara ett intresse. Denna sjätte demotext gör det möjligt att kontrollera utskrift på tre A4-sidor.'],
+  [
+    'pil',
+    'Ett rum av levande pil',
+    'Ett växande rum av pil kan vara både en plats för grönska och en skuggig sittplats. Detta är ett fiktivt exempel som demonstrerar hur ett odlingsintresse kan presenteras.',
+  ],
+  [
+    'spel',
+    'En återblick på retrospel',
+    'Äldre spel och spelkonsoler kan få en egen plats i en personlig tidning. Denna påhittade artikel används för att testa text, rubriker och utrymme.',
+  ],
+  [
+    'rymd',
+    'Intresse för astronomi',
+    'En tidning kan innehålla artiklar om rymden. Här används enbart demotext för att prova layouten, utan att påstå att någon ny upptäckt har gjorts.',
+  ],
+  [
+    'teknik',
+    'Teknik i vardagen',
+    'Teknikprojekt kan beskrivas på ett lättläst sätt. I denna prototyp är texten endast demonstrationsmaterial och inte någon verklig nyhetsrapport.',
+  ],
+  [
+    'konst',
+    'Akvarell och formgivning',
+    'Dämpade färger och lekfulla dekorationer ger ett personligt uttryck. Texten är påhittad för att testa den visuella formen.',
+  ],
+  [
+    'bocker',
+    'Böcker och berättelser',
+    'Böcker och ljudböcker kan också vara ett intresse. Denna sjätte demotext gör det möjligt att kontrollera utskrift på tre A4-sidor.',
+  ],
 ] as const
 
 export const demoArticles: DemoArticle[] = topics.map(([id, title, body]) => ({
@@ -30,20 +54,14 @@ const ARTICLES_PER_PAGE = 2
 const WORD_BUDGET = 85
 const TITLE_BUDGET = 72
 
-export function budgetPages(
-  articles: readonly DemoArticle[],
-  requestedPages: number,
-): DemoArticle[][] {
-  const maximum = Number.isFinite(requestedPages)
-    ? Math.max(1, Math.min(3, Math.floor(requestedPages)))
-    : 1
+export function budgetPages(articles: readonly DemoArticle[], requestedPages: number): DemoArticle[][] {
+  const maximum = Number.isFinite(requestedPages) ? Math.max(1, Math.min(3, Math.floor(requestedPages))) : 1
   const selected = articles.slice(0, maximum * ARTICLES_PER_PAGE).map(article => {
     const words = article.body.trim().split(/\s+/).filter(Boolean)
     return {
       ...article,
       title: article.title.slice(0, TITLE_BUDGET),
-      body: words.slice(0, WORD_BUDGET).join(' ') +
-        (words.length > WORD_BUDGET ? ' …' : ''),
+      body: words.slice(0, WORD_BUDGET).join(' ') + (words.length > WORD_BUDGET ? ' …' : ''),
     }
   })
   const pages: DemoArticle[][] = []
@@ -95,11 +113,7 @@ const css = `
 }
 `
 
-function Sheet({ articles, number, total }: {
-  articles: readonly DemoArticle[]
-  number: number
-  total: number
-}) {
+function Sheet({ articles, number, total }: { articles: readonly DemoArticle[]; number: number; total: number }) {
   return (
     <section aria-label={`Tidningssida ${number}`} className="newspaper-sheet">
       <header className="newspaper-heading">
@@ -112,13 +126,17 @@ function Sheet({ articles, number, total }: {
           <article className="newspaper-story" key={article.id}>
             <h3>{article.title}</h3>
             <p>{article.body}</p>
-            <small>{article.source} · {article.date}</small>
+            <small>
+              {article.source} · {article.date}
+            </small>
           </article>
         ))}
       </div>
       <footer className="newspaper-footer">
         <span>BigBrain · N1</span>
-        <span>Sida {number} av {total}</span>
+        <span>
+          Sida {number} av {total}
+        </span>
       </footer>
     </section>
   )
@@ -138,12 +156,7 @@ export function Newspaper() {
   }, [])
 
   const sheets = pages.map((articles, index) => (
-    <Sheet
-      articles={articles}
-      key={index}
-      number={index + 1}
-      total={pages.length}
-    />
+    <Sheet articles={articles} key={index} number={index + 1} total={pages.length} />
   ))
 
   return (
@@ -152,11 +165,7 @@ export function Newspaper() {
       <p>Endast layouttest – inga verkliga nyheter hämtas.</p>
       <div className="newspaper-controls">
         <label htmlFor="newspaper-max">Maximalt antal sidor</label>
-        <select
-          id="newspaper-max"
-          onChange={event => setMaximum(Number(event.target.value))}
-          value={maximum}
-        >
+        <select id="newspaper-max" onChange={event => setMaximum(Number(event.target.value))} value={maximum}>
           <option value={1}>1 sida</option>
           <option value={2}>2 sidor</option>
           <option value={3}>3 sidor</option>
@@ -166,10 +175,7 @@ export function Newspaper() {
         </button>
       </div>
       <div className="newspaper-preview">{sheets}</div>
-      {printRoot && createPortal(
-        <div className="newspaper-print-pages">{sheets}</div>,
-        printRoot,
-      )}
+      {printRoot && createPortal(<div className="newspaper-print-pages">{sheets}</div>, printRoot)}
     </section>
   )
 }
