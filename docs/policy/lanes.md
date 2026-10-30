@@ -1,4 +1,4 @@
-# Spår: Web-only (förslag, ej ikraftträtt)
+# Spår: Web-only
 
 Detta dokument är aktivt när både PR #15 och riskpolicyns ersättning
 (PR #16) finns i `main`. Fram till dess gäller befintlig riskpolicy.
