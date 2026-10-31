@@ -91,6 +91,34 @@ const css = `
 .newspaper-heading { border-bottom:2px solid #718a7d; padding-bottom:8mm; text-align:center }
 .newspaper-heading h2 { margin:2mm 0; font-size:32pt; line-height:1.1; color:#415a4c }
 .newspaper-heading p { margin:0; font-size:9pt; letter-spacing:.08em }
+.newspaper-sheet--front::before { display:none }
+.newspaper-sheet--front .newspaper-heading {
+  text-align:left; padding-bottom:3mm; border-bottom:3px double #435b4c
+}
+.newspaper-sheet--front .newspaper-heading h2 {
+  margin:1mm 0 2mm; font-size:47pt; letter-spacing:-.045em; line-height:1.06
+}
+.newspaper-edition-line {
+  display:flex; justify-content:space-between; gap:5mm; padding-top:2mm;
+  border-top:1px solid #a8b3a6; font-size:9pt; letter-spacing:.04em
+}
+.newspaper-sheet--front .newspaper-stories {
+  display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+  gap:7mm; padding-top:8mm; align-content:start
+}
+.newspaper-story-kicker {
+  display:block; margin-bottom:3mm; color:#48624f;
+  font-size:8pt; font-weight:700; letter-spacing:.13em
+}
+.newspaper-sheet--front .newspaper-story--lead h3 {
+  font-size:31pt; line-height:1.07; letter-spacing:-.025em
+}
+.newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) {
+  border-left:1px solid #a9b7aa; padding-left:5mm
+}
+.newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) h3 {
+  font-size:19pt
+}
 .newspaper-stories { flex:1; display:grid; align-content:start; gap:12mm; padding-top:12mm }
 .newspaper-story h3 { margin:0 0 4mm; font-size:20pt; line-height:1.2; color:#405a4b }
 .newspaper-story p { margin:0 0 4mm; font-size:12pt; line-height:1.55 }
@@ -119,6 +147,18 @@ const css = `
   }
   .newspaper-print-pages .newspaper-stories { display:block }
   .newspaper-print-pages .newspaper-story + .newspaper-story { margin-top:12mm }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-stories {
+    display:block; padding-top:8mm
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story--lead {
+    float:left; width:59%
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) {
+    float:right; width:34%; margin-top:0; padding-left:4mm
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-stories::after {
+    content:''; display:block; clear:both
+  }
   .newspaper-print-pages .newspaper-footer {
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
@@ -127,15 +167,31 @@ const css = `
 
 function Sheet({ articles, number, total }: { articles: readonly DemoArticle[]; number: number; total: number }) {
   return (
-    <section aria-label={`Tidningssida ${number}`} className="newspaper-sheet">
+    <section
+      aria-label={`Tidningssida ${number}`}
+      className={`newspaper-sheet${number === 1 ? ' newspaper-sheet--front' : ''}`}
+    >
       <header className="newspaper-heading">
         <p>PERSONLIG MORGONTIDNING · PROVUPPLAGA</p>
         <h2>Morgonbladet</h2>
-        <p>30 oktober 2026 · Endast demomaterial</p>
+        {number === 1 ? (
+          <div className="newspaper-edition-line">
+            <span>30 oktober 2026</span>
+            <span>Endast demomaterial</span>
+          </div>
+        ) : (
+          <p>30 oktober 2026 · Endast demomaterial</p>
+        )}
       </header>
       <div className="newspaper-stories">
-        {articles.map(article => (
-          <article className="newspaper-story" key={article.id}>
+        {articles.map((article, index) => (
+          <article
+            className={`newspaper-story${number === 1 && index === 0 ? ' newspaper-story--lead' : ''}`}
+            key={article.id}
+          >
+            {number === 1 && (
+              <span className="newspaper-story-kicker">{index === 0 ? 'HUVUDARTIKEL · DEMO' : 'NOTIS · DEMO'}</span>
+            )}
             <h3>{article.title}</h3>
             <p>{article.body}</p>
             <small>

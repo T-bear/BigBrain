@@ -31,3 +31,15 @@ test('print button uses the existing browser-print mechanism', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Skriv ut provtidning' }))
   expect(print).toHaveBeenCalledOnce()
 })
+
+test('only the first preview sheet uses the newspaper front-page hierarchy', () => {
+  const { container } = render(<Newspaper />)
+  const sheets = container.querySelectorAll('.newspaper-preview .newspaper-sheet')
+  expect(sheets).toHaveLength(2)
+  expect(sheets[0].classList.contains('newspaper-sheet--front')).toBe(true)
+  expect(sheets[0].querySelector('.newspaper-edition-line')).not.toBeNull()
+  expect(sheets[0].querySelector('.newspaper-story--lead')?.textContent).toContain('Ett rum av levande pil')
+  expect(sheets[0].textContent).toContain('HUVUDARTIKEL · DEMO')
+  expect(sheets[1].classList.contains('newspaper-sheet--front')).toBe(false)
+  expect(sheets[1].querySelector('.newspaper-story--lead')).toBeNull()
+})
