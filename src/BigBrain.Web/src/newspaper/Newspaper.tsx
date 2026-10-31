@@ -70,6 +70,89 @@ export function budgetPages(articles: readonly DemoArticle[], requestedPages: nu
   return pages
 }
 
+function WillowArtwork() {
+  return (
+    <figure className="newspaper-art newspaper-art--willow">
+      <svg viewBox="0 0 520 290" role="img" aria-label="Tecknad sittplats under en båge av levande pil">
+        <path d="M18 256 Q262 278 502 255" fill="none" stroke="#b5bcab" strokeWidth="3" />
+        <path
+          d="M79 252 C84 135 147 32 263 28 C374 29 447 132 452 253"
+          fill="none"
+          stroke="#687e6a"
+          strokeWidth="9"
+          strokeLinecap="round"
+        />
+        <path
+          d="M114 248 C116 140 169 61 262 60 C352 60 410 141 417 249"
+          fill="none"
+          stroke="#9bab92"
+          strokeWidth="5"
+        />
+        <path
+          d="M150 246 C154 147 195 93 263 93 C329 94 369 149 378 245"
+          fill="none"
+          stroke="#738b78"
+          strokeWidth="4"
+        />
+        <path d="M92 174 Q250 115 433 182 M130 103 Q258 155 396 107" fill="none" stroke="#a4b394" strokeWidth="3" />
+        <g fill="#b3c7a8" stroke="#718e73" strokeWidth="1.5">
+          <ellipse cx="128" cy="102" rx="19" ry="7" transform="rotate(-37 128 102)" />
+          <ellipse cx="189" cy="49" rx="17" ry="7" transform="rotate(27 189 49)" />
+          <ellipse cx="285" cy="32" rx="17" ry="7" transform="rotate(-24 285 32)" />
+          <ellipse cx="370" cy="75" rx="18" ry="7" transform="rotate(36 370 75)" />
+          <ellipse cx="419" cy="133" rx="18" ry="7" transform="rotate(-24 419 133)" />
+          <ellipse cx="100" cy="185" rx="18" ry="7" transform="rotate(32 100 185)" />
+          <ellipse cx="407" cy="199" rx="18" ry="7" transform="rotate(-29 407 199)" />
+        </g>
+        <path
+          d="M184 223 H338 M197 223 L183 260 M326 223 L342 260"
+          fill="none"
+          stroke="#90765d"
+          strokeWidth="7"
+          strokeLinecap="round"
+        />
+        <path d="M221 208 H309 L325 219 H206 Z" fill="#d5c2a0" stroke="#90765d" strokeWidth="3" />
+        <path
+          d="M119 222 H171 M131 219 L122 254 M163 219 L173 254"
+          stroke="#998568"
+          strokeWidth="6"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M352 222 H406 M360 219 L351 254 M397 219 L408 254"
+          stroke="#998568"
+          strokeWidth="6"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path d="M251 205 V196 M242 196 Q251 189 260 196" stroke="#6b826b" strokeWidth="3" fill="none" />
+        <path d="M32 258 Q51 230 70 257 M447 259 Q468 223 490 258" stroke="#8eaa84" strokeWidth="4" fill="none" />
+      </svg>
+      <figcaption>Illustration av ett pilrum · Demomaterial</figcaption>
+    </figure>
+  )
+}
+
+function RetroArtwork() {
+  return (
+    <figure className="newspaper-art newspaper-art--retro">
+      <svg viewBox="0 0 320 185" role="img" aria-label="Tecknad retrospelskärm och handkontroll">
+        <rect x="64" y="10" width="204" height="138" rx="12" fill="none" stroke="#656d60" strokeWidth="7" />
+        <rect x="82" y="27" width="166" height="94" rx="4" fill="#e9efeb" stroke="#9aaea2" strokeWidth="3" />
+        <path d="M82 95 L119 66 L157 93 L197 51 L248 93" fill="none" stroke="#799b85" strokeWidth="5" />
+        <path d="M82 110 H248" stroke="#9aab8a" strokeWidth="4" />
+        <path d="M145 149 V168 M190 149 V168 M128 168 H210" fill="none" stroke="#656d60" strokeWidth="6" />
+        <rect x="26" y="116" width="133" height="54" rx="25" fill="#e5e1d7" stroke="#777a6c" strokeWidth="4" />
+        <path d="M53 144 H87 M70 127 V161" stroke="#646a64" strokeWidth="7" strokeLinecap="round" />
+        <circle cx="115" cy="137" r="6" fill="#789784" />
+        <circle cx="132" cy="151" r="6" fill="#b1a07b" />
+      </svg>
+      <figcaption>Retrospel · Demomaterial</figcaption>
+    </figure>
+  )
+}
+
 const css = `
 .newspaper-prototype { display:grid; gap:16px; min-width:0 }
 .newspaper-controls { display:flex; align-items:center; flex-wrap:wrap; gap:10px }
@@ -119,6 +202,36 @@ const css = `
 .newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) h3 {
   font-size:19pt
 }
+.newspaper-art { margin:3mm 0 4mm; break-inside:avoid; page-break-inside:avoid }
+.newspaper-art svg { display:block; width:100%; height:auto; max-height:62mm }
+.newspaper-art figcaption {
+  margin-top:1mm; color:#626b61; font-size:8pt; line-height:1.3
+}
+.newspaper-art--retro svg { max-height:40mm }
+.newspaper-mast-mark {
+  float:right; color:#78917c; font-size:21pt; line-height:1.6;
+  font-weight:normal; letter-spacing:0
+}
+.newspaper-front-index {
+  grid-column:1 / -1; border-top:1px solid #99a89a;
+  border-bottom:1px solid #c5ccc1; padding:4mm 0;
+  margin-top:3mm; font-size:9pt
+}
+.newspaper-front-index > strong {
+  display:block; margin-bottom:3mm; color:#425d49;
+  font-size:10pt; text-transform:uppercase; letter-spacing:.11em
+}
+.newspaper-front-index ul {
+  display:grid; grid-template-columns:1fr 1fr; column-gap:10mm;
+  row-gap:2mm; margin:0; padding:0; list-style:none
+}
+.newspaper-front-index li {
+  display:flex; justify-content:space-between; gap:3mm;
+  border-bottom:1px dotted #c5cec5; padding-bottom:1mm
+}
+.newspaper-front-index li span:last-child {
+  flex-shrink:0; font-variant-numeric:tabular-nums
+}
 .newspaper-stories { flex:1; display:grid; align-content:start; gap:12mm; padding-top:12mm }
 .newspaper-story h3 { margin:0 0 4mm; font-size:20pt; line-height:1.2; color:#405a4b }
 .newspaper-story p { margin:0 0 4mm; font-size:12pt; line-height:1.55 }
@@ -159,13 +272,31 @@ const css = `
   .newspaper-print-pages .newspaper-sheet--front .newspaper-stories::after {
     content:''; display:block; clear:both
   }
+  .newspaper-print-pages .newspaper-front-index {
+    clear:both; margin-top:5mm; break-inside:avoid; page-break-inside:avoid
+  }
+  .newspaper-print-pages .newspaper-art {
+    break-inside:avoid; page-break-inside:avoid
+  }
   .newspaper-print-pages .newspaper-footer {
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
 }
 `
 
-function Sheet({ articles, number, total }: { articles: readonly DemoArticle[]; number: number; total: number }) {
+type ContentsEntry = { id: string; title: string; page: number }
+
+function Sheet({
+  articles,
+  number,
+  total,
+  contents,
+}: {
+  articles: readonly DemoArticle[]
+  number: number
+  total: number
+  contents: readonly ContentsEntry[]
+}) {
   return (
     <section
       aria-label={`Tidningssida ${number}`}
@@ -173,7 +304,14 @@ function Sheet({ articles, number, total }: { articles: readonly DemoArticle[]; 
     >
       <header className="newspaper-heading">
         <p>PERSONLIG MORGONTIDNING · PROVUPPLAGA</p>
-        <h2>Morgonbladet</h2>
+        <h2>
+          Morgonbladet
+          {number === 1 && (
+            <span className="newspaper-mast-mark" aria-hidden="true">
+              ❦
+            </span>
+          )}
+        </h2>
         {number === 1 ? (
           <div className="newspaper-edition-line">
             <span>30 oktober 2026</span>
@@ -193,12 +331,27 @@ function Sheet({ articles, number, total }: { articles: readonly DemoArticle[]; 
               <span className="newspaper-story-kicker">{index === 0 ? 'HUVUDARTIKEL · DEMO' : 'NOTIS · DEMO'}</span>
             )}
             <h3>{article.title}</h3>
+            {number === 1 && index === 0 && <WillowArtwork />}
+            {number === 1 && index === 1 && <RetroArtwork />}
             <p>{article.body}</p>
             <small>
               {article.source} · {article.date}
             </small>
           </article>
         ))}
+        {number === 1 && (
+          <aside className="newspaper-front-index" aria-label="Innehåll i detta nummer">
+            <strong>I detta nummer</strong>
+            <ul>
+              {contents.map(entry => (
+                <li key={entry.id}>
+                  <span>{entry.title}</span>
+                  <span>{entry.page}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
       </div>
       <footer className="newspaper-footer">
         <span>BigBrain · N1</span>
@@ -223,8 +376,12 @@ export function Newspaper() {
     return () => element.remove()
   }, [])
 
+  const contents: ContentsEntry[] = pages.flatMap((articles, pageIndex) =>
+    articles.map(article => ({ id: article.id, title: article.title, page: pageIndex + 1 })),
+  )
+
   const sheets = pages.map((articles, index) => (
-    <Sheet articles={articles} key={index} number={index + 1} total={pages.length} />
+    <Sheet articles={articles} contents={contents} key={index} number={index + 1} total={pages.length} />
   ))
 
   return (
