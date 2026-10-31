@@ -56,6 +56,7 @@ promotes branch code or a proposed decision above accepted architecture. See the
 - [Dashboard and Widget Framework](../architecture/dashboard-widget-framework.md)
 - [Media module](../modules/media.md)
 - [Calendar module](../modules/calendar.md)
+- [Morgonbladet – produkt- och designkontrakt](../modules/newspaper.md)
 - [Finance master roadmap](../architecture/finance/master-roadmap.md)
 - [Finance module](../modules/finance.md)
 - [Finance threat model](../security/finance-threat-model.md)
