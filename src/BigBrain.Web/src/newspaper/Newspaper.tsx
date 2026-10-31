@@ -107,14 +107,21 @@ const css = `
   body > #bigbrain-newspaper-print { display:block!important }
   .newspaper-print-pages { margin:0; padding:0 }
   .newspaper-print-pages > .newspaper-sheet {
-    width:210mm; height:270mm; margin:0; padding:18mm;
-    background-color:#fff!important; background-image:none!important;
+    display:block; width:210mm; height:260mm; margin:0; padding:18mm;
+    overflow:visible; background-color:#fff!important; background-image:none!important;
     color:#34342f!important; border:0; box-shadow:none;
-    break-inside:avoid; page-break-inside:avoid;
-    break-after:page; page-break-after:always;
+    break-inside:auto; page-break-inside:auto;
+    break-after:auto; page-break-after:auto;
     print-color-adjust:economy; -webkit-print-color-adjust:economy
   }
-  .newspaper-print-pages > .newspaper-sheet:last-child { break-after:auto; page-break-after:auto }
+  .newspaper-print-pages > .newspaper-sheet + .newspaper-sheet {
+    break-before:page; page-break-before:always
+  }
+  .newspaper-print-pages .newspaper-stories { display:block }
+  .newspaper-print-pages .newspaper-story + .newspaper-story { margin-top:12mm }
+  .newspaper-print-pages .newspaper-footer {
+    position:absolute; bottom:18mm; left:18mm; right:18mm
+  }
 }
 `
 
