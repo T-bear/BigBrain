@@ -55,9 +55,16 @@ De påhittade nyhetstexterna, citaten, vädret, namnen, bilderna
 och sidnumren i illustrationsreferensen är endast designexempel.
 De ska inte behandlas som verkliga uppgifter eller källor.
 
-Denna text är en beskrivning av referensbilden; själva bildfilen
-är ännu inte versionshanterad i detta repository. Inga senare
-implementatörer ska anta att bilden redan finns som en asset.
+### Versionshanterad bildreferens
+
+![Vald designreferens: klassisk Morgonbladet-förstasida](../assets/newspaper/morgonbladet-designreferens-20261031.png)
+
+Bilden är den av produktägaren valda visuella referensen, inte
+en färdig utskriftsmall eller en produktionsasset. Bildens
+illustrativa nyheter, datum, citat, väder och sidnummer är
+fiktiva och får inte återanvändas som verifierat innehåll.
+Den krämvita tonen ska skapas av pappret, inte genom att
+skriva ut en heltäckande bakgrundsfärg.
 
 ## 3. Pappersval och bläcksnål utskrift
 
