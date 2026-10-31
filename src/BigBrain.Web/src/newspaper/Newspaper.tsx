@@ -101,15 +101,20 @@ const css = `
 }
 #bigbrain-newspaper-print { display:none }
 @media print {
-  @page { size:A4; margin:0 }
+  @page { size:A4; margin:10mm 0 }
   body:has(> #bigbrain-newspaper-print) { margin:0!important; overflow:visible!important }
   body:has(> #bigbrain-newspaper-print) > #root { display:none!important }
   body > #bigbrain-newspaper-print { display:block!important }
-  .newspaper-sheet {
-    border:0; box-shadow:none; break-after:page; page-break-after:always;
-    print-color-adjust:exact; -webkit-print-color-adjust:exact
+  .newspaper-print-pages { margin:0; padding:0 }
+  .newspaper-print-pages > .newspaper-sheet {
+    width:210mm; height:270mm; margin:0; padding:18mm;
+    background-color:#fff!important; background-image:none!important;
+    color:#34342f!important; border:0; box-shadow:none;
+    break-inside:avoid; page-break-inside:avoid;
+    break-after:page; page-break-after:always;
+    print-color-adjust:economy; -webkit-print-color-adjust:economy
   }
-  .newspaper-sheet:last-child { break-after:auto; page-break-after:auto }
+  .newspaper-print-pages > .newspaper-sheet:last-child { break-after:auto; page-break-after:auto }
 }
 `
 
