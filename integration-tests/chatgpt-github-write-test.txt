@@ -1,0 +1,5 @@
+BigBrain / ChatGPT assisted GitHub smoke test
+Date: 2026-10-29
+Purpose: verify a user-run helper can publish a draft pull request.
+This text file has no effect on application code, configuration or deployment.
+Do not merge the resulting draft PR into main.
