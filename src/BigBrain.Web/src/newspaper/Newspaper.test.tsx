@@ -77,3 +77,13 @@ test('front-page illustrations and contents use only selected pages', async () =
     expect(preview?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
   })
 })
+
+test('expanded demo articles stay within the page budget', () => {
+  const articles = budgetPages(demoArticles, 3).flat()
+
+  expect(articles).toHaveLength(6)
+  expect(articles.every(article => article.source === 'Demomaterial')).toBe(true)
+  expect(articles.every(article => article.body.trim().split(/\s+/).length <= 85)).toBe(true)
+  expect(articles[0].body.trim().split(/\s+/).length).toBeGreaterThan(50)
+  expect(articles[2].body.trim().split(/\s+/).length).toBeGreaterThan(50)
+})

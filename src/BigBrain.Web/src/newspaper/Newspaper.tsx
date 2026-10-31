@@ -13,32 +13,32 @@ const topics = [
   [
     'pil',
     'Ett rum av levande pil',
-    'Ett växande rum av pil kan vara både en plats för grönska och en skuggig sittplats. Detta är ett fiktivt exempel som demonstrerar hur ett odlingsintresse kan presenteras.',
+    'Ett växande rum av pil kan vara både en plats för grönska och en skuggig sittplats. Detta är ett fiktivt exempel som demonstrerar hur ett odlingsintresse kan presenteras. Den tänkta sittplatsen får en enkel bänk, en liten gång och ett tak av böjda grenar. Text och illustration är endast ett exempel på hur ett odlingsintresse kan presenteras i ett personligt morgonblad.',
   ],
   [
     'spel',
     'En återblick på retrospel',
-    'Äldre spel och spelkonsoler kan få en egen plats i en personlig tidning. Denna påhittade artikel används för att testa text, rubriker och utrymme.',
+    'Äldre spel och spelkonsoler kan få en egen plats i en personlig tidning. Denna påhittade artikel används för att testa text, rubriker och utrymme. I detta tänkta kulturinslag samsas en handkontroll med en kort berättelse om pixlar, skärmar och spelminnen. Det handlar inte om en verklig spelnyhet eller recension, utan om hur spaltens form kan fungera.',
   ],
   [
     'rymd',
     'Intresse för astronomi',
-    'En tidning kan innehålla artiklar om rymden. Här används enbart demotext för att prova layouten, utan att påstå att någon ny upptäckt har gjorts.',
+    'En tidning kan innehålla artiklar om rymden. Här används enbart demotext för att prova layouten, utan att påstå att någon ny upptäckt har gjorts. En längre vetenskapsspalt skulle kunna bjuda in läsaren att upptäcka natthimlens detaljer och lära sig mer om observationer. Här används bara exempel för att testa en längre, balanserad text i en tidningsspalt, utan aktuella faktaanspråk.',
   ],
   [
     'teknik',
     'Teknik i vardagen',
-    'Teknikprojekt kan beskrivas på ett lättläst sätt. I denna prototyp är texten endast demonstrationsmaterial och inte någon verklig nyhetsrapport.',
+    'Teknikprojekt kan beskrivas på ett lättläst sätt. I denna prototyp är texten endast demonstrationsmaterial och inte någon verklig nyhetsrapport. I en tänkt artikel beskrivs vägen från en enkel skiss till ett praktiskt projekt. Målet med denna text är att ge sidan mer rytm och innehåll. Inga tekniska specifikationer eller verkliga produktnyheter rapporteras.',
   ],
   [
     'konst',
     'Akvarell och formgivning',
-    'Dämpade färger och lekfulla dekorationer ger ett personligt uttryck. Texten är påhittad för att testa den visuella formen.',
+    'Dämpade färger och lekfulla dekorationer ger ett personligt uttryck. Texten är påhittad för att testa den visuella formen. Här får färg och form en egen lugn kulturspalt. Ett personligt uttryck kan byggas med tunna linjer, små illustrationer och läsbara stycken. Allt är en tänkt redaktionell övning och inte en aktuell konstnyhet.',
   ],
   [
     'bocker',
     'Böcker och berättelser',
-    'Böcker och ljudböcker kan också vara ett intresse. Denna sjätte demotext gör det möjligt att kontrollera utskrift på tre A4-sidor.',
+    'Böcker och ljudböcker kan också vara ett intresse. Denna sjätte demotext gör det möjligt att kontrollera utskrift på tre A4-sidor. I den här påhittade kulturspalten får böcker och ljudböcker skapa en känsla av nyfikenhet och läslust. Det finns inga verkliga bokrecensioner eller rekommendationer här. Texten används för att prova den tredje sidans spalter.',
   ],
 ] as const
 
@@ -179,7 +179,10 @@ const css = `
   text-align:left; padding-bottom:3mm; border-bottom:3px double #435b4c
 }
 .newspaper-sheet--front .newspaper-heading h2 {
-  margin:1mm 0 2mm; font-size:47pt; letter-spacing:-.045em; line-height:1.06
+  margin:1mm 0 2mm;
+  font-family:Palatino,"Palatino Linotype",Georgia,serif;
+  font-size:47pt; font-weight:700;
+  letter-spacing:-.055em; line-height:1.06
 }
 .newspaper-edition-line {
   display:flex; justify-content:space-between; gap:5mm; padding-top:2mm;
@@ -233,8 +236,26 @@ const css = `
   flex-shrink:0; font-variant-numeric:tabular-nums
 }
 .newspaper-stories { flex:1; display:grid; align-content:start; gap:12mm; padding-top:12mm }
+.newspaper-sheet:not(.newspaper-sheet--front) .newspaper-heading {
+  text-align:left; padding-bottom:4mm
+}
+.newspaper-sheet:not(.newspaper-sheet--front) .newspaper-heading h2 {
+  margin:0 0 2mm;
+  font-family:Palatino,"Palatino Linotype",Georgia,serif;
+  font-size:27pt; font-weight:700
+}
+.newspaper-sheet:not(.newspaper-sheet--front) .newspaper-stories {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-content:start; gap:9mm; padding-top:9mm
+}
+.newspaper-sheet:not(.newspaper-sheet--front) .newspaper-story + .newspaper-story {
+  border-left:1px solid #b9c4b9; padding-left:5mm
+}
 .newspaper-story h3 { margin:0 0 4mm; font-size:20pt; line-height:1.2; color:#405a4b }
-.newspaper-story p { margin:0 0 4mm; font-size:12pt; line-height:1.55 }
+.newspaper-story p { margin:0 0 4mm; font-size:11pt; line-height:1.5 }
+.newspaper-sheet--front .newspaper-story--lead p {
+  font-size:11.5pt; line-height:1.52
+}
 .newspaper-story small { font-size:9pt }
 .newspaper-footer {
   display:flex; justify-content:space-between; border-top:1px solid #a9b7aa;
@@ -260,6 +281,13 @@ const css = `
   }
   .newspaper-print-pages .newspaper-stories { display:block }
   .newspaper-print-pages .newspaper-story + .newspaper-story { margin-top:12mm }
+  .newspaper-print-pages .newspaper-sheet:not(.newspaper-sheet--front) .newspaper-stories {
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9mm; align-content:start
+  }
+  .newspaper-print-pages .newspaper-sheet:not(.newspaper-sheet--front) .newspaper-story + .newspaper-story {
+    margin-top:0
+  }
   .newspaper-print-pages .newspaper-sheet--front .newspaper-stories {
     display:block; padding-top:8mm
   }
