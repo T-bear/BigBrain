@@ -301,7 +301,14 @@ const css = `
     content:''; display:block; clear:both
   }
   .newspaper-print-pages .newspaper-front-index {
-    clear:both; margin-top:5mm; break-inside:avoid; page-break-inside:avoid
+    clear:both; margin-top:2mm; padding:2mm 0;
+    break-inside:avoid; page-break-inside:avoid
+  }
+  .newspaper-print-pages .newspaper-front-index ul {
+    row-gap:1mm
+  }
+  .newspaper-print-pages .newspaper-front-index li {
+    padding-bottom:.5mm
   }
   .newspaper-print-pages .newspaper-art {
     break-inside:avoid; page-break-inside:avoid
@@ -310,7 +317,7 @@ const css = `
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
   .newspaper-print-pages .newspaper-sheet--front .newspaper-footer {
-    bottom:7mm
+    position:static; margin-top:8mm
   }
 }
 `
