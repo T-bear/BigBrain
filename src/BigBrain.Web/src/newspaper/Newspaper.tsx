@@ -309,6 +309,9 @@ const css = `
   .newspaper-print-pages .newspaper-footer {
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-footer {
+    bottom:7mm
+  }
 }
 `
 
