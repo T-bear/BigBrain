@@ -157,3 +157,38 @@ test('rasterbilder finns i förhandsvisning och utskrift', () => {
     expect(sheet?.textContent).toContain('CC BY 2.0')
   }
 })
+
+test('editorial first page contains an actual rail and lower feature', async () => {
+  const { container } = render(<Newspaper />)
+
+  const front = container.querySelector('.newspaper-preview .newspaper-sheet--front')
+  const printFront = document.querySelector('#bigbrain-newspaper-print .newspaper-sheet--front')
+
+  for (const sheet of [front, printFront]) {
+    expect(sheet?.querySelector('.newspaper-front-rail')).not.toBeNull()
+    expect(sheet?.querySelector('.newspaper-front-feature')).not.toBeNull()
+    expect(sheet?.textContent).toContain('Intresse för astronomi')
+    expect(sheet?.textContent).toContain('Teknik i vardagen')
+    expect(sheet?.querySelectorAll('.newspaper-art img')).toHaveLength(2)
+  }
+
+  fireEvent.change(within(container).getByLabelText('Maximalt antal sidor'), { target: { value: '1' } })
+
+  await waitFor(() => {
+    const one = container.querySelector('.newspaper-preview .newspaper-sheet--front')
+    expect(one?.textContent).not.toContain('Fortsätter på sida 2')
+    expect(one?.textContent).not.toContain('Intresse för astronomi')
+    expect(container.querySelectorAll('.newspaper-preview .newspaper-sheet')).toHaveLength(1)
+  })
+})
+
+test('editorial print grid preserves the A4 frame and footer', () => {
+  const { container } = render(<Newspaper />)
+  const css = container.querySelector('style')?.textContent ?? ''
+
+  expect(css).toContain('"lead lead rail"')
+  expect(css).toContain('"retro feature rail"')
+  expect(css).toContain('height:260mm')
+  expect(css).toContain('bottom:2mm')
+  expect(css).toContain('print-color-adjust:exact')
+})

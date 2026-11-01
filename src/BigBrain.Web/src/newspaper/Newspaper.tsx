@@ -250,6 +250,132 @@ const css = `
   display:flex; justify-content:space-between; border-top:1px solid #a9b7aa;
   padding-top:4mm; font-size:9pt
 }
+
+/* N1: redaktionell förstasida. Efterföljande sidor är orörda. */
+.newspaper-sheet--front .newspaper-stories {
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(0,1.08fr) minmax(0,.82fr);
+  grid-template-areas:
+    "lead lead rail"
+    "retro feature rail"
+    "index index index";
+  gap:3mm 3.5mm;
+  padding-top:3mm;
+  align-content:start
+}
+.newspaper-sheet--front .newspaper-story--lead {
+  grid-area:lead;
+  display:grid;
+  grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+  gap:1.5mm 3mm;
+  align-content:start
+}
+.newspaper-sheet--front .newspaper-story--lead .newspaper-story-kicker,
+.newspaper-sheet--front .newspaper-story--lead h3 {
+  grid-column:1 / -1
+}
+.newspaper-sheet--front .newspaper-story--lead h3 {
+  margin:0 0 1mm;
+  font-size:27pt;
+  line-height:1.06;
+  letter-spacing:-.035em;
+  color:#222820
+}
+.newspaper-sheet--front .newspaper-story--lead .newspaper-art {
+  grid-column:2;
+  grid-row:3 / span 2;
+  margin:0;
+  align-self:start
+}
+.newspaper-sheet--front .newspaper-story--lead p {
+  grid-column:1;
+  grid-row:3;
+  margin:0;
+  font-size:9.2pt;
+  line-height:1.33
+}
+.newspaper-sheet--front .newspaper-story--lead small {
+  grid-column:1;
+  grid-row:4
+}
+.newspaper-sheet--front .newspaper-story--lead .newspaper-art img {
+  height:53mm
+}
+.newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) {
+  grid-area:retro;
+  padding-left:0;
+  border-left:0;
+  min-width:0
+}
+.newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) h3 {
+  margin-bottom:1.5mm;
+  font-size:18pt;
+  color:#222820
+}
+.newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) p {
+  font-size:8.5pt;
+  line-height:1.32
+}
+.newspaper-sheet--front .newspaper-art--retro img {
+  height:25mm
+}
+.newspaper-sheet--front .newspaper-front-rail {
+  grid-area:rail;
+  border-left:1px solid #aab5a7;
+  padding-left:3mm;
+  min-width:0
+}
+.newspaper-front-rail span,
+.newspaper-front-feature span {
+  display:block;
+  margin-bottom:1.5mm;
+  font-size:7pt;
+  font-weight:700;
+  letter-spacing:.07em;
+  color:#55725b
+}
+.newspaper-front-rail h3 {
+  margin:0 0 2mm;
+  font-size:18pt;
+  line-height:1.14;
+  color:#252b23
+}
+.newspaper-front-rail h4 {
+  margin:0 0 1.5mm;
+  font-size:12pt;
+  line-height:1.15
+}
+.newspaper-front-rail p,
+.newspaper-front-feature p {
+  margin:0 0 2mm;
+  font-size:8.8pt;
+  line-height:1.34
+}
+.newspaper-front-rail small,
+.newspaper-front-feature small {
+  font-size:8pt
+}
+.newspaper-front-rail-note {
+  margin-top:6mm;
+  padding-top:3mm;
+  border-top:1px solid #b4bfb0
+}
+.newspaper-sheet--front .newspaper-front-feature {
+  grid-area:feature;
+  border-top:1px solid #a2aea0;
+  padding-top:3mm;
+  min-width:0
+}
+.newspaper-front-feature h3 {
+  margin:0 0 2mm;
+  font-size:18pt;
+  line-height:1.16;
+  color:#252b23
+}
+.newspaper-sheet--front .newspaper-front-index {
+  grid-area:index;
+  grid-column:1 / -1
+}
 #bigbrain-newspaper-print { display:none }
 @media print {
   @page { size:A4; margin:10mm 0 }
@@ -340,6 +466,47 @@ const css = `
     padding-top:2mm;
     margin-top:0
   }
+
+  /* Redaktionellt rutnät ersätter den äldre float-layouten. */
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-stories {
+    display:grid;
+    grid-template-columns:minmax(0,1.08fr) minmax(0,1.08fr) minmax(0,.82fr);
+    grid-template-areas:
+      "lead lead rail"
+      "retro feature rail"
+      "index index index";
+    gap:3mm 3.5mm;
+    padding-top:2mm
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story--lead {
+    float:none;
+    width:auto;
+    margin:0
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story:not(.newspaper-story--lead) {
+    float:none;
+    width:auto;
+    margin:0;
+    padding-left:0
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-stories::after {
+    display:none;
+    content:none
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-front-index {
+    clear:none;
+    margin-top:0;
+    padding:.5mm 0
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story--lead p {
+    font-size:9.2pt;
+    line-height:1.33
+  }
+  .newspaper-print-pages > .newspaper-sheet {
+    print-color-adjust:exact;
+    -webkit-print-color-adjust:exact
+  }
+
 }
 `
 
@@ -356,6 +523,9 @@ function Sheet({
   total: number
   contents: readonly ContentsEntry[]
 }) {
+  const astronomy = contents.find(entry => entry.id === 'rymd')
+  const technology = contents.find(entry => entry.id === 'teknik')
+
   return (
     <section
       aria-label={`Tidningssida ${number}`}
@@ -438,12 +608,43 @@ function Sheet({
             <h3>{article.title}</h3>
             {number === 1 && index === 0 && <WillowArtwork />}
             {number === 1 && index === 1 && <RetroArtwork />}
-            <p>{article.body}</p>
+            <p>{number === 1 && index === 1 ? `${article.body.split(' ').slice(0, 30).join(' ')} …` : article.body}</p>
             <small>
               {article.source} · {article.date}
             </small>
           </article>
         ))}
+        {number === 1 && (
+          <aside className="newspaper-front-rail" aria-label="Redaktionell högerspalt">
+            {astronomy ? (
+              <section>
+                <span>ASTRONOMI · DEMO</span>
+                <h3>{astronomy.title}</h3>
+                <p>En personlig tidning kan väcka nyfikenhet inför stjärnhimlen och rymdens många frågor.</p>
+                <small>Fortsätter på sida {astronomy.page} · Demo</small>
+              </section>
+            ) : (
+              <section>
+                <span>OM UTGÅVAN · DEMO</span>
+                <h3>En personlig morgonstund</h3>
+                <p>Ett litet layoutprov med natur, spelminnen och läsglädje.</p>
+              </section>
+            )}
+            <section className="newspaper-front-rail-note">
+              <span>SMÅ BERÄTTELSER · DEMO</span>
+              <h4>En tidning att återvända till</h4>
+              <p>Detta är ett redaktionellt layoutprov. Inga verkliga nyheter hämtas.</p>
+            </section>
+          </aside>
+        )}
+        {number === 1 && (
+          <aside className="newspaper-front-feature" aria-label="Redaktionell teknikruta">
+            <span>VARDAG & TEKNIK · DEMO</span>
+            <h3>{technology ? technology.title : 'Idéer i vardagen'}</h3>
+            <p>Små projekt och smarta lösningar får också en plats i en personlig tidning.</p>
+            {technology && <small>Fortsätter på sida {technology.page} · Demo</small>}
+          </aside>
+        )}
         {number === 1 && (
           <aside className="newspaper-front-index" aria-label="Innehåll i detta nummer">
             <strong>I detta nummer</strong>
