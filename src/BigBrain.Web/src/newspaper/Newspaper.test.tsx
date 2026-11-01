@@ -87,3 +87,22 @@ test('expanded demo articles stay within the page budget', () => {
   expect(articles[0].body.trim().split(/\s+/).length).toBeGreaterThan(50)
   expect(articles[2].body.trim().split(/\s+/).length).toBeGreaterThan(50)
 })
+
+test('editorial ribbon belongs only to the first sheet', async () => {
+  const { container } = render(<Newspaper />)
+  const sheets = container.querySelectorAll('.newspaper-preview .newspaper-sheet')
+
+  expect(sheets).toHaveLength(2)
+  expect(sheets[0].querySelectorAll('.newspaper-front-ribbon > div')).toHaveLength(3)
+  expect(sheets[0].textContent).toContain('Gröna rum')
+  expect(sheets[0].textContent).toContain('Spelminnen')
+  expect(sheets[1].querySelector('.newspaper-front-ribbon')).toBeNull()
+
+  fireEvent.change(within(container).getByLabelText('Maximalt antal sidor'), { target: { value: '3' } })
+
+  await waitFor(() => {
+    const all = container.querySelectorAll('.newspaper-preview .newspaper-sheet')
+    expect(all).toHaveLength(3)
+    expect(container.querySelectorAll('.newspaper-preview .newspaper-front-ribbon')).toHaveLength(1)
+  })
+})

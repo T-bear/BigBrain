@@ -190,7 +190,44 @@ const css = `
 }
 .newspaper-sheet--front .newspaper-stories {
   display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
-  gap:7mm; padding-top:8mm; align-content:start
+  gap:7mm; padding-top:4mm; align-content:start
+}
+
+.newspaper-front-ribbon {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  margin-top:2mm;
+  padding:2mm 0;
+  border-top:1px solid #b2bdb0;
+  border-bottom:2px double #7d927e;
+  break-inside:avoid;
+  page-break-inside:avoid
+}
+.newspaper-front-ribbon > div {
+  min-width:0;
+  padding:0 2.5mm
+}
+.newspaper-front-ribbon > div + div {
+  border-left:1px solid #becabc
+}
+.newspaper-front-ribbon span {
+  display:block;
+  margin-bottom:1mm;
+  font-size:7pt;
+  color:#536d58;
+  font-weight:700;
+  letter-spacing:.07em
+}
+.newspaper-front-ribbon strong {
+  display:block;
+  font-family:Georgia,serif;
+  font-size:11pt;
+  line-height:1.15
+}
+.newspaper-front-ribbon p {
+  margin:1mm 0 0;
+  font-size:8pt;
+  line-height:1.25
 }
 .newspaper-story-kicker {
   display:block; margin-bottom:3mm; color:#48624f;
@@ -359,6 +396,25 @@ function Sheet({
           <p>30 oktober 2026 · Endast demomaterial</p>
         )}
       </header>
+      {number === 1 && (
+        <section className="newspaper-front-ribbon" aria-label="Redaktionellt demoband">
+          <div>
+            <span>NATUR · DEMO</span>
+            <strong>Gröna rum</strong>
+            <p>En tänkt plats för grönska och vila.</p>
+          </div>
+          <div>
+            <span>KULTUR · DEMO</span>
+            <strong>Spelminnen</strong>
+            <p>En liten återblick på äldre spel.</p>
+          </div>
+          <div>
+            <span>PERSONLIGT · DEMO</span>
+            <strong>Morgonstund</strong>
+            <p>En lugn stund med en egen tidning.</p>
+          </div>
+        </section>
+      )}
       <div className="newspaper-stories">
         {articles.map((article, index) => (
           <article
