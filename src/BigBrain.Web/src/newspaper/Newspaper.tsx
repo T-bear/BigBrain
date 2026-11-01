@@ -353,9 +353,9 @@ const css = `
   .newspaper-print-pages .newspaper-footer {
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
-  /* Förstasidans utskriftsbudget: A4 med 10 mm sidmarginal. */
+  /* Fast 260 mm-ram med marginal för iPhones A4-sidbrytning. */
   .newspaper-print-pages > .newspaper-sheet--front {
-    height:270mm
+    height:260mm
   }
   .newspaper-print-pages .newspaper-front-ribbon {
     margin-top:1mm;
@@ -375,11 +375,18 @@ const css = `
   }
   .newspaper-print-pages .newspaper-sheet--front .newspaper-front-index {
     margin-top:1mm;
-    padding:1mm 0
+    padding:.5mm 0
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-front-index > strong {
+    margin-bottom:1mm
   }
   .newspaper-print-pages .newspaper-sheet--front .newspaper-footer {
-    position:static;
-    margin-top:4mm
+    position:absolute;
+    bottom:2mm;
+    left:18mm;
+    right:18mm;
+    padding-top:2mm;
+    margin-top:0
   }
 }
 `

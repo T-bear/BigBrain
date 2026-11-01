@@ -106,3 +106,19 @@ test('editorial ribbon belongs only to the first sheet', async () => {
     expect(container.querySelectorAll('.newspaper-preview .newspaper-front-ribbon')).toHaveLength(1)
   })
 })
+
+test('print layout uses a fixed A4 frame with an anchored front-page footer', () => {
+  const { container } = render(<Newspaper />)
+  const css = container.querySelector('style')?.textContent ?? ''
+
+  const frame = css.match(/\.newspaper-print-pages > \.newspaper-sheet--front\s*\{([^}]*)\}/)?.[1]
+
+  const footer = css.match(/\.newspaper-print-pages \.newspaper-sheet--front \.newspaper-footer\s*\{([^}]*)\}/)?.[1]
+
+  expect(frame).toContain('height:260mm')
+  expect(footer).toContain('position:absolute')
+  expect(footer).toContain('bottom:2mm')
+  expect(footer).toContain('margin-top:0')
+
+  expect(document.querySelectorAll('#bigbrain-newspaper-print .newspaper-sheet')).toHaveLength(2)
+})
