@@ -26,6 +26,15 @@ Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant 
 
 ## Family — Skollunch
 
+Avgränsad uppdatering 2026-11-01: PR #25 (`283060d`) för minnesbaserad hämtning är enligt
+ägaren oberoende godkänd; GitHub visar öppen/ej mergad PR och SUCCESS för CI-run
+[41338289335](https://github.com/T-bear/BigBrain/actions/runs/41338289335).
+Andra/sista PR:en förbereder [STANDARD API+Web](policy/lanes.md) som T2-review checkpoint
+från main `e7e81d2`. Gamla paket/approvals/worker är arkiverade på plats i repositoryt;
+installerade artefakter och drift lämnas orörda. Offline-testad, inte accepterad eller deployad.
+Oberoende T2-review och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
+bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
+
 | Tillstånd | Verifierad eller dokumenterad evidens |
 | --- | --- |
 | Implementerat och mergat | V1: `6d7f6de68f618f6c06b0845b659983ec12529f96`. V2-plan: `1125b65393e99d3606fbdb00d67cbd02d5582f36`. V2: `c8aaba15ac6382b6934591acfa6f615505c95819`. Alla ingår i verifierad main. |

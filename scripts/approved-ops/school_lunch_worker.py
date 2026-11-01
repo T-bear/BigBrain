@@ -537,6 +537,7 @@ def load(root, expected_hash):
 
 
 def main():
+    raise Blocked('InvalidInvocation: FROZEN historical SchoolLunch operations; see docs/policy/lanes.md')
     need(os.geteuid() == 0 and len(sys.argv) == 4 and sys.argv[1] in ('work', 'recover'), 'InvalidInvocation')
     os.umask(0o077)
     invocation = os.environ.get('INVOCATION_ID', '')
