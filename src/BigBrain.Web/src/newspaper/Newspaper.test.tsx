@@ -51,7 +51,7 @@ test('front-page illustrations and contents use only selected pages', async () =
   const { container } = render(<Newspaper />)
   const front = container.querySelector('.newspaper-preview .newspaper-sheet--front')
 
-  expect(front?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
+  expect(front?.querySelectorAll('.newspaper-art img')).toHaveLength(2)
   expect(front?.querySelector('.newspaper-front-index')).not.toBeNull()
   expect(front?.textContent).toContain('I detta nummer')
   expect(front?.textContent).toContain('Intresse för astronomi')
@@ -74,7 +74,7 @@ test('front-page illustrations and contents use only selected pages', async () =
     const preview = container.querySelector('.newspaper-preview')
     expect(preview?.querySelectorAll('.newspaper-sheet')).toHaveLength(3)
     expect(preview?.querySelector('.newspaper-front-index')?.textContent).toContain('Böcker och berättelser')
-    expect(preview?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
+    expect(preview?.querySelectorAll('.newspaper-art img')).toHaveLength(2)
   })
 })
 
@@ -132,10 +132,28 @@ test('botanical illustrations appear in preview and print', () => {
   expect(front?.querySelector('.newspaper-mast-mark svg')).not.toBeNull()
   expect(printed?.querySelector('.newspaper-mast-mark svg')).not.toBeNull()
 
-  const willow = front?.querySelector('.newspaper-art--willow svg')
+  const willow = front?.querySelector('.newspaper-art--willow img')
   expect(willow).not.toBeNull()
-  expect(willow?.querySelectorAll('ellipse').length).toBeGreaterThan(20)
+  expect(willow?.getAttribute('src')).toBe('/newspaper/willow-dome.jpg')
 
-  expect(front?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
-  expect(printed?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
+  expect(front?.querySelectorAll('.newspaper-art img')).toHaveLength(2)
+  expect(printed?.querySelectorAll('.newspaper-art img')).toHaveLength(2)
+})
+
+test('rasterbilder finns i förhandsvisning och utskrift', () => {
+  const { container } = render(<Newspaper />)
+
+  const preview = container.querySelector('.newspaper-preview .newspaper-sheet--front')
+  const printed = document.querySelector('#bigbrain-newspaper-print .newspaper-sheet--front')
+
+  for (const sheet of [preview, printed]) {
+    const images = sheet?.querySelectorAll('.newspaper-art img')
+
+    expect(images).toHaveLength(2)
+    expect(images?.[0].getAttribute('src')).toBe('/newspaper/willow-dome.jpg')
+    expect(images?.[1].getAttribute('src')).toBe('/newspaper/retro-games.jpg')
+
+    expect(sheet?.textContent).toContain('CC BY-SA 2.0')
+    expect(sheet?.textContent).toContain('CC BY 2.0')
+  }
 })

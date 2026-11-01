@@ -73,103 +73,8 @@ export function budgetPages(articles: readonly DemoArticle[], requestedPages: nu
 function WillowArtwork() {
   return (
     <figure className="newspaper-art newspaper-art--willow">
-      <svg viewBox="0 0 520 290" role="img" aria-label="Tecknad sittplats under en båge av levande pil">
-        <g opacity=".22">
-          <ellipse cx="235" cy="240" rx="195" ry="30" fill="#a6bca1" />
-          <ellipse cx="171" cy="105" rx="62" ry="48" fill="#c2ceaa" />
-          <ellipse cx="341" cy="106" rx="67" ry="44" fill="#d1c4a5" />
-          <ellipse cx="262" cy="36" rx="91" ry="19" fill="#b4c7b2" />
-          <ellipse cx="288" cy="204" rx="100" ry="33" fill="#dbc8a6" />
-        </g>
-        <path d="M18 256 Q262 278 502 255" fill="none" stroke="#b5bcab" strokeWidth="3" />
-        <path
-          d="M79 252 C84 135 147 32 263 28 C374 29 447 132 452 253"
-          fill="none"
-          stroke="#687e6a"
-          strokeWidth="9"
-          strokeLinecap="round"
-        />
-        <path
-          d="M114 248 C116 140 169 61 262 60 C352 60 410 141 417 249"
-          fill="none"
-          stroke="#9bab92"
-          strokeWidth="5"
-        />
-        <path
-          d="M150 246 C154 147 195 93 263 93 C329 94 369 149 378 245"
-          fill="none"
-          stroke="#738b78"
-          strokeWidth="4"
-        />
-        <path d="M92 174 Q250 115 433 182 M130 103 Q258 155 396 107" fill="none" stroke="#a4b394" strokeWidth="3" />
-        <g fill="#b3c7a8" stroke="#718e73" strokeWidth="1.5">
-          <ellipse cx="128" cy="102" rx="19" ry="7" transform="rotate(-37 128 102)" />
-          <ellipse cx="189" cy="49" rx="17" ry="7" transform="rotate(27 189 49)" />
-          <ellipse cx="285" cy="32" rx="17" ry="7" transform="rotate(-24 285 32)" />
-          <ellipse cx="370" cy="75" rx="18" ry="7" transform="rotate(36 370 75)" />
-          <ellipse cx="419" cy="133" rx="18" ry="7" transform="rotate(-24 419 133)" />
-          <ellipse cx="100" cy="185" rx="18" ry="7" transform="rotate(32 100 185)" />
-          <ellipse cx="407" cy="199" rx="18" ry="7" transform="rotate(-29 407 199)" />
-        </g>
-        <path
-          d="M184 223 H338 M197 223 L183 260 M326 223 L342 260"
-          fill="none"
-          stroke="#90765d"
-          strokeWidth="7"
-          strokeLinecap="round"
-        />
-        <path d="M221 208 H309 L325 219 H206 Z" fill="#d5c2a0" stroke="#90765d" strokeWidth="3" />
-        <path
-          d="M119 222 H171 M131 219 L122 254 M163 219 L173 254"
-          stroke="#998568"
-          strokeWidth="6"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M352 222 H406 M360 219 L351 254 M397 219 L408 254"
-          stroke="#998568"
-          strokeWidth="6"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path d="M251 205 V196 M242 196 Q251 189 260 196" stroke="#6b826b" strokeWidth="3" fill="none" />
-        <path d="M32 258 Q51 230 70 257 M447 259 Q468 223 490 258" stroke="#8eaa84" strokeWidth="4" fill="none" />
-        <g fill="none" stroke="#809b78" strokeWidth="2.2" opacity=".78">
-          <path d="M93 201 Q56 170 38 129" />
-          <path d="M132 106 Q99 77 72 56" />
-          <path d="M211 48 Q191 19 168 8" />
-          <path d="M321 45 Q338 13 367 7" />
-          <path d="M403 118 Q439 93 467 70" />
-          <path d="M427 212 Q465 184 480 143" />
-        </g>
-        <g fill="#9ebc94" opacity=".85">
-          <ellipse cx="61" cy="168" rx="18" ry="7" transform="rotate(50 61 168)" />
-          <ellipse cx="48" cy="139" rx="15" ry="7" transform="rotate(-15 48 139)" />
-          <ellipse cx="84" cy="80" rx="16" ry="7" transform="rotate(48 84 80)" />
-          <ellipse cx="111" cy="89" rx="17" ry="7" transform="rotate(-18 111 89)" />
-          <ellipse cx="173" cy="19" rx="18" ry="6" transform="rotate(35 173 19)" />
-          <ellipse cx="214" cy="34" rx="17" ry="6" transform="rotate(-24 214 34)" />
-          <ellipse cx="352" cy="21" rx="17" ry="7" transform="rotate(37 352 21)" />
-          <ellipse cx="381" cy="30" rx="17" ry="6" transform="rotate(-27 381 30)" />
-          <ellipse cx="443" cy="90" rx="19" ry="7" transform="rotate(29 443 90)" />
-          <ellipse cx="463" cy="75" rx="15" ry="6" transform="rotate(-40 463 75)" />
-          <ellipse cx="467" cy="174" rx="18" ry="7" transform="rotate(-18 467 174)" />
-          <ellipse cx="451" cy="201" rx="17" ry="6" transform="rotate(36 451 201)" />
-        </g>
-        <g fill="#c5b18d" opacity=".54">
-          <ellipse cx="140" cy="83" rx="10" ry="4" transform="rotate(28 140 83)" />
-          <ellipse cx="315" cy="30" rx="11" ry="5" transform="rotate(-31 315 30)" />
-          <ellipse cx="417" cy="155" rx="11" ry="5" transform="rotate(23 417 155)" />
-        </g>
-        <g fill="#b99d85" opacity=".77">
-          <circle cx="42" cy="151" r="3" />
-          <circle cx="49" cy="146" r="2.5" />
-          <circle cx="459" cy="174" r="3" />
-          <circle cx="465" cy="169" r="2.5" />
-        </g>
-      </svg>
-      <figcaption>Illustration av ett pilrum · Demomaterial</figcaption>
+      <img src="/newspaper/willow-dome.jpg" alt="Fotografi av ett rum av levande pil" loading="eager" />
+      <figcaption>Exempelfoto: Stan Wray · CC BY-SA 2.0 · Demomaterial</figcaption>
     </figure>
   )
 }
@@ -177,18 +82,8 @@ function WillowArtwork() {
 function RetroArtwork() {
   return (
     <figure className="newspaper-art newspaper-art--retro">
-      <svg viewBox="0 0 320 185" role="img" aria-label="Tecknad retrospelskärm och handkontroll">
-        <rect x="64" y="10" width="204" height="138" rx="12" fill="none" stroke="#656d60" strokeWidth="7" />
-        <rect x="82" y="27" width="166" height="94" rx="4" fill="#e9efeb" stroke="#9aaea2" strokeWidth="3" />
-        <path d="M82 95 L119 66 L157 93 L197 51 L248 93" fill="none" stroke="#799b85" strokeWidth="5" />
-        <path d="M82 110 H248" stroke="#9aab8a" strokeWidth="4" />
-        <path d="M145 149 V168 M190 149 V168 M128 168 H210" fill="none" stroke="#656d60" strokeWidth="6" />
-        <rect x="26" y="116" width="133" height="54" rx="25" fill="#e5e1d7" stroke="#777a6c" strokeWidth="4" />
-        <path d="M53 144 H87 M70 127 V161" stroke="#646a64" strokeWidth="7" strokeLinecap="round" />
-        <circle cx="115" cy="137" r="6" fill="#789784" />
-        <circle cx="132" cy="151" r="6" fill="#b1a07b" />
-      </svg>
-      <figcaption>Retrospel · Demomaterial</figcaption>
+      <img src="/newspaper/retro-games.jpg" alt="Fotografi av en klassisk spelkontroll" loading="eager" />
+      <figcaption>Exempelfoto: Digital Game Museum · CC BY 2.0 · Demomaterial</figcaption>
     </figure>
   )
 }
@@ -288,6 +183,20 @@ const css = `
   margin-top:1mm; color:#626b61; font-size:8pt; line-height:1.3
 }
 .newspaper-art--retro svg { max-height:40mm }
+.newspaper-art img {
+  display:block;
+  width:100%;
+  object-fit:cover
+}
+.newspaper-art--willow img {
+  height:54mm;
+  object-position:center 45%
+}
+.newspaper-art--retro img {
+  height:33mm;
+  object-position:center
+}
+
 .newspaper-mast-mark {
   float:right; display:block; width:24mm; height:15mm;
   margin-left:2mm; line-height:1
