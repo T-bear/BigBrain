@@ -122,3 +122,20 @@ test('print layout uses a fixed A4 frame with an anchored front-page footer', ()
 
   expect(document.querySelectorAll('#bigbrain-newspaper-print .newspaper-sheet')).toHaveLength(2)
 })
+
+test('botanical illustrations appear in preview and print', () => {
+  const { container } = render(<Newspaper />)
+
+  const front = container.querySelector('.newspaper-preview .newspaper-sheet--front')
+  const printed = document.querySelector('#bigbrain-newspaper-print .newspaper-sheet--front')
+
+  expect(front?.querySelector('.newspaper-mast-mark svg')).not.toBeNull()
+  expect(printed?.querySelector('.newspaper-mast-mark svg')).not.toBeNull()
+
+  const willow = front?.querySelector('.newspaper-art--willow svg')
+  expect(willow).not.toBeNull()
+  expect(willow?.querySelectorAll('ellipse').length).toBeGreaterThan(20)
+
+  expect(front?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
+  expect(printed?.querySelectorAll('.newspaper-art svg')).toHaveLength(2)
+})

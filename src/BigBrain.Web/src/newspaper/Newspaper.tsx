@@ -74,6 +74,13 @@ function WillowArtwork() {
   return (
     <figure className="newspaper-art newspaper-art--willow">
       <svg viewBox="0 0 520 290" role="img" aria-label="Tecknad sittplats under en båge av levande pil">
+        <g opacity=".22">
+          <ellipse cx="235" cy="240" rx="195" ry="30" fill="#a6bca1" />
+          <ellipse cx="171" cy="105" rx="62" ry="48" fill="#c2ceaa" />
+          <ellipse cx="341" cy="106" rx="67" ry="44" fill="#d1c4a5" />
+          <ellipse cx="262" cy="36" rx="91" ry="19" fill="#b4c7b2" />
+          <ellipse cx="288" cy="204" rx="100" ry="33" fill="#dbc8a6" />
+        </g>
         <path d="M18 256 Q262 278 502 255" fill="none" stroke="#b5bcab" strokeWidth="3" />
         <path
           d="M79 252 C84 135 147 32 263 28 C374 29 447 132 452 253"
@@ -128,6 +135,39 @@ function WillowArtwork() {
         />
         <path d="M251 205 V196 M242 196 Q251 189 260 196" stroke="#6b826b" strokeWidth="3" fill="none" />
         <path d="M32 258 Q51 230 70 257 M447 259 Q468 223 490 258" stroke="#8eaa84" strokeWidth="4" fill="none" />
+        <g fill="none" stroke="#809b78" strokeWidth="2.2" opacity=".78">
+          <path d="M93 201 Q56 170 38 129" />
+          <path d="M132 106 Q99 77 72 56" />
+          <path d="M211 48 Q191 19 168 8" />
+          <path d="M321 45 Q338 13 367 7" />
+          <path d="M403 118 Q439 93 467 70" />
+          <path d="M427 212 Q465 184 480 143" />
+        </g>
+        <g fill="#9ebc94" opacity=".85">
+          <ellipse cx="61" cy="168" rx="18" ry="7" transform="rotate(50 61 168)" />
+          <ellipse cx="48" cy="139" rx="15" ry="7" transform="rotate(-15 48 139)" />
+          <ellipse cx="84" cy="80" rx="16" ry="7" transform="rotate(48 84 80)" />
+          <ellipse cx="111" cy="89" rx="17" ry="7" transform="rotate(-18 111 89)" />
+          <ellipse cx="173" cy="19" rx="18" ry="6" transform="rotate(35 173 19)" />
+          <ellipse cx="214" cy="34" rx="17" ry="6" transform="rotate(-24 214 34)" />
+          <ellipse cx="352" cy="21" rx="17" ry="7" transform="rotate(37 352 21)" />
+          <ellipse cx="381" cy="30" rx="17" ry="6" transform="rotate(-27 381 30)" />
+          <ellipse cx="443" cy="90" rx="19" ry="7" transform="rotate(29 443 90)" />
+          <ellipse cx="463" cy="75" rx="15" ry="6" transform="rotate(-40 463 75)" />
+          <ellipse cx="467" cy="174" rx="18" ry="7" transform="rotate(-18 467 174)" />
+          <ellipse cx="451" cy="201" rx="17" ry="6" transform="rotate(36 451 201)" />
+        </g>
+        <g fill="#c5b18d" opacity=".54">
+          <ellipse cx="140" cy="83" rx="10" ry="4" transform="rotate(28 140 83)" />
+          <ellipse cx="315" cy="30" rx="11" ry="5" transform="rotate(-31 315 30)" />
+          <ellipse cx="417" cy="155" rx="11" ry="5" transform="rotate(23 417 155)" />
+        </g>
+        <g fill="#b99d85" opacity=".77">
+          <circle cx="42" cy="151" r="3" />
+          <circle cx="49" cy="146" r="2.5" />
+          <circle cx="459" cy="174" r="3" />
+          <circle cx="465" cy="169" r="2.5" />
+        </g>
       </svg>
       <figcaption>Illustration av ett pilrum · Demomaterial</figcaption>
     </figure>
@@ -249,8 +289,11 @@ const css = `
 }
 .newspaper-art--retro svg { max-height:40mm }
 .newspaper-mast-mark {
-  float:right; color:#78917c; font-size:21pt; line-height:1.6;
-  font-weight:normal; letter-spacing:0
+  float:right; display:block; width:24mm; height:15mm;
+  margin-left:2mm; line-height:1
+}
+.newspaper-mast-mark svg {
+  display:block; width:100%; height:100%
 }
 .newspaper-front-index {
   grid-column:1 / -1; border-top:1px solid #99a89a;
@@ -415,7 +458,34 @@ function Sheet({
           Morgonbladet
           {number === 1 && (
             <span className="newspaper-mast-mark" aria-hidden="true">
-              ❦
+              <svg viewBox="0 0 140 86" aria-hidden="true" focusable="false">
+                <g fill="none" stroke="#897e6d" strokeWidth="2">
+                  <path d="M6 76 Q70 71 136 43" />
+                  <path d="M35 72 Q28 54 19 45" />
+                  <path d="M117 52 Q130 32 132 19" />
+                </g>
+                <g fill="#8faf8b" opacity=".8">
+                  <ellipse cx="23" cy="47" rx="11" ry="4" transform="rotate(48 23 47)" />
+                  <ellipse cx="38" cy="61" rx="12" ry="5" transform="rotate(-38 38 61)" />
+                  <ellipse cx="53" cy="70" rx="13" ry="5" transform="rotate(25 53 70)" />
+                  <ellipse cx="127" cy="24" rx="10" ry="4" transform="rotate(-40 127 24)" />
+                  <ellipse cx="119" cy="42" rx="11" ry="5" transform="rotate(32 119 42)" />
+                </g>
+                <g fill="#b58d77" opacity=".8">
+                  <circle cx="16" cy="43" r="3" />
+                  <circle cx="22" cy="39" r="3" />
+                  <circle cx="29" cy="44" r="3" />
+                  <circle cx="129" cy="19" r="3" />
+                </g>
+                <path d="M77 50 L53 62 L63 47 L80 40 Z" fill="#708b99" opacity=".82" />
+                <ellipse cx="91" cy="43" rx="19" ry="12" transform="rotate(-16 91 43)" fill="#d8bc83" />
+                <path d="M77 41 Q92 29 104 40 Q96 51 83 51 Z" fill="#688696" opacity=".93" />
+                <circle cx="105" cy="31" r="9" fill="#e6e1d1" />
+                <path d="M98 27 Q105 17 113 27 L111 31 L99 31 Z" fill="#526e80" />
+                <path d="M112 32 L122 36 L112 38 Z" fill="#927966" />
+                <circle cx="108" cy="31" r="1.7" fill="#29332f" />
+                <path d="M90 54 L87 65 M98 53 L101 61" fill="none" stroke="#7a6b55" strokeWidth="1.8" />
+              </svg>
             </span>
           )}
         </h2>
