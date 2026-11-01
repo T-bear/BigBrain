@@ -353,8 +353,33 @@ const css = `
   .newspaper-print-pages .newspaper-footer {
     position:absolute; bottom:18mm; left:18mm; right:18mm
   }
+  /* Förstasidans utskriftsbudget: A4 med 10 mm sidmarginal. */
+  .newspaper-print-pages > .newspaper-sheet--front {
+    height:270mm
+  }
+  .newspaper-print-pages .newspaper-front-ribbon {
+    margin-top:1mm;
+    padding:1mm 0
+  }
+  .newspaper-print-pages .newspaper-front-ribbon p {
+    margin-top:0;
+    font-size:7.5pt;
+    line-height:1.15
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-stories {
+    padding-top:3mm
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-story--lead p {
+    font-size:11pt;
+    line-height:1.4
+  }
+  .newspaper-print-pages .newspaper-sheet--front .newspaper-front-index {
+    margin-top:1mm;
+    padding:1mm 0
+  }
   .newspaper-print-pages .newspaper-sheet--front .newspaper-footer {
-    position:static; margin-top:8mm
+    position:static;
+    margin-top:4mm
   }
 }
 `
