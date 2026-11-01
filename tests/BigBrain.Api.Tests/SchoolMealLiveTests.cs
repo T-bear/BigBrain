@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace BigBrain.Api.Tests;
 
-public sealed class SchoolMealLiveTests : IDisposable
+public sealed class SchoolMealLiveTests
 {
     private sealed class Clock : TimeProvider
     {
@@ -33,13 +33,8 @@ public sealed class SchoolMealLiveTests : IDisposable
     {
         SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true }
     };
-    private readonly SchoolMealTestData data = new();
-    public void Dispose() => data.Dispose();
-    private SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null)
-    {
-        options = data.Options(options ?? Enabled, clock.Now);
-        return new(options, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock, data.Store(options));
-    }
+    private static SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null) =>
+        new(options ?? Enabled, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock);
     private static Task<SchoolMealWeek> Get(SchoolMealService service) => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
 
     [Fact]
@@ -414,20 +409,20 @@ public sealed class SchoolMealLiveTests : IDisposable
     }
 
     [Fact]
-    public async Task RestartDropsMenuButPreservesCooldownAndSourcesRemainIndependent()
+    public async Task RestartDropsMenuAndCooldownAndSourcesRemainIndependent()
     {
         var handler = new Handler();
         var clock = new Clock();
-        var options = data.Options(Enabled, clock.Now);
+        var options = Enabled;
         using (var first = Service(handler, clock, options)) await Get(first);
         using var restarted = Service(handler, clock, options);
-        Assert.Equal("unavailable", (await Get(restarted)).Status);
-        Assert.Equal(1, handler.Calls);
-        Assert.Equal("invalid", (await restarted.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken)).Status);
+        Assert.Equal("published", (await Get(restarted)).Status);
         Assert.Equal(2, handler.Calls);
+        Assert.Equal("invalid", (await restarted.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken)).Status);
+        Assert.Equal(3, handler.Calls);
         clock.Now = clock.Now.AddHours(6);
         Assert.Equal("published", (await Get(restarted)).Status);
-        Assert.Equal(3, handler.Calls);
+        Assert.Equal(4, handler.Calls);
     }
 
     [Theory]
@@ -533,6 +528,148 @@ public sealed class SchoolMealLiveTests : IDisposable
         };
         using var service = Service(handler, clock);
         Assert.Equal("cachePolicy", (await Get(service)).Status);
+    }
+
+    [Fact]
+    public async Task CooldownStartsAfterSourceCompletion()
+    {
+        var clock = new Clock();
+        var start = clock.Now;
+        var handler = new Handler { Reply = (_, _) => { clock.Now = start.AddHours(2); return Task.FromResult(Rss()); } };
+        using var service = Service(handler, clock);
+        Assert.Equal("published", (await Get(service)).Status);
+        clock.Now = start.AddHours(8).AddTicks(-1);
+        await Get(service);
+        Assert.Equal(1, handler.Calls);
+        handler.Reply = (_, _) => Task.FromResult(Rss());
+        clock.Now = start.AddHours(8);
+        await Get(service);
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Fact]
+    public async Task SlowSchoolDoesNotBlockOtherSchool()
+    {
+        var waiting = new TaskCompletionSource<HttpResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var handler = new Handler
+        {
+            Reply = (request, _) => request.RequestUri!.Host == "www.skolmat.info"
+            ? waiting.Task : Task.FromResult(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable))
+        };
+        using var service = Service(handler, new Clock());
+        var slow = Get(service);
+        var other = await service.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken);
+        Assert.Equal("unavailable", other.Status);
+        Assert.False(slow.IsCompleted);
+        Assert.Equal(2, handler.Calls);
+        waiting.SetResult(Rss());
+        Assert.Equal("published", (await slow).Status);
+        await Get(service);
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UncertainHeadersBlockOnlyThisSchoolUntilProcessRestart(bool malformedRetry)
+    {
+        var clock = new Clock();
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+        {
+            if (!malformedRetry) throw new HttpRequestException();
+            var response = Rss();
+            response.Headers.TryAddWithoutValidation("Retry-After", "not-a-date-or-delay");
+            return Task.FromResult(response);
+        }
+        };
+        using var service = Service(handler, clock);
+        Assert.Equal("unavailable", (await Get(service)).Status);
+        clock.Now = clock.Now.AddDays(2);
+        await Get(service);
+        Assert.Equal(1, handler.Calls);
+        await service.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken);
+        Assert.Equal(2, handler.Calls);
+        handler.Reply = (_, _) => Task.FromResult(Rss());
+        using var restarted = Service(handler, clock);
+        Assert.Equal("published", (await Get(restarted)).Status);
+        Assert.Equal(3, handler.Calls);
+    }
+
+    [Fact]
+    public async Task FetchDoesNotOpenOrCreateMealPlannerDatabase()
+    {
+        var directory = Directory.CreateTempSubdirectory("school-memory-");
+        try
+        {
+            // A directory is not a usable SQLite file; school fetching must not try to open it.
+            var handler = new Handler();
+            using var service = Service(handler, new Clock(), Enabled with { DatabasePath = directory.FullName });
+            Assert.Equal("published", (await Get(service)).Status);
+            Assert.Empty(directory.EnumerateFileSystemInfos());
+        }
+        finally { directory.Delete(true); }
+    }
+
+    [Fact]
+    public async Task FetchLeavesExistingHouseholdDatabaseAndHistoricalGateUntouched()
+    {
+        var directory = Directory.CreateTempSubdirectory("school-household-");
+        try
+        {
+            var path = Path.Combine(directory.FullName, "meal-planner.db");
+            var options = Enabled with { DatabasePath = path };
+            using var household = new MealPlannerStore(options);
+            Assert.True(household.IsAvailable);
+            using (var db = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={path};Pooling=False"))
+            {
+                db.Open();
+                using var command = db.CreateCommand();
+                // Historical or malformed gate data must be ignored, not migrated or deleted.
+                command.CommandText = "CREATE TABLE SchoolMealFetchGate (HistoricalState TEXT); INSERT INTO SchoolMealFetchGate VALUES ('untouched');";
+                command.ExecuteNonQuery();
+            }
+            Dictionary<string, byte[]> Snapshot() => directory.EnumerateFiles().ToDictionary(file => file.Name, file => File.ReadAllBytes(file.FullName));
+            var before = Snapshot();
+            var handler = new Handler();
+            using var service = Service(handler, new Clock(), options);
+            Assert.Equal("published", (await Get(service)).Status);
+            await service.GetAsync(SchoolMeals.Musikugglan, 2026, 43, TestContext.Current.CancellationToken);
+            var after = Snapshot();
+            Assert.Equal(before.Keys.Order(), after.Keys.Order());
+            foreach (var file in before) Assert.Equal(file.Value, after[file.Key]);
+        }
+        finally { directory.Delete(true); }
+    }
+
+    [Fact]
+    public async Task LastModifiedAloneCanValidate304WithoutChangingFetchProvenance()
+    {
+        var clock = new Clock();
+        var modified = clock.Now.AddHours(-1);
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+        {
+            var response = Rss();
+            response.Content.Headers.LastModified = modified;
+            return Task.FromResult(response);
+        }
+        };
+        using var service = Service(handler, clock);
+        var first = await Get(service);
+        clock.Now = clock.Now.AddHours(6);
+        handler.Reply = (request, _) =>
+        {
+            Assert.Empty(request.Headers.IfNoneMatch);
+            Assert.Equal(modified, request.Headers.IfModifiedSince);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+        };
+        var validated = await Get(service);
+        Assert.Equal("published", validated.Status);
+        Assert.Equal(first.FetchedAtUtc, validated.FetchedAtUtc);
+        Assert.Equal(modified, validated.SourceUpdatedAtUtc);
     }
 
     [Fact]

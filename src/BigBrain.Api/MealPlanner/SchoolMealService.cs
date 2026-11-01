@@ -7,14 +7,10 @@ public sealed record SchoolMealOptions
     public bool Enabled { get; init; }
     public bool RosenfeldtEnabled { get; init; }
     public bool MusikugglanEnabled { get; init; }
-    // Bootstrap only: independently verified bounds, including any Retry-After.
-    // Null is UNKNOWN, never permission to fetch. Existing rows are never reset by configuration.
-    public DateTimeOffset? RosenfeldtVerifiedInitialNotBeforeUtc { get; init; }
-    public DateTimeOffset? MusikugglanVerifiedInitialNotBeforeUtc { get; init; }
 }
 
-// Menu content stays process-local; supplier admission survives restarts in Meal Planner storage.
-public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSourceClient source, TimeProvider clock, MealPlannerStore store) : IDisposable
+// One singleton per API process: independent, on-demand memory caches and source cooldowns.
+public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSourceClient source, TimeProvider clock) : IDisposable
 {
     private sealed class Entry : IDisposable
     {
@@ -75,61 +71,48 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
             }
             if (now >= entry.NextAttempt)
             {
-                var initialBound = school == SchoolMeals.Rosenfeldt
-                    ? config.RosenfeldtVerifiedInitialNotBeforeUtc : config.MusikugglanVerifiedInitialNotBeforeUtc;
-                var attempt = await store.TryBeginSchoolFetchAsync(school, now, initialBound, token);
-                if (attempt is null)
+                // Unknown response headers may contain a longer Retry-After. Keep this school
+                // blocked in memory unless the client can establish a safe completed response.
+                entry.NextAttempt = DateTimeOffset.MaxValue;
+                entry.CheckedAt = now;
+                var response = await source.GetAsync(school, entry.ETag, entry.Modified, token);
+                var completedAt = clock.GetUtcNow();
+                var next = completedAt.AddHours(6);
+                if (response.RetryAt > next) next = response.RetryAt.Value;
+                entry.NextAttempt = response.HeadersVerified ? next : DateTimeOffset.MaxValue;
+                if (!response.HeadersVerified)
                 {
-                    // Unknown history, another request, cooldown or storage failure: this source only.
-                    entry.Status = "unavailable";
+                    if (response.Status != "cachePolicy") response = response with { Status = "unavailable", Content = null };
+                    entry.AllowStale &= response.AllowStale;
                 }
-                else
+                entry.Status = response.Status;
+                if (response.Status == "cachePolicy")
                 {
-                    entry.NextAttempt = now.AddHours(6);
-                    entry.CheckedAt = now;
-                    var response = await source.GetAsync(school, entry.ETag, entry.Modified, token);
-                    var completedAt = clock.GetUtcNow();
-                    // Completion + six hours is conservative even if scheduling delayed the actual send.
-                    var next = completedAt.AddHours(6);
-                    if (response.RetryAt > next) next = response.RetryAt.Value;
-                    entry.NextAttempt = next;
-                    if (!response.HeadersVerified || !await store.CompleteSchoolFetchAsync(school, attempt, next, CancellationToken.None))
+                    entry.ClearMenu();
+                }
+                else if (response.Status == "notModified")
+                {
+                    if (entry.Menu is null || (entry.ETag is null && entry.Modified is null)) entry.Status = "invalid";
+                    else
                     {
-                        // Leave the durable in-flight marker intact; an unseen Retry-After may exist.
-                        // Storage uncertainty must never hide a provider's cache prohibition.
-                        if (response.Status != "cachePolicy") response = response with { Status = "unavailable", Content = null };
+                        entry.Status = entry.Menu.Status;
+                        entry.ValidatedAt = clock.GetUtcNow();
                         entry.AllowStale &= response.AllowStale;
                     }
-                    entry.Status = response.Status;
-                    if (response.RetryAt > entry.NextAttempt) entry.NextAttempt = response.RetryAt.Value;
-                    if (response.Status == "cachePolicy")
+                }
+                else if (response.Content is { } content)
+                {
+                    var parsed = school == SchoolMeals.Rosenfeldt
+                        ? SchoolMeals.ParseRss(content, year, week)
+                        : MusikugglanSchoolMeals.Parse(content, year, week);
+                    entry.Status = parsed.Status;
+                    if (parsed.Status != "invalid")
                     {
-                        entry.ClearMenu();
-                    }
-                    else if (response.Status == "notModified")
-                    {
-                        if (entry.Menu is null || (entry.ETag is null && entry.Modified is null)) entry.Status = "invalid";
-                        else
-                        {
-                            entry.Status = entry.Menu.Status;
-                            entry.ValidatedAt = clock.GetUtcNow();
-                            entry.AllowStale &= response.AllowStale;
-                        }
-                    }
-                    else if (response.Content is { } content)
-                    {
-                        var parsed = school == SchoolMeals.Rosenfeldt
-                            ? SchoolMeals.ParseRss(content, year, week)
-                            : MusikugglanSchoolMeals.Parse(content, year, week);
-                        entry.Status = parsed.Status;
-                        if (parsed.Status != "invalid")
-                        {
-                            entry.ValidatedAt = clock.GetUtcNow();
-                            entry.Menu = parsed with { FetchedAtUtc = entry.ValidatedAt, SourceUpdatedAtUtc = response.Modified };
-                            entry.ETag = response.ETag;
-                            entry.Modified = response.Modified;
-                            entry.AllowStale = response.AllowStale;
-                        }
+                        entry.ValidatedAt = clock.GetUtcNow();
+                        entry.Menu = parsed with { FetchedAtUtc = entry.ValidatedAt, SourceUpdatedAtUtc = response.Modified };
+                        entry.ETag = response.ETag;
+                        entry.Modified = response.Modified;
+                        entry.AllowStale = response.AllowStale;
                     }
                 }
             }
