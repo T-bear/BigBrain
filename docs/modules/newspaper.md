@@ -75,10 +75,11 @@ Primärt mål är naturvitt eller krämvitt A4-papper.
   får skrivas ut.
 - Utskriftsbakgrunden ska vara vit eller transparent.
 - Brödtext har hög kontrast och trycks helst i svart.
-- Mörkgröna rubriker och tunna färgade detaljer är tillåtna.
-- Färgbilder används där de faktiskt tillför innehållsvärde.
-- Akvarellornament ska vara små och bläcksnåla.
-- Stora mörka eller täckande färgfält ska undvikas.
+- Rubriker, ingresser, ramar och andra redaktionella designelement får vara färgstarka när de stärker läsupplevelsen.
+- Fotografier, målade illustrationer och dekorativa bilder får använda hela färgskalan när de bidrar till den visuella upplevelsen.
+- Akvarellornament får vara stora, detaljrika och färgstarka när det gagnar gestaltningen och läsbarheten.
+- Enkla kodritade SVG-motiv är inte standard för artikelillustrationer. Riktiga bilder med verifierade rättigheter prioriteras; SVG får användas för enklare grafiska detaljer.
+- Bläckbesparingen gäller endast den heltäckande sidbakgrunden, inte artikelbilder, illustrationer, ornament eller andra redaktionella färgytor.
 - Tidningen ska fungera även på vanligt vitt kopieringspapper.
 
 Naturvitt papper är ett önskat materialval, inte ett krav på att
@@ -143,7 +144,7 @@ Dekorationerna får inte:
 - försämra läsbarheten,
 - dominera över nyheterna,
 - förstöra A4-sidbudgeten,
-- orsaka hög färgförbrukning,
+- skapa en heltäckande tryckt färgbakgrund,
 - eller förväxlas med redaktionella fakta.
 
 ## 8. N1 – teknik, verifiering och kvarstående acceptans
