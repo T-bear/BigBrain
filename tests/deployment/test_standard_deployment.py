@@ -1,5 +1,6 @@
 """Offline T2 fault tests: synthetic SQLite/WAL and simulated Docker only."""
 import copy
+import io
 import importlib.util
 import json
 import os
@@ -8,6 +9,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -70,12 +72,14 @@ class StandardTests(unittest.TestCase):
         self.patches = [
             patch.object(d, 'command', side_effect=AssertionError('No real command')),
             patch.object(d, 'docker', side_effect=self.docker),
-            patch.object(d, 'inspect', side_effect=lambda cid: copy.deepcopy(self.runtime[cid])),
+            patch.object(d, 'inspect', side_effect=lambda cid: copy.deepcopy(next(c for c in self.runtime.values() if c['Id'] == cid))),
             patch.object(d, 'git_guard'), patch.object(d, 'http_health'),
             patch.object(self.dep, 'current', side_effect=lambda role: copy.deepcopy(self.runtime[role])),
             patch.object(self.dep, 'others', return_value=self.dep.other_snapshot),
             patch.object(self.dep, 'compose', side_effect=self.compose),
             patch.object(self.dep, 'wait_healthy', side_effect=self.wait_healthy),
+            patch.object(self.dep, 'build_images'),
+            patch.object(self.dep, 'prove_restartability'),
         ]
         for p in self.patches:
             p.start()
@@ -91,7 +95,8 @@ class StandardTests(unittest.TestCase):
     def docker(self, *args, **kwargs):
         self.calls.append(('docker', args))
         if args[0] == 'stop':
-            self.runtime[args[-1]]['State']['Running'] = False
+            c = next(c for c in self.runtime.values() if c['Id'] == args[-1])
+            c['State'].update(Running=False, Status='exited', Restarting=False)
             return b''
         if args[0] == 'diff':
             return b''
@@ -113,7 +118,12 @@ class StandardTests(unittest.TestCase):
         self.assertIn(role, d.ROLES)
         image = OLD if path.name == 'rollback.json' else NEW
         self.runtime[role]['Image'] = image
-        self.runtime[role]['State']['Running'] = True
+        self.runtime[role]['Id'] = role + '-' + str(len(self.calls))
+        self.runtime[role]['State'].update(Running=True, Status='running', ExitCode=0)
+        if self.fail == ('crash', role) and image == NEW:
+            self.runtime[role]['State'].update(Running=False, Status='exited', ExitCode=1)
+            self.databases[0].execute("UPDATE household SET value='after-backup'")
+            self.databases[0].commit()
         if self.fail == ('start', role) and image == NEW:
             raise d.Blocked('StartFailed')
         if self.fail == ('timeout', role) and image == NEW:
@@ -132,13 +142,223 @@ class StandardTests(unittest.TestCase):
 
     def test_success_backup_precedes_only_api_web_switches(self):
         self.dep.execute()
-        self.assertEqual(self.phases(), ['PREPARING', 'SWITCHING_API', 'SWITCHING_WEB', 'PASS'])
+        self.assertEqual(self.phases(), ['PREPARING', 'BUILDING', 'SWITCHING_API', 'SWITCHING_WEB', 'PASS'])
         receipt = json.loads((self.dep.folder / 'receipt.json').read_text())
         folder = self.state / 'backups' / receipt['backupId']
         self.assertEqual(d.backup.verify_set(folder), receipt['backupManifestSha256'])
         ups = [args[-1] for cmd, args in self.calls if cmd == 'compose' and args[0] == 'up']
         self.assertEqual(ups, ['api', 'web'])
         self.assertEqual((self.dep.folder / 'receipt.json').stat().st_mode & 0o777, 0o600)
+
+    def test_crashed_api_exit_one_restores_image_without_database_restore(self):
+        self.fail = ('crash', 'api')
+        self.dep.wait_healthy.side_effect = lambda role, image: d.Deployment.wait_healthy(self.dep, role, image)
+        with self.assertRaisesRegex(d.Blocked, 'ReplacementExited'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'ROLLED_BACK')
+        self.assertTrue(all(c['Image'] == OLD for c in self.runtime.values()))
+        self.assertEqual(self.databases[0].execute('SELECT value FROM household').fetchone()[0], 'after-backup')
+        self.assertEqual([a[-1] for cmd, a in self.calls if cmd == 'compose' and a[0] == 'up'], ['api', 'api'])
+
+    def test_crashed_web_exit_one_restores_both_images(self):
+        self.fail = ('crash', 'web')
+        self.dep.wait_healthy.side_effect = lambda role, image: d.Deployment.wait_healthy(self.dep, role, image)
+        with self.assertRaisesRegex(d.Blocked, 'ReplacementExited'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'ROLLED_BACK')
+        self.assertTrue(all(c['Image'] == OLD for c in self.runtime.values()))
+        self.assertEqual(self.databases[0].execute('SELECT value FROM household').fetchone()[0], 'after-backup')
+
+    def test_restarting_failed_candidate_is_stopped_before_rollback(self):
+        self.runtime['api'].update(Id='replacement', Image=NEW)
+        self.runtime['api']['State'].update(Running=False, Status='restarting', Restarting=True, ExitCode=1)
+        self.dep.stop('api', recovery=True)
+        self.assertFalse(self.runtime['api']['State']['Restarting'])
+        self.assertEqual(self.calls[-1], ('docker', ('stop', '--time', '-1', 'replacement')))
+
+    def test_crashed_original_is_not_treated_as_failed_candidate(self):
+        self.runtime['api']['State'].update(Running=False, Status='exited', ExitCode=1)
+        with self.assertRaisesRegex(d.Blocked, 'UncleanStop'): self.dep.stop('api', recovery=True)
+
+    def test_foreign_crashed_replacement_is_not_accepted(self):
+        self.runtime['api'].update(Id='foreign', Image='sha256:' + 'd' * 64)
+        self.runtime['api']['State'].update(Running=False, Status='exited', ExitCode=1)
+        with self.assertRaisesRegex(d.Blocked, 'UncleanStop'): self.dep.stop('api', recovery=True)
+
+    def test_build_failure_never_stops_original_services(self):
+        self.dep.build_images.side_effect = d.Blocked('BuildFailed')
+        with self.assertRaisesRegex(d.Blocked, 'BuildFailed'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'PRE_SWITCH_FAILED')
+        self.assertTrue(all(c['State']['Running'] and c['Image'] == OLD for c in self.runtime.values()))
+        self.assertFalse(any(a[0] in ('stop', 'up') for _, a in self.calls))
+
+    def test_failed_restart_proof_blocks_production_switch(self):
+        self.dep.prove_restartability.side_effect = d.Blocked('ProbeExited')
+        with self.assertRaisesRegex(d.Blocked, 'ProbeExited'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'PRE_SWITCH_FAILED')
+        self.assertTrue(all(c['State']['Running'] and c['Image'] == OLD for c in self.runtime.values()))
+        self.assertFalse(any(a[0] in ('stop', 'up') for _, a in self.calls))
+
+    def test_build_backup_proof_and_switch_are_one_ordered_flow(self):
+        events = []
+        self.dep.build_images.side_effect = lambda: events.append('build')
+        def prove(folder):
+            self.assertEqual(json.loads((folder / 'manifest.json').read_text())['status'], 'PASS')
+            self.assertTrue(all(c['State']['Running'] and c['Image'] == OLD for c in self.runtime.values()))
+            events.append('backup-and-proof')
+        self.dep.prove_restartability.side_effect = prove
+        original = self.compose
+        def compose(path, *args, **kw):
+            if args[0] == 'up': events.append('switch-' + args[-1])
+            return original(path, *args, **kw)
+        self.dep.compose.side_effect = compose
+        self.dep.execute()
+        self.assertEqual(events, ['build', 'backup-and-proof', 'switch-api', 'switch-web'])
+
+    def test_build_uses_git_archive_and_pinned_bases_not_workspace(self):
+        self.dep.folder = self.state / 'run-build'
+        self.dep.folder.mkdir()
+        calls = []
+        def command(args, **kwargs):
+            calls.append(args)
+            if args[1] == 'archive':
+                self.assertEqual(args[-1], REV)
+                archive = Path(args[3].removeprefix('--output='))
+                with tarfile.open(archive, 'w') as bundle:
+                    for role in ('Api', 'Web'):
+                        info = tarfile.TarInfo('src/BigBrain.' + role + '/Dockerfile')
+                        body = b'FROM base:fixed AS runtime\n'
+                        info.size = len(body)
+                        bundle.addfile(info, io.BytesIO(body))
+                return b''
+            if args[1] == 'rev-parse': return b'git-tree'
+            raise AssertionError(args)
+        def docker(*args, **kwargs):
+            calls.append(args)
+            if args[0] == 'pull': return b''
+            if args[:2] == ('image', 'inspect'):
+                return json.dumps([{'RepoDigests': ['base@sha256:' + 'e' * 64]}]).encode()
+            self.assertEqual(args[0], 'build')
+            pinned = Path(args[args.index('--file') + 1])
+            self.assertIn('FROM base@sha256:' + 'e' * 64, pinned.read_text())
+            self.assertEqual(args[-1], str(self.dep.folder / 'source'))
+            self.assertIn('org.opencontainers.image.revision=' + REV, args)
+            Path(args[args.index('--iidfile') + 1]).write_text(NEW)
+            self.assertTrue(all(c['State']['Running'] and c['Image'] == OLD for c in self.runtime.values()))
+            return b''
+        with patch.object(d, 'command', side_effect=command), patch.object(d, 'docker', side_effect=docker), \
+             patch.object(d, 'image_info'), patch.object(self.dep, 'bind_images'):
+            d.Deployment.build_images(self.dep)
+        self.assertEqual(len([a for a in calls if a[0] == 'build']), 2)
+        self.assertEqual(len([a for a in calls if a[0] == 'pull']), 1)
+        receipt = json.loads((self.dep.folder / 'build.json').read_text())
+        self.assertEqual(receipt['revision'], REV)
+        self.assertEqual(receipt['images'], {'api': NEW, 'web': NEW})
+        self.assertEqual(receipt['bases']['base:fixed'], 'base@sha256:' + 'e' * 64)
+
+    def test_compose_inputs_discovered_without_prepared_json(self):
+        env_file = self.root / 'private.env'
+        env_file.write_text('LOCAL=value')
+        for c in self.runtime.values():
+            c['Config']['Labels'].update({
+                'com.docker.compose.project.environment_file': str(env_file),
+                'com.docker.compose.project.config_files': str(self.source) + ',' + str(self.root / 'override.yaml'),
+                'com.docker.compose.project.working_dir': str(self.root)})
+        self.dep.source = None
+        self.dep.discover_compose()
+        self.assertEqual(self.dep.source_files, [self.source, self.root / 'override.yaml'])
+        self.assertEqual(self.dep.project_directory, self.root)
+        self.assertEqual(self.dep.env_files, [env_file])
+
+    def test_mismatched_runtime_compose_inputs_are_rejected(self):
+        self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = '/one'
+        self.dep.source = None
+        with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'): self.dep.discover_compose()
+
+    def test_readonly_preflight_without_images_does_not_build(self):
+        self.dep.images = {}
+        self.preflight()
+        self.dep.build_images.assert_not_called()
+        self.dep.prove_restartability.assert_not_called()
+
+    def test_proof_covers_old_and_new_images_for_both_roles(self):
+        self.dep.folder = self.state / 'run-proof'
+        self.dep.folder.mkdir()
+        with patch.object(self.dep, 'probe_image') as probe, patch.object(d.backup, 'verify_set', return_value='digest'):
+            d.Deployment.prove_restartability(self.dep, self.root)
+        self.assertEqual([(c.args[0], c.args[1], c.args[3]) for c in probe.call_args_list],
+                         [('api', OLD, 'rollback'), ('api', NEW, 'candidate'), ('web', OLD, 'rollback'), ('web', NEW, 'candidate')])
+        self.assertTrue((self.dep.folder / 'restartability.json').is_file())
+
+    def probe(self, role='api', crash_on_start=0, stop_timeout=False):
+        self.dep.folder = self.state / 'run-probe'
+        self.dep.folder.mkdir()
+        self.dep.originals[role]['Config']['User'] = '1654'
+        self.dep.originals[role]['Config']['Env'] = ['Finance__ObservationRuntime__Enabled=true', 'MealPlanner__SchoolMeals__Enabled=true']
+        backup_folder = d.backup.run_backup(self.roots, self.state / 'backups', {}, lambda: None)
+        original_hash = d.backup.verify_set(backup_folder)
+        cid = 'f' * 64
+        probe_state = {'Image': OLD, 'Config': {'User': '1654'},
+                       'HostConfig': {'NetworkMode': 'none', 'PortBindings': {}},
+                       'State': {'Running': False, 'OOMKilled': False, 'ExitCode': 0}}
+        calls = []
+        starts = 0
+        def docker(*args, **kwargs):
+            nonlocal starts
+            calls.append(args)
+            if args[0] == 'create': return cid.encode()
+            self.assertEqual(args[1] if args[0] in ('start', 'exec') else args[-1], cid)
+            if args[0] == 'start':
+                starts += 1
+                probe_state['State']['Running'] = starts != crash_on_start
+                probe_state['State']['ExitCode'] = 1 if starts == crash_on_start else 0
+            if args[0] == 'stop':
+                if stop_timeout: raise d.Uncertain('CommandInterrupted')
+                probe_state['State']['Running'] = False
+            return b''
+        with patch.object(d, 'docker', side_effect=docker), patch.object(d, 'inspect', return_value=probe_state):
+            if stop_timeout:
+                with self.assertRaises(d.Uncertain):
+                    self.dep.probe_image(role, OLD, backup_folder, 'rollback')
+            elif crash_on_start:
+                with self.assertRaisesRegex(d.Blocked, 'ProbeExited'):
+                    self.dep.probe_image(role, OLD, backup_folder, 'rollback')
+            else:
+                self.dep.probe_image(role, OLD, backup_folder, 'rollback')
+        self.assertEqual(d.backup.verify_set(backup_folder), original_hash)
+        self.assertEqual(probe_state['State']['Running'], stop_timeout)
+        return calls
+
+    def test_restart_probe_starts_real_entrypoint_twice_with_only_copies(self):
+        calls = self.probe()
+        create = calls[0]
+        self.assertNotIn('--entrypoint', create)
+        self.assertNotIn('--publish', create)
+        self.assertNotIn('--privileged', create)
+        self.assertEqual(create[create.index('--network') + 1], 'none')
+        self.assertEqual(create[create.index('--user') + 1], '1654')
+        mounts = [create[i + 1] for i, arg in enumerate(create) if arg == '--mount']
+        self.assertEqual(len(mounts), 5)
+        for mount in mounts:
+            self.assertIn(str(self.dep.folder / 'probe-api-rollback'), mount)
+        env = Path(create[create.index('--env-file') + 1]).read_text()
+        self.assertIn('Finance__ObservationRuntime__Enabled=false', env)
+        self.assertIn('MealPlanner__SchoolMeals__Enabled=false', env)
+        self.assertEqual(len([a for a in calls if a[0] == 'start']), 2)
+        self.assertEqual(len([a for a in calls if a[0] == 'stop']), 2)
+        self.assertNotIn('rm', [a[0] for a in calls])
+
+    def test_rollback_probe_detects_image_that_fails_on_second_start(self):
+        calls = self.probe(crash_on_start=2)
+        self.assertEqual(len([a for a in calls if a[0] == 'start']), 2)
+        self.assertFalse((self.dep.folder / 'restartability.json').exists())
+
+    def test_uncertain_probe_stop_is_not_retried(self):
+        calls = self.probe(stop_timeout=True)
+        self.assertEqual(len([a for a in calls if a[0] == 'stop']), 1)
+
+    def test_web_probe_requires_no_network_or_production_mount(self):
+        create = self.probe(role='web')[0]
+        self.assertNotIn('--mount', create)
+        self.assertEqual(create[create.index('--add-host') + 1], 'api:127.0.0.1')
 
     def test_schema_drift_never_downgrades_or_restores_database(self):
         def check(role, image):
@@ -260,6 +480,10 @@ class StandardTests(unittest.TestCase):
         self.runtime['api']['Config']['Labels']['com.docker.compose.config-hash'] = 'different'
         with self.assertRaisesRegex(d.Blocked, 'ComposeRuntimeMismatch'): self.preflight()
 
+    def test_unproven_runtime_command_override_blocks_preflight(self):
+        self.runtime['api']['Config']['Cmd'] = ['custom-runtime-mode']
+        with self.assertRaisesRegex(d.Blocked, 'RuntimeEntrypointOverride'): self.preflight()
+
     def test_repaired_container_cannot_be_rollback_image(self):
         with patch.object(d, 'docker', return_value=b'C /app/appsettings.json\n'):
             with self.assertRaisesRegex(d.Blocked, 'RollbackImageHasRuntimeRepairs'): self.preflight()
@@ -272,6 +496,7 @@ class StandardTests(unittest.TestCase):
         link = self.root / 'alias.json'
         link.symlink_to(self.source)
         self.dep.source = link
+        self.dep.source_files = [link]
         with self.assertRaises(d.backup.Blocked): self.dep.preflight()
 
     def test_candidate_revision_is_checked(self):
@@ -279,8 +504,10 @@ class StandardTests(unittest.TestCase):
             with self.assertRaisesRegex(d.Blocked, 'ImageRevisionMismatch'): self.dep.preflight()
 
     def test_image_entrypoint_change_rejected(self):
-        with patch.object(d, 'image_info', side_effect=[{'Config': {}}, {'Config': {
-                'Entrypoint': ['different'], 'Labels': {'org.opencontainers.image.revision': REV}}}]):
+        def images(image):
+            return {'Config': {'Labels': {'org.opencontainers.image.revision': REV},
+                    'Entrypoint': ['different'] if image == NEW else None}}
+        with patch.object(d, 'image_info', side_effect=images):
             with self.assertRaisesRegex(d.Blocked, 'ImageRuntimeContractChanged'): self.dep.preflight()
 
     def test_resource_snapshot_is_external_and_only_api_web(self):

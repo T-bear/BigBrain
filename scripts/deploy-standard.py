@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """T2: bounded API+Web image replacement. Independent review required before use.
 
-No merge, build, pull, schema operation, privilege grant or database restore.
+Build from accepted Git, prove isolated restartability, then replace API+Web.
+No merge, schema operation, privilege grant or database restore.
 Default is read-only preflight. See docs/policy/lanes.md for authority and limits.
 """
 import argparse
@@ -15,9 +16,11 @@ import os
 from pathlib import Path
 import re
 import signal
+import shutil
 import sqlite3
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.request
 import uuid
@@ -229,11 +232,40 @@ class Deployment:
         self.originals = {}
         self.changed = []
         self.folder = None
+        self.source_files = [compose_file] if compose_file else []
+        self.project_directory = compose_file.parent if compose_file else None
+        self.probes = set()
+        self.env_files = []
 
     def compose(self, path, *args, mutation=False):
-        return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.source.parent),
-                      '--env-file', '/dev/null', '-f', str(path),
+        files = self.source_files if path == self.source else [path]
+        # Resolve ordinary YAML/overrides and .env ourselves; no prepared JSON required.
+        env_files = self.env_files or [self.project_directory / '.env']
+        if path != self.source:
+            env_files = [Path('/dev/null')]
+        env_args = [arg for env in env_files for arg in ('--env-file', str(env if env.exists() else Path('/dev/null')))]
+        return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
+                      *env_args,
+                      *[arg for source in files for arg in ('-f', str(source))],
                       *args, timeout=120, mutation=mutation)
+
+    def discover_compose(self):
+        if self.source is not None:
+            return
+        labels = [self.current(r)['Config']['Labels'] for r in ROLES]
+        keys = ('com.docker.compose.project.config_files', 'com.docker.compose.project.working_dir')
+        need(all(labels[0].get(k) and labels[0].get(k) == labels[1].get(k) for k in keys), 'ComposeProvenanceMissing')
+        self.source_files = [Path(x) for x in labels[0][keys[0]].split(',')]
+        self.source = self.source_files[0]
+        env_key = 'com.docker.compose.project.environment_file'
+        need(labels[0].get(env_key, '') == labels[1].get(env_key, ''), 'ComposeEnvironmentMismatch')
+        self.env_files = [Path(x) for x in labels[0].get(env_key, '').split(',') if x]
+        for path in self.env_files:
+            need(path.is_absolute() and path.is_file(), 'ComposeEnvironmentMissing')
+            backup.no_symlinks(path)
+        self.project_directory = Path(labels[0][keys[1]])
+        need(self.project_directory.is_absolute(), 'ComposeDirectoryInvalid')
+        backup.no_symlinks(self.project_directory)
 
     def current(self, role):
         ids = docker('ps', '-aq', '--no-trunc', '--filter', f'label=com.docker.compose.project={PROJECT}',
@@ -245,12 +277,13 @@ class Deployment:
         target_ids = {self.current(r)['Id'] for r in ROLES}
         result = {}
         for cid in docker('ps', '-aq', '--no-trunc').decode().split():
-            if cid not in target_ids:
+            if cid not in target_ids and cid not in self.probes:
                 c = inspect(cid)
                 result[cid] = (c['Image'], fingerprint(c), c['State']['Running'], c['State']['StartedAt'])
         return result
 
     def unchanged(self):
+        need(all(not inspect(cid)['State']['Running'] for cid in self.probes), 'ProbeStillRunning')
         need(self.others() == self.other_snapshot, 'OtherServiceChanged')
         for role, old in self.originals.items():
             current = self.current(role)
@@ -260,17 +293,19 @@ class Deployment:
             healthy(current)
 
     def preflight(self):
-        need(self.source.is_absolute() and self.source.is_file(), 'ComposeMissing')
-        backup.no_symlinks(self.source)
+        self.discover_compose()
+        for path in self.source_files:
+            need(path.is_absolute() and path.is_file(), 'ComposeMissing')
+            backup.no_symlinks(path)
         self.config = json.loads(self.compose(self.source, 'config', '--format', 'json'))
         hashes = dict(line.split() for line in self.compose(self.source, 'config', '--hash', '*').decode().splitlines())
         for role in ROLES:
             old = self.current(role)
             healthy(old)
             need(old['Config']['Labels'].get('com.docker.compose.config-hash') == hashes[role], 'ComposeRuntimeMismatch')
-            prior, candidate = image_info(old['Image']), image_info(self.images[role])
-            need(candidate['Config'].get('Labels', {}).get('org.opencontainers.image.revision') == self.revision, 'ImageRevisionMismatch')
-            need(all(candidate['Config'].get(k) == prior['Config'].get(k) for k in IMAGE_FIELDS), 'ImageRuntimeContractChanged')
+            prior = image_info(old['Image'])
+            need(all(old['Config'].get(k) == prior['Config'].get(k)
+                     for k in ('User', 'Cmd', 'Entrypoint', 'WorkingDir')), 'RuntimeEntrypointOverride')
             # A healthy container repaired in its writable layer is not a safe rollback image.
             diff = docker('diff', old['Id']).decode().splitlines()
             need(not any(not (row[2:] == '/tmp' or row[2:].startswith(('/tmp/', '/var/cache/nginx', '/var/run/', '/run/')))
@@ -281,10 +316,10 @@ class Deployment:
             http_health(role)
         git_guard(self.revision, self.originals)
         self.other_snapshot = self.others()
-        self.release = release_config(self.config, self.images)
-        for service in self.release['services'].values():
-            service.setdefault('labels', {})['org.opencontainers.image.revision'] = self.revision
         self.rollback = release_config(self.config, {r: c['Image'] for r, c in self.originals.items()})
+        self.release = copy.deepcopy(self.rollback)
+        if self.images:
+            self.bind_images()
         # Resolve existing resource IDs; no creation is permitted by the execution snapshot.
         for kind, noun in (('networks', 'network'), ('volumes', 'volume')):
             for value in self.release.get(kind, {}).values():
@@ -293,6 +328,165 @@ class Deployment:
         self.inventory, _ = backup.inventory(self.roots)
         self.schemas = schemas(self.roots)
         self.unchanged()
+
+    def bind_images(self):
+        for role, old in self.originals.items():
+            prior, candidate = image_info(old['Image']), image_info(self.images[role])
+            need(candidate['Config'].get('Labels', {}).get('org.opencontainers.image.revision') == self.revision, 'ImageRevisionMismatch')
+            need(all(candidate['Config'].get(k) == prior['Config'].get(k) for k in IMAGE_FIELDS), 'ImageRuntimeContractChanged')
+        self.release = release_config(self.config, self.images)
+        for service in self.release['services'].values():
+            service.setdefault('labels', {})['org.opencontainers.image.revision'] = self.revision
+
+    def build_images(self):
+        # No workspace/untracked file enters the context. Keep archive + base bindings.
+        git_guard(self.revision, self.originals)
+        archive = self.folder / 'source.tar'
+        command(['git', 'archive', '--format=tar', '--output=' + str(archive), self.revision], timeout=120)
+        source = self.folder / 'source'
+        source.mkdir()
+        with tarfile.open(archive) as bundle:
+            need(all(m.isfile() or m.isdir() for m in bundle.getmembers()), 'UnsupportedBuildTree')
+            bundle.extractall(source, filter='data')
+        bases = {}
+        for role in ROLES:
+            original = source / ('src/BigBrain.' + ('Api' if role == 'api' else 'Web') + '/Dockerfile')
+            lines = original.read_text().splitlines()
+            for index, line in enumerate(lines):
+                if not line.upper().startswith('FROM '):
+                    continue
+                fields = line.split()
+                ref = fields[1]
+                need(re.fullmatch(r'[a-z0-9./_-]+:[A-Za-z0-9._-]+', ref), 'UnsupportedBuildBase')
+                if ref not in bases:
+                    docker('pull', ref, timeout=600, mutation=True)
+                    info = json.loads(docker('image', 'inspect', ref))[0]
+                    repo = ref.rsplit(':', 1)[0]
+                    matches = [x for x in info.get('RepoDigests', []) if x.startswith(repo + '@sha256:')]
+                    need(len(matches) == 1 and re.fullmatch(r'.+@sha256:[0-9a-f]{64}', matches[0]), 'UnpinnedBuildBase')
+                    bases[ref] = matches[0]
+                fields[1] = bases[ref]
+                lines[index] = ' '.join(fields)
+            pinned = self.folder / (role + '.Dockerfile')
+            pinned.write_text('\n'.join(lines) + '\n')
+            iid = self.folder / (role + '.iid')
+            docker('build', '--pull=false', '--file', str(pinned), '--iidfile', str(iid),
+                   '--tag', f'bigbrain-standard-{role}:{self.revision}-{self.folder.name}',
+                   '--label', 'org.opencontainers.image.revision=' + self.revision,
+                   '--build-arg', 'BIGBRAIN_REVISION=' + self.revision, str(source), timeout=1200, mutation=True)
+            self.images[role] = iid.read_text().strip()
+            image_info(self.images[role])
+            self.unchanged()
+        self.bind_images()
+        save(self.folder / 'build.json', {'revision': self.revision,
+             'tree': command(['git', 'rev-parse', self.revision + '^{tree}']).decode().strip(),
+             'archiveSha256': backup.digest(archive), 'bases': bases, 'images': self.images})
+
+    def prove_restartability(self, backup_folder):
+        results = []
+        for role in ROLES:
+            for purpose, image in (('rollback', self.originals[role]['Image']), ('candidate', self.images[role])):
+                self.probe_image(role, image, backup_folder, purpose)
+                results.append({'role': role, 'purpose': purpose, 'image': image, 'starts': 2, 'status': 'PASS'})
+                self.unchanged()
+        save(self.folder / 'restartability.json', {'backupManifestSha256': backup.verify_set(backup_folder),
+             'isolation': 'network-none; no production mounts or ports; disposable backup copies', 'results': results})
+
+    def probe_image(self, role, image, backup_folder, purpose):
+        # Actual immutable image, entrypoint and non-root user. Never use the old
+        # container's writable layer, production mounts, provider network or Docker socket.
+        old = self.originals[role]
+        uid = old['Config'].get('User', '')
+        need(re.fullmatch(r'[1-9][0-9]*(?::[1-9][0-9]*)?', uid), 'ProbeUserUnknown')
+        uid_number = uid.split(':')[0]
+        gid = uid.split(':')[-1]
+        folder = self.folder / ('probe-' + role + '-' + purpose)
+        folder.mkdir(mode=0o700)
+        args = ['create', '--name', 'bigbrain-standard-' + uuid.uuid4().hex,
+                '--label', 'bigbrain.standard.probe=' + self.folder.name,
+                '--network', 'none', '--read-only', '--cap-drop', 'ALL',
+                '--security-opt', 'no-new-privileges', '--restart', 'no',
+                '--memory', '768m', '--cpus', '1', '--pids-limit', '256', '--user', uid,
+                '--tmpfs', f'/tmp:rw,nosuid,nodev,uid={uid_number},gid={gid},mode=0700']
+        env = dict(entry.split('=', 1) for entry in old['Config']['Env'])
+        roots = {}
+        if role == 'api':
+            # Disable external work only in the probe; production snapshot is unchanged.
+            for key in list(env):
+                if key.lower().endswith('__enabled') or key.lower().endswith('__directaudioimportenabled'):
+                    env[key] = 'false'
+            for key in ('MealPlanner__SchoolMeals__Enabled', 'MealPlanner__SchoolMeals__RosenfeldtEnabled',
+                        'MealPlanner__SchoolMeals__MusikugglanEnabled', 'Sentinel__Enabled',
+                        'Finance__RecurringLocalReasoner__Enabled', 'Finance__ResearchScheduler__Enabled',
+                        'Finance__ObservationRuntime__Enabled', 'Media__Requests__DirectAudioImportEnabled',
+                        'Media__SmartShuffle__Enabled'):
+                env[key] = 'false'
+            env['Finance__ResearchOperations__MaintenancePaused'] = 'true'
+            for target, names in backup.EXPECTED.items():
+                copies = folder / target.lstrip('/')
+                copies.mkdir()
+                # Accessible to the image UID only through its bind mount. The host
+                # parent remains 0700; original backups and production stay untouched.
+                copies.chmod(0o777)
+                for name in names:
+                    shutil.copyfile(backup_folder / target.lstrip('/') / name, copies / name)
+                    (copies / name).chmod(0o666)
+                roots[target] = (copies, 'isolated-copy')
+                args += ['--mount', f'type=bind,source={copies},target={target}']
+            for target in ('/finance-data', '/app/data'):
+                args += ['--tmpfs', f'{target}:rw,nosuid,nodev,uid={uid_number},gid={gid},mode=0700']
+        else:
+            # nginx resolves its upstream at startup, but no upstream request is made.
+            args += ['--add-host', 'api:127.0.0.1', '--tmpfs', f'/var/cache/nginx:uid={uid_number},gid={gid}',
+                     '--tmpfs', f'/run:uid={uid_number},gid={gid}']
+        need(all('\n' not in k + v and '\r' not in k + v for k, v in env.items()), 'ProbeEnvironmentInvalid')
+        env_file = folder / 'environment'
+        env_file.write_text(''.join(k + '=' + v + '\n' for k, v in env.items()))
+        env_file.chmod(0o600)
+        args += ['--env-file', str(env_file), image]
+        save(folder / 'intent.json', {'name': args[2], 'image': image})
+        cid = docker(*args, mutation=True).decode().strip()
+        need(re.fullmatch(r'[0-9a-f]{64}', cid), 'ProbeIdentityUnknown')
+        self.probes.add(cid)
+        save(folder / 'identity.json', {'containerId': cid, 'image': image})
+        initial_schema = schemas(roots) if roots else None
+        try:
+            for cycle in range(2):
+                docker('start', cid, mutation=True)
+                deadline = time.monotonic() + 60
+                while True:
+                    c = inspect(cid)
+                    need(c['Image'] == image and c['State']['Running'] and not c['State']['OOMKilled'], 'ProbeExited')
+                    need(c['HostConfig']['NetworkMode'] == 'none' and not c['HostConfig'].get('PortBindings')
+                         and c['Config']['User'] == uid, 'ProbeIsolationChanged')
+                    try:
+                        if role == 'api':
+                            check = "exec 3<>/dev/tcp/127.0.0.1/8080; printf 'GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; IFS= read -r line <&3; [[ $line == *' 200 '* ]]"
+                            docker('exec', cid, '/bin/bash', '-ec', check)
+                        else:
+                            docker('exec', cid, 'wget', '--spider', '-q', 'http://127.0.0.1:8080/')
+                        break
+                    except Blocked:
+                        need(time.monotonic() < deadline, 'ProbeHealthDeadline')
+                        time.sleep(1)
+                docker('stop', '--time', '-1', cid, timeout=90, mutation=True)
+                stopped = inspect(cid)
+                need(not stopped['State']['Running'] and stopped['State']['ExitCode'] == 0
+                     and not stopped['State']['OOMKilled'], 'ProbeUncleanStop')
+                if roots:
+                    need(schemas(roots) == initial_schema, 'ProbeSchemaChanged')
+                record(self.folder, 'PROBE_' + role.upper() + '_' + purpose.upper() + '_' + str(cycle + 1))
+        finally:
+            # Retain the uniquely owned stopped probe and its private evidence. No rm,
+            # production stop or force-kill; uncertain cleanup blocks the release.
+            if not isinstance(sys.exc_info()[1], (Uncertain, KeyboardInterrupt, SystemExit)):
+                try:
+                    c = inspect(cid)
+                    if c['State']['Running']:
+                        docker('stop', '--time', '-1', cid, timeout=90, mutation=True)
+                    need(not inspect(cid)['State']['Running'], 'ProbeStillRunning')
+                except BaseException:
+                    raise Uncertain('ProbeCleanupUncertain') from None
 
     def data_identity(self):
         need(schemas(self.roots) == self.schemas, 'SchemaChangedNoAutomaticRollback')
@@ -306,6 +500,7 @@ class Deployment:
         while time.monotonic() < deadline:
             c = self.current(role)
             need(c['Image'] == image and fingerprint(c) == fingerprint(self.originals[role]), 'ReplacementConfigChanged')
+            need(c['State']['Running'] or c['State'].get('Restarting'), 'ReplacementExited')
             try:
                 healthy(c)
                 http_health(role)
@@ -314,16 +509,23 @@ class Deployment:
                 time.sleep(2)
         raise Blocked('HealthDeadline')
 
-    def stop(self, role):
+    def stop(self, role, recovery=False):
         c = self.current(role)
-        if c['State']['Running']:
+        if c['State']['Running'] or c['State'].get('Restarting'):
             docker('stop', '--time', '-1', c['Id'], timeout=90, mutation=True)
         stopped = inspect(c['Id'])
-        need(not stopped['State']['Running'] and not stopped['State']['OOMKilled']
-             and stopped['State']['ExitCode'] == 0, 'UncleanStop')
+        # A failed candidate is not the original healthy service. Its known exit=1
+        # must not prevent image rollback, but never waive the original's clean stop.
+        failed_candidate = (recovery and stopped['Id'] != self.originals[role]['Id']
+                            and stopped['Image'] == self.images[role]
+                            and fingerprint(stopped) == fingerprint(self.originals[role])
+                            and stopped['State'].get('Status') == 'exited')
+        need(not stopped['State']['Running'] and not stopped['State'].get('Restarting')
+             and not stopped['State'].get('Dead') and not stopped['State']['OOMKilled']
+             and (stopped['State']['ExitCode'] == 0 or failed_candidate), 'UncleanStop')
 
     def switch(self, role, recovery=False):
-        self.stop(role)
+        self.stop(role, recovery=recovery)
         path = self.folder / ('rollback.json' if recovery else 'release.json')
         self.compose(path, 'up', '-d', '--no-deps', '--no-build', '--pull', 'never', '--force-recreate', role, mutation=True)
         self.wait_healthy(role, self.originals[role]['Image'] if recovery else self.images[role])
@@ -335,6 +537,8 @@ class Deployment:
         sync_dir(self.state)
         record(self.folder, 'PREPARING')
         try:
+            record(self.folder, 'BUILDING')
+            self.build_images()
             save(self.folder / 'release.json', self.release)
             save(self.folder / 'rollback.json', self.rollback)
             # Preserve canonical Compose escaping; verify the frozen execution model.
@@ -345,6 +549,8 @@ class Deployment:
                         'revision': self.originals['api']['Config']['Labels']['org.opencontainers.image.revision']}
             folder = backup.run_backup(self.roots, self.state / 'backups', identity, self.unchanged)
             digest = backup.verify_set(folder)
+            self.prove_restartability(folder)
+            need(backup.verify_set(folder) == digest, 'BackupChangedDuringProbe')
             save(self.folder / 'receipt.json', {'revision': self.revision, 'images': self.images,
                  'previous': {r: c['Image'] for r, c in self.originals.items()},
                  'backupId': folder.name, 'backupManifestSha256': digest})
@@ -361,7 +567,7 @@ class Deployment:
             record(self.folder, 'PASS')
         except BaseException as error:
             if not self.changed:
-                record(self.folder, 'PRE_SWITCH_FAILED')
+                record(self.folder, 'MANUAL_REVIEW_REQUIRED' if isinstance(error, (Uncertain, KeyboardInterrupt, SystemExit)) else 'PRE_SWITCH_FAILED')
             elif isinstance(error, (Uncertain, KeyboardInterrupt, SystemExit)):
                 record(self.folder, 'MANUAL_REVIEW_REQUIRED')
             else:
@@ -386,9 +592,7 @@ class Deployment:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--revision', required=True)
-    parser.add_argument('--api-image', required=True)
-    parser.add_argument('--web-image', required=True)
-    parser.add_argument('--compose', required=True, type=Path)
+    parser.add_argument('--compose', type=Path, help='Optional ordinary Compose file; default discovers active files from runtime labels')
     parser.add_argument('--execute', action='store_true', help='Separately authorized deployment; default is read-only preflight')
     args = parser.parse_args()
     os.umask(0o077)
@@ -397,7 +601,7 @@ def main():
         if name.startswith(('COMPOSE_', 'DOCKER_')):
             del os.environ[name]
     state = Path.home() / '.local/state/bigbrain-standard'
-    deployment = Deployment(args.revision, {'api': args.api_image, 'web': args.web_image}, args.compose, state)
+    deployment = Deployment(args.revision, {}, args.compose, state)
     if not args.execute:
         deployment.preflight()
         print('PREFLIGHT PASS; no backup, deployment or acceptance performed')

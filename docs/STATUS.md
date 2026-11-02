@@ -32,7 +32,9 @@ Avgränsad uppdatering 2026-11-01: PR #25 (`283060d`) för minnesbaserad hämtni
 Andra/sista PR:en förbereder [STANDARD API+Web](policy/lanes.md) som T2-review checkpoint
 från main `e7e81d2`. Gamla paket/approvals/worker är arkiverade på plats i repositoryt;
 installerade artefakter och drift lämnas orörda. Offline-testad, inte accepterad eller deployad.
-Oberoende T2-review och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
+Uppföljning 2026-11-02: första oberoende T2-review av `c883e78` blockerade merge med två P1: kraschrollback
+och ofullständigt bygg-/omstartsflöde. Korrigering i samma PR är offline-verifierad;
+andra T2-reviewvarvet och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
 bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
 
 | Tillstånd | Verifierad eller dokumenterad evidens |
