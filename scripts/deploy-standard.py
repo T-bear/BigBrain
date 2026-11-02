@@ -34,6 +34,8 @@ MEMORY_FETCH = '283060d41f4494d2e5606f7c857fb82972e86094'
 CHECKS = {'backend', 'frontend', 'documentation', 'secrets'}
 SHA = r'[0-9a-f]{40}'
 IMAGE = r'sha256:[0-9a-f]{64}'
+SDK_VERSION = '10.0.302'
+SDK_REPOSITORY = 'mcr.microsoft.com/dotnet/sdk'
 BACKUP_IMAGE = 'python@sha256:b658b05ce9c4eb97ec6fc19424818a1f31993659c2b505a532f470e83807815d'
 HELPER_HOME = Path('/tmp/bigbrain-standard-backup')
 IDENTITY_FIELDS = ('device', 'inode', 'uid', 'gid', 'mode')
@@ -706,10 +708,26 @@ class Deployment:
         with tarfile.open(archive) as bundle:
             need(all(m.isfile() or m.isdir() for m in bundle.getmembers()), 'UnsupportedBuildTree')
             bundle.extractall(source, filter='data')
+        # Bounded workaround for the accepted 10.0.300/latestPatch contract.
+        # Do not modify the archive, extracted sources or ordinary Dockerfiles.
+        contract = json.loads((source / 'global.json').read_text())
+        need(contract == {'sdk': {'version': '10.0.300', 'rollForward': 'latestPatch'}},
+             'UnsupportedSdkContract')
+        need(re.fullmatch(r'10\.0\.3[0-9]{2}', SDK_VERSION), 'IncompatibleBuildSdk')
+        sdk_ref = SDK_REPOSITORY + ':' + SDK_VERSION
         bases = {}
         for role in ROLES:
             original = source / ('src/BigBrain.' + ('Api' if role == 'api' else 'Web') + '/Dockerfile')
             lines = original.read_text().splitlines()
+            if role == 'api':
+                sdk_from = 'FROM ' + SDK_REPOSITORY + ':10.0 AS build'
+                global_copy = 'COPY Directory.Build.props global.json ./'
+                need(lines.count(sdk_from) == lines.count(global_copy) == 1, 'UnsupportedSdkBuildDefinition')
+                lines[lines.index(sdk_from)] = 'FROM ' + sdk_ref + ' AS build'
+                # Resolve with the archived global.json in scope, not image metadata.
+                # A missing/wrong SDK fails the build before any database helper runs.
+                lines.insert(lines.index(global_copy) + 1,
+                             'RUN test "$(dotnet --version)" = "' + SDK_VERSION + '"')
             for index, line in enumerate(lines):
                 if not line.upper().startswith('FROM '):
                     continue
@@ -738,7 +756,10 @@ class Deployment:
         self.bind_images()
         save(self.folder / 'build.json', {'revision': self.revision,
              'tree': command(['git', 'rev-parse', self.revision + '^{tree}']).decode().strip(),
-             'archiveSha256': backup.digest(archive), 'bases': bases, 'images': self.images})
+             'archiveSha256': backup.digest(archive), 'bases': bases, 'images': self.images,
+             'sdk': {'version': SDK_VERSION, 'image': bases[sdk_ref],
+                     'globalJsonSha256': backup.digest(source / 'global.json'),
+                     'verification': 'dotnet --version with archived global.json during API build'}})
 
     def prove_restartability(self, backup_folder):
         results = []
