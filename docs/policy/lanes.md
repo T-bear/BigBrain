@@ -110,6 +110,92 @@ funktion; källobservation och iPhone/PWA är PENDING. Daglig backup/restore-gri
 schemaändringar kvarstår i [backupunderlaget](../operations/backup-restore/README.md).
 All Finance-/BB-158-, schema-, privilegie- eller nätverksändring är utanför spåret.
 
+### Avgränsad backuphjälpare — T2-checkpoint 2026-11-02
+
+Nytt ägarauktoriserat uppdrag från `55ebaa9`: endast backupåtkomst, tre filer,
+en PR och ett oberoende T2-reviewvarv. Ingen produktionsdatabasåtkomst, merge eller
+deployment ingår. `backup_support.py` är oförändrad. Äldre formuleringar ovan om
+ännu ej mergade #25/#26 är historik; båda ingår i denna accepterade startbaseline.
+
+**Standard-preflight förblir läsande:** inga nya containrar, volymer, images,
+kataloger eller backuper. Den verifierar fem volymer via daemonens `volume inspect`
+(Name/Mountpoint, lokal driver utan options) mot API:s mounts, men läser inga
+produktionsdatabasfiler från värden. Datainventory/schema/backup rapporteras
+**DEFERRED / BLOCKED**, exitkod 2; detta är inte en godkänd full förkontroll.
+Endast framtida separat auktoriserad `--execute` får genomföra hjälparsteget.
+
+Hjälparen använder exakt
+`python@sha256:b658b05ce9c4eb97ec6fc19424818a1f31993659c2b505a532f470e83807815d`,
+`--pull never`, verifierad SQLite **3.53.4** och UID:GID **1654:1654**.
+Nätverket är `none`; alla capabilities tas bort, `no-new-privileges` gäller,
+minne/swap begränsas till 512 MiB, CPU till 1, processer till 32 och processen till
+180 sekunder. Ingen Docker-socket, API-miljö, extra grupp, port eller Finance-volym
+följer med. Image-ID och faktisk containerkonfiguration/mountlista verifieras före
+start. Endast de fem befintliga volymerna monteras med `volume-nocopy`, på deras
+verifierade absoluta källsökvägar så att oförändrad `backup.sources()` kan användas.
+Alias, överlapp, saknad/extra mount och okänd volymidentitet ger stopp.
+
+**Avgränsat undantag från skrivskyddad montering:** de fem källvolymerna måste
+monteras skrivbara för att SQLite ska kunna skapa WAL/SHM när de saknas. Alla
+originalanslutningar använder fortfarande `mode=ro` och `query_only`; ingen
+`immutable=1`, rå originalkopiering, checkpoint eller journal-mode-ändring görs.
+UID 1654 äger originalfilerna: skrivbar montering innebär därför en kvarstående
+filsystemsskrivrisk, inte ett tekniskt bevis att processen bara kan skriva sidofiler.
+Risken avgränsas av låst image/kod, kort livslängd, exakt volymlista, samma non-root-UID,
+frånvaro av nätverk/socket och kontroller före/efter. Katalogernas device/inode/UID/GID/
+mode och databasernas motsvarande identitet samt schema jämförs inne i hjälparen.
+Katalogerna måste vara 1654:0/0755; databasfiler och kvarvarande sidofiler måste vara
+1654:1654 med 0600 eller 0644. Nya sidofiler skapas med umask 0077 och är åtkomliga
+för API:s samma UID. Normal borttagning av sidofiler vid SQLite-close är tillåten;
+levande databasers innehåll, storlek och mtime är inte oföränderlighetskrav.
+Finance är helt utanför mounts/backup. Befintlig Media acquisition-databas ingår i
+det redan accepterade sexdatabaskontraktet; inga BB-158-funktioner körs eller ändras.
+
+**Beständighet och ägarskap:** varje engångshjälpare skapar exklusivt
+`/tmp/bigbrain-standard-backup` med ägare 1654:1654 och mode 0700 i sitt eget
+beständiga containerlager, inte tmpfs eller värdens delade `/tmp`. Ingen annan
+process/tjänst delar katalogen; ingen oskyddad staging på värden används.
+Det skrivbara containerlagret behövs för denna privata destination; källvolymernas
+ägare och katalogrättigheter ändras aldrig. `run_backup()` skriver sina vanliga
+`backups/<backup-id>/` med 0700-kataloger, 0600-filer och ofullständigt manifest före
+kopiering. `verify_set()` verifierar alla sex databaser, hash, integrity/FK/schema
+och isolerad återläsning. Konsistens gäller per databas, inte atomärt över sex.
+
+Containern avslutas och bevaras utan `--rm`. `docker cp` **utan `-a`** kopierar
+resultatet till operatörens separata
+`~/.local/state/bigbrain-standard/run-<id>/bigbrain-standard-backup-<id>/output/`.
+Värdoperatören måste ha UID 1000; kopian ägs av denne. Kataloger måste vara 0700,
+filer 0600, utan symlänkar/hårdlänkar; filerna och katalogerna synkas till disk.
+Värden kör oförändrad `verify_set()` igen och jämför manifesthash/runtimeidentitet.
+`receipt.json` anger den relativa backupvägen. Endast denna verifierade kopia används
+i de befintliga isolerade start-/omstartsproven. Källcontainerns privata backup och
+journal bevaras även efter kopiering, utan automatisk städning eller restore.
+
+Hjälparens namn/intent journalförs före skapande, ID före start. Avbrott, krasch,
+timeout, kopieringsfel eller misslyckad verifiering ger **MANUAL_REVIEW_REQUIRED**;
+vid hård krasch kan hjälparjournalen sluta på STARTED och manifestet på INCOMPLETE.
+Containerlagret, partiella värdkopior och journaler bevaras. Ingen automatisk omkörning
+eller återställning tillåts. Nya kortlivade hjälpare verifierar datans identitet/schema
+före/efter byte och inför rollback; de omfattas av samma säkerhetsgräns. Inget API/Web-
+byte får passera utan verifierad backup/readback och befintliga start-/omstartsprov.
+Detta ändrar inte backupgrinden för schemaändringar eller kravet på separat drifttillstånd.
+
+Verifieringsunderlag för denna checkpoint anges i PR med exakt SHA/tree. Det opt-in-
+styrda syntetiska Docker-testet använder enbart egna nya volymer och ovanstående image;
+ordinarie CI kör offline-felen och markerar Docker-testet SKIP när det inte beställts.
+Första syntetiska försöket stoppade på fixturens GID: `docker cp -a` till container
+använde containeranvändarens grupp. Fixturen korrigerades till uttryckliga tar-metadata
+utan `-a`; produktionsgränsen 1654:0/0755 ändrades inte. Ingen sådan ägarjustering finns
+i produktionsflödet. Verifiering 2026-11-02: **179 offline-tester PASS**, ett Docker-test
+SKIP i standardkörningen; separat opt-in-körning av samma Docker-test **PASS** med
+WAL utan sidofiler, samtidig skrivning under onlinebackup, SIGKILL mitt i backup,
+kvarvarande sidofilers behörigheter och API-ekvivalent fortsatt läs-/skrivåtkomst.
+Både fullständig och ofullständig backup/journal kopierades till UID 1000 och
+bevarades efter att testhjälparna tagits bort; korrupt/ofullständig kopia avvisades.
+Verklig hjälparorkestrering kördes endast mot fem nybildade syntetiska volymer.
+Dokumentvalidator PASS. Alla testägda containrar/volymer städades efter kontrollen.
+Produktions-WAL, verklig backup och deployment är **NOT RUN**.
+
 ### Skrivskyddad kompatibilitetskontroll 2026-11-02
 
 **De tre kompatibilitetskontrollerna PASS med korrigerad kod; full release ännu BLOCKED.**
