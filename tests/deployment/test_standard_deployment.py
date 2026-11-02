@@ -1,6 +1,6 @@
 """Offline T2 fault tests: synthetic SQLite/WAL and simulated Docker only."""
 import copy
-from contextlib import closing
+from contextlib import closing, contextmanager
 import io
 import importlib.util
 import json
@@ -231,9 +231,10 @@ class StandardTests(unittest.TestCase):
         self.dep.execute()
         self.assertEqual(events, ['build', 'backup-and-proof', 'switch-api', 'switch-web'])
 
-    def test_build_uses_git_archive_and_pinned_bases_not_workspace(self):
-        self.dep.folder = self.state / 'run-build'
-        self.dep.folder.mkdir()
+    @contextmanager
+    def mocked_build(self, failure=None, files=None):
+        files = files if files is not None else {name: (ROOT / name).read_bytes() for name in (
+            'global.json', 'src/BigBrain.Api/Dockerfile', 'src/BigBrain.Web/Dockerfile')}
         calls = []
         def command(args, **kwargs):
             calls.append(args)
@@ -241,9 +242,8 @@ class StandardTests(unittest.TestCase):
                 self.assertEqual(args[-1], REV)
                 archive = Path(args[3].removeprefix('--output='))
                 with tarfile.open(archive, 'w') as bundle:
-                    for role in ('Api', 'Web'):
-                        info = tarfile.TarInfo('src/BigBrain.' + role + '/Dockerfile')
-                        body = b'FROM base:fixed AS runtime\n'
+                    for name, body in files.items():
+                        info = tarfile.TarInfo(name)
                         info.size = len(body)
                         bundle.addfile(info, io.BytesIO(body))
                 return b''
@@ -251,26 +251,112 @@ class StandardTests(unittest.TestCase):
             raise AssertionError(args)
         def docker(*args, **kwargs):
             calls.append(args)
-            if args[0] == 'pull': return b''
+            if args[0] == 'pull':
+                self.assertNotEqual(args[1], d.SDK_REPOSITORY + ':10.0')
+                if failure == 'unavailable-sdk' and args[1].startswith(d.SDK_REPOSITORY + ':'):
+                    raise d.Blocked('CommandFailed')
+                return b''
             if args[:2] == ('image', 'inspect'):
-                return json.dumps([{'RepoDigests': ['base@sha256:' + 'e' * 64]}]).encode()
+                repo = args[2].rsplit(':', 1)[0]
+                digests = [repo + '@sha256:' + 'e' * 64]
+                if failure == 'unpinned-sdk' and repo == d.SDK_REPOSITORY:
+                    digests = []
+                return json.dumps([{'RepoDigests': digests}]).encode()
             self.assertEqual(args[0], 'build')
             pinned = Path(args[args.index('--file') + 1])
-            self.assertIn('FROM base@sha256:' + 'e' * 64, pinned.read_text())
+            lines = pinned.read_text().splitlines()
+            for line in lines:
+                if line.startswith('FROM '):
+                    self.assertRegex(line.split()[1], r'^.+@sha256:[0-9a-f]{64}$')
+            if pinned.name == 'api.Dockerfile':
+                self.assertEqual(lines[0], 'FROM ' + d.SDK_REPOSITORY + '@sha256:' + 'e' * 64 + ' AS build')
+                index = lines.index('COPY Directory.Build.props global.json ./')
+                self.assertEqual(lines[index + 1], 'RUN test "$(dotnet --version)" = "' + d.SDK_VERSION + '"')
+                self.assertLess(index + 1, next(i for i, line in enumerate(lines) if line.startswith('RUN dotnet restore ')))
+                if failure == 'wrong-sdk-content':
+                    raise d.Blocked('CommandFailed')
             self.assertEqual(args[-1], str(self.dep.folder / 'source'))
             self.assertIn('org.opencontainers.image.revision=' + REV, args)
             Path(args[args.index('--iidfile') + 1]).write_text(NEW)
             self.assertTrue(all(c['State']['Running'] and c['Image'] == OLD for c in self.runtime.values()))
             return b''
         with patch.object(d, 'command', side_effect=command), patch.object(d, 'docker', side_effect=docker), \
-             patch.object(d, 'image_info'), patch.object(self.dep, 'bind_images'):
+             patch.object(d, 'image_info'), patch.object(self.dep, 'bind_images'), \
+             patch.object(self.dep, 'build_images', side_effect=lambda: d.Deployment.build_images(self.dep)):
+            yield calls
+
+    def test_build_uses_git_archive_and_pinned_bases_not_workspace(self):
+        self.dep.folder = self.state / 'run-build'
+        self.dep.folder.mkdir()
+        with self.mocked_build() as calls:
             d.Deployment.build_images(self.dep)
         self.assertEqual(len([a for a in calls if a[0] == 'build']), 2)
-        self.assertEqual(len([a for a in calls if a[0] == 'pull']), 1)
+        self.assertEqual(len([a for a in calls if a[0] == 'pull']), 4)
         receipt = json.loads((self.dep.folder / 'build.json').read_text())
         self.assertEqual(receipt['revision'], REV)
+        self.assertEqual(receipt['tree'], 'git-tree')
         self.assertEqual(receipt['images'], {'api': NEW, 'web': NEW})
-        self.assertEqual(receipt['bases']['base:fixed'], 'base@sha256:' + 'e' * 64)
+        self.assertEqual(receipt['bases'][d.SDK_REPOSITORY + ':' + d.SDK_VERSION], d.SDK_REPOSITORY + '@sha256:' + 'e' * 64)
+        self.assertEqual(receipt['sdk']['version'], d.SDK_VERSION)
+        self.assertEqual(receipt['sdk']['image'], receipt['bases'][d.SDK_REPOSITORY + ':' + d.SDK_VERSION])
+        self.assertEqual(receipt['sdk']['globalJsonSha256'], d.backup.digest(ROOT / 'global.json'))
+        self.assertEqual(receipt['archiveSha256'], d.backup.digest(self.dep.folder / 'source.tar'))
+        self.assertEqual(stat.S_IMODE((self.dep.folder / 'build.json').stat().st_mode), 0o600)
+        with tarfile.open(self.dep.folder / 'source.tar') as bundle:
+            for entry in bundle.getmembers():
+                expected = (ROOT / entry.name).read_bytes()
+                self.assertEqual(bundle.extractfile(entry).read(), expected)
+                self.assertEqual((self.dep.folder / 'source' / entry.name).read_bytes(), expected)
+
+    def test_sdk_300_and_302_are_selected_with_latest_patch_contract(self):
+        for version in ('10.0.300', '10.0.302'):
+            with self.subTest(version=version), patch.object(d, 'SDK_VERSION', version):
+                self.dep.folder = self.root / version
+                self.dep.folder.mkdir()
+                with self.mocked_build() as calls:
+                    self.dep.build_images()
+                self.assertIn(('pull', d.SDK_REPOSITORY + ':' + version), calls)
+                self.assertNotIn(('pull', d.SDK_REPOSITORY + ':10.0.403'), calls)
+
+    def assert_sdk_blocked_before_data(self):
+        self.assertEqual(self.phases()[-1], 'PRE_SWITCH_FAILED')
+        self.dep.backup_data.assert_not_called()
+        self.dep.helper_data.assert_not_called()
+        self.dep.prove_restartability.assert_not_called()
+        self.assertEqual(self.dep.changed, [])
+        self.assertEqual(self.runtime, self.dep.originals)
+        self.assertFalse((self.dep.folder / 'build.json').exists())
+
+    def test_incompatible_sdk_versions_block_before_pull_or_database(self):
+        for version in ('10.0.403', '10.0.299', '10.1.300', '11.0.300', '10.0.302-preview', '10.0', ''):
+            with self.subTest(version=version), patch.object(d, 'SDK_VERSION', version), self.mocked_build() as calls:
+                with self.assertRaisesRegex(d.Blocked, 'IncompatibleBuildSdk'):
+                    self.dep.execute()
+                self.assertFalse(any(a[0] in ('pull', 'build') for a in calls))
+                self.assert_sdk_blocked_before_data()
+
+    def test_unavailable_unpinned_or_wrong_sdk_blocks_before_database(self):
+        for failure in ('unavailable-sdk', 'unpinned-sdk', 'wrong-sdk-content'):
+            with self.subTest(failure=failure), self.mocked_build(failure) as calls:
+                with self.assertRaises(d.Blocked):
+                    self.dep.execute()
+                self.assert_sdk_blocked_before_data()
+                self.assertFalse(any(a[0] == 'build' and 'web.Dockerfile' in ' '.join(a) for a in calls))
+
+    def test_changed_sdk_contract_or_dockerfile_blocks_without_source_rewrite(self):
+        originals = {name: (ROOT / name).read_bytes() for name in (
+            'global.json', 'src/BigBrain.Api/Dockerfile', 'src/BigBrain.Web/Dockerfile')}
+        cases = [('global.json', b'{"sdk":{"version":"10.0.300","rollForward":"latestFeature"}}'),
+                 ('global.json', b'{"sdk":{"version":"10.0.400","rollForward":"latestPatch"}}'),
+                 ('src/BigBrain.Api/Dockerfile', originals['src/BigBrain.Api/Dockerfile'].replace(b'sdk:10.0 ', b'sdk:10.0.403 ')),
+                 ('src/BigBrain.Api/Dockerfile', originals['src/BigBrain.Api/Dockerfile'].replace(b'COPY Directory.Build.props global.json ./', b'COPY global.json ./'))]
+        for name, body in cases:
+            with self.subTest(name=name, body=body), self.mocked_build(files={**originals, name: body}) as calls:
+                with self.assertRaisesRegex(d.Blocked, 'UnsupportedSdk'):
+                    self.dep.execute()
+                self.assertFalse(any(a[0] in ('pull', 'build') for a in calls))
+                self.assert_sdk_blocked_before_data()
+                self.assertEqual((self.dep.folder / 'source' / name).read_bytes(), body)
 
     def test_compose_inputs_discovered_without_prepared_json(self):
         env_file = self.root / 'private.env'

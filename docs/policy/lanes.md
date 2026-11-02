@@ -255,3 +255,39 @@ oberoende T2-review samt alla backup-/rollback-/dataintegritetsgrindar kvarstår
 Kontrollen ger inget merge- eller deploymenttillstånd.
 
 Det [äldre paket-/approval-/workerspåret är fryst och arkiverat på plats](../operations/runbooks/approved-operations.md#fryst-och-arkiverat-skollunchspår--2026-11-01).
+
+### Avgränsad SDK-korrigering — T2-checkpoint 2026-11-02
+
+Baseline `7db1e23e956ab963097bc6d7872db206bb9057a7`. Den auktoriserade STANDARD-körningen
+`run-185ce6e2e4ec48aabc17b68b182d10e5` stoppades i API-bygget med `PRE_SWITCH_FAILED`
+(BuildKit `3llmez5rq88vyo3phyo3olqr8`, restore exitkod 155). Den flytande SDK-taggen
+`10.0` gav **10.0.403**, medan accepterad `global.json` kräver **10.0.300/latestPatch**.
+Enligt [Microsofts SDK-regler](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json#rollforward)
+tillåter detta endast samma feature band, alltså 10.0.3xx. Enligt incidentunderlaget förblev
+API/Web healthy; ingen produktionsbackup, tjänsteväxling eller databasrestore genomfördes.
+Den tidigare körningen och dess bevis lämnas orörda och omkörs inte i detta uppdrag.
+
+MCR-verifiering 2026-11-02: `10.0.303` svarade **404**, men officiella **10.0.302** finns.
+Dess manifestlista har digest
+`sha256:72dd743782f2ae7e5476fd64f6a460045e3998dc862218b80e6944cba79a01b0`.
+Skriptet väljer `mcr.microsoft.com/dotnet/sdk:10.0.302`, hämtar och digestlåser den med
+befintlig mekanism. Endast den tillfälligt genererade API-Dockerfilen ändras. Efter kopiering
+av arkivets `global.json` måste `dotnet --version` vara exakt 10.0.302 före restore.
+Image-metadata räcker inte: kontrollen kör SDK-resolvern med det accepterade kontraktet.
+Felaktig/otillgänglig image eller ändrat SDK-kontrakt stoppar före databashjälparen och bytet.
+Privat `build.json` får SDK-version, vald digest och hash för oförändrad `global.json`
+efter lyckade byggen. Alla övriga baser förblir digestlåsta; Git-arkiv, källträd,
+ordinarie Dockerfiles, revisions-/källproveniens och befintliga skyddsgrindar bevaras.
+
+Offline-verifiering: **183 PASS, ett befintligt opt-in-Docker-test SKIP** (184 tester totalt).
+Regressionerna täcker godkänd 10.0.300/10.0.302, nekad 10.0.403 och andra inkompatibla
+versioner, saknad digest, pull-/SDK-byggfel före databasåtkomst samt bevarat arkiv/källträd.
+Verkliga isolerade SDK-byggen på linux/amd64 med `--network none`, utan volymmounts:
+**10.0.302 PASS** för SDK-innehåll, resolver med accepterad `global.json` och restore av
+ett minimalt net10.0-projekt utan externa paket; **10.0.403 avvisad som förväntat**.
+Detta är inte ett fullständigt API/Web-deploymentbygge. Dokumentvalidator PASS;
+exakt kandidat-SHA/tree, diff och CI-resultat redovisas i PR.
+Detta uppdrag omfattar exakt skriptet, STANDARD-testfilen och denna dokumentation.
+Oberoende T2-review krävs före merge. Ingen merge, `--execute`, deployment, produktions-
+volymåtkomst eller ändring av körande containrar ingår. Finance, BB-158,
+`backup_support.py`, databasåtkomst och deploymentbehörigheter är oförändrade.
