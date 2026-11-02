@@ -926,12 +926,43 @@ class StandardTests(unittest.TestCase):
         cfg['services']['api']['build'] = '.'
         cfg['services']['api']['depends_on'] = {'finance': {}}
         cfg['volumes']['data'] = {'name': 'existing-data', 'driver': 'local'}
+        cfg['services']['api']['volumes'] = [
+            {'type': 'volume', 'source': 'data', 'target': '/data'}]
         result = d.release_config(cfg, {r: NEW for r in d.ROLES})
         self.assertEqual(set(result['services']), {'api', 'web'})
         self.assertEqual(result['volumes'], {'data': {'name': 'existing-data', 'external': True}})
         self.assertNotIn('build', result['services']['api'])
         self.assertNotIn('depends_on', result['services']['api'])
         self.assertEqual(cfg['services']['api']['build'], '.')
+
+    def test_snapshot_only_declares_referenced_named_volumes(self):
+        cfg = copy.deepcopy(self.config)
+        cfg['volumes'] = {
+            f'v{i}': {'name': f'existing-{i}'} for i in range(10)}
+        for role, indices in (('api', range(4)), ('web', range(4, 7))):
+            cfg['services'][role]['volumes'] = [
+                {'type': 'volume', 'source': f'v{i}', 'target': f'/data{i}'}
+                for i in indices]
+        result = d.release_config(cfg, {r: NEW for r in d.ROLES})
+        self.assertEqual(set(result['volumes']), {f'v{i}' for i in range(7)})
+        self.assertTrue(all(v['external'] is True
+                            for v in result['volumes'].values()))
+        self.assertEqual(len(cfg['volumes']), 10)
+        self.assertTrue(d.snapshot_matches(copy.deepcopy(result),
+                                           copy.deepcopy(result)))
+        changed = copy.deepcopy(result)
+        changed['volumes']['v0']['name'] = 'unexpected'
+        self.assertFalse(d.snapshot_matches(changed, copy.deepcopy(result)))
+        missing = copy.deepcopy(result)
+        del missing['volumes']['v0']
+        self.assertFalse(d.snapshot_matches(missing, copy.deepcopy(result)))
+        extra = copy.deepcopy(result)
+        extra['volumes']['v9'] = {'name': 'existing-9', 'external': True}
+        self.assertFalse(d.snapshot_matches(extra, copy.deepcopy(result)))
+        cfg['services']['api']['volumes'].append(
+            {'type': 'volume', 'source': 'undeclared', 'target': '/extra'})
+        with self.assertRaisesRegex(d.Blocked, 'VolumeDeclarationMissing'):
+            d.release_config(cfg, {r: NEW for r in d.ROLES})
 
     def test_unsupported_configuration_cannot_expand_scope(self):
         for key in ('profiles', 'extends', 'configs', 'secrets', 'develop', 'links', 'volumes_from'):
