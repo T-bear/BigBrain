@@ -6,6 +6,7 @@ omfattning, undantag och återupptagningsprotokoll.
 | Projekt | Fryst sedan | Kanoniskt dokument |
 | --- | --- | --- |
 | Finance | 2026-10-16 | [finance-freeze-20261016.md](finance-freeze-20261016.md) |
+| Äldre Skollunch-paket, approvals och worker | 2026-11-01 | [Arkiverat spår](runbooks/approved-operations.md#fryst-och-arkiverat-skollunchspår--2026-11-01) |
 | BB-158 | 2026-10-23 | [bb158-freeze-20261023.md](bb158-freeze-20261023.md) |
 
 Upptining kräver nytt uttryckligt ägarbeslut och ny auktoriserad scope/DoD. Historiska

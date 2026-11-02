@@ -430,6 +430,7 @@ class Operations:
 
 
 def main():
+    raise Denied('InvalidInvocation: FROZEN historical SchoolLunch operations; see docs/policy/lanes.md')
     need(os.geteuid() == 0 and len(sys.argv) == 2 and sys.argv[1] in OPERATIONS, 'InvalidInvocation')
     os.umask(0o077)
     os.chdir('/')

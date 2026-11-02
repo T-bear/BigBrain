@@ -53,6 +53,7 @@ def assemble(source, destination):
 
 
 if __name__ == '__main__':
+    raise SystemExit('FROZEN: historical SchoolLunch packages; see docs/policy/lanes.md')
     try:
         if len(sys.argv) != 3:
             raise ValueError('ExpectedPrivateInputDirectoryAndNewOutputDirectory')

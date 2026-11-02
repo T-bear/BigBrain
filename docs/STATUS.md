@@ -26,6 +26,28 @@ Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant 
 
 ## Family — Skollunch
 
+Avgränsad uppdatering 2026-11-01: PR #25 (`283060d`) för minnesbaserad hämtning är enligt
+ägaren oberoende godkänd; GitHub visar öppen/ej mergad PR och SUCCESS för CI-run
+[41338289335](https://github.com/T-bear/BigBrain/actions/runs/41338289335).
+Andra/sista PR:en förbereder [STANDARD API+Web](policy/lanes.md) som T2-review checkpoint
+från main `e7e81d2`. Gamla paket/approvals/worker är arkiverade på plats i repositoryt;
+installerade artefakter och drift lämnas orörda. Offline-testad, inte accepterad eller deployad.
+Uppföljning 2026-11-02: första oberoende T2-review av `c883e78` blockerade merge med två P1: kraschrollback
+och ofullständigt bygg-/omstartsflöde. Korrigering i samma PR är offline-verifierad;
+andra T2-reviewvarvet och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
+bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
+
+Avgränsad kompatibilitetsanpassning 2026-11-02 efter `46aec78`, mot main `e7e81d2`:
+API/Web är healthy med oförändrad runtime. Verklig skrivskyddad delverifiering av
+Compose-rekonstruktion, båda runtime-hasharna, exakt Web-image/BuildKit-revision och
+`/host-timesync`-montering **PASS**. 171 offline-tester PASS; okänt/motsägande underlag
+blockeras. Den ärvda Web-etiketten tillhör nginx; separat BuildKit-underlag binder den
+körande imagen till accepterade `8029bb2`. [Befintligt spårunderlag](policy/lanes.md#skrivskyddad-kompatibilitetskontroll-2026-11-02)
+bevarar tidigare stopp, image-ID:n och verifieringsgränser. Full preflight/release är
+fortfarande **BLOCKED** av ej accepterade PR:er och återstående driftgrindar; start-/
+omstartsprov, backup och produktionsbyte är inte körda. Ingen root-autentisering,
+merge eller deployment; korrigerad kandidat kräver oberoende T2-granskning.
+
 | Tillstånd | Verifierad eller dokumenterad evidens |
 | --- | --- |
 | Implementerat och mergat | V1: `6d7f6de68f618f6c06b0845b659983ec12529f96`. V2-plan: `1125b65393e99d3606fbdb00d67cbd02d5582f36`. V2: `c8aaba15ac6382b6934591acfa6f615505c95819`. Alla ingår i verifierad main. |
