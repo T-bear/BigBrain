@@ -37,14 +37,16 @@ och ofullständigt bygg-/omstartsflöde. Korrigering i samma PR är offline-veri
 andra T2-reviewvarvet och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
 bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
 
-Sista kompatibilitetskontrollen 2026-11-02 av `e3f5e3b` och main `e7e81d2`:
-API/Web är healthy vid skrivskyddad inspektion, men STANDARD är **BLOCKED** av olika
-Compose-ursprung, skyddad API-konfiguration och obestyrkt BigBrain-ursprung för Web.
-Webs tidigare rapporterade OCI-revision tillhör nginx upstream. `git_guard()` korrigeras
-i samma PR för respektive apps egen runtime-baslinje; 150 offline-tester PASS, utan
-undantag för okänt ursprung eller förbjudna deltan. [Befintligt spårunderlag](policy/lanes.md#skrivskyddad-kompatibilitetskontroll-2026-11-02)
-bevarar image-ID:n, konkreta stopp och verifieringsgränser. Ingen root-autentisering,
-merge eller deployment; korrigerad kandidat kräver fortsatt oberoende T2-granskning.
+Avgränsad kompatibilitetsanpassning 2026-11-02 efter `46aec78`, mot main `e7e81d2`:
+API/Web är healthy med oförändrad runtime. Verklig skrivskyddad delverifiering av
+Compose-rekonstruktion, båda runtime-hasharna, exakt Web-image/BuildKit-revision och
+`/host-timesync`-montering **PASS**. 171 offline-tester PASS; okänt/motsägande underlag
+blockeras. Den ärvda Web-etiketten tillhör nginx; separat BuildKit-underlag binder den
+körande imagen till accepterade `8029bb2`. [Befintligt spårunderlag](policy/lanes.md#skrivskyddad-kompatibilitetskontroll-2026-11-02)
+bevarar tidigare stopp, image-ID:n och verifieringsgränser. Full preflight/release är
+fortfarande **BLOCKED** av ej accepterade PR:er och återstående driftgrindar; start-/
+omstartsprov, backup och produktionsbyte är inte körda. Ingen root-autentisering,
+merge eller deployment; korrigerad kandidat kräver oberoende T2-granskning.
 
 | Tillstånd | Verifierad eller dokumenterad evidens |
 | --- | --- |

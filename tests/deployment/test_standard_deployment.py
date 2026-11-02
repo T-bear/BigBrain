@@ -7,6 +7,7 @@ import os
 import runpy
 from pathlib import Path
 import sqlite3
+import stat
 import subprocess
 import sys
 import tarfile
@@ -73,7 +74,7 @@ class StandardTests(unittest.TestCase):
             patch.object(d, 'command', side_effect=AssertionError('No real command')),
             patch.object(d, 'docker', side_effect=self.docker),
             patch.object(d, 'inspect', side_effect=lambda cid: copy.deepcopy(next(c for c in self.runtime.values() if c['Id'] == cid))),
-            patch.object(d, 'git_guard'), patch.object(d, 'http_health'),
+            patch.object(d, 'git_guard', return_value={}), patch.object(d, 'http_health'),
             patch.object(self.dep, 'current', side_effect=lambda role: copy.deepcopy(self.runtime[role])),
             patch.object(self.dep, 'others', return_value=self.dep.other_snapshot),
             patch.object(self.dep, 'compose', side_effect=self.compose),
@@ -107,6 +108,7 @@ class StandardTests(unittest.TestCase):
     def compose(self, path, *args, **kwargs):
         self.calls.append(('compose', args))
         if args[:2] == ('config', '--hash'):
+            if args[-1] == 'web': return b'web web-hash\n'
             return b'api api-hash\nweb web-hash\n'
         if args[0] == 'config':
             if path == self.source:
@@ -272,6 +274,94 @@ class StandardTests(unittest.TestCase):
         self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = '/one'
         self.dep.source = None
         with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'): self.dep.discover_compose()
+
+    def mixed_compose(self):
+        self.source = self.root / 'compose.yaml'
+        self.source.write_text('{}')
+        for role, c in self.runtime.items():
+            c['Config']['Labels'].update({
+                'com.docker.compose.project.config_files': str(self.source) if role == 'web' else
+                    '/var/lib/bigbrain-approved-ops/runs/legacy/release.compose.json',
+                'com.docker.compose.project.working_dir': str(self.root)})
+        self.runtime['api']['Config']['Env'] = ['SECRET=literal$VALUE${name}',
+            'Finance__Enabled=false', 'Media__Librarr__DirectAudioImportEnabled=true']
+        self.dep.source = None
+        self.config['services']['api'].update(user='1654', command=['original'],
+            volumes=[{'type': 'bind', 'source': '/original', 'target': '/original', 'read_only': True}],
+            environment={'Media__Librarr__DirectAudioImportEnabled': 'false'})
+
+    def model(self, config, *args):
+        if args[:2] == ('config', '--hash'): return b'api api-hash\nweb web-hash\n'
+        return json.dumps(config).encode()
+
+    def test_mixed_compose_preserves_runtime_environment_and_all_other_inputs(self):
+        self.mixed_compose()
+        previous = copy.deepcopy(self.config)
+        with patch.object(self.dep, 'compose_model', side_effect=self.model):
+            result = self.dep.configuration(self.runtime)
+        api = result['services']['api']
+        self.assertEqual(api['environment'], {'SECRET': 'literal$$VALUE$${name}', 'Finance__Enabled': 'false',
+            'Media__Librarr__DirectAudioImportEnabled': 'true'})
+        for key in ('user', 'command', 'volumes', 'networks'):
+            self.assertEqual(api[key], previous['services']['api'][key])
+        self.assertEqual(result['services']['web'], previous['services']['web'])
+        self.assertEqual(result['networks'], previous['networks'])
+        self.assertFalse(list(self.state.iterdir()))
+
+    def test_reconstruction_does_not_accept_unmatched_runtime_hashes(self):
+        for role in d.ROLES:
+            with self.subTest(role=role):
+                self.mixed_compose()
+                self.runtime[role]['Config']['Labels']['com.docker.compose.config-hash'] = 'wrong'
+                with patch.object(self.dep, 'compose_model', side_effect=self.model):
+                    with self.assertRaisesRegex(d.Blocked, 'ComposeRuntimeMismatch'):
+                        self.dep.configuration(self.runtime)
+                self.runtime[role]['Config']['Labels']['com.docker.compose.config-hash'] = role + '-hash'
+
+    def test_reconstruction_rejects_missing_duplicate_or_malformed_environment(self):
+        for env in ([], ['NO_VALUE'], ['X=one', 'X=two'], [None]):
+            with self.subTest(env=env):
+                self.mixed_compose()
+                self.runtime['api']['Config']['Env'] = env
+                with self.assertRaisesRegex(d.Blocked, 'RuntimeEnvironment'):
+                    self.dep.configuration(self.runtime)
+
+    def test_reconstruction_rejects_unrecognized_origin_or_changed_snapshot(self):
+        self.mixed_compose()
+        self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = '/unknown/compose.yaml'
+        with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'): self.dep.configuration(self.runtime)
+        self.mixed_compose()
+        def changed(config, *args):
+            if args[:2] == ('config', '--hash'): return b'api api-hash\nweb web-hash\n'
+            changed = copy.deepcopy(config)
+            changed['services']['api']['user'] = '0'
+            return json.dumps(changed).encode()
+        with patch.object(self.dep, 'compose_model', side_effect=changed):
+            with self.assertRaisesRegex(d.Blocked, 'SnapshotChanged'): self.dep.configuration(self.runtime)
+
+    def test_private_snapshot_mode_does_not_depend_on_callers_umask(self):
+        previous = os.umask(0)
+        try: d.save(self.state / 'private.json', {'secret': 'synthetic'})
+        finally: os.umask(previous)
+        self.assertEqual((self.state / 'private.json').stat().st_mode & 0o777, 0o600)
+
+    def test_changed_build_provenance_stops_before_container_switch(self):
+        with patch.object(d, 'git_guard', return_value={'web': 'changed'}):
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceChanged'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'PRE_SWITCH_FAILED')
+        self.assertFalse(any(cmd == 'compose' and args[0] == 'up' for cmd, args in self.calls))
+
+    def test_timesync_identity_is_rechecked_before_and_after_switch(self):
+        self.dep.timesync = (9, 42)
+        with patch.object(d, 'timesync_identity', return_value=(9, 43)):
+            with self.assertRaisesRegex(d.Blocked, 'TimesyncIdentityMismatch'): self.dep.unchanged()
+            with self.assertRaisesRegex(d.Blocked, 'TimesyncIdentityMismatch'):
+                d.Deployment.wait_healthy(self.dep, 'api', OLD)
+
+    def test_disappeared_explicit_env_file_is_not_replaced_with_empty_input(self):
+        self.dep.env_files = [self.root / 'missing.env']
+        with self.assertRaisesRegex(d.Blocked, 'ComposeEnvironmentMissing'):
+            d.Deployment.compose(self.dep, self.source, 'config', '--format', 'json')
 
     def test_readonly_preflight_without_images_does_not_build(self):
         self.dep.images = {}
@@ -689,6 +779,157 @@ class GitGuardTests(unittest.TestCase):
     def test_both_runtime_baselines_are_required(self):
         del self.originals['web']
         with self.assertRaisesRegex(d.Blocked, 'MissingRuntimeBaseline'): self.guard()
+
+    def test_proven_legacy_web_revision_is_checked_against_accepted_ancestry(self):
+        labels = self.originals['web']['Config']['Labels']
+        labels.update({'org.opencontainers.image.source': d.NGINX_SOURCE,
+                       'org.opencontainers.image.revision': 'c4edb2fc1a693a7bdae4ab2bbc1c7fe63622290f'})
+        with patch.object(d, 'legacy_web_provenance', return_value={'image': OLD, 'revision': self.web_base}) as proof:
+            self.guard()
+            proof.assert_called_once_with(OLD)
+        branch = self.git('commit-tree', 'HEAD^{tree}', '-p', self.api_base, '-m', 'unaccepted')
+        with patch.object(d, 'legacy_web_provenance', return_value={'image': OLD, 'revision': branch}):
+            with self.assertRaisesRegex(d.Blocked, 'OldRevisionNotAccepted'): self.guard()
+        with patch.object(d, 'legacy_web_provenance', side_effect=d.Blocked('BuildProvenanceAmbiguousOrMissing')):
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceAmbiguousOrMissing'): self.guard()
+
+
+class CompatibilityEvidenceTests(unittest.TestCase):
+    def setUp(self):
+        self.ref = 'a' * 25
+        self.rows = [{'status': 'Completed', 'name': 'src/BigBrain.Web', 'ref': 'default/default/' + self.ref}]
+        self.record = {'Ref': self.ref, 'Status': 'completed', 'Dockerfile': 'src/BigBrain.Web/Dockerfile',
+            'VCSRevision': REV, 'VCSRepository': 'git@github.com:T-bear/BigBrain.git', 'Attachments': [
+                {'Digest': OLD, 'Type': 'application/vnd.oci.image.index.v1+json'},
+                {'Digest': NEW, 'Type': 'https://slsa.dev/provenance/v1'}]}
+        self.proof = {'buildDefinition': {
+            'buildType': 'https://github.com/moby/buildkit/blob/master/docs/attestations/slsa-definitions.md',
+            'externalParameters': {'configSource': {'path': 'Dockerfile'}, 'request': {'root': {'request': {'args': {
+            'vcs:revision': REV, 'vcs:source': self.record['VCSRepository']}}}}}}, 'runDetails': {'metadata': {
+            'buildkit_metadata': {'vcs': {'revision': REV, 'source': self.record['VCSRepository']}},
+            'buildkit_completeness': {'request': True}}}}
+        self.calls = []
+
+    def docker(self, *args, **kwargs):
+        self.calls.append(args)
+        self.assertEqual(args[:2], ('buildx', 'history'))
+        self.assertIn('default', args)
+        if args[2] == 'ls': return b'\n'.join(json.dumps(x).encode() for x in self.rows)
+        if args[3] == 'attachment':
+            self.assertEqual(args[-1], NEW)  # digest selection, never a movable type/tag
+            return json.dumps(self.proof).encode()
+        return json.dumps(self.record).encode()
+
+    def prove(self):
+        with patch.object(d, 'image_info', return_value={'Config': {'Labels': {'org.opencontainers.image.source': d.NGINX_SOURCE}}}), \
+                patch.object(d, 'docker', side_effect=self.docker):
+            return d.legacy_web_provenance(OLD)
+
+    def test_buildkit_binds_exact_image_record_proof_and_revision(self):
+        result = self.prove()
+        self.assertEqual((result['image'], result['revision'], result['provenanceDigest']), (OLD, REV, NEW))
+        self.assertEqual(len(self.calls), 3)
+
+    def test_tag_label_or_other_image_cannot_substitute_for_build_result(self):
+        for image in ('repo:latest', NEW):
+            self.record['Attachments'][0]['Digest'] = image
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceAmbiguousOrMissing'): self.prove()
+
+    def test_missing_or_duplicate_matching_records_are_rejected(self):
+        rows = self.rows
+        for changed in ([], rows + rows):
+            self.rows = changed
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceAmbiguousOrMissing'): self.prove()
+
+    def test_wrong_repository_revision_dockerfile_or_build_state_blocks(self):
+        for key, bad in (('VCSRepository', 'https://example.invalid/repo'), ('VCSRevision', REV + '-dirty'),
+                         ('Dockerfile', 'unknown/Dockerfile'), ('Status', 'error'), ('Ref', 'b' * 25)):
+            with self.subTest(key=key):
+                previous = self.record[key]
+                self.record[key] = bad
+                with self.assertRaises(d.Blocked): self.prove()
+                self.record[key] = previous
+
+    def test_missing_or_conflicting_attestation_blocks(self):
+        attestation = self.record['Attachments'].pop()
+        with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceMissing'): self.prove()
+        self.record['Attachments'].append(attestation)
+        vcs = self.proof['runDetails']['metadata']['buildkit_metadata']['vcs']
+        for key in ('revision', 'source'):
+            original = vcs[key]
+            vcs[key] = 'contradiction'
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceMismatch'): self.prove()
+            vcs[key] = original
+        self.proof['runDetails']['metadata']['buildkit_completeness']['request'] = False
+        with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceMismatch'): self.prove()
+
+    def test_unknown_provenance_format_or_build_definition_blocks(self):
+        for key, value in (('buildType', 'unknown'), ('externalParameters', {})):
+            prior = self.proof['buildDefinition'][key]
+            self.proof['buildDefinition'][key] = value
+            with self.assertRaisesRegex(d.Blocked, 'BuildProvenanceMismatch'): self.prove()
+            self.proof['buildDefinition'][key] = prior
+
+    def mount_fixture(self):
+        c = container('api')
+        c['Mounts'] = [{'Type': 'bind', 'Source': '/run/systemd/timesync', 'Destination': '/host-timesync',
+                        'RW': False, 'Propagation': 'rprivate'}]
+        service = {'volumes': [{'type': 'bind', 'source': '/run/systemd/timesync', 'target': '/host-timesync', 'read_only': True}]}
+        return c, service
+
+    def layer(self, c, service, diff=b'A /host-timesync\n', identity=b'9:42:41ed', host_stats=None, role='api'):
+        info = os.stat_result((stat.S_IFDIR | 0o755, 42, 9, 1, 0, 0, 0, 0, 0, 0))
+        def docker(*args, **kw):
+            if args[0] == 'diff': return diff
+            self.assertEqual(args, ('exec', c['Id'], 'stat', '-c', '%d:%i:%f', '/host-timesync'))
+            return identity
+        with patch.object(d, 'docker', side_effect=docker), patch.object(d.backup, 'no_symlinks'), \
+                patch.object(Path, 'stat', side_effect=host_stats or [info, info]):
+            return d.writable_layer(role, c, service)
+
+    def test_only_declared_readonly_timesync_mount_with_matching_identity_passes(self):
+        c, service = self.mount_fixture()
+        self.assertEqual(self.layer(c, service), (9, 42))
+
+    def test_missing_writable_wrong_source_or_propagated_mount_blocks(self):
+        for target, key, bad in (('live', 'RW', True), ('live', 'Source', '/elsewhere'),
+                                 ('live', 'Type', 'volume'), ('live', 'Propagation', 'shared'),
+                                 ('declared', 'read_only', False), ('declared', 'source', '/elsewhere')):
+            c, service = self.mount_fixture()
+            value = c['Mounts'][0] if target == 'live' else service['volumes'][0]
+            value[key] = bad
+            with self.assertRaisesRegex(d.Blocked, 'TimesyncMountMismatch'): self.layer(c, service)
+        c, service = self.mount_fixture()
+        service['volumes'] = []
+        with self.assertRaisesRegex(d.Blocked, 'TimesyncMountMissing'): self.layer(c, service)
+
+    def test_changed_inode_device_non_directory_or_missing_stat_blocks(self):
+        c, service = self.mount_fixture()
+        for value in (b'9:43:41ed', b'10:42:41ed', b'9:42:81a4', b'9:42:a1ff', b''):
+            with self.assertRaises(d.Blocked): self.layer(c, service, identity=value)
+
+    def test_timesync_host_replacement_during_verification_blocks(self):
+        c, service = self.mount_fixture()
+        before = os.stat_result((stat.S_IFDIR | 0o755, 42, 9, 1, 0, 0, 0, 0, 0, 0))
+        after = os.stat_result((stat.S_IFDIR | 0o755, 43, 9, 1, 0, 0, 0, 0, 0, 0))
+        with self.assertRaisesRegex(d.Blocked, 'TimesyncIdentityMismatch'):
+            self.layer(c, service, host_stats=[before, after])
+
+    def test_timesync_symlink_source_is_rejected(self):
+        c, service = self.mount_fixture()
+        with patch.object(d.backup, 'no_symlinks', side_effect=d.backup.Blocked('Symlink')):
+            with self.assertRaises(d.backup.Blocked): d.timesync_identity(c, service)
+
+    def test_all_other_nonvolatile_changes_still_block(self):
+        c, service = self.mount_fixture()
+        for diff in (b'C /host-timesync', b'D /host-timesync', b'A /host-timesync/extra',
+                     b'A /host-timesync-other', b'C /app/appsettings.json', b'A /var/cache/nginx-other',
+                     b'A /host-timesync\nC /etc/passwd'):
+            with self.subTest(diff=diff):
+                with self.assertRaisesRegex(d.Blocked, 'RollbackImageHasRuntimeRepairs'):
+                    self.layer(c, service, diff=diff)
+        with self.assertRaisesRegex(d.Blocked, 'RollbackImageHasRuntimeRepairs'):
+            self.layer(c, service, role='web')
 
 
 if __name__ == '__main__':

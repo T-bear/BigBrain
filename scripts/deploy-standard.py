@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import stat
 import shutil
 import sqlite3
 import subprocess
@@ -32,6 +33,9 @@ MEMORY_FETCH = '283060d41f4494d2e5606f7c857fb82972e86094'
 CHECKS = {'backend', 'frontend', 'documentation', 'secrets'}
 SHA = r'[0-9a-f]{40}'
 IMAGE = r'sha256:[0-9a-f]{64}'
+NGINX_SOURCE = 'https://github.com/nginx/docker-nginx-unprivileged'
+REPOSITORIES = {'git@github.com:T-bear/BigBrain.git', 'https://github.com/T-bear/BigBrain.git',
+                'https://github.com/T-bear/BigBrain'}
 # Intentionally narrow initial lane. Expansion requires review, never a path-only safety claim.
 APP_FILES = {
     'src/BigBrain.Api/MealPlanner/SchoolMealService.cs',
@@ -66,10 +70,11 @@ def need(value, reason):
         raise Blocked(reason)
 
 
-def command(args, timeout=30, mutation=False):
+def command(args, timeout=30, mutation=False, input_data=None):
     # Retain no raw stdout/stderr on failure: Compose/inspect may contain secrets.
     try:
-        result = subprocess.run(args, cwd=ROOT, stdin=subprocess.DEVNULL,
+        stream = {'stdin': subprocess.DEVNULL} if input_data is None else {'input': input_data}
+        result = subprocess.run(args, cwd=ROOT, **stream,
                                 capture_output=True, timeout=timeout, check=False)
     except (subprocess.TimeoutExpired, KeyboardInterrupt):
         raise Uncertain('CommandInterrupted') if mutation else Blocked('CommandInterrupted') from None
@@ -77,9 +82,10 @@ def command(args, timeout=30, mutation=False):
     return result.stdout
 
 
-def docker(*args, timeout=30, mutation=False):
+def docker(*args, timeout=30, mutation=False, input_data=None):
     # Fixed local daemon, never a caller-selected context/remote host.
-    return command(['docker', '--host', 'unix:///var/run/docker.sock', *args], timeout, mutation)
+    extra = {} if input_data is None else {'input_data': input_data}
+    return command(['docker', '--host', 'unix:///var/run/docker.sock', *args], timeout, mutation, **extra)
 
 
 def inspect(identifier):
@@ -140,6 +146,53 @@ def ci_green(revision):
         need(runs and all(c['status'] == 'completed' and c['conclusion'] == 'success' for c in runs), 'CiNotGreen')
 
 
+def legacy_web_provenance(image):
+    """Read only the existing local builder; no tag, supplied receipt or label fallback."""
+    prior = image_info(image)
+    need(prior['Config'].get('Labels', {}).get('org.opencontainers.image.source') == NGINX_SOURCE,
+         'LegacyWebSourceUnknown')
+    rows = [json.loads(line) for line in docker('buildx', 'history', 'ls', '--builder', 'default',
+            '--no-trunc', '--format', 'json').splitlines()]
+    matches = []
+    for row in rows:
+        if row.get('status') != 'Completed' or 'bigbrain.web' not in row.get('name', '').lower():
+            continue
+        need(re.fullmatch(r'default/default/[a-z0-9]{25}', row.get('ref', '')), 'BuildRecordLocationUnknown')
+        ref = row['ref'].split('/')[-1]
+        raw = docker('buildx', 'history', 'inspect', '--builder', 'default', '--format', 'json', ref)
+        record = json.loads(raw)
+        attachments = record.get('Attachments', [])
+        images = [a for a in attachments if a.get('Digest') == image and a.get('Type') in
+                  {'application/vnd.oci.image.index.v1+json', 'application/vnd.oci.image.manifest.v1+json'}]
+        if not images:
+            continue
+        need(len(images) == 1 and record.get('Status') == 'completed'
+             and record.get('Ref') == ref and record.get('Dockerfile') == 'src/BigBrain.Web/Dockerfile'
+             and record.get('VCSRepository') in REPOSITORIES, 'BuildRecordMismatch')
+        revision = record.get('VCSRevision', '')
+        need(re.fullmatch(SHA, revision), 'BuildRevisionUnknown')
+        attestations = [a for a in attachments if a.get('Type') == 'https://slsa.dev/provenance/v1']
+        need(len(attestations) == 1 and re.fullmatch(IMAGE, attestations[0].get('Digest', '')), 'BuildProvenanceMissing')
+        raw_proof = docker('buildx', 'history', 'inspect', 'attachment', '--builder', 'default',
+                           ref, attestations[0]['Digest'])
+        proof = json.loads(raw_proof)
+        definition, details = proof.get('buildDefinition', {}), proof.get('runDetails', {})
+        args = definition.get('externalParameters', {}).get('request', {}).get('root', {}).get('request', {}).get('args', {})
+        metadata = details.get('metadata', {})
+        vcs = metadata.get('buildkit_metadata', {}).get('vcs', {})
+        need(definition.get('buildType') == 'https://github.com/moby/buildkit/blob/master/docs/attestations/slsa-definitions.md'
+             and definition.get('externalParameters', {}).get('configSource', {}).get('path') == 'Dockerfile'
+             and args.get('vcs:revision') == vcs.get('revision') == revision
+             and args.get('vcs:source') == vcs.get('source') == record['VCSRepository']
+             and metadata.get('buildkit_completeness', {}).get('request') is True,
+             'BuildProvenanceMismatch')
+        # Preserve raw builder evidence privately on execute, never print it.
+        matches.append({'image': image, 'revision': revision, 'ref': ref,
+                        'record': record, 'provenanceDigest': attestations[0]['Digest'], 'provenance': proof})
+    need(len(matches) == 1, 'BuildProvenanceAmbiguousOrMissing')
+    return matches[0]
+
+
 def git_guard(revision, originals):
     need(re.fullmatch(SHA, revision), 'InvalidRevision')
     remote = command(['git', 'ls-remote', 'origin', 'refs/heads/main']).decode().split()
@@ -148,13 +201,18 @@ def git_guard(revision, originals):
     need(not command(['git', 'status', '--porcelain', '--untracked-files=no']).strip(), 'TrackedChanges')
     command(['git', 'merge-base', '--is-ancestor', MEMORY_FETCH, revision])
     need(set(originals) == set(ROLES), 'MissingRuntimeBaseline')
+    evidence = {}
     for role, old in originals.items():
         base = old['Config']['Labels'].get('org.opencontainers.image.revision', '')
         need(re.fullmatch(SHA, base), 'OldRevisionUnknown')
         try:
             need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
         except Blocked:
-            raise Blocked('OldRevisionUnavailable') from None
+            if role != 'web' or old['Config']['Labels'].get('org.opencontainers.image.source') != NGINX_SOURCE:
+                raise Blocked('OldRevisionUnavailable') from None
+            evidence[role] = legacy_web_provenance(old['Image'])
+            base = evidence[role]['revision']
+            need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
         try:
             command(['git', 'merge-base', '--is-ancestor', base, revision])
         except Blocked:
@@ -169,6 +227,42 @@ def git_guard(revision, originals):
             need(path in APP_FILES or path.startswith(('docs/', 'tests/', 'scripts/'))
                  or path in {'AGENTS.md', '.github/workflows/ci.yml'}, 'OutsideStandardScope')
     ci_green(revision)
+    return evidence
+
+
+def timesync_identity(container, service):
+    declared = [m for m in service.get('volumes', []) if m.get('target') == '/host-timesync']
+    actual = [m for m in container['Mounts'] if m['Destination'] == '/host-timesync']
+    need(len(declared) == len(actual) == 1, 'TimesyncMountMissing')
+    mount, live = declared[0], actual[0]
+    source = Path('/run/systemd/timesync')
+    need(mount.get('type') == live.get('Type') == 'bind'
+         and mount.get('source') == live.get('Source') == str(source)
+         and mount.get('read_only') is True and live.get('RW') is False
+         and live.get('Propagation') == 'rprivate'
+         and mount.get('bind', {}).get('propagation', 'rprivate') == 'rprivate', 'TimesyncMountMismatch')
+    backup.no_symlinks(source)
+    before = source.stat()
+    need(stat.S_ISDIR(before.st_mode), 'TimesyncNotDirectory')
+    # stat runs as the existing container user; no writes, shell, root override or restart.
+    fields = docker('exec', container['Id'], 'stat', '-c', '%d:%i:%f', '/host-timesync').decode().strip().split(':')
+    need(len(fields) == 3 and all(re.fullmatch(r'[0-9a-f]+', x) for x in fields), 'TimesyncIdentityUnknown')
+    after = source.stat()
+    identity = (before.st_dev, before.st_ino)
+    need(identity == (after.st_dev, after.st_ino) == (int(fields[0]), int(fields[1]))
+         and stat.S_ISDIR(int(fields[2], 16)), 'TimesyncIdentityMismatch')
+    return identity
+
+
+def writable_layer(role, container, service):
+    identity = None
+    for row in docker('diff', container['Id']).decode().splitlines():
+        if role == 'api' and row == 'A /host-timesync':
+            identity = timesync_identity(container, service)
+            continue
+        need(re.fullmatch(r'[ACD] /.+', row) and any(row[2:] == p or row[2:].startswith(p + '/')
+             for p in ('/tmp', '/var/cache/nginx', '/var/run', '/run')), 'RollbackImageHasRuntimeRepairs')
+    return identity
 
 
 def release_config(config, images):
@@ -217,7 +311,8 @@ def snapshot_matches(rendered, expected):
 
 def save(path, value):
     # Exclusive artifacts: no existing file or recovery evidence is overwritten.
-    with path.open('x', encoding='utf8') as stream:
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, 'w', encoding='utf8') as stream:
         json.dump(value, stream, sort_keys=True, indent=2)
         stream.flush()
         os.fsync(stream.fileno())
@@ -257,11 +352,21 @@ class Deployment:
         self.project_directory = compose_file.parent if compose_file else None
         self.probes = set()
         self.env_files = []
+        self.reconstruct = False
+        self.provenance = {}
+        self.timesync = None
+
+    def compose_model(self, config, *args):
+        return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
+                      '--env-file', '/dev/null', '-f', '-', *args, timeout=120,
+                      input_data=json.dumps(config).encode())
 
     def compose(self, path, *args, mutation=False):
         files = self.source_files if path == self.source else [path]
         # Resolve ordinary YAML/overrides and .env ourselves; no prepared JSON required.
         env_files = self.env_files or [self.project_directory / '.env']
+        if path == self.source and self.env_files:
+            need(all(env.is_file() for env in self.env_files), 'ComposeEnvironmentMissing')
         if path != self.source:
             env_files = [Path('/dev/null')]
         env_args = [arg for env in env_files for arg in ('--env-file', str(env if env.exists() else Path('/dev/null')))]
@@ -275,18 +380,50 @@ class Deployment:
             return
         labels = [self.current(r)['Config']['Labels'] for r in ROLES]
         keys = ('com.docker.compose.project.config_files', 'com.docker.compose.project.working_dir')
-        need(all(labels[0].get(k) and labels[0].get(k) == labels[1].get(k) for k in keys), 'ComposeProvenanceMissing')
-        self.source_files = [Path(x) for x in labels[0][keys[0]].split(',')]
+        need(all(l.get(k) for l in labels for k in keys), 'ComposeProvenanceMissing')
+        self.reconstruct = any(labels[0][k] != labels[1][k] for k in keys)
+        if self.reconstruct:
+            # Only the diagnosed legacy API + ordinary Web combination is supported.
+            need(re.fullmatch(r'/var/lib/bigbrain-approved-ops/runs/[a-zA-Z0-9_-]+/release\.compose\.json', labels[0][keys[0]])
+                 and Path(labels[1][keys[0]]).name == 'compose.yaml'
+                 and ',' not in labels[1][keys[0]], 'ComposeProvenanceMissing')
+        selected = labels[1] if self.reconstruct else labels[0]
+        self.source_files = [Path(x) for x in selected[keys[0]].split(',')]
         self.source = self.source_files[0]
         env_key = 'com.docker.compose.project.environment_file'
-        need(labels[0].get(env_key, '') == labels[1].get(env_key, ''), 'ComposeEnvironmentMismatch')
-        self.env_files = [Path(x) for x in labels[0].get(env_key, '').split(',') if x]
+        need(self.reconstruct or labels[0].get(env_key, '') == labels[1].get(env_key, ''), 'ComposeEnvironmentMismatch')
+        self.env_files = [Path(x) for x in selected.get(env_key, '').split(',') if x]
         for path in self.env_files:
             need(path.is_absolute() and path.is_file(), 'ComposeEnvironmentMissing')
             backup.no_symlinks(path)
-        self.project_directory = Path(labels[0][keys[1]])
+        self.project_directory = Path(selected[keys[1]])
         need(self.project_directory.is_absolute(), 'ComposeDirectoryInvalid')
         backup.no_symlinks(self.project_directory)
+
+    def configuration(self, originals):
+        self.discover_compose()
+        for path in self.source_files:
+            need(path.is_absolute() and path.is_file(), 'ComposeMissing')
+            backup.no_symlinks(path)
+        config = json.loads(self.compose(self.source, 'config', '--format', 'json'))
+        if self.reconstruct:
+            web_hash = self.compose(self.source, 'config', '--hash', 'web').decode().split()
+            need(web_hash == ['web', originals['web']['Config']['Labels'].get('com.docker.compose.config-hash')], 'ComposeRuntimeMismatch')
+            api = config['services']['api']
+            api['image'] = originals['api']['Image']
+            api.setdefault('labels', {})['org.opencontainers.image.revision'] = originals['api']['Config']['Labels']['org.opencontainers.image.revision']
+            env = originals['api']['Config']['Env']
+            need(env and all(isinstance(x, str) and re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', x) for x in env), 'RuntimeEnvironmentUnknown')
+            pairs = [x.split('=', 1) for x in env]
+            need(len({k for k, v in pairs}) == len(pairs), 'RuntimeEnvironmentAmbiguous')
+            api['environment'] = {k: v.replace('$', '$$') for k, v in pairs}
+            hashes = dict(line.split() for line in self.compose_model(config, 'config', '--hash', '*').decode().splitlines())
+            rendered = json.loads(self.compose_model(config, 'config', '--format', 'json'))
+            need(snapshot_matches(rendered, copy.deepcopy(config)), 'SnapshotChanged')
+        else:
+            hashes = dict(line.split() for line in self.compose(self.source, 'config', '--hash', '*').decode().splitlines())
+        need(all(hashes.get(r) and hashes[r] == originals[r]['Config']['Labels'].get('com.docker.compose.config-hash') for r in ROLES), 'ComposeRuntimeMismatch')
+        return config
 
     def current(self, role):
         ids = docker('ps', '-aq', '--no-trunc', '--filter', f'label=com.docker.compose.project={PROJECT}',
@@ -312,32 +449,29 @@ class Deployment:
                  and fingerprint(current) == fingerprint(old)
                  and current['State']['StartedAt'] == old['State']['StartedAt'], 'RuntimeChanged')
             healthy(current)
+        if self.timesync is not None:
+            need(timesync_identity(self.current('api'), self.config['services']['api']) == self.timesync, 'TimesyncIdentityMismatch')
 
     def preflight(self):
-        self.discover_compose()
-        for path in self.source_files:
-            need(path.is_absolute() and path.is_file(), 'ComposeMissing')
-            backup.no_symlinks(path)
-        self.config = json.loads(self.compose(self.source, 'config', '--format', 'json'))
-        hashes = dict(line.split() for line in self.compose(self.source, 'config', '--hash', '*').decode().splitlines())
+        originals = {r: self.current(r) for r in ROLES}
+        self.config = self.configuration(originals)
         for role in ROLES:
-            old = self.current(role)
+            old = originals[role]
             healthy(old)
-            need(old['Config']['Labels'].get('com.docker.compose.config-hash') == hashes[role], 'ComposeRuntimeMismatch')
             prior = image_info(old['Image'])
             need(prior['Config'].get('Labels', {}).get('org.opencontainers.image.revision')
                  == old['Config']['Labels'].get('org.opencontainers.image.revision'), 'OldImageRevisionMismatch')
             need(all(old['Config'].get(k) == prior['Config'].get(k)
                      for k in ('User', 'Cmd', 'Entrypoint', 'WorkingDir')), 'RuntimeEntrypointOverride')
             # A healthy container repaired in its writable layer is not a safe rollback image.
-            diff = docker('diff', old['Id']).decode().splitlines()
-            need(not any(not (row[2:] == '/tmp' or row[2:].startswith(('/tmp/', '/var/cache/nginx', '/var/run/', '/run/')))
-                         for row in diff), 'RollbackImageHasRuntimeRepairs')
+            identity = writable_layer(role, old, self.config['services'][role])
+            if identity is not None:
+                self.timesync = identity
             for name in old['Config']['Env']:
                 need('VerifiedInitialNotBeforeUtc=' not in name, 'LegacyBootstrapPresent')
             self.originals[role] = old
             http_health(role)
-        git_guard(self.revision, self.originals)
+        self.provenance = git_guard(self.revision, self.originals)
         self.other_snapshot = self.others()
         self.rollback = release_config(self.config, {r: c['Image'] for r, c in self.originals.items()})
         self.release = copy.deepcopy(self.rollback)
@@ -363,7 +497,7 @@ class Deployment:
 
     def build_images(self):
         # No workspace/untracked file enters the context. Keep archive + base bindings.
-        git_guard(self.revision, self.originals)
+        need(git_guard(self.revision, self.originals) == self.provenance, 'BuildProvenanceChanged')
         archive = self.folder / 'source.tar'
         command(['git', 'archive', '--format=tar', '--output=' + str(archive), self.revision], timeout=120)
         source = self.folder / 'source'
@@ -524,6 +658,8 @@ class Deployment:
             c = self.current(role)
             need(c['Image'] == image and fingerprint(c) == fingerprint(self.originals[role]), 'ReplacementConfigChanged')
             need(c['State']['Running'] or c['State'].get('Restarting'), 'ReplacementExited')
+            if role == 'api' and self.timesync is not None and c['State']['Running']:
+                need(timesync_identity(c, self.config['services']['api']) == self.timesync, 'TimesyncIdentityMismatch')
             try:
                 healthy(c)
                 http_health(role)
@@ -560,6 +696,8 @@ class Deployment:
         sync_dir(self.state)
         record(self.folder, 'PREPARING')
         try:
+            save(self.folder / 'baseline.json', self.config)
+            save(self.folder / 'provenance.json', self.provenance)
             record(self.folder, 'BUILDING')
             self.build_images()
             save(self.folder / 'release.json', self.release)
@@ -577,7 +715,7 @@ class Deployment:
             save(self.folder / 'receipt.json', {'revision': self.revision, 'images': self.images,
                  'previous': {r: c['Image'] for r, c in self.originals.items()},
                  'backupId': folder.name, 'backupManifestSha256': digest})
-            git_guard(self.revision, self.originals)
+            need(git_guard(self.revision, self.originals) == self.provenance, 'BuildProvenanceChanged')
             self.unchanged()
             self.data_identity()
             for role in ROLES:
