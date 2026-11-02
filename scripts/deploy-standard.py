@@ -11,6 +11,7 @@ from contextlib import closing
 import fcntl
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -33,6 +34,9 @@ MEMORY_FETCH = '283060d41f4494d2e5606f7c857fb82972e86094'
 CHECKS = {'backend', 'frontend', 'documentation', 'secrets'}
 SHA = r'[0-9a-f]{40}'
 IMAGE = r'sha256:[0-9a-f]{64}'
+BACKUP_IMAGE = 'python@sha256:b658b05ce9c4eb97ec6fc19424818a1f31993659c2b505a532f470e83807815d'
+HELPER_HOME = Path('/tmp/bigbrain-standard-backup')
+IDENTITY_FIELDS = ('device', 'inode', 'uid', 'gid', 'mode')
 NGINX_SOURCE = 'https://github.com/nginx/docker-nginx-unprivileged'
 REPOSITORIES = {'git@github.com:T-bear/BigBrain.git', 'https://github.com/T-bear/BigBrain.git',
                 'https://github.com/T-bear/BigBrain'}
@@ -342,6 +346,122 @@ def no_pending_run(state):
         need(rows and json.loads(rows[-1])['phase'] in {'PASS', 'ROLLED_BACK', 'PRE_SWITCH_FAILED'}, 'PreviousRunNeedsReview')
 
 
+def volume_sources(container):
+    """Daemon metadata only; never traverse host production directories."""
+    need(container['Config'].get('User') in {'1654', '1654:1654'}, 'BackupApiUser')
+    selected = []
+    for target in backup.EXPECTED:
+        matches = [m for m in container['Mounts'] if m['Destination'] == target]
+        need(len(matches) == 1 and matches[0]['Type'] == 'volume', 'BackupMountMismatch')
+        mount = matches[0]
+        name, source = mount.get('Name', ''), mount['Source']
+        need(re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]+', name)
+             and source == str(Path(source)) and Path(source).is_absolute()
+             and '..' not in Path(source).parts, 'BackupVolumeIdentity')
+        info = json.loads(docker('volume', 'inspect', name))
+        need(len(info) == 1 and info[0]['Name'] == name and info[0]['Mountpoint'] == source
+             and info[0]['Driver'] == 'local' and not info[0].get('Options'), 'BackupVolumeIdentity')
+        for other in container['Mounts']:
+            if other is mount:
+                continue
+            path = Path(other['Source'])
+            need(other.get('Name') != name and not Path(source).is_relative_to(path)
+                 and not path.is_relative_to(source)
+                 and not other['Destination'].startswith(target + '/'), 'BackupVolumeOverlap')
+        selected.append({k: mount[k] for k in ('Type', 'Name', 'Source', 'Destination')})
+    need(len(selected) == 5, 'BackupVolumeCoverage')
+    return {'Mounts': selected}
+
+
+def data_snapshot(roots):
+    directories = {}
+    for target, (path, _) in roots.items():
+        backup.no_symlinks(path)
+        s = path.stat()
+        need(stat.S_ISDIR(s.st_mode) and s.st_uid == 1654 and s.st_gid == 0
+             and stat.S_IMODE(s.st_mode) == 0o755, 'BackupDirectoryIdentity')
+        directories[target] = [s.st_dev, s.st_ino, s.st_uid, s.st_gid, stat.S_IMODE(s.st_mode)]
+    inventory, _ = backup.inventory(roots)
+    need(all(v['uid'] == v['gid'] == 1654 and v['mode'] in (0o600, 0o644)
+             for v in inventory.values()), 'BackupDatabasePermissions')
+    schema = schemas(roots)  # mode=ro/query_only; SQLite may create WAL/SHM files.
+    for target, (path, _) in roots.items():
+        for name in backup.EXPECTED[target]:
+            for suffix in ('-wal', '-shm'):
+                sidecar = path / (name + suffix)
+                try:
+                    s = sidecar.lstat()
+                except FileNotFoundError:
+                    continue  # normal SQLite close/removal, not a required invariant
+                need(stat.S_ISREG(s.st_mode) and s.st_nlink == 1 and s.st_uid == s.st_gid == 1654
+                     and stat.S_IMODE(s.st_mode) in (0o600, 0o644), 'BackupSidecarPermissions')
+    return json.loads(json.dumps({'directories': directories, 'inventory': inventory, 'schemas': schema}))
+
+
+def same_data(before, after):
+    need(before['directories'] == after['directories'], 'BackupDirectoryChanged')
+    need(before['schemas'] == after['schemas'], 'SchemaChangedNoAutomaticRollback')
+    old, new = before['inventory'], after['inventory']
+    need(old.keys() == new.keys(), 'DatabaseCoverageChanged')
+    need(all(old[key][field] == new[key][field] for key in old for field in IDENTITY_FIELDS),
+         'DatabaseIdentityChanged')
+
+
+def backup_helper(request):
+    """Internal one-shot entrypoint, copied from accepted code; no new operator CLI."""
+    need(os.getuid() == os.getgid() == 1654 and os.getgroups() in ([], [1654]), 'BackupHelperUser')
+    need(sqlite3.sqlite_version == '3.53.4', 'BackupSQLiteVersion')
+    os.umask(0o077)
+    HELPER_HOME.mkdir(mode=0o700)  # exclusive; retained container layer, never tmpfs
+    record(HELPER_HOME, 'STARTED')
+    try:
+        roots = backup.sources(request['sources'])
+        before = data_snapshot(roots)
+        if request['baseline'] is not None:
+            same_data(request['baseline'], before)
+        save(HELPER_HOME / 'baseline.json', before)
+        result = {'data': before}
+        if request['backup']:
+            folder = backup.run_backup(roots, HELPER_HOME / 'backups', request['identity'],
+                                       lambda: same_data(before, data_snapshot(roots)))
+            result.update(backupId=folder.name, manifestSha256=backup.verify_set(folder))
+        same_data(before, data_snapshot(roots))
+        save(HELPER_HOME / 'result.json', result)
+        record(HELPER_HOME, 'PASS')
+    except BaseException:
+        record(HELPER_HOME, 'MANUAL_REVIEW_REQUIRED')
+        raise
+
+
+def helper_archive(request):
+    stream = io.BytesIO()
+    with tarfile.open(fileobj=stream, mode='w') as bundle:
+        files = {path: (ROOT / path).read_bytes() for path in
+                 ('scripts/deploy-standard.py', 'scripts/approved-ops/backup_support.py')}
+        files['request.json'] = json.dumps(request).encode()
+        for path, body in files.items():
+            info = tarfile.TarInfo('standard-code/' + path)
+            info.mode, info.size = 0o444, len(body)
+            bundle.addfile(info, io.BytesIO(body))
+    return stream.getvalue()
+
+
+def verify_private_copy(folder):
+    """docker cp without -a makes a separate caller-owned copy; persist before use."""
+    for path in [folder, *folder.rglob('*')]:
+        s = path.lstat()
+        need(s.st_uid == os.geteuid() and not path.is_symlink(), 'BackupCopyOwner')
+        if stat.S_ISDIR(s.st_mode):
+            need(stat.S_IMODE(s.st_mode) == 0o700, 'BackupCopyMode')
+            sync_dir(path)
+        else:
+            need(stat.S_ISREG(s.st_mode) and s.st_nlink == 1 and stat.S_IMODE(s.st_mode) == 0o600,
+                 'BackupCopyMode')
+            with path.open('rb') as stream:
+                os.fsync(stream.fileno())
+    sync_dir(folder.parent)
+
+
 class Deployment:
     def __init__(self, revision, images, compose_file, state):
         self.revision, self.images, self.source, self.state = revision, images, compose_file, state
@@ -355,6 +475,8 @@ class Deployment:
         self.reconstruct = False
         self.provenance = {}
         self.timesync = None
+        self.data = None
+        self.helper_incomplete = False
 
     def compose_model(self, config, *args):
         return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
@@ -481,10 +603,89 @@ class Deployment:
         for kind, noun in (('networks', 'network'), ('volumes', 'volume')):
             for value in self.release.get(kind, {}).values():
                 docker(noun, 'inspect', value['name'])
-        self.roots = backup.sources(self.originals['api'])
-        self.inventory, _ = backup.inventory(self.roots)
-        self.schemas = schemas(self.roots)
+        self.sources = volume_sources(self.originals['api'])
         self.unchanged()
+
+    def helper_data(self, make_backup=False):
+        need(self.folder is not None, 'HelperRequiresExecute')
+        need(os.geteuid() == 1000, 'BackupOperatorUser')
+        sources = volume_sources(self.current('api'))
+        need(sources == self.sources, 'BackupVolumesChanged')
+        image = json.loads(docker('image', 'inspect', BACKUP_IMAGE))[0]
+        need(BACKUP_IMAGE in image.get('RepoDigests', []) and not image['Config'].get('Volumes')
+             and re.fullmatch(IMAGE, image['Id']), 'BackupImageIdentity')
+        request = {'sources': sources, 'baseline': self.data, 'backup': make_backup,
+                   'identity': {'containerId': self.originals['api']['Id'], 'image': self.originals['api']['Image'],
+                                'revision': self.originals['api']['Config']['Labels']['org.opencontainers.image.revision']}}
+        name = 'bigbrain-standard-backup-' + uuid.uuid4().hex
+        folder = self.folder / name
+        folder.mkdir(mode=0o700)
+        save(folder / 'intent.json', {'name': name, 'image': BACKUP_IMAGE, 'sources': sources})
+        self.helper_incomplete = True
+        record(self.folder, 'HELPER_STARTED')
+        code = (
+            "import importlib.util,json,signal,sys; from pathlib import Path; "
+            "s=importlib.util.spec_from_file_location('standard','/standard-code/scripts/deploy-standard.py'); "
+            "m=importlib.util.module_from_spec(s); s.loader.exec_module(m); "
+            "signal.alarm(180); "
+            "m.backup_helper(json.loads(Path('/standard-code/request.json').read_text()))"
+        )
+        args = ['create', '--name', name, '--pull', 'never', '--user', '1654:1654',
+                '--network', 'none', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
+                '--restart', 'no', '--memory', '512m', '--memory-swap', '512m', '--cpus', '1',
+                '--pids-limit', '32', '--log-driver', 'none', '--entrypoint', 'python3']
+        for mount in sources['Mounts']:
+            args += ['--mount', f"type=volume,source={mount['Name']},target={mount['Source']},volume-nocopy"]
+        args += [BACKUP_IMAGE, '-I', '-B', '-c', code]
+        cid = docker(*args, mutation=True).decode().strip()
+        need(re.fullmatch(r'[0-9a-f]{64}', cid), 'BackupHelperIdentity')
+        self.probes.add(cid)
+        save(folder / 'identity.json', {'containerId': cid, 'imageId': image['Id']})
+        c = inspect(cid)
+        host = c['HostConfig']
+        need(c['Image'] == image['Id'] and c['Config']['User'] == '1654:1654'
+             and c['Config']['Entrypoint'] == ['python3'] and c['Config']['Cmd'] == ['-I', '-B', '-c', code]
+             and not c['State']['Running'] and host['NetworkMode'] == 'none'
+             and not host.get('Privileged') and not host.get('Binds') and not host.get('Devices')
+             and not host.get('GroupAdd') and not host.get('CapAdd') and not host.get('PortBindings')
+             and host.get('CapDrop') == ['ALL'] and host.get('SecurityOpt') == ['no-new-privileges']
+             and host['Memory'] == host['MemorySwap'] == 512 * 1024 * 1024
+             and host['NanoCpus'] == 1000000000 and host['PidsLimit'] == 32
+             and host['RestartPolicy']['Name'] == 'no' and not host.get('AutoRemove'), 'BackupHelperIsolation')
+        actual = sorted((m['Type'], m.get('Name'), m['Source'], m['Destination'], m['RW']) for m in c['Mounts'])
+        expected = sorted(('volume', m['Name'], m['Source'], m['Source'], True) for m in sources['Mounts'])
+        need(actual == expected, 'BackupHelperMounts')
+        docker('cp', '-', cid + ':/', input_data=helper_archive(request), mutation=True)
+        # The container exits after this one operation. Timeout/crash is never retried.
+        docker('start', '--attach', cid, timeout=210, mutation=True)
+        stopped = inspect(cid)
+        need(not stopped['State']['Running'] and not stopped['State']['OOMKilled']
+             and stopped['State']['ExitCode'] == 0, 'BackupHelperFailed')
+        output = folder / 'output'
+        output.mkdir(mode=0o700)
+        docker('cp', cid + ':' + str(HELPER_HOME) + '/.', str(output), timeout=120, mutation=True)
+        verify_private_copy(output)
+        result = json.loads((output / 'result.json').read_text())
+        journal = [json.loads(row)['phase'] for row in (output / 'journal.jsonl').read_text().splitlines()]
+        need(journal == ['STARTED', 'PASS'], 'BackupHelperJournal')
+        if self.data is not None:
+            same_data(self.data, result['data'])
+        if make_backup:
+            need(re.fullmatch(r'[0-9]{8}T[0-9]{6}Z-[0-9a-f]{32}', result['backupId']), 'BackupId')
+            backup_folder = output / 'backups' / result['backupId']
+            need(backup.verify_set(backup_folder) == result['manifestSha256'], 'BackupCopyMismatch')
+            manifest = json.loads((backup_folder / 'manifest.json').read_text())
+            need(manifest['runtime'] == request['identity'], 'BackupRuntimeMismatch')
+            self.data = result['data']
+        need(volume_sources(self.current('api')) == sources, 'BackupVolumesChanged')
+        self.helper_incomplete = False
+        record(self.folder, 'HELPER_VERIFIED')
+        return backup_folder if make_backup else result['data']
+
+    def backup_data(self):
+        folder = self.helper_data(make_backup=True)
+        self.unchanged()
+        return folder
 
     def bind_images(self):
         for role, old in self.originals.items():
@@ -646,11 +847,8 @@ class Deployment:
                     raise Uncertain('ProbeCleanupUncertain') from None
 
     def data_identity(self):
-        need(schemas(self.roots) == self.schemas, 'SchemaChangedNoAutomaticRollback')
-        after, _ = backup.inventory(self.roots)
-        need(after.keys() == self.inventory.keys(), 'DatabaseCoverageChanged')
-        for key, old in self.inventory.items():
-            need(all(after[key][k] == old[k] for k in ('device', 'inode', 'uid', 'gid', 'mode')), 'DatabaseIdentityChanged')
+        need(self.data is not None, 'BackupDataUnverified')
+        same_data(self.data, self.helper_data())
 
     def wait_healthy(self, role, image):
         deadline = time.monotonic() + 100
@@ -706,15 +904,13 @@ class Deployment:
             for name, expected in (('release', self.release), ('rollback', self.rollback)):
                 rendered = json.loads(self.compose(self.folder / (name + '.json'), 'config', '--format', 'json'))
                 need(snapshot_matches(rendered, copy.deepcopy(expected)), 'SnapshotChanged')
-            identity = {'containerId': self.originals['api']['Id'], 'image': self.originals['api']['Image'],
-                        'revision': self.originals['api']['Config']['Labels']['org.opencontainers.image.revision']}
-            folder = backup.run_backup(self.roots, self.state / 'backups', identity, self.unchanged)
+            folder = self.backup_data()
             digest = backup.verify_set(folder)
             self.prove_restartability(folder)
             need(backup.verify_set(folder) == digest, 'BackupChangedDuringProbe')
             save(self.folder / 'receipt.json', {'revision': self.revision, 'images': self.images,
                  'previous': {r: c['Image'] for r, c in self.originals.items()},
-                 'backupId': folder.name, 'backupManifestSha256': digest})
+                 'backupId': folder.name, 'backupPath': str(folder.relative_to(self.folder)), 'backupManifestSha256': digest})
             need(git_guard(self.revision, self.originals) == self.provenance, 'BuildProvenanceChanged')
             self.unchanged()
             self.data_identity()
@@ -727,7 +923,9 @@ class Deployment:
             need(self.others() == self.other_snapshot, 'OtherServiceChanged')
             record(self.folder, 'PASS')
         except BaseException as error:
-            if not self.changed:
+            if self.helper_incomplete:
+                record(self.folder, 'MANUAL_REVIEW_REQUIRED')
+            elif not self.changed:
                 record(self.folder, 'MANUAL_REVIEW_REQUIRED' if isinstance(error, (Uncertain, KeyboardInterrupt, SystemExit)) else 'PRE_SWITCH_FAILED')
             elif isinstance(error, (Uncertain, KeyboardInterrupt, SystemExit)):
                 record(self.folder, 'MANUAL_REVIEW_REQUIRED')
@@ -765,8 +963,8 @@ def main():
     deployment = Deployment(args.revision, {}, args.compose, state)
     if not args.execute:
         deployment.preflight()
-        print('PREFLIGHT PASS; no backup, deployment or acceptance performed')
-        return
+        print('PREFLIGHT BLOCKED: data inventory/schema/backup DEFERRED to separately authorized --execute; no mutations performed')
+        raise SystemExit(2)
     for folder in (state, Path.home() / '.local/state/bigbrain-web-deploy'):
         backup.no_symlinks(folder)
         folder.mkdir(mode=0o700, parents=True, exist_ok=True)

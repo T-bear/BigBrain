@@ -1,5 +1,6 @@
 """Offline T2 fault tests: synthetic SQLite/WAL and simulated Docker only."""
 import copy
+from contextlib import closing
 import io
 import importlib.util
 import json
@@ -7,11 +8,15 @@ import os
 import runpy
 from pathlib import Path
 import sqlite3
+import shutil
 import stat
 import subprocess
 import sys
 import tarfile
 import tempfile
+import threading
+import time
+import uuid
 import unittest
 from unittest.mock import patch
 
@@ -70,6 +75,7 @@ class StandardTests(unittest.TestCase):
         self.dep.roots = self.roots
         self.dep.inventory, _ = d.backup.inventory(self.roots)
         self.dep.schemas = d.schemas(self.roots)
+        self.dep.data = self.offline_snapshot()
         self.patches = [
             patch.object(d, 'command', side_effect=AssertionError('No real command')),
             patch.object(d, 'docker', side_effect=self.docker),
@@ -81,10 +87,20 @@ class StandardTests(unittest.TestCase):
             patch.object(self.dep, 'wait_healthy', side_effect=self.wait_healthy),
             patch.object(self.dep, 'build_images'),
             patch.object(self.dep, 'prove_restartability'),
+            patch.object(self.dep, 'backup_data', side_effect=self.offline_backup),
+            patch.object(self.dep, 'helper_data', side_effect=self.offline_snapshot),
+            patch.object(d, 'volume_sources', return_value={'Mounts': []}),
         ]
         for p in self.patches:
             p.start()
         self.fail = None
+
+    def offline_snapshot(self):
+        inventory, _ = d.backup.inventory(self.roots)
+        return json.loads(json.dumps(dict(directories={}, inventory=inventory, schemas=d.schemas(self.roots))))
+
+    def offline_backup(self):
+        return d.backup.run_backup(self.roots, self.dep.folder / 'backups', {}, self.dep.unchanged)
 
     def tearDown(self):
         for p in reversed(self.patches):
@@ -146,7 +162,7 @@ class StandardTests(unittest.TestCase):
         self.dep.execute()
         self.assertEqual(self.phases(), ['PREPARING', 'BUILDING', 'SWITCHING_API', 'SWITCHING_WEB', 'PASS'])
         receipt = json.loads((self.dep.folder / 'receipt.json').read_text())
-        folder = self.state / 'backups' / receipt['backupId']
+        folder = self.dep.folder / receipt['backupPath']
         self.assertEqual(d.backup.verify_set(folder), receipt['backupManifestSha256'])
         ups = [args[-1] for cmd, args in self.calls if cmd == 'compose' and args[0] == 'up']
         self.assertEqual(ups, ['api', 'web'])
@@ -518,7 +534,7 @@ class StandardTests(unittest.TestCase):
             with self.assertRaises(d.backup.Blocked): self.dep.execute()
         self.assertEqual(self.phases()[-1], 'PRE_SWITCH_FAILED')
         self.assertFalse(any(a[0] in ('stop', 'up') for _, a in self.calls))
-        self.assertTrue(list((self.state / 'backups').glob('*/manifest.json')))
+        self.assertTrue(list((self.dep.folder / 'backups').glob('*/manifest.json')))
 
     def test_failed_rollback_requires_manual_review(self):
         def check(role, image):
@@ -930,6 +946,348 @@ class CompatibilityEvidenceTests(unittest.TestCase):
                     self.layer(c, service, diff=diff)
         with self.assertRaisesRegex(d.Blocked, 'RollbackImageHasRuntimeRepairs'):
             self.layer(c, service, role='web')
+
+
+class BackupHelperTests(unittest.TestCase):
+    def setUp(self):
+        self.api = container('api')
+        self.api['Config']['User'] = '1654'
+        self.api['Mounts'] = [dict(Type='volume', Name='synthetic-' + str(i),
+            Source='/var/lib/docker/volumes/synthetic-' + str(i) + '/_data', Destination=t, RW=True)
+            for i, t in enumerate(d.backup.EXPECTED)]
+
+    def volume(self, *args, **kwargs):
+        self.assertEqual(args[:2], ('volume', 'inspect'))
+        m = next(m for m in self.api['Mounts'] if m.get('Name') == args[-1])
+        return json.dumps([dict(Name=m['Name'], Mountpoint=m['Source'], Driver='local', Options=None)]).encode()
+
+    def test_volume_validation_never_traverses_production_paths(self):
+        with patch.object(d, 'docker', side_effect=self.volume), \
+             patch.object(Path, 'stat', side_effect=AssertionError('host database access')):
+            result = d.volume_sources(self.api)
+        self.assertEqual(len(result['Mounts']), 5)
+        self.assertNotIn('/finance-data', [m['Destination'] for m in result['Mounts']])
+
+    def test_wrong_volume_name_mountpoint_driver_and_options_rejected(self):
+        for field, bad in [('Name', 'foreign'), ('Mountpoint', '/foreign'), ('Driver', 'nfs'), ('Options', {'device': '/finance'})]:
+            def wrong(*args):
+                value = json.loads(self.volume(*args)); value[0][field] = bad
+                return json.dumps(value).encode()
+            with self.subTest(field=field), patch.object(d, 'docker', side_effect=wrong):
+                with self.assertRaisesRegex(d.Blocked, 'BackupVolumeIdentity'): d.volume_sources(self.api)
+
+    def test_alias_finance_nested_missing_and_duplicate_mounts_rejected(self):
+        original = copy.deepcopy(self.api)
+        for fault in ('alias', 'nested', 'missing', 'duplicate', 'bind', 'root-user'):
+            self.api = copy.deepcopy(original)
+            if fault == 'alias': self.api['Mounts'].append(dict(self.api['Mounts'][0], Destination='/finance-data'))
+            if fault == 'nested': self.api['Mounts'].append(dict(Type='bind', Source='/elsewhere', Destination='/data/nested'))
+            if fault == 'missing': self.api['Mounts'].pop()
+            if fault == 'duplicate': self.api['Mounts'].append(copy.deepcopy(self.api['Mounts'][0]))
+            if fault == 'bind': self.api['Mounts'][0]['Type'] = 'bind'
+            if fault == 'root-user': self.api['Config']['User'] = '0'
+            with self.subTest(fault=fault), patch.object(d, 'docker', side_effect=self.volume):
+                with self.assertRaises(d.Blocked): d.volume_sources(self.api)
+
+    def test_same_data_allows_live_writes_but_rejects_identity_schema_or_directory_drift(self):
+        before = dict(directories={'/data': [1, 2, 1654, 0, 493]}, schemas={'db': ['table']},
+                      inventory={'db': dict(device=1, inode=2, uid=1654, gid=1654, mode=420, sourceBytes=100)})
+        after = copy.deepcopy(before); after['inventory']['db']['sourceBytes'] = 200
+        d.same_data(before, after)
+        for field in d.IDENTITY_FIELDS:
+            bad = copy.deepcopy(after); bad['inventory']['db'][field] += 1
+            with self.assertRaisesRegex(d.Blocked, 'DatabaseIdentityChanged'): d.same_data(before, bad)
+        for field in ('directories', 'schemas', 'inventory'):
+            bad = copy.deepcopy(before); bad[field] = {}
+            with self.assertRaises(d.Blocked): d.same_data(before, bad)
+
+    def test_default_cli_reports_deferred_without_any_mutation_or_host_data_read(self):
+        with patch.object(sys, 'argv', ['deploy-standard.py', '--revision', REV]), \
+             patch.object(d.Deployment, 'preflight') as preflight, \
+             patch.object(d.Deployment, 'execute', side_effect=AssertionError('execute')), \
+             patch.object(Path, 'mkdir', side_effect=AssertionError('mkdir')), \
+             patch.object(d, 'docker', side_effect=AssertionError('Docker mutation')), \
+             patch.object(d.backup, 'sources', side_effect=AssertionError('host data')), \
+             patch('sys.stdout', new_callable=io.StringIO) as output:
+            with self.assertRaises(SystemExit) as error: d.main()
+            self.assertEqual(error.exception.code, 2)
+            self.assertIn('DEFERRED', output.getvalue())
+            preflight.assert_called_once()
+
+    def test_copy_validation_rejects_symlink_wide_permissions_and_wrong_owner(self):
+        with tempfile.TemporaryDirectory() as name:
+            folder = Path(name); file = folder / 'data'; file.write_text('synthetic'); file.chmod(0o600)
+            d.verify_private_copy(folder)
+            file.chmod(0o644)
+            with self.assertRaisesRegex(d.Blocked, 'BackupCopyMode'): d.verify_private_copy(folder)
+            file.unlink(); file.symlink_to('/does-not-exist')
+            with self.assertRaisesRegex(d.Blocked, 'BackupCopyOwner'): d.verify_private_copy(folder)
+
+    def test_helper_isolation_faults_block_before_start_and_preserve_intent(self):
+        for fault in ('user', 'image', 'capability', 'privileged', 'network', 'extra-mount',
+                      'writable-bind', 'groups', 'memory', 'autoremove', 'entrypoint'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as name:
+                dep = d.Deployment(REV, {}, None, Path(name))
+                dep.folder = Path(name) / 'run-test'; dep.folder.mkdir(mode=0o700)
+                dep.originals = {'api': self.api}
+                dep.sources = {'Mounts': [{k: m[k] for k in ('Type','Name','Source','Destination')} for m in self.api['Mounts']]}
+                calls = []
+                cid = 'f' * 64
+                c = {'Image': OLD, 'Config': {'User': '1654:1654', 'Entrypoint': ['python3']},
+                     'State': {'Running': False}, 'HostConfig': {
+                     'NetworkMode': 'none', 'CapDrop': ['ALL'], 'SecurityOpt': ['no-new-privileges'],
+                     'Memory': 512*1024*1024, 'MemorySwap': 512*1024*1024, 'NanoCpus': 1000000000,
+                     'PidsLimit': 32, 'RestartPolicy': {'Name': 'no'}},
+                     'Mounts': [dict(m, Destination=m['Source'], RW=True) for m in self.api['Mounts']]}
+                def docker(*args, **kwargs):
+                    calls.append(args)
+                    if args[:2] == ('image', 'inspect'):
+                        return json.dumps([{'Id': OLD, 'RepoDigests': [d.BACKUP_IMAGE], 'Config': {}}]).encode()
+                    self.assertEqual(args[0], 'create')
+                    self.assertEqual(args[args.index('--pull')+1], 'never')
+                    self.assertEqual(args[args.index('--user')+1], '1654:1654')
+                    self.assertNotIn('--rm', args)
+                    mounts = [args[i+1] for i,v in enumerate(args) if v == '--mount']
+                    self.assertEqual(len(mounts), 5)
+                    self.assertTrue(all('volume-nocopy' in v for v in mounts))
+                    c['Config']['Cmd'] = list(args[-4:])
+                    if fault == 'user': c['Config']['User'] = '0'
+                    if fault == 'image': c['Image'] = NEW
+                    if fault == 'capability': c['HostConfig']['CapAdd'] = ['SYS_ADMIN']
+                    if fault == 'privileged': c['HostConfig']['Privileged'] = True
+                    if fault == 'network': c['HostConfig']['NetworkMode'] = 'host'
+                    if fault == 'extra-mount': c['Mounts'].append(dict(Type='bind', Name='', Source='/finance', Destination='/finance', RW=True))
+                    if fault == 'writable-bind': c['HostConfig']['Binds'] = ['/var/run/docker.sock:/var/run/docker.sock']
+                    if fault == 'groups': c['HostConfig']['GroupAdd'] = ['0']
+                    if fault == 'memory': c['HostConfig']['Memory'] = 0
+                    if fault == 'autoremove': c['HostConfig']['AutoRemove'] = True
+                    if fault == 'entrypoint': c['Config']['Entrypoint'] = ['sh']
+                    return cid.encode()
+                with patch.object(d, 'docker', side_effect=docker), patch.object(d, 'inspect', return_value=c), \
+                     patch.object(d, 'volume_sources', return_value=dep.sources), \
+                     patch.object(dep, 'current', return_value=self.api), patch.object(os, 'geteuid', return_value=1000):
+                    with self.assertRaisesRegex(d.Blocked, 'BackupHelper'): dep.helper_data(True)
+                self.assertTrue(dep.helper_incomplete)
+                self.assertTrue(list(dep.folder.glob('*/intent.json')))
+                self.assertFalse(any(v[0] in ('start','cp') for v in calls))
+
+    def test_helper_failure_requires_manual_review_and_blocks_retry(self):
+        with tempfile.TemporaryDirectory() as name:
+            state = Path(name)
+            dep = d.Deployment(REV, {}, None, state)
+            dep.config = dep.provenance = dep.release = dep.rollback = {}
+            def fail():
+                dep.helper_incomplete = True
+                raise d.Blocked('BackupHelperFailed')
+            with patch.object(dep, 'build_images'), patch.object(dep, 'compose', return_value=b'{}'), \
+                 patch.object(dep, 'backup_data', side_effect=fail), patch.object(dep, 'switch') as switch:
+                with self.assertRaisesRegex(d.Blocked, 'BackupHelperFailed'): dep.execute()
+                switch.assert_not_called()
+            with self.assertRaisesRegex(d.Blocked, 'PreviousRunNeedsReview'): d.no_pending_run(state)
+
+
+def synthetic_in_container(request):
+    """Explicit opt-in Docker test, exclusively newly created synthetic volumes."""
+    import multiprocessing
+    import signal
+    assert os.getuid() == os.getgid() == 1654
+    assert sqlite3.sqlite_version == '3.53.4'
+    os.umask(0o077)
+    roots = d.backup.sources(request['sources'])
+    for target, (root, _) in roots.items():
+        for name in d.backup.EXPECTED[target]:
+            with closing(sqlite3.connect(root / name)) as db:
+                db.execute('CREATE TABLE household(id INTEGER PRIMARY KEY, value BLOB)')
+                db.execute("INSERT INTO household VALUES(1, 'initial')")
+                db.commit()
+                db.execute('PRAGMA journal_mode=WAL')  # no data writes after this switch
+            # Do not assume that close must remove WAL/SHM. Prove the requested
+            # fixture using closed synthetic DBs with no committed WAL frames; only
+            # their optional empty sidecars are removed.
+            for suffix in ('-wal', '-shm'):
+                (root / (name + suffix)).unlink(missing_ok=True)
+            assert not (root / (name + '-wal')).exists()
+            assert not (root / (name + '-shm')).exists()
+    for root, _ in roots.values():
+        s = root.stat()
+        assert (s.st_uid, s.st_gid, stat.S_IMODE(s.st_mode)) == (1654, 0, 0o755), (s.st_uid, s.st_gid, oct(stat.S_IMODE(s.st_mode)))
+    baseline = d.data_snapshot(roots)
+    live = roots['/data'][0] / 'meal-planner.db'
+    # Enough pages to force incremental backup callbacks and deterministic overlap.
+    with closing(sqlite3.connect(live)) as db:
+        db.executemany('INSERT INTO household(value) VALUES(?)', [(b'x' * 4096,)] * 512)
+        db.commit()
+    before = d.data_snapshot(roots)
+    ctx = multiprocessing.get_context('fork')
+    ready, finish = ctx.Event(), ctx.Event()
+    def writer():
+        with closing(sqlite3.connect(live, timeout=3)) as db:
+            db.execute("UPDATE household SET value='concurrent' WHERE id=1"); db.commit()
+            ready.set()
+            assert finish.wait(20)
+    child = ctx.Process(target=writer)
+    original = d.backup.copy_database
+    concurrent = []
+    def copy_with_writer(source, destination, deadline):
+        if source != live:
+            return original(source, destination, deadline)
+        # Exercise the unchanged copy_database and SQLite backup API: its normal
+        # monotonic deadline callback synchronizes one real concurrent writer.
+        real_time = time.monotonic
+        def progress_time():
+            if not concurrent:
+                concurrent.append(True); child.start(); assert ready.wait(10)
+            return real_time()
+        with patch.object(d.backup.time, 'monotonic', side_effect=progress_time):
+            original(source, destination, deadline)
+    home = Path('/tmp/synthetic-results'); home.mkdir(mode=0o700)
+    try:
+        with patch.object(d.backup, 'copy_database', side_effect=copy_with_writer):
+            folder = d.backup.run_backup(roots, home / 'concurrent', {}, lambda: d.same_data(before, d.data_snapshot(roots)))
+    finally:
+        finish.set()
+        if child.pid is not None: child.join(10)
+    assert concurrent and child.exitcode == 0
+    digest = d.backup.verify_set(folder)
+    with closing(sqlite3.connect(folder / 'data/meal-planner.db')) as db:
+        assert db.execute('SELECT value FROM household WHERE id=1').fetchone()[0] == 'concurrent'
+    # Kill a process during an actual incremental backup, with live WAL and an
+    # INCOMPLETE manifest already durable. No restore, journal-mode or checkpoint.
+    entered = ctx.Event()
+    def crashing_backup():
+        os.umask(0o077)
+        crash = home / 'crash'; crash.mkdir(mode=0o700)
+        d.record(crash, 'STARTED')
+        real_copy = d.backup.copy_database
+        def slow(source, destination, deadline):
+            if source != live: return real_copy(source, destination, deadline)
+            def pause():
+                entered.set(); signal.pause()
+            with patch.object(d.backup.time, 'monotonic', side_effect=pause):
+                real_copy(source, destination, deadline)
+        with patch.object(d.backup, 'copy_database', side_effect=slow):
+            d.backup.run_backup(roots, crash / 'backups', {}, lambda: None)
+    crash = ctx.Process(target=crashing_backup)
+    crash.start(); assert entered.wait(10)
+    os.kill(crash.pid, signal.SIGKILL); crash.join(10)
+    assert crash.exitcode == -signal.SIGKILL
+    manifest = next((home / 'crash/backups').glob('*/manifest.json'))
+    assert json.loads(manifest.read_text())['status'] == 'INCOMPLETE'
+    assert (home / 'crash/journal.jsonl').is_file()
+    try: d.backup.verify_set(manifest.parent)
+    except d.backup.Blocked: pass
+    else: raise AssertionError('Incomplete backup accepted')
+    d.same_data(baseline, d.data_snapshot(roots))
+    # API-equivalent UID/GID can still read and write every database. Remaining
+    # sidecars may exist or disappear; permissions/ownership are what matters.
+    for target, (root, _) in roots.items():
+        for name in d.backup.EXPECTED[target]:
+            with closing(sqlite3.connect(root / name)) as db:
+                assert db.execute('PRAGMA integrity_check').fetchone() == ('ok',)
+                db.execute("UPDATE household SET value='api-after-crash' WHERE id=1"); db.commit()
+                for suffix in ('-wal', '-shm'):
+                    p = root / (name + suffix)
+                    if p.exists():
+                        s = p.stat()
+                        assert s.st_uid == s.st_gid == 1654 and stat.S_IMODE(s.st_mode) == 0o600
+    assert d.backup.verify_set(folder) == digest
+    d.backup_helper(request)  # real unchanged run_backup/verify_set + durable result
+    print('SYNTHETIC WAL/concurrency/SIGKILL/permissions/backup PASS', flush=True)
+
+
+@unittest.skipUnless(os.environ.get('BIGBRAIN_STANDARD_SYNTHETIC_DOCKER') == '1', 'explicit synthetic Docker opt-in required')
+class SyntheticDockerTests(unittest.TestCase):
+    def test_real_image_wal_crash_durability_and_host_copy(self):
+        token = uuid.uuid4().hex
+        names, containers = [], []
+        api = container('api'); api['Config']['User'] = '1654'; api['Mounts'] = []
+        # Only objects created by this test are eligible for cleanup.
+        def docker(*args, **kw): return d.docker(*args, **kw)
+        with tempfile.TemporaryDirectory() as temporary:
+            state = Path(temporary)
+            try:
+                for i, target in enumerate(d.backup.EXPECTED):
+                    name = 'bigbrain-standard-test-' + token + '-' + str(i)
+                    docker('volume', 'create', '--label', 'bigbrain.standard.test=' + token, name, mutation=True)
+                    names.append(name)
+                    v = json.loads(docker('volume', 'inspect', name))[0]
+                    api['Mounts'].append(dict(Type='volume', Name=name, Source=v['Mountpoint'], Destination=target, RW=True))
+                sources = d.volume_sources(api)
+                request = dict(sources=sources, baseline=None, backup=True, identity={})
+                code = ("import importlib.util,json; from pathlib import Path; "
+                        "s=importlib.util.spec_from_file_location('suite','/standard-code/tests/deployment/test_standard_deployment.py'); "
+                        "m=importlib.util.module_from_spec(s); s.loader.exec_module(m); "
+                        "m.synthetic_in_container(json.loads(Path('/standard-code/request.json').read_text()))")
+                args = ['create', '--name', 'bigbrain-standard-test-' + token, '--pull', 'never',
+                        '--user', '1654:1654', '--network', 'none', '--cap-drop', 'ALL',
+                        '--security-opt', 'no-new-privileges', '--restart', 'no', '--memory', '512m',
+                        '--memory-swap', '512m', '--cpus', '1', '--pids-limit', '32', '--entrypoint', 'python3']
+                for m in sources['Mounts']:
+                    args += ['--mount', 'type=volume,source=' + m['Name'] + ',target=' + m['Source'] + ',volume-nocopy']
+                cid = docker(*args, d.BACKUP_IMAGE, '-I', '-B', '-c', code, mutation=True).decode().strip()
+                containers.append(cid)
+                stream = io.BytesIO(d.helper_archive(request))
+                with tarfile.open(fileobj=stream, mode='a') as archive:
+                    body = Path(__file__).read_bytes()
+                    info = tarfile.TarInfo('standard-code/tests/deployment/test_standard_deployment.py')
+                    info.size, info.mode = len(body), 0o444
+                    archive.addfile(info, io.BytesIO(body))
+                    # Ownership only of newly created, empty synthetic volume roots;
+                    # stdin tar ownership, no root process, no production paths/volumes.
+                    for m in sources['Mounts']:
+                        info = tarfile.TarInfo(m['Source'].lstrip('/'))
+                        info.type, info.uid, info.gid, info.mode = tarfile.DIRTYPE, 1654, 0, 0o755
+                        archive.addfile(info)
+                docker('cp', '-', cid + ':/', input_data=stream.getvalue(), mutation=True)
+                try:
+                    output = docker('start', '--attach', cid, timeout=90, mutation=True)
+                except d.Blocked:
+                    logs = subprocess.run(['docker', '--host', 'unix:///var/run/docker.sock', 'logs', cid], capture_output=True)
+                    raise AssertionError((logs.stdout + logs.stderr).decode()) from None
+                self.assertIn(b'SYNTHETIC WAL/concurrency/SIGKILL/permissions/backup PASS', output)
+                self.assertEqual(d.inspect(cid)['State']['ExitCode'], 0)
+                copied = state / 'copied'; copied.mkdir(mode=0o700)
+                docker('cp', cid + ':' + str(d.HELPER_HOME) + '/.', str(copied), mutation=True)
+                d.verify_private_copy(copied)
+                interrupted = state / 'interrupted'; interrupted.mkdir(mode=0o700)
+                docker('cp', cid + ':/tmp/synthetic-results/crash/.', str(interrupted), mutation=True)
+                d.verify_private_copy(interrupted)
+                incomplete = next((interrupted / 'backups').iterdir())
+                with self.assertRaises(d.backup.Blocked): d.backup.verify_set(incomplete)
+                self.assertTrue((interrupted / 'journal.jsonl').exists())
+                result = json.loads((copied / 'result.json').read_text())
+                self.assertEqual(d.backup.verify_set(copied / 'backups' / result['backupId']), result['manifestSha256'])
+                # Use the real orchestration path with ONLY the synthetic API mounts.
+                dep = d.Deployment(REV, {}, None, state)
+                dep.folder = state / 'run-synthetic'; dep.folder.mkdir(mode=0o700)
+                dep.sources, dep.originals = sources, {'api': api}
+                with patch.object(dep, 'current', return_value=api):
+                    try:
+                        folder = dep.helper_data(make_backup=True)
+                        self.assertTrue(folder.is_relative_to(dep.folder))
+                        d.backup.verify_set(folder)
+                        dep.data_identity()
+                    finally:
+                        containers.extend(dep.probes)
+                # Corrupt only a separate host copy: hash/integrity gate must reject it.
+                damaged = state / 'damaged'; shutil.copytree(folder, damaged)
+                with (damaged / 'data/meal-planner.db').open('r+b') as stream:
+                    stream.write(b'corrupt')
+                with self.assertRaises(d.backup.Blocked): d.backup.verify_set(damaged)
+                for item in containers:
+                    self.assertFalse(d.inspect(item)['State']['Running'])
+                # Separate copied data persists and verifies after helper deletion.
+                for item in list(containers):
+                    docker('rm', item, mutation=True); containers.remove(item)
+                self.assertEqual(d.backup.verify_set(copied / 'backups' / result['backupId']), result['manifestSha256'])
+                self.assertTrue((interrupted / 'journal.jsonl').exists())
+                with self.assertRaises(d.backup.Blocked): d.backup.verify_set(incomplete)
+            finally:
+                for item in containers:
+                    # Only test-owned objects; never global prune or other services.
+                    if d.inspect(item)['State']['Running']: docker('stop', '--time', '5', item, mutation=True)
+                    docker('rm', item, mutation=True)
+                for name in names: docker('volume', 'rm', name, mutation=True)
 
 
 if __name__ == '__main__':
