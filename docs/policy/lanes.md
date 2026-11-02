@@ -333,3 +333,22 @@ och felstatus. Docker-/byggorkestreringen är mockad; verkligt nytt API/Web-bygg
 produktionsdatabasåtkomst och deployment är **NOT RUN**. Befintliga säkerhetsgrindar
 kvarstår. Exakt SHA/tree, fullständig diff, CI och begränsningar finns i checkpoint-PR:n.
 **STOPP för oberoende ChatGPT T2-review; ingen merge eller deployment är auktoriserad.**
+
+### STANDARD – oanvända Compose-volymer (T2-checkpoint 2026-11-02)
+
+Den tredje auktoriserade STANDARD-körningen på `e3ea2c4` stoppade med
+`PRE_SWITCH_FAILED` efter lyckade API/Web-byggen. Release- och rollback-
+snapshots innehöll tio toppnivåvolymer, medan Compose renderade sju.
+En skrivskyddad jämförelse verifierade att de tre utelämnade definitionerna
+inte refererades av de projicerade API/Web-tjänsterna och att återstående
+konfigurationer var identiska efter just denna avgränsning.
+
+`release_config()` deklarerar nu endast namngivna volymer som de båda
+tjänsterna refererar till. Samtliga behålls som `external: true`.
+Odeklarerade referenser avvisas. `snapshot_matches()`, backupkontroller,
+runtimekontrakt, frysningar och driftgrindar är oförändrade.
+
+Denna checkpoint är en kodkorrigering, inte deploymentacceptans.
+Produktionsbackup, återstartstester och tjänstebyte är fortfarande
+NOT RUN för den korrigerade revisionen. Oberoende T2-review krävs
+före merge. Ingen omkörning eller produktionsändring ingår.

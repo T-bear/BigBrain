@@ -307,10 +307,17 @@ def release_config(config, images):
         service.pop('depends_on', None)
         service['image'] = images[role]
         service['pull_policy'] = 'never'
-    # Existing volumes/networks only. Never let Compose create a network or volume.
+    # Retain only named volumes referenced by the projected API/Web services.
+    # Every retained resource remains external: Compose must not create volumes.
+    used = {mount['source']
+            for service in result['services'].values()
+            for mount in service.get('volumes', [])
+            if mount.get('type') == 'volume'}
+    need(used <= set(result.get('volumes', {})), 'VolumeDeclarationMissing')
     for kind in ('volumes', 'networks'):
         result[kind] = {key: {'name': entry['name'], 'external': True}
-                        for key, entry in result.get(kind, {}).items()}
+                        for key, entry in result.get(kind, {}).items()
+                        if kind != 'volumes' or key in used}
     result.pop('configs', None)
     result.pop('secrets', None)
     return result
