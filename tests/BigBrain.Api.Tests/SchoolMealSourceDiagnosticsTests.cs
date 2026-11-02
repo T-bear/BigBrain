@@ -158,10 +158,9 @@ public sealed class SchoolMealSourceDiagnosticsTests
             return response;
         });
         using var http = new HttpClient(handler);
-        using var data = new SchoolMealTestData();
-        var options = data.Options(new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true } }, clock.Now);
+        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true } };
         using var service = new SchoolMealService(options,
-            new SchoolMealSourceClient(http, clock, log), clock, data.Store(options));
+            new SchoolMealSourceClient(http, clock, log), clock);
         Assert.Equal("unavailable", (await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken)).Status);
         Assert.Equal("rateLimited", Assert.Single(log.Entries)["PolicyReason"]);
         var interval = retry is "delta" or "date" ? 12 : 6;

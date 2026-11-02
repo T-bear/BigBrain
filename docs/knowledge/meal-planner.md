@@ -18,11 +18,28 @@ Samla verifierad kunskap om modulen Matlista.
 
 - Recept, ingredienskoppling och automatisk inköpslistegenerering är framtidsplaner, inte implementation.
 - Backup/restore och fleranvändarkonflikter är inte lösta.
-- Skollunch v1 har en offline RSS-parser och separat read-only skolmåltidskontrakt för review.
-  Family visar offline-status och utvecklingsfixtur; ingen hushållsplan eller inköpslista skrivs.
-  V2-hämtning och processcache är implementerade för review men avstängda som standard; inte mergade/deployade. Båda originalfilerna har parsats offline med fem lunchdagar; HTML anger vecka men inte årtal.
-  Skolmedveten hushållsmenygenerering är fortsatt framtida scope.
-  [Kontrakt och evidens](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
+- Skolmedveten hushållsmenygenerering är fortsatt framtida scope.
+- Skollunchs tidigare offline- och källverifieringar är daterad evidens, inte aktuell driftstatus:
+  [kontrakt och historisk evidens](../reports/features/family/school-meals-preparation-20261023.md#skollunch-v1--offline-implementation-2026-10-23).
+
+## Skollunch – minnesbaserad hämtning (review, 2026-11-01)
+
+- Ägarens steg (c) återför hämtningen till processminne utan `MealPlannerStore`,
+  bootstrap-inställningar eller skapande/användning av `SchoolMealFetchGate`. En redan befintlig
+  tabell lämnas orörd; ingen migration eller dataradering ingår.
+- Varje skola har egen låsning och cache. Högst ett källanrop pågår per skola och API-process;
+  nästa försök tillåts tidigast sex timmar efter avslutat anrop, eller senare enligt Retry-After.
+  Ogiltig Retry-After eller osäkert mottagna headers spärrar den skolan resten av processens livstid.
+- Omstart tömmer historiken och tillåter första anropet utan verifierad tidigare historik enligt
+  det uttryckliga ägarbeslutet. Inga schemalagda hämtningar eller automatiska omförsök införs.
+- Källklient, parser, API/UI-kontrakt och default-off-flaggor behålls. Cacheförbud respekteras;
+  stale begränsas till 24 timmar efter giltig validering och samma ISO-vecka. Utgångna menyer och
+  validatorer rensas; 304 utan skickad validator får inte förnya innehåll.
+- Offlineverifiering: 117 fokuserade SchoolMeal-, MealPlanner- och ShoppingList-tester passerar,
+  inklusive samtidighet, omstart, Retry-After, cache/304, timeout och oförändrade databasbytes.
+  Ingen verklig källhämtning, merge eller deployment ingår i denna checkpoint.
+- Befintligt privilegierat deploymentkontrakt ändras inte här. Dess krav på beständig gate och
+  bootstrap är inte bevis för denna minnesbaserade revision; drift kräver separat tillämpligt beslut.
 
 ## Relaterade runbooks
 
