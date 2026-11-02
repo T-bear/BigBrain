@@ -291,3 +291,45 @@ Detta uppdrag omfattar exakt skriptet, STANDARD-testfilen och denna dokumentatio
 Oberoende T2-review krävs före merge. Ingen merge, `--execute`, deployment, produktions-
 volymåtkomst eller ändring av körande containrar ingår. Finance, BB-158,
 `backup_support.py`, databasåtkomst och deploymentbehörigheter är oförändrade.
+
+### Avgränsat runtimeundantag — T2-checkpoint 2026-11-02
+
+Baseline `77f0deed3b65a317e0afc42f050316b4ca985a3d`. Enligt ägarens incidentunderlag
+stoppade `run-1f5a9487e1b649ef90c3e7b2632f3e1e` med `PRE_SWITCH_FAILED` efter två
+lyckade byggen: API-imagens enda identifierade kontraktsdelta var `DOTNET_VERSION`
+och `ASPNET_VERSION`, båda **10.0.10 → 10.0.14**. Web-kontraktet var oförändrat;
+ingen backuphjälpare eller tjänsteväxling startades. Incidenten omkörs inte här.
+
+Korrigeringen tillåter endast dessa två API-imagevärden att ändras. Båda måste vara
+entydiga numeriska `major.minor.patch`, lika inom respektive image, inom samma
+major/minor som originalet och utan nedgradering. Övriga image-runtimefält och
+miljöposter jämförs exakt enligt befintligt kontrakt; Web får inget undantag.
+Miljötext är inte runtimebevis: den tillfälliga digestlåsta API-Dockerfilens sista
+byggsteg kör `dotnet --list-runtimes` som image-användaren och kräver lyckad exit
+och exakt de två förväntade shared frameworks, versionerna och installationsvägarna.
+Extra/saknade runtimes eller avvikande innehåll stoppar bygget före databasåtkomst.
+Endast lyckat bygge skapar det processinterna bevis som `bind_images()` kräver.
+Privat `build.json` binder kontrollen, basdigest, Dockerfile-hash och versionspar till
+slutlig image-digest, accepterad Git-revision/tree och källarkivhash. Ingen extern
+receipt, flyttbar tagg eller ensam OCI-/miljöetikett kan aktivera undantaget.
+
+En exakt kandidatmiljö härleds från originalet och verifierad image. Befintliga
+Compose-overrides bevaras, även när de anger gamla versionsvärden; det faktiska
+runtimeinnehållet styrks av byggkontrollen. Ett partiellt override som skulle ge
+inkonsistenta versionsvärden avvisas. Samma digestbundna förväntan används i
+isolerade kandidatprober, `wait_healthy()` och `stop()` inför rollback. Originalets
+kontroll före byte och återgång till originalimage använder fortsatt originalmiljön.
+Ersättnings-ID registreras efter den avgränsade Compose-operationen och kontrolleras
+igen vid hälsa/stopp. Främmande ID/image, miljö-/behörighetsdrift, OOM och okända
+exitkoder ger ingen automatisk rollback; känt exit **1** får återställas efter övriga
+kontroller. Osäker återgång slutar fortsatt i `MANUAL_REVIEW_REQUIRED` utan DB-restore.
+
+Verifiering 2026-11-02: **196 offline-tester PASS, ett befintligt opt-in-Docker-test
+SKIP** (197 totalt), inklusive 101 PASS i STANDARD-testfilen. Regressionerna täcker
+patchacceptans med byggbevis, felaktiga versioner/proveniens, övriga kontraktsändringar,
+lyckat byte utan falskt `ReplacementConfigChanged`, exakt originalkontroll och
+säker/osäker rollback. Genererad shellkontroll provas med syntetiskt runtimeinnehåll
+och felstatus. Docker-/byggorkestreringen är mockad; verkligt nytt API/Web-bygge,
+produktionsdatabasåtkomst och deployment är **NOT RUN**. Befintliga säkerhetsgrindar
+kvarstår. Exakt SHA/tree, fullständig diff, CI och begränsningar finns i checkpoint-PR:n.
+**STOPP för oberoende ChatGPT T2-review; ingen merge eller deployment är auktoriserad.**

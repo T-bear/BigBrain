@@ -187,6 +187,7 @@ class StandardTests(unittest.TestCase):
 
     def test_restarting_failed_candidate_is_stopped_before_rollback(self):
         self.runtime['api'].update(Id='replacement', Image=NEW)
+        self.dep.replacement_ids['api'] = 'replacement'
         self.runtime['api']['State'].update(Running=False, Status='restarting', Restarting=True, ExitCode=1)
         self.dep.stop('api', recovery=True)
         self.assertFalse(self.runtime['api']['State']['Restarting'])
@@ -261,7 +262,8 @@ class StandardTests(unittest.TestCase):
                 digests = [repo + '@sha256:' + 'e' * 64]
                 if failure == 'unpinned-sdk' and repo == d.SDK_REPOSITORY:
                     digests = []
-                return json.dumps([{'RepoDigests': digests}]).encode()
+                return json.dumps([{'RepoDigests': digests, 'Config': {
+                    'Env': ['DOTNET_VERSION=10.0.14', 'ASPNET_VERSION=10.0.14']}}]).encode()
             self.assertEqual(args[0], 'build')
             pinned = Path(args[args.index('--file') + 1])
             lines = pinned.read_text().splitlines()
@@ -274,6 +276,12 @@ class StandardTests(unittest.TestCase):
                 self.assertEqual(lines[index + 1], 'RUN test "$(dotnet --version)" = "' + d.SDK_VERSION + '"')
                 self.assertLess(index + 1, next(i for i, line in enumerate(lines) if line.startswith('RUN dotnet restore ')))
                 if failure == 'wrong-sdk-content':
+                    raise d.Blocked('CommandFailed')
+                self.assertTrue(lines[-1].startswith('RUN runtimes="$(dotnet --list-runtimes)" && test'))
+                self.assertIn('Microsoft.NETCore.App 10.0.14 [/usr/share/dotnet/shared/Microsoft.NETCore.App]', lines[-1])
+                self.assertIn('Microsoft.AspNetCore.App 10.0.14 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]', lines[-1])
+                self.assertGreater(len(lines) - 1, lines.index('USER $APP_UID'))
+                if failure == 'wrong-runtime-content':
                     raise d.Blocked('CommandFailed')
             self.assertEqual(args[-1], str(self.dep.folder / 'source'))
             self.assertIn('org.opencontainers.image.revision=' + REV, args)
@@ -301,6 +309,11 @@ class StandardTests(unittest.TestCase):
         self.assertEqual(receipt['sdk']['image'], receipt['bases'][d.SDK_REPOSITORY + ':' + d.SDK_VERSION])
         self.assertEqual(receipt['sdk']['globalJsonSha256'], d.backup.digest(ROOT / 'global.json'))
         self.assertEqual(receipt['archiveSha256'], d.backup.digest(self.dep.folder / 'source.tar'))
+        self.assertEqual(receipt['runtime']['image'], NEW)
+        self.assertEqual(receipt['runtime']['revision'], REV)
+        self.assertEqual(receipt['runtime']['versions'], dict.fromkeys(d.RUNTIME_KEYS, '10.0.14'))
+        self.assertEqual(receipt['runtime']['base'], receipt['bases'][d.RUNTIME_REPOSITORY + ':10.0'])
+        self.assertEqual(receipt['runtime']['dockerfileSha256'], d.backup.digest(self.dep.folder / 'api.Dockerfile'))
         self.assertEqual(stat.S_IMODE((self.dep.folder / 'build.json').stat().st_mode), 0o600)
         with tarfile.open(self.dep.folder / 'source.tar') as bundle:
             for entry in bundle.getmembers():
@@ -336,7 +349,7 @@ class StandardTests(unittest.TestCase):
                 self.assert_sdk_blocked_before_data()
 
     def test_unavailable_unpinned_or_wrong_sdk_blocks_before_database(self):
-        for failure in ('unavailable-sdk', 'unpinned-sdk', 'wrong-sdk-content'):
+        for failure in ('unavailable-sdk', 'unpinned-sdk', 'wrong-sdk-content', 'wrong-runtime-content'):
             with self.subTest(failure=failure), self.mocked_build(failure) as calls:
                 with self.assertRaises(d.Blocked):
                     self.dep.execute()
@@ -710,6 +723,202 @@ class StandardTests(unittest.TestCase):
                     'Entrypoint': ['different'] if image == NEW else None}}
         with patch.object(d, 'image_info', side_effect=images):
             with self.assertRaisesRegex(d.Blocked, 'ImageRuntimeContractChanged'): self.dep.preflight()
+
+    def runtime_fixture(self):
+        before = ['DOTNET_VERSION=10.0.10', 'ASPNET_VERSION=10.0.10', 'APP_UID=1654']
+        after = ['DOTNET_VERSION=10.0.14', 'ASPNET_VERSION=10.0.14', 'APP_UID=1654']
+        self.dep.originals['api']['Config']['Env'] = before.copy()
+        self.runtime['api']['Config']['Env'] = before.copy()
+        self.dep.runtime_build = {'image': NEW, 'revision': REV,
+                                  'base': d.RUNTIME_REPOSITORY + '@sha256:' + 'e' * 64,
+                                  'versions': dict.fromkeys(d.RUNTIME_KEYS, '10.0.14')}
+        configs = [{'Env': before}, {'Env': after}, {'Env': []}, {'Env': []}]
+        for config in configs:
+            config['Labels'] = {'org.opencontainers.image.revision': REV}
+        return [{'Config': config} for config in configs]
+
+    def bind_runtime(self, images):
+        with patch.object(d, 'image_info', side_effect=images):
+            self.dep.bind_images()
+
+    def runtime_flow(self):
+        self.bind_runtime(self.runtime_fixture())
+        self.dep.wait_healthy.side_effect = lambda role, image: d.Deployment.wait_healthy(self.dep, role, image)
+        def compose(path, *args, **kwargs):
+            result = self.compose(path, *args, **kwargs)
+            if args[0] == 'up':
+                role = args[-1]
+                self.runtime[role]['Config']['Env'] = list(self.dep.expected_environment(role, self.runtime[role]['Image']))
+            return result
+        self.dep.compose.side_effect = compose
+
+    def test_runtime_patch_binds_build_proof_and_keeps_compose_exact(self):
+        images = self.runtime_fixture()
+        config = copy.deepcopy(self.config)
+        self.bind_runtime(images)
+        expected = copy.deepcopy(self.dep.originals['api'])
+        expected.update(Image=NEW)
+        expected['Config']['Env'] = images[1]['Config']['Env'].copy()
+        self.assertTrue(self.dep.runtime_matches('api', expected, NEW))
+        self.assertFalse(self.dep.runtime_matches('api', expected, OLD))
+        self.assertEqual(self.config, config)
+        self.assertEqual(self.dep.release['services']['api']['environment'], config['services']['api']['environment'])
+
+    def test_runtime_patch_requires_matching_digest_revision_base_and_content_proof(self):
+        for field, value in (('image', OLD), ('revision', 'f' * 40), ('base', d.RUNTIME_REPOSITORY + ':10.0'),
+                             ('versions', dict.fromkeys(d.RUNTIME_KEYS, '10.0.10')), (None, None)):
+            with self.subTest(field=field):
+                images = self.runtime_fixture()
+                if field is None:
+                    self.dep.runtime_build = None
+                else:
+                    self.dep.runtime_build[field] = value
+                with self.assertRaisesRegex(d.Blocked, 'RuntimeBuildProofMissing'):
+                    self.bind_runtime(images)
+
+    def test_runtime_versions_reject_downgrade_major_minor_mismatch_and_invalid_values(self):
+        for version in ('10.0.9', '10.1.14', '11.0.14', '10.0', '10.0.14-preview', '10.0.14.1',
+                        '010.0.14', '-10.0.14', '10.0.14\n', '１０.0.14', '', '10.0.$(id)'):
+            with self.subTest(version=version):
+                images = self.runtime_fixture()
+                images[1]['Config']['Env'] = [k + '=' + version for k in d.RUNTIME_KEYS] + ['APP_UID=1654']
+                with self.assertRaises(d.Blocked): self.bind_runtime(images)
+        for index in (0, 1):
+            for env in (['DOTNET_VERSION=10.0.14', 'ASPNET_VERSION=10.0.10'],
+                        ['DOTNET_VERSION=10.0.14'],
+                        ['DOTNET_VERSION=10.0.14', 'ASPNET_VERSION=10.0.14', 'DOTNET_VERSION=10.0.14'],
+                        ['DOTNET_VERSION=10.0.14', 'ASPNET_VERSION=10.0.14', 'BARE'], None):
+                with self.subTest(index=index, env=env):
+                    images = self.runtime_fixture()
+                    images[index]['Config']['Env'] = env
+                    with self.assertRaises(d.Blocked): self.bind_runtime(images)
+
+    def test_other_image_environment_fields_and_web_runtime_changes_are_rejected(self):
+        for field in d.IMAGE_FIELDS:
+            if field == 'Env': continue
+            with self.subTest(field=field):
+                images = self.runtime_fixture()
+                images[1]['Config'][field] = 'changed'
+                with self.assertRaisesRegex(d.Blocked, 'ImageRuntimeContractChanged'): self.bind_runtime(images)
+        for other in (['APP_UID=0'], ['APP_UID=1654', 'EXTRA=value'], [], ['APP_UID=1654', 'APP_UID=1654']):
+            with self.subTest(other=other):
+                images = self.runtime_fixture()
+                images[1]['Config']['Env'] = images[1]['Config']['Env'][:2] + other
+                with self.assertRaises(d.Blocked): self.bind_runtime(images)
+        images = self.runtime_fixture()
+        images[2]['Config']['Env'] = images[0]['Config']['Env'].copy()
+        images[3]['Config']['Env'] = images[1]['Config']['Env'].copy()
+        with self.assertRaisesRegex(d.Blocked, 'ImageRuntimeContractChanged'): self.bind_runtime(images)
+
+    def test_compose_version_overrides_stay_exact_even_with_new_runtime_content(self):
+        images = self.runtime_fixture()
+        self.config['services']['api']['environment'].update(dict.fromkeys(d.RUNTIME_KEYS, '10.0.10'))
+        self.bind_runtime(images)
+        self.assertEqual(self.dep.expected_environment('api', NEW), self.dep.originals['api']['Config']['Env'])
+        self.config['services']['api']['environment']['DOTNET_VERSION'] = '10.0.14'
+        with self.assertRaisesRegex(d.Blocked, 'RuntimeEnvironmentOverrideChanged'): self.bind_runtime(images)
+        self.config['services']['api']['environment']['DOTNET_VERSION'] = '10.0.10'
+        del self.config['services']['api']['environment']['ASPNET_VERSION']
+        with self.assertRaisesRegex(d.Blocked, 'RuntimeVersionInvalid'): self.bind_runtime(images)
+
+    def test_runtime_patch_success_uses_real_health_contract_without_false_config_failure(self):
+        self.runtime_flow()
+        self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'PASS')
+        self.assertIn('DOTNET_VERSION=10.0.14', self.runtime['api']['Config']['Env'])
+
+    def test_patch_crash_exit_one_restores_exact_original_and_preserves_new_writes(self):
+        for role in d.ROLES:
+            with self.subTest(role=role):
+                self.runtime_flow()
+                self.fail = ('crash', role)
+                with self.assertRaisesRegex(d.Blocked, 'ReplacementExited'): self.dep.execute()
+                self.assertEqual(self.phases()[-1], 'ROLLED_BACK')
+                self.assertTrue(all(c['Image'] == OLD for c in self.runtime.values()))
+                self.assertEqual(self.runtime['api']['Config']['Env'], self.dep.originals['api']['Config']['Env'])
+                self.assertEqual(self.databases[0].execute('SELECT value FROM household').fetchone()[0], 'after-backup')
+                # Each subcase represents a new preflight against the restored services.
+                self.dep.originals = copy.deepcopy(self.runtime)
+                self.dep.changed = []
+                self.dep.replacement_ids = {}
+
+    def test_unexpected_replacement_environment_blocks_health_and_rollback_even_exit_zero(self):
+        self.runtime_flow()
+        compose = self.dep.compose.side_effect
+        def altered(path, *args, **kwargs):
+            result = compose(path, *args, **kwargs)
+            if args[0] == 'up': self.runtime['api']['Config']['Env'].append('EXTRA=value')
+            return result
+        self.dep.compose.side_effect = altered
+        with self.assertRaisesRegex(d.Blocked, 'RollbackFailedManualReview'): self.dep.execute()
+        self.assertEqual(self.phases()[-1], 'MANUAL_REVIEW_REQUIRED')
+        self.assertEqual([a[-1] for cmd, a in self.calls if cmd == 'compose' and a[0] == 'up'], ['api'])
+
+    def test_bound_runtime_still_rejects_env_privilege_and_identity_drift(self):
+        self.runtime_flow()
+        candidate = copy.deepcopy(self.runtime['api'])
+        candidate.update(Id='replacement', Image=NEW)
+        candidate['Config']['Env'] = list(self.dep.expected_environment('api', NEW))
+        self.dep.replacement_ids['api'] = 'replacement'
+        for field in ('env', 'host', 'id', 'image'):
+            with self.subTest(field=field):
+                self.runtime['api'] = copy.deepcopy(candidate)
+                if field == 'env': self.runtime['api']['Config']['Env'].append('UNEXPECTED=1')
+                if field == 'host': self.runtime['api']['HostConfig']['Privileged'] = True
+                if field == 'id': self.runtime['api']['Id'] = 'foreign'
+                if field == 'image': self.runtime['api']['Image'] = 'sha256:' + 'f' * 64
+                with self.assertRaises(d.Blocked): d.Deployment.wait_healthy(self.dep, 'api', NEW)
+                with self.assertRaises(d.Blocked): self.dep.stop('api', recovery=True)
+
+    def test_patch_exception_never_relaxes_original_or_rollback_contract(self):
+        self.runtime_flow()
+        self.runtime['api']['Config']['Env'] = list(self.dep.expected_environment('api', NEW))
+        with self.assertRaisesRegex(d.Blocked, 'RuntimeChanged'): self.dep.unchanged()
+        with self.assertRaisesRegex(d.Blocked, 'UncleanStop'): self.dep.stop('api')
+        with self.assertRaisesRegex(d.Blocked, 'ReplacementConfigChanged'):
+            d.Deployment.wait_healthy(self.dep, 'api', OLD)
+
+    def test_patch_unsafe_crash_cannot_rollback(self):
+        self.runtime_flow()
+        self.runtime['api'].update(Id='replacement', Image=NEW)
+        self.dep.replacement_ids['api'] = 'replacement'
+        self.runtime['api']['Config']['Env'] = list(self.dep.expected_environment('api', NEW))
+        self.runtime['api']['State'].update(Running=False, Status='exited', ExitCode=1)
+        for field, value in (('ExitCode', 137), ('OOMKilled', True), ('Dead', True)):
+            previous = self.runtime['api']['State'].get(field)
+            self.runtime['api']['State'][field] = value
+            with self.subTest(field=field), self.assertRaisesRegex(d.Blocked, 'UncleanStop'):
+                self.dep.stop('api', recovery=True)
+            self.runtime['api']['State'][field] = previous
+
+    def test_final_runtime_check_tests_command_content_and_exit_status(self):
+        self.dep.folder = self.state / 'run-runtime-proof'
+        self.dep.folder.mkdir()
+        with self.mocked_build(): self.dep.build_images()
+        check = (self.dep.folder / 'api.Dockerfile').read_text().splitlines()[-1].removeprefix('RUN ')
+        executable = self.root / 'dotnet'
+        output = ('Microsoft.AspNetCore.App 10.0.14 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]\n'
+                  'Microsoft.NETCore.App 10.0.14 [/usr/share/dotnet/shared/Microsoft.NETCore.App]\n')
+        for body, code, success in ((output, 0, True), (output, 1, False),
+                                    (output.replace('10.0.14', '10.0.10'), 0, False),
+                                    (output + 'Extra runtime\n', 0, False), ('', 0, False)):
+            with self.subTest(body=body, code=code):
+                executable.write_text('#!/bin/sh\ncat <<\'RUNTIMES\'\n' + body + 'RUNTIMES\nexit ' + str(code) + '\n')
+                executable.chmod(0o700)
+                result = subprocess.run(['/bin/sh', '-c', check], env={**os.environ, 'PATH': str(self.root) + ':' + os.environ['PATH']},
+                                        capture_output=True, timeout=5)
+                self.assertEqual(result.returncode == 0, success)
+
+    def test_build_produces_runtime_proof_consumed_by_real_binding(self):
+        images = self.runtime_fixture()
+        self.dep.runtime_build = None
+        self.dep.folder = self.state / 'run-provenance'
+        self.dep.folder.mkdir()
+        with self.mocked_build(), patch.object(d, 'image_info', side_effect=[images[1], images[3], *images]):
+            self.dep.bind_images.side_effect = lambda: d.Deployment.bind_images(self.dep)
+            self.dep.build_images()
+        self.assertIn('DOTNET_VERSION=10.0.14', self.dep.expected_environment('api', NEW))
+        self.assertIsNotNone(self.dep.runtime_build)
 
     def test_resource_snapshot_is_external_and_only_api_web(self):
         cfg = copy.deepcopy(self.config)
