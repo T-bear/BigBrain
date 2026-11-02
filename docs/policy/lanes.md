@@ -49,9 +49,15 @@ Ingen manuellt upplöst JSON, förbyggd image eller nytt root-godkännande behö
 Config-hash måste matcha körande API/Web. Saknad åtkomst eller okända inputs ger stopp.
 
 1. Kontrollera aktuell remote main, ren checkout, PR #25:s commit i ancestry och fyra
-   gröna main-jobb. Appdiff sedan båda runtime-revisionerna tillåter initialt endast
-   `SchoolMealService.cs` och borttagna `MealPlannerStore.SchoolMeals.cs`, utöver
-   dokumentation/tester/driftskript/CI. Semantisk schema-/säkerhetsreview kvarstår.
+   gröna main-jobb. Båda runtime-revisionerna måste vara tillgängliga Git-commits i
+   accepterad ancestry och matcha respektive rollback-images revisionsetikett.
+   Varje apps diff bedöms från dess egen runtime-revision: Web-källor som inte kopieras
+   av API:s Dockerfile räknas endast mot Web-baslinjen, och omvänt för API:s källträd.
+   Gemensamma/okända bygg- och konfigurationsinputs undantas inte. API-deltan tillåter
+   initialt endast `SchoolMealService.cs` och borttagna `MealPlannerStore.SchoolMeals.cs`;
+   Web tillåter ingen ny appdelta. Dokumentation/tester/driftskript/CI tillåts som tidigare.
+   Därmed blockeras fortfarande nya Finance-/BB-158-, schema-, rättighets- och nätverks-
+   ändringar. Sökvägstestet ersätter aldrig semantisk schema-/säkerhetsreview.
 2. Bygg **både API och Web medan originalen kör** från ett `git archive` av exakt SHA.
    Lås varje Dockerfile-bas till hämtad registry-digest före build; sätt OCI-revision
    på båda images och API-buildarg. Spara Git-tree, arkivhash, basdigests, byggfiler
@@ -84,8 +90,11 @@ rättigheter, flaggor, nätverk, schema eller Finance-/BB-158-resurser ändras.
 
 T2-review av `c883e78` fann två **P1**: rollback nekade exitkod 1 och bygg-/omstartsprov
 saknades i flödet. Den korrigerade diffen i samma PR behöver andra oberoende reviewvarvet.
-Verifiering 2026-11-02: **142 offline-tester PASS**, inklusive de två felen, bevarade
+Verifiering 2026-11-02: **150 offline-tester PASS**, inklusive de två felen, bevarade
 skrivningar, låsta bygginputs, Compose-upptäckt och nekad release vid bygg-/probefel.
+Riktade tester med verkliga lokala Git-historiker täcker olika API-/Web-baslinjer,
+okända/ej accepterade revisioner och fortsatt stopp för förbjudna app-/bygg-/konfigurationsdeltan.
+Samma test med accepterad mellanliggande Web-ändring reproducerar felet i `e3f5e3b`.
 Verklig Compose-parser och dokumentvalidator PASS. CI kör drifttesterna i befintligt
 backendjobb. Detta bevisar styrflödet med simulerad Docker och syntetisk SQLite/WAL;
 verklig imagebuild, isolerad image-start och produktionsbyte är **NOT RUN** i PR-arbetet.
@@ -96,5 +105,34 @@ eller annan appdelta ger stopp. Isolerade prov bevisar inte externa integratione
 funktion; källobservation och iPhone/PWA är PENDING. Daglig backup/restore-grinden för
 schemaändringar kvarstår i [backupunderlaget](../operations/backup-restore/README.md).
 All Finance-/BB-158-, schema-, privilegie- eller nätverksändring är utanför spåret.
+
+### Skrivskyddad kompatibilitetskontroll 2026-11-02
+
+**BLOCKED före build/backup/byte.** Båda tjänsterna är running/healthy och deras image-ID:n
+finns lokalt. Ingen root-autentisering, build, omstart, databaskontroll eller deployment utfördes.
+
+| Tjänst | Aktuell image | Container- och image-etikett för revision |
+| --- | --- | --- |
+| API | `sha256:c26a862197ca5d7aca1c87d7cd5bb097f33959c8f303e97a5ae3ff1d160cae44` | `a68c0247ea7a78ad5fadf6400ed8bc2e22ed35c0` |
+| Web | `sha256:4f3b10e760541a7d0dbbef4460cbbb0848cfbf1b5288745d2c4f480234885a4b` | `c4edb2fc1a693a7bdae4ab2bbc1c7fe63622290f` — **upstream, inte BigBrain** |
+
+Första verkliga stoppet är `ComposeProvenanceMissing`: API pekar på det arkiverade
+gateway-spårets skyddade `release.compose.json`; Web pekar på vanlig `compose.yaml`.
+API-filen är inte läsbar med nuvarande åtkomst. Web-konfigurationens renderade hash
+matchar Web men **inte API**; att bara ange Web-filen med `--compose` löser inte grinden.
+API:s writable layer innehåller dessutom `A /host-timesync`, vilket nuvarande
+rollback-imagekontroll nekar. Detta bevisar inte en manuell image-reparation;
+återstartbarheten är fortfarande oprövad och inget undantag införs.
+
+Webs `source`/`url`/`title` anger nginx upstream; revisionsetiketten är en verifierad
+[nginx-commit](https://github.com/nginx/docker-nginx-unprivileged/commit/c4edb2fc1a693a7bdae4ab2bbc1c7fe63622290f).
+BigBrains GitHub svarar att denna commit saknas; lokala objekt/refs/reflogs saknar den också.
+Web-Dockerfile och Web-only-skriptet sätter ingen egen OCI-revision, så basimagens etikett
+ärvs. Den tidigare rapporterade revisionen identifierar alltså inte BigBrain-källorna.
+Aktuell image har kandidat-taggen `8029bb2853a0913670e6dd4ff67c72f0ea439199`, som finns
+i accepterad main, men en flyttbar tagg är inte byggproveniens och används inte som reservbaslinje.
+Verifierbart BigBrain-ursprung för Web och reproducerbar, åtkomlig produktionskonfiguration
+kvarstår tillsammans med rollback-/backup-/dataintegritetsgrindarna. Dessutom är #25/#26
+ännu inte mergade. Kontrollen ger inget merge- eller deploymenttillstånd.
 
 Det [äldre paket-/approval-/workerspåret är fryst och arkiverat på plats](../operations/runbooks/approved-operations.md#fryst-och-arkiverat-skollunchspår--2026-11-01).

@@ -500,8 +500,17 @@ class StandardTests(unittest.TestCase):
         with self.assertRaises(d.backup.Blocked): self.dep.preflight()
 
     def test_candidate_revision_is_checked(self):
-        with patch.object(d, 'image_info', return_value={'Config': {'Labels': {}}}):
+        def images(image):
+            return {'Config': {'Labels': {'org.opencontainers.image.revision': REV} if image == OLD else {}}}
+        with patch.object(d, 'image_info', side_effect=images):
             with self.assertRaisesRegex(d.Blocked, 'ImageRevisionMismatch'): self.dep.preflight()
+
+    def test_runtime_label_cannot_replace_rollback_image_revision(self):
+        for role in d.ROLES:
+            with self.subTest(role=role):
+                self.runtime[role]['Config']['Labels']['org.opencontainers.image.revision'] = 'd' * 40
+                with self.assertRaisesRegex(d.Blocked, 'OldImageRevisionMismatch'): self.preflight()
+                self.runtime[role]['Config']['Labels']['org.opencontainers.image.revision'] = REV
 
     def test_image_entrypoint_change_rejected(self):
         def images(image):
@@ -552,6 +561,7 @@ class StandardTests(unittest.TestCase):
         def fake(args, *a):
             if args[1] == 'ls-remote': return (REV + '\trefs/heads/main').encode()
             if args[1] == 'rev-parse': return REV.encode()
+            if args[1] == 'cat-file': return b'commit\n'
             if args[1] == 'diff': return (self.path + '\0').encode()
             return b''
         with patch.object(d, 'command', side_effect=fake), patch.object(d, 'ci_green'):
@@ -573,6 +583,112 @@ class StandardTests(unittest.TestCase):
             # Only these local Python entrypoints; guards precede argument/root/host checks.
             result = subprocess.run([sys.executable, str(ROOT / 'scripts/approved-ops' / filename)], capture_output=True)
             self.assertNotEqual(result.returncode, 0)
+
+
+class GitGuardTests(unittest.TestCase):
+    """Actual local Git ancestry/deltas; no Docker or network requests."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.git('init', '-q')
+        self.git('config', 'user.name', 'Deployment test')
+        self.git('config', 'user.email', 'test@example.invalid')
+        self.git('config', 'commit.gpgsign', 'false')
+        self.git('config', 'core.hooksPath', '/dev/null')
+        self.api_file = 'src/BigBrain.Api/MealPlanner/SchoolMealService.cs'
+        self.web_file = 'src/BigBrain.Web/src/MediaDashboard.tsx'
+        self.write(self.api_file, 'old API')
+        self.write(self.web_file, 'old Web')
+        self.api_base = self.commit()
+        self.write(self.web_file, 'accepted Web-only text change')
+        self.web_base = self.commit()
+        self.write(self.api_file, 'memory fetch')
+        self.revision = self.commit()
+        self.originals = {r: container(r) for r in d.ROLES}
+        for role, base in (('api', self.api_base), ('web', self.web_base)):
+            self.originals[role]['Config']['Labels']['org.opencontainers.image.revision'] = base
+
+    def git(self, *args):
+        return subprocess.run(['git', *args], cwd=self.root, check=True, capture_output=True).stdout.decode().strip()
+
+    def write(self, path, value):
+        file = self.root / path
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(value)
+
+    def commit(self):
+        self.git('add', '.')
+        self.git('commit', '-qm', 'fixture')
+        return self.git('rev-parse', 'HEAD')
+
+    def guard(self):
+        real_command = d.command
+        def command(args, *a, **kw):
+            if args[:2] == ['git', 'ls-remote']:
+                return (self.revision + '\trefs/heads/main').encode()
+            return real_command(args, *a, **kw)
+        with patch.object(d, 'ROOT', self.root), patch.object(d, 'command', side_effect=command), \
+                patch.object(d, 'MEMORY_FETCH', self.api_base), patch.object(d, 'ci_green') as ci:
+            GIT_GUARD(self.revision, self.originals)
+            ci.assert_called_once_with(self.revision)
+
+    def test_accepted_web_delta_is_compared_to_web_baseline_not_older_api(self):
+        self.assertIn(self.web_file, self.git('diff', '--name-only', self.api_base, self.revision))
+        self.assertNotIn(self.web_file, self.git('diff', '--name-only', self.web_base, self.revision))
+        self.guard()
+
+    def test_new_web_delta_is_not_exempted_by_role_filter(self):
+        for path in (self.web_file, 'src/BigBrain.Web/src/FinanceDashboard.tsx',
+                     'src/BigBrain.Web/src/MediaImport.tsx', 'src/BigBrain.Web/Dockerfile',
+                     'src/BigBrain.Web/nginx.conf', 'src/BigBrain.Web/package-lock.json'):
+            with self.subTest(path=path):
+                self.write(path, 'unapproved new Web change')
+                self.revision = self.commit()
+                with self.assertRaisesRegex(d.Blocked, 'OutsideStandardScope'): self.guard()
+                # Restore the fixture's accepted contents before the next independent delta.
+                if path == self.web_file:
+                    self.write(path, 'accepted Web-only text change')
+                else:
+                    (self.root / path).unlink()
+
+    def test_api_finance_schema_privilege_bb158_and_build_changes_still_block(self):
+        for path in ('src/BigBrain.Api/MealPlanner/MealPlannerStore.cs',
+                     'src/BigBrain.Api/Finance/FinanceSchemaMigrations.cs',
+                     'src/BigBrain.Finance.Hosting/Program.cs', 'src/BigBrain.Api/Media/MediaImport.cs',
+                     'src/BigBrain.Api/Program.cs', 'src/BigBrain.Api/Dockerfile',
+                     'src/BigBrain.Api/appsettings.json', 'src/BigBrain.Modules/Finance/Authority.cs'):
+            with self.subTest(path=path):
+                self.write(path, 'out of scope')
+                self.revision = self.commit()
+                with self.assertRaisesRegex(d.Blocked, 'OutsideStandardScope'): self.guard()
+                (self.root / path).unlink()
+
+    def test_shared_inputs_and_infrastructure_remain_blocked(self):
+        for path in ('compose.yaml', '.dockerignore', 'Directory.Build.props', 'global.json',
+                     'infrastructure/sudoers', 'infrastructure/network.yaml'):
+            with self.subTest(path=path):
+                self.write(path, 'out of scope')
+                self.revision = self.commit()
+                with self.assertRaisesRegex(d.Blocked, 'OutsideStandardScope'): self.guard()
+                (self.root / path).unlink()
+
+    def test_missing_or_noncommit_web_revision_is_not_replaced_with_api_baseline(self):
+        for revision in ('c4edb2fc1a693a7bdae4ab2bbc1c7fe63622290f',
+                         self.git('rev-parse', 'HEAD:' + self.web_file)):
+            with self.subTest(revision=revision):
+                self.originals['web']['Config']['Labels']['org.opencontainers.image.revision'] = revision
+                with self.assertRaisesRegex(d.Blocked, 'OldRevisionUnavailable'): self.guard()
+
+    def test_local_unaccepted_revision_is_not_a_runtime_baseline(self):
+        branch = self.git('commit-tree', 'HEAD^{tree}', '-p', self.api_base, '-m', 'unaccepted')
+        self.originals['web']['Config']['Labels']['org.opencontainers.image.revision'] = branch
+        with self.assertRaisesRegex(d.Blocked, 'OldRevisionNotAccepted'): self.guard()
+
+    def test_both_runtime_baselines_are_required(self):
+        del self.originals['web']
+        with self.assertRaisesRegex(d.Blocked, 'MissingRuntimeBaseline'): self.guard()
 
 
 if __name__ == '__main__':

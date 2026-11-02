@@ -37,6 +37,14 @@ APP_FILES = {
     'src/BigBrain.Api/MealPlanner/SchoolMealService.cs',
     'src/BigBrain.Api/MealPlanner/MealPlannerStore.SchoolMeals.cs',
 }
+# These disjoint source trees are copied only by their respective Dockerfiles.
+# Other inputs (including root build/config files) remain subject to the shared gate.
+# Dockerfile changes themselves are NOT allowed by APP_FILES.
+SOURCE_TREES = {
+    'api': ('src/BigBrain.Api/', 'src/BigBrain.Modules/', 'src/BigBrain.Sentinel.Contracts/',
+            'src/BigBrain.Brain/', 'src/BigBrain.Finance.Hosting/'),
+    'web': ('src/BigBrain.Web/',),
+}
 CONFIG_FIELDS = ('User', 'Cmd', 'Entrypoint', 'WorkingDir', 'Healthcheck', 'StopTimeout', 'StopSignal')
 IMAGE_FIELDS = ('User', 'Cmd', 'Entrypoint', 'WorkingDir', 'Env', 'Healthcheck',
                 'StopSignal', 'Volumes', 'ExposedPorts', 'Shell', 'OnBuild')
@@ -139,12 +147,25 @@ def git_guard(revision, originals):
     need(command(['git', 'rev-parse', 'HEAD']).decode().strip() == revision, 'CheckoutNotAcceptedMain')
     need(not command(['git', 'status', '--porcelain', '--untracked-files=no']).strip(), 'TrackedChanges')
     command(['git', 'merge-base', '--is-ancestor', MEMORY_FETCH, revision])
-    for old in originals.values():
+    need(set(originals) == set(ROLES), 'MissingRuntimeBaseline')
+    for role, old in originals.items():
         base = old['Config']['Labels'].get('org.opencontainers.image.revision', '')
         need(re.fullmatch(SHA, base), 'OldRevisionUnknown')
-        command(['git', 'merge-base', '--is-ancestor', base, revision])
+        try:
+            need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
+        except Blocked:
+            raise Blocked('OldRevisionUnavailable') from None
+        try:
+            command(['git', 'merge-base', '--is-ancestor', base, revision])
+        except Blocked:
+            raise Blocked('OldRevisionNotAccepted') from None
         paths = command(['git', 'diff', '--no-renames', '--name-only', '-z', base, revision]).decode().split('\0')
         for path in filter(None, paths):
+            # API and Web may have been deployed from different accepted commits.
+            # The other application's delta is checked against ITS own baseline below.
+            other_role = 'web' if role == 'api' else 'api'
+            if path.startswith(SOURCE_TREES[other_role]):
+                continue
             need(path in APP_FILES or path.startswith(('docs/', 'tests/', 'scripts/'))
                  or path in {'AGENTS.md', '.github/workflows/ci.yml'}, 'OutsideStandardScope')
     ci_green(revision)
@@ -304,6 +325,8 @@ class Deployment:
             healthy(old)
             need(old['Config']['Labels'].get('com.docker.compose.config-hash') == hashes[role], 'ComposeRuntimeMismatch')
             prior = image_info(old['Image'])
+            need(prior['Config'].get('Labels', {}).get('org.opencontainers.image.revision')
+                 == old['Config']['Labels'].get('org.opencontainers.image.revision'), 'OldImageRevisionMismatch')
             need(all(old['Config'].get(k) == prior['Config'].get(k)
                      for k in ('User', 'Cmd', 'Entrypoint', 'WorkingDir')), 'RuntimeEntrypointOverride')
             # A healthy container repaired in its writable layer is not a safe rollback image.

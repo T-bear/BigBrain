@@ -37,6 +37,15 @@ och ofullständigt bygg-/omstartsflöde. Korrigering i samma PR är offline-veri
 andra T2-reviewvarvet och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
 bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
 
+Sista kompatibilitetskontrollen 2026-11-02 av `e3f5e3b` och main `e7e81d2`:
+API/Web är healthy vid skrivskyddad inspektion, men STANDARD är **BLOCKED** av olika
+Compose-ursprung, skyddad API-konfiguration och obestyrkt BigBrain-ursprung för Web.
+Webs tidigare rapporterade OCI-revision tillhör nginx upstream. `git_guard()` korrigeras
+i samma PR för respektive apps egen runtime-baslinje; 150 offline-tester PASS, utan
+undantag för okänt ursprung eller förbjudna deltan. [Befintligt spårunderlag](policy/lanes.md#skrivskyddad-kompatibilitetskontroll-2026-11-02)
+bevarar image-ID:n, konkreta stopp och verifieringsgränser. Ingen root-autentisering,
+merge eller deployment; korrigerad kandidat kräver fortsatt oberoende T2-granskning.
+
 | Tillstånd | Verifierad eller dokumenterad evidens |
 | --- | --- |
 | Implementerat och mergat | V1: `6d7f6de68f618f6c06b0845b659983ec12529f96`. V2-plan: `1125b65393e99d3606fbdb00d67cbd02d5582f36`. V2: `c8aaba15ac6382b6934591acfa6f615505c95819`. Alla ingår i verifierad main. |
