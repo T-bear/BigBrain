@@ -36,6 +36,8 @@ SHA = r'[0-9a-f]{40}'
 IMAGE = r'sha256:[0-9a-f]{64}'
 SDK_VERSION = '10.0.302'
 SDK_REPOSITORY = 'mcr.microsoft.com/dotnet/sdk'
+RUNTIME_REPOSITORY = 'mcr.microsoft.com/dotnet/aspnet'
+RUNTIME_KEYS = ('DOTNET_VERSION', 'ASPNET_VERSION')
 BACKUP_IMAGE = 'python@sha256:b658b05ce9c4eb97ec6fc19424818a1f31993659c2b505a532f470e83807815d'
 HELPER_HOME = Path('/tmp/bigbrain-standard-backup')
 IDENTITY_FIELDS = ('device', 'inode', 'uid', 'gid', 'mode')
@@ -115,6 +117,30 @@ def fingerprint(c):
              'mounts': sorted((m['Type'], m.get('Name'), m['Source'], m['Destination'], m['RW']) for m in c['Mounts']),
              'networks': sorted(c['NetworkSettings']['Networks'])}
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+
+
+def runtime_versions(env):
+    need(isinstance(env, list) and all(isinstance(x, str) and '=' in x for x in env),
+         'RuntimeEnvironmentUnknown')
+    pairs = [x.split('=', 1) for x in env]
+    need(len({k for k, _ in pairs}) == len(pairs), 'RuntimeEnvironmentAmbiguous')
+    values = dict(pairs)
+    versions = {k: values.get(k, '') for k in RUNTIME_KEYS}
+    need(all(re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', v)
+             for v in versions.values()) and len(set(versions.values())) == 1,
+         'RuntimeVersionInvalid')
+    return versions
+
+
+def runtime_patch(prior, candidate):
+    before, after = runtime_versions(prior), runtime_versions(candidate)
+    old, new = (tuple(map(int, versions['DOTNET_VERSION'].split('.'))) for versions in (before, after))
+    need(old[:2] == new[:2] and new >= old, 'RuntimePatchRequired')
+    # Preserve every other entry and its ordering, just like the original image check.
+    expected = [x.split('=', 1)[0] + '=' + after[x.split('=', 1)[0]]
+                if x.split('=', 1)[0] in RUNTIME_KEYS else x for x in prior]
+    need(expected == candidate, 'ImageRuntimeContractChanged')
+    return before, after
 
 
 def healthy(c):
@@ -479,6 +505,9 @@ class Deployment:
         self.timesync = None
         self.data = None
         self.helper_incomplete = False
+        self.runtime_build = None
+        self.runtime_contract = None
+        self.replacement_ids = {}
 
     def compose_model(self, config, *args):
         return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
@@ -690,10 +719,35 @@ class Deployment:
         return folder
 
     def bind_images(self):
+        contract = None
         for role, old in self.originals.items():
             prior, candidate = image_info(old['Image']), image_info(self.images[role])
             need(candidate['Config'].get('Labels', {}).get('org.opencontainers.image.revision') == self.revision, 'ImageRevisionMismatch')
-            need(all(candidate['Config'].get(k) == prior['Config'].get(k) for k in IMAGE_FIELDS), 'ImageRuntimeContractChanged')
+            need(all(candidate['Config'].get(k) == prior['Config'].get(k) for k in IMAGE_FIELDS if k != 'Env'), 'ImageRuntimeContractChanged')
+            if candidate['Config'].get('Env') != prior['Config'].get('Env'):
+                need(role == 'api', 'ImageRuntimeContractChanged')
+                before, after = runtime_patch(prior['Config'].get('Env'), candidate['Config'].get('Env'))
+                proof = self.runtime_build
+                need(proof is not None and proof['image'] == self.images[role]
+                     and proof['revision'] == self.revision and proof['versions'] == after
+                     and re.fullmatch(re.escape(RUNTIME_REPOSITORY) + r'@sha256:[0-9a-f]{64}', proof['base']),
+                     'RuntimeBuildProofMissing')
+                expected = copy.deepcopy(old)
+                overrides = self.config['services'][role].get('environment', {})
+                need(isinstance(overrides, dict), 'RuntimeEnvironmentUnknown')
+                runtime_versions(old['Config']['Env'])
+                for key in RUNTIME_KEYS:
+                    if key in overrides:
+                        need(isinstance(overrides[key], str) and
+                             key + '=' + overrides[key].replace('$$', '$') in old['Config']['Env'],
+                             'RuntimeEnvironmentOverrideChanged')
+                    else:
+                        need(key + '=' + before[key] in old['Config']['Env'], 'RuntimeEnvironmentUnknown')
+                        expected['Config']['Env'][expected['Config']['Env'].index(key + '=' + before[key])] = key + '=' + after[key]
+                runtime_versions(expected['Config']['Env'])
+                contract = {'original': old['Image'], 'image': self.images[role],
+                            'env': expected['Config']['Env']}
+        self.runtime_contract = contract
         self.release = release_config(self.config, self.images)
         for service in self.release['services'].values():
             service.setdefault('labels', {})['org.opencontainers.image.revision'] = self.revision
@@ -716,6 +770,8 @@ class Deployment:
         need(re.fullmatch(r'10\.0\.3[0-9]{2}', SDK_VERSION), 'IncompatibleBuildSdk')
         sdk_ref = SDK_REPOSITORY + ':' + SDK_VERSION
         bases = {}
+        runtime = None
+        self.runtime_build = None
         for role in ROLES:
             original = source / ('src/BigBrain.' + ('Api' if role == 'api' else 'Web') + '/Dockerfile')
             lines = original.read_text().splitlines()
@@ -741,8 +797,19 @@ class Deployment:
                     matches = [x for x in info.get('RepoDigests', []) if x.startswith(repo + '@sha256:')]
                     need(len(matches) == 1 and re.fullmatch(r'.+@sha256:[0-9a-f]{64}', matches[0]), 'UnpinnedBuildBase')
                     bases[ref] = matches[0]
+                    if role == 'api' and repo == RUNTIME_REPOSITORY:
+                        runtime = {'base': matches[0], 'versions': runtime_versions(info['Config'].get('Env'))}
                 fields[1] = bases[ref]
                 lines[index] = ' '.join(fields)
+            if role == 'api':
+                need(runtime is not None and lines.count('FROM ' + runtime['base'] + ' AS runtime') == 1,
+                     'UnsupportedRuntimeBuildDefinition')
+                version = runtime['versions']['DOTNET_VERSION']
+                # Final-stage content proof, after all COPY/RUN instructions, as the
+                # image user. Numeric values are validated before shell interpolation.
+                lines.append('RUN runtimes="$(dotnet --list-runtimes)" && test "$runtimes" = "$(printf \'%s\\n\' '
+                             + "'Microsoft.AspNetCore.App " + version + " [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]' "
+                             + "'Microsoft.NETCore.App " + version + " [/usr/share/dotnet/shared/Microsoft.NETCore.App]')\"")
             pinned = self.folder / (role + '.Dockerfile')
             pinned.write_text('\n'.join(lines) + '\n')
             iid = self.folder / (role + '.iid')
@@ -752,11 +819,16 @@ class Deployment:
                    '--build-arg', 'BIGBRAIN_REVISION=' + self.revision, str(source), timeout=1200, mutation=True)
             self.images[role] = iid.read_text().strip()
             image_info(self.images[role])
+            if role == 'api':
+                self.runtime_build = {**runtime, 'revision': self.revision, 'image': self.images[role],
+                                      'dockerfileSha256': backup.digest(pinned),
+                                      'verification': 'final-stage dotnet --list-runtimes exact content check'}
             self.unchanged()
         self.bind_images()
         save(self.folder / 'build.json', {'revision': self.revision,
              'tree': command(['git', 'rev-parse', self.revision + '^{tree}']).decode().strip(),
              'archiveSha256': backup.digest(archive), 'bases': bases, 'images': self.images,
+             'runtime': self.runtime_build,
              'sdk': {'version': SDK_VERSION, 'image': bases[sdk_ref],
                      'globalJsonSha256': backup.digest(source / 'global.json'),
                      'verification': 'dotnet --version with archived global.json during API build'}})
@@ -787,7 +859,7 @@ class Deployment:
                 '--security-opt', 'no-new-privileges', '--restart', 'no',
                 '--memory', '768m', '--cpus', '1', '--pids-limit', '256', '--user', uid,
                 '--tmpfs', f'/tmp:rw,nosuid,nodev,uid={uid_number},gid={gid},mode=0700']
-        env = dict(entry.split('=', 1) for entry in old['Config']['Env'])
+        env = dict(entry.split('=', 1) for entry in self.expected_environment(role, image))
         roots = {}
         if role == 'api':
             # Disable external work only in the probe; production snapshot is unchanged.
@@ -871,11 +943,25 @@ class Deployment:
         need(self.data is not None, 'BackupDataUnverified')
         same_data(self.data, self.helper_data())
 
+    def expected_environment(self, role, image):
+        contract = self.runtime_contract
+        if role == 'api' and contract is not None and image != self.originals[role]['Image']:
+            need(image == self.images[role] == contract['image']
+                 and self.originals[role]['Image'] == contract['original'], 'RuntimeImageBindingChanged')
+            return contract['env']
+        return self.originals[role]['Config']['Env']
+
+    def runtime_matches(self, role, container, image):
+        expected = copy.deepcopy(self.originals[role])
+        expected['Config']['Env'] = self.expected_environment(role, image)
+        return container['Image'] == image and fingerprint(container) == fingerprint(expected)
+
     def wait_healthy(self, role, image):
         deadline = time.monotonic() + 100
         while time.monotonic() < deadline:
             c = self.current(role)
-            need(c['Image'] == image and fingerprint(c) == fingerprint(self.originals[role]), 'ReplacementConfigChanged')
+            need(self.runtime_matches(role, c, image), 'ReplacementConfigChanged')
+            need(c['Id'] == self.replacement_ids.get(role, self.originals[role]['Id']), 'ReplacementIdentityChanged')
             need(c['State']['Running'] or c['State'].get('Restarting'), 'ReplacementExited')
             if role == 'api' and self.timesync is not None and c['State']['Running']:
                 need(timesync_identity(c, self.config['services']['api']) == self.timesync, 'TimesyncIdentityMismatch')
@@ -889,24 +975,43 @@ class Deployment:
 
     def stop(self, role, recovery=False):
         c = self.current(role)
+        original = c['Id'] == self.originals[role]['Id']
+        image = self.originals[role]['Image'] if original else self.images[role]
+        need((original or recovery and c['Id'] == self.replacement_ids.get(role))
+             and self.runtime_matches(role, c, image), 'UncleanStop')
         if c['State']['Running'] or c['State'].get('Restarting'):
             docker('stop', '--time', '-1', c['Id'], timeout=90, mutation=True)
         stopped = inspect(c['Id'])
+        need(stopped['Id'] == c['Id'] and self.runtime_matches(role, stopped, image), 'UncleanStop')
         # A failed candidate is not the original healthy service. Its known exit=1
         # must not prevent image rollback, but never waive the original's clean stop.
         failed_candidate = (recovery and stopped['Id'] != self.originals[role]['Id']
                             and stopped['Image'] == self.images[role]
-                            and fingerprint(stopped) == fingerprint(self.originals[role])
+                            and self.runtime_matches(role, stopped, self.images[role])
                             and stopped['State'].get('Status') == 'exited')
         need(not stopped['State']['Running'] and not stopped['State'].get('Restarting')
              and not stopped['State'].get('Dead') and not stopped['State']['OOMKilled']
-             and (stopped['State']['ExitCode'] == 0 or failed_candidate), 'UncleanStop')
+             and (stopped['State']['ExitCode'] == 0 or failed_candidate and stopped['State']['ExitCode'] == 1), 'UncleanStop')
 
     def switch(self, role, recovery=False):
         self.stop(role, recovery=recovery)
         path = self.folder / ('rollback.json' if recovery else 'release.json')
-        self.compose(path, 'up', '-d', '--no-deps', '--no-build', '--pull', 'never', '--force-recreate', role, mutation=True)
+        previous_id = self.current(role)['Id']
+        try:
+            self.compose(path, 'up', '-d', '--no-deps', '--no-build', '--pull', 'never', '--force-recreate', role, mutation=True)
+        except Uncertain:
+            raise
+        except Blocked:
+            self.identify_replacement(role, previous_id, recovery)
+            raise
+        self.identify_replacement(role, previous_id, recovery)
         self.wait_healthy(role, self.originals[role]['Image'] if recovery else self.images[role])
+
+    def identify_replacement(self, role, previous_id, recovery):
+        c = self.current(role)
+        image = self.originals[role]['Image'] if recovery else self.images[role]
+        need(c['Id'] != previous_id and self.runtime_matches(role, c, image), 'ReplacementConfigChanged')
+        self.replacement_ids[role] = c['Id']
 
     def execute(self):
         no_pending_run(self.state)
