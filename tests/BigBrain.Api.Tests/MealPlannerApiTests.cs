@@ -173,7 +173,7 @@ public sealed class MealPlannerApiTests : IDisposable
         Assert.False(rss.IsFixture);
         Assert.Equal(2026, rss.Year);
         Assert.Equal(43, rss.Week);
-        Assert.Equal(clock.GetUtcNow().AddSeconds(60), rss.ValidUntilUtc);
+        Assert.Equal(new DateTimeOffset(2026, 10, 25, 23, 0, 0, TimeSpan.Zero), rss.ValidUntilUtc);
         var html = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=musikugglan", TestContext.Current.CancellationToken);
         Assert.Equal("unavailable", html!.Status);
         var partial = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026", TestContext.Current.CancellationToken);

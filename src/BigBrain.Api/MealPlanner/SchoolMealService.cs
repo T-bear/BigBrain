@@ -7,6 +7,7 @@ public sealed record SchoolMealOptions
     public bool Enabled { get; init; }
     public bool RosenfeldtEnabled { get; init; }
     public bool MusikugglanEnabled { get; init; }
+    public bool DailySnapshot { get; init; } = true;
 }
 
 // One singleton per API process: independent, on-demand memory caches and source cooldowns.
@@ -17,6 +18,8 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
         public readonly SemaphoreSlim Gate = new(1, 1);
         public DateTimeOffset NextAttempt;
         public DateTimeOffset? CheckedAt;
+        public int? CheckedYear;
+        public int? CheckedWeek;
         public DateTimeOffset? ValidatedAt;
         public SchoolMealWeek? Menu;
         public string? ETag;
@@ -58,6 +61,8 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
         try
         {
             if (CurrentWeek() != (year, week)) return Empty("notPublished");
+            if (config.DailySnapshot)
+                return await GetDailyAsync(entry, school, year, week, token);
             var now = clock.GetUtcNow();
             if (entry.Menu is { } previous && (previous.Year != year || previous.Week != week))
             {
@@ -136,6 +141,104 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
             };
         }
         finally { entry.Gate.Release(); }
+    }
+
+    // Parsed application snapshot, independent of HTTP cache freshness.
+    private async Task<SchoolMealWeek> GetDailyAsync(
+        Entry entry, string school, int year, int week,
+        CancellationToken token)
+    {
+        SchoolMealWeek Empty(string status) =>
+            SchoolMeals.Create(school, year, week, status, "unknown", false, []);
+
+        if (entry.CheckedYear != year || entry.CheckedWeek != week)
+        {
+            entry.ClearMenu();
+            entry.CheckedAt = null;
+            entry.CheckedYear = year;
+            entry.CheckedWeek = week;
+            entry.Status = "unavailable";
+        }
+
+        var now = clock.GetUtcNow();
+        if ((entry.CheckedAt is null ||
+             now - entry.CheckedAt.Value >= TimeSpan.FromDays(1))
+            && now >= entry.NextAttempt)
+        {
+            entry.CheckedAt = now;
+            entry.NextAttempt = DateTimeOffset.MaxValue;
+
+            // Complete response only; do not reuse HTTP cache entries.
+            var response = await source.GetAsync(
+                school, null, null, token, null,
+                acceptApplicationData: true);
+
+            var completedAt = clock.GetUtcNow();
+            var next = completedAt.AddSeconds(60);
+            if (response.RetryAt > next)
+                next = response.RetryAt.Value;
+
+            entry.NextAttempt = response.HeadersVerified
+                ? next : DateTimeOffset.MaxValue;
+
+            entry.Status = response.HeadersVerified
+                ? response.Status : "unavailable";
+
+            if (entry.Status == "cachePolicy")
+            {
+                entry.ClearMenu();
+            }
+            else if (response.HeadersVerified &&
+                     response.Content is { } content)
+            {
+                var parsed = school == SchoolMeals.Rosenfeldt
+                    ? SchoolMeals.ParseRss(content, year, week)
+                    : MusikugglanSchoolMeals.Parse(content, year, week);
+
+                entry.Status = parsed.Status;
+
+                if (parsed.Status == "published")
+                {
+                    entry.ValidatedAt = completedAt;
+                    entry.Menu = parsed with
+                    {
+                        FetchedAtUtc = completedAt,
+                        SourceUpdatedAtUtc = response.Modified
+                    };
+                }
+                else if (parsed.Status == "notPublished")
+                {
+                    entry.ClearMenu();
+                }
+            }
+        }
+
+        if (CurrentWeek() != (year, week))
+            return Empty("notPublished");
+
+        if (entry.Menu is not { } menu)
+            return Empty(entry.Status) with
+            {
+                LastCheckedAtUtc = entry.CheckedAt,
+                SourceStatus = entry.Status
+            };
+
+        var nextMonday = ISOWeek.ToDateTime(
+            year, week, DayOfWeek.Monday).AddDays(7);
+
+        var weekEnd = new DateTimeOffset(
+            TimeZoneInfo.ConvertTimeToUtc(nextMonday, Stockholm),
+            TimeSpan.Zero);
+
+        return menu with
+        {
+            LastCheckedAtUtc = entry.CheckedAt,
+            IsStale = entry.Status != "published" ||
+                (entry.CheckedAt is { } checkedAt &&
+                 now - checkedAt >= TimeSpan.FromDays(1)),
+            SourceStatus = entry.Status,
+            ValidUntilUtc = weekEnd
+        };
     }
 
     public void Dispose()

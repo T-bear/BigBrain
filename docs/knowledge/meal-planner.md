@@ -117,14 +117,57 @@ ovanstående UI-regel om enbart lokal fokus-/synlighetskontroll. **Inte deployat
   av Age, transport och visning; golvet räknas efter avslutat försök. Utgången meny döljs även
   om golv/Retry-After hindrar ny kontroll. En öppen vy uppdateras inte automatiskt vid utgång.
 
-**Leverantörsbesked: fortfarande PENDING för båda källorna.** Inget komplett ägaruppgivet besked
-med datum, avsändare, exakt formulering, frekvens och omfattning har lämnats i detta uppdrag.
-För Skolmat.info krävs uttrycklig täckning av automatiserad RSS-hämtning trots tidigare observerat
-`robots.txt: Disallow: /`. Ägaruppgifter ska märkas som sådana, aldrig som självständigt verifierat
-avtal. Privat korrespondens får inte publiceras. Inga leverantörsanrop görs för dessa tester;
-ny liveverifiering/aktivering/deployment är fortsatt blockerad tills tillämpliga besked och beslut finns.
+**Historiskt leverantörsläge vid denna T2-checkpoint (ersatt 2026-11-03):**
+Projektets underlag markerade då båda tillstånden som `PENDING`, inklusive
+automatisk RSS-hämtning trots tidigare observerat `robots.txt: Disallow: /`.
+Checkpointen omfattade inga nya leverantörsanrop eller driftåtgärder.
+Ett senare uttryckligt produktägarbesked dokumenteras i avsnittet om
+daglig veckomeny nedan. Historisk osäkerhet ska inte presenteras som
+att produktägaren fortfarande måste upprepa sitt besked.
 
 [Gemensam checkpoint och testproveniens](../reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).
+
+## Skollunch – daglig veckomeny (reviewförslag, 2026-11-03)
+
+Detta är ännu inte mergat, deployat eller manuellt accepterat.
+
+- Senast lyckad parsad meny behålls i processminnet för aktuell
+  ISO-vecka och visas även om HTTP-färskheten har löpt ut.
+- En efterfrågestyrd kontroll per skola och rullande 24 timmar.
+- Misslyckad kontroll behåller tidigare veckomeny med `isStale`.
+- Fullständiga HTTP 200-svar med `Vary: *` eller förbrukad
+  HTTP-färskhet får användas som separat applikationsdata,
+  under förutsättning att leverantörstillståndet omfattar detta.
+- `no-store`, `no-cache`, `private`, ogiltiga headers och
+  felaktiga svar accepteras inte.
+- 60-sekundersgolv, `Retry-After`, veckokontroll och skydd
+  mot parallella anrop bevaras.
+- Inga databaser, nya tjänster, bakgrundsanrop eller polling.
+- Serveromstart tappar minneskopian; inget gammalt veckonummer
+  får presenteras som aktuell matsedel.
+
+**Leverantörstillstånd – produktägarbekräftelse 2026-11-03:**
+
+Produktägaren har upprepade gånger bekräftat att både **Skolmat.info**
+och **Tant Grön** har gett fullt tillstånd utan slutdatum för BigBrains
+automatiserade hämtning, lokala lagring, återanvändning och visning
+av matsedelsinformation. Enligt produktägaren omfattar tillstånden
+de aktuella källvägarna, inklusive Skolmat.infos RSS, och den
+föreslagna efterfrågestyrda dagliga kontrollen.
+
+Detta är **produktägarens uttryckliga uppgift**, inte ett självständigt
+granskat leverantörsavtal. Ingen avsändare, avtalsformulering eller
+privat korrespondens påstås ha verifierats av ChatGPT.
+
+Den tidigare markeringen `PENDING` avseende saknat
+**produktägarbesked** är därmed ersatt. Produktägaren ska inte
+behöva lämna samma besked igen.
+
+Befintliga tekniska säkerhetskrav gäller oförändrat: HTTP-svarens
+uttryckliga förbud, Retry-After, källisolering, relevanta tester,
+oberoende granskning, CI, STANDARD-driftkontroller och fysisk
+iPhone/PWA-acceptans. Dokumentationen i sig gör ingen merge,
+deployment eller ny extern hämtning.
 
 ## Relaterade runbooks
 

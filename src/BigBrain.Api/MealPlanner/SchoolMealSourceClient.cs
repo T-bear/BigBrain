@@ -24,7 +24,7 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
     };
 
     public async Task<SchoolMealSourceResult> GetAsync(string school, string? etag, DateTimeOffset? modified, CancellationToken token,
-        SchoolMealCachePolicy? previousPolicy = null)
+        SchoolMealCachePolicy? previousPolicy = null, bool acceptApplicationData = false)
     {
         var url = school switch
         {
@@ -104,7 +104,14 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
                 return Result("unavailable");
             if (notModified && (previousPolicy is null || !MatchesStoredValidator(response, etag, modified)))
                 return Result("invalid");
-            if (reason != "cacheAccepted") return Result("cachePolicy");
+            // A complete 200 body may supply separately permitted
+            // application data even when HTTP cache reuse is forbidden
+            // by Vary:* or exhausted freshness.
+            if (reason != "cacheAccepted" &&
+                !(acceptApplicationData &&
+                  response.StatusCode == HttpStatusCode.OK &&
+                  (reason is "varyStar" or "noFreshness")))
+                return Result("cachePolicy");
             if (notModified) return Result("notModified", responseEtag: response.Headers.ETag?.ToString() ?? etag,
                 responseModified: response.Content.Headers.LastModified ?? modified);
             var type = response.Content.Headers.ContentType?.MediaType;

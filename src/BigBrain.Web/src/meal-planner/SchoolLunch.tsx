@@ -68,8 +68,13 @@ export function SchoolLunch({
         .then(menu => {
           if (controller.signal.aborted) return
           const visible = expireMenu(menu)
-          if (!visible.isFixture && visible.status === 'published') {
-            refreshable.set(school.id, Date.parse(visible.validUntilUtc!))
+          if (!visible.isFixture) {
+            const weekEnd =
+              visible.status === 'published' && visible.validUntilUtc ? Date.parse(visible.validUntilUtc) : Infinity
+            const nextCheck = visible.lastCheckedAtUtc
+              ? Math.min(Date.parse(visible.lastCheckedAtUtc) + 86400000, weekEnd)
+              : weekEnd
+            if (Number.isFinite(nextCheck)) refreshable.set(school.id, nextCheck)
           }
           setFailed(current => current.filter(id => id !== school.id))
           setMenus(current => ({ ...current, [school.id]: visible }))
@@ -155,7 +160,7 @@ export function SchoolLunch({
                   </>
                 )}
               </h3>
-              {failed.includes(school.id) ? (
+              {failed.includes(school.id) && menu?.status !== 'published' ? (
                 <p role="alert">
                   {fixture
                     ? 'Testmenyn kunde inte läsas. Kontrollera att API körs i utvecklingsläge.'
@@ -165,8 +170,15 @@ export function SchoolLunch({
                 <p role="status">{offlinePreview ? statusText.offline : 'Läser skolmeny…'}</p>
               ) : (
                 <>
+                  {failed.includes(school.id) && menu.status === 'published' && (
+                    <p role="status">Kunde inte kontrollera matsedeln; visar senast hämtad information.</p>
+                  )}
                   {menu.isFixture && <p>Historiskt offline-exempel från produktägarens manuellt hämtade fil.</p>}
-                  {menu.isStale && <p role="status">Inaktuell meny – senaste kontrollen misslyckades.</p>}
+                  {menu.isStale && (
+                    <p role="status">
+                      Matsedeln kan vara inaktuell – senaste kontrollen kunde inte bekräfta ny information.
+                    </p>
+                  )}
                   {menu.status !== 'published' && (
                     <p role="status">{statusText[menu.status] ?? 'Information saknas.'}</p>
                   )}

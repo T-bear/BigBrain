@@ -26,6 +26,30 @@ Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant 
 
 ## Family — Skollunch
 
+**Aktuell granskningsstatus 2026-11-03 – PR #33, ännu inte mergad:**
+Daglig minnesbaserad veckomeny är publicerad för granskning på
+`review/chatgpt-20261103-185716-3410735`. Kandidaten har
+automatiskt verifierats med fyra gröna GitHub-CI-jobb före
+denna dokumentationsuppdatering. Ny slutlig revision kräver
+sina egna kontroller. Ingen ny deployment eller fysisk
+iPhone/PWA-acceptans påstås.
+
+**Leverantörstillstånd enligt produktägaren:**
+Produktägaren har uttryckligen och upprepade gånger bekräftat
+fullt tillstånd utan slutdatum från både Skolmat.info och
+Tant Grön för automatisk hämtning, lagring och visning.
+Beskedet omfattar enligt produktägaren även Skolmat.infos
+RSS-väg och den avsedda dagliga kontrollen.
+
+Detta är ägarbekräftad uppgift, inte en självständigt
+verifierad avtalskopia. Tidigare `PENDING`-formuleringar
+nedan hör till äldre checkpoints och betyder inte att
+ägaren behöver lämna samma besked ytterligare en gång.
+
+[Befintligt och föreslaget kontrakt](knowledge/meal-planner.md#skollunch--daglig-veckomeny-reviewförslag-2026-11-03).
+Merge, deployment, driftkontroller och fysisk acceptans
+är fortsatt separata steg.
+
 Aktuellt reviewarbete 2026-11-03: `fix/school-meal-demand-standard` utgår från verifierad
 main `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1` (PR #31 MERGED, main-CI fyra SUCCESS).
 Ägaren har beslutat 60 sekunders anropsgolv för båda källorna och UX B. Färsk meny återanvänds;

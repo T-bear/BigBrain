@@ -32,7 +32,7 @@ public sealed class SchoolMealLiveTests
     };
     private static MealPlannerOptions Enabled => new()
     {
-        SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true }
+        SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true, DailySnapshot = false }
     };
     private static SchoolMealService Service(Handler handler, Clock clock, MealPlannerOptions? options = null) =>
         new(options ?? Enabled, new SchoolMealSourceClient(new HttpClient(handler), clock, NullLogger<SchoolMealSourceClient>.Instance), clock);
