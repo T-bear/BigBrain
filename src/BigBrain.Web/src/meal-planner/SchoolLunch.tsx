@@ -49,9 +49,12 @@ export function SchoolLunch({
   useEffect(() => {
     if (offlinePreview) return
     const controller = new AbortController()
+    // One focus refresh per menu that was actually displayed while fresh. Consume it
+    // before the request, so focus/visibility pairs and failed replies cannot retry it.
+    const refreshable = new Map<string, number>()
     setMenus({})
     setFailed([])
-    for (const school of schools) {
+    const load = (school: (typeof schools)[number]) => {
       void getSchoolMeals(
         school.id,
         fixture ? 2026 : undefined,
@@ -60,13 +63,36 @@ export function SchoolLunch({
         controller.signal,
       )
         .then(menu => {
-          if (!controller.signal.aborted) setMenus(current => ({ ...current, [school.id]: expireMenu(menu) }))
+          if (controller.signal.aborted) return
+          const visible = expireMenu(menu)
+          if (!visible.isFixture && visible.status === 'published') {
+            refreshable.set(school.id, Date.parse(visible.validUntilUtc!))
+          }
+          setMenus(current => ({ ...current, [school.id]: visible }))
         })
         .catch(() => {
           if (!controller.signal.aborted) setFailed(current => [...current, school.id])
         })
     }
-    return () => controller.abort()
+    for (const school of schools) load(school)
+    const resume = () => {
+      if (fixture || document.visibilityState !== 'visible') return
+      setMenus(current => Object.fromEntries(Object.entries(current).map(([id, menu]) => [id, expireMenu(menu)])))
+      for (const school of schools) {
+        const deadline = refreshable.get(school.id)
+        if (deadline !== undefined && deadline <= Date.now()) {
+          refreshable.delete(school.id)
+          load(school)
+        }
+      }
+    }
+    window.addEventListener('focus', resume)
+    document.addEventListener('visibilitychange', resume)
+    return () => {
+      controller.abort()
+      window.removeEventListener('focus', resume)
+      document.removeEventListener('visibilitychange', resume)
+    }
   }, [fixture, offlinePreview])
 
   useEffect(() => {
@@ -78,12 +104,8 @@ export function SchoolLunch({
     const expire = () =>
       setMenus(current => Object.fromEntries(Object.entries(current).map(([id, menu]) => [id, expireMenu(menu)])))
     const timer = window.setTimeout(expire, Math.max(0, Math.min(...deadlines) - Date.now()))
-    window.addEventListener('focus', expire)
-    document.addEventListener('visibilitychange', expire)
     return () => {
       window.clearTimeout(timer)
-      window.removeEventListener('focus', expire)
-      document.removeEventListener('visibilitychange', expire)
     }
   }, [menus])
 

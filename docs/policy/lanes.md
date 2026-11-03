@@ -58,8 +58,11 @@ den skyddade gateway-filen behöver inte läsas om rekonstruktionen verifieras f
    Varje apps diff bedöms från dess egen runtime-revision: Web-källor som inte kopieras
    av API:s Dockerfile räknas endast mot Web-baslinjen, och omvänt för API:s källträd.
    Gemensamma/okända bygg- och konfigurationsinputs undantas inte. API-deltan tillåter
-   initialt endast `SchoolMealService.cs` och borttagna `MealPlannerStore.SchoolMeals.cs`;
-   Web tillåter ingen ny appdelta. Dokumentation/tester/driftskript/CI tillåts som tidigare.
+   `SchoolMealService.cs`, borttagna `MealPlannerStore.SchoolMeals.cs`, `SchoolMealSourceClient.cs`
+   och `SchoolMeals.cs` under `src/BigBrain.Api/MealPlanner/`. Web tillåter endast
+   `src/BigBrain.Web/src/api.ts`, `src/BigBrain.Web/src/meal-planner/SchoolLunch.tsx` och
+   `src/BigBrain.Web/src/meal-planner/SchoolLunch.test.tsx`. Dessa fem tillägg är reviewarbete
+   enligt avsnittet nedan. Dokumentation/tester/driftskript/CI tillåts som tidigare.
    Därmed blockeras fortfarande nya Finance-/BB-158-, schema-, rättighets- och nätverks-
    ändringar. Sökvägstestet ersätter aldrig semantisk schema-/säkerhetsreview.
 2. Bygg **både API och Web medan originalen kör** från ett `git archive` av exakt SHA.
@@ -352,3 +355,43 @@ Denna checkpoint är en kodkorrigering, inte deploymentacceptans.
 Produktionsbackup, återstartstester och tjänstebyte är fortfarande
 NOT RUN för den korrigerade revisionen. Oberoende T2-review krävs
 före merge. Ingen omkörning eller produktionsändring ingår.
+
+### Skollunch och STANDARD-guardfix — T2-checkpoint 2026-11-03
+
+Baseline `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1`; en gemensam checkpoint med
+[Skollunchkontraktet](../knowledge/meal-planner.md#skollunch--behovsstyrd-omvalidering-och-ux-b-t2-checkpoint-2026-11-03).
+Ingen merge eller deployment. Tidigare läsande preflight mot denna main identifierade API/Web
+på `6ecf6f4b34b044c41164fa75d7297010499eaa2e` och två faktiska hinder: `ComposeEnvironmentMissing`
+för körande Compose-label `/dev/null`, samt fem exakta filer utanför `APP_FILES`.
+CLI stannade med exitkod 1 före config-hashkontrollen; separat oförändrad `git_guard` bekräftade
+`OutsideStandardScope`. Det var inte det avsiktliga uppskjutna avslutet med exitkod 2.
+Detta är daterad preflightevidens, inte ny runtimeverifiering i implementationsuppdraget.
+
+Tillåtelselistan utökas med exakt följande filer, utan SHA-undantag eller katalogwildcards:
+
+| Fullständig sökväg | Beteende/beroende och risk | Nödvändig regression/gräns |
+| --- | --- | --- |
+| `src/BigBrain.Api/MealPlanner/SchoolMealSourceClient.cs` | Skollunchens HTTP-adapter, validatorer och cachemetadata; fel kan ge otillåten återanvändning eller anrop. | Cachevillkor, 200/304, Retry-After, anropsgolv och källisolering. |
+| `src/BigBrain.Api/MealPlanner/SchoolMeals.cs` | DTO, ren parser och offlinefixtures; PR #31 tillför giltighetstid. | API-serialisering, RSS/HTML-underlag och bevarad databasgräns. |
+| `src/BigBrain.Web/src/api.ts` | Delad klient/kontraktsfil; PR #31 tillför endast Skollunchens giltighetstid. | TypeScript/build och semantisk granskning av varje delta; sökvägen ensam begränsar inte andra moduler. |
+| `src/BigBrain.Web/src/meal-planner/SchoolLunch.tsx` | Presentation och anrop via befintligt API. | Fail-closed-utgång, UX B, fixtures och frånvaro av polling/dubbla anrop. |
+| `src/BigBrain.Web/src/meal-planner/SchoolLunch.test.tsx` | Skollunchens frontendtester, ligger utanför rotens `tests/`. | Exakt testfil tillåts; närliggande filer och bygginputs avvisas. |
+
+Ingen ny Finance-/BB-158-sökväg eller schema-, rättighets-, nätverks-, Dockerfile-, Compose-
+eller beroendefil tillåts. Modulerna ändras inte i aktuell diff. Den delade `api.ts` innebär en
+uttrycklig granskningsrisk: framtida orelaterade ändringar där omfattas inte av mandatet även om
+sökvägskontrollen passerar. Semantisk säkerhets-/schemareview och samtliga andra grindar kvarstår.
+
+Miljökällor valideras vid discovery och på nytt före Compose-användning. Endast den bokstavliga
+`/dev/null`, utan symlänk i någon sökvägsdel, får vara specialfil: `lstat` måste visa teckenenhet
+med major/minor **1:3**. Även Compose-modellens tomma miljökälla kontrolleras. Andra enheter,
+FIFO, kataloger, symlänkar (även trasiga), relativa och explicit saknade miljöfiler avvisas.
+Vanliga absoluta filer fortsätter fungera. Oförändrad implicit `.env`-regel: om inga env-labels
+angivits och projektets `.env` saknas används verifierad `/dev/null`; en explicit felaktig källa
+får aldrig ersättas med detta fallback. Inga privata miljövärden eller sökvägar publiceras.
+
+Config-hash, driftidentitet, ancestry, CI, backup, isolerade start-/omstartsprov, journal och
+rollbackgrindar är oförändrade. Offlinefallen verifierar simulerad Docker och syntetisk SQLite;
+produktionspreflight körs inte på en oaccepterad kandidat. Ny läsande preflight mot accepterad
+main och därefter separat auktoriserade driftkontroller återstår.
+[Testresultat och kvarstående hinder](../reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).

@@ -84,6 +84,44 @@ Denna korrigering ersätter cache-/stale-beteendet ovan; minnesmodell och anrops
 [Scope, testresultat, underlagsproveniens och kvarstående leverantörshinder](../reports/features/family/school-meals-preparation-20261023.md#cache-policy-correction--t2-review-checkpoint-2026-11-03).
 Implementation/offline-test är inte deployment, aktuell menyverifiering eller ägaracceptans.
 
+## Skollunch – behovsstyrd omvalidering och UX B (T2-checkpoint, 2026-11-03)
+
+Detta reviewarbete på `fix/school-meal-demand-standard` utgår från accepterad main
+`2cdb71df1e166f8ff8e644e1014b1902cb08f5a1` (PR #31). Det ersätter sex­timmarsspärren och
+ovanstående UI-regel om enbart lokal fokus-/synlighetskontroll. **Inte deployat eller mergekandidat.**
+
+- Produktägaren beslutade 2026-11-03 säkerhetsgolvet med formuleringen **”60 sekunders”** som
+  svar på frågan om båda källorna. Båda använder 60 sekunder efter avslutat försök. Detta är
+  ett lokalt produktbeslut, inte ett leverantörstillstånd eller bevis på tillåten frekvens.
+- En färsk lagrad veckomeny återanvänds även efter golvets slut. Endast efterfrågan på saknad
+  eller utgången meny kan utlösa ett källanrop, och endast när golv och Retry-After medger det.
+  Ett 60-minuterssvar hämtas alltså inte på nytt efter 60 sekunder. Inga bakgrundsjobb/polling.
+- En pågående hämtning per skola och process, villkorade anrop, godkända 304-validatorer,
+  cachemetadata/ålder, cacheförbud, 24-timmars retention och förbudet mot stale är oförändrade.
+  429 utan Retry-After använder golvet; giltigt längre Retry-After har företräde även vid 200/304.
+  Osäkra headers eller ogiltigt Retry-After spärrar skolan resten av processens livstid.
+- Veckoskifte rensar föregående veckas meny/validatorer men inte anropsspärren. Omstart tömmer
+  processminnet; ingen garanti om absolut anropstak över omstarter finns. Ingen beständig lagring.
+- **UX B, ägarbeslut:** när Family View får fokus eller blir synlig görs en kontroll via befintligt
+  API endast för en tidigare visad, giltig livemeny vars deadline nu passerats. Dubbletthändelser
+  delar samma försök. Varje visad deadline förbrukas före anropet; endast ett nytt färskt svar
+  kan ge en ny sådan kontroll. Fel, spärrad/tom meny eller redan utgånget svar ger inga fortsatta
+  fokusomförsök. Omladdning/ny öppning kan göra ett nytt vanligt API-anrop, under backendens spärr.
+  Dold vy, färsk meny och fixtures utlöser ingen fokusuppdatering. Avmontering/lägesbyte avbryter
+  anrop och sena svar ignoreras. Den lokala timern döljer bara utgången mat; den hämtar aldrig.
+- Kontinuerlig visning garanteras fortfarande inte: Rosenfeldts uppgivna `max-age=60` förbrukas
+  av Age, transport och visning; golvet räknas efter avslutat försök. Utgången meny döljs även
+  om golv/Retry-After hindrar ny kontroll. En öppen vy uppdateras inte automatiskt vid utgång.
+
+**Leverantörsbesked: fortfarande PENDING för båda källorna.** Inget komplett ägaruppgivet besked
+med datum, avsändare, exakt formulering, frekvens och omfattning har lämnats i detta uppdrag.
+För Skolmat.info krävs uttrycklig täckning av automatiserad RSS-hämtning trots tidigare observerat
+`robots.txt: Disallow: /`. Ägaruppgifter ska märkas som sådana, aldrig som självständigt verifierat
+avtal. Privat korrespondens får inte publiceras. Inga leverantörsanrop görs för dessa tester;
+ny liveverifiering/aktivering/deployment är fortsatt blockerad tills tillämpliga besked och beslut finns.
+
+[Gemensam checkpoint och testproveniens](../reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).
+
 ## Relaterade runbooks
 
 - [Operationsindex](../indexes/operations.md)

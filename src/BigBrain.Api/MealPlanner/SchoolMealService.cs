@@ -71,7 +71,8 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
                 entry.ClearMenu();
                 if (entry.Status == "published") entry.Status = "unavailable";
             }
-            if (now >= entry.NextAttempt)
+            // A completed cooldown is permission to retry, not a reason to replace fresh data.
+            if ((entry.Menu is null || now >= entry.FreshUntil) && now >= entry.NextAttempt)
             {
                 // Unknown response headers may contain a longer Retry-After. Keep this school
                 // blocked in memory unless the client can establish a safe completed response.
@@ -79,7 +80,7 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
                 entry.CheckedAt = now;
                 var response = await source.GetAsync(school, entry.ETag, entry.Modified, token, entry.CachePolicy);
                 var completedAt = clock.GetUtcNow();
-                var next = completedAt.AddHours(6);
+                var next = completedAt.AddSeconds(60);
                 if (response.RetryAt > next) next = response.RetryAt.Value;
                 entry.NextAttempt = response.HeadersVerified ? next : DateTimeOffset.MaxValue;
                 if (!response.HeadersVerified)

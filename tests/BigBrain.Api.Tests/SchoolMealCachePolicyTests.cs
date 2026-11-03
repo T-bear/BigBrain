@@ -38,7 +38,7 @@ public sealed class SchoolMealCachePolicyTests
     [Theory]
     [InlineData(SchoolMeals.Rosenfeldt, 60, true, 43)]
     [InlineData(SchoolMeals.Musikugglan, 3600, false, 44)]
-    public async Task ProductionPoliciesParseAllowedFixturesAndExpireWithoutAnotherSourceCall(string school, int seconds, bool revalidate, int week)
+    public async Task ProductionPoliciesReuseFreshMenusAndFetchOnDemandAtExpiry(string school, int seconds, bool revalidate, int week)
     {
         var clock = new Clock();
         if (week == 44) clock.Now = clock.Now.AddDays(7);
@@ -58,22 +58,57 @@ public sealed class SchoolMealCachePolicyTests
             Assert.Equal(fixture.Days[i].Date, first.Days[i].Date);
             Assert.Equal(fixture.Days[i].Dishes, first.Days[i].Dishes);
         }
+        clock.Now = start.AddSeconds(59);
+        Assert.Equal(first, await Read());
+        if (seconds > 60)
+        {
+            clock.Now = start.AddSeconds(60);
+            Assert.Equal(first, await Read()); // Cooldown expiry does not invalidate a fresh hour-long menu.
+            Assert.Equal(1, handler.Calls);
+        }
         clock.Now = start.AddSeconds(seconds).AddTicks(-1);
         Assert.Equal("published", (await Read()).Status);
         clock.Now = start.AddSeconds(seconds);
         var concurrent = await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => Read()));
         Assert.All(concurrent, menu =>
         {
-            Assert.Equal("unavailable", menu.Status);
+            Assert.Equal("published", menu.Status);
             Assert.False(menu.IsStale);
-            Assert.Null(menu.ValidUntilUtc);
-            Assert.All(menu.Days, day => Assert.Empty(day.Dishes));
+            Assert.Equal(clock.Now.AddSeconds(seconds), menu.ValidUntilUtc);
         });
-        clock.Now = start.AddHours(6).AddTicks(-1);
-        await Read();
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ExpiredMenuWaitsForFloorThenAccepts200Or304(bool notModified)
+    {
+        var clock = new Clock();
+        var start = clock.Now;
+        var calls = 0;
+        using var handler = new Handler(request =>
+        {
+            calls++;
+            if (calls > 1) Assert.Equal("\"menu\"", Assert.Single(request.Headers.IfNoneMatch).Tag);
+            var response = calls > 1 && notModified ? new HttpResponseMessage(HttpStatusCode.NotModified) : Response("max-age=30");
+            response.Headers.ETag = new("\"menu\"");
+            return response;
+        });
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock);
+        Task<SchoolMealWeek> Read() => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
+        var first = await Read();
+        clock.Now = start.AddSeconds(59);
+        var blocked = await Read();
+        Assert.Equal("unavailable", blocked.Status);
+        Assert.All(blocked.Days, day => Assert.Empty(day.Dishes));
         Assert.Equal(1, handler.Calls);
-        clock.Now = start.AddHours(6);
-        Assert.Equal("published", (await Read()).Status);
+        clock.Now = start.AddSeconds(60);
+        var refreshed = await Read();
+        Assert.Equal("published", refreshed.Status);
+        Assert.Equal(clock.Now.AddSeconds(30), refreshed.ValidUntilUtc);
+        Assert.Equal(notModified ? first.FetchedAtUtc : clock.Now, refreshed.FetchedAtUtc);
         Assert.Equal(2, handler.Calls);
     }
 
@@ -95,6 +130,7 @@ public sealed class SchoolMealCachePolicyTests
             var response = Response(policy);
             response.Headers.Date = clock.Now.AddSeconds(-apparentAge);
             response.Headers.Age = TimeSpan.FromSeconds(age);
+            response.Headers.RetryAfter = new(TimeSpan.FromHours(2));
             response.Content.Headers.Expires = response.Headers.Date.Value.AddSeconds(60);
             return response;
         });
@@ -133,7 +169,7 @@ public sealed class SchoolMealCachePolicyTests
         var menu = await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
         Assert.Equal("cachePolicy", menu.Status);
         Assert.All(menu.Days, day => Assert.Empty(day.Dishes));
-        clock.Now = clock.Now.AddHours(5);
+        clock.Now = clock.Now.AddSeconds(59);
         await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
         Assert.Equal(1, handler.Calls);
     }
@@ -154,6 +190,7 @@ public sealed class SchoolMealCachePolicyTests
             response.Headers.ETag = new(wrongTag && refresh ? "\"other\"" : "\"menu\"");
             if (refresh)
             {
+                response.Headers.RetryAfter = new(TimeSpan.FromHours(1));
                 Assert.Equal("\"menu\"", Assert.Single(request.Headers.IfNoneMatch).Tag);
                 if (update is not null) response.Headers.CacheControl = CacheControlHeaderValue.Parse(update);
             }
@@ -244,7 +281,7 @@ public sealed class SchoolMealCachePolicyTests
         }
         clock.Now = clock.Now.AddHours(6);
         await Read();
-        Assert.Equal(2, handler.Calls); // 304 Retry-After still extends the six-hour floor.
+        Assert.Equal(2, handler.Calls); // 304 Retry-After still extends the 60-second floor.
         if (!accepted)
         {
             clock.Now = clock.Now.AddHours(6); // Retry-After ends; original validators must still be sent.
