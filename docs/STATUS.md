@@ -32,8 +32,12 @@ main `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1` (PR #31 MERGED, main-CI fyra SUC
 utgången meny kan omvalideras vid efterfrågan. STANDARD:s fem exakta sökvägstillägg och
 verifierad `/dev/null` korrigeras utan generella undantag. [Aktuellt kontrakt](knowledge/meal-planner.md#skollunch--behovsstyrd-omvalidering-och-ux-b-t2-checkpoint-2026-11-03)
 och [gemensam checkpointevidens](reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).
+PR #32:s första oberoende T2-review identifierade en P1 i `ea85b7d`: ett blockerat API-svar
+förbrukade permanent möjligheten att kontrollera menyn vid senare återgång. Korrigeringen
+behåller utgången deadline och skiljer verklig återgång från dubbletthändelser/pågående anrop.
+[Reproduktion och andra reviewunderlaget](reports/features/family/school-meals-preparation-20261023.md#pr-32--ux-b-p1-correction-for-second-t2-review-2026-11-03).
 **Ofullständig REVIEW CHECKPOINT, inte mergekandidat:** leverantörsbesked för båda källorna,
-inklusive uttryckligt RSS-undantag från tidigare robots-förbud, återstår. Oberoende T2-review,
+inklusive uttryckligt RSS-undantag från tidigare robots-förbud, återstår. Andra oberoende T2-reviewvarvet,
 separata merge-/deploymentbeslut och fysisk iPhone/PWA-acceptans återstår. Inga källanrop,
 produktionsändringar eller nya leverantörsavtal verifieras genom implementationen.
 Nedan bevaras tidigare daterad status; uppgifterna om PR #31 som ej mergad är historik.

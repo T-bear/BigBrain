@@ -42,6 +42,9 @@ describe('SchoolLunch', () => {
       expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
       expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
       expect(api.getSchoolMeals).toHaveBeenCalledTimes(2) // Timer never fetches.
+      fireEvent.focus(window)
+      fireEvent(document, new Event('visibilitychange'))
+      expect(api.getSchoolMeals).toHaveBeenCalledTimes(2) // No absence, so not a new return.
       let resolve: (value: api.SchoolMealWeek) => void = () => {}
       vi.mocked(api.getSchoolMeals).mockImplementation(
         () =>
@@ -49,8 +52,11 @@ describe('SchoolLunch', () => {
             resolve = done
           }),
       )
-      const resume = () =>
-        event === 'focus' ? fireEvent.focus(window) : fireEvent(document, new Event('visibilitychange'))
+      const resume = () => {
+        fireEvent.blur(window)
+        if (event === 'focus') fireEvent.focus(window)
+        else fireEvent(document, new Event('visibilitychange'))
+      }
       resume()
       fireEvent.focus(window)
       fireEvent(document, new Event('visibilitychange'))
@@ -76,7 +82,7 @@ describe('SchoolLunch', () => {
     },
   )
 
-  it.each(['blocked', 'error', 'expired'])('does not repeatedly refetch after a %s response', async outcome => {
+  it.each(['blocked', 'error', 'expired'])('retries a %s response only after another real return', async outcome => {
     vi.useFakeTimers()
     vi.mocked(api.getSchoolMeals).mockImplementation(async id => liveMenu(id, 60))
     render(<SchoolLunch allowFixture={false} />)
@@ -86,6 +92,7 @@ describe('SchoolLunch', () => {
       if (outcome === 'error') throw new Error('offline')
       return outcome === 'expired' ? liveMenu(id, -1) : { ...liveMenu(id, 60), status: 'unavailable', days: [] }
     })
+    fireEvent.blur(window)
     await act(async () => {
       fireEvent.focus(window)
     })
@@ -96,6 +103,125 @@ describe('SchoolLunch', () => {
       fireEvent(document, new Event('visibilitychange'))
     }
     expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => liveMenu(id, 3600))
+    fireEvent.blur(window)
+    await act(async () => {
+      fireEvent.focus(window)
+    })
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(6)
+    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+    expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it.each(['focus-first', 'visible-first'])(
+    'retries on the separate 12:01:10 return after a floor-blocked 12:00:35 check (%s)',
+    async order => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-11-03T12:00:00Z'))
+      const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+      const leave = () => {
+        fireEvent.blur(window)
+        visibility.mockReturnValue('hidden')
+        fireEvent(document, new Event('visibilitychange'))
+      }
+      const resume = async () => {
+        visibility.mockReturnValue('visible')
+        // Resolve even the first event's promise before the paired event arrives.
+        await act(async () => {
+          if (order === 'focus-first') fireEvent.focus(window)
+          else fireEvent(document, new Event('visibilitychange'))
+        })
+        await act(async () => {
+          if (order === 'focus-first') fireEvent(document, new Event('visibilitychange'))
+          else fireEvent.focus(window)
+        })
+      }
+      try {
+        vi.mocked(api.getSchoolMeals).mockImplementation(async id => liveMenu(id, id === 'rosenfeldt' ? 30 : 3600))
+        render(<SchoolLunch allowFixture={false} />)
+        await act(async () => {})
+        expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+        await act(async () => {
+          vi.advanceTimersByTime(30000)
+        })
+        expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
+        expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+        leave()
+        vi.setSystemTime(new Date('2026-11-03T12:00:35Z'))
+        vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+          ...liveMenu(id, 0),
+          status: 'unavailable',
+          days: [],
+        }))
+        await resume()
+        expect(api.getSchoolMeals).toHaveBeenCalledTimes(3)
+        expect(vi.mocked(api.getSchoolMeals).mock.calls[2][0]).toBe('rosenfeldt')
+        expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
+        for (let i = 0; i < 3; i++) {
+          fireEvent.focus(window)
+          fireEvent(document, new Event('visibilitychange'))
+        }
+        await act(async () => {
+          vi.advanceTimersByTime(30000)
+        })
+        expect(api.getSchoolMeals).toHaveBeenCalledTimes(3) // No retry at the server's floor or on duplicate events.
+        leave()
+        vi.setSystemTime(new Date('2026-11-03T12:01:10Z'))
+        vi.mocked(api.getSchoolMeals).mockImplementation(async id => liveMenu(id, 3600))
+        await resume()
+        expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+        expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+        expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+        leave()
+        await resume()
+        expect(api.getSchoolMeals).toHaveBeenCalledTimes(4) // Both menus are still fresh.
+      } finally {
+        visibility.mockRestore()
+      }
+    },
+  )
+
+  it('does not overlap checks or queue a retry when another return occurs while pending', async () => {
+    vi.useFakeTimers()
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => liveMenu(id, id === 'rosenfeldt' ? 30 : 3600))
+    const view = render(<SchoolLunch allowFixture={false} />)
+    await act(async () => {})
+    await act(async () => {
+      vi.advanceTimersByTime(30000)
+    })
+    let resolve: (menu: api.SchoolMealWeek) => void = () => {}
+    vi.mocked(api.getSchoolMeals).mockImplementation(
+      () =>
+        new Promise(done => {
+          resolve = done
+        }),
+    )
+    fireEvent.blur(window)
+    fireEvent.focus(window)
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(3)
+    fireEvent.blur(window)
+    fireEvent.focus(window)
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(3)
+    await act(async () => {
+      resolve({ ...liveMenu('rosenfeldt', 0), status: 'unavailable', days: [] })
+    })
+    fireEvent.focus(window)
+    fireEvent(document, new Event('visibilitychange'))
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(3)
+    fireEvent.blur(window)
+    fireEvent.focus(window)
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+    const signal = vi.mocked(api.getSchoolMeals).mock.calls[3][4]!
+    view.unmount()
+    expect(signal.aborted).toBe(true)
+    await act(async () => {
+      resolve(liveMenu('rosenfeldt', 3600))
+    })
+    fireEvent.blur(window)
+    fireEvent.focus(window)
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+    expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
   })
 
   it('does not fetch while hidden, and refreshes on becoming visible', async () => {
@@ -207,6 +333,7 @@ describe('SchoolLunch', () => {
     expect(await screen.findAllByText('Kockens val')).toHaveLength(2)
     expect(screen.getByText('Pasta serveras med ost & skinksås')).toBeInTheDocument()
     expect(screen.getByText('Fläsknoisette och stekt kulpotatis samt kall sås /Vegobiff')).toBeInTheDocument()
+    fireEvent.blur(window)
     fireEvent.focus(window)
     fireEvent(document, new Event('visibilitychange'))
     expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)

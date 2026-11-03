@@ -49,12 +49,15 @@ export function SchoolLunch({
   useEffect(() => {
     if (offlinePreview) return
     const controller = new AbortController()
-    // One focus refresh per menu that was actually displayed while fresh. Consume it
-    // before the request, so focus/visibility pairs and failed replies cannot retry it.
+    // Retain expired displayed deadlines across failures; a later real return may retry.
     const refreshable = new Map<string, number>()
+    const pending = new Set<string>()
+    let away = document.visibilityState !== 'visible'
     setMenus({})
     setFailed([])
     const load = (school: (typeof schools)[number]) => {
+      if (pending.has(school.id)) return
+      pending.add(school.id)
       void getSchoolMeals(
         school.id,
         fixture ? 2026 : undefined,
@@ -68,30 +71,42 @@ export function SchoolLunch({
           if (!visible.isFixture && visible.status === 'published') {
             refreshable.set(school.id, Date.parse(visible.validUntilUtc!))
           }
+          setFailed(current => current.filter(id => id !== school.id))
           setMenus(current => ({ ...current, [school.id]: visible }))
         })
         .catch(() => {
           if (!controller.signal.aborted) setFailed(current => [...current, school.id])
         })
+        .finally(() => pending.delete(school.id))
     }
     for (const school of schools) load(school)
     const resume = () => {
-      if (fixture || document.visibilityState !== 'visible') return
+      if (fixture || document.visibilityState !== 'visible' || !away) return
+      // Consume this return before requests settle, not the menu's future retry eligibility.
+      away = false
       setMenus(current => Object.fromEntries(Object.entries(current).map(([id, menu]) => [id, expireMenu(menu)])))
       for (const school of schools) {
         const deadline = refreshable.get(school.id)
         if (deadline !== undefined && deadline <= Date.now()) {
-          refreshable.delete(school.id)
           load(school)
         }
       }
     }
+    const leave = () => {
+      away = true
+    }
+    const visibilityChanged = () => {
+      if (document.visibilityState !== 'visible') leave()
+      else resume()
+    }
+    window.addEventListener('blur', leave)
     window.addEventListener('focus', resume)
-    document.addEventListener('visibilitychange', resume)
+    document.addEventListener('visibilitychange', visibilityChanged)
     return () => {
       controller.abort()
+      window.removeEventListener('blur', leave)
       window.removeEventListener('focus', resume)
-      document.removeEventListener('visibilitychange', resume)
+      document.removeEventListener('visibilitychange', visibilityChanged)
     }
   }, [fixture, offlinePreview])
 

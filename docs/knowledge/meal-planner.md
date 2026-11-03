@@ -104,9 +104,13 @@ ovanstående UI-regel om enbart lokal fokus-/synlighetskontroll. **Inte deployat
   processminnet; ingen garanti om absolut anropstak över omstarter finns. Ingen beständig lagring.
 - **UX B, ägarbeslut:** när Family View får fokus eller blir synlig görs en kontroll via befintligt
   API endast för en tidigare visad, giltig livemeny vars deadline nu passerats. Dubbletthändelser
-  delar samma försök. Varje visad deadline förbrukas före anropet; endast ett nytt färskt svar
-  kan ge en ny sådan kontroll. Fel, spärrad/tom meny eller redan utgånget svar ger inga fortsatta
-  fokusomförsök. Omladdning/ny öppning kan göra ett nytt vanligt API-anrop, under backendens spärr.
+  delar samma försök. En verklig återgång kräver föregående fönster-blur eller dold flik;
+  första synliga fokus-/synlighetshändelsen förbrukar den återgången. Upprepade händelser utan
+  ny frånvaro gör inget. En tidigare visad utgången deadline behålls efter fel, spärrad/tom meny
+  eller redan utgånget svar, så att en senare separat återgång kan försöka igen. Högst ett
+  API-anrop per skola pågår; en återgång under pågående anrop köar inget omförsök. Ett nytt svar
+  som lyckas rensar tidigare nätverksfel i presentationen. Backendens golv och Retry-After
+  avgör fortsatt om ett leverantörsanrop får göras; frontend inför ingen egen retrytimer.
   Dold vy, färsk meny och fixtures utlöser ingen fokusuppdatering. Avmontering/lägesbyte avbryter
   anrop och sena svar ignoreras. Den lokala timern döljer bara utgången mat; den hämtar aldrig.
 - Kontinuerlig visning garanteras fortfarande inte: Rosenfeldts uppgivna `max-age=60` förbrukas
