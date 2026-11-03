@@ -41,6 +41,40 @@ Samla verifierad kunskap om modulen Matlista.
 - Befintligt privilegierat deploymentkontrakt ändras inte här. Dess krav på beständig gate och
   bootstrap är inte bevis för denna minnesbaserade revision; drift kräver separat tillämpligt beslut.
 
+## Skollunch – HTTP-färskhet skild från anropsspärr (T2-review, 2026-11-03)
+
+Denna korrigering ersätter cache-/stale-beteendet ovan; minnesmodell och anropsspärr bevaras.
+
+- Ett giltigt svar behöver inte ha sex timmars `max-age`. En separat absolut färskhetsgräns
+  beräknas enligt [RFC 9111 §§4.2–4.3](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.2):
+  `s-maxage` före `max-age` före `Expires`, med `Date`, `Age` och anropets fördröjning.
+  Även läsning av svarskroppen förbrukar färskhet. Lokal livslängd begränsas till 24 timmar.
+- API:t återanvänder aldrig ett utgånget svar. Frånvaro av `must-revalidate` innebär inte
+  verifierad stale-rätt. Stale-utökningar aktiveras inte. `no-store`, `no-cache` (även med
+  fältnamn), `private`, `Vary: *`, ogiltig/tvetydig cachemetadata och saknad explicit färskhet
+  avvisas konservativt. `must-revalidate`/`proxy-revalidate` uppfylls genom förbudet mot stale.
+- Giltig 304 kräver sparad meny och skickad validator; motsägande ETag avvisas. Utelämnade
+  cachefält ärvs, nya fält ersätter motsvarande metadata. Färskheten räknas om, ursprunglig
+  hämtningstid bevaras. Utgången data kan hållas enbart för validering inom befintlig 24 h-/
+  ISO-veckogräns; den får inte visas. Cacheförbud rensar även meny och validatorer.
+- `NextAttempt` förblir minst sex timmar efter avslutat anrop, senare vid `Retry-After` på
+  vilket HTTP-svar som helst. Osäkra headers/ogiltig Retry-After spärrar resten av processen.
+  Cacheutgång, UI-timer och samtidiga läsningar ger inga extra källanrop.
+- Additivt `validUntilUtc` i befintligt API låter en redan öppen vy dölja utgångna menyer med
+  samma feltext. Timer samt fokus-/synlighetskontroll hämtar inget. Historiska fixtures påverkas
+  inte. Webbläsarens tidskontroll förutsätter korrekt enhetsklocka; fysisk PWA-acceptans återstår.
+- Omstart tömmer fortfarande cache och spärr enligt accepterad main och ägarbeslutet 2026-11-01.
+  **Ingen beständig spärr över omstarter finns.** Detta uppdrag tillför inga databas-, fil- eller
+  driftsändringar. Omstart får inte användas för att kringgå källgränser; framtida drift måste
+  verifiera tidigare åtkomst/Retry-After innan nya anrop. Nuvarande uppdrag gör inga anrop.
+- Ägarrapporterad produktionsdiagnostik: Rosenfeldt `200/max-age=60/must-revalidate` ger högst
+  60 sekunders visning per sex timmar, minus redan förbrukad ålder. **Kontinuerlig visning är
+  omöjlig med dessa villkor.** Musikugglan `200/max-age=3600` ger högst en timme; inte heller
+  där används utgångna svar utan verifierad rätt. Ingen ökad hämtningsfrekvens föreslås här.
+
+[Scope, testresultat, underlagsproveniens och kvarstående leverantörshinder](../reports/features/family/school-meals-preparation-20261023.md#cache-policy-correction--t2-review-checkpoint-2026-11-03).
+Implementation/offline-test är inte deployment, aktuell menyverifiering eller ägaracceptans.
+
 ## Relaterade runbooks
 
 - [Operationsindex](../indexes/operations.md)

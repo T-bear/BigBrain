@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SchoolLunch } from './SchoolLunch'
 import * as api from '../api'
@@ -6,9 +6,68 @@ vi.mock('../api', () => ({ getSchoolMeals: vi.fn() }))
 afterEach(() => {
   cleanup()
   vi.resetAllMocks()
+  vi.useRealTimers()
 })
 
 describe('SchoolLunch', () => {
+  it('expires each source locally without refetching and rechecks on resume', async () => {
+    vi.useFakeTimers()
+    const start = new Date('2026-10-19T10:00:00Z')
+    vi.setSystemTime(start)
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+      schoolId: id,
+      schoolName: id,
+      sourceName: 'Testkälla',
+      sourceUrl: 'https://example.org',
+      year: 2026,
+      week: 43,
+      status: 'published',
+      dateBasis: 'sourceGuid',
+      fetchedAtUtc: start.toISOString(),
+      isFixture: false,
+      validUntilUtc: new Date(start.getTime() + (id === 'rosenfeldt' ? 60000 : 3600000)).toISOString(),
+      days: [{ date: '2026-10-19', status: 'published', dishes: [id + ' lunch'] }],
+    }))
+    await act(async () => {
+      render(<SchoolLunch allowFixture={false} />)
+    })
+    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+    expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+    await act(async () => {
+      vi.advanceTimersByTime(59999)
+    })
+    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+    await act(async () => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
+    expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+    vi.setSystemTime(new Date(start.getTime() + 3600000))
+    fireEvent.focus(window)
+    expect(screen.queryByText('musikugglan lunch')).not.toBeInTheDocument()
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+  })
+  it('does not display a menu that expires while the API response is in flight', async () => {
+    vi.mocked(api.getSchoolMeals).mockResolvedValue({
+      schoolId: 'rosenfeldt',
+      schoolName: 'Rosenfeldtskolan',
+      sourceName: 'Testkälla',
+      sourceUrl: 'https://example.org',
+      year: 2026,
+      week: 43,
+      status: 'published',
+      dateBasis: 'sourceGuid',
+      fetchedAtUtc: null,
+      isFixture: false,
+      validUntilUtc: '2000-01-01T00:00:00Z',
+      days: [{ date: '2026-10-19', status: 'published', dishes: ['Expired lunch'] }],
+    })
+    render(<SchoolLunch allowFixture={false} />)
+    expect(await screen.findAllByText('Kunde inte uppdatera matsedeln just nu. Försök igen senare.')).toHaveLength(2)
+    expect(screen.queryByText('Expired lunch')).not.toBeInTheDocument()
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+  })
+
   it('reads current menus through the local API without exposing fixtures in production', async () => {
     vi.mocked(api.getSchoolMeals).mockResolvedValue({
       schoolId: 'rosenfeldt',

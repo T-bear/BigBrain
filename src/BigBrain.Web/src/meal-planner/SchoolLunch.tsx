@@ -20,6 +20,20 @@ const checkedTime = (value: string) => new Date(value).toLocaleString('sv-SE', {
 const lunchDate = (value: string) =>
   new Date(`${value}T00:00:00Z`).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', timeZone: 'UTC' })
 
+function expireMenu(menu: SchoolMealWeek): SchoolMealWeek {
+  if (menu.isFixture || !menu.validUntilUtc || Date.parse(menu.validUntilUtc) > Date.now()) return menu
+  return {
+    ...menu,
+    status: 'unavailable',
+    sourceStatus: 'unavailable',
+    days: [],
+    isStale: false,
+    fetchedAtUtc: null,
+    sourceUpdatedAtUtc: null,
+    validUntilUtc: null,
+  }
+}
+
 export function SchoolLunch({
   allowFixture = import.meta.env.DEV,
   offlinePreview = false,
@@ -44,7 +58,7 @@ export function SchoolLunch({
         controller.signal,
       )
         .then(menu => {
-          if (!controller.signal.aborted) setMenus(current => ({ ...current, [school.id]: menu }))
+          if (!controller.signal.aborted) setMenus(current => ({ ...current, [school.id]: expireMenu(menu) }))
         })
         .catch(() => {
           if (!controller.signal.aborted) setFailed(current => [...current, school.id])
@@ -52,6 +66,24 @@ export function SchoolLunch({
     }
     return () => controller.abort()
   }, [fixture, offlinePreview])
+
+  useEffect(() => {
+    const deadlines = Object.values(menus)
+      .filter(menu => !menu.isFixture && menu.validUntilUtc)
+      .map(menu => Date.parse(menu.validUntilUtc!))
+    if (deadlines.length === 0) return
+    // Expire presentation locally; this must never initiate another API/provider request.
+    const expire = () =>
+      setMenus(current => Object.fromEntries(Object.entries(current).map(([id, menu]) => [id, expireMenu(menu)])))
+    const timer = window.setTimeout(expire, Math.max(0, Math.min(...deadlines) - Date.now()))
+    window.addEventListener('focus', expire)
+    document.addEventListener('visibilitychange', expire)
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('focus', expire)
+      document.removeEventListener('visibilitychange', expire)
+    }
+  }, [menus])
 
   return (
     <section className="family-section school-lunch" aria-labelledby="school-lunch-title">

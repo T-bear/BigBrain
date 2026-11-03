@@ -51,14 +51,14 @@ public sealed class SchoolMealSourceDiagnosticsTests
     [Theory]
     [InlineData("no-store", 0, 0, "noStore")]
     [InlineData("no-cache", 0, 0, "noCache")]
-    [InlineData("max-age=300", 0, 0, "insufficientFreshness")]
-    [InlineData("max-age=21600", 1, 0, "insufficientFreshness")]
-    [InlineData(null, 0, 21599, "expiresTooSoon")]
-    [InlineData(null, 0, -1, "expiresTooSoon")]
+    [InlineData("max-age=300", 0, 0, "cacheAccepted")]
+    [InlineData("max-age=21600", 1, 0, "cacheAccepted")]
+    [InlineData(null, 0, 21599, "cacheAccepted")]
+    [InlineData(null, 0, -1, "noFreshness")]
     [InlineData(null, 0, 21600, "cacheAccepted")]
     [InlineData("max-age=21600", 0, -1, "cacheAccepted")]
     [InlineData("max-age=300, no-cache, no-store", 0, 0, "noStore")]
-    public async Task CacheReasonsAndBoundariesArePreservedFor200And304(string? policy, int age, int expires, string reason)
+    public async Task CacheReasonsSeparateFreshnessFromFetchIntervalFor200And304(string? policy, int age, int expires, string reason)
     {
         foreach (var status in new[] { 200, 304 })
         {
@@ -74,9 +74,9 @@ public sealed class SchoolMealSourceDiagnosticsTests
                 return response;
             });
             using var http = new HttpClient(handler);
-            var result = await new SchoolMealSourceClient(http, clock, log).GetAsync(SchoolMeals.Rosenfeldt, null, null, TestContext.Current.CancellationToken);
+            var result = await new SchoolMealSourceClient(http, clock, log).GetAsync(SchoolMeals.Rosenfeldt, "\"menu\"", null, TestContext.Current.CancellationToken, new(null, null, null));
             Assert.Equal(reason == "cacheAccepted" ? status == 200 ? "ok" : "notModified" : "cachePolicy", result.Status);
-            if (reason != "cacheAccepted") Assert.False(result.AllowStale);
+            if (reason == "cacheAccepted") Assert.True(result.FreshUntil > clock.Now);
             var entry = Assert.Single(log.Entries);
             Assert.Equal(reason, entry["PolicyReason"]);
             Assert.Equal(status, entry["HttpStatus"]);
@@ -90,7 +90,7 @@ public sealed class SchoolMealSourceDiagnosticsTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task MissingAndMalformedHeadersAreDistinguishedWithoutChangingExistingPolicy(bool malformed)
+    public async Task MissingAndMalformedHeadersAreDistinguishedAndFailClosed(bool malformed)
     {
         var log = new CaptureLogger();
         using var handler = new Handler(() =>
@@ -107,8 +107,8 @@ public sealed class SchoolMealSourceDiagnosticsTests
         });
         using var http = new HttpClient(handler);
         var result = await new SchoolMealSourceClient(http, new Clock(), log).GetAsync(SchoolMeals.Rosenfeldt, null, null, TestContext.Current.CancellationToken);
-        // Malformed Expires is already treated as expired by .NET and the existing policy.
-        Assert.Equal(malformed ? "cachePolicy" : "ok", result.Status);
+        // Neither missing freshness nor malformed metadata authorizes cache reuse.
+        Assert.Equal("cachePolicy", result.Status);
         var entry = Assert.Single(log.Entries);
         foreach (var key in new[] { "CacheControl", "Age", "Date", "Expires" })
             Assert.Equal(malformed ? "invalid" : "missing", entry[key]);
