@@ -31,9 +31,127 @@ public sealed class SchoolMealCachePolicyTests
         Headers = { CacheControl = CacheControlHeaderValue.Parse(policy) }
     };
 
-    private static SchoolMealService Service(HttpClient http, Clock clock) => new(
-        new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } },
+    private static SchoolMealService Service(HttpClient http, Clock clock, bool daily = false) => new(
+        new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true, DailySnapshot = daily } },
         new SchoolMealSourceClient(http, clock, NullLogger<SchoolMealSourceClient>.Instance), clock);
+
+    [Fact]
+    public async Task DailySnapshotRetainsWeeklyMenuAfterFailedCheck()
+    {
+        var clock = new Clock();
+        var start = clock.Now;
+
+        using var handler = new Handler(_ =>
+        {
+            if (clock.Now > start)
+                return new HttpResponseMessage(
+                    HttpStatusCode.ServiceUnavailable);
+
+            var response = Response("max-age=60, must-revalidate");
+            response.Headers.Date = clock.Now;
+            return response;
+        });
+
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock, daily: true);
+
+        Task<SchoolMealWeek> Read() => service.GetAsync(
+            SchoolMeals.Rosenfeldt, 2026, 43,
+            TestContext.Current.CancellationToken);
+
+        var first = await Read();
+        Assert.Equal("published", first.Status);
+
+        clock.Now = start.AddHours(6);
+        Assert.Equal("published", (await Read()).Status);
+        Assert.Equal(1, handler.Calls);
+
+        clock.Now = start.AddHours(24);
+        var retained = await Read();
+
+        Assert.Equal("published", retained.Status);
+        Assert.True(retained.IsStale);
+        Assert.Equal("unavailable", retained.SourceStatus);
+        Assert.Equal(first.Days[0].Dishes.ToArray(),
+                     retained.Days[0].Dishes.ToArray());
+        Assert.Equal(2, handler.Calls);
+
+        await Read();
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Fact]
+    public async Task DailySnapshotAcceptsVaryStar()
+    {
+        var clock = new Clock();
+        clock.Now = clock.Now.AddDays(7);
+
+        using var handler = new Handler(_ =>
+        {
+            var response = Response(
+                "max-age=3600", SchoolMeals.Musikugglan);
+            response.Headers.Vary.Add("*");
+            return response;
+        });
+
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock, daily: true);
+
+        Task<SchoolMealWeek> Read() => service.GetAsync(
+            SchoolMeals.Musikugglan, 2026, 44,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("published", (await Read()).Status);
+
+        clock.Now = clock.Now.AddHours(3);
+        Assert.Equal("published", (await Read()).Status);
+        Assert.Equal(1, handler.Calls);
+    }
+
+    [Fact]
+    public async Task DailySnapshotAcceptsFull200WithExpiredHttpFreshness()
+    {
+        var clock = new Clock();
+
+        using var handler = new Handler(_ =>
+        {
+            var response = Response("max-age=60, must-revalidate");
+            response.Headers.Date = clock.Now.AddHours(-4);
+            response.Headers.Age = TimeSpan.FromHours(4);
+            return response;
+        });
+
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock, daily: true);
+
+        var menu = await service.GetAsync(
+            SchoolMeals.Rosenfeldt, 2026, 43,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("published", menu.Status);
+    }
+
+    [Theory]
+    [InlineData("no-store, max-age=60")]
+    [InlineData("no-cache, max-age=60")]
+    public async Task DailySnapshotKeepsExplicitCacheProhibitions(string policy)
+    {
+        var clock = new Clock();
+
+        using var handler = new Handler(_ => Response(policy));
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock, daily: true);
+
+        Task<SchoolMealWeek> Read() => service.GetAsync(
+            SchoolMeals.Rosenfeldt, 2026, 43,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("cachePolicy", (await Read()).Status);
+
+        clock.Now = clock.Now.AddSeconds(61);
+        await Read();
+        Assert.Equal(1, handler.Calls);
+    }
 
     [Theory]
     [InlineData(SchoolMeals.Rosenfeldt, 60, true, 43)]

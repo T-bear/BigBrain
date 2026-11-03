@@ -126,6 +126,30 @@ ny liveverifiering/aktivering/deployment är fortsatt blockerad tills tillämpli
 
 [Gemensam checkpoint och testproveniens](../reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).
 
+## Skollunch – daglig veckomeny (reviewförslag, 2026-11-03)
+
+Detta är ännu inte mergat, deployat eller manuellt accepterat.
+
+- Senast lyckad parsad meny behålls i processminnet för aktuell
+  ISO-vecka och visas även om HTTP-färskheten har löpt ut.
+- En efterfrågestyrd kontroll per skola och rullande 24 timmar.
+- Misslyckad kontroll behåller tidigare veckomeny med `isStale`.
+- Fullständiga HTTP 200-svar med `Vary: *` eller förbrukad
+  HTTP-färskhet får användas som separat applikationsdata,
+  under förutsättning att leverantörstillståndet omfattar detta.
+- `no-store`, `no-cache`, `private`, ogiltiga headers och
+  felaktiga svar accepteras inte.
+- 60-sekundersgolv, `Retry-After`, veckokontroll och skydd
+  mot parallella anrop bevaras.
+- Inga databaser, nya tjänster, bakgrundsanrop eller polling.
+- Serveromstart tappar minneskopian; inget gammalt veckonummer
+  får presenteras som aktuell matsedel.
+
+Leverantörsproveniens är fortfarande en separat releasegrind,
+särskilt automatisk RSS-hämtning trots tidigare `robots.txt`.
+Detta arbete får publiceras för granskning men inte användas
+för att kringgå tillstånds- eller driftkrav.
+
 ## Relaterade runbooks
 
 - [Operationsindex](../indexes/operations.md)

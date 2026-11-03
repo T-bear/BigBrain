@@ -159,7 +159,7 @@ public sealed class SchoolMealSourceDiagnosticsTests
             return response;
         });
         using var http = new HttpClient(handler);
-        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true } };
+        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, DailySnapshot = false } };
         using var service = new SchoolMealService(options,
             new SchoolMealSourceClient(http, clock, log), clock);
         Assert.Equal("unavailable", (await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken)).Status);

@@ -68,8 +68,14 @@ export function SchoolLunch({
         .then(menu => {
           if (controller.signal.aborted) return
           const visible = expireMenu(menu)
-          if (!visible.isFixture && visible.status === 'published') {
-            refreshable.set(school.id, Date.parse(visible.validUntilUtc!))
+          if (!visible.isFixture) {
+            const nextCheck = visible.lastCheckedAtUtc
+              ? Date.parse(visible.lastCheckedAtUtc) + 86400000
+              : visible.status === 'published'
+                ? Date.parse(visible.validUntilUtc!)
+                : NaN
+            if (Number.isFinite(nextCheck))
+              refreshable.set(school.id, nextCheck)
           }
           setFailed(current => current.filter(id => id !== school.id))
           setMenus(current => ({ ...current, [school.id]: visible }))
@@ -166,7 +172,7 @@ export function SchoolLunch({
               ) : (
                 <>
                   {menu.isFixture && <p>Historiskt offline-exempel från produktägarens manuellt hämtade fil.</p>}
-                  {menu.isStale && <p role="status">Inaktuell meny – senaste kontrollen misslyckades.</p>}
+                  {menu.isStale && <p role="status">Matsedeln kan vara inaktuell – senaste kontrollen kunde inte bekräfta ny information.</p>}
                   {menu.status !== 'published' && (
                     <p role="status">{statusText[menu.status] ?? 'Information saknas.'}</p>
                   )}

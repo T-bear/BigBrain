@@ -25,6 +25,36 @@ describe('SchoolLunch', () => {
     days: [{ date: '2026-10-19', status: 'published', dishes: [id + ' lunch'] }],
   })
 
+  it('checks a weekly snapshot after 24 hours, not on every return', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-19T10:00:00Z'))
+
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+      ...liveMenu(id, 7 * 24 * 60 * 60),
+      lastCheckedAtUtc: new Date().toISOString(),
+    }))
+
+    render(<SchoolLunch allowFixture={false} />)
+    await act(async () => {})
+
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+
+    fireEvent.blur(window)
+    vi.setSystemTime(new Date('2026-10-19T16:00:00Z'))
+    fireEvent.focus(window)
+    await act(async () => {})
+
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+
+    fireEvent.blur(window)
+    vi.setSystemTime(new Date('2026-10-20T10:01:00Z'))
+    fireEvent.focus(window)
+    await act(async () => {})
+
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+  })
+
   it.each(['focus', 'visibilitychange'])(
     'expires locally and refreshes only the expired school once on %s',
     async event => {
