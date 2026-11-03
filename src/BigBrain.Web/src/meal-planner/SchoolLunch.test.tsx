@@ -55,6 +55,38 @@ describe('SchoolLunch', () => {
     expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
   })
 
+  it('checks the new ISO week without waiting for the daily interval', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-25T21:00:00Z'))
+
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => {
+      const nextWeek = Date.now() >= Date.parse('2026-10-25T23:00:00Z')
+      return {
+        ...liveMenu(id, 7 * 86400),
+        year: 2026,
+        week: nextWeek ? 44 : 43,
+        lastCheckedAtUtc: new Date().toISOString(),
+        validUntilUtc: nextWeek ? '2026-11-01T23:00:00Z' : '2026-10-25T23:00:00Z',
+      }
+    })
+
+    render(<SchoolLunch allowFixture={false} />)
+    await act(async () => {})
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+
+    fireEvent.blur(window)
+    vi.setSystemTime(new Date('2026-10-26T00:05:00Z'))
+    fireEvent.focus(window)
+    await act(async () => {})
+
+    expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
+    expect(
+      screen.getByRole('heading', {
+        name: 'Rosenfeldtskolan · vecka 44, 2026',
+      }),
+    ).toBeInTheDocument()
+  })
+
   it('keeps the weekly menu visible when the local API refresh fails', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-10-19T10:00:00Z'))

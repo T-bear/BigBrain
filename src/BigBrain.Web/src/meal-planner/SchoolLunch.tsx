@@ -69,11 +69,11 @@ export function SchoolLunch({
           if (controller.signal.aborted) return
           const visible = expireMenu(menu)
           if (!visible.isFixture) {
+            const weekEnd =
+              visible.status === 'published' && visible.validUntilUtc ? Date.parse(visible.validUntilUtc) : Infinity
             const nextCheck = visible.lastCheckedAtUtc
-              ? Date.parse(visible.lastCheckedAtUtc) + 86400000
-              : visible.status === 'published'
-                ? Date.parse(visible.validUntilUtc!)
-                : NaN
+              ? Math.min(Date.parse(visible.lastCheckedAtUtc) + 86400000, weekEnd)
+              : weekEnd
             if (Number.isFinite(nextCheck)) refreshable.set(school.id, nextCheck)
           }
           setFailed(current => current.filter(id => id !== school.id))
