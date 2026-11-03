@@ -173,6 +173,7 @@ public sealed class MealPlannerApiTests : IDisposable
         Assert.False(rss.IsFixture);
         Assert.Equal(2026, rss.Year);
         Assert.Equal(43, rss.Week);
+        Assert.Equal(clock.GetUtcNow().AddSeconds(60), rss.ValidUntilUtc);
         var html = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=musikugglan", TestContext.Current.CancellationToken);
         Assert.Equal("unavailable", html!.Status);
         var partial = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026", TestContext.Current.CancellationToken);
@@ -193,7 +194,11 @@ public sealed class MealPlannerApiTests : IDisposable
         {
             Calls++;
             return Task.FromResult(request.RequestUri!.Host == "www.skolmat.info"
-                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(SchoolMeals.ExampleRss, System.Text.Encoding.UTF8, "application/rss+xml") }
+                ? new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(SchoolMeals.ExampleRss, System.Text.Encoding.UTF8, "application/rss+xml"),
+                    Headers = { CacheControl = new() { MaxAge = TimeSpan.FromSeconds(60) } }
+                }
                 : new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
         }
     }

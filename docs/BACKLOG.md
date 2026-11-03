@@ -519,6 +519,15 @@ samt sparsamma notiser. Beroenden BB-029, BB-036, BB-027, auth-hardening och Hom
 
 ### Skollunch — kvarstående livegrindar
 
+Uppdatering 2026-11-03: ägaren rapporterar STANDARD-deployment PASS, API/Web healthy och
+aktiverade källflaggor; båda HTTP 200 avvisas av sex­timmarskravet på färskhet.
+[Korrigering för T2-review](knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03)
+separerar spärr och färskhet. Återstående begränsning: Rosenfeldts `max-age=60/must-revalidate`
+medger inte kontinuerlig cachevisning vid sex timmars anropsintervall; Musikugglans `max-age=3600`
+medger högst en timme utan separat stale-rätt. Ingen kringgång eller ny leverantörshämtning ingår.
+Omstartsspärren är fortsatt endast processlokal enligt accepterad main; ingen ny beständig gate
+ingår. Uppgifterna nedan är tidigare daterad evidens, inte en ny bedömning av runtime/aktivering.
+
 **BLOCKED för extern aktivering/liveacceptans.** V1 och v2-plan är mergade; v2-implementation är
 mergad via `c8aaba15ac6382b6934591acfa6f615505c95819` och CI40004794277 SUCCESS enligt
 [STATUS](STATUS.md#family--skollunch). Offline-original/fixtures, RSS/HTML-parser, read-only API,

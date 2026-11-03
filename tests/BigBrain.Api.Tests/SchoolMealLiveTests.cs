@@ -27,7 +27,8 @@ public sealed class SchoolMealLiveTests
     }
     private static HttpResponseMessage Rss(string? text = null) => new(HttpStatusCode.OK)
     {
-        Content = new StringContent(text ?? SchoolMeals.ExampleRss, Encoding.UTF8, "application/rss+xml")
+        Content = new StringContent(text ?? SchoolMeals.ExampleRss, Encoding.UTF8, "application/rss+xml"),
+        Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } }
     };
     private static MealPlannerOptions Enabled => new()
     {
@@ -77,7 +78,7 @@ public sealed class SchoolMealLiveTests
     }
 
     [Fact]
-    public async Task SourceModifiedAndFetchTimesStayDistinctOnCacheHitAndFailure()
+    public async Task SourceModifiedAndFetchTimesStayDistinctOnCacheHitAndExpiredFailure()
     {
         var clock = new Clock();
         var modified = clock.Now.AddDays(-1);
@@ -101,9 +102,11 @@ public sealed class SchoolMealLiveTests
         clock.Now = clock.Now.AddHours(5);
         handler.Reply = (_, _) => throw new HttpRequestException();
         var stale = await Get(service);
-        Assert.True(stale.IsStale);
-        Assert.Equal(modified, stale.SourceUpdatedAtUtc);
-        Assert.Equal(first.FetchedAtUtc, stale.FetchedAtUtc);
+        Assert.False(stale.IsStale);
+        Assert.Equal("unavailable", stale.Status);
+        Assert.All(stale.Days, day => Assert.Empty(day.Dishes));
+        Assert.Null(stale.SourceUpdatedAtUtc);
+        Assert.Null(stale.FetchedAtUtc);
         Assert.Equal(clock.Now, stale.LastCheckedAtUtc);
     }
 
@@ -143,7 +146,7 @@ public sealed class SchoolMealLiveTests
     }
 
     [Fact]
-    public async Task FailedRefreshIsStaleOnlyWithinSameWeekAndTwentyFourHours()
+    public async Task FailedRefreshNeverServesExpiredContent()
     {
         var handler = new Handler();
         var clock = new Clock();
@@ -152,8 +155,10 @@ public sealed class SchoolMealLiveTests
         handler.Reply = (_, _) => throw new HttpRequestException("not exposed");
         clock.Now = clock.Now.AddHours(6);
         var stale = await Get(service);
-        Assert.True(stale.IsStale);
-        Assert.Equal(first.FetchedAtUtc, stale.FetchedAtUtc);
+        Assert.False(stale.IsStale);
+        Assert.Equal("unavailable", stale.Status);
+        Assert.All(stale.Days, day => Assert.Empty(day.Dishes));
+        Assert.Null(stale.FetchedAtUtc);
         Assert.Equal("unavailable", stale.SourceStatus);
         Assert.Equal(clock.Now, stale.LastCheckedAtUtc);
         clock.Now = clock.Now.AddHours(19);
@@ -166,7 +171,7 @@ public sealed class SchoolMealLiveTests
     }
 
     [Fact]
-    public async Task InvalidRefreshPreservesStaleButEmptyMenuReplacesIt()
+    public async Task InvalidRefreshHidesExpiredContentAndEmptyMenuReplacesIt()
     {
         var handler = new Handler();
         var clock = new Clock();
@@ -175,7 +180,8 @@ public sealed class SchoolMealLiveTests
         handler.Reply = (_, _) => Task.FromResult(Rss("<rss>"));
         clock.Now = clock.Now.AddHours(6);
         var invalid = await Get(service);
-        Assert.True(invalid.IsStale);
+        Assert.False(invalid.IsStale);
+        Assert.All(invalid.Days, day => Assert.Empty(day.Dishes));
         Assert.Equal("invalid", invalid.SourceStatus);
         handler.Reply = (_, _) => Task.FromResult(Rss("<rss version='2.0'><channel><title>Skolmat - Rosenfeldtskolan</title></channel></rss>"));
         clock.Now = clock.Now.AddHours(6);
@@ -203,7 +209,8 @@ public sealed class SchoolMealLiveTests
         handler.Reply = (request, _) =>
         {
             Assert.Equal("\"menu-v1\"", Assert.Single(request.Headers.IfNoneMatch).ToString());
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified)
+            { Headers = { ETag = new("\"menu-v1\"") } });
         };
         clock.Now = clock.Now.AddHours(6);
         var unchanged = await Get(service);
@@ -227,7 +234,10 @@ public sealed class SchoolMealLiveTests
             {
                 var response = html
                     ? new HttpResponseMessage(HttpStatusCode.OK)
-                    { Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html") }
+                    {
+                        Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html"),
+                        Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } }
+                    }
                     : Rss();
                 response.Headers.ETag = new("\"original-menu\"");
                 response.Content.Headers.LastModified = started.AddHours(-1);
@@ -244,9 +254,9 @@ public sealed class SchoolMealLiveTests
             response.Headers.RetryAfter = new(TimeSpan.FromHours(48));
             return Task.FromResult(response);
         };
-        Assert.True((await Read()).IsStale);
+        Assert.Equal("unavailable", (await Read()).Status);
         clock.Now = started.AddHours(24);
-        Assert.True((await Read()).IsStale); // Preserve the existing inclusive stale boundary.
+        Assert.Equal("unavailable", (await Read()).Status); // Retention never authorizes stale reuse.
         clock.Now = clock.Now.AddSeconds(1);
         var expired = await Read();
         Assert.Equal("unavailable", expired.Status);
@@ -281,7 +291,10 @@ public sealed class SchoolMealLiveTests
         {
             Reply = (_, _) => Task.FromResult(html
                 ? new HttpResponseMessage(HttpStatusCode.OK)
-                { Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html") }
+                {
+                    Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html"),
+                    Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } }
+                }
                 : Rss())
         };
         using var service = Service(handler, clock);
@@ -297,8 +310,9 @@ public sealed class SchoolMealLiveTests
         clock.Now = clock.Now.AddHours(6);
         var failed = await Read();
         Assert.Equal("invalid", failed.SourceStatus);
-        Assert.True(failed.IsStale);
-        Assert.Equal(first.FetchedAtUtc, failed.FetchedAtUtc);
+        Assert.False(failed.IsStale);
+        Assert.All(failed.Days, day => Assert.Empty(day.Dishes));
+        Assert.Null(failed.FetchedAtUtc);
         Assert.False(failed.IsFixture);
         await Read();
         Assert.Equal(2, handler.Calls);
@@ -307,7 +321,6 @@ public sealed class SchoolMealLiveTests
     [Theory]
     [InlineData("no-store")]
     [InlineData("no-cache")]
-    [InlineData("max-age=300")]
     public async Task StricterCachePolicyClearsPreviousMenu(string policy)
     {
         var handler = new Handler();
@@ -335,7 +348,7 @@ public sealed class SchoolMealLiveTests
             Reply = (_, _) =>
         {
             var response = Rss();
-            response.Headers.CacheControl = new() { MustRevalidate = true };
+            response.Headers.CacheControl = new() { MustRevalidate = true, MaxAge = TimeSpan.FromSeconds(60) };
             return Task.FromResult(response);
         }
         };
@@ -379,7 +392,11 @@ public sealed class SchoolMealLiveTests
             Reply = (request, _) =>
         {
             Assert.Equal("https://www.tantgron.nu/matsedel/", request.RequestUri!.AbsoluteUri);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html") });
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(MusikugglanSchoolMeals.ExampleHtml, Encoding.UTF8, "text/html"),
+                Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } }
+            });
         }
         };
         using var service = Service(handler, clock);
@@ -433,7 +450,7 @@ public sealed class SchoolMealLiveTests
         var bytes = new byte[SchoolMealSourceClient.MaximumBytes + 1];
         var content = knownLength ? (HttpContent)new ByteArrayContent(bytes) : new StreamContent(new NonSeekableStream(bytes));
         content.Headers.ContentType = new("application/rss+xml");
-        var handler = new Handler { Reply = (_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = content }) };
+        var handler = new Handler { Reply = (_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = content, Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } } }) };
         using var service = Service(handler, new Clock());
         Assert.Equal("invalid", (await Get(service)).Status);
     }
@@ -455,7 +472,7 @@ public sealed class SchoolMealLiveTests
             if (!slowBody) await Task.Delay(Timeout.Infinite, token);
             var content = new StreamContent(new SlowStream());
             content.Headers.ContentType = new("application/rss+xml");
-            return new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = content, Headers = { CacheControl = new() { MaxAge = TimeSpan.FromHours(6) } } };
         }
         };
         using var service = Service(handler, new Clock());
@@ -522,6 +539,7 @@ public sealed class SchoolMealLiveTests
             Reply = (_, _) =>
         {
             var response = Rss();
+            response.Headers.CacheControl = null;
             response.Content.Headers.Expires = clock.Now.AddMinutes(-1);
             return Task.FromResult(response);
         }
@@ -664,7 +682,9 @@ public sealed class SchoolMealLiveTests
         {
             Assert.Empty(request.Headers.IfNoneMatch);
             Assert.Equal(modified, request.Headers.IfModifiedSince);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+            var response = new HttpResponseMessage(HttpStatusCode.NotModified);
+            response.Content.Headers.LastModified = modified;
+            return Task.FromResult(response);
         };
         var validated = await Get(service);
         Assert.Equal("published", validated.Status);

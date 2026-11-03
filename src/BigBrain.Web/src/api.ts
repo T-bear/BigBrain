@@ -460,6 +460,7 @@ export type SchoolMealWeek = {
   isFixture: boolean
   lastCheckedAtUtc?: string | null
   sourceUpdatedAtUtc?: string | null
+  validUntilUtc?: string | null
   isStale?: boolean
   sourceStatus?: string | null
   days: { date: string; status: string; dishes: string[] }[]

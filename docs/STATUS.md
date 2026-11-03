@@ -26,6 +26,19 @@ Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant 
 
 ## Family — Skollunch
 
+Avgränsad uppdatering 2026-11-03: cachekorrigering för oberoende T2-review på
+`fix/school-meal-cache-policy`, baseline `6ecf6f4b34b044c41164fa75d7297010499eaa2e`.
+Sex­timmarsspärr och HTTP-färskhet separeras; API och öppen vy döljer utgångna menyer utan
+extra hämtning. [Aktuellt kontrakt och leverantörsbegränsningar](knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03),
+[test- och reviewunderlag](reports/features/family/school-meals-preparation-20261023.md#cache-policy-correction--t2-review-checkpoint-2026-11-03).
+Ägaren rapporterar STANDARD PASS, API/Web healthy, alla källflaggor på och två HTTP 200 med
+kort max-age; detta är inte självständigt runtimeverifierat här. Korrigeringen är inte deployad.
+PR #31:s första T2-review identifierade två P1 i `a2d5cb1`: 304-validatorer och saknad
+frontendgiltighetstid. [Avgränsad korrigering och regressionsevidens](reports/features/family/school-meals-preparation-20261023.md#pr-31--p1-corrections-for-second-t2-review-2026-11-03)
+är publicerad för andra oberoende review; ingen merge eller ägaracceptans registreras.
+Rosenfeldts 60 sekunder + must-revalidate hindrar kontinuerlig visning vid sex timmars intervall.
+Nedan bevaras tidigare daterad status och evidens; den ersätter inte denna uppdatering.
+
 Avgränsad uppdatering 2026-11-01: PR #25 (`283060d`) för minnesbaserad hämtning är enligt
 ägaren oberoende godkänd; GitHub visar öppen/ej mergad PR och SUCCESS för CI-run
 [41338289335](https://github.com/T-bear/BigBrain/actions/runs/41338289335).
