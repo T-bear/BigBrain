@@ -53,16 +53,25 @@ Denna korrigering ersätter cache-/stale-beteendet ovan; minnesmodell och anrops
   verifierad stale-rätt. Stale-utökningar aktiveras inte. `no-store`, `no-cache` (även med
   fältnamn), `private`, `Vary: *`, ogiltig/tvetydig cachemetadata och saknad explicit färskhet
   avvisas konservativt. `must-revalidate`/`proxy-revalidate` uppfylls genom förbudet mot stale.
-- Giltig 304 kräver sparad meny och skickad validator; motsägande ETag avvisas. Utelämnade
-  cachefält ärvs, nya fält ersätter motsvarande metadata. Färskheten räknas om, ursprunglig
-  hämtningstid bevaras. Utgången data kan hållas enbart för validering inom befintlig 24 h-/
-  ISO-veckogräns; den får inte visas. Cacheförbud rensar även meny och validatorer.
+- Giltig 304 identifierar en lagrad representation enligt
+  [RFC 9111 §4.3.4](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.3.4).
+  Ett mottaget starkt ETag kräver samma lagrade starka ETag; ett svagt ETag jämförs utan `W/`.
+  Utan motsägande ETag kan samma Last-Modified identifiera den enda lagrade menyn. Källornas
+  klockrelation är inte verifierad, så Last-Modified uppgraderas inte till stark validator för
+  att acceptera ett nytt starkt ETag. Ogiltiga validatorer och validatorfri 304 avvisas; inga
+  villkorliga anrop skapas från annan metadata än lagrade validatorer.
+- Godkänd 304 ersätter mottagna validatorer/cachefält och bevarar utelämnade fält. Nya
+  validatorer används vid nästa tillåtna anrop. SourceUpdatedAtUtc följer Last-Modified;
+  ursprunglig FetchedAtUtc bevaras. Avvisad 304 förnyar varken färskhet, validatorer eller
+  retention. Utgången data kan hållas enbart för validering inom befintlig 24 h-/ISO-veckogräns;
+  den får inte visas. Cacheförbud rensar även meny och validatorer.
 - `NextAttempt` förblir minst sex timmar efter avslutat anrop, senare vid `Retry-After` på
   vilket HTTP-svar som helst. Osäkra headers/ogiltig Retry-After spärrar resten av processen.
   Cacheutgång, UI-timer och samtidiga läsningar ger inga extra källanrop.
 - Additivt `validUntilUtc` i befintligt API låter en redan öppen vy dölja utgångna menyer med
-  samma feltext. Timer samt fokus-/synlighetskontroll hämtar inget. Historiska fixtures påverkas
-  inte. Webbläsarens tidskontroll förutsätter korrekt enhetsklocka; fysisk PWA-acceptans återstår.
+  samma feltext. Publicerad livemeny kräver ett parsbart, ändligt datum i framtiden;
+  saknat/null/tomt, ogiltigt eller passerat värde döljer maträtterna. Timer samt fokus-/
+  synlighetskontroll hämtar inget. Historiska fixtures kräver ingen giltighetstid. Webbläsarens tidskontroll förutsätter korrekt enhetsklocka; fysisk PWA-acceptans återstår.
 - Omstart tömmer fortfarande cache och spärr enligt accepterad main och ägarbeslutet 2026-11-01.
   **Ingen beständig spärr över omstarter finns.** Detta uppdrag tillför inga databas-, fil- eller
   driftsändringar. Omstart får inte användas för att kringgå källgränser; framtida drift måste

@@ -67,6 +67,7 @@ public sealed class SchoolMealSourceDiagnosticsTests
             using var handler = new Handler(() =>
             {
                 var response = Response(status);
+                response.Headers.ETag = new("\"menu\"");
                 if (policy is not null) response.Headers.CacheControl = CacheControlHeaderValue.Parse(policy);
                 response.Headers.Age = TimeSpan.FromSeconds(age);
                 response.Headers.Date = clock.Now;

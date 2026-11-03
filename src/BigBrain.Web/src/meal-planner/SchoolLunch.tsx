@@ -21,7 +21,9 @@ const lunchDate = (value: string) =>
   new Date(`${value}T00:00:00Z`).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', timeZone: 'UTC' })
 
 function expireMenu(menu: SchoolMealWeek): SchoolMealWeek {
-  if (menu.isFixture || !menu.validUntilUtc || Date.parse(menu.validUntilUtc) > Date.now()) return menu
+  if (menu.isFixture || menu.status !== 'published') return menu
+  const deadline = menu.validUntilUtc ? Date.parse(menu.validUntilUtc) : NaN
+  if (Number.isFinite(deadline) && deadline > Date.now()) return menu
   return {
     ...menu,
     status: 'unavailable',
@@ -69,7 +71,7 @@ export function SchoolLunch({
 
   useEffect(() => {
     const deadlines = Object.values(menus)
-      .filter(menu => !menu.isFixture && menu.validUntilUtc)
+      .filter(menu => !menu.isFixture && menu.status === 'published' && menu.validUntilUtc)
       .map(menu => Date.parse(menu.validUntilUtc!))
     if (deadlines.length === 0) return
     // Expire presentation locally; this must never initiate another API/provider request.

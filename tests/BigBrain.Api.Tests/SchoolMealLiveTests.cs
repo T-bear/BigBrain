@@ -209,7 +209,8 @@ public sealed class SchoolMealLiveTests
         handler.Reply = (request, _) =>
         {
             Assert.Equal("\"menu-v1\"", Assert.Single(request.Headers.IfNoneMatch).ToString());
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified)
+            { Headers = { ETag = new("\"menu-v1\"") } });
         };
         clock.Now = clock.Now.AddHours(6);
         var unchanged = await Get(service);
@@ -681,7 +682,9 @@ public sealed class SchoolMealLiveTests
         {
             Assert.Empty(request.Headers.IfNoneMatch);
             Assert.Equal(modified, request.Headers.IfModifiedSince);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+            var response = new HttpResponseMessage(HttpStatusCode.NotModified);
+            response.Content.Headers.LastModified = modified;
+            return Task.FromResult(response);
         };
         var validated = await Get(service);
         Assert.Equal("published", validated.Status);

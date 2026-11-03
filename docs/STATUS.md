@@ -33,6 +33,9 @@ extra hämtning. [Aktuellt kontrakt och leverantörsbegränsningar](knowledge/me
 [test- och reviewunderlag](reports/features/family/school-meals-preparation-20261023.md#cache-policy-correction--t2-review-checkpoint-2026-11-03).
 Ägaren rapporterar STANDARD PASS, API/Web healthy, alla källflaggor på och två HTTP 200 med
 kort max-age; detta är inte självständigt runtimeverifierat här. Korrigeringen är inte deployad.
+PR #31:s första T2-review identifierade två P1 i `a2d5cb1`: 304-validatorer och saknad
+frontendgiltighetstid. [Avgränsad korrigering och regressionsevidens](reports/features/family/school-meals-preparation-20261023.md#pr-31--p1-corrections-for-second-t2-review-2026-11-03)
+är publicerad för andra oberoende review; ingen merge eller ägaracceptans registreras.
 Rosenfeldts 60 sekunder + must-revalidate hindrar kontinuerlig visning vid sex timmars intervall.
 Nedan bevaras tidigare daterad status och evidens; den ersätter inte denna uppdatering.
 

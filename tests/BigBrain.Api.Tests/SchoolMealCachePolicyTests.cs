@@ -178,6 +178,140 @@ public sealed class SchoolMealCachePolicyTests
         Assert.Equal(2, handler.Calls);
     }
 
+    [Theory]
+    [InlineData(null, true, "\"new\"", "same", false)]
+    [InlineData(null, true, null, "missing", false)]
+    [InlineData("\"menu\"", false, "\"menu\"", "missing", true)]
+    [InlineData("\"menu\"", false, "\"other\"", "missing", false)]
+    [InlineData("W/\"menu\"", false, "\"menu\"", "missing", false)]
+    [InlineData("\"menu\"", false, "W/\"menu\"", "missing", true)]
+    [InlineData("W/\"menu\"", false, "W/\"menu\"", "missing", true)]
+    [InlineData("W/\"menu\"", false, "W/\"other\"", "missing", false)]
+    [InlineData("\"menu\"", true, "\"other\"", "same", false)]
+    [InlineData("\"menu\"", true, "W/\"other\"", "same", false)]
+    [InlineData("\"menu\"", false, null, "missing", false)]
+    [InlineData(null, true, null, "same", true)]
+    [InlineData(null, true, null, "different", false)]
+    [InlineData("\"menu\"", true, null, "same", true)]
+    [InlineData(null, true, "W/\"new\"", "same", true)]
+    [InlineData(null, true, "bad", "same", false)]
+    [InlineData("\"menu\"", true, "\"menu\"", "bad", false)]
+    public async Task RevalidationRequiresCorrespondingValidatorAndPreservesCooldown(
+        string? storedTag, bool storedModified, string? receivedTag, string receivedModified, bool accepted)
+    {
+        var clock = new Clock();
+        var modified = clock.Now.AddHours(-1);
+        var attempt = 0;
+        using var handler = new Handler(request =>
+        {
+            attempt++;
+            if (attempt == 1)
+            {
+                var original = Response("max-age=60");
+                if (storedTag is not null) original.Headers.ETag = EntityTagHeaderValue.Parse(storedTag);
+                if (storedModified) original.Content.Headers.LastModified = modified;
+                return original;
+            }
+            if (attempt == 4)
+            {
+                // Failed validation must not mutate validators or extend 24-hour retention.
+                Assert.Empty(request.Headers.IfNoneMatch);
+                Assert.Null(request.Headers.IfModifiedSince);
+                return new(HttpStatusCode.NotModified);
+            }
+            Assert.Equal(storedTag, request.Headers.IfNoneMatch.SingleOrDefault()?.ToString());
+            Assert.Equal(storedModified ? modified : (DateTimeOffset?)null, request.Headers.IfModifiedSince);
+            if (attempt == 3) return new(HttpStatusCode.NotModified);
+            var response = new HttpResponseMessage(HttpStatusCode.NotModified);
+            response.Headers.CacheControl = new() { MaxAge = TimeSpan.FromHours(24) };
+            response.Headers.RetryAfter = new(TimeSpan.FromHours(12));
+            if (receivedTag is not null) response.Headers.TryAddWithoutValidation("ETag", receivedTag);
+            if (receivedModified != "missing") response.Content.Headers.TryAddWithoutValidation("Last-Modified",
+                receivedModified == "bad" ? "bad" : (receivedModified == "same" ? modified : modified.AddMinutes(1)).ToString("R"));
+            return response;
+        });
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock);
+        Task<SchoolMealWeek> Read() => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
+        Assert.Equal("published", (await Read()).Status);
+        clock.Now = clock.Now.AddHours(6);
+        var result = await Read();
+        Assert.Equal(accepted ? "published" : "invalid", result.Status);
+        if (!accepted)
+        {
+            Assert.Null(result.ValidUntilUtc);
+            Assert.All(result.Days, day => Assert.Empty(day.Dishes));
+        }
+        clock.Now = clock.Now.AddHours(6);
+        await Read();
+        Assert.Equal(2, handler.Calls); // 304 Retry-After still extends the six-hour floor.
+        if (!accepted)
+        {
+            clock.Now = clock.Now.AddHours(6); // Retry-After ends; original validators must still be sent.
+            Assert.Equal("invalid", (await Read()).Status);
+            Assert.Equal(3, handler.Calls);
+            clock.Now = modified.AddHours(26); // 25 hours after original storage, 19 after invalid 304.
+            Assert.Equal("invalid", (await Read()).Status);
+            Assert.Equal(4, handler.Calls);
+        }
+    }
+
+    [Fact]
+    public async Task Valid304UpdatesValidatorsAndPolicyAndPreservesOmittedFields()
+    {
+        var clock = new Clock();
+        var modified = clock.Now.AddHours(-1);
+        var updated = modified.AddMinutes(1);
+        var attempt = 0;
+        using var handler = new Handler(request =>
+        {
+            attempt++;
+            if (attempt == 1)
+            {
+                var original = Response("max-age=60, s-maxage=60");
+                original.Headers.ETag = new("\"menu\"");
+                original.Content.Headers.LastModified = modified;
+                original.Content.Headers.Expires = clock.Now.AddHours(24);
+                return original;
+            }
+            var response = new HttpResponseMessage(HttpStatusCode.NotModified);
+            response.Headers.Date = clock.Now;
+            if (attempt == 2)
+            {
+                Assert.Equal("\"menu\"", Assert.Single(request.Headers.IfNoneMatch).ToString());
+                Assert.Equal(modified, request.Headers.IfModifiedSince);
+                response.Headers.ETag = EntityTagHeaderValue.Parse("W/\"menu\"");
+                response.Content.Headers.LastModified = updated;
+                response.Headers.CacheControl = new() { MaxAge = TimeSpan.FromSeconds(120) };
+                response.Content.Headers.Expires = clock.Now.AddHours(18);
+            }
+            else
+            {
+                Assert.Equal("W/\"menu\"", Assert.Single(request.Headers.IfNoneMatch).ToString());
+                Assert.Equal(updated, request.Headers.IfModifiedSince);
+                response.Content.Headers.LastModified = updated; // ETag and Expires omitted: retain them.
+                if (attempt == 4) response.Headers.CacheControl = new() { Public = true };
+            }
+            return response;
+        });
+        using var http = new HttpClient(handler);
+        using var service = Service(http, clock);
+        Task<SchoolMealWeek> Read() => service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
+        var original = await Read();
+        for (var step = 1; step <= 3; step++)
+        {
+            clock.Now = clock.Now.AddHours(6);
+            var validated = await Read();
+            Assert.Equal("published", validated.Status);
+            Assert.Equal(original.FetchedAtUtc, validated.FetchedAtUtc);
+            Assert.Equal(updated, validated.SourceUpdatedAtUtc);
+            // Replacing Cache-Control removes old s-maxage; omitted Cache-Control is retained.
+            // At step 3, max-age is removed and the retained absolute Expires becomes effective.
+            Assert.Equal(step < 3 ? clock.Now.AddSeconds(120) : clock.Now.AddHours(6), validated.ValidUntilUtc);
+        }
+        Assert.Equal(4, handler.Calls);
+    }
+
     [Fact]
     public async Task BodyTransferCannotResetFreshnessDeadline()
     {

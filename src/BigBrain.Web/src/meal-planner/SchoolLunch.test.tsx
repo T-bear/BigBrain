@@ -10,63 +10,70 @@ afterEach(() => {
 })
 
 describe('SchoolLunch', () => {
-  it('expires each source locally without refetching and rechecks on resume', async () => {
-    vi.useFakeTimers()
-    const start = new Date('2026-10-19T10:00:00Z')
-    vi.setSystemTime(start)
-    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
-      schoolId: id,
-      schoolName: id,
-      sourceName: 'Testkälla',
-      sourceUrl: 'https://example.org',
-      year: 2026,
-      week: 43,
-      status: 'published',
-      dateBasis: 'sourceGuid',
-      fetchedAtUtc: start.toISOString(),
-      isFixture: false,
-      validUntilUtc: new Date(start.getTime() + (id === 'rosenfeldt' ? 60000 : 3600000)).toISOString(),
-      days: [{ date: '2026-10-19', status: 'published', dishes: [id + ' lunch'] }],
-    }))
-    await act(async () => {
+  it.each(['focus', 'visibilitychange'])(
+    'expires each source locally without refetching and rechecks on %s',
+    async event => {
+      vi.useFakeTimers()
+      const start = new Date('2026-10-19T10:00:00Z')
+      vi.setSystemTime(start)
+      vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+        schoolId: id,
+        schoolName: id,
+        sourceName: 'Testkälla',
+        sourceUrl: 'https://example.org',
+        year: 2026,
+        week: 43,
+        status: 'published',
+        dateBasis: 'sourceGuid',
+        fetchedAtUtc: start.toISOString(),
+        isFixture: false,
+        validUntilUtc: new Date(start.getTime() + (id === 'rosenfeldt' ? 60000 : 3600000)).toISOString(),
+        days: [{ date: '2026-10-19', status: 'published', dishes: [id + ' lunch'] }],
+      }))
+      await act(async () => {
+        render(<SchoolLunch allowFixture={false} />)
+      })
+      expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+      expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+      await act(async () => {
+        vi.advanceTimersByTime(59999)
+      })
+      expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+      await act(async () => {
+        vi.advanceTimersByTime(1)
+      })
+      expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
+      expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
+      vi.setSystemTime(new Date(start.getTime() + 3600000))
+      if (event === 'focus') fireEvent.focus(window)
+      else fireEvent(document, new Event('visibilitychange'))
+      expect(screen.queryByText('musikugglan lunch')).not.toBeInTheDocument()
+      expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+    },
+  )
+  it.each([undefined, null, '', 'not-a-date', '2000-01-01T00:00:00Z'])(
+    'hides live dishes with invalid or expired deadline %s',
+    async validUntilUtc => {
+      vi.mocked(api.getSchoolMeals).mockResolvedValue({
+        schoolId: 'rosenfeldt',
+        schoolName: 'Rosenfeldtskolan',
+        sourceName: 'Testkälla',
+        sourceUrl: 'https://example.org',
+        year: 2026,
+        week: 43,
+        status: 'published',
+        dateBasis: 'sourceGuid',
+        fetchedAtUtc: null,
+        isFixture: false,
+        validUntilUtc,
+        days: [{ date: '2026-10-19', status: 'published', dishes: ['Expired lunch'] }],
+      })
       render(<SchoolLunch allowFixture={false} />)
-    })
-    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
-    expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
-    await act(async () => {
-      vi.advanceTimersByTime(59999)
-    })
-    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
-    await act(async () => {
-      vi.advanceTimersByTime(1)
-    })
-    expect(screen.queryByText('rosenfeldt lunch')).not.toBeInTheDocument()
-    expect(screen.getByText('musikugglan lunch')).toBeInTheDocument()
-    vi.setSystemTime(new Date(start.getTime() + 3600000))
-    fireEvent.focus(window)
-    expect(screen.queryByText('musikugglan lunch')).not.toBeInTheDocument()
-    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
-  })
-  it('does not display a menu that expires while the API response is in flight', async () => {
-    vi.mocked(api.getSchoolMeals).mockResolvedValue({
-      schoolId: 'rosenfeldt',
-      schoolName: 'Rosenfeldtskolan',
-      sourceName: 'Testkälla',
-      sourceUrl: 'https://example.org',
-      year: 2026,
-      week: 43,
-      status: 'published',
-      dateBasis: 'sourceGuid',
-      fetchedAtUtc: null,
-      isFixture: false,
-      validUntilUtc: '2000-01-01T00:00:00Z',
-      days: [{ date: '2026-10-19', status: 'published', dishes: ['Expired lunch'] }],
-    })
-    render(<SchoolLunch allowFixture={false} />)
-    expect(await screen.findAllByText('Kunde inte uppdatera matsedeln just nu. Försök igen senare.')).toHaveLength(2)
-    expect(screen.queryByText('Expired lunch')).not.toBeInTheDocument()
-    expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
-  })
+      expect(await screen.findAllByText('Kunde inte uppdatera matsedeln just nu. Försök igen senare.')).toHaveLength(2)
+      expect(screen.queryByText('Expired lunch')).not.toBeInTheDocument()
+      expect(api.getSchoolMeals).toHaveBeenCalledTimes(2)
+    },
+  )
 
   it('reads current menus through the local API without exposing fixtures in production', async () => {
     vi.mocked(api.getSchoolMeals).mockResolvedValue({
@@ -146,7 +153,7 @@ describe('SchoolLunch', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Visa testveckorna' }))
     await waitFor(() => expect(screen.getAllByRole('alert')[0]).toHaveTextContent('Testmenyn kunde inte läsas'))
   })
-  it('keeps the other school visible when one request fails and marks stale data', async () => {
+  it('hides stale data without a deadline when the other school fails', async () => {
     vi.mocked(api.getSchoolMeals).mockImplementation(async id => {
       if (id === 'musikugglan') throw new Error('unavailable')
       return {
@@ -166,8 +173,9 @@ describe('SchoolLunch', () => {
       }
     })
     render(<SchoolLunch allowFixture={false} />)
-    expect(await screen.findByText('Pasta med spenat och ostsås')).toBeInTheDocument()
-    expect(screen.getByText(/Inaktuell meny/)).toBeInTheDocument()
+    await waitFor(() => expect(api.getSchoolMeals).toHaveBeenCalledTimes(2))
+    expect(screen.queryByText('Pasta med spenat och ostsås')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Inaktuell meny/)).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Kunde inte uppdatera matsedeln just nu. Försök igen senare.')
     expect(screen.queryByText(/TESTDATA/)).not.toBeInTheDocument()
   })
@@ -201,6 +209,7 @@ describe('SchoolLunch', () => {
     await waitFor(() => expect(screen.queryByText('SEN TESTDATA')).not.toBeInTheDocument())
   })
   it('shows calendar dates across ISO year boundaries and renders source text without executing markup', async () => {
+    const validUntilUtc = new Date(Date.now() + 3600000).toISOString()
     const unsafeText = '<img src=x onerror="alert(1)"><script>alert(1)</script>'
     vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
       schoolId: id,
@@ -213,6 +222,7 @@ describe('SchoolLunch', () => {
       dateBasis: id === 'rosenfeldt' ? 'sourceGuid' : 'unknown',
       fetchedAtUtc: id === 'rosenfeldt' ? '2026-12-28T08:00:00Z' : null,
       sourceUpdatedAtUtc: id === 'rosenfeldt' ? '2026-12-27T12:00:00Z' : null,
+      validUntilUtc,
       isFixture: false,
       days: [
         { date: '2026-12-28', status: 'published', dishes: [unsafeText, 'Pasta med spenat och ostsås'] },

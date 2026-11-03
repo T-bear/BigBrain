@@ -100,6 +100,9 @@ public sealed class SchoolMealService(MealPlannerOptions options, SchoolMealSour
                         entry.ValidatedAt = clock.GetUtcNow();
                         entry.FreshUntil = response.FreshUntil;
                         entry.CachePolicy = response.CachePolicy;
+                        entry.ETag = response.ETag;
+                        entry.Modified = response.Modified;
+                        entry.Menu = entry.Menu with { SourceUpdatedAtUtc = response.Modified };
                     }
                 }
                 else if (response.Content is { } content)

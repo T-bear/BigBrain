@@ -102,11 +102,11 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
             }
             if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.NotModified)
                 return Result("unavailable");
-            if (notModified && (previousPolicy is null || etag is null && modified is null
-                || etag is not null && response.Headers.ETag is { } receivedTag
-                    && EntityTagHeaderValue.Parse(etag).Tag != receivedTag.Tag)) return Result("invalid");
+            if (notModified && (previousPolicy is null || !MatchesStoredValidator(response, etag, modified)))
+                return Result("invalid");
             if (reason != "cacheAccepted") return Result("cachePolicy");
-            if (notModified) return Result("notModified");
+            if (notModified) return Result("notModified", responseEtag: response.Headers.ETag?.ToString() ?? etag,
+                responseModified: response.Content.Headers.LastModified ?? modified);
             var type = response.Content.Headers.ContentType?.MediaType;
             var supported = school == SchoolMeals.Rosenfeldt
                 ? type is "application/rss+xml" or "application/xml" or "text/xml"
@@ -130,6 +130,25 @@ public sealed partial class SchoolMealSourceClient(HttpClient client, TimeProvid
         {
             return Result("unavailable");
         }
+    }
+
+    private static bool MatchesStoredValidator(HttpResponseMessage response, string? etag, DateTimeOffset? modified)
+    {
+        var receivedTag = response.Headers.ETag;
+        var receivedModified = response.Content.Headers.LastModified;
+        if (response.Headers.Contains("ETag") && (receivedTag is null || receivedTag.Tag == "*")
+            || response.Content.Headers.Contains("Last-Modified") && receivedModified is null) return false;
+        var storedTag = etag is null ? null : EntityTagHeaderValue.Parse(etag);
+        // RFC 9111 §4.3.4: a new strong ETag cannot identify a stored weak tag or
+        // a Last-Modified-only representation. Weak comparison ignores only W/.
+        if (receivedTag is { IsWeak: false })
+            return storedTag is { IsWeak: false } && storedTag.Tag == receivedTag.Tag;
+        if (receivedTag is not null && storedTag is not null)
+            return storedTag.Tag == receivedTag.Tag;
+        // We do not infer strong Last-Modified validators from unverified source clocks.
+        // With no conflicting ETag, an equal Last-Modified identifies our sole stored menu.
+        // A validator-free 304 cannot identify a menu whose validator we sent.
+        return modified is not null && receivedModified == modified;
     }
 
     private static bool HasDuplicateFreshness(HttpResponseMessage response)

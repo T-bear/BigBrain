@@ -1316,3 +1316,75 @@ Independent T2 review, actual permitted live parsing, device acceptance, merge a
 runtime action remain separate. No approval is requested or presumed by publishing this PR.
 Recovery was inspected: no new interrupted operation or unpublished implementation remains at
 checkpoint publication; the historical frozen operational recovery entries are not cleared.
+
+
+## PR 31 — P1 corrections for second T2 review, 2026-11-03
+
+**UPDATED REVIEW CHECKPOINT — STOP for second independent T2 review; no merge/deployment.**
+The owner supplied two independently reviewed P1 findings against `a2d5cb11d96e302d439c7fed433e0b77043c8a67`
+and authorized only their correction on the same `fix/school-meal-cache-policy` branch / PR #31.
+GitHub main and PR head matched the handoff before implementation: main
+`6ecf6f4b34b044c41164fa75d7297010499eaa2e`, prior candidate `a2d5cb1` (prior CI all four jobs PASS).
+No conflict, history rewrite, new branch or PR. Risk remains **2 / T2**. Candidate SHA/tree are
+bound by the new commit metadata and updated PR evidence, not self-referential document text.
+DoD is limited to correcting both P1s, regressions, builds/format/docs/diff checks and exact-head CI.
+
+**P1: 304 validator selection and metadata.** The client now requires a corresponding stored
+validator before accepting a 304. Strong ETags require a strong match; weak ETags use weak
+comparison. Equal Last-Modified may select the sole stored response when no conflicting ETag
+exists. We do not infer strong date validators from unverified provider clocks, or use a matching
+weak date to admit a new strong ETag. Malformed/absent response validators do not renew content.
+This remains a deliberately conservative client for two fixed sources, not a general shared cache.
+The service updates accepted ETag/Last-Modified and SourceUpdatedAtUtc along with existing cache
+metadata; omitted fields are retained, and original FetchedAtUtc remains unchanged. Subsequent
+conditional requests use the updated validators. Invalid 304s leave validator/freshness/retention
+state unchanged while still consuming the cooldown and honoring Retry-After. The existing tests
+that accepted validator-free 304s now supply matching ETag or Last-Modified respectively.
+Authority: [RFC 9111 §4.3.4](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.3.4) and the
+[canonical module contract](../../../knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03).
+
+**P1: mandatory frontend deadline.** A published live menu is shown only when validUntilUtc
+parses to a finite future timestamp. Missing/null/empty, invalid and expired timestamps use the
+existing unavailable presentation without dishes. Fixtures still bypass live expiry. Existing
+expiry timers and focus/visibility handling remain local; no new API/source request or retry.
+The old stale-positive frontend test now requires the deadline-less menu to be hidden, while
+normal live presentation tests supply a valid future deadline. The parser/fixture provenance,
+source clocks/device-clock limitation and all provider/restart availability constraints above
+remain unchanged.
+
+Changed implementation: `SchoolMealSourceClient.cs`, `SchoolMealService.cs`, `SchoolLunch.tsx`.
+Changed tests: existing `SchoolMealCachePolicyTests.cs`, `SchoolMealLiveTests.cs`,
+`SchoolMealSourceDiagnosticsTests.cs`, `SchoolLunch.test.tsx`. Canonical knowledge and STATUS are
+updated; no new backlog item or recovery operation is needed for these already tracked P1s.
+No database, deployment, configuration, provider URL/interval, Finance or BB-158 change.
+
+Verification (2026-11-03):
+
+- Pre-fix regression proof against prior production code: **8 FAIL / 10 PASS** in the new
+  backend selection/metadata cases, and **4 FAIL / 8 PASS** in SchoolLunch frontend tests.
+  A weak-tag test-fixture constructor was corrected to EntityTagHeaderValue.Parse before the
+  recorded backend proof. Failures then directly reproduced missing/mismatched validators,
+  weak-to-strong promotion, malformed metadata and missing UI expiry. No runtime attempt occurred.
+- **PASS:** `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlanner|FullyQualifiedName~ShoppingList' -v quiet`:
+  **163 passed, 0 failed, 0 skipped**, including .NET build. The 18 added backend cases cover
+  validator selection, strong/weak ETags, equal/missing/changed Last-Modified, malformed headers,
+  metadata replacement/inheritance, next-request validators, unchanged retention and Retry-After.
+  All prior cache-policy, six-hour gate, parser, restart and household-isolation tests pass.
+- **PASS:** `npm test -- --run src/meal-planner/SchoolLunch.test.tsx
+  src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`: **29 passed**. Five deadline
+  negatives, corrected stale case, both focus/visibility resume checks, exact expiry and fixtures
+  retain assertions for no extra API calls. **PASS:** `npm run build` (TypeScript/Vite); only tests
+  changed after that build, so its unchanged production-code evidence is reused.
+- **PASS:** scoped `dotnet format BigBrain.slnx --no-restore --verify-no-changes --include` on
+  the five changed C# files, scoped `npx prettier --check`, documentation validator (290 Markdown
+  files / 53 unique backlog IDs), `git diff --check`, local scope/content review. No raw provider
+  content, credentials or private logs added. GitHub secrets/CI result is reported for exact head.
+- Reused: unchanged original RSS/HTML provenance and source rights evidence from the prior
+  checkpoint. Changed paths and their surrounding cache/household tests are rerun; no provider
+  call, device acceptance, production inspection, restart or deployment (**SKIP / unauthorized**).
+
+GitHub exact-candidate CI and remote SHA/tree are recorded in PR #31 after publication. This
+checkpoint does not declare independent review or owner UX acceptance. Main and production are
+unchanged by this work. No further repair loop or scope expansion is authorized; next is the
+second independent review of these two findings and the added diff.
