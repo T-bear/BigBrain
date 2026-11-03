@@ -24,6 +24,32 @@ begränsningar även under frysningen; aktuell privat status är okänd. Se
 [kanonisk drift-/retentiongräns](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
 Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant eller skapar handelsauktoritet.
 
+## Aktuell leveransacceptans – Skollunch 2026-11-03
+
+**PASS – uttryckligen godkänd av produktägaren 2026-11-03.**
+
+PR #33 har mergats till accepterad main
+`80fa231773dace31dda60ad0a32c69c1a42b5e50`.
+Backend, frontend, dokumentation och secrets har fyra
+godkända main-CI-kontroller.
+
+Produktägarens terminalrapport visar `STANDARD PASS`
+för API+Web på den accepterade revisionen.
+En därefter tillhandahållen iPhone/PWA-vy visar
+Rosenfeldtskolans och Musikugglans aktuella matsedlar
+för vecka 45/2026, med källor och hämtningstidpunkter.
+
+Produktägaren har därefter uttryckligen godkänt
+Skollunchens manuella UX-acceptans. Senare eventuella
+UX-fynd hanteras som separata GitHub-issues och
+återöppnar inte denna leverans automatiskt.
+
+Detta är ägarrapporterad drift och ägaracceptans,
+inte en separat oberoende verifiering av leverantörernas
+matsedelsinnehåll eller framtida långtidsdrift.
+
+De äldre granskningsuppgifterna nedan är historik.
+
 ## Family — Skollunch
 
 **Aktuell granskningsstatus 2026-11-03 – PR #33, ännu inte mergad:**
