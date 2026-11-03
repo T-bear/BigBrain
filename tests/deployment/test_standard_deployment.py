@@ -385,6 +385,71 @@ class StandardTests(unittest.TestCase):
         self.assertEqual(self.dep.project_directory, self.root)
         self.assertEqual(self.dep.env_files, [env_file])
 
+    def test_literal_dev_null_discovery_and_compose_are_read_only(self):
+        for c in self.runtime.values():
+            c['Config']['Labels'].update({
+                'com.docker.compose.project.environment_file': '/dev/null',
+                'com.docker.compose.project.config_files': str(self.source),
+                'com.docker.compose.project.working_dir': str(self.root)})
+        self.dep.source = None
+        self.dep.discover_compose()
+        self.assertEqual(self.dep.env_files, [Path('/dev/null')])
+        original = copy.deepcopy(self.runtime)
+        with patch.object(d, 'docker', return_value=b'{}') as docker:
+            for path in (self.source, self.root / 'release.json'):
+                d.Deployment.compose(self.dep, path, 'config', '--format', 'json')
+                args = docker.call_args.args
+                self.assertEqual(args[args.index('--env-file') + 1], '/dev/null')
+                self.assertFalse(docker.call_args.kwargs['mutation'])
+            self.dep.compose_model(self.config, 'config')
+        self.assertEqual(self.runtime, original)
+        self.assertFalse(list(self.state.iterdir()))
+
+    def test_environment_sources_fail_closed_in_discovery_and_compose(self):
+        regular = self.root / 'regular.env'
+        regular.write_text('LOCAL=value')
+        linked = self.root / 'linked.env'
+        linked.symlink_to(regular)
+        null_link = self.root / 'null.env'
+        null_link.symlink_to('/dev/null')
+        dangling = self.root / 'dangling.env'
+        dangling.symlink_to(self.root / 'missing')
+        linked_parent = self.root / 'linked-parent'
+        linked_parent.symlink_to(self.root, target_is_directory=True)
+        fifo = self.root / 'fifo.env'
+        os.mkfifo(fifo)
+        rejected = [linked, null_link, dangling, linked_parent / 'regular.env', fifo,
+                    self.root, self.root / 'missing', Path('/dev/zero'), Path('relative.env')]
+        for path in rejected:
+            with self.subTest(path=path):
+                for c in self.runtime.values():
+                    c['Config']['Labels'].update({
+                        'com.docker.compose.project.environment_file': str(path),
+                        'com.docker.compose.project.config_files': str(self.source),
+                        'com.docker.compose.project.working_dir': str(self.root)})
+                self.dep.source = None
+                with self.assertRaises((d.Blocked, d.backup.Blocked)): self.dep.discover_compose()
+                self.dep.source = self.source
+                self.dep.env_files = [path]
+                with patch.object(d, 'docker') as docker:
+                    with self.assertRaises((d.Blocked, d.backup.Blocked)):
+                        d.Deployment.compose(self.dep, self.source, 'config')
+                    docker.assert_not_called()
+        self.dep.env_files = [regular]
+        with patch.object(d, 'docker', return_value=b'{}') as docker:
+            d.Deployment.compose(self.dep, self.source, 'config')
+            self.assertIn(str(regular), docker.call_args.args)
+
+    def test_dev_null_must_be_literal_and_the_expected_character_device(self):
+        for value in ('/dev//null', '/dev/./null', '/dev/../dev/null'):
+            with self.subTest(value=value), self.assertRaises(d.Blocked): d.environment_file(value)
+        for mode, device in ((stat.S_IFREG | 0o666, 0), (stat.S_IFCHR | 0o666, os.makedev(1, 5))):
+            # Use a tiny stat object so the device number does not depend on stat_result's platform layout.
+            from types import SimpleNamespace
+            with patch.object(Path, 'lstat', return_value=SimpleNamespace(st_mode=mode, st_rdev=device)), \
+                 patch.object(d.backup, 'no_symlinks'):
+                with self.assertRaisesRegex(d.Blocked, 'ComposeEnvironmentInvalid'): d.environment_file('/dev/null')
+
     def test_mismatched_runtime_compose_inputs_are_rejected(self):
         self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = '/one'
         self.dep.source = None
@@ -1070,6 +1135,27 @@ class GitGuardTests(unittest.TestCase):
         self.assertIn(self.web_file, self.git('diff', '--name-only', self.api_base, self.revision))
         self.assertNotIn(self.web_file, self.git('diff', '--name-only', self.web_base, self.revision))
         self.guard()
+
+    def test_exact_school_paths_are_accepted_against_each_runtime_baseline(self):
+        added = {
+            'src/BigBrain.Api/MealPlanner/SchoolMealSourceClient.cs',
+            'src/BigBrain.Api/MealPlanner/SchoolMeals.cs',
+            'src/BigBrain.Web/src/api.ts',
+            'src/BigBrain.Web/src/meal-planner/SchoolLunch.tsx',
+            'src/BigBrain.Web/src/meal-planner/SchoolLunch.test.tsx',
+        }
+        self.assertEqual(d.APP_FILES, added | {self.api_file,
+            'src/BigBrain.Api/MealPlanner/MealPlannerStore.SchoolMeals.cs'})
+        for path in sorted(added):
+            self.write(path, 'school-only candidate delta')
+            self.revision = self.commit()
+            self.guard()
+        for path in sorted(added):
+            neighbor = path + '.other'
+            self.write(neighbor, 'not an allowed path')
+            self.revision = self.commit()
+            with self.assertRaisesRegex(d.Blocked, 'OutsideStandardScope'): self.guard()
+            (self.root / neighbor).unlink()
 
     def test_new_web_delta_is_not_exempted_by_role_filter(self):
         for path in (self.web_file, 'src/BigBrain.Web/src/FinanceDashboard.tsx',

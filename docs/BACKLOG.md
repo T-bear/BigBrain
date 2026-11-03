@@ -519,6 +519,13 @@ samt sparsamma notiser. Beroenden BB-029, BB-036, BB-027, auth-hardening och Hom
 
 ### Skollunch — kvarstående livegrindar
 
+Ny checkpoint 2026-11-03: ägaren har beslutat 60 sekunders golv och UX B.
+[Behovsstyrd omvalidering och leverantörsgrind](knowledge/meal-planner.md#skollunch--behovsstyrd-omvalidering-och-ux-b-t2-checkpoint-2026-11-03)
+är implementeringsscope, inte liveacceptans. Kompletta ägaruppgivna leverantörsbesked för båda
+källorna saknas fortfarande; Skolmat.info måste uttryckligen omfatta automatiserad RSS trots
+observerat `Disallow: /`. Ingen privat korrespondens publiceras. Äldre sex­timmarsuppgifter nedan
+avser tidigare revisioner. Backloggens livegrindar är fortsatt öppna.
+
 Uppdatering 2026-11-03: ägaren rapporterar STANDARD-deployment PASS, API/Web healthy och
 aktiverade källflaggor; båda HTTP 200 avvisas av sex­timmarskravet på färskhet.
 [Korrigering för T2-review](knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03)

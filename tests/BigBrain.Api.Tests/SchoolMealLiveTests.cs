@@ -111,7 +111,7 @@ public sealed class SchoolMealLiveTests
     }
 
     [Fact]
-    public async Task ConcurrentRequestsShareOneFetchAndSixHourInterval()
+    public async Task ConcurrentRequestsShareOneFetchAndRefresh()
     {
         var gate = new TaskCompletionSource<HttpResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
         var handler = new Handler { Reply = (_, _) => gate.Task };
@@ -125,9 +125,14 @@ public sealed class SchoolMealLiveTests
         clock.Now = clock.Now.AddHours(5.99);
         await Get(service);
         Assert.Equal(1, handler.Calls);
-        handler.Reply = (_, _) => Task.FromResult(Rss());
+        var refreshGate = new TaskCompletionSource<HttpResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+        handler.Reply = (_, _) => refreshGate.Task;
         clock.Now = clock.Now.AddMinutes(1);
-        await Get(service);
+        var refreshes = Enumerable.Range(0, 10).Select(_ => Get(service)).ToArray();
+        Assert.Equal(2, handler.Calls);
+        Assert.All(refreshes, request => Assert.False(request.IsCompleted));
+        refreshGate.SetResult(Rss());
+        Assert.All(await Task.WhenAll(refreshes), result => Assert.Equal("published", result.Status));
         Assert.Equal(2, handler.Calls);
     }
 
@@ -420,9 +425,40 @@ public sealed class SchoolMealLiveTests
         var next = await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 44, TestContext.Current.CancellationToken);
         Assert.Equal("notPublished", next.Status);
         Assert.All(next.Days, day => Assert.Empty(day.Dishes));
-        Assert.Equal(1, handler.Calls);
+        Assert.Equal(2, handler.Calls);
         clock.Now = new(2027, 1, 1, 12, 0, 0, TimeSpan.Zero);
         Assert.Equal((2026, 53), service.CurrentWeek());
+    }
+
+    [Fact]
+    public async Task WeekRolloverClearsValidatorsButCannotBypassSixtySecondFloor()
+    {
+        var clock = new Clock { Now = new(2026, 10, 25, 22, 59, 30, TimeSpan.Zero) };
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+        {
+            var response = Rss();
+            response.Headers.ETag = new("\"old-week\"");
+            return Task.FromResult(response);
+        }
+        };
+        using var service = Service(handler, clock);
+        await Get(service);
+        clock.Now = clock.Now.AddSeconds(30);
+        var blocked = await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 44, TestContext.Current.CancellationToken);
+        Assert.Equal("notPublished", blocked.Status);
+        Assert.All(blocked.Days, day => Assert.Empty(day.Dishes));
+        Assert.Equal(1, handler.Calls);
+        handler.Reply = (request, _) =>
+        {
+            Assert.Empty(request.Headers.IfNoneMatch);
+            Assert.Null(request.Headers.IfModifiedSince);
+            return Task.FromResult(Rss());
+        };
+        clock.Now = clock.Now.AddSeconds(30);
+        await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 44, TestContext.Current.CancellationToken);
+        Assert.Equal(2, handler.Calls);
     }
 
     [Fact]
@@ -553,15 +589,26 @@ public sealed class SchoolMealLiveTests
     {
         var clock = new Clock();
         var start = clock.Now;
-        var handler = new Handler { Reply = (_, _) => { clock.Now = start.AddHours(2); return Task.FromResult(Rss()); } };
+        var handler = new Handler
+        {
+            Reply = (_, _) =>
+        {
+            clock.Now = start.AddSeconds(10);
+            var response = Rss();
+            response.Headers.CacheControl = new() { MaxAge = TimeSpan.FromSeconds(30) };
+            return Task.FromResult(response);
+        }
+        };
         using var service = Service(handler, clock);
         Assert.Equal("published", (await Get(service)).Status);
-        clock.Now = start.AddHours(8).AddTicks(-1);
-        await Get(service);
+        clock.Now = start.AddSeconds(69);
+        var blocked = await Get(service);
+        Assert.Equal("unavailable", blocked.Status);
+        Assert.All(blocked.Days, day => Assert.Empty(day.Dishes));
         Assert.Equal(1, handler.Calls);
         handler.Reply = (_, _) => Task.FromResult(Rss());
-        clock.Now = start.AddHours(8);
-        await Get(service);
+        clock.Now = start.AddSeconds(70);
+        Assert.Equal("published", (await Get(service)).Status);
         Assert.Equal(2, handler.Calls);
     }
 

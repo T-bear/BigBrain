@@ -164,8 +164,8 @@ public sealed class SchoolMealSourceDiagnosticsTests
             new SchoolMealSourceClient(http, clock, log), clock);
         Assert.Equal("unavailable", (await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken)).Status);
         Assert.Equal("rateLimited", Assert.Single(log.Entries)["PolicyReason"]);
-        var interval = retry is "delta" or "date" ? 12 : 6;
-        clock.Now = clock.Now.AddHours(interval).AddSeconds(-1);
+        var interval = retry is "delta" or "date" ? TimeSpan.FromHours(12) : TimeSpan.FromSeconds(60);
+        clock.Now = clock.Now.Add(interval).AddSeconds(-1);
         await service.GetAsync(SchoolMeals.Rosenfeldt, 2026, 43, TestContext.Current.CancellationToken);
         Assert.Equal(1, handler.Calls);
         Assert.Single(log.Entries);

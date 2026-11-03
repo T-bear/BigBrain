@@ -48,6 +48,11 @@ REPOSITORIES = {'git@github.com:T-bear/BigBrain.git', 'https://github.com/T-bear
 APP_FILES = {
     'src/BigBrain.Api/MealPlanner/SchoolMealService.cs',
     'src/BigBrain.Api/MealPlanner/MealPlannerStore.SchoolMeals.cs',
+    'src/BigBrain.Api/MealPlanner/SchoolMealSourceClient.cs',
+    'src/BigBrain.Api/MealPlanner/SchoolMeals.cs',
+    'src/BigBrain.Web/src/api.ts',
+    'src/BigBrain.Web/src/meal-planner/SchoolLunch.tsx',
+    'src/BigBrain.Web/src/meal-planner/SchoolLunch.test.tsx',
 }
 # These disjoint source trees are copied only by their respective Dockerfiles.
 # Other inputs (including root build/config files) remain subject to the shared gate.
@@ -76,6 +81,22 @@ class Uncertain(Blocked):
 def need(value, reason):
     if not value:
         raise Blocked(reason)
+
+
+def environment_file(value):
+    path = Path(value)
+    need(path.is_absolute(), 'ComposeEnvironmentMissing')
+    backup.no_symlinks(path)
+    try:
+        info = path.lstat()
+    except OSError:
+        raise Blocked('ComposeEnvironmentMissing') from None
+    if path == Path('/dev/null'):
+        need(str(value) == '/dev/null' and stat.S_ISCHR(info.st_mode)
+             and info.st_rdev == os.makedev(1, 3), 'ComposeEnvironmentInvalid')
+    else:
+        need(stat.S_ISREG(info.st_mode), 'ComposeEnvironmentInvalid')
+    return path
 
 
 def command(args, timeout=30, mutation=False, input_data=None):
@@ -517,6 +538,7 @@ class Deployment:
         self.replacement_ids = {}
 
     def compose_model(self, config, *args):
+        environment_file('/dev/null')
         return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
                       '--env-file', '/dev/null', '-f', '-', *args, timeout=120,
                       input_data=json.dumps(config).encode())
@@ -524,12 +546,14 @@ class Deployment:
     def compose(self, path, *args, mutation=False):
         files = self.source_files if path == self.source else [path]
         # Resolve ordinary YAML/overrides and .env ourselves; no prepared JSON required.
-        env_files = self.env_files or [self.project_directory / '.env']
-        if path == self.source and self.env_files:
-            need(all(env.is_file() for env in self.env_files), 'ComposeEnvironmentMissing')
         if path != self.source:
             env_files = [Path('/dev/null')]
-        env_args = [arg for env in env_files for arg in ('--env-file', str(env if env.exists() else Path('/dev/null')))]
+        elif self.env_files:
+            env_files = self.env_files
+        else:
+            implicit = self.project_directory / '.env'
+            env_files = [implicit if implicit.exists() or implicit.is_symlink() else Path('/dev/null')]
+        env_args = [arg for env in env_files for arg in ('--env-file', str(environment_file(env)))]
         return docker('compose', '--project-name', PROJECT, '--project-directory', str(self.project_directory),
                       *env_args,
                       *[arg for source in files for arg in ('-f', str(source))],
@@ -552,10 +576,7 @@ class Deployment:
         self.source = self.source_files[0]
         env_key = 'com.docker.compose.project.environment_file'
         need(self.reconstruct or labels[0].get(env_key, '') == labels[1].get(env_key, ''), 'ComposeEnvironmentMismatch')
-        self.env_files = [Path(x) for x in selected.get(env_key, '').split(',') if x]
-        for path in self.env_files:
-            need(path.is_absolute() and path.is_file(), 'ComposeEnvironmentMissing')
-            backup.no_symlinks(path)
+        self.env_files = [environment_file(x) for x in selected.get(env_key, '').split(',') if x]
         self.project_directory = Path(selected[keys[1]])
         need(self.project_directory.is_absolute(), 'ComposeDirectoryInvalid')
         backup.no_symlinks(self.project_directory)
