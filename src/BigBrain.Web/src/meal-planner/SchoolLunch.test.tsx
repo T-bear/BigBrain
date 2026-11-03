@@ -55,6 +55,29 @@ describe('SchoolLunch', () => {
     expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
   })
 
+  it('keeps the weekly menu visible when the local API refresh fails', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-19T10:00:00Z'))
+
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+      ...liveMenu(id, 7 * 24 * 60 * 60),
+      lastCheckedAtUtc: new Date().toISOString(),
+    }))
+
+    render(<SchoolLunch allowFixture={false} />)
+    await act(async () => {})
+
+    vi.mocked(api.getSchoolMeals).mockRejectedValue(new Error('local API unavailable'))
+
+    fireEvent.blur(window)
+    vi.setSystemTime(new Date('2026-10-20T10:01:00Z'))
+    fireEvent.focus(window)
+    await act(async () => {})
+
+    expect(screen.getByText('rosenfeldt lunch')).toBeInTheDocument()
+    expect(screen.getAllByText(/Kunde inte kontrollera matsedeln/)).toHaveLength(2)
+  })
+
   it.each(['focus', 'visibilitychange'])(
     'expires locally and refreshes only the expired school once on %s',
     async event => {

@@ -74,8 +74,7 @@ export function SchoolLunch({
               : visible.status === 'published'
                 ? Date.parse(visible.validUntilUtc!)
                 : NaN
-            if (Number.isFinite(nextCheck))
-              refreshable.set(school.id, nextCheck)
+            if (Number.isFinite(nextCheck)) refreshable.set(school.id, nextCheck)
           }
           setFailed(current => current.filter(id => id !== school.id))
           setMenus(current => ({ ...current, [school.id]: visible }))
@@ -161,7 +160,7 @@ export function SchoolLunch({
                   </>
                 )}
               </h3>
-              {failed.includes(school.id) ? (
+              {failed.includes(school.id) && menu?.status !== 'published' ? (
                 <p role="alert">
                   {fixture
                     ? 'Testmenyn kunde inte läsas. Kontrollera att API körs i utvecklingsläge.'
@@ -171,8 +170,15 @@ export function SchoolLunch({
                 <p role="status">{offlinePreview ? statusText.offline : 'Läser skolmeny…'}</p>
               ) : (
                 <>
+                  {failed.includes(school.id) && menu.status === 'published' && (
+                    <p role="status">Kunde inte kontrollera matsedeln; visar senast hämtad information.</p>
+                  )}
                   {menu.isFixture && <p>Historiskt offline-exempel från produktägarens manuellt hämtade fil.</p>}
-                  {menu.isStale && <p role="status">Matsedeln kan vara inaktuell – senaste kontrollen kunde inte bekräfta ny information.</p>}
+                  {menu.isStale && (
+                    <p role="status">
+                      Matsedeln kan vara inaktuell – senaste kontrollen kunde inte bekräfta ny information.
+                    </p>
+                  )}
                   {menu.status !== 'published' && (
                     <p role="status">{statusText[menu.status] ?? 'Information saknas.'}</p>
                   )}
