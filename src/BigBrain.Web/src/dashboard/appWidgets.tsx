@@ -23,6 +23,7 @@ import { useWidgets } from './widgetFramework'
 import { ThemeControl } from '../ThemeControl'
 import { AudiobookSettings } from '../audiobooks/AudiobookSettings'
 import { HomeOverview } from './HomeOverview'
+import { Newspaper } from '../newspaper/Newspaper'
 
 export interface AppWidgetData {
   docker: DockerInventory | null
@@ -396,6 +397,19 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       supportedViews: ['ai'],
       permissions: [],
       render: () => <AIOverview />,
+    },
+    {
+      id: 'newspaper-prototype',
+      title: 'Morgonbladet – prototyp',
+      description: 'Statisk A4-tidning med manuell utskrift.',
+      icon: '▤',
+      category: 'Verktyg',
+      defaultView: 'more',
+      defaultSize: 'full',
+      minimumSize: 'large',
+      supportedViews: ['more'],
+      permissions: [],
+      render: () => <Newspaper />,
     },
     {
       id: 'settings',
