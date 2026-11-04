@@ -12,6 +12,12 @@ Detta är en sanerad GitHub-version av dokumentationen.
 
 ## Status
 
+**REVIEW CHECKPOINT — statisk A4-PDF integreras för iPhone-test.**
+Tidigare HTML-utskrift från iPhone gav två sidor. PDF-metoden har
+testats separat på iPhone med en A4-sida och tas nu in i Web.
+Öppning från BigBrain och slutlig ägaracceptans är ännu PENDING.
+Ingen merge eller deployment.
+
 **REVIEW CHECKPOINT — iPhone Chrome PDF FAIL på commit `8da872c`: två A4-sidor.**
 Tidigare automatisk Chromium-verifiering gav en sida, men den manuella
 iPhone-exporten visade ett verkligt pagineringsfel. En begränsad justering
@@ -19,6 +25,15 @@ iPhone-exporten visade ett verkligt pagineringsfel. En begränsad justering
 Ingen merge, deployment eller slutlig owner UX approval.
 
 ## Changes
+
+### Statisk PDF som ersätter HTML-utskrift
+
+- Designmastern i PNG-format bevaras oförändrad.
+- En färdig ensidig A4-PDF bäddar in originalets komprimerade bilddata.
+- PDF-länken öppnar filen direkt i webbläsaren.
+- Den tidigare HTML-utskriftsportalen tas bort.
+- PDF-kontrollen ersätter det gamla Chromium-testet.
+- Ingen API-, databas- eller produktionsändring görs.
 
 ### iPhone-utskriftskorrigering 2026-11-04
 
@@ -56,6 +71,11 @@ enskilda kausala andelen för overflow respektive sidregel är inte fastställd.
 
 ## Evidence
 
+Ny PDF ska verifieras med pdfinfo och bytejämförelse av inbäddad
+originalbild. Tidigare manuellt iPhone-test av färdig PDF gav
+en A4-sida utan observerad beskärning. Nytt test från BigBrains
+direkta PDF-länk återstår.
+
 Manuell PDF exporterad från Chrome på iOS 26.7.2 den 2026-11-04:
 FAIL, två A4-sidor. Bilden låg på sida 1 i en ruta om cirka
 559,28 × 791,02 PDF-punkter. Den första sidans tillgängliga
@@ -92,7 +112,7 @@ beroenden eller hemligheter har införts.
 
 ## Remaining work
 
-- Verifiera en A4-sida genom en ny PDF-export i Chrome på iPhone.
+- Verifiera direktöppnad A4-PDF från BigBrain på iPhone.
 - Kontrollera separat Safari, installerad PWA och fysisk utskrift.
 - Begär uttrycklig produktacceptans före beslut om merge.
 
