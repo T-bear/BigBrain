@@ -14,6 +14,7 @@ import {
   setMealPlannerDay,
   updateMealPlannerMeal,
 } from '../api'
+import { SchoolLunch } from './SchoolLunch'
 import { CollapsibleModule } from '../dashboard/CollapsibleModule'
 import type { MealPlannerDay, MealPlannerMeal, MealPlannerSchedule, MealPlannerTag } from '../types'
 
@@ -31,6 +32,7 @@ const tabs = [
   { id: 'meals', label: 'Maträtter' },
   { id: 'generate', label: 'Generera' },
   { id: 'saved', label: 'Sparade' },
+  { id: 'school', label: 'Skolmat' },
 ] as const
 type MealPlannerTab = (typeof tabs)[number]['id']
 
@@ -310,6 +312,15 @@ export function MealPlanner({
               </button>
             ))}
           </div>
+
+          <section
+            aria-labelledby="meal-planner-tab-school"
+            hidden={activeTab !== 'school'}
+            id="meal-planner-panel-school"
+            role="tabpanel"
+          >
+            <SchoolLunch />
+          </section>
 
           <section
             aria-labelledby="meal-planner-tab-schedule"

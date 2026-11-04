@@ -76,6 +76,12 @@ Orelaterade oregistrerade filer har bevarats. Återanvänd testresultaten när m
 
 ## SchoolLunch mixed-runtime recovery — 2026-10-29
 
+Uppdatering 2026-11-01: det gamla paket-/approval-/workerspåret är
+[fryst och arkiverat på plats](runbooks/approved-operations.md#fryst-och-arkiverat-skollunchspår--2026-11-01).
+Följande tidigare recoverysekvens är historik och får inte återstartas. Ingen driftåtgärd
+har utförts och runtimeosäkerheten kvarstår. [STANDARD](../policy/lanes.md) är separat
+reviewförberedelse; dess preflight ska stoppa vid osäker rollback-image eller runtimeavvikelse.
+
 **INTERRUPTED — MANUAL REVIEW REQUIRED** for production recovery, not a new production attempt.
 Baseline `a68c0247ea7a78ad5fadf6400ed8bc2e22ed35c0`; branch
 `ops/school-lunch-mixed-runtime-recovery`. Exact checkpoint SHA/tree is in Git metadata.

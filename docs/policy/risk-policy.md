@@ -25,8 +25,13 @@ Web-only STANDARD (nivå 1, endast Web-filer enligt `docs/policy/lanes.md`) får
 deployas med `scripts/deploy-web-only.sh` utan oktober-gatewayen.
 Ägarens körning av kommandot är merge- och deploymentgodkännandet.
 Undantaget gäller först när båda filerna har accepterats i `main`.
-Gatewayen behålls för API+Web-deployments och allt STRIKT.
-Admin-ACL:er ändras inte; personer och enheter med administratörsåtkomst är ännu
+API+Web STANDARD följer den avgränsade [T2-regeln i lanes.md](lanes.md#standard--apiweb-t2-review-checkpoint-2026-11-01)
+först efter oberoende kandidatgranskning och acceptans i main. Detta ersätter kravet på
+oktober-gatewayens skolmatspaket/approvals inom just det spåret. Det aktuella uppdraget
+auktoriserar endast implementation, test och PR-publicering, ingen merge/deployment.
+Gamla paket, approvals och worker är frysta/arkiverade, inte en alternativ STRIKT-väg.
+STRIKT, schemaändringar och frysningar behåller sina bindande gransknings-/driftgränser;
+ingen ny generell exekveringsväg införs. Admin-ACL:er ändras inte; personer och enheter med administratörsåtkomst är ännu
 inte beslutade. Inga nya betaltjänster eller handelsrättigheter följer.
 
 ### Proportionell arbetsinsats och verifiering

@@ -34,8 +34,8 @@ diff och tillämpliga required checks. Verifiera oförändrade identiteter omede
 vid avvikelse eller blockerande kontroll: stoppa. Bevara historiken, verifiera publicerad main och
 relevant CI för exakt merge-SHA före deployment. Dokumentera faktiskt levererad revision och
 verifieringsresultat. Ingen rätt följer att kringgå GitHub-skydd, installerad gateway, root-approvals,
-backup/recovery, leverantörsgränser eller bindande P0/P1. Oktober-gatewayen och admin-ACL:er ändras
-inte genom delegeringen. Ekonomiska gränser, sekretess och samtliga frysningar gäller oförändrat.
+backup/recovery, leverantörsgränser eller bindande P0/P1. Delegeringen ändrar inte admin-ACL:er. Uttryckliga STANDARD-undantag och arkiveringen av
+oktober-gatewayens skolmatsspår avgränsas i [lanes](../policy/lanes.md); övriga skydd kvarstår. Ekonomiska gränser, sekretess och samtliga frysningar gäller oförändrat.
 
 Teknisk leverans är inte manuell produktacceptans. Obligatorisk iPhone/PWA-acceptans utförs av
 ägaren och redovisas separat som återstående tills uttryckligt godkänd; CI eller autonoma

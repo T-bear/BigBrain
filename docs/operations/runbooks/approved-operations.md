@@ -1,5 +1,26 @@
 # Restricted BigBrain operations wrapper
 
+## Fryst och arkiverat Skollunchspår — 2026-11-01
+
+**FROZEN / ARCHIVED IN PLACE.** Ägarens nya leveransuppdrag ersätter fortsättningsordrarna
+nedan för gamla skolmatspaket, gateway-approvals och `school_lunch_worker.py`.
+Detta dokument och koden bevaras på befintliga sökvägar som historik; inga filer raderas.
+CLI-ingångarna i gateway, paketassembler och worker avvisar nu all körning innan någon
+operation utförs. Historiska funktioner/tester bevaras för spårbarhet; de ska inte användas
+som alternativa ingångar. Endast oförändrad `backup_support.py` återanvänds i
+[API+Web STANDARD](../../policy/lanes.md#standard--apiweb-t2-review-checkpoint-2026-11-01).
+
+Privata/installerade paket, approvals, claims, interlock, receipts och systemd-worker
+**lämnas orörda och får inte återanvändas**. Arkivmarkeringen är inte fysisk avinstallation,
+flytt, återkallelse av OS-rättigheter eller bevis för aktuellt hosttillstånd. Inga skyddade
+filer läses, kopieras till Git, raderas eller skrivs över i detta uppdrag. Framtida eventuell
+administrativ arkivering måste bevara dem på plats; historiska driftproblem är inte lösta.
+Befintlig sudoers och installerad gateway ändras inte genom en repo-commit.
+
+PR #25:s minneshämtning och den separata STANDARD-PR:en är de två enda PR:erna i denna
+leverans. Oberoende T2-review återstår; ingen merge, installation eller deployment är
+auktoriserad här. Texten nedan är bevarat historiskt kontrakt/evidens, **inte körorder**.
+
 Status: **durable SchoolLunch contract amendment — not installed** (2026-10-28).
 The previous wrapper is installed; this amended contract is not. Current implementation baseline:
 `65ed713649f7d47ec5787efde6bf15745b72c0f0`; branch `fix/school-lunch-durable-gate`.

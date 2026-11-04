@@ -126,6 +126,32 @@ konstgjord redeployment. Databas- eller privilegieändringar får inte ingå und
 Pilot får starta som ett nytt uttryckligen auktoriserat uppdrag efter uppfyllda ikraftträdandevillkor
 och verifierade befintliga driftgrindar. Leverantörsvillkor bevaras; inget installerat skydd får kringgås.
 
+### Uppföljning 2026-11-03 – 3/5 verkliga deploymenter
+
+**3/5 – Skollunch, API+Web, PR #33, 2026-11-03.**
+
+- Accepterad merge-revision:
+  `80fa231773dace31dda60ad0a32c69c1a42b5e50`.
+- [Main-CI](https://github.com/T-bear/BigBrain/actions/runs/41707389683):
+  backend, frontend, documentation och secrets PASS.
+- Produktägarens terminalrapport: STANDARD API+Web
+  `--execute` avslutades med `PASS: API+Web replaced`.
+  Ingen rollback rapporterades.
+- Ett tidigare startförsök stoppade före deployment.
+  Diagnostik och ett nytt kontrollerat försök utfördes.
+  Minst två ytterligare operatörskörningar är redovisade;
+  exakt antal extra ägaringrepp är inte fullständigt avstämt.
+- iPhone/PWA: båda skolornas aktuella matsedlar för
+  vecka 45 visades, med källhänvisningar.
+- **Manuell UX-acceptans: PASS, uttryckligen godkänd av
+  produktägaren 2026-11-03.**
+- Eventuella framtida UX-förbättringar förs som
+  separata issues, inte som fortsatt leveransarbete.
+
+Driftuppgifterna bygger på produktägarens redovisade
+terminalutskrift. CI och merge-SHA är separat verifierade.
+Detta innebär ingen ny deployment.
+
 ## Controlled Finance daily acquisition / API revision
 
 [BB-132F1 operator gate](../runbooks/finance-controlled-acquisition.md) defines the exact-revision

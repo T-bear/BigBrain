@@ -160,12 +160,11 @@ public sealed class MealPlannerApiTests : IDisposable
     {
         var clock = new SchoolClock();
         using var transport = new SchoolHandler();
-        using var data = new SchoolMealTestData();
-        var options = data.Options(new() { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } }, clock.GetUtcNow());
+        var options = new MealPlannerOptions { SchoolMeals = new() { Enabled = true, RosenfeldtEnabled = true, MusikugglanEnabled = true } };
         await using var factory = Factory().WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<SchoolMealService>();
-            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock, NullLogger<SchoolMealSourceClient>.Instance), clock, data.Store(options)));
+            services.AddSingleton(new SchoolMealService(options, new SchoolMealSourceClient(new HttpClient(transport), clock, NullLogger<SchoolMealSourceClient>.Instance), clock));
         }));
         using var client = factory.CreateClient();
         var before = await client.GetStringAsync("/api/v1/modules/meal-planner/meals", TestContext.Current.CancellationToken);
@@ -174,6 +173,7 @@ public sealed class MealPlannerApiTests : IDisposable
         Assert.False(rss.IsFixture);
         Assert.Equal(2026, rss.Year);
         Assert.Equal(43, rss.Week);
+        Assert.Equal(new DateTimeOffset(2026, 10, 25, 23, 0, 0, TimeSpan.Zero), rss.ValidUntilUtc);
         var html = await client.GetFromJsonAsync<SchoolMealWeek>("/api/v1/modules/meal-planner/school-meals?schoolId=musikugglan", TestContext.Current.CancellationToken);
         Assert.Equal("unavailable", html!.Status);
         var partial = await client.GetAsync("/api/v1/modules/meal-planner/school-meals?schoolId=rosenfeldt&year=2026", TestContext.Current.CancellationToken);
@@ -194,7 +194,11 @@ public sealed class MealPlannerApiTests : IDisposable
         {
             Calls++;
             return Task.FromResult(request.RequestUri!.Host == "www.skolmat.info"
-                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(SchoolMeals.ExampleRss, System.Text.Encoding.UTF8, "application/rss+xml") }
+                ? new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(SchoolMeals.ExampleRss, System.Text.Encoding.UTF8, "application/rss+xml"),
+                    Headers = { CacheControl = new() { MaxAge = TimeSpan.FromSeconds(60) } }
+                }
                 : new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
         }
     }

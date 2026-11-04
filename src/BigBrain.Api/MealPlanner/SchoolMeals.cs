@@ -14,6 +14,7 @@ public sealed record SchoolMealWeek(string SchoolId, string SchoolName, string S
     public DateTimeOffset? LastCheckedAtUtc { get; init; }
     public DateTimeOffset? SourceUpdatedAtUtc { get; init; }
     public bool IsStale { get; init; }
+    public DateTimeOffset? ValidUntilUtc { get; init; }
     public string? SourceStatus { get; init; }
 }
 

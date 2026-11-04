@@ -80,6 +80,14 @@ beforeEach(() => {
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input)
       const method = init?.method ?? 'GET'
+      if (url.includes('/school-meals?'))
+        return response({
+          schoolId: new URL(url, 'https://example.org').searchParams.get('schoolId'),
+          status: 'offline',
+          days: [],
+          sourceName: 'Testkälla',
+          sourceUrl: 'https://example.org',
+        })
       if (url.endsWith('/tags') && method === 'GET') return response(tags)
       if (url.endsWith('/meals') && method === 'GET') return response(meals)
       if (url.endsWith('/schedules') && method === 'GET') return response(schedules)
@@ -233,14 +241,35 @@ describe('Matlista UX', () => {
     expect(screen.getByRole('heading', { name: 'Sparade matsedlar' })).toBeVisible()
   })
 
+  test('school tab stays mounted without duplicate requests and leaves household controls intact', async () => {
+    render(<MealPlanner today="2026-08-03" />)
+    await openTab('Skolmat')
+    const panel = screen.getByRole('tabpanel', { name: 'Skolmat' })
+    expect(panel).toHaveAttribute('id', 'meal-planner-panel-school')
+    expect(screen.getByRole('tab', { name: 'Skolmat' })).toHaveAttribute('aria-selected', 'true')
+    expect(within(panel).getAllByRole('listitem')).toHaveLength(5)
+    expect(within(panel).queryByRole('button', { name: /Byt/ })).not.toBeInTheDocument()
+    expect(within(panel).queryByText(/Antal personer|Lördag|Söndag/)).not.toBeInTheDocument()
+    const requests = () => vi.mocked(fetch).mock.calls.filter(([url]) => String(url).includes('/school-meals?'))
+    await waitFor(() => expect(requests()).toHaveLength(2))
+    await openTab('Matsedel')
+    expect(screen.getByRole('button', { name: 'Byt lunch Lördag' })).toBeVisible()
+    expect(screen.getAllByText(/6 personer/).some(element => element.closest('[hidden]') === null)).toBe(true)
+    await openTab('Skolmat')
+    expect(requests()).toHaveLength(2)
+    expect(document.querySelectorAll('.school-lunch')).toHaveLength(1)
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Skolmat' }), { key: 'ArrowRight' })
+    expect(screen.getByRole('tab', { name: 'Matsedel' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   test('week view shows seven compact rows, today and bounded navigation without permanent select', async () => {
     render(<MealPlanner today="2026-08-03" />)
     expect(await screen.findByRole('heading', { name: /Vecka 1/ })).toBeInTheDocument()
-    expect(document.querySelectorAll('.meal-planner__day')).toHaveLength(7)
+    expect(document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')).toHaveLength(7)
     expect(document.querySelector('.meal-planner__day--today')).toHaveTextContent('Idag')
     expect(screen.getByRole('button', { name: 'Föregående vecka' })).toBeDisabled()
     expect(screen.queryByLabelText(/Välj maträtt för/)).not.toBeInTheDocument()
-    const saturday = document.querySelectorAll('.meal-planner__day')[5]
+    const saturday = document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')[5]
     expect(saturday).toHaveTextContent('Lunch')
     expect(saturday).toHaveTextContent('Middag')
     expect(within(saturday as HTMLElement).getByRole('button', { name: 'Byt lunch Lördag' })).toBeInTheDocument()
@@ -267,15 +296,19 @@ describe('Matlista UX', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /Byt middag/ })[0])
     fireEvent.click(screen.getByRole('button', { name: 'Föreslå en annan' }))
     expect(await screen.findByRole('status')).toHaveTextContent('Måndag middag uppdaterades')
-    expect(document.querySelectorAll('.meal-planner__day')[0]).toHaveTextContent('Soppa')
-    expect(document.querySelectorAll('.meal-planner__day')[1]).toHaveTextContent('Soppa')
+    expect(document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')[0]).toHaveTextContent('Soppa')
+    expect(document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')[1]).toHaveTextContent('Soppa')
 
     fireEvent.click(screen.getAllByRole('button', { name: /Byt middag/ })[1])
     fireEvent.click(screen.getByRole('button', { name: 'Välj maträtt manuellt' }))
     fireEvent.change(screen.getByLabelText('Välj maträtt'), { target: { value: 'pancakes' } })
     fireEvent.click(screen.getByRole('button', { name: 'Använd vald' }))
-    await waitFor(() => expect(document.querySelectorAll('.meal-planner__day')[1]).toHaveTextContent('Pannkakor'))
-    expect(document.querySelectorAll('.meal-planner__day')[0]).toHaveTextContent('Soppa')
+    await waitFor(() =>
+      expect(document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')[1]).toHaveTextContent(
+        'Pannkakor',
+      ),
+    )
+    expect(document.querySelectorAll('#meal-planner-panel-schedule .meal-planner__day')[0]).toHaveTextContent('Soppa')
   })
 
   test('meal library combines text search and tags, reports matches and keeps actions compact', async () => {

@@ -24,7 +24,108 @@ begränsningar även under frysningen; aktuell privat status är okänd. Se
 [kanonisk drift-/retentiongräns](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
 Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant eller skapar handelsauktoritet.
 
+## Aktuell leveransacceptans – Skollunch 2026-11-03
+
+**PASS – uttryckligen godkänd av produktägaren 2026-11-03.**
+
+PR #33 har mergats till accepterad main
+`80fa231773dace31dda60ad0a32c69c1a42b5e50`.
+Backend, frontend, dokumentation och secrets har fyra
+godkända main-CI-kontroller.
+
+Produktägarens terminalrapport visar `STANDARD PASS`
+för API+Web på den accepterade revisionen.
+En därefter tillhandahållen iPhone/PWA-vy visar
+Rosenfeldtskolans och Musikugglans aktuella matsedlar
+för vecka 45/2026, med källor och hämtningstidpunkter.
+
+Produktägaren har därefter uttryckligen godkänt
+Skollunchens manuella UX-acceptans. Senare eventuella
+UX-fynd hanteras som separata GitHub-issues och
+återöppnar inte denna leverans automatiskt.
+
+Detta är ägarrapporterad drift och ägaracceptans,
+inte en separat oberoende verifiering av leverantörernas
+matsedelsinnehåll eller framtida långtidsdrift.
+
+De äldre granskningsuppgifterna nedan är historik.
+
 ## Family — Skollunch
+
+**Aktuell granskningsstatus 2026-11-03 – PR #33, ännu inte mergad:**
+Daglig minnesbaserad veckomeny är publicerad för granskning på
+`review/chatgpt-20261103-185716-3410735`. Kandidaten har
+automatiskt verifierats med fyra gröna GitHub-CI-jobb före
+denna dokumentationsuppdatering. Ny slutlig revision kräver
+sina egna kontroller. Ingen ny deployment eller fysisk
+iPhone/PWA-acceptans påstås.
+
+**Leverantörstillstånd enligt produktägaren:**
+Produktägaren har uttryckligen och upprepade gånger bekräftat
+fullt tillstånd utan slutdatum från både Skolmat.info och
+Tant Grön för automatisk hämtning, lagring och visning.
+Beskedet omfattar enligt produktägaren även Skolmat.infos
+RSS-väg och den avsedda dagliga kontrollen.
+
+Detta är ägarbekräftad uppgift, inte en självständigt
+verifierad avtalskopia. Tidigare `PENDING`-formuleringar
+nedan hör till äldre checkpoints och betyder inte att
+ägaren behöver lämna samma besked ytterligare en gång.
+
+[Befintligt och föreslaget kontrakt](knowledge/meal-planner.md#skollunch--daglig-veckomeny-reviewförslag-2026-11-03).
+Merge, deployment, driftkontroller och fysisk acceptans
+är fortsatt separata steg.
+
+Aktuellt reviewarbete 2026-11-03: `fix/school-meal-demand-standard` utgår från verifierad
+main `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1` (PR #31 MERGED, main-CI fyra SUCCESS).
+Ägaren har beslutat 60 sekunders anropsgolv för båda källorna och UX B. Färsk meny återanvänds;
+utgången meny kan omvalideras vid efterfrågan. STANDARD:s fem exakta sökvägstillägg och
+verifierad `/dev/null` korrigeras utan generella undantag. [Aktuellt kontrakt](knowledge/meal-planner.md#skollunch--behovsstyrd-omvalidering-och-ux-b-t2-checkpoint-2026-11-03)
+och [gemensam checkpointevidens](reports/features/family/school-meals-preparation-20261023.md#demand-refresh-and-standard-guards--review-checkpoint-2026-11-03).
+PR #32:s första oberoende T2-review identifierade en P1 i `ea85b7d`: ett blockerat API-svar
+förbrukade permanent möjligheten att kontrollera menyn vid senare återgång. Korrigeringen
+behåller utgången deadline och skiljer verklig återgång från dubbletthändelser/pågående anrop.
+[Reproduktion och andra reviewunderlaget](reports/features/family/school-meals-preparation-20261023.md#pr-32--ux-b-p1-correction-for-second-t2-review-2026-11-03).
+**Ofullständig REVIEW CHECKPOINT, inte mergekandidat:** leverantörsbesked för båda källorna,
+inklusive uttryckligt RSS-undantag från tidigare robots-förbud, återstår. Andra oberoende T2-reviewvarvet,
+separata merge-/deploymentbeslut och fysisk iPhone/PWA-acceptans återstår. Inga källanrop,
+produktionsändringar eller nya leverantörsavtal verifieras genom implementationen.
+Nedan bevaras tidigare daterad status; uppgifterna om PR #31 som ej mergad är historik.
+
+Avgränsad uppdatering 2026-11-03: cachekorrigering för oberoende T2-review på
+`fix/school-meal-cache-policy`, baseline `6ecf6f4b34b044c41164fa75d7297010499eaa2e`.
+Sex­timmarsspärr och HTTP-färskhet separeras; API och öppen vy döljer utgångna menyer utan
+extra hämtning. [Aktuellt kontrakt och leverantörsbegränsningar](knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03),
+[test- och reviewunderlag](reports/features/family/school-meals-preparation-20261023.md#cache-policy-correction--t2-review-checkpoint-2026-11-03).
+Ägaren rapporterar STANDARD PASS, API/Web healthy, alla källflaggor på och två HTTP 200 med
+kort max-age; detta är inte självständigt runtimeverifierat här. Korrigeringen är inte deployad.
+PR #31:s första T2-review identifierade två P1 i `a2d5cb1`: 304-validatorer och saknad
+frontendgiltighetstid. [Avgränsad korrigering och regressionsevidens](reports/features/family/school-meals-preparation-20261023.md#pr-31--p1-corrections-for-second-t2-review-2026-11-03)
+är publicerad för andra oberoende review; ingen merge eller ägaracceptans registreras.
+Rosenfeldts 60 sekunder + must-revalidate hindrar kontinuerlig visning vid sex timmars intervall.
+Nedan bevaras tidigare daterad status och evidens; den ersätter inte denna uppdatering.
+
+Avgränsad uppdatering 2026-11-01: PR #25 (`283060d`) för minnesbaserad hämtning är enligt
+ägaren oberoende godkänd; GitHub visar öppen/ej mergad PR och SUCCESS för CI-run
+[41338289335](https://github.com/T-bear/BigBrain/actions/runs/41338289335).
+Andra/sista PR:en förbereder [STANDARD API+Web](policy/lanes.md) som T2-review checkpoint
+från main `e7e81d2`. Gamla paket/approvals/worker är arkiverade på plats i repositoryt;
+installerade artefakter och drift lämnas orörda. Offline-testad, inte accepterad eller deployad.
+Uppföljning 2026-11-02: första oberoende T2-review av `c883e78` blockerade merge med två P1: kraschrollback
+och ofullständigt bygg-/omstartsflöde. Korrigering i samma PR är offline-verifierad;
+andra T2-reviewvarvet och verklig drift-/käll-/iPhone-acceptans kvarstår. Tabellen nedan
+bevarar DOC-2A:s daterade evidens; den är inte en ny runtimekontroll.
+
+Avgränsad kompatibilitetsanpassning 2026-11-02 efter `46aec78`, mot main `e7e81d2`:
+API/Web är healthy med oförändrad runtime. Verklig skrivskyddad delverifiering av
+Compose-rekonstruktion, båda runtime-hasharna, exakt Web-image/BuildKit-revision och
+`/host-timesync`-montering **PASS**. 171 offline-tester PASS; okänt/motsägande underlag
+blockeras. Den ärvda Web-etiketten tillhör nginx; separat BuildKit-underlag binder den
+körande imagen till accepterade `8029bb2`. [Befintligt spårunderlag](policy/lanes.md#skrivskyddad-kompatibilitetskontroll-2026-11-02)
+bevarar tidigare stopp, image-ID:n och verifieringsgränser. Full preflight/release är
+fortfarande **BLOCKED** av ej accepterade PR:er och återstående driftgrindar; start-/
+omstartsprov, backup och produktionsbyte är inte körda. Ingen root-autentisering,
+merge eller deployment; korrigerad kandidat kräver oberoende T2-granskning.
 
 | Tillstånd | Verifierad eller dokumenterad evidens |
 | --- | --- |

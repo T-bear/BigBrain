@@ -1208,3 +1208,312 @@ Minimum remaining administrative sequence after exact independent code review:
 Changed checkpoint files: gateway, existing SchoolLunch worker, their two offline test files,
 approved-operations runbook, this report and the existing recovery handoff. No application,
 workflow, freeze, database, installed binary, sudoers or production configuration was changed.
+
+
+## Cache policy correction — T2 review checkpoint, 2026-11-03
+
+**REVIEW CHECKPOINT — NOT MERGED / NOT DEPLOYED. STOP for ChatGPT independent T2 review.**
+Owner-authorized scope: correct source HTTP caching, preserve request limits, test both formats
+with permitted offline material, publish a checkpoint PR. Risk level **2 / T2**, effort MEDIUM
+with focused temporal/concurrency verification. Baseline fetched and verified against GitHub main:
+`6ecf6f4b34b044c41164fa75d7297010499eaa2e`, tree `7d3bee17485eca02a42b75772a6ca9a883d218df`;
+[baseline CI 41522675360](https://github.com/T-bear/BigBrain/actions/runs/41522675360) SUCCESS.
+Branch `fix/school-meal-cache-policy`; final candidate SHA/tree resolve from this commit's Git
+metadata and the checkpoint PR. Main's delta from the previous local branch concerned STANDARD
+runtime preparation only; this work starts from current main. Unrelated untracked work is preserved.
+
+### Scope, implementation and acceptance criteria
+
+DoD: accept both reported positive freshness lifetimes without requiring six hours; enforce
+expiry independently of the fetch throttle; honor restrictive/ambiguous headers, Age, Date,
+Expires, shared-cache precedence and Retry-After; preserve per-school serialization, restart
+semantics and failure blocking; exercise both permitted parser fixtures and publish evidence.
+No Finance, BB-158, database/schema, deployment machinery, source URLs, credentials, scheduler,
+automatic retries, robots bypass, production deployment or new provider call. No architecture or
+permission change. Existing service/client/parser ownership is retained without new dependencies.
+
+The client returns an absolute freshness deadline and the small policy snapshot required for
+conditional 304. The service keeps freshness separate from NextAttempt; expiry cannot authorize
+HTTP. A conditional response must correspond to stored content and sent validators; mismatched
+ETag fails closed. Omitted 304 policy fields inherit prior metadata; supplied fields replace it.
+Only successfully revalidated content receives a new deadline. Failed attempts never extend it.
+Storage for conditional validation remains bounded by the existing 24-hour/current-week rule.
+No expired content is served, even on failure and even without must-revalidate. Missing explicit
+freshness, no-store/no-cache, private, Vary-star and malformed/ambiguous cache metadata are
+conservatively unavailable. Stale extensions are not enabled. See the
+[canonical cache contract](../../../knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03).
+
+The additive `validUntilUtc` field allows Web to hide a menu already loaded before expiry, using
+existing unavailable text. It also checks expiry when a suspended page regains visibility/focus.
+There is no API/source refetch timer. Existing historical fixture mode and parser semantics remain.
+Backend remains authoritative for response reuse; browser presentation assumes an accurate device
+clock and an executing browser. Physical iPhone/PWA acceptance is still pending.
+
+### Source evidence and remaining constraints
+
+The owner reports production HTTP200 for Rosenfeldt (`max-age=60`, `must-revalidate=true`) and
+Musikugglan (`max-age=3600`, `must-revalidate=false`), both rejected as insufficientFreshness;
+all flags enabled, STANDARD PASS and API/Web healthy. These are supplied diagnostics, not new
+runtime observations. Full response headers/bodies, current robots/terms and current menus were
+not fetched. The existing 2026-10-25 permission record is owner-reported, not independently
+inspected correspondence; it does not override restrictive HTTP cache directives or prove a
+specific right to serve stale content. RFC 9111 was consulted as protocol reference, not as a
+source-access grant. No school/provider/robots endpoint was called, including through tests.
+
+**Rosenfeldt cannot be displayed continuously with a six-hour fetch interval under these headers.**
+It is fresh for at most 60 seconds, reduced by Age/apparent age/transit. must-revalidate forbids
+serving it afterward without successful validation, which the six-hour throttle prevents until
+eligible. Musikugglan is fresh for at most one hour; missing must-revalidate alone is not treated
+as permission for the remaining five hours. This checkpoint deliberately leaves availability gaps.
+Any future relaxation requires verified source rights and separately authorized scope; no retry,
+restart, RSS ttl interpretation or alternate endpoint bypass is introduced.
+
+Main explicitly accepts memory-only history: a process restart loses the cooldown and permits a
+first request. The regression test preserves that accepted behavior; it is **not a durable restart
+frequency guarantee**. This task adds no storage or restart mechanism. Later runtime work must
+verify source-access history/Retry-After before new calls; no restart or provider access occurred.
+
+Parser provenance: existing `SchoolMeals.ExampleRss` and `MusikugglanSchoolMeals.ExampleHtml`
+come from owner-provided files verified 2026-10-23 in the
+[original-file evidence](#skollunch-v1--original-file-verification-2026-10-23). The test replays
+both formats through stub HTTP with the reported production policies and verifies all ordered
+dishes/dates, original year provenance, expiry and concurrent cache access. Existing parser
+negative cases are rerun. No private original is republished and no current live parsing is claimed.
+
+### Verification and review handoff
+
+- **PASS:** `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlanner|FullyQualifiedName~ShoppingList' -v quiet`:
+  **145 passed, 0 failed, 0 skipped**, including build. Final run 2026-11-03, offline handlers only.
+  Covers short source lifetimes, exact expiry boundary, Age/Date/delay, body-transfer expiry,
+  s-maxage precedence, Expires, no-cache/no-store/private/Vary, malformed/duplicate lifetimes,
+  conditional 304 inheritance/replacement/mismatch, success/error Retry-After, independent sources,
+  same-school concurrency, restart semantics, timeout/cancellation, retention/week rollover and
+  unchanged household database bytes.
+- **PASS:** `npm test -- --run src/meal-planner/SchoolLunch.test.tsx
+  src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`: **24 passed**. Expiry on delivery,
+  exact timer boundary and resumed-page expiry cause no additional API requests. Parser-derived
+  dish text and fixture separation remain covered. Only formatting followed this test run.
+- **PASS:** `npm run build` (TypeScript/Vite), scoped `dotnet format BigBrain.slnx --no-restore --include`
+  for the seven changed backend/test files, scoped Prettier for the three changed frontend files,
+  `node scripts/verify-documentation.mjs` (290 Markdown files, 53 unique backlog IDs), `git diff --check`.
+- **PASS:** local scope/content review; no credentials, private originals or raw runtime logs added.
+  Local Gitleaks is unavailable; the configured GitHub secrets job is the scanner evidence.
+  Candidate CI status belongs to the exact PR SHA and is reported in the PR/handoff, not inferred
+  from baseline CI. Full repository tests are delegated to existing PR CI; no local full-suite rerun.
+- **SKIP / NOT AUTHORIZED:** provider calls, production checks/deployment/restart and device testing.
+  No independent T2 review or owner UX approval is claimed.
+
+Initial focused run: 99 PASS / 4 FAIL. Three transport tests lacked explicit freshness metadata
+and one week-rollover empty result lost its notPublished classification. Fixtures now supply
+explicit freshness so size/body-timeout checks still execute, and the service preserves the
+week-rollover status. Old stale-positive assertions are replaced with no-stale assertions;
+304, retention, request limits, cancellation and database isolation coverage remain.
+No production repair attempt or operational rollback occurred. Unchanged parser/fixture provenance
+is reused from the cited evidence; automated behavior is verified again for this candidate.
+
+Independent T2 review, actual permitted live parsing, device acceptance, merge and any future
+runtime action remain separate. No approval is requested or presumed by publishing this PR.
+Recovery was inspected: no new interrupted operation or unpublished implementation remains at
+checkpoint publication; the historical frozen operational recovery entries are not cleared.
+
+
+## PR 31 — P1 corrections for second T2 review, 2026-11-03
+
+**UPDATED REVIEW CHECKPOINT — STOP for second independent T2 review; no merge/deployment.**
+The owner supplied two independently reviewed P1 findings against `a2d5cb11d96e302d439c7fed433e0b77043c8a67`
+and authorized only their correction on the same `fix/school-meal-cache-policy` branch / PR #31.
+GitHub main and PR head matched the handoff before implementation: main
+`6ecf6f4b34b044c41164fa75d7297010499eaa2e`, prior candidate `a2d5cb1` (prior CI all four jobs PASS).
+No conflict, history rewrite, new branch or PR. Risk remains **2 / T2**. Candidate SHA/tree are
+bound by the new commit metadata and updated PR evidence, not self-referential document text.
+DoD is limited to correcting both P1s, regressions, builds/format/docs/diff checks and exact-head CI.
+
+**P1: 304 validator selection and metadata.** The client now requires a corresponding stored
+validator before accepting a 304. Strong ETags require a strong match; weak ETags use weak
+comparison. Equal Last-Modified may select the sole stored response when no conflicting ETag
+exists. We do not infer strong date validators from unverified provider clocks, or use a matching
+weak date to admit a new strong ETag. Malformed/absent response validators do not renew content.
+This remains a deliberately conservative client for two fixed sources, not a general shared cache.
+The service updates accepted ETag/Last-Modified and SourceUpdatedAtUtc along with existing cache
+metadata; omitted fields are retained, and original FetchedAtUtc remains unchanged. Subsequent
+conditional requests use the updated validators. Invalid 304s leave validator/freshness/retention
+state unchanged while still consuming the cooldown and honoring Retry-After. The existing tests
+that accepted validator-free 304s now supply matching ETag or Last-Modified respectively.
+Authority: [RFC 9111 §4.3.4](https://www.rfc-editor.org/rfc/rfc9111.html#section-4.3.4) and the
+[canonical module contract](../../../knowledge/meal-planner.md#skollunch--http-färskhet-skild-från-anropsspärr-t2-review-2026-11-03).
+
+**P1: mandatory frontend deadline.** A published live menu is shown only when validUntilUtc
+parses to a finite future timestamp. Missing/null/empty, invalid and expired timestamps use the
+existing unavailable presentation without dishes. Fixtures still bypass live expiry. Existing
+expiry timers and focus/visibility handling remain local; no new API/source request or retry.
+The old stale-positive frontend test now requires the deadline-less menu to be hidden, while
+normal live presentation tests supply a valid future deadline. The parser/fixture provenance,
+source clocks/device-clock limitation and all provider/restart availability constraints above
+remain unchanged.
+
+Changed implementation: `SchoolMealSourceClient.cs`, `SchoolMealService.cs`, `SchoolLunch.tsx`.
+Changed tests: existing `SchoolMealCachePolicyTests.cs`, `SchoolMealLiveTests.cs`,
+`SchoolMealSourceDiagnosticsTests.cs`, `SchoolLunch.test.tsx`. Canonical knowledge and STATUS are
+updated; no new backlog item or recovery operation is needed for these already tracked P1s.
+No database, deployment, configuration, provider URL/interval, Finance or BB-158 change.
+
+Verification (2026-11-03):
+
+- Pre-fix regression proof against prior production code: **8 FAIL / 10 PASS** in the new
+  backend selection/metadata cases, and **4 FAIL / 8 PASS** in SchoolLunch frontend tests.
+  A weak-tag test-fixture constructor was corrected to EntityTagHeaderValue.Parse before the
+  recorded backend proof. Failures then directly reproduced missing/mismatched validators,
+  weak-to-strong promotion, malformed metadata and missing UI expiry. No runtime attempt occurred.
+- **PASS:** `dotnet test tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj --no-restore --filter
+  'FullyQualifiedName~SchoolMeal|FullyQualifiedName~MealPlanner|FullyQualifiedName~ShoppingList' -v quiet`:
+  **163 passed, 0 failed, 0 skipped**, including .NET build. The 18 added backend cases cover
+  validator selection, strong/weak ETags, equal/missing/changed Last-Modified, malformed headers,
+  metadata replacement/inheritance, next-request validators, unchanged retention and Retry-After.
+  All prior cache-policy, six-hour gate, parser, restart and household-isolation tests pass.
+- **PASS:** `npm test -- --run src/meal-planner/SchoolLunch.test.tsx
+  src/meal-planner/MealPlanner.test.tsx src/ux-lab/UXLab.test.tsx`: **29 passed**. Five deadline
+  negatives, corrected stale case, both focus/visibility resume checks, exact expiry and fixtures
+  retain assertions for no extra API calls. **PASS:** `npm run build` (TypeScript/Vite); only tests
+  changed after that build, so its unchanged production-code evidence is reused.
+- **PASS:** scoped `dotnet format BigBrain.slnx --no-restore --verify-no-changes --include` on
+  the five changed C# files, scoped `npx prettier --check`, documentation validator (290 Markdown
+  files / 53 unique backlog IDs), `git diff --check`, local scope/content review. No raw provider
+  content, credentials or private logs added. GitHub secrets/CI result is reported for exact head.
+- Reused: unchanged original RSS/HTML provenance and source rights evidence from the prior
+  checkpoint. Changed paths and their surrounding cache/household tests are rerun; no provider
+  call, device acceptance, production inspection, restart or deployment (**SKIP / unauthorized**).
+
+GitHub exact-candidate CI and remote SHA/tree are recorded in PR #31 after publication. This
+checkpoint does not declare independent review or owner UX acceptance. Main and production are
+unchanged by this work. No further repair loop or scope expansion is authorized; next is the
+second independent review of these two findings and the added diff.
+
+## Demand refresh and STANDARD guards — REVIEW CHECKPOINT 2026-11-03
+
+The following is the first checkpoint's evidence for `ea85b7d`. Its one-attempt-per-deadline UX
+was rejected as P1; the correction and current frontend evidence are recorded in the section below.
+
+**Incomplete checkpoint, NOT A MERGE CANDIDATE.** T2 / risk level 2; one combined PR for
+independent review. No merge or deployment is authorized. Baseline independently fetched and
+verified: `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1`, tree
+`317fa938176ac827cd5acf70c2a258a1342cb567`. PR #31 is merged; unchanged baseline CI
+[41591006053](https://github.com/T-bear/BigBrain/actions/runs/41591006053) passed all four jobs.
+Branch: `fix/school-meal-demand-standard`. Exact candidate SHA/tree and its CI are bound by
+Git metadata and the PR checkpoint description; this text does not self-reference its own commit.
+
+The owner authorized development and UX B, then explicitly answered **“60 sekunders”** on
+2026-11-03 when asked for the safety floor for both sources. The implementation uses that floor
+for each school, measured after completion. This is an owner product decision, **not provider
+permission**. Complete owner-reported provider statements (date, sender, exact wording, scope,
+frequency/conditions) remain missing for both sources. Skolmat.info specifically needs explicit
+coverage for automated RSS despite the previously observed `robots.txt: Disallow: /`.
+No private correspondence is included and no independently verified agreement is claimed.
+The open condition prevents a completed handoff/merge-candidate claim and any new source use.
+
+**Implementation and invariants:**
+
+- `SchoolMealService.cs`: reuse fresh same-week menus regardless of cooldown expiry; fetch only
+  on demand when missing/expired and the 60-second floor and Retry-After permit. Existing lock,
+  200/304 validation, metadata, 429, fail-closed unknown headers, no stale, week/retention eviction
+  and process-only restart semantics remain. No persistent storage, scheduler or dependencies.
+- `SchoolLunch.tsx`: UX B through the existing API only. Timer hides expired dishes without a
+  request. Focus/visible resume consumes one refresh entitlement per previously displayed fresh
+  deadline before calling. Paired/repeated events cannot duplicate pending requests or retry a
+  failed, blocked or already-expired response. A new fresh response permits a future expiry check;
+  reload/reopen remains possible under the backend floor. Fixtures and hidden views do not refresh.
+- `deploy-standard.py`: exact five additions to APP_FILES; no SHA exceptions or directory globs.
+  Shared environment validation permits only literal `/dev/null` as a nonsymlink character
+  device with major/minor 1:3, at discovery and again before Compose use (including model rendering).
+  Explicit missing files, other devices, FIFO, directories, relative paths and symlinks fail closed.
+  Existing optional implicit `.env` fallback remains; invalid explicit inputs never fall back.
+  Config hashes, role-specific ancestry, runtime identity, CI, backup/probe/journal/rollback checks
+  are not relaxed. The shared `api.ts` allowance requires semantic review for unrelated deltas.
+
+[Canonical behavior and provider boundaries](../../../knowledge/meal-planner.md#skollunch--behovsstyrd-omvalidering-och-ux-b-t2-checkpoint-2026-11-03),
+[STANDARD per-file scope, risks and regression boundary](../../../policy/lanes.md#skollunch-och-standard-guardfix--t2-checkpoint-2026-11-03).
+No Finance, BB-158, schema, migration, source URL, flag or frozen-tool changes. Historical approved
+fixture/parser provenance and unchanged 304 algorithm are reused; their regression suites are rerun.
+The earlier read-only runtime preflight evidence is preserved in lanes; this implementation task
+makes no production preflight attempt on an unaccepted revision.
+
+**Verification, 2026-11-03:**
+
+- **PASS:** 166 focused .NET tests (`SchoolMeal`, `MealPlanner`, `ShoppingList`), including both
+  source parsers, a fresh 60-minute menu after 60 seconds, expired content blocked by the floor
+  or Retry-After, 200/304 renewal, paired concurrent fetch/refresh, 429 with/without Retry-After,
+  uncertain headers, completion-relative floor, restart and week rollover without bypassing the
+  floor or retaining old-week validators. Household/database isolation assertions remain green.
+- **PASS:** 33 frontend tests (SchoolLunch, MealPlanner, UXLab); missing/invalid/expired deadlines,
+  local timer, per-school refresh, paired focus/visibility while pending, no repeated calls after
+  failure/block/expired response, fresh menus, hidden views, fixtures, cleanup and late replies.
+  TypeScript/Vite build and frontend format check PASS.
+- **PASS:** 201 offline deployment tests; **SKIP:** 1 explicitly opt-in synthetic Docker integration
+  test. STANDARD subset: 106 PASS / 1 SKIP. Positive paths and neighboring-path rejection use real
+  temporary Git histories; no GitHub or production mutations. Exact null-device and regular-file
+  acceptance, symlinks/parents/dangling links, other devices, missing/relative paths, FIFO and wrong
+  device type/number are covered. Existing read-only preflight, config-hash, identity, Finance,
+  BB-158, schema/build/privilege exclusions and rollback tests remain green with simulated Docker
+  and synthetic SQLite/WAL only.
+- First focused backend run: **164 PASS / 1 FAIL**, caused by the old diagnostic test still
+  expecting six hours for 429 without Retry-After. The expectation was updated to the explicit
+  60-second decision; the final run above includes the added week-boundary regression. This was
+  a test-contract update, not a production retry or a change to Retry-After semantics.
+- Source access, production preflight/build/start/restart, live menus and iPhone/PWA acceptance:
+  **SKIP / not authorized**. No source requests, production database operations or container actions.
+
+**PASS:** solution-wide Release .NET build (0 warnings/errors), scoped C# format verification,
+documentation validator (290 Markdown files / 53 unique backlog IDs), `git diff --check` and local
+scope/content review. Exact-candidate GitHub CI is recorded in the PR checkpoint after publication. Remaining decisions: provider statements and independent
+T2 review; merge and deployment each require separate authorization. The owner-decided UX behavior
+is not physical-device acceptance. Ongoing continuous visibility and an absolute rate cap across
+process restarts are not promised. Unrelated local drafts remain unmodified and unpublished.
+
+## PR #32 — UX B P1 correction for second T2 review, 2026-11-03
+
+**Draft REVIEW CHECKPOINT, not a merge candidate.** Same branch/PR and T2 risk; no history
+rewrite. Before work, remote main remained `2cdb71df1e166f8ff8e644e1014b1902cb08f5a1` and PR #32
+head was `ea85b7d8b68e8b1a264a5bc536baf277bdf4e20c`, tree
+`ef03803c87551bad258b500f024662ea43741785`. No tracked local divergence; unrelated drafts preserved.
+Candidate SHA/tree and exact-head CI are recorded in the updated PR checkpoint after publication.
+
+**Verified P1 and reproduction:** UX B requires a later separate return to retry a previously
+displayed expired menu. The old code deleted its deadline before the first check. At 12:00:00
+Rosenfeldt is fresh until 12:00:30, while the server floor lasts until 12:01:00. Returning at
+12:00:35 yields unavailable. A separate return at 12:01:10 then incorrectly does nothing.
+New fake-clock tests reproduce this sequence with both focus-first and visibility-first event
+ordering, including an API response between the paired events. Against unchanged `ea85b7d`
+implementation: **6 FAIL / 14 PASS**. All six failures are missing later-return requests (blocked,
+network failure, expired response, the two exact-timeline cases, and a return after pending work).
+An initial test invocation from the repository root exited before running tests because package.json
+is in the Web project; the recorded regression proof was then run from the correct directory.
+
+**Minimal correction:** only `SchoolLunch.tsx` production code changes. Retain the deadline of
+previously displayed live menus across blocked/failed replies. A local boolean records absence
+(window blur or hidden document); the first visible return consumes that absence before requests
+start. Paired/repeated events cannot request again without a new absence, even after a response
+settles. A per-school pending set prevents overlap, including another return during a pending
+request; completion never queues an automatic retry. A successful response clears the prior
+network-error presentation. Existing expiry validation/timer, fixture isolation, AbortController
+and late-response checks remain. No backend/API fields, frontend retry timers, polling or services.
+Backend 60-second floor and Retry-After remain authoritative and unchanged.
+
+**Final verification:** 36 focused frontend tests PASS (SchoolLunch: 20, plus MealPlanner/UXLab).
+The revised blocked/error/expired cases require recovery on a later real return while rejecting
+duplicates without one. Both exact 12:00:00–12:01:10 cases pass. Tests retain fresh-menu, hidden-view,
+fixture, no-fetch expiry timer and late-response coverage; new pending-return coverage verifies no
+parallel or queued requests and abort/late-response behavior on unmount. TypeScript/Vite build and
+full frontend format check PASS. Documentation validator and diff check are verified before commit.
+
+**Reused unchanged evidence:** previous 166 focused backend and 201 offline deployment PASS /
+1 opt-in Docker SKIP, plus all four successful jobs in
+[exact prior candidate CI 41626731377](https://github.com/T-bear/BigBrain/actions/runs/41626731377).
+Backend, HTTP client, 60-second floor, STANDARD guards/allowlist/null handling and their tests are
+byte-identical to the prior candidate. Current exact-candidate CI must pass before final handoff.
+No production checks, provider requests, container operations, merge, deployment or iPhone/PWA
+acceptance are performed (**SKIP / outside scope**).
+
+Provider statements remain PENDING, especially automated Skolmat.info RSS despite the previously
+observed robots.txt Disallow: /. The 60-second floor is already owner-approved, not an open decision
+or provider permission. No private correspondence is published. Next is ChatGPT's second independent
+T2 review of the P1 correction and added diff; no general improvement loop or merge/deployment authority.
