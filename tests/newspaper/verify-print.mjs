@@ -111,8 +111,10 @@ createRoot(document.getElementById('root')).render(React.createElement(Newspaper
     })()`)
     assert.equal(printed.fit, 'contain')
     assert.equal(printed.rootDisplay, 'none')
-    assert.ok(Math.abs(printed.width - (210 * 96) / 25.4) < 0.1)
-    assert.ok(Math.abs(printed.height - (297 * 96) / 25.4) < 0.1)
+    const printWidthMm = 185
+    const printHeightMm = (printWidthMm * 3508) / 2480
+    assert.ok(Math.abs(printed.width - (printWidthMm * 96) / 25.4) < 0.1)
+    assert.ok(Math.abs(printed.height - (printHeightMm * 96) / 25.4) < 0.1)
     const pdf = await call('Page.printToPDF', {
       preferCSSPageSize: true,
       printBackground: false,

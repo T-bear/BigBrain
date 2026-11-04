@@ -13,8 +13,8 @@ const css = `
   body:has(> #bigbrain-newspaper-print) > :not(#bigbrain-newspaper-print) { display:none !important }
   #bigbrain-newspaper-print { display:block !important; margin:0; padding:0; background:white }
   #bigbrain-newspaper-print > img {
-    display:block; box-sizing:border-box; width:210mm; height:297mm;
-    max-width:none; max-height:none; margin:0; padding:0; border:0;
+    display:block; box-sizing:border-box; width:185mm; height:auto;
+    max-width:none; max-height:none; margin:0 auto; padding:0; border:0;
     object-fit:contain; background:white; break-inside:avoid;
     print-color-adjust:exact; -webkit-print-color-adjust:exact;
   }

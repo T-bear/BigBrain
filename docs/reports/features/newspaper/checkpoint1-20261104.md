@@ -12,11 +12,22 @@ Detta är en sanerad GitHub-version av dokumentationen.
 
 ## Status
 
-**REVIEW CHECKPOINT — automatisk A4-verifiering PASS efter separat auktoriserad korrigering.**
-Ingen merge, deployment eller slutlig owner UX approval. Verklig iPhone/PWA och fysisk
-utskrift kräver fortfarande manuell acceptans. Oberoende review återstår.
+**REVIEW CHECKPOINT — iPhone Chrome PDF FAIL på commit `8da872c`: två A4-sidor.**
+Tidigare automatisk Chromium-verifiering gav en sida, men den manuella
+iPhone-exporten visade ett verkligt pagineringsfel. En begränsad justering
+är förberedd; ny manuell iPhone-acceptans återstår.
+Ingen merge, deployment eller slutlig owner UX approval.
 
 ## Changes
+
+### iPhone-utskriftskorrigering 2026-11-04
+
+Originalbilden behålls byteidentisk. Utskriftsbilden ändras från
+210 × 297 mm till 185 mm bredd med automatisk, proportionell höjd
+(cirka 261,7 mm), och centreras horisontellt.
+Den mindre ramen ger utrymme för iPhones faktiska utskriftsmarginaler.
+Ingen annan funktion, API-integration eller global CSS ändras.
+Det verkliga iPhone-resultatet måste verifieras efter publicering.
 
 ### Avgränsad korrigering efter `4cc68a4`
 
@@ -45,7 +56,16 @@ enskilda kausala andelen för overflow respektive sidregel är inte fastställd.
 
 ## Evidence
 
-Verifiering 2026-11-04, Chromium 145.0.7632.6 och Node 20.19.2:
+Manuell PDF exporterad från Chrome på iOS 26.7.2 den 2026-11-04:
+FAIL, två A4-sidor. Bilden låg på sida 1 i en ruta om cirka
+559,28 × 791,02 PDF-punkter. Den första sidans tillgängliga
+innehållshöjd var cirka 761,43 punkter. Cirka 29,6 punkter
+av bildens nederkant fortsatte på sida 2.
+
+Detta är evidens för den tidigare versionens fel.
+Ett nytt iPhone-test efter den avgränsade korrigeringen är PENDING.
+
+Tidigare verifiering på `9f38e4d`, Chromium 145.0.7632.6 och Node 20.19.2:
 
 | Kontroll efter korrigering | Resultat |
 | --- | --- |
@@ -71,6 +91,10 @@ Den avgränsade korrigeringen ändrar inga API:er, databaser,
 beroenden eller hemligheter har införts.
 
 ## Remaining work
+
+- Verifiera en A4-sida genom en ny PDF-export i Chrome på iPhone.
+- Kontrollera separat Safari, installerad PWA och fysisk utskrift.
+- Begär uttrycklig produktacceptans före beslut om merge.
 
 Fysisk skrivares marginaler och Safaris utskriftsdialog är inte bevisade av Chromium-testet.
 ## Resumption
