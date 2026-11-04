@@ -213,12 +213,19 @@ test('starts on the calm Home launcher and keeps family tools in Family', async 
     [...container.querySelectorAll('[data-widget-id]')].map(element => element.getAttribute('data-widget-id')),
   ).toEqual(['meal-plan', 'shopping-list', 'calendar', 'reminders'])
   expect(container.querySelector('#family')).toHaveClass('family-experience')
-  expect(screen.getByRole('heading', { name: 'Skollunch' })).toBeInTheDocument()
-  expect(screen.getByText('Aktuell veckas skolluncher')).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Skollunch' })).not.toBeInTheDocument()
+  expect(screen.queryByText('Aktuell veckas skolluncher')).not.toBeInTheDocument()
   expect(container.querySelector('#family .dashboard-widget')).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Dashboardinställningar' })).toHaveAttribute('aria-haspopup', 'dialog')
   expect(await screen.findByRole('tab', { name: 'Matsedel' })).toHaveAttribute('aria-selected', 'true')
+  fireEvent.click(screen.getByRole('tab', { name: 'Skolmat' }))
+  expect(screen.getByRole('tabpanel', { name: 'Skolmat' })).toBeVisible()
+  expect(container.querySelectorAll('.school-lunch')).toHaveLength(1)
+  expect(container.querySelector('.school-lunch')?.closest('[data-family-section]')).toHaveAttribute(
+    'data-family-section',
+    'meal-plan',
+  )
   expect(container.querySelector('[data-family-section="shopping-list"]')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Öppna kalender' })).toBeInTheDocument()
   expect(screen.getByRole('navigation', { name: 'Snabbnavigation' })).toBeInTheDocument()

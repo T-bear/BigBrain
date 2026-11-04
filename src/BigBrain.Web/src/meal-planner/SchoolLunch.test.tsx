@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SchoolLunch } from './SchoolLunch'
 import * as api from '../api'
@@ -23,6 +23,41 @@ describe('SchoolLunch', () => {
     isFixture: false,
     validUntilUtc: new Date(Date.now() + seconds * 1000).toISOString(),
     days: [{ date: '2026-10-19', status: 'published', dishes: [id + ' lunch'] }],
+  })
+
+  it.each([
+    ['2026-11-03T20:39:07Z', '3 nov, 21.39'],
+    ['2026-07-03T19:39:07Z', '3 juli, 21.39'],
+  ])('groups weekdays and preserves sources and warnings with Stockholm time %s', async (timestamp, expected) => {
+    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+      ...liveMenu(id, 3600),
+      lastCheckedAtUtc: timestamp,
+      sourceUpdatedAtUtc: timestamp,
+      isStale: true,
+    }))
+    const { container } = render(<SchoolLunch allowFixture={false} />)
+    await screen.findByText('rosenfeldt lunch')
+    const rows = container.querySelectorAll('.meal-planner__day')
+    expect(rows).toHaveLength(5)
+    expect([...rows].map(row => row.querySelector('.meal-planner__day-copy')?.textContent)).toEqual([
+      'Måndag',
+      'Tisdag',
+      'Onsdag',
+      'Torsdag',
+      'Fredag',
+    ])
+    const monday = within(rows[0] as HTMLElement)
+    for (const name of ['Rosenfeldtskolan', 'Musikugglan', 'rosenfeldt lunch', 'musikugglan lunch']) {
+      expect(monday.getByText(name)).toBeInTheDocument()
+    }
+    expect(screen.getAllByText(`Kontrollerad: ${expected}`)).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: 'Testkälla' })).toHaveLength(2)
+    expect(screen.getAllByText(/Matsedeln kan vara inaktuell/)).toHaveLength(2)
+    expect(
+      screen.queryByText(/Skollunch|Aktuell veckas skolluncher|Datum från RSS|Menyn hämtad|Källans angivna/),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/Lördag|Söndag|Antal personer/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Byt/ })).not.toBeInTheDocument()
   })
 
   it('checks a weekly snapshot after 24 hours, not on every return', async () => {
@@ -82,7 +117,7 @@ describe('SchoolLunch', () => {
     expect(api.getSchoolMeals).toHaveBeenCalledTimes(4)
     expect(
       screen.getByRole('heading', {
-        name: 'Rosenfeldtskolan · vecka 44, 2026',
+        name: 'Rosenfeldtskolan',
       }),
     ).toBeInTheDocument()
   })
@@ -425,8 +460,8 @@ describe('SchoolLunch', () => {
     expect(screen.getByText(/TESTDATA/)).toBeInTheDocument()
     expect(api.getSchoolMeals).toHaveBeenCalledWith('rosenfeldt', 2026, 43, true, expect.any(AbortSignal))
     expect(api.getSchoolMeals).toHaveBeenCalledWith('musikugglan', 2026, 44, true, expect.any(AbortSignal))
-    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan · vecka 43, 2026' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Musikugglan · vecka 44 (källans årtal saknas)' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Musikugglan' })).toBeInTheDocument()
     const signal = vi.mocked(api.getSchoolMeals).mock.calls[0][4]!
     view.unmount()
     expect(signal.aborted).toBe(true)
@@ -519,14 +554,14 @@ describe('SchoolLunch', () => {
     const { container } = render(<SchoolLunch allowFixture={false} />)
     expect(await screen.findByText(unsafeText)).toBeInTheDocument()
     expect(container.querySelector('img, script')).toBeNull()
-    expect(screen.getByRole('heading', { name: 'Måndag · 28 december' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Fredag · 1 januari' })).toBeInTheDocument()
+    expect(screen.getByText('Måndag')).toBeInTheDocument()
+    expect(screen.getByText('Fredag')).toBeInTheDocument()
     expect(container.querySelector('time[datetime="2027-01-01"]')).toHaveTextContent('1 januari')
-    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan · vecka 53, 2026' })).toBeInTheDocument()
-    expect(screen.getByText(/^Källans angivna ändringstid:/)).toHaveTextContent('2026-12-27')
-    expect(screen.getByText(/^Menyn hämtad:/)).toHaveTextContent('2026-12-28')
+    expect(screen.getByRole('heading', { name: 'Rosenfeldtskolan' })).toBeInTheDocument()
+    expect(screen.queryByText(/^Källans angivna ändringstid:/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Menyn hämtad:/)).not.toBeInTheDocument()
     expect(screen.getAllByText('Meny saknas för dagen. Det betyder inte att skolan är stängd.')).toHaveLength(3)
-    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual([
+    expect([...container.querySelectorAll('.meal-planner__day-meal strong')].map(item => item.textContent)).toEqual([
       unsafeText,
       'Pasta med spenat och ostsås',
       'Kockens val',
