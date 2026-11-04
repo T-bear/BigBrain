@@ -1,10 +1,24 @@
 # Morgonbladet checkpoint 1 — A4-korrigering för review, 2026-11-04
 
+## Metadata
+
+- Datum: 2026-11-04.
+- Risknivå: 1.
+- Review: PR #22, befintlig checkpoint-branch.
+- Verifierad kodrevision: `9f38e4db742907222b9f7b4c624e6cfa30eb97ce`.
+- Omfattning: statisk A4-designmaster och utskrift.
+
+Detta är en sanerad GitHub-version av dokumentationen.
+
+## Status
+
 **REVIEW CHECKPOINT — automatisk A4-verifiering PASS efter separat auktoriserad korrigering.**
 Ingen merge, deployment eller slutlig owner UX approval. Verklig iPhone/PWA och fysisk
 utskrift kräver fortfarande manuell acceptans. Oberoende review återstår.
 
-## Avgränsad korrigering efter `4cc68a4`
+## Changes
+
+### Avgränsad korrigering efter `4cc68a4`
 
 Ägaren auktoriserade ett nytt, enda korrigeringsförsök med jämförelse mot
 `9631bd328b229263664e9071f2aaf980b89cf0ef`. Aktuell main är fortsatt
@@ -29,6 +43,8 @@ föregående PDF hade samma bildobjekt fragmenterat över två sidor. Den samman
 korrigeringen ger en sida. Reglerna har inte isolerats i separata experiment, så den
 enskilda kausala andelen för overflow respektive sidregel är inte fastställd.
 
+## Evidence
+
 Verifiering 2026-11-04, Chromium 145.0.7632.6 och Node 20.19.2:
 
 | Kontroll efter korrigering | Resultat |
@@ -48,7 +64,17 @@ Lokala artefakter från oförändrat PDF-test finns i `data/newspaper-checkpoint
 - `evidence.json`: browseridentitet och båda mätfallen.
 - `desktop-before-correction.pdf`: bevarad tidigare tvåsidig PDF.
 
+## Security
+
+Den avgränsade korrigeringen ändrar inga API:er, databaser,
+åtkomstregler eller produktionsinställningar. Inga nya
+beroenden eller hemligheter har införts.
+
+## Remaining work
+
 Fysisk skrivares marginaler och Safaris utskriftsdialog är inte bevisade av Chromium-testet.
+## Resumption
+
 Ett korrigeringsförsök är förbrukat i detta nya uppdrag. Nästa steg är oberoende review
 av publicerad commit och manuell acceptans; ingen checkpoint 2 eller automatisk fortsättning.
 
