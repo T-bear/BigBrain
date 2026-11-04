@@ -88,15 +88,14 @@ and cannot serve as an approved executable package. No local application delta o
 Next: independent exact-candidate review, followed by the report's single administrative recovery
 sequence. No autonomous interlock reset, obsolete backup reuse, deployment or source request.
 
-## Morgonbladet checkpoint 1 — 2026-11-04
+## Morgonbladet checkpoint 1 — avstämd 2026-11-04
 
-**INTERRUPTED — MANUAL REVIEW REQUIRED.** Implementation stoppad vid ägarens försöksgräns.
+Det tidigare avbrottet vid `4cc68a4` är hanterat genom ägarens separat auktoriserade,
+enda avgränsade CSS-korrigering. Inget pågående implementationsavbrott återstår här.
 PR #22 / `review/chatgpt-20261030-230941-1430648`; verifierad main
-`c2d33099fe5af6d51a70a943b4006c7ea8f5f0bd`. Originalbilden är verifierad och bevarad.
-[Scope, revisionsidentiteter, filer, tester och reproduktion](../reports/features/newspaper/checkpoint1-20261104.md)
-är det kanoniska underlaget; denna not duplicerar inte evidensen.
-Ett implementationsförsök och ett korrigeringsförsök är förbrukade. Faktisk PDF har två sidor.
-Arbetet publiceras som blockerad REVIEW CHECKPOINT, aldrig Merge Candidate.
-Nästa exakta åtgärd: oberoende arkitektreview av publicerad commit och beslut om eventuell
-ny avgränsad korrigering. Ingen merge, deployment, automatisk retry eller checkpoint 2.
+`c2d33099fe5af6d51a70a943b4006c7ea8f5f0bd`.
+[Scope, jämförelse, historiskt fel, aktuell verifiering och artefakter](../reports/features/newspaper/checkpoint1-20261104.md)
+är det kanoniska underlaget. Publiceringscommit/tree finns i Gitmetadata.
+Nästa steg är oberoende review och återstående manuell iPhone/PWA-/utskriftsacceptans.
+Ingen merge, deployment, ytterligare automatisk korrigering eller checkpoint 2 är auktoriserad.
 Orelaterade working-tree-filer i huvudarbetskopian är orörda.

@@ -8,12 +8,11 @@ const css = `
 .newspaper-master-preview { display:block; width:100%; max-width:210mm; height:auto; background:white }
 #bigbrain-newspaper-print { display:none }
 @media print {
-  @page newspaper-master { size:A4 portrait; margin:0 }
-  body:has(> #bigbrain-newspaper-print) { margin:0 !important; padding:0 !important; background:white !important }
+  @page { size:A4 portrait; margin:0 }
+  body:has(> #bigbrain-newspaper-print) { margin:0 !important; padding:0 !important; overflow:visible !important; background:white !important }
   body:has(> #bigbrain-newspaper-print) > :not(#bigbrain-newspaper-print) { display:none !important }
   #bigbrain-newspaper-print { display:block !important; margin:0; padding:0; background:white }
   #bigbrain-newspaper-print > img {
-    page:newspaper-master;
     display:block; box-sizing:border-box; width:210mm; height:297mm;
     max-width:none; max-height:none; margin:0; padding:0; border:0;
     object-fit:contain; background:white; break-inside:avoid;
