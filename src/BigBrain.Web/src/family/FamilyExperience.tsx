@@ -1,4 +1,3 @@
-import { SchoolLunch } from '../meal-planner/SchoolLunch'
 import { AppIcon } from '../AppIcon'
 import type { WidgetDefinition } from '../dashboard/widgetFramework'
 import type { ReactNode, RefObject } from 'react'
@@ -53,7 +52,6 @@ export function FamilyExperience({
         </div>
       </div>
       <div className="family-flow">
-        <SchoolLunch />
         {widgets.map(widget => {
           const copy = sectionNames[widget.id] ?? { title: widget.title, kicker: widget.category }
           return (
