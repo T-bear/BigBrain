@@ -1,5 +1,7 @@
 # Finance reports
 
+- [Release 1: access handoff, 2026-11-06](finance-release1-access-handoff-20261106.md)
+
 - [V — Release 1: read-only review preparation, 2026-11-06](finance-release1-readonly-preparation-20261106.md)
 
 - [BB-128A Alpaca live activation readiness](finance-bb-128a-alpaca-live-activation-readiness-20260902.md)
