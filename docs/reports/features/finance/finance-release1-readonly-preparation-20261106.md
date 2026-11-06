@@ -5,7 +5,7 @@ O = okänt. Inga Finance-data har öppnats eller verifierats i denna etapp.
 
 ## Metadata
 
-V — 2026-11-06, risknivå 3. GitHub-main via GitHub-API: `0f11890dac3ff1529c83d7438658b90e4a61948e`.
+V — 2026-11-06, risknivå 3. Verifierad GitHub-main, commit: `0f11890dac3ff1529c83d7438658b90e4a61948e`.
 [Ägarmandatet](https://github.com/T-bear/BigBrain/blob/28e08469f248921922ece380523a0ac7f0a0f6db/docs/operations/finance-release1-mandate-20261106.md)
 är läst på exakt SHA; PR #40 var öppen/omergad.
 V — Huvudarbetskopian: HEAD `e946793707a2a2c46c1d67d8a61ae1f06a9df992`, tree
@@ -15,7 +15,10 @@ V — Huvudarbetskopian: HEAD `e946793707a2a2c46c1d67d8a61ae1f06a9df992`, tree
 ## Status
 
 V — **REVIEW CHECKPOINT; dataverifiering stoppad vid saknad åtkomst.** `/etc/passwd` bekräftar det dedikerade kontot; `os.geteuid()` visar annan sessionsanvändare.
-Ett `os.stat` av backupen gav PermissionError. Ingen Finance-fil öppnades eller åtkomst höjdes.
+Förnyad metadatakontroll (`os.stat`) gav PermissionError; sessionens UID/EUID motsvarar inte
+det dedikerade kontot. Ingen Finance-fil öppnades eller åtkomst höjdes.
+D — Ägaren har nu förmedlat arkitektens godkännande av exakt skripthash nedan för augustikopian.
+V — Filhashen är omverifierad och oförändrad; verifieraren har inte körts mot Finance-data.
 O — kräver: befintlig tillåten körkontext med dedikerad skrivskyddad identitet och verifierade
 läsrättigheter; kontots faktiska ACL:er och kopians aktuella metadata är inte styrkta.
 
@@ -58,17 +61,43 @@ Första FAIL stoppar skriptet; endast sanerad stdout och exit 0 utan FAIL, annar
 V — Text-/AST-kontroll: INSERT/DELETE/ALTER/DROP/VACUUM/REINDEX/ATTACH/CREATE/subprocess/socket: 0;
 UPDATE: 2, båda `hashlib.update` i minnet. Tre filöppningar, samtliga `rb`; inga skrivlägen.
 
+### Sekretessjobbets verifierade falsklarm och avgränsat förslag
+
+V — [CI 42219758708](https://github.com/T-bear/BigBrain/actions/runs/42219758708), kandidat
+`029ef0d9d96ddcabff80649138d5f2dd0272c55e`: backend/frontend/documentation PASS;
+[secrets 127898580555](https://github.com/T-bear/BigBrain/actions/runs/42219758708/job/127898580555)
+FAIL. Gitleaks 8.24.3 rapporterade exakt ett fynd, `generic-api-key`, rapportens historiska rad 8.
+Den utpekade strängen är main-commitidentiteten i Metadata, verifierad både via GitHub och
+`git cat-file -t` (commit), inte en credential. Jobbets maskerade Finding-rad binder fyndet till
+formuleringen före denna SHA. Raden har nu förtydligats; det tar inte bort det historiska fyndet.
+
+V — Befintlig praxis: [BB-124](finance-bb-124-anti-overfitting-oos-governance-20260901.md),
+commit `91247b81be5b55b1200e7c39233106ef3f2ecd3e` och repots `.gitleaksignore` använder ett
+fyndspecifikt undantag. Förslag, **inte tillämpat**: lägg efter avgränsad granskning till exakt
+följande enda rad i den befintliga filen, med en vanlig framåtriktad commit:
+
+```text
+029ef0d9d96ddcabff80649138d5f2dd0272c55e:docs/reports/features/finance/finance-release1-readonly-preparation-20261106.md:generic-api-key:8
+```
+
+Förslaget undantar bara kombinationen commit/fil/regel/rad. Behåll övriga regler, workflow,
+kravet på godkänt sekretessjobb och befintlig historik. Verifiera därefter sekretessjobbet på
+ny exakt kandidat; andra fynd måste bedömas separat. V — `.gitleaksignore`, workflow och det
+godkända skriptet är oförändrade i denna dokumentationsetapp; inget nytt sekretess-PASS påstås.
+
 ## Remaining work
 
-O — kräver: arkitektens godkännande av exakt skripthash och befintlig tillåten åtkomst före
-någon Finance-läsning. Evidensintegritet, Release 1-DoD och separat reproducerbarhetskrav är
+O — kräver: en redan tillåten dedikerad körkontext med befintlig läs-/traverseringsrätt till
+backupkatalogen och den utpekade kopian. Ingen sådan körkontext är styrkt i denna session;
+kontots faktiska rättigheter är inte härledbara ur dess existens. Inga nya rättigheter beställs.
+Evidensintegritet, Release 1-DoD och separat reproducerbarhetskrav är
 inte avgjorda av syntetiska PASS. D — retentionbeslut förblir ägarens enligt mandat §6;
 senaste dokumenterade granskningsfrist är 2026-11-10 14.36.45 svensk tid, eller tidigare.
 
 ## Resumption
 
-V — Nästa steg: oberoende granskning; ingen merge, D3 eller driftåtgärd utförd.
-Efter godkännande och tillåten åtkomst: `python3 -B finance-release1-verify-readonly-20261106.py
+V — STOP enligt mandat §7: ingen körning utan styrkt befintlig åtkomst; ingen merge, D3
+eller driftåtgärd utförd. D — Exakt skript är godkänt enligt ägarens besked. Först i tillåten kontext: `python3 -B finance-release1-verify-readonly-20261106.py
 --db <godkänd-kopia> --manifest-dir <backupkatalog>` (en rad). Exit 0 innebär inte Release 1-acceptans.
 
 Parkerat: O — numerisk omräkning av käll-/feature-checksummor och driftens senare evidens.
