@@ -273,7 +273,7 @@ class SyntheticTests(unittest.TestCase):
             self.assertEqual(command[0], '/usr/bin/systemd-run')
             command_settings.update(x.removeprefix('--property=').split('=', 1)
                                     for x in command if x.startswith('--property='))
-            self.assertEqual(command_settings['ReadOnlyPaths'], '/root')
+            self.assertEqual(command_settings['ReadOnlyPaths'], '+/root')
             for binding in command_settings['BindReadOnlyPaths'].split():
                 source, destination, option = binding.split(':')
                 self.assertTrue(source.startswith('/proc/'))
@@ -299,11 +299,15 @@ class SyntheticTests(unittest.TestCase):
             result.update(MemoryMax='536870912', RuntimeMaxUSec='5min', TimeoutStartUSec='30s',
                           TimeoutStopUSec='5s', CPUQuotaPerSecUSec='1s')
             self.assertIn('ReadOnlyPaths', keys)
+            # v257.13 preserves '+' in the D-Bus string array and systemctl show.
+            result['ReadOnlyPaths'] = '+/root'
             observed['properties_checked'] = True
             if failure == 'readonly_missing':
                 result.pop('ReadOnlyPaths')
             elif failure == 'readonly_wrong':
                 result['ReadOnlyPaths'] = '/elsewhere'
+            elif failure == 'readonly_host':
+                result['ReadOnlyPaths'] = '/root'
             return result
 
         def unlink(path, *args, **kwargs):
@@ -339,7 +343,7 @@ class SyntheticTests(unittest.TestCase):
         self.assertNotIn('/private', text)
         self.assertNotIn(str(self.base), text)
         self.assertEqual(sorted(inputs.iterdir()), sorted(inputs / name for name in package.FILES))
-        self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong'))
+        self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong', 'readonly_host'))
         return rc, text, list(self.base.glob('owned-*'))
 
     def test_start_normal_cleanup(self):
@@ -365,6 +369,14 @@ class SyntheticTests(unittest.TestCase):
 
     def test_start_wrong_readonly_property_blocks_go_and_cleans_up(self):
         rc, text, remaining = self.exercise_start('readonly_wrong')
+        self.assertEqual(rc, 1)
+        self.assertIn('FAIL S09_service_properties', text)
+        self.assertNotIn('PASS identity_hash', text)
+        self.assertIn('PASS temporary_resources_removed', text)
+        self.assertEqual(remaining, [])
+
+    def test_start_host_relative_readonly_is_rejected_before_go(self):
+        rc, text, remaining = self.exercise_start('readonly_host')
         self.assertEqual(rc, 1)
         self.assertIn('FAIL S09_service_properties', text)
         self.assertNotIn('PASS identity_hash', text)
