@@ -16,7 +16,7 @@ import sys
 from types import SimpleNamespace
 import uuid
 
-PACKAGE_HASH = '449b5045555df72430771d65c3434800e8d0cb53d5a11a14e10a9947a3fa9201'
+PACKAGE_HASH = '277201476976f10dad22ac483ce430aa289dbce6184530910091545d34f35029'
 PREFIX = '/run/finance-release1-probe-'
 
 

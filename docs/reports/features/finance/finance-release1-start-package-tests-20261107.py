@@ -5,6 +5,7 @@ Identity/ownership, mounts and systemd are simulated; filesystem operations use
 only TemporaryDirectory. This suite does not certify runtime isolation.
 """
 import contextlib
+import errno
 import hashlib
 import importlib.util
 import io
@@ -229,6 +230,66 @@ class SyntheticTests(unittest.TestCase):
         self.assertEqual(guard['STEP'], 'G06_spec')
         self.assertIn('G06_spec', package.GUARD_STEPS)
 
+    def make_mask_fixture(self):
+        guest = self.base / 'mask-guest'
+        guest.mkdir()
+        for name in ('sys', 'run'):
+            path = guest / name
+            path.mkdir()
+            path.chmod(0)
+            self.addCleanup(path.chmod, 0o700)
+        return guest
+
+    def test_mask_denies_real_unprivileged_directory_access(self):
+        guest = self.make_mask_fixture()
+        # Real kernel DAC checks as the ordinary test user, not simulated UID 1654.
+        guard['check_inaccessible'](str(guest))
+        for name in ('sys', 'run'):
+            path = guest / name
+            for mode in (0o400, 0o200, 0o100, 0o555):
+                with self.subTest(directory=name, mode=mode):
+                    path.chmod(mode)
+                    with self.assertRaises(RuntimeError):
+                        guard['check_inaccessible'](str(guest))
+                    self.assertEqual(guard['STEP'], 'G05_mask_' + name + '_access')
+                    path.chmod(0)
+
+    def test_mask_requires_actual_eacces_not_just_access_flags(self):
+        guest = self.make_mask_fixture()
+        # False access flags alone must not conceal a usable directory.
+        path = guest / 'sys'
+        path.chmod(0o400)
+        with patch.object(guard['os'], 'access', return_value=False):
+            with self.assertRaises(RuntimeError):
+                guard['check_inaccessible'](str(guest))
+            self.assertEqual(guard['STEP'], 'G05_mask_sys_open')
+        path.chmod(0o100)
+        with patch.object(guard['os'], 'access', return_value=False):
+            with self.assertRaises(RuntimeError):
+                guard['check_inaccessible'](str(guest))
+            self.assertEqual(guard['STEP'], 'G05_mask_sys_traverse')
+        path.chmod(0)
+        for operation in ('open', 'stat'):
+            for error in (PermissionError(errno.EPERM, 'private'),
+                          FileNotFoundError(errno.ENOENT, 'private'), OSError(errno.EIO, 'private')):
+                with self.subTest(operation=operation, error=error.errno), \
+                     patch.object(guard['os'], operation, side_effect=error):
+                    with self.assertRaises((OSError, RuntimeError)):
+                        guard['check_inaccessible'](str(guest))
+                    self.assertEqual(guard['STEP'], 'G05_mask_sys_' +
+                                     ('open' if operation == 'open' else 'traverse'))
+        path.chmod(0o700)
+        path.rmdir()
+        with self.assertRaises(FileNotFoundError):
+            guard['check_inaccessible'](str(guest))
+        self.assertEqual(guard['STEP'], 'G05_mask_sys_type')
+        path.symlink_to(self.outside)
+        with self.assertRaises(RuntimeError):
+            guard['check_inaccessible'](str(guest))
+        self.assertEqual(guard['STEP'], 'G05_mask_sys_type')
+        path.unlink()
+        path.mkdir()
+
     def test_prepared_probe_payloads_without_systemd(self):
         path = SOURCE.with_name('finance-release1-systemd-probe-20261107.py')
         probe_spec = importlib.util.spec_from_file_location('review_probe', path)
@@ -261,24 +322,34 @@ class SyntheticTests(unittest.TestCase):
         real_chmod = os.chmod
         real_unlink = Path.unlink
         command_settings = {}
+        guest = self.make_mask_fixture()
+        if failure in ('mask_sys', 'mask_run'):
+            (guest / failure.removeprefix('mask_')).chmod(0o555)
         observed = {'properties_checked': False, 'go': False}
         fake = SimpleNamespace(returncode=None, stdin=io.BytesIO())
         read_fd, write_fd = os.pipe()
         fake.stdout = os.fdopen(read_fd, 'rb', buffering=0)
         self.addCleanup(fake.stdout.close)
-        os.write(write_fd, b'FAIL G06_empty_root_readonly\n' if failure == 'guard' else b'READY identity_hash_isolation\n')
-        os.close(write_fd)
 
         def spawn(command, **kwargs):
             self.assertEqual(command[0], '/usr/bin/systemd-run')
             command_settings.update(x.removeprefix('--property=').split('=', 1)
                                     for x in command if x.startswith('--property='))
             self.assertEqual(command_settings['ReadOnlyPaths'], '+/root')
+            self.assertEqual(command_settings['InaccessiblePaths'], '+/sys +/run')
             for binding in command_settings['BindReadOnlyPaths'].split():
                 source, destination, option = binding.split(':')
                 self.assertTrue(source.startswith('/proc/'))
                 self.assertFalse(destination == '/root' or destination.startswith('/root/'))
                 self.assertEqual(option, 'norbind')
+            try:
+                guard['check_inaccessible'](str(guest))
+                line = ('FAIL G06_empty_root_readonly' if failure == 'guard'
+                        else 'READY identity_hash_isolation')
+            except (RuntimeError, OSError):
+                line = 'FAIL ' + guard['STEP']
+            os.write(write_fd, (line + '\n').encode('ascii'))
+            os.close(write_fd)
             return fake
 
         def communicate(input, timeout):
@@ -301,6 +372,14 @@ class SyntheticTests(unittest.TestCase):
             self.assertIn('ReadOnlyPaths', keys)
             # v257.13 preserves '+' in the D-Bus string array and systemctl show.
             result['ReadOnlyPaths'] = '+/root'
+            self.assertIn('InaccessiblePaths', keys)
+            result['InaccessiblePaths'] = '+/sys +/run'
+            if failure == 'mask_property_host':
+                result['InaccessiblePaths'] = '/sys /run'
+            elif failure == 'mask_property_mixed':
+                result['InaccessiblePaths'] = '+/sys /run'
+            elif failure == 'mask_property_missing':
+                result.pop('InaccessiblePaths')
             observed['properties_checked'] = True
             if failure == 'readonly_missing':
                 result.pop('ReadOnlyPaths')
@@ -343,7 +422,9 @@ class SyntheticTests(unittest.TestCase):
         self.assertNotIn('/private', text)
         self.assertNotIn(str(self.base), text)
         self.assertEqual(sorted(inputs.iterdir()), sorted(inputs / name for name in package.FILES))
-        self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong', 'readonly_host'))
+        self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong', 'readonly_host',
+                          'mask_property_host', 'mask_property_mixed', 'mask_property_missing',
+                          'mask_sys', 'mask_run'))
         return rc, text, list(self.base.glob('owned-*'))
 
     def test_start_normal_cleanup(self):
@@ -382,6 +463,29 @@ class SyntheticTests(unittest.TestCase):
         self.assertNotIn('PASS identity_hash', text)
         self.assertIn('PASS temporary_resources_removed', text)
         self.assertEqual(remaining, [])
+
+    def assert_mask_start_stops(self, failure, step):
+        rc, text, remaining = self.exercise_start(failure)
+        self.assertEqual(rc, 1)
+        self.assertIn('FAIL ' + step, text)
+        self.assertNotIn('PASS identity_hash', text)
+        self.assertIn('PASS temporary_resources_removed', text)
+        self.assertEqual(remaining, [])
+
+    def test_host_relative_mask_properties_stop_before_go(self):
+        self.assert_mask_start_stops('mask_property_host', 'S09_service_properties')
+
+    def test_mixed_mask_properties_stop_before_go(self):
+        self.assert_mask_start_stops('mask_property_mixed', 'S09_service_properties')
+
+    def test_missing_mask_properties_stop_before_go(self):
+        self.assert_mask_start_stops('mask_property_missing', 'S09_service_properties')
+
+    def test_unmasked_sys_stops_before_go_and_cleans_up(self):
+        self.assert_mask_start_stops('mask_sys', 'G05_mask_sys_access')
+
+    def test_unmasked_run_stops_before_go_and_cleans_up(self):
+        self.assert_mask_start_stops('mask_run', 'G05_mask_run_access')
 
     def test_start_timeout_cleanup(self):
         rc, text, remaining = self.exercise_start('timeout')

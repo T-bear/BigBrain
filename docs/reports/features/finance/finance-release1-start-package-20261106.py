@@ -44,13 +44,41 @@ RUNTIME = (
 
 # Inline guard: not staged. It runs unprivileged in the final namespace.
 GUARD = r'''
-import ctypes, hashlib, io, json, os, stat, sys
+import ctypes, errno, hashlib, io, json, os, stat, sys
 
 STEP = 'G00_spec'
 
 def need(ok):
     if not ok:
         raise RuntimeError('guard')
+
+def check_inaccessible(root='/'):
+    global STEP
+    # G01/G04 already established UID/GID 1654 and no capabilities.
+    # No directory entries or file contents are read, and no write is attempted.
+    for name in ('sys', 'run'):
+        path = root.rstrip('/') + '/' + name
+        prefix = 'G05_mask_' + name
+        STEP = prefix + '_type'
+        need(stat.S_ISDIR(os.lstat(path).st_mode))
+        STEP = prefix + '_access'
+        need(not any(os.access(path, mode, effective_ids=True)
+                     for mode in (os.R_OK, os.W_OK, os.X_OK)))
+        STEP = prefix + '_open'
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+        except PermissionError as error:
+            need(error.errno == errno.EACCES)
+        else:
+            os.close(fd)
+            need(False)
+        STEP = prefix + '_traverse'
+        try:
+            os.stat(path + '/.', follow_symlinks=False)
+        except PermissionError as error:
+            need(error.errno == errno.EACCES)
+        else:
+            need(False)
 
 def check_skeleton(spec, root='/'):
     global STEP
@@ -114,6 +142,7 @@ def main():
     need(set(os.listdir('/finance')) == set(spec['files']))
     need(not os.path.lexists('/finance/bb090-closure-20260816'))
     need(not any(os.path.lexists(p) for p in ('/home', '/opt', '/srv', '/mnt', '/media')))
+    check_inaccessible()
     check_skeleton(spec)
     STEP = 'G07_input_metadata'
     for name, expected in spec['files'].items():
@@ -170,6 +199,8 @@ if __name__ == '__main__':
 GUARD_STEPS = frozenset(('G00_spec', 'G01_identity', 'G02_dumpable', 'G03_namespaces',
     'G04_process_protection', 'G05_exposure', 'G06_spec', 'G07_input_metadata', 'G08_verifier_hash',
     'G09_wait_go', 'G10_verifier', 'G11_output_contract',
+    *('G05_mask_' + name + '_' + condition for name in ('sys', 'run')
+      for condition in ('type', 'access', 'open', 'traverse')),
     *('G06_empty_' + p[1:] + '_' + condition for p in EMPTY_SKELETON
       for condition in ('lstat', 'type', 'owner', 'mode', 'device', 'inode',
                         'statvfs', 'readonly', 'listdir', 'empty'))))
@@ -459,7 +490,7 @@ def start(verifier, backup_dir):
             'ProcSubset': 'pid', 'ProtectProc': 'invisible', 'RestrictNamespaces': 'yes',
             'RestrictSUIDSGID': 'yes', 'LockPersonality': 'yes', 'MemoryDenyWriteExecute': 'yes',
             'SystemCallArchitectures': 'native', 'SystemCallFilter': '~@network-io @mount @privileged @reboot @swap',
-            'InaccessiblePaths': '/sys /run', 'UnsetEnvironment': 'LD_PRELOAD LD_LIBRARY_PATH PYTHONPATH PYTHONHOME',
+            'InaccessiblePaths': '+/sys +/run', 'UnsetEnvironment': 'LD_PRELOAD LD_LIBRARY_PATH PYTHONPATH PYTHONHOME',
             'Environment': 'LC_ALL=C', 'WorkingDirectory': '/', 'UMask': '0077',
             'MemoryMax': '512M', 'MemorySwapMax': '0', 'CPUQuota': '100%', 'TasksMax': '8',
             'RuntimeMaxSec': '300', 'TimeoutStartSec': '30', 'TimeoutStopSec': '5',
@@ -486,6 +517,7 @@ def start(verifier, backup_dir):
         wait_ready(process.stdout)
         step = 'S09_service_properties'
         expected = {
+            'InaccessiblePaths': '+/sys +/run',
             'User': '1654', 'Group': '1654', 'SupplementaryGroups': '',
             'CapabilityBoundingSet': '', 'AmbientCapabilities': '', 'NoNewPrivileges': 'yes',
             'PrivatePIDs': 'yes', 'PrivateNetwork': 'yes', 'RootDirectory': str(root),

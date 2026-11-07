@@ -4,14 +4,15 @@ Detta är en sanerad GitHub-version. V = verifierat i denna avstämning;
 D = dokumenterat/ägarrapporterat; O = okänt. Paketets föreslagna beteende är
 kontrollerat med syntetiska filer utan privilegier. Ägarlokalt systemd-prov av
 kandidaten `013125d` har rapporterat FAIL. Den nya kandidaten är endast för granskning;
-`InaccessiblePaths` har en kvarstående målsemantisk lucka.
+`InaccessiblePaths`-luckan har en förberedd kodkorrigering och gästkontroll, ännu inte
+verifierad i systemd.
 
 ## Metadata
 
 V — 2026-11-07: accepterad GitHub-main
 `0f11890dac3ff1529c83d7438658b90e4a61948e`; PR #40:s utgångspunkt
-`3a72ef05dfeacac9441fce272d3bd907d5452dfc`, tree
-`0efbdea95b67ea2cace3a75532b753205f3ed6a7`, rent checkpoint-working-tree före
+`ad2fd99a728a373db2be0aba99a98d3bd7db7623`, tree
+`cbcba2d3bfe981c83ea6c307a91f5ae28ebdc0a8`, rent checkpoint-working-tree före
 denna korrigering. Finance-risknivå 3; inget exekverings- eller mergegodkännande.
 V — Samma checkpoint används; orelaterade filer i ordinarie checkout lämnas orörda.
 D — Ägaren har rapporterat metadataavstämning `problems=0`; råresultatet har inte omverifierats.
@@ -35,9 +36,9 @@ D — Normalfallet avvisades; båda cleanup-stegen rapporterades PASS. Ingen lyc
 systemd-verifiering påstås. V — Koden når G06 före READY/GO och startar inte andra
 provfallet när normalfallet misslyckas. D — Det äldre utfallet särskilde inte
 delvillkoret; följande nya prov rapporterar det explicit.
-D — Föregående beslut gav `ReadOnlyPaths=/root`. Det nya uppdraget preciserar
-`+/root`, systemds återläsningsrepresentation, regression mot det gamla värdet samt
-granskning/redovisning av målsemantiken för `InaccessiblePaths`.
+D — Föregående beslut korrigerade ReadOnlyPaths till `+/root`. Det nya uppdraget
+auktoriserar `InaccessiblePaths=+/sys +/run`, återläsning före GO och faktisk kontroll
+av otillgänglighet i gästen, med oförändrad övrig isolering.
 V — Ingen Finance-dataåtkomst, administratörsexekvering eller verklig systemd-start har
 gjorts av Codex i denna etapp. D — Ägaren rapporterar 2026-11-07 följande nya utfall
 för provets SHA-256 `b9092c6a3bf39600087f11e4eee1450a183b4bdb2c30a8bb5c2be8ebb8d73679`:
@@ -59,25 +60,35 @@ returnerade utan `ST_RDONLY` för gästens rootkatalog. Typ, ägare, mode, devic
 kontrolleras dessförinnan; tomhet kontrolleras efteråt och nåddes inte för katalogen.
 V — Stoppet sker före READY, S09:s återläsning och GO. Det avsiktliga felprovet startas
 inte efter detta normalfallsfel; dess utskrivna ID bevisar inte körning. D — Ingen ny
-exekveringsauktorisering följer av resultatrapporten. Startpaketet kvarstår blockerat.
+exekveringsauktorisering följer av resultatrapporten. Ingen ny kandidat har körts av ägaren
+enligt tillgängligt underlag; faktisk isolering är inte godkänd.
 
 ## Evidence
 
 | Kontroll | Evidens och begränsning |
 | --- | --- |
 | V — Oförändrad verifierare | SHA-256 `7c065708528a10a0d3f0408e7de5fd4af4b5d93cf43ecae1c5105829de8fb9bb`, samma bytes som den [godkända artefakten](https://github.com/T-bear/BigBrain/blob/029ef0d9d96ddcabff80649138d5f2dd0272c55e/docs/reports/features/finance/finance-release1-verify-readonly-20261106.py). |
-| V — Nytt startpaket | SHA-256 `449b5045555df72430771d65c3434800e8d0cb53d5a11a14e10a9947a3fa9201`. Föregående kandidat `bf2815aa2260a33cceea43033d4028fa730312d7864c1ac08c842ef361227aef` finns kvar i Git-historiken. |
+| V — Nytt startpaket | SHA-256 `277201476976f10dad22ac483ce430aa289dbce6184530910091545d34f35029`. Föregående kandidat `449b5045555df72430771d65c3434800e8d0cb53d5a11a14e10a9947a3fa9201` finns kvar i Git-historiken. |
 | V — Bevarad cleanup-rättning | Den historiska bristen i `82a73a8` är rättad sedan `a9f68f9`: de fyra tomma katalogerna ingår och okända poster blockerar borttagning. Cleanup-koden ändras inte i denna kandidat. |
-| V — Syntetisk regression | [20 tester PASS](finance-release1-start-package-tests-20261107.py), inklusive 40 G06-felfall: tio delvillkor/operationer för vart och ett av fyra katalog-ID:n. Kontrollerar exakt felkod genom förälderns protokoll och avvisning av otillåtna identifierare. Det värdrelativa `/root` samt saknad/felaktig återläst `ReadOnlyPaths` ger `FAIL S09_service_properties`, inget GO och lyckad cleanup. Normalfallet kräver återläsning före GO; bindningarna får inte exponera värdens rootkatalog. Befintliga normal-/felcleanup-tester passerar. Systemd, ägare/UID och mountskydd simuleras; filoperationer sker endast i temp-fixturer. Orelaterad sentinel bevaras. |
+| V — Syntetisk regression | [27 tester PASS](finance-release1-start-package-tests-20261107.py), inklusive 40 oförändrade G06-felfall. Gamla, blandade eller saknade maskeringsvärden stoppar S09 före GO. Åtkomlig sys/run stoppas genom den riktiga kontrollfunktionen och förälderns felprotokoll före GO, med lyckad cleanup. Riktiga kernel-DAC-fel provas i temp-kataloger som vanlig testanvändare; varken root, UID 1654 eller systemd används. Öppning/traversering måste nekas även om `os.access` simuleras falskt. ENOENT, EPERM, EIO och symlänk avvisas. Orelaterad sentinel bevaras. |
 | D/O — OS-runtime | Föregående avstämning: Python 3.13.5/systemd 257.13. O — kräver separat godkänt systemd-prov för faktisk namespace-, DAC/ACL- och cgroup-funktion. Syntetiska tester bevisar inte dessa skydd. |
 | D/O — Datakopia | Augustikopia 2026-08-17 och manifest-/datafiler från 2026-08-15/16 enligt befintligt underlag. O — kräver verifierarens faktiska hash-, lineage- och internkonsistenskontroller för resultat om innehållet. Ägarens metadatautfall bevisar inte innehållsintegritet. |
 
 ## Changes
 
-V — Två värden ändras från `/root` till `+/root`: tjänsteinställningen och S09:s
-exakta återläsningskrav före GO. G06:s `ST_RDONLY`, ägare, mode, device/inode och tomhet
-är oförändrade, liksom verifieraren, bindningarna, resursgränserna och cleanup.
-Provets enda kodändring är hashbindningen. Inga nya bindningar eller källrättigheter.
+V — `InaccessiblePaths=+/sys +/run` sätts i den tillfälliga tjänsten och krävs exakt
+i S09:s återläsning före GO. Befintliga `ReadOnlyPaths=+/root` och dess återläsning
+behålls. Verifieraren, övrig isolering, bindningar, resursgränser och cleanup är oförändrade.
+Provets enda kodändring är hashbindningen. Inga nya källrättigheter eller databindningar.
+
+V — Ny `check_inaccessible()` körs efter G01/G04:s verifiering av UID/GID 1654 och
+noll capabilities, före READY/GO. För vardera sys/run krävs en verklig katalog utan
+symlänk, nekad R/W/X-åtkomst via `os.access(..., effective_ids=True)`, samt exakt
+`EACCES` från både skrivskyddad katalogöppning och `stat` av `/.` för traversering.
+Oväntat lyckad öppning stängs omedelbart och stoppar; inga katalogposter eller
+filinnehåll läses. Inget skrivförsök görs. Saknade mål eller andra fel godtas inte.
+Sanerade fel är `G05_mask_<sys|run>_<type|access|open|traverse>` och tillåts uttryckligen
+i förälderns felprotokoll. G06:s ST_RDONLY, ägare, mode, device/inode och tomhet behålls.
 
 V — I upstream **systemd v257.13** bevarar
 [dbus-execute.c](https://github.com/systemd/systemd/blob/v257.13/src/core/dbus-execute.c#L3103-L3149)
@@ -140,7 +151,7 @@ python3 -B docs/reports/features/finance/finance-release1-start-package-tests-20
 ```
 
 V — [Förberett systemd-prov](finance-release1-systemd-probe-20261107.py), SHA-256
-`06aa3fb32327fd71220560269067898f621c2fea0aa4c1b0aeaa03e580b60268`, är inte kört.
+`4180b911b2f828ff5fe0b87a43486ae026d812f565563fc53e407022e7151623`, är inte kört.
 D — Föregående provs rapporterade körning står under Status; resultatet är FAIL, inte
 godkänd isolering. Tidigare engångsgodkännande får inte återanvändas.
 V — Provet har endast egna syntetiska filer, två villkorade fall och befintlig avgränsad
@@ -151,7 +162,7 @@ O — kräver arkitektgranskning och nytt separat ägarbeslut före varje nytt a
 D — Augustikopian kan endast ge historisk snapshot-evidens, inte dagens drifttillstånd.
 
 V — Följande uppdaterade terminalblock är **endast för granskning**, inte exekverat.
-Kvarstående lucka nedan måste hanteras före godkännande. Det förutsätter
+Oberoende granskning och separat ägargodkännande krävs före exekvering. Det förutsätter
 checkpointens reporot som arbetskatalog. Blocket kontrollerar provets hash och kör samma
 inlästa bytes; provet kontrollerar i sin tur startpaketets hash ovan före staging.
 Administratörsprivilegiet är värdens root för temporär systemd-tjänst, isolering,
@@ -164,7 +175,7 @@ sudo -- /usr/bin/python3 -I -S -B - \
 import hashlib
 import sys
 
-expected = "06aa3fb32327fd71220560269067898f621c2fea0aa4c1b0aeaa03e580b60268"
+expected = "4180b911b2f828ff5fe0b87a43486ae026d812f565563fc53e407022e7151623"
 try:
     probe_path, package_path = sys.argv[1:]
     with open(probe_path, "rb") as stream:
@@ -183,22 +194,14 @@ PY
 
 ## Resumption
 
-V — **Kvarstående skyddslucka:** befintliga `InaccessiblePaths=/sys /run` är värdrelativa,
-inte relativa till gästens `RootDirectory`. D — Samma prefixregel gäller enligt
-[systemd v257.13:s dokumentation](https://github.com/systemd/systemd/blob/v257.13/man/systemd.exec.xml#L1495-L1537).
-V — [namespace.c](https://github.com/systemd/systemd/blob/v257.13/src/core/namespace.c#L364-L395)
-skiljer dessa fall; `drop_outside_root` tar bort mål utanför gästrot. S09 återläser inte
-InaccessiblePaths och G05 kontrollerar inte åtkomst till dessa två kataloger.
-D — Detta avviker från startpaketets avsedda maskering av gästens `/sys` och `/run`.
-Bedömning: P1 mot det befintliga isoleringskravet; värdrelativa mål kan lämna gästens
-kataloger omaskerade trots att egenskapen är satt. Ingen faktisk innehållsexponering
-på servern påstås. O — kräver tillåten runtime-evidens för det faktiska tillståndet.
+D — Föregående kandidat hade `InaccessiblePaths=/sys /run`, alltså värdrelativa mål
+enligt [systemd v257.13](https://github.com/systemd/systemd/blob/v257.13/man/systemd.exec.xml#L1495-L1537).
+V — Den nu auktoriserade korrigeringen riktar maskeringen mot gästen och kontrollerar
+både inställning och faktiskt nekad åtkomst. Den tidigare P1-luckan är hanterad i kod,
+inte stängd genom runtime-evidens. O — kräver separat godkänt syntetiskt systemd-prov
+för faktisk maskering som UID 1654; lokala tester bevisar inte monteringsmekanismen.
 
-V — InaccessiblePaths lämnas oförändrat inom uppdragets granskning/redovisning; inga
-åtkomster utökas. D — Förslag för separat beslut: gästrelativa `+/sys +/run`, kontroll
-av återläst representation samt faktiskt nekad åtkomst, utan att ändra källrättigheter
-eller lägga till bindningar. Det förslaget är inte implementerat eller provat.
-O — kräver arkitektens hantering av luckan och granskning av exakt kandidat samt separat
-ägarbeslut före nytt administratörsprov. Ingen D3, merge, retentionåtgärd eller driftändring
-är utförd här. Ingen automatisk omkörning; det tidigare provet stoppade före GO och
-båda cleanup-stegen är endast ägarrapporterade PASS.
+V — Nästa steg är oberoende granskning av samlad kandidat och provblock. D — Tidigare
+engångsgodkännande är förbrukat. Ingen rootexekvering, Finance-dataåtkomst, D3 eller
+merge ingår nu. Föregående prov stoppade före GO; båda cleanup-stegen är dokumenterade
+som ägarrapporterade PASS. Ingen automatisk omkörning.
