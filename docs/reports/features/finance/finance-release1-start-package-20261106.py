@@ -25,6 +25,7 @@ FILES = (DATABASE,) + tuple(
     for suffix in ('.manifest.json', '.data.json'))
 SIDECARS = tuple(DATABASE + suffix for suffix in ('-wal', '-shm', '-journal'))
 PREFIX = '/run/finance-release1-'
+EMPTY_SKELETON = ('/etc', '/var', '/root', '/bin')
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C'}
 # Existing Debian runtime, read-only; no /usr, /lib, host /etc or data volume bind.
 RUNTIME = (
@@ -45,9 +46,23 @@ RUNTIME = (
 GUARD = r'''
 import ctypes, hashlib, io, json, os, stat, sys
 
+STEP = 'G00_spec'
+
 def need(ok):
     if not ok:
         raise RuntimeError('guard')
+
+def check_skeleton(spec, root='/'):
+    global STEP
+    need(set(spec['empty_skeleton']) == {'/etc', '/var', '/root', '/bin'})
+    for rel, identity in spec['empty_skeleton'].items():
+        STEP = 'G06_empty_' + rel[1:]
+        path = root.rstrip('/') + rel
+        s = os.lstat(path)
+        need(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and stat.S_IMODE(s.st_mode) == 0o555)
+        need([s.st_dev, s.st_ino] == identity)
+        need(os.statvfs(path).f_flag & os.ST_RDONLY)
+        need(not os.listdir(path))
 
 class BoundedOutput(io.StringIO):
     def write(self, text):
@@ -55,17 +70,22 @@ class BoundedOutput(io.StringIO):
         return super().write(text)
 
 def main():
+    global STEP
     spec = json.loads(sys.argv[1])
     os.environ.clear()
+    STEP = 'G01_identity'
     need(os.getresuid() == (1654, 1654, 1654))
     need(os.getresgid() == (1654, 1654, 1654))
     need(set(os.getgroups()) <= {1654})
+    STEP = 'G02_dumpable'
     # Shared host UID: forbid peer processes from inspecting this process.
     libc = ctypes.CDLL(None, use_errno=True)
     need(libc.prctl(4, 0, 0, 0, 0) == 0)  # PR_SET_DUMPABLE=0
+    STEP = 'G03_namespaces'
     need(os.getpid() == 1 and os.getppid() == 0)
     for kind in ('pid', 'net', 'mnt', 'ipc'):
         need(os.stat('/proc/self/ns/' + kind).st_ino != spec['host_ns'][kind])
+    STEP = 'G04_process_protection'
     with open('/proc/self/status', encoding='ascii') as stream:
         status = dict(line.rstrip().split(':', 1) for line in stream if ':' in line)
     for key in ('CapInh', 'CapPrm', 'CapEff', 'CapBnd', 'CapAmb'):
@@ -73,9 +93,12 @@ def main():
     need(status['NoNewPrivs'].strip() == '1' and status['Seccomp'].strip() == '2')
     need([int(x) for x in status['Uid'].split()] == [1654]*4)
     need([int(x) for x in status['Gid'].split()] == [1654]*4)
+    STEP = 'G05_exposure'
     need(set(os.listdir('/finance')) == set(spec['files']))
     need(not os.path.lexists('/finance/bb090-closure-20260816'))
-    need(not any(os.path.lexists(p) for p in ('/var', '/home', '/root', '/opt', '/srv', '/mnt', '/media')))
+    need(not any(os.path.lexists(p) for p in ('/home', '/opt', '/srv', '/mnt', '/media')))
+    check_skeleton(spec)
+    STEP = 'G07_input_metadata'
     for name, expected in spec['files'].items():
         path = '/finance/' + name
         s = os.lstat(path)
@@ -83,6 +106,7 @@ def main():
         need([s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns] == expected)
         need(os.statvfs(path).f_flag & os.ST_RDONLY)
         need(os.access(path, os.R_OK) and not os.access(path, os.W_OK))
+    STEP = 'G08_verifier_hash'
     s = os.lstat('/verify.py')
     need(stat.S_ISREG(s.st_mode) and s.st_uid == 0 and s.st_gid == 1654)
     need(stat.S_IMODE(s.st_mode) == 0o440 and os.statvfs('/verify.py').f_flag & os.ST_RDONLY)
@@ -92,7 +116,9 @@ def main():
     # No Finance content has been read. Parent must recheck originals before GO.
     sys.stdout.write('READY identity_hash_isolation\n')
     sys.stdout.flush()
+    STEP = 'G09_wait_go'
     need(sys.stdin.readline(16) == 'GO\n')
+    STEP = 'G10_verifier'
     saved = sys.stdout
     output = BoundedOutput()
     sys.stdout = output
@@ -102,6 +128,7 @@ def main():
         result = namespace['main'](['--db', '/finance/' + spec['database'], '--manifest-dir', '/finance'])
     finally:
         sys.stdout = saved
+    STEP = 'G11_output_contract'
     text = output.getvalue()
     need(len(text.encode('utf-8')) <= 262144 and len(text.splitlines()) <= 80)
     need(all(line.startswith(('PASS ', 'FAIL ', 'NOT CHECKED ', 'SAMMANFATTNING: ')) for line in text.splitlines()))
@@ -113,14 +140,30 @@ def main():
     sys.stdout.flush()
     return result
 
-try:
-    rc = main()
-except BaseException:
-    sys.stdout = sys.__stdout__
-    print('FAIL execution_guard_or_output_contract')
-    rc = 1
-raise SystemExit(rc)
+if __name__ == '__main__':
+    try:
+        rc = main()
+    except BaseException:
+        sys.stdout = sys.__stdout__
+        print('FAIL ' + STEP)
+        rc = 1
+    raise SystemExit(rc)
 '''
+
+GUARD_STEPS = frozenset(('G00_spec', 'G01_identity', 'G02_dumpable', 'G03_namespaces',
+    'G04_process_protection', 'G05_exposure', 'G07_input_metadata', 'G08_verifier_hash',
+    'G09_wait_go', 'G10_verifier', 'G11_output_contract',
+    *('G06_empty_' + p[1:] for p in EMPTY_SKELETON)))
+
+
+class GuardFailure(RuntimeError):
+    def __init__(self, step):
+        self.step = step
+
+
+class CleanupFailure(RuntimeError):
+    def __init__(self, step):
+        self.step = step
 
 
 def need(ok):
@@ -214,13 +257,16 @@ def wait_ready(stream):
             byte = os.read(stream.fileno(), 1)
             need(byte and len(line) < 128)
             line += byte
+    failure = line.decode('ascii', errors='replace').removeprefix('FAIL ').rstrip('\n')
+    if line.startswith(b'FAIL ') and failure in GUARD_STEPS:
+        raise GuardFailure(failure)
     need(line == b'READY identity_hash_isolation\n')
 
 
 def layout():
     files = {'/verify.py', *(destination for _, destination, is_dir in RUNTIME if not is_dir),
              *('/finance/' + name for name in FILES)}
-    dirs = {'/', '/finance', '/proc', '/sys', '/dev', '/run', '/usr/lib/python3.13'}
+    dirs = {'/', '/finance', '/proc', '/sys', '/dev', '/run', '/usr/lib/python3.13', *EMPTY_SKELETON}
     for path in files | dirs.copy():
         parent = Path(path).parent
         while str(parent) != '/':
@@ -230,18 +276,39 @@ def layout():
 
 
 def stop_and_cleanup(token):
-    need(re.fullmatch('[0-9a-f]{32}', token) is not None)
-    stage = Path(PREFIX + token)
-    unit = 'finance-release1-' + token + '.service'
-    # Stop only this exact transient unit. Never touch an existing Finance service.
-    run_tool(['/usr/bin/systemctl', 'stop', unit], timeout=20)
-    state = properties(unit, ['LoadState', 'ActiveState', 'MainPID'])
-    need(state.get('LoadState') == 'not-found' or
-         (state.get('ActiveState') in ('inactive', 'failed') and state.get('MainPID') == '0'))
-    # KillMode=control-group/SendSIGKILL were fixed at creation. No child may survive.
-    if state.get('LoadState') != 'not-found':
-        run_tool(['/usr/bin/systemctl', 'reset-failed', unit])
-        need(properties(unit, ['LoadState']).get('LoadState') == 'not-found')
+    step = 'C00_token'
+    try:
+        need(re.fullmatch('[0-9a-f]{32}', token) is not None)
+        stage = Path(PREFIX + token)
+        unit = 'finance-release1-' + token + '.service'
+        step = 'C01_stop'
+        # Stop only this exact transient unit. Never touch an existing Finance service.
+        run_tool(['/usr/bin/systemctl', 'stop', unit], timeout=20)
+        step = 'C02_stopped'
+        state = properties(unit, ['LoadState', 'ActiveState', 'MainPID'])
+        need(state.get('LoadState') == 'not-found' or
+             (state.get('ActiveState') in ('inactive', 'failed') and state.get('MainPID') == '0'))
+        step = 'C03_unloaded'
+        # KillMode=control-group/SendSIGKILL were fixed at creation.
+        if state.get('LoadState') != 'not-found':
+            run_tool(['/usr/bin/systemctl', 'reset-failed', unit])
+            need(properties(unit, ['LoadState']).get('LoadState') == 'not-found')
+    except BaseException:
+        raise CleanupFailure(step) from None
+    cleanup_tree(stage)
+
+
+def cleanup_tree(stage):
+    step = 'C04_stage'
+    try:
+        _cleanup_tree(stage)
+    except CleanupFailure:
+        raise
+    except BaseException:
+        raise CleanupFailure(step) from None
+
+
+def _cleanup_tree(stage):
     if not os.path.lexists(stage):
         return
     files, dirs = layout()
@@ -252,7 +319,28 @@ def stop_and_cleanup(token):
             return
         s = path.lstat()
         need(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and not s.st_mode & 0o022)
-    # First validate all known targets. Unexpected content is never removed recursively.
+    # Preflight the bounded, known skeleton before deleting anything. No recursive walk.
+    step = 'C05_inventory'
+    try:
+        need(set(os.listdir(stage)) == {'root'})
+        for rel in sorted(dirs, key=lambda x: x.count('/')):
+            p = root / rel.lstrip('/')
+            if not os.path.lexists(p):
+                continue
+            s = p.lstat()
+            need(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and not s.st_mode & 0o022)
+            children = {Path(item).name for item in files | (dirs - {'/'})
+                        if str(Path(item).parent) == rel}
+            need(set(os.listdir(p)) <= children)
+        _remove_known_tree(stage, root, files, dirs)
+    except CleanupFailure:
+        raise
+    except BaseException:
+        raise CleanupFailure(step) from None
+
+
+def _remove_known_tree(stage, root, files, dirs):
+    # Validate every known target before any unlink. No symlink or source contents allowed.
     for rel in sorted(dirs - {'/'}, key=lambda x: x.count('/')):
         p = root / rel.lstrip('/')
         if os.path.lexists(p):
@@ -265,16 +353,21 @@ def stop_and_cleanup(token):
             need(stat.S_ISREG(s.st_mode) and s.st_uid == 0 and s.st_nlink == 1)
             if rel != '/verify.py':
                 need(s.st_size == 0)
-    for rel in sorted(files):
-        p = root / rel.lstrip('/')
-        if os.path.lexists(p):
-            p.unlink()
-    for rel in sorted(dirs - {'/'}, key=lambda x: x.count('/'), reverse=True):
-        p = root / rel.lstrip('/')
-        if os.path.lexists(p):
-            p.rmdir()
-    root.rmdir()
-    stage.rmdir()
+    step = 'C06_remove_files'
+    try:
+        for rel in sorted(files):
+            p = root / rel.lstrip('/')
+            if os.path.lexists(p):
+                p.unlink()
+        step = 'C07_remove_dirs'
+        for rel in sorted(dirs - {'/'}, key=lambda x: x.count('/'), reverse=True):
+            p = root / rel.lstrip('/')
+            if os.path.lexists(p):
+                p.rmdir()
+        root.rmdir()
+        stage.rmdir()
+    except BaseException:
+        raise CleanupFailure(step) from None
 
 
 def start(verifier, backup_dir):
@@ -282,20 +375,25 @@ def start(verifier, backup_dir):
     token = None
     process = None
     rc = 1
+    step = 'S01_identity'
     try:
         need(os.getuid() == os.geteuid() == 0)
         pins.pin('/run', directory=True, trusted=True)
+        step = 'S02_verifier_hash'
         # No source content is read here except the approved Python script.
         script_fd = pins.pin(verifier)
         with open('/proc/self/fd/' + str(script_fd), 'rb') as stream:
             source = stream.read(131073)
         need(len(source) <= 131072 and hashlib.sha256(source).hexdigest() == APPROVED)
+        step = 'S03_source_metadata'
         directory_fd = pins.pin(backup_dir, directory=True)
         directory_sig = sig(os.fstat(directory_fd))
         no_sidecars(directory_fd)
         sources = {name: pins.pin(backup_dir + '/' + name) for name in FILES}
+        step = 'S04_runtime_metadata'
         runtime = [(pins.pin(src, directory=directory, trusted=True), dst)
                    for src, dst, directory in RUNTIME]
+        step = 'S05_stage'
         candidate = uuid.uuid4().hex
         unit = 'finance-release1-' + candidate + '.service'
         need(properties(unit, ['LoadState']).get('LoadState') == 'not-found')
@@ -324,6 +422,9 @@ def start(verifier, backup_dir):
         for rel in dirs:
             os.chmod(root / rel.lstrip('/'), 0o555)
         spec = {'hash': APPROVED, 'database': DATABASE,
+                'empty_skeleton': {rel: [os.lstat(root / rel.lstrip('/')).st_dev,
+                                         os.lstat(root / rel.lstrip('/')).st_ino]
+                                   for rel in EMPTY_SKELETON},
                 'host_ns': {name: os.stat('/proc/self/ns/' + name).st_ino for name in ('pid', 'net', 'mnt', 'ipc')},
                 'files': {name: [os.fstat(fd).st_dev, os.fstat(fd).st_ino,
                                  os.fstat(fd).st_size, os.fstat(fd).st_mtime_ns,
@@ -354,12 +455,16 @@ def start(verifier, backup_dir):
         command += ['--property=' + key + '=' + value for key, value in settings.items()]
         command += ['/usr/bin/python3.13', '-I', '-S', '-B', '-X', 'utf8=1', '-c', GUARD,
                     json.dumps(spec, separators=(',', ':'))]
+        step = 'S06_originals_before_start'
         pins.unchanged()
         need(sig(os.fstat(directory_fd)) == directory_sig)
         no_sidecars(directory_fd)  # Original names, immediately before process start.
+        step = 'S07_service_start'
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.DEVNULL, env=ENV, bufsize=0)
+        step = 'S08_wait_ready'
         wait_ready(process.stdout)
+        step = 'S09_service_properties'
         expected = {
             'User': '1654', 'Group': '1654', 'SupplementaryGroups': '',
             'CapabilityBoundingSet': '', 'AmbientCapabilities': '', 'NoNewPrivileges': 'yes',
@@ -372,16 +477,21 @@ def start(verifier, backup_dir):
         }
         actual = properties(unit, list(expected))
         need(all(actual.get(key) == value for key, value in expected.items()))
+        step = 'S10_resource_limits'
         check_resource_limits(unit)
+        step = 'S11_originals_before_go'
         pins.unchanged()
         need(sig(os.fstat(directory_fd)) == directory_sig)
         no_sidecars(directory_fd)  # Recheck originals after guard, before first content read.
         print('PASS identity_hash_isolation_and_original_sidecars', flush=True)
+        step = 'S12_execution'
         output, _ = process.communicate(input=b'GO\n', timeout=330)
         need(len(output) <= 262144)
+        step = 'S13_originals_after_execution'
         pins.unchanged()
         need(sig(os.fstat(directory_fd)) == directory_sig)
         no_sidecars(directory_fd)
+        step = 'S14_output_contract'
         text = output.decode('utf-8', errors='strict')
         need(all(ch == '\n' or ch.isprintable() for ch in text))
         need(all(line.startswith(('PASS ', 'FAIL ', 'NOT CHECKED ', 'SAMMANFATTNING: ')) for line in text.splitlines()))
@@ -390,15 +500,20 @@ def start(verifier, backup_dir):
             need(re.search(r'SAMMANFATTNING: \d+/0/\d+\n$', text) is not None)
         sys.stdout.write(text)
         rc = 0 if process.returncode == 0 else 1
+    except GuardFailure as failure:
+        print('FAIL ' + failure.step, flush=True)
     except BaseException:
-        print('FAIL start_context_sources_timeout_or_execution; no automatic retry', flush=True)
+        print('FAIL ' + step, flush=True)
     finally:
         if token is not None:
             try:
                 stop_and_cleanup(token)
                 print('PASS temporary_resources_removed', flush=True)
+            except CleanupFailure as failure:
+                print('FAIL ' + failure.step + ' cleanup_unconfirmed RESOURCE_ID=' + token, flush=True)
+                rc = 1
             except BaseException:
-                print('FAIL cleanup_unconfirmed RESOURCE_ID=' + token, flush=True)
+                print('FAIL C99_cleanup_unconfirmed RESOURCE_ID=' + token, flush=True)
                 rc = 1
         if process is not None:
             if process.poll() is None:
@@ -435,6 +550,9 @@ def main(argv):
 if __name__ == '__main__':
     try:
         raise SystemExit(main(sys.argv[1:]))
+    except CleanupFailure as failure:
+        print('FAIL ' + failure.step + ' cleanup_unconfirmed')
+        raise SystemExit(1)
     except Exception:
-        print('FAIL package_arguments_or_cleanup; no automatic retry')
+        print('FAIL A00_arguments_or_cleanup')
         raise SystemExit(1)
