@@ -54,15 +54,32 @@ def need(ok):
 
 def check_skeleton(spec, root='/'):
     global STEP
+    STEP = 'G06_spec'
     need(set(spec['empty_skeleton']) == {'/etc', '/var', '/root', '/bin'})
+    need(all(isinstance(value, list) and len(value) == 2 for value in spec['empty_skeleton'].values()))
     for rel, identity in spec['empty_skeleton'].items():
-        STEP = 'G06_empty_' + rel[1:]
+        prefix = 'G06_empty_' + rel[1:]
         path = root.rstrip('/') + rel
+        STEP = prefix + '_lstat'
         s = os.lstat(path)
-        need(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and stat.S_IMODE(s.st_mode) == 0o555)
-        need([s.st_dev, s.st_ino] == identity)
-        need(os.statvfs(path).f_flag & os.ST_RDONLY)
-        need(not os.listdir(path))
+        STEP = prefix + '_type'
+        need(stat.S_ISDIR(s.st_mode))
+        STEP = prefix + '_owner'
+        need(s.st_uid == 0)
+        STEP = prefix + '_mode'
+        need(stat.S_IMODE(s.st_mode) == 0o555)
+        STEP = prefix + '_device'
+        need(s.st_dev == identity[0])
+        STEP = prefix + '_inode'
+        need(s.st_ino == identity[1])
+        STEP = prefix + '_statvfs'
+        flags = os.statvfs(path).f_flag
+        STEP = prefix + '_readonly'
+        need(flags & os.ST_RDONLY)
+        STEP = prefix + '_listdir'
+        entries = os.listdir(path)
+        STEP = prefix + '_empty'
+        need(not entries)
 
 class BoundedOutput(io.StringIO):
     def write(self, text):
@@ -151,9 +168,11 @@ if __name__ == '__main__':
 '''
 
 GUARD_STEPS = frozenset(('G00_spec', 'G01_identity', 'G02_dumpable', 'G03_namespaces',
-    'G04_process_protection', 'G05_exposure', 'G07_input_metadata', 'G08_verifier_hash',
+    'G04_process_protection', 'G05_exposure', 'G06_spec', 'G07_input_metadata', 'G08_verifier_hash',
     'G09_wait_go', 'G10_verifier', 'G11_output_contract',
-    *('G06_empty_' + p[1:] for p in EMPTY_SKELETON)))
+    *('G06_empty_' + p[1:] + '_' + condition for p in EMPTY_SKELETON
+      for condition in ('lstat', 'type', 'owner', 'mode', 'device', 'inode',
+                        'statvfs', 'readonly', 'listdir', 'empty'))))
 
 
 class GuardFailure(RuntimeError):

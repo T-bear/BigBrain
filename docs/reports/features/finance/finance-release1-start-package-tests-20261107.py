@@ -144,7 +144,7 @@ class SyntheticTests(unittest.TestCase):
                 p.chmod(0o555)
                 with self.subTest(directory=rel), self.assertRaises(RuntimeError):
                     guard['check_skeleton']({'empty_skeleton': identities}, str(root))
-                self.assertEqual(guard['STEP'], 'G06_empty_' + rel[1:])
+                self.assertEqual(guard['STEP'], 'G06_empty_' + rel[1:] + '_empty')
                 p.chmod(0o755)
                 (p / 'unexpected').unlink()
                 p.chmod(0o555)
@@ -161,14 +161,14 @@ class SyntheticTests(unittest.TestCase):
             p.symlink_to(self.outside)
             with self.assertRaises(RuntimeError):
                 guard['check_skeleton']({'empty_skeleton': identities}, str(root))
-            self.assertEqual(guard['STEP'], 'G06_empty_bin')
+            self.assertEqual(guard['STEP'], 'G06_empty_bin_type')
             p.unlink()
             p.mkdir()
         for p in root.iterdir():
             p.chmod(0o755)
 
     def test_ready_failure_is_sanitized(self):
-        for line, expected in ((b'FAIL G06_empty_var\n', package.GuardFailure),
+        for line, expected in ((b'FAIL G06_empty_var_readonly\n', package.GuardFailure),
                                (b'FAIL /private/example secret\n', RuntimeError)):
             read_fd, write_fd = os.pipe()
             with os.fdopen(read_fd, 'rb', buffering=0) as stream:
@@ -178,7 +178,56 @@ class SyntheticTests(unittest.TestCase):
                     package.wait_ready(stream)
             self.assertNotIn('/private', str(error.exception))
             if isinstance(error.exception, package.GuardFailure):
-                self.assertEqual(error.exception.step, 'G06_empty_var')
+                self.assertEqual(error.exception.step, 'G06_empty_var_readonly')
+
+    def test_g06_each_subcondition_and_protocol(self):
+        # Same protected baseline, one failing predicate/operation at a time.
+        root = self.base / 'diagnostic-fixture'
+        root.mkdir(mode=0o555)
+        root.chmod(0o555)
+        baseline = self.root_stat(root)
+        expected = [baseline.st_dev, baseline.st_ino]
+        conditions = ('lstat', 'type', 'owner', 'mode', 'device', 'inode',
+                      'statvfs', 'readonly', 'listdir', 'empty')
+        for rel in package.EMPTY_SKELETON:
+            identities = {rel: expected, **{p: expected for p in package.EMPTY_SKELETON if p != rel}}
+            for condition in conditions:
+                with self.subTest(directory=rel, condition=condition):
+                    observed = SimpleNamespace(**vars(baseline))
+                    if condition == 'type': observed.st_mode = stat.S_IFLNK | 0o555
+                    if condition == 'owner': observed.st_uid = 1654
+                    if condition == 'mode': observed.st_mode = stat.S_IFDIR | 0o750
+                    if condition == 'device': observed.st_dev += 1
+                    if condition == 'inode': observed.st_ino += 1
+                    private = '/private/synthetic-value-do-not-print'
+                    with patch.object(guard['os'], 'lstat', return_value=observed) as metadata, \
+                         patch.object(guard['os'], 'statvfs', return_value=SimpleNamespace(
+                             f_flag=0 if condition == 'readonly' else os.ST_RDONLY)) as flags, \
+                         patch.object(guard['os'], 'listdir', return_value=(
+                             [private] if condition == 'empty' else [])) as entries:
+                        for name, operation in (('lstat', metadata), ('statvfs', flags), ('listdir', entries)):
+                            if condition == name:
+                                operation.side_effect = PermissionError(private)
+                        with self.assertRaises((RuntimeError, OSError)):
+                            guard['check_skeleton']({'empty_skeleton': identities}, str(root))
+                    step = 'G06_empty_' + rel[1:] + '_' + condition
+                    self.assertEqual(guard['STEP'], step)
+                    self.assertIn(step, package.GUARD_STEPS)
+                    read_fd, write_fd = os.pipe()
+                    with os.fdopen(read_fd, 'rb', buffering=0) as stream:
+                        os.write(write_fd, ('FAIL ' + step + '\n').encode('ascii'))
+                        os.close(write_fd)
+                        with self.assertRaises(package.GuardFailure) as failure:
+                            package.wait_ready(stream)
+                    self.assertEqual(failure.exception.step, step)
+                    self.assertNotIn(private, str(failure.exception))
+        root.chmod(0o755)
+
+    def test_g06_invalid_schema_is_sanitized(self):
+        with self.assertRaises(RuntimeError):
+            guard['check_skeleton']({'empty_skeleton': {'/private/unexpected': [0, 0]}})
+        self.assertEqual(guard['STEP'], 'G06_spec')
+        self.assertIn('G06_spec', package.GUARD_STEPS)
 
     def test_prepared_probe_payloads_without_systemd(self):
         path = SOURCE.with_name('finance-release1-systemd-probe-20261107.py')
@@ -216,7 +265,7 @@ class SyntheticTests(unittest.TestCase):
         read_fd, write_fd = os.pipe()
         fake.stdout = os.fdopen(read_fd, 'rb', buffering=0)
         self.addCleanup(fake.stdout.close)
-        os.write(write_fd, b'FAIL G06_empty_root\n' if failure == 'guard' else b'READY identity_hash_isolation\n')
+        os.write(write_fd, b'FAIL G06_empty_root_readonly\n' if failure == 'guard' else b'READY identity_hash_isolation\n')
         os.close(write_fd)
 
         def spawn(command, **kwargs):
@@ -286,7 +335,7 @@ class SyntheticTests(unittest.TestCase):
     def test_start_guard_failure_cleanup(self):
         rc, text, remaining = self.exercise_start('guard')
         self.assertEqual(rc, 1)
-        self.assertIn('FAIL G06_empty_root', text)
+        self.assertIn('FAIL G06_empty_root_readonly', text)
         self.assertNotIn('PASS identity_hash', text)
         self.assertEqual(remaining, [])
 
