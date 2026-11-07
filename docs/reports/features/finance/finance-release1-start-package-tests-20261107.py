@@ -261,6 +261,7 @@ class SyntheticTests(unittest.TestCase):
         real_chmod = os.chmod
         real_unlink = Path.unlink
         command_settings = {}
+        observed = {'properties_checked': False, 'go': False}
         fake = SimpleNamespace(returncode=None, stdin=io.BytesIO())
         read_fd, write_fd = os.pipe()
         fake.stdout = os.fdopen(read_fd, 'rb', buffering=0)
@@ -272,10 +273,18 @@ class SyntheticTests(unittest.TestCase):
             self.assertEqual(command[0], '/usr/bin/systemd-run')
             command_settings.update(x.removeprefix('--property=').split('=', 1)
                                     for x in command if x.startswith('--property='))
+            self.assertEqual(command_settings['ReadOnlyPaths'], '/root')
+            for binding in command_settings['BindReadOnlyPaths'].split():
+                source, destination, option = binding.split(':')
+                self.assertTrue(source.startswith('/proc/'))
+                self.assertFalse(destination == '/root' or destination.startswith('/root/'))
+                self.assertEqual(option, 'norbind')
             return fake
 
         def communicate(input, timeout):
             self.assertEqual(input, b'GO\n')
+            self.assertTrue(observed['properties_checked'])
+            observed['go'] = True
             if failure == 'timeout':
                 raise subprocess.TimeoutExpired('/private/do-not-print', timeout)
             fake.returncode = 1 if failure == 'verifier' else 0
@@ -289,6 +298,12 @@ class SyntheticTests(unittest.TestCase):
             result = {key: command_settings.get(key) for key in keys}
             result.update(MemoryMax='536870912', RuntimeMaxUSec='5min', TimeoutStartUSec='30s',
                           TimeoutStopUSec='5s', CPUQuotaPerSecUSec='1s')
+            self.assertIn('ReadOnlyPaths', keys)
+            observed['properties_checked'] = True
+            if failure == 'readonly_missing':
+                result.pop('ReadOnlyPaths')
+            elif failure == 'readonly_wrong':
+                result['ReadOnlyPaths'] = '/elsewhere'
             return result
 
         def unlink(path, *args, **kwargs):
@@ -324,6 +339,7 @@ class SyntheticTests(unittest.TestCase):
         self.assertNotIn('/private', text)
         self.assertNotIn(str(self.base), text)
         self.assertEqual(sorted(inputs.iterdir()), sorted(inputs / name for name in package.FILES))
+        self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong'))
         return rc, text, list(self.base.glob('owned-*'))
 
     def test_start_normal_cleanup(self):
@@ -337,6 +353,22 @@ class SyntheticTests(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertIn('FAIL G06_empty_root_readonly', text)
         self.assertNotIn('PASS identity_hash', text)
+        self.assertEqual(remaining, [])
+
+    def test_start_missing_readonly_property_blocks_go_and_cleans_up(self):
+        rc, text, remaining = self.exercise_start('readonly_missing')
+        self.assertEqual(rc, 1)
+        self.assertIn('FAIL S09_service_properties', text)
+        self.assertNotIn('PASS identity_hash', text)
+        self.assertIn('PASS temporary_resources_removed', text)
+        self.assertEqual(remaining, [])
+
+    def test_start_wrong_readonly_property_blocks_go_and_cleans_up(self):
+        rc, text, remaining = self.exercise_start('readonly_wrong')
+        self.assertEqual(rc, 1)
+        self.assertIn('FAIL S09_service_properties', text)
+        self.assertNotIn('PASS identity_hash', text)
+        self.assertIn('PASS temporary_resources_removed', text)
         self.assertEqual(remaining, [])
 
     def test_start_timeout_cleanup(self):
