@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import stat
 import subprocess
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -230,6 +231,107 @@ class SyntheticTests(unittest.TestCase):
         self.assertEqual(guard['STEP'], 'G06_spec')
         self.assertIn('G06_spec', package.GUARD_STEPS)
 
+    def test_stderr_capture_drains_flood_without_unbounded_memory(self):
+        # Ordinary-user synthetic child, no systemd or Finance files.
+        child = subprocess.Popen([sys.executable, '-I', '-S', '-B', '-c',
+                                  'import os; [os.write(2, b"x"*4096) for _ in range(512)]'],
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.PIPE)
+        capture = package.DiagnosticCapture(child.stderr)
+        try:
+            child.wait(timeout=5)  # > pipe capacity must finish even after capture cap.
+        finally:
+            if child.poll() is None:
+                child.kill()
+                child.wait(timeout=2)
+            capture.close()
+        data, limited, failed = capture.snapshot()
+        self.assertEqual(len(data), 65536)
+        self.assertTrue(limited)
+        self.assertFalse(failed)
+        self.assertFalse(capture.thread.is_alive())
+
+    def test_capture_close_is_bounded_with_writer_still_open(self):
+        reader, writer = os.pipe()
+        capture = package.DiagnosticCapture(os.fdopen(reader, 'rb', buffering=0))
+        try:
+            capture.close()
+            self.assertFalse(capture.thread.is_alive())
+        finally:
+            os.close(writer)
+
+    def test_startup_diagnostic_never_outputs_raw_details(self):
+        records = [
+            {'MESSAGE': 'unit: Failed to set up mount namespacing: /private/secret: Permission denied', 'ERRNO': '13'},
+            {'MESSAGE': 'Failed to create parent directory for symlink /private/key: Read-only file system', 'ERRNO': '30'},
+            {'MESSAGE': 'ignored private raw text', 'ERRNO': '1'},
+            {'MESSAGE': ['private'], 'ERRNO': '13'},
+            {'MESSAGE': 'status=226/NAMESPACE'},
+        ]
+        lines = package.sanitized_startup(records, b'Failed at step NAMESPACE spawning /private/token: failure\n')
+        self.assertIn('FAIL D01_NAMESPACE operation=MOUNT_NAMESPACE errno=EACCES', lines)
+        self.assertIn('FAIL D01_NAMESPACE operation=SYMLINK_PARENT errno=EROFS', lines)
+        self.assertIn('FAIL D01_NAMESPACE operation=UNKNOWN errno=UNKNOWN', lines)
+        self.assertIn('FAIL D01_NAMESPACE operation=NAMESPACE_EXEC errno=UNKNOWN', lines)
+        self.assertNotIn('private', '\n'.join(lines))
+        self.assertNotIn('secret', '\n'.join(lines))
+        self.assertLessEqual(len(lines), 6)
+        self.assertEqual(package.sanitized_startup([], b'secret'),
+                         ['NOT CHECKED D01_STARTUP operation=UNKNOWN errno=UNKNOWN'])
+        self.assertIn('errno=UNKNOWN', package.sanitized_startup([
+            {'MESSAGE': 'Failed to set up mount namespacing', 'ERRNO': '13-secret'}], b'')[0])
+
+    def test_journal_query_scope_and_unavailable_diagnostic(self):
+        with patch.object(package.subprocess, 'Popen') as popen:
+            with self.assertRaises(RuntimeError):
+                package.startup_journal('other.service')
+            popen.assert_not_called()
+        output = io.StringIO()
+        with patch.object(package, 'startup_journal', side_effect=PermissionError('private')), \
+             contextlib.redirect_stdout(output):
+            package.report_startup('finance-release1-' + 'a'*32 + '.service', None)
+        self.assertNotIn('private', output.getvalue())
+        self.assertIn('NOT CHECKED D02_JOURNAL', output.getvalue())
+        self.assertIn('operation=UNKNOWN errno=UNKNOWN', output.getvalue())
+
+    def test_journal_capture_bound_and_exact_unit_query(self):
+        unit = 'finance-release1-' + 'b'*32 + '.service'
+        real_popen = subprocess.Popen
+        for payload, passes in ((b'{"MESSAGE":"status=226/NAMESPACE"}\n', True),
+                                (b'x'*131072, False)):
+            def synthetic_command(command, **kwargs):
+                self.assertEqual(command, ['/usr/bin/journalctl', '--boot', '--no-pager',
+                    '--quiet', '--unit=' + unit, '--lines=16', '--output=json',
+                    '--output-fields=MESSAGE,ERRNO,EXIT_STATUS'])
+                # Synthetic child only; no invocation of journalctl.
+                code = ('import sys; sys.stdout.buffer.write(' + repr(payload) + ')' if passes
+                        else 'import sys; sys.stdout.buffer.write(b"x"*131072)')
+                return real_popen([sys.executable, '-I', '-S', '-B', '-c', code], **kwargs)
+            with self.subTest(passes=passes), patch.object(package.subprocess, 'Popen', synthetic_command):
+                if passes:
+                    self.assertEqual(package.startup_journal(unit), [{'MESSAGE': 'status=226/NAMESPACE'}])
+                else:
+                    with self.assertRaises(RuntimeError):
+                        package.startup_journal(unit)
+
+    def test_journal_timeout_kills_and_closes_capture(self):
+        reader, writer = os.pipe()
+        os.close(writer)
+        stream = os.fdopen(reader, 'rb', buffering=0)
+        fake = SimpleNamespace(stdout=stream, returncode=None)
+        fake.poll = lambda: fake.returncode
+        fake.kill = lambda: setattr(fake, 'returncode', -9)
+        def wait(timeout):
+            if timeout == 3:
+                raise subprocess.TimeoutExpired('synthetic', timeout)
+            return fake.returncode
+        fake.wait = wait
+        with patch.object(package.subprocess, 'Popen', return_value=fake):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                package.startup_journal('finance-release1-' + 'c'*32 + '.service')
+        self.assertEqual(fake.returncode, -9)
+        self.assertTrue(stream.closed)
+
     def make_mask_fixture(self):
         guest = self.base / 'mask-guest'
         guest.mkdir()
@@ -326,7 +428,13 @@ class SyntheticTests(unittest.TestCase):
         if failure in ('mask_sys', 'mask_run'):
             (guest / failure.removeprefix('mask_')).chmod(0o555)
         observed = {'properties_checked': False, 'go': False}
-        fake = SimpleNamespace(returncode=None, stdin=io.BytesIO())
+        stderr_read, stderr_write = os.pipe()
+        if failure == 'namespace':
+            os.write(stderr_write, b'Failed at step NAMESPACE spawning /private/secret: Permission denied\n')
+        os.close(stderr_write)
+        fake = SimpleNamespace(returncode=None, stdin=io.BytesIO(),
+                               stderr=os.fdopen(stderr_read, 'rb', buffering=0))
+        self.addCleanup(fake.stderr.close)
         read_fd, write_fd = os.pipe()
         fake.stdout = os.fdopen(read_fd, 'rb', buffering=0)
         self.addCleanup(fake.stdout.close)
@@ -337,6 +445,7 @@ class SyntheticTests(unittest.TestCase):
                                     for x in command if x.startswith('--property='))
             self.assertEqual(command_settings['ReadOnlyPaths'], '+/root')
             self.assertEqual(command_settings['InaccessiblePaths'], '+/sys +/run')
+            self.assertEqual(command_settings['MountAPIVFS'], 'no')
             for binding in command_settings['BindReadOnlyPaths'].split():
                 source, destination, option = binding.split(':')
                 self.assertTrue(source.startswith('/proc/'))
@@ -348,7 +457,7 @@ class SyntheticTests(unittest.TestCase):
                         else 'READY identity_hash_isolation')
             except (RuntimeError, OSError):
                 line = 'FAIL ' + guard['STEP']
-            os.write(write_fd, (line + '\n').encode('ascii'))
+            os.write(write_fd, b'' if failure == 'namespace' else (line + '\n').encode('ascii'))
             os.close(write_fd)
             return fake
 
@@ -372,6 +481,8 @@ class SyntheticTests(unittest.TestCase):
             self.assertIn('ReadOnlyPaths', keys)
             # v257.13 preserves '+' in the D-Bus string array and systemctl show.
             result['ReadOnlyPaths'] = '+/root'
+            self.assertIn('MountAPIVFS', keys)
+            result['MountAPIVFS'] = 'yes' if failure == 'apivfs' else 'no'
             self.assertIn('InaccessiblePaths', keys)
             result['InaccessiblePaths'] = '+/sys +/run'
             if failure == 'mask_property_host':
@@ -408,6 +519,9 @@ class SyntheticTests(unittest.TestCase):
                 (package.Pins, 'pin', lambda obj, p, directory=False, trusted=False:
                  original_pin(obj, str(self.base) if p == '/run' else p, directory, False)),
                 (package, 'properties', properties), (package, 'run_tool', lambda *a, **k: None),
+                (package, 'startup_journal', lambda unit: [
+                    {'MESSAGE': 'Failed to set up mount namespacing: private', 'ERRNO': '13'},
+                    {'MESSAGE': 'status=226/NAMESPACE'}]),
                 (package, 'check_resource_limits', lambda unit: None),
                 (package.subprocess, 'Popen', spawn),
                 (os, 'getuid', lambda: 0), (os, 'geteuid', lambda: 0),
@@ -424,7 +538,7 @@ class SyntheticTests(unittest.TestCase):
         self.assertEqual(sorted(inputs.iterdir()), sorted(inputs / name for name in package.FILES))
         self.assertEqual(observed['go'], failure not in ('guard', 'readonly_missing', 'readonly_wrong', 'readonly_host',
                           'mask_property_host', 'mask_property_mixed', 'mask_property_missing',
-                          'mask_sys', 'mask_run'))
+                          'mask_sys', 'mask_run', 'namespace', 'apivfs'))
         return rc, text, list(self.base.glob('owned-*'))
 
     def test_start_normal_cleanup(self):
@@ -486,6 +600,18 @@ class SyntheticTests(unittest.TestCase):
 
     def test_unmasked_run_stops_before_go_and_cleans_up(self):
         self.assert_mask_start_stops('mask_run', 'G05_mask_run_access')
+
+    def test_implicit_apivfs_regression_stops_before_go(self):
+        self.assert_mask_start_stops('apivfs', 'S09_service_properties')
+
+    def test_namespace_failure_is_sanitized_before_cleanup(self):
+        rc, text, remaining = self.exercise_start('namespace')
+        self.assertEqual(rc, 1)
+        self.assertIn('FAIL S08_wait_ready', text)
+        self.assertIn('FAIL D01_NAMESPACE operation=MOUNT_NAMESPACE errno=EACCES', text)
+        self.assertNotIn('PASS identity_hash', text)
+        self.assertIn('PASS temporary_resources_removed', text)
+        self.assertEqual(remaining, [])
 
     def test_start_timeout_cleanup(self):
         rc, text, remaining = self.exercise_start('timeout')

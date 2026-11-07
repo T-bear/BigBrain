@@ -4,6 +4,7 @@
 Only the approved verifier is copied. Finance sources are metadata-pinned and
 bound read-only by the transient service. This file is NOT the approved verifier.
 """
+import errno
 import hashlib
 import json
 import os
@@ -15,6 +16,7 @@ import stat
 import subprocess
 import sys
 import time
+import threading
 import uuid
 
 APPROVED = '7c065708528a10a0d3f0408e7de5fd4af4b5d93cf43ecae1c5105829de8fb9bb'
@@ -226,6 +228,128 @@ def run_tool(args, timeout=15):
                           stderr=subprocess.DEVNULL, env=ENV, timeout=timeout, check=False)
 
 
+class DiagnosticCapture:
+    """Drain continuously, retain at most 64 KiB in RAM; never echo raw bytes."""
+    LIMIT = 65536
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.data = bytearray()
+        self.limited = False
+        self.failed = False
+        self.lock = threading.Lock()
+        self.stop = threading.Event()
+        self.thread = threading.Thread(target=self._drain, daemon=True)
+        self.thread.start()
+
+    def _drain(self):
+        try:
+            fd = self.stream.fileno()
+            os.set_blocking(fd, False)
+            with selectors.DefaultSelector() as selector:
+                selector.register(fd, selectors.EVENT_READ)
+                while not self.stop.is_set():
+                    if not selector.select(0.1):
+                        continue
+                    try:
+                        chunk = os.read(fd, 4096)
+                    except BlockingIOError:
+                        continue
+                    if not chunk:
+                        return
+                    with self.lock:
+                        room = self.LIMIT - len(self.data)
+                        self.data.extend(chunk[:room])
+                        self.limited |= len(chunk) > room
+        except Exception:
+            self.failed = True
+
+    def snapshot(self):
+        with self.lock:
+            return bytes(self.data), self.limited, self.failed
+
+    def close(self):
+        self.thread.join(0.25)  # Allow final bytes/EOF after the producer has exited.
+        if self.thread.is_alive():
+            self.failed = True
+        self.stop.set()
+        self.thread.join(1)
+        self.stream.close()
+        need(not self.thread.is_alive())
+
+
+def startup_journal(unit):
+    # Read only this newly created unit on this boot, at most 16 records/64 KiB/3 s.
+    need(re.fullmatch(r'finance-release1-[0-9a-f]{32}\.service', unit) is not None)
+    process = subprocess.Popen([
+        '/usr/bin/journalctl', '--boot', '--no-pager', '--quiet', '--unit=' + unit,
+        '--lines=16', '--output=json', '--output-fields=MESSAGE,ERRNO,EXIT_STATUS'],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=ENV)
+    capture = None
+    try:
+        capture = DiagnosticCapture(process.stdout)
+        process.wait(timeout=3)
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=2)
+        if capture is not None:
+            capture.close()
+        else:
+            process.stdout.close()
+    data, limited, failed = capture.snapshot()
+    need(process.returncode == 0 and not limited and not failed)
+    records = [json.loads(line) for line in data.splitlines()]
+    need(len(records) <= 16 and all(isinstance(record, dict) for record in records))
+    return records
+
+
+def sanitized_startup(records, stderr):
+    operations = (
+        ('Failed to set up mount namespacing', 'MOUNT_NAMESPACE'),
+        ('Failed to set up IPC namespacing', 'IPC_NAMESPACE'),
+        ('Failed to set up pid namespace', 'PID_NAMESPACE'),
+        ('Failed to set up cgroup namespacing', 'CGROUP_NAMESPACE'),
+        ('Failed to set up network namespacing', 'NETWORK_NAMESPACE'),
+        ('Failed to set up symlinks inside mount namespace', 'SYMLINK_SETUP'),
+        ('Failed to create parent directory for symlink', 'SYMLINK_PARENT'),
+        ('Failed at step NAMESPACE', 'NAMESPACE_EXEC'),
+    )
+    lines = []
+    # Journal ERRNO is authoritative for its own record, not a different message.
+    for record in records + [{'MESSAGE': line} for line in stderr.decode('utf-8', 'replace').splitlines()]:
+        message = record.get('MESSAGE')
+        if not isinstance(message, str):
+            continue
+        operation = next((code for phrase, code in operations if phrase in message), None)
+        namespace = record.get('EXIT_STATUS') in ('226', 226) or 'status=226/NAMESPACE' in message
+        if operation is None and not namespace:
+            continue
+        raw_errno = record.get('ERRNO')
+        number = int(raw_errno) if isinstance(raw_errno, (str, int)) and str(raw_errno).isdigit() and len(str(raw_errno)) <= 4 else 0
+        error = errno.errorcode.get(number, 'UNKNOWN')
+        code = 'D01_NAMESPACE' if namespace or (operation and operation != 'NETWORK_NAMESPACE') else 'D01_STARTUP'
+        line = 'FAIL ' + code + ' operation=' + (operation or 'UNKNOWN') + ' errno=' + error
+        if line not in lines:
+            lines.append(line)
+        if len(lines) == 6:
+            break
+    return lines or ['NOT CHECKED D01_STARTUP operation=UNKNOWN errno=UNKNOWN']
+
+
+def report_startup(unit, capture):
+    try:
+        records = startup_journal(unit)
+    except Exception:
+        records = []
+        print('NOT CHECKED D02_JOURNAL operation=JOURNAL_READ errno=UNKNOWN', flush=True)
+    data, limited, failed = capture.snapshot() if capture else (b'', False, True)
+    for line in sanitized_startup(records, data):
+        print(line, flush=True)
+    if limited or failed:
+        print('NOT CHECKED D02_CAPTURE operation=STDERR_CAPTURE errno=UNKNOWN', flush=True)
+
+
 def properties(unit, keys):
     result = run_tool(['/usr/bin/systemctl', 'show', unit] +
                       ['--property=' + key for key in keys])
@@ -424,6 +548,8 @@ def start(verifier, backup_dir):
     pins = Pins()
     token = None
     process = None
+    stderr_capture = None
+    startup_failed = False
     rc = 1
     step = 'S01_identity'
     try:
@@ -486,6 +612,7 @@ def start(verifier, backup_dir):
             'NoNewPrivileges': 'yes', 'PrivatePIDs': 'yes', 'PrivateNetwork': 'yes',
             'PrivateDevices': 'yes', 'PrivateIPC': 'yes', 'ProtectSystem': 'strict',
             'ReadOnlyPaths': '+/root',
+            'MountAPIVFS': 'no',
             'BindLogSockets': 'no',
             'ProcSubset': 'pid', 'ProtectProc': 'invisible', 'RestrictNamespaces': 'yes',
             'RestrictSUIDSGID': 'yes', 'LockPersonality': 'yes', 'MemoryDenyWriteExecute': 'yes',
@@ -512,7 +639,9 @@ def start(verifier, backup_dir):
         no_sidecars(directory_fd)  # Original names, immediately before process start.
         step = 'S07_service_start'
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                   stderr=subprocess.DEVNULL, env=ENV, bufsize=0)
+                                   stderr=subprocess.PIPE, env=ENV, bufsize=0)
+        stderr_capture = DiagnosticCapture(process.stderr)
+        process.stderr = None  # Collector owns stderr; communicate must never read it.
         step = 'S08_wait_ready'
         wait_ready(process.stdout)
         step = 'S09_service_properties'
@@ -523,6 +652,7 @@ def start(verifier, backup_dir):
             'PrivatePIDs': 'yes', 'PrivateNetwork': 'yes', 'RootDirectory': str(root),
             'PrivateIPC': 'yes', 'BindLogSockets': 'no', 'ProtectSystem': 'strict',
             'ReadOnlyPaths': '+/root',
+            'MountAPIVFS': 'no',
             'MemoryMax': '536870912', 'MemorySwapMax': '0', 'TasksMax': '8',
             'RuntimeMaxUSec': '5min', 'TimeoutStartUSec': '30s', 'TimeoutStopUSec': '5s',
             'CPUQuotaPerSecUSec': '1s', 'SendSIGKILL': 'yes',
@@ -556,8 +686,14 @@ def start(verifier, backup_dir):
     except GuardFailure as failure:
         print('FAIL ' + failure.step, flush=True)
     except BaseException:
+        startup_failed = step in ('S07_service_start', 'S08_wait_ready')
         print('FAIL ' + step, flush=True)
     finally:
+        if startup_failed and token is not None:
+            try:
+                report_startup(unit, stderr_capture)
+            except BaseException:
+                print('NOT CHECKED D02_DIAGNOSTIC operation=CAPTURE errno=UNKNOWN', flush=True)
         if token is not None:
             try:
                 stop_and_cleanup(token)
@@ -576,9 +712,15 @@ def start(verifier, backup_dir):
                 except subprocess.TimeoutExpired:
                     process.kill()
                     process.wait(timeout=5)
-            for pipe in (process.stdin, process.stdout):
+            for pipe in (process.stdin, process.stdout, process.stderr):
                 if pipe is not None:
                     pipe.close()
+        if stderr_capture is not None:
+            try:
+                stderr_capture.close()
+            except Exception:
+                print('FAIL D02_CAPTURE operation=CAPTURE_CLOSE errno=UNKNOWN', flush=True)
+                rc = 1
         pins.close()
     return rc
 
