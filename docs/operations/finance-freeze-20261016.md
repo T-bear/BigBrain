@@ -28,6 +28,11 @@ Primära underlag: [AGENTS](../../AGENTS.md), [dokumentauktoritet](../indexes/do
 
 ## B. Ägarbeslut och auktoritet
 
+**Avgränsat senare ägarbeslut, 2026-11-08:** [Finance Release 1 – tilläggsmandat v1.1
+för riskproportionell säkerhet](finance-release1-security-simplification-mandate-20261108.md)
+tillåter analys och avgränsad förberedelse av en enklare modellfri offlineforskningsmiljö.
+Frysningen gäller i övrigt; ingen ny drift-, root-, D3-, merge- eller handelsauktoritet.
+
 Produktägaren har uttryckligen beslutat om omedelbar frysning av **hela Finance**, inte enbart
 historisk Qwen. Det äldre villkoret att självständig forskning först måste vara verifierat igång
 är uttryckligen ersatt. Endast ett nytt uttryckligt ägarbeslut kan häva frysningen eller auktorisera
