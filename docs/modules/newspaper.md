@@ -1,8 +1,9 @@
 # Morgonbladet – produkt- och designkontrakt
 
 **Beslutsdatum:** 2026-10-31.
+**Reviderat designbeslut:** 2026-11-01.
 **Ägare:** BigBrains produktägare.
-**Status:** Produktinriktning och vald designreferens bekräftade.
+**Status:** Fast A4-designmaster med separata innehållszoner beslutad; implementation och visuell acceptans återstår.
 **Implementation:** N1 är ännu inte visuellt accepterad, mergad
 eller deployad. Dokumentet ger ingen exekveringsauktorisering.
 
@@ -12,16 +13,19 @@ Vid framtida uppdrag ska denna fil läsas tillsammans med aktuell
 
 ## 1. Produktvision
 
-Morgonbladet är en personlig morgontidning som kan sammanställas
-för olika personer i hushållet och skrivas ut på A4.
+Morgonbladet är en personlig morgontidning som sammanställs
+för hushållets medlemmar och skrivs ut på A4.
 
 - Varje person väljer sitt eget maximala sidantal: 1–3 sidor.
-- Innehållet utgår från personens valda intressen och önskemål.
-- Tidningen ska vara lugn, trevlig, källkritisk och lättläst.
-- Sidantalet är en faktisk utskriftsgräns, inte bara ett UI-val.
-- Layouten ska vara fördefinierad och konsekvent mellan utgåvor.
-- Säsongs- och högtidsteman får förändra de dekorativa detaljerna,
-  inte den grundläggande sidstrukturen.
+- Innehållet bygger på personens intressen och önskemål.
+- Tidningen ska vara lugn, vacker, lättläst och källkritisk.
+- Maxantalet sidor är en faktisk gräns för färdig PDF och utskrift.
+- Tidningens visuella identitet är fast och konsekvent.
+- Inga automatiska säsongs-, högtids- eller slumpdekorationer används.
+- Endast innehållet, artikelbilderna, datumet och annan
+  utgåvespecifik information varierar mellan utgåvor.
+- Grafisk kvalitet uppnås genom godkända, återanvändbara
+  designassets, inte genom daglig generering av dekorationer.
 
 ## 2. Vald designriktning – produktägarens beslut
 
@@ -35,8 +39,8 @@ Referensbilden valdes av produktägaren 2026-10-31.
 
 - Mycket stor, klassisk serif-vinjett med texten "Morgonbladet".
 - Mörkgrön eller nästan svart typografi.
-- Små botaniska akvarelldetaljer kring vinjetten, exempelvis
-  kvistar, blommor och en liten fågel.
+- Vackra, fasta botaniska akvarelldetaljer kring vinjetten,
+  exempelvis kvistar, blommor och en liten fågel.
 - En kompakt rad med datum, utgåva och korta notiser.
 - Redaktionell spaltlayout med en tydligt dominerande huvudartikel.
 - Huvudartikel med stor rubrik, ingress, längre text och stor bild.
@@ -66,7 +70,11 @@ fiktiva och får inte återanvändas som verifierat innehåll.
 Den krämvita tonen ska skapas av pappret, inte genom att
 skriva ut en heltäckande bakgrundsfärg.
 
-## 3. Pappersval och bläcksnål utskrift
+Referensbilden används för konstnärlig riktning och är inte
+den framtida designmastern. En ny, textfri A4-master med
+separat zondefinition ska tas fram och godkännas.
+
+## 3. Papper, sidbakgrund och färg
 
 Primärt mål är naturvitt eller krämvitt A4-papper.
 
@@ -75,35 +83,116 @@ Primärt mål är naturvitt eller krämvitt A4-papper.
   får skrivas ut.
 - Utskriftsbakgrunden ska vara vit eller transparent.
 - Brödtext har hög kontrast och trycks helst i svart.
-- Mörkgröna rubriker och tunna färgade detaljer är tillåtna.
-- Färgbilder används där de faktiskt tillför innehållsvärde.
-- Akvarellornament ska vara små och bläcksnåla.
-- Stora mörka eller täckande färgfält ska undvikas.
+- Rubriker, ingresser, ramar och andra redaktionella designelement får vara färgstarka när de stärker läsupplevelsen.
+- Fotografier, målade illustrationer och dekorativa bilder får använda hela färgskalan när de bidrar till den visuella upplevelsen.
+- Akvarellornament får vara stora, detaljrika och färgstarka när det gagnar gestaltningen och läsbarheten.
+- Enkla kodritade SVG-motiv är inte standard för artikelillustrationer. Riktiga bilder med verifierade rättigheter prioriteras; SVG får användas för enklare grafiska detaljer.
+- Bläckbesparingen gäller endast den heltäckande sidbakgrunden, inte artikelbilder, illustrationer, ornament eller andra redaktionella färgytor.
 - Tidningen ska fungera även på vanligt vitt kopieringspapper.
 
 Naturvitt papper är ett önskat materialval, inte ett krav på att
 skrivaren eller PDF-generatorn ska simulera pappersfärgen.
 
-## 4. Fast layout och innehållshierarki
+## 4. Fast A4-designmaster och dynamiska innehållszoner
 
-### Förstasidan
+### 4.1 Designmaster
 
-- Stor tidningsvinjett och datumrad.
-- En tydligt utvald huvudartikel.
-- Stor bild eller illustration när relevant material finns.
-- Kortare artiklar och notiser i mindre spalter.
-- Diskreta dekorativa detaljer som stödjer årstid och tema.
-- Källhänvisningar och sidnumrering utan onödigt visuellt brus.
+Morgonbladet använder en förhandsgodkänd, versionshanterad
+A4-designmaster som grafiskt grundlager.
 
-### Efterföljande sidor
+Designmastern får skapas med bildgenerering och innehålla
+vinjetten, den fasta fågeln, botaniska akvarellkvistar,
+grafiska avdelare och övriga permanenta designelement.
 
-- Mindre sidhuvud än på förstasidan.
-- Samma typografi och visuella identitet.
-- Fördefinierade spalter och artikelblock.
-- Ingen hänvisning till sidor utanför den faktiska utgåvan.
+- Mastern representerar en exakt A4-sida: 210 × 297 mm.
+- Pappersbakgrunden är vit eller transparent.
+- Mastern innehåller inga dagsaktuella nyhetsrubriker,
+  artikeltexter, artikelbilder, datum, källor eller sidnummer.
+- Om tidningsnamnets grafiska vinjett ingår i masterbilden
+  är den ett fast, godkänt varumärkeselement.
+- Text- och bildytor i mastern är reserverade och lämnas tomma.
+- Designmastern ska ha tillräcklig upplösning för tydlig utskrift.
+- Masterbild, zondefinition och version hör alltid ihop.
+- Nya utgåvor genererar inte nya designmasters.
 
-Mallar och innehållsbudget ska hantera både korta och längre
-texter utan ofrivillig klippning, tomma extrasidor eller spill.
+En komplett sidbild får alltså användas som fast grafiskt
+underlag, men inte som ett rasteriserat slutresultat där
+nyhetsinnehållet har bakats in.
+
+### 4.2 Dynamiskt innehållslager
+
+BigBrain placerar utgåvans innehåll ovanpå designmastern
+genom ett separat, deterministiskt innehållslager.
+
+Det dynamiska lagret omfattar bland annat:
+
+- Huvudrubriker och underrubriker.
+- Ingresser och brödtext.
+- Aktuella, relevanta artikelbilder.
+- Bildtexter och erforderliga upphovsangivelser.
+- Datum, källhänvisningar och sidnummer.
+- Innehållsförteckning och fortsättningshänvisningar.
+
+Rubriker och brödtext ska återges som riktig, skarp och
+sökbar text i PDF, inte som pixlar inbyggda i en bild.
+Färg och fotografier får användas fullt ut inom den
+redaktionella designen.
+
+### 4.3 Måttsatta innehållszoner
+
+Varje godkänd designmaster ska ha en separat,
+versionshanterad zondefinition.
+
+För varje dynamisk zon ska följande kunna fastställas:
+
+- Unikt zon-ID och innehållstyp.
+- Position X och Y relativt A4-sidans koordinatsystem.
+- Bredd och höjd i mm eller entydigt konverterbara enheter.
+- Säkerhetsmarginal och eventuell inre utfyllnad.
+- Typografi: typsnitt, teckenstorlek, radavstånd och justering.
+- Högsta tillåtna antal faktiskt renderade textrader.
+- Bildformat och tillåten beskärning när zonen innehåller bild.
+- Hantering av tomt innehåll och text som inte ryms.
+
+Zonernas exakta mått fastställs först när respektive
+designmaster har granskats och godkänts. AI-genererade
+visuella ytor betraktas inte automatiskt som exakta
+koordinater; zonerna ska mätas, dokumenteras och testas.
+
+### 4.4 Textpassning och redaktionell integritet
+
+Textbudgeten bestäms av faktisk typografisk passning
+inom zonens mått, inte enbart av antal tecken eller ord.
+
+- Radräkning och höjd verifieras av renderingsmotorn.
+- Text får aldrig klippas utan att systemet upptäcker det.
+- För långt innehåll ska hanteras med ett kontrollerat,
+  faktatroget utdrag eller placering i annan tillåten zon.
+- Fortsättningshänvisningar får bara peka på en verklig
+  fortsättning inom den aktuella utgåvan.
+- Om innehållet inte ryms ska en godkänd reservmall
+  väljas eller utgåvan stoppas för korrigering.
+- Ingen text får ligga ovanpå fasta dekorativa element,
+  annan text, bilder eller sidfoten.
+
+Sammanfattningar får inte fabricera, förvanska eller utelämna
+viktig sakinformation på ett vilseledande sätt.
+
+### 4.5 Sidmallar och innehållsvariation
+
+Ett litet antal fasta, testade mallar används för förstasida
+och efterföljande sidor. Mallval får bero på innehållets
+faktiska behov, exempelvis tillgång till relevant bild.
+
+Alla mallar delar samma grafiska identitet.
+Ingen daglig AI-generering av en ny sidlayout ingår.
+
+Mallar och zondefinitioner måste tillsammans garantera
+att den färdiga utgåvan håller sig inom användarens
+maximala sidantal, 1–3 A4-sidor.
+
+Både artiklar med bild och artiklar utan bild ska kunna
+hanteras utan att felaktiga platshållarbilder används.
 
 ## 5. Personliga inställningar – framtida funktioner
 
@@ -131,56 +220,75 @@ Inställningar, personprofiler och automatiserad nyhetsinhämtning
 - Bilder ska ha lämplig proveniens och användningsrätt.
 - Vid osäker källa eller verifiering utelämnas påståendet.
 
-## 7. Årstider och lekfulla illustrationer
+## 7. Fast grafisk identitet och bildrättigheter
 
-Små akvarellillustrationer får anpassas efter exempelvis vår,
-sommar, höst, vinter, halloween, jul och nyår.
+Fågeln, kvistarna, blommorna och andra fasta ornament är
+permanenta delar av Morgonbladets grafiska identitet.
 
-Även lekfulla detaljer som små katter, oväntade djur eller
-fantasifulla figurer får förekomma.
+- Dessa originalillustrationer får tas fram med bildgenerering.
+- Produktägaren godkänner illustrationerna innan användning.
+- Godkända bilder lagras som versionshanterade assets.
+- Samma godkända design återanvänds mellan utgåvor.
+- Inga dynamiska katter, årstidsdekorationer,
+  högtidsvarianter eller slumpmässiga ornament genereras.
+- Ändring av den fasta grafiska identiteten kräver
+  ett separat designbeslut och ny verifiering.
 
-Dekorationerna får inte:
-- försämra läsbarheten,
-- dominera över nyheterna,
-- förstöra A4-sidbudgeten,
-- orsaka hög färgförbrukning,
-- eller förväxlas med redaktionella fakta.
+Artikelbilder är däremot dynamiska och ska vara relevanta
+för den faktiska artikeln. Källa, upphovsperson, licens och
+eventuella villkor för beskärning eller bearbetning ska
+kontrolleras och kunna redovisas.
+
+Bilder utan verifierad användningsrätt får inte användas.
+Vid avsaknad av lämplig bild ska en godkänd textbaserad
+layout kunna användas.
+
+Dekorativa originalillustrationer får inte förväxlas med
+dokumentära bilder från verkliga nyhetshändelser.
 
 ## 8. N1 – teknik, verifiering och kvarstående acceptans
 
-N1 är en statisk Web-only-prototyp med uttryckligt märkt
-demoinnehåll. Ingen verklig nyhetsinhämtning krävs i N1.
+N1 är fortsatt en statisk Web-only-prototyp med tydligt
+märkt demoinnehåll. Verklig nyhetsinhämtning ingår inte.
 
-2026-10-31 verifierades i separata PDF-prov från mobilens
-webbläsare att befintlig utskriftsmekanik kunde generera
-exakt 1, 2 och 3 A4-sidor, med två demoartiklar på varje
-sida och utan observerade extrasidor eller avklippt innehåll.
+2026-10-31 verifierades äldre PDF-utskrifter med exakt
+1, 2 och 3 A4-sidor. Dessa prov avsåg den dåvarande
+HTML/CSS-layouten och är historisk teknisk evidens,
+inte ett godkännande av den nya arkitekturen.
 
-Detta verifierar enbart den dåvarande tekniska utskriften,
-inte den nya designens framtida sidfördelning, utskrift
-med verkliga nyhetstexter eller acceptans i installerad PWA.
+Under 2026-11-01 har den vidareutvecklade redaktionella
+prototypen fortfarande visat överlappning och innehåll
+som spiller mellan sidor. Detta är inte löst genom
+detta dokumentationsbeslut.
 
-Den aktuella review-implementationen finns i:
+Befintlig implementation för granskning finns i:
 [PR #22](https://github.com/T-bear/BigBrain/pull/22).
 
-Produktägaren har uttryckligen inte accepterat den äldre,
-glest satta N1-designen. Den tekniskt fungerande
-utskriftsmekaniken ska bevaras så långt det är rimligt,
-medan den visuella layouten omarbetas.
+Den implementationen bygger inte på den nu beslutade
+designmaster-arkitekturen och måste omprövas innan den
+kan bli en godkänd leveranskandidat.
 
 ### Kvarvarande acceptanskriterier
 
-- Den nya förstasidan bedöms mot designriktningen i avsnitt 2.
-- Efterföljande sidor får samma genomarbetade tidningskänsla.
-- 1, 2 och 3 faktiska A4-sidor fungerar utan spill eller klipp.
-- Ingen heltäckande bakgrundsfärg trycks.
-- Ny typografi, bildplacering och spalter förblir lättlästa.
-- Mobil/webbläsare och dator kontrolleras separat.
-- Installerad BigBrain-PWA får separat manuell ägaracceptans.
-- Produktägaren godkänner uttryckligen den slutliga designen.
+- Fast grafisk identitet och designmaster godkänns av ägaren.
+- Masterbild och motsvarande zondefinition är versionsbundna.
+- Variabla texter och artikelbilder placeras i egna lager.
+- Textpassning verifieras med faktisk renderad höjd.
+- Färdig PDF innehåller skarp och sökbar artikeltext.
+- Bildrättigheter, källor och bildtexter är kontrollerade.
+- Inga ofrivilliga överlappningar, avklipp eller extrasidor.
+- Exakt 1, 2 och 3 A4-sidor verifieras separat.
+- Ingen heltäckande färgad pappersbakgrund skrivs ut.
+- Mobil webbläsare och dator kontrolleras separat.
+- Installerad BigBrain-PWA får separat manuell acceptans.
+- Produktägaren godkänner den slutliga visuella designen.
 
-Grön CI, publicerad PR eller fungerande PDF är inte automatiskt
-visuell produktacceptans eller deploymenttillstånd.
+Det nya designbeslutet är inte implementerat eller
+verifierat genom denna dokumentationsändring.
+
+Grön CI, publicerad PR och historiska PDF-prov innebär
+inte automatiskt visuell acceptans, mergegodkännande
+eller deploymenttillstånd.
 
 ## 9. Etapper och avgränsning
 
