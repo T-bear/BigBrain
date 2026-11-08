@@ -198,12 +198,6 @@ export function SchoolLunch({
                   </p>
                 )}
                 {menu.status !== 'published' && <p role="status">{statusText[menu.status] ?? 'Information saknas.'}</p>}
-                <p>
-                  Källa: <a href={menu.sourceUrl}>{menu.sourceName}</a>.
-                </p>
-                {menu.dateBasis === 'htmlWeekRequestedYear' && (
-                  <p>Visningsår {menu.year} är härlett; källan anger endast veckonummer.</p>
-                )}
                 {menu.lastCheckedAtUtc && <p>Kontrollerad: {checkedTime(menu.lastCheckedAtUtc)}</p>}
               </>
             )}
