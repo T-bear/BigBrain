@@ -28,38 +28,41 @@ describe('SchoolLunch', () => {
   it.each([
     ['2026-11-03T20:39:07Z', '3 nov, 21.39'],
     ['2026-07-03T19:39:07Z', '3 juli, 21.39'],
-  ])('groups weekdays and shows only concise timestamps as metadata with Stockholm time %s', async (timestamp, expected) => {
-    vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
-      ...liveMenu(id, 3600),
-      lastCheckedAtUtc: timestamp,
-      sourceUpdatedAtUtc: timestamp,
-      isStale: true,
-    }))
-    const { container } = render(<SchoolLunch allowFixture={false} />)
-    await screen.findByText('rosenfeldt lunch')
-    const rows = container.querySelectorAll('.meal-planner__day')
-    expect(rows).toHaveLength(5)
-    expect([...rows].map(row => row.querySelector('.meal-planner__day-copy')?.textContent)).toEqual([
-      'Måndag',
-      'Tisdag',
-      'Onsdag',
-      'Torsdag',
-      'Fredag',
-    ])
-    const monday = within(rows[0] as HTMLElement)
-    for (const name of ['Rosenfeldtskolan', 'Musikugglan', 'rosenfeldt lunch', 'musikugglan lunch']) {
-      expect(monday.getByText(name)).toBeInTheDocument()
-    }
-    expect(screen.getAllByText(`Kontrollerad: ${expected}`)).toHaveLength(2)
-    expect(screen.queryByRole('link', { name: 'Testkälla' })).not.toBeInTheDocument()
-    expect(screen.queryByText(/Källa:|Visningsår|Datum från RSS|Menyn hämtad/)).not.toBeInTheDocument()
-    expect(screen.getAllByText(/Matsedeln kan vara inaktuell/)).toHaveLength(2)
-    expect(
-      screen.queryByText(/Skollunch|Aktuell veckas skolluncher|Datum från RSS|Menyn hämtad|Källans angivna/),
-    ).not.toBeInTheDocument()
-    expect(screen.queryByText(/Lördag|Söndag|Antal personer/)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Byt/ })).not.toBeInTheDocument()
-  })
+  ])(
+    'groups weekdays and shows only concise timestamps as metadata with Stockholm time %s',
+    async (timestamp, expected) => {
+      vi.mocked(api.getSchoolMeals).mockImplementation(async id => ({
+        ...liveMenu(id, 3600),
+        lastCheckedAtUtc: timestamp,
+        sourceUpdatedAtUtc: timestamp,
+        isStale: true,
+      }))
+      const { container } = render(<SchoolLunch allowFixture={false} />)
+      await screen.findByText('rosenfeldt lunch')
+      const rows = container.querySelectorAll('.meal-planner__day')
+      expect(rows).toHaveLength(5)
+      expect([...rows].map(row => row.querySelector('.meal-planner__day-copy')?.textContent)).toEqual([
+        'Måndag',
+        'Tisdag',
+        'Onsdag',
+        'Torsdag',
+        'Fredag',
+      ])
+      const monday = within(rows[0] as HTMLElement)
+      for (const name of ['Rosenfeldtskolan', 'Musikugglan', 'rosenfeldt lunch', 'musikugglan lunch']) {
+        expect(monday.getByText(name)).toBeInTheDocument()
+      }
+      expect(screen.getAllByText(`Kontrollerad: ${expected}`)).toHaveLength(2)
+      expect(screen.queryByRole('link', { name: 'Testkälla' })).not.toBeInTheDocument()
+      expect(screen.queryByText(/Källa:|Visningsår|Datum från RSS|Menyn hämtad/)).not.toBeInTheDocument()
+      expect(screen.getAllByText(/Matsedeln kan vara inaktuell/)).toHaveLength(2)
+      expect(
+        screen.queryByText(/Skollunch|Aktuell veckas skolluncher|Datum från RSS|Menyn hämtad|Källans angivna/),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByText(/Lördag|Söndag|Antal personer/)).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Byt/ })).not.toBeInTheDocument()
+    },
+  )
 
   it('checks a weekly snapshot after 24 hours, not on every return', async () => {
     vi.useFakeTimers()
