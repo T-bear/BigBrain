@@ -46,8 +46,8 @@ Konkreta beroenden och kvarstående DoD ligger i [Backlog](docs/BACKLOG.md).
 
 [Ursprungligt Family-beslut](docs/history/roadmap-before-doc-2b-20261024.md#future-family-view--family-coordination-epic-planned-only)
 och [Backlogs produkt-, UX- och auth-krav](docs/history/backlog-before-doc-2b-20261024.md#future-product-ux-authentication-and-meal-planner-capture)
-bevaras. Äldre meningar om aktiv Finance-prioritet överordnas av senare frysning; det skapar inte
-ett nytt generellt Family-uppdrag.
+bevaras. Finance-frysningen från 2026-10-16 har hävts genom separat ägarbeslut
+2026-11-08; det skapar inte ett nytt generellt Family-uppdrag.
 
 ## Säkerhets- och beroendegrindar
 
@@ -68,7 +68,9 @@ ett nytt generellt Family-uppdrag.
 [Original säkerhetsmilsten](docs/history/roadmap-before-doc-2b-20261024.md#security-and-penetration-testing-gate--planned),
 [kvarstående konkreta krav](docs/BACKLOG.md#säkerhet-drift-och-arkitekturgrindar).
 
-## Fryst arbete
+<a id="fryst-arbete"></a>
+
+## Frysningar och återupptaget arbete
 
 [Registret](docs/operations/freezes.md) länkar kanoniska ägarbeslut; det är inte en separat auktoritet.
 Befintlig drift lämnas orörd. Upptining kräver nytt uttryckligt ägarbeslut och auktoriserad scope/DoD,
@@ -76,7 +78,7 @@ inte gamla next/current-instruktioner. Det ger inte automatiskt merge/deployment
 
 | Område | Bevarad riktning och gräns |
 | --- | --- |
-| Finance — FROZEN sedan 2026-10-16 | [Kanoniskt beslut](docs/operations/finance-freeze-20261016.md). RESEARCH / 0 SEK / NONE; G3a BLOCKED, G3b NOT RUN. Rättigheter, retention/disposal, integritet, hostisolering, journal/enrollment/authority, science/holdout och kvarstående driftkrav gäller fortsatt. Ingen ny källa, grant, modellkörning, PAPER/LIVE/AUTO eller brokerkoppling. |
+| Finance — **UPPTINAD 2026-11-08** | [Kanoniskt aktuellt ägarbeslut](docs/operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08). RESEARCH / 0 SEK / NONE; G3a BLOCKED, G3b NOT RUN. Planeringsinriktning BB-045/073/082 vald. Rättigheter, retention/disposal, integritet, hostisolering, journal/authority, science/holdout och kvarstående driftgrindar består. Inga grants, modell-/forskningskörningar, PAPER/LIVE/AUTO, merge eller deployment följer automatiskt. |
 | Hela BB-158 — FROZEN sedan 2026-10-23 | [Kanoniskt beslut](docs/operations/bb158-freeze-20261023.md). Accepterad direktimport/DOI bevaras; YouTube/ISBN/konvertering och review-isolering är inte färdig produkt. Aktuell deployment/aktivering/import/recovery är inte omverifierad; ingen automatisk felsökning, retry, merge eller deployment. |
 
 Finance behåller långsiktigt ägarbeslut **“Finance may be creative with hypotheses, but conservative
@@ -85,12 +87,12 @@ modellen får inte generera kod/plugins/exekveringsmekanismer/risk-/sciencepolic
 Local-first och 0-SEK-gränsen kvarstår; extern AI är valfri efter separat rights/export/auth/cost-review,
 inte ett krav på kvalificerad lokal användning eller automatisk fallback.
 
-Den frysta långsiktiga riktningen är lokal forskare → beständig loop/historik → prospektiv validering →
+Den långsiktiga riktningen är lokal forskare → beständig loop/historik → prospektiv validering →
 framtida långsiktig och aktiv/högrisk PAPER-forskning → obevakad översikt/drift. Detta är mål, inte
 påstående om levererad kontinuerlig forskning. Aktiv forskning kan avse intradag till flera dagar,
 meningsfull första bedömning kring en månad och prospektiv utvärdering upp till ungefär ett år.
 Realistisk spread, avgifter, slippage och förluster krävs; compounding är inget avkastningslöfte och
-**zero trades is valid**. Fryst [Finance master roadmap](docs/architecture/finance/master-roadmap.md)
+**zero trades is valid**. [Finance master roadmap](docs/architecture/finance/master-roadmap.md)
 bär domänsekvensen; [Backlog](docs/BACKLOG.md#finance--fryst-arbete-och-kvarstående-krav) behåller öppna DoD.
 [Ägarbeslutets original](docs/history/roadmap-before-doc-2b-20261024.md#finance-product-direction--owner-instruction-2026-09-29).
 
@@ -98,7 +100,7 @@ bär domänsekvensen; [Backlog](docs/BACKLOG.md#finance--fryst-arbete-och-kvarst
 
 Alla 25 originalavsnitt finns i [Roadmap-arkivet](docs/history/roadmap-before-doc-2b-20261024.md).
 BB-130:s stabiliseringssekvens och BB-131/132:s bounded next-step-ledger är historik; genomförd
-implementation eller gammal commissioning återauktoriserar inget fryst arbete.
+implementation eller gammal commissioning återauktoriserar inget nytt uppdrag.
 [DOC-2B:s fullständiga mappning](docs/reports/documentation/doc-2b-backlog-roadmap-inventory-20261024.md#fas-b--förlustfri-konsolidering-2026-10-24)
 visar original och destinationer. Ägarprinciper och öppna skyddsgrindar ovan förblir synliga utan att
 ändra kanonisk dokumentauktoritet, prioriteringar eller acceptera en ny produktfunktion.

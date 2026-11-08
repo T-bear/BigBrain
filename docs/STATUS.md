@@ -1,7 +1,7 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-10-24 — DOC-2A, dokumentationsavstämning.
-- Verifierad mot commit: `7b3beb5288ddf7010990d17adf0635c0d59f0790` (accepterad main).
+- Senast uppdaterad: 2026-11-08 — Finance-ägarbeslut om upptining; övrig DOC-2A-status daterad 2026-10-24.
+- Verifierad mot commit: `93a31d2f31da37e8976feb47012c30eed7384e08` (Finance-upptining; övrig DOC-2A-status är daterad 2026-10-24).
 - Runtime senast verifierad: ingen ny runtimekontroll i DOC-2A; daterad driftevidens har sitt eget scope.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
@@ -14,13 +14,13 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 | Område | Gällande beslut och kvarstående begränsningar |
 | --- | --- |
-| Finance | **FROZEN sedan 2026-10-16. RESEARCH / 0 SEK / NONE.** [Kanoniskt beslut](operations/finance-freeze-20261016.md) styr. Historisk Qwen och recurring research är mergad kod; G1/G2 dokumenterat PASS, G3a BLOCKED, G3b NOT RUN. Senast dokumenterat forskning pausad och AAPL-observation aktiverad; aktuell drift, authority, mapping och journal är inte omverifierade. |
+| Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. AAPL-observation senast dokumenterat aktiverad och forskning pausad; aktuell runtime, authority, mapping och journal är inte omverifierade. |
 | BB-158 | **FROZEN sedan 2026-10-23.** [Kanoniskt beslut](operations/bb158-freeze-20261023.md) styr. Direkt MP3/M4A, valfri DOI och Sonarr-duration-korrigering finns i accepterad kod. Deployment är ägarrapporterad; aktuella images, aktivering, importer, bibliotek och recoveryutfall är **UNKNOWN / NOT REVERIFIED**. YouTube/ISBN/konvertering är inte implementerade; review-isolering är inte accepterad produktfunktion. |
 
-Upptining kräver nytt uttryckligt ägarbeslut. Gamla fortsättningsinstruktioner och ersatta
-Finance-prioriteringar gäller inte som körorder. Befintlig drift lämnas orörd utan separat beslut.
-Finance-rättigheter, retention, BB-132K:s faktiska disposal-deadline och dataintegritet förblir
-begränsningar även under frysningen; aktuell privat status är okänd. Se
+Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
+är inte körorder. Nytt tekniskt scope kräver tillämplig DoD/auktorisering och separata driftbeslut.
+Befintlig drift lämnas orörd. Finance-rättigheter, retention, BB-132K:s faktiska
+retentions-/dispositionsfrist och dataintegritet förblir bindande; privat status är okänd. Se
 [kanonisk drift-/retentiongräns](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
 Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant eller skapar handelsauktoritet.
 
