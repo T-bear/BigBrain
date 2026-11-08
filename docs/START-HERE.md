@@ -29,6 +29,11 @@ Utöka läsning vid konkret risk, osäkerhet, beroende eller konflikt. Tabellen 
 inte ett nytt fullständigt läskrav. [Dokumentationsindexet](indexes/documentation.md) hjälper till
 att hitta källor; [TESTING](../TESTING.md) hjälper till att välja riskmotiverad verifiering.
 
+Inför uppdrag där verktygsval påverkar risk, kvalitet eller kostnad använder ChatGPT och Codex
+[verktygskatalogen](operations/tool-catalog.md) som kort beslutsstöd. Välj minsta lämpliga
+verktygskombination och kontrollera faktisk åtkomst vid användning. Ingen obligatorisk
+fullständig kataloggenomgång för rutinuppgifter; katalogen ger inga nya befogenheter.
+
 Vid breda sökningar ska historiska dokument normalt exkluderas. Exempel från repositoryroten:
 
 ```sh
