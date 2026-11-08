@@ -1,22 +1,32 @@
 # Finance EODHD retention and deletion
 
-BB-085 inventory rule: EODHD is explicitly `SubscriptionOnly/DeleteAtSubscriptionEnd` and
-excluded from the public-domain indefinite backup. Any separately authorized EODHD backup
-must join this preview/deletion scope and deadline. BB-084 source-isolation remains: queries must not
-delete `NASDAQ-WIKI`, its public-domain quarantine artifact, `wiki-*` revisions or their exact
+Issue #61 (2026-11-08): EODHD Free personal retention is now `LongTerm/None`
+(no automatic deadline) under the [current Terms](https://eodhd.com/financial-apis/terms-conditions)
+and [storage FAQ](https://eodhd.com/help/storage). Private data obtained under
+an authorized subscription may be retained after cancellation; new API
+acquisition and entitlement-gated processing remain blocked without
+current authorization. EODHD is still provider-tagged and `Restricted`,
+**not** WIKI public-domain backup-eligible. A new copy or restore requires
+separate owner authorization; this amendment creates none.
+BB-084 source-isolation remains: queries must not delete `NASDAQ-WIKI`,
+its public-domain quarantine artifact, `wiki-*` revisions or their exact
 derived lineage. Shared symbols/dates do not establish shared retention.
 
 ## Scope and safety
 
 This runbook covers only data tagged `EODHD` / `Free` /
 `eodhd-free-personal-v2026-08-11`. It does not authorize trading and must not delete another
-provider's data. EODHD permits private non-commercial storage/manipulation/analysis while
-the account/subscription is active and requires all copies deleted within one month after
-termination or expiry.
+provider's data. EODHD permits private non-commercial storage/manipulation/analysis and
+retention of previously obtained data and derived evidence after termination,
+without an automatic deletion deadline, under the official pages reviewed
+2026-11-08. The previous one-month rule is preserved as historical policy in
+ADR 0028 and issue #61, not as a current deletion instruction.
 
 Loss of network access is an outage, not proof of termination. Set an entitlement end only
-from an owner/provider account fact. Once ended, acquisition, replay and derived processing
-are blocked immediately; deletion still requires the two-phase owner action below.
+from an owner/provider account fact. Once ended, acquisition, replay and other entitlement-gated processing
+remain blocked until separately authorized; stored bytes are not
+automatically destroyed. Voluntary deletion still requires the two-phase
+owner action below.
 
 ## Configure the free account
 
@@ -77,10 +87,17 @@ The command performs no provider request. Its output is sanitized to lineage, ev
 
 Set `FINANCE__EODHD__ACCOUNTACTIVE=false` and
 `FINANCE__EODHD__ENTITLEMENTENDSATUTC=<verified UTC instant>`, then recreate API. The UI/API
-shows the one-month deadline and blocks acquisition/replay use. Do not set this merely for
+shows expiry without any deletion deadline and blocks acquisition/replay use.
+Do not set this merely for
 HTTP errors or a missing key.
 
-## Preview deletion
+## Voluntary deletion only (separate owner authorization)
+
+There is no automatic EODHD cancellation deletion. The existing commands
+below are retained solely for a separate, explicitly authorized destructive
+operation. Do not run them for this policy reconciliation.
+
+### Preview deletion
 
 Run the API image as a one-shot maintenance command with the same Finance volume and
 configuration:
@@ -95,7 +112,7 @@ catalog indexes. Generic feature definitions contain no provider values and may 
 included in any BigBrain backup workflow in BB-077; if an operator has independently copied
 it, that copy must be enumerated and deleted separately before attesting completion.
 
-## Execute and verify
+### Execute and verify
 
 After explicit product-owner approval for the displayed preview:
 
@@ -112,9 +129,14 @@ datasets/volumes remain intact. Never retain prices inside the receipt.
 
 Deletion is intentionally irreversible. There is no data rollback after execution. Before
 execution, rollback means cancelling the operation and correcting account-state evidence.
-Do not restore deleted EODHD data from a backup after the legal deadline.
+Do not automatically restore deliberately deleted EODHD data, or create
+a new copy without source-specific authorization. There is no automatic
+cancellation deletion deadline under the currently reviewed EODHD Free
+personal terms.
 
 BB-089 risk evaluations reference EODHD market/feature revisions and contain minimized derived rule
-evidence; they inherit EODHD deletion scope and are removed before source lineage. Pure risk-halt
+evidence; they remain provider-tagged and are removed before source lineage
+only during a separately approved voluntary EODHD deletion. Pure risk-halt
 transition metadata contains no copied market values and may remain as indefinite audit evidence.
-EODHD-derived risk evaluations must not enter a public-domain indefinite backup.
+EODHD-derived risk evaluations must not enter a WIKI-only public-domain
+backup. Retention permission does not itself grant a new EODHD copy.

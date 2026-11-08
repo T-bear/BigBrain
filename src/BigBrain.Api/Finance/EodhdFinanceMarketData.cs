@@ -46,10 +46,10 @@ internal static class EodhdCatalog
 internal static class EodhdEntitlement
 {
     internal static MarketDataEntitlementPolicy Create(EodhdFinanceOptions options) => new(
-        new PolicyId(EodhdMarketMemory.Policy), new PolicyVersion("2026-08-11"),
+        new PolicyId(EodhdMarketMemory.Policy), new PolicyVersion("2026-11-08"),
         new MarketDataProvider(EodhdMarketMemory.Provider), new ProviderDataset(EodhdMarketMemory.Product),
-        new EvidenceReference("eodhd:first-party-pricing-api-terms:2026-08-11"),
-        new DateTimeOffset(2026, 8, 11, 0, 0, 0, TimeSpan.Zero),
+        new EvidenceReference("eodhd:first-party-terms-storage-faq:2026-11-08"),
+        new DateTimeOffset(2026, 11, 8, 0, 0, 0, TimeSpan.Zero),
         new DateTimeOffset(2026, 8, 11, 0, 0, 0, TimeSpan.Zero), options.EntitlementEndsAtUtc,
         new Dictionary<MarketDataUse, EntitlementDecision>
         {
@@ -61,14 +61,17 @@ internal static class EodhdEntitlement
             [MarketDataUse.PaperTrading] = EntitlementDecision.Denied,
             [MarketDataUse.WalkForward] = EntitlementDecision.Denied,
             [MarketDataUse.StrategyTraining] = EntitlementDecision.Denied
-        }, EntitlementDecision.Allowed, EntitlementDecision.Denied,
-        RetentionClassification.SubscriptionOnly, DeletionRequirement.DeleteAtSubscriptionEnd,
+        }, EntitlementDecision.Allowed, EntitlementDecision.Allowed,
+        RetentionClassification.LongTerm, DeletionRequirement.None,
         evidenceClass: EntitlementEvidenceClass.OwnerAcceptedPersonalResearch, monetaryCostSek: 0,
-        ownerAcceptanceVersion: "BB-077/2026-08-11",
-        rationale: "EODHD Free private non-commercial EOD storage, manipulation, analysis and replay while active; all copies deleted within one month after expiry.");
+        ownerAcceptanceVersion: "BB-077/2026-08-11+issue-61/2026-11-08",
+        rationale: "EODHD Free private non-commercial storage and retained derived evidence have no automatic post-cancellation deletion deadline under terms and FAQ checked 2026-11-08; new acquisition and entitlement-gated processing still require an active authorized account.");
 
     internal static bool AllowsAcquisition(EodhdFinanceOptions options, DateTimeOffset now)
     {
+        // Retention survives cancellation. New API acquisition never does.
+        if (!options.Enabled || !options.AccountActive ||
+            options.EntitlementEndsAtUtc is { } end && now >= end) return false;
         var policy = Create(options); var context = new MarketDataEntitlementContext(now, true, true,
             MarketDataClassification.Raw, policy.Provider, policy.ProviderDataset);
         return new[] { MarketDataUse.HistoricalAnalysis, MarketDataUse.Backtest, MarketDataUse.DerivedMetrics, MarketDataUse.LongTermStorage }
@@ -324,7 +327,7 @@ internal sealed partial class EodhdMarketMemory
         var riskEvaluations = Scalar(connection, "SELECT COUNT(*) FROM risk_evaluations");
         var seed = $"{Provider}|{Product}|{Policy}|{observations}|{revisions}|{payloads}|{featureValues}|{featureRevisions}|{backtestRuns}|{backtestEvents}|{backtestFills}|{backtestEquity}|{evaluations}|{windows}|{parameterPoints}|{costPoints}|{runReferences}|{shadowPredictions}|{shadowOutcomes}|{riskEvaluations}";
         return new($"preview-{Sha(Encoding.UTF8.GetBytes(seed))[7..19]}", observations, revisions, payloads, featureValues, featureRevisions, backtestRuns, backtestEvents, backtestFills, backtestEquity, evaluations, windows, parameterPoints, costPoints, runReferences,
-            _options.EntitlementEndsAtUtc?.AddMonths(1), "raw payloads, normalized observations, market/feature revisions, dependent backtests, robustness, prospective shadow and source-dependent risk evaluations; pure halt audit metadata is retained");
+            null, "optional owner-confirmed deletion of EODHD raw, normalized and derived evidence; no automatic retention deadline");
     }
 
     internal string ExecuteDeletion(EodhdDeletionPreview preview, string confirmation, DateTimeOffset deletedAtUtc)
@@ -387,10 +390,12 @@ internal sealed partial class EodhdMarketMemory
         var backtestRuns = Scalar(connection, "SELECT COUNT(*) FROM backtest_runs"); var backtestEvents = Scalar(connection, "SELECT COUNT(*) FROM backtest_events"); var backtestFills = Scalar(connection, "SELECT COUNT(*) FROM backtest_fills"); var backtestEquity = Scalar(connection, "SELECT COUNT(*) FROM backtest_equity");
         var evaluations = Scalar(connection, "SELECT COUNT(*) FROM robustness_evaluations"); var windows = Scalar(connection, "SELECT COUNT(*) FROM robustness_windows"); var parameterPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_parameter_sensitivity"); var costPoints = Scalar(connection, "SELECT COUNT(*) FROM robustness_cost_sensitivity"); var runReferences = Scalar(connection, "SELECT COUNT(*) FROM robustness_run_references");
         string? receipt = null; using (var command = connection.CreateCommand()) { command.CommandText = "SELECT receipt_id FROM deletion_receipts ORDER BY deleted_utc DESC LIMIT 1"; receipt = command.ExecuteScalar() as string; }
-        var deadline = _options.EntitlementEndsAtUtc?.AddMonths(1); var state = receipt is not null && observations == 0 ? FinanceRetentionState.DeletionComplete :
-            accountActive ? FinanceRetentionState.Active : deadline is null ? FinanceRetentionState.Unknown : DateTimeOffset.UtcNow > deadline ? FinanceRetentionState.ExpiredBlocked : FinanceRetentionState.DeletionRequired;
-        return new(state, _options.EntitlementEndsAtUtc, deadline, observations, revisions, payloads,
-            "raw payloads, normalized observations, market revisions, derived feature values/revisions and catalog indexes", receipt,
+        // No deletion countdown. ExpiredBlocked denotes acquisition/use authority, not a deletion obligation.
+        var state = receipt is not null && observations == 0 ? FinanceRetentionState.DeletionComplete :
+            accountActive && (_options.EntitlementEndsAtUtc is not { } end || end > DateTimeOffset.UtcNow)
+                ? FinanceRetentionState.Active : FinanceRetentionState.ExpiredBlocked;
+        return new(state, _options.EntitlementEndsAtUtc, null, observations, revisions, payloads,
+            "retained EODHD raw and derived evidence; optional explicitly owner-confirmed deletion only", receipt,
             featureValues, featureRevisions, backtestRuns, backtestEvents, backtestFills, backtestEquity, evaluations, windows, parameterPoints, costPoints, runReferences);
     }
 

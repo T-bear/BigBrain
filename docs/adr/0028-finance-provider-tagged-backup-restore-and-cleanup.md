@@ -31,3 +31,27 @@ included in that class; any permitted EODHD copy must preserve its expiry/deleti
 Derived rows are included only when every exact source revision is included. Operations are
 maintenance-only; API/Web expose sanitized read-only inventory. Finance remains RESEARCH and
 this decision creates no broker, order, PAPER, LIVE or AUTO capability.
+
+## Addendum — EODHD Free personal retention, 2026-11-08 (issue #61)
+
+**Later owner-scoped decision supersedes only EODHD's former automatic
+`SubscriptionOnly/DeleteAtSubscriptionEnd` policy.** The official
+[Terms and Conditions](https://eodhd.com/financial-apis/terms-conditions)
+and [storage/cancellation FAQ](https://eodhd.com/help/storage), directly
+checked 2026-11-08, permit a non-professional user to store and retain
+downloaded market data and private derived research after cancellation,
+without a post-cancellation deletion deadline. An older web-cached Terms
+version still displayed the former one-month requirement; preserve this
+date-sensitive discrepancy in issue #61 rather than calling it nonexistent.
+
+The current EODHD Free retention classification is therefore
+`LongTerm/None`: no automatic deletion deadline. This is a
+provider/product-specific retention amendment, **not** public-domain
+classification, unlimited access, permission to redistribute, or new
+provider/grant authorization. WIKI-only automatic backups remain WIKI-only;
+EODHD copies remain `Restricted`, explicitly provider-tagged, and require
+their own owner-approved copy/restore scope. Post-termination API acquisition
+and entitlement-gated processing remain blocked; existing records need no
+migration or retroactive rewriting. Manual deletion remains a separately
+confirmed, irreversible owner action. All other providers and the separate
+BB-132K disposition stay unchanged. Finance remains RESEARCH / 0 SEK / NONE.

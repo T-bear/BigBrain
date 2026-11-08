@@ -16,7 +16,9 @@ public sealed class FinanceDataProtectionTests
         var eodhd = FinanceBackupPolicyV1.Classify(EodhdMarketMemory.Provider, EodhdMarketMemory.Product, EodhdMarketMemory.Policy, null, null, null, new DateTimeOffset(2026, 8, 31, 0, 0, 0, TimeSpan.Zero));
         var unknown = FinanceBackupPolicyV1.Classify("Unknown", "Unknown", "unknown", null, null, null, null);
         Assert.Equal(FinanceBackupEligibility.Eligible, wiki.BackupEligibility); Assert.Equal("Indefinite", wiki.RetentionClass);
-        Assert.Equal(FinanceBackupEligibility.Restricted, eodhd.BackupEligibility); Assert.Equal("DeleteAtSubscriptionEnd", eodhd.DeletionRequirement); Assert.Equal(new DateTimeOffset(2026, 9, 30, 0, 0, 0, TimeSpan.Zero), eodhd.DeletionDeadlineUtc);
+        Assert.Equal(FinanceBackupEligibility.Restricted, eodhd.BackupEligibility); Assert.Equal("LongTerm", eodhd.RetentionClass);
+        Assert.Equal("None", eodhd.DeletionRequirement); Assert.Null(eodhd.DeletionDeadlineUtc);
+        Assert.True(eodhd.RestoreEligible);
         Assert.Equal(FinanceBackupEligibility.Excluded, unknown.BackupEligibility); Assert.False(unknown.RestoreEligible);
     }
 
