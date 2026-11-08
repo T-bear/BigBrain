@@ -44,9 +44,9 @@ internal static class FinanceBackupPolicyV1
             return new(provider, product, "PublicDomain", "Indefinite", "None", null,
                 FinanceBackupEligibility.Eligible, true, "Verified public-domain promoted evidence.");
         if (provider == EodhdMarketMemory.Provider && product == EodhdMarketMemory.Product && policy == EodhdMarketMemory.Policy)
-            return new(provider, product, "OwnerAcceptedPersonalResearch", "SubscriptionOnly", "DeleteAtSubscriptionEnd",
-                entitlementEndsAtUtc?.AddMonths(1), FinanceBackupEligibility.Restricted, true,
-                "Provider-tagged copies remain in the EODHD deletion inventory and may not enter an indefinite backup.");
+            return new(provider, product, "OwnerAcceptedPersonalResearch", "LongTerm", "None",
+                null, FinanceBackupEligibility.Restricted, true,
+                "Private EODHD copies may be retained without an automatic deletion deadline; remain provider-tagged and excluded from WIKI-only public-domain backups.");
         if (candidateState == "Promoted" && provenanceResult == "Pass" && licenseClass is "Cc0" or "CcBy" or "CompatibleOther")
             return new(provider, product, licenseClass, licenseClass == "CcBy" ? "AttributionRequired" : "Indefinite", "None", null,
                 FinanceBackupEligibility.Eligible, true, "Compatible promoted evidence with preserved attribution and lineage.");

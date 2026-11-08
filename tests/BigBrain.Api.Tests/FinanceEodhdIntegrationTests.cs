@@ -131,6 +131,9 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
 
         Assert.False(blocked.Safety.IngestionAllowed);
         Assert.Equal(FinanceRetentionState.ExpiredBlocked, blocked.Retention!.State);
+        Assert.Null(blocked.Retention.DeletionDeadlineUtc);
+        Assert.Null(preview.DeadlineUtc);
+        Assert.True(blocked.Retention.CoveredObservationCount > 0);
         Assert.Equal(featureRevision.ValueCount, preview.FeatureValues);
         Assert.Equal(1, preview.FeatureRevisions);
         Assert.Equal(6, preview.BacktestRuns);
@@ -175,7 +178,7 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     }
 
     [Fact]
-    public void EntitlementAllowsOnlyActiveFreeResearchAndDeniesPostExpiryRetentionAndTrading()
+    public void EntitlementAllowsPrivateRetentionButDeniesExpiredAcquisitionAndTrading()
     {
         var options = Options(); var policy = EodhdEntitlement.Create(options);
         var active = new MarketDataEntitlementContext(new DateTimeOffset(2026, 8, 11, 12, 0, 0, TimeSpan.Zero), true, true,
@@ -184,10 +187,18 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
 
         Assert.Equal(0, policy.MonetaryCostSek);
         Assert.Equal(EntitlementEvidenceClass.OwnerAcceptedPersonalResearch, policy.EvidenceClass);
+        Assert.Equal("2026-11-08", policy.Version.Value);
+        Assert.Equal(RetentionClassification.LongTerm, policy.Retention);
+        Assert.Equal(DeletionRequirement.None, policy.Deletion);
+        Assert.Equal(EntitlementDecision.Allowed, policy.PostSubscriptionRetention);
         Assert.True(MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.Backtest, active).IsAllowed);
+        Assert.True(MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.LongTermStorage, ended).IsAllowed);
         Assert.False(MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.PaperTrading, active).IsAllowed);
-        Assert.Equal(MarketDataEntitlementReasons.PostSubscriptionRetentionDenied,
-            MarketDataEntitlementEvaluator.Evaluate(policy, MarketDataUse.HistoricalAnalysis, ended).ReasonCode);
+        Assert.False(EodhdEntitlement.AllowsAcquisition(options with { AccountActive = false }, active.EvaluatedAtUtc));
+        var expired = options with { EntitlementEndsAtUtc = active.EvaluatedAtUtc.AddMinutes(-1) };
+        Assert.False(EodhdEntitlement.AllowsAcquisition(expired, active.EvaluatedAtUtc));
+        Assert.Equal(MarketDataEntitlementReasons.PolicyExpired,
+            MarketDataEntitlementEvaluator.Evaluate(EodhdEntitlement.Create(expired), MarketDataUse.Backtest, active).ReasonCode);
     }
 
     private EodhdFinanceOptions Options(string token = "") => new()

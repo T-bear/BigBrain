@@ -51,8 +51,11 @@ genom denna statusändring. Befintlig drift lämnas orörd utan separat beslut.
   providergaranti; de sex besvarade frågorna ska inte skickas igen, men villkor/feed/lifecycle och policy/mapping
   måste vara giltiga. SimFin/Stooq och Avanza har kvarvarande rättighetsgrindar; Yahoo/yfinance och beständig
   Tiingo Starter-intake är inte generellt tillåtna. Ingen skyddad nedladdningskontroll får kringgås.
-- Retention/deletion/backup ärvs av raw, härledd evidens och audit. EODHD får inte behandlas som WIKI:s
-  public-domain-minne. BB-132K:s faktiska privata disposal-frist är okänd; frysningen förlänger inga frister.
+- Retention/deletion/backup ärvs av raw, härledd evidens och audit. Issue #61:s
+  EODHD Free-ändring (2026-11-08) medger privat lagring av tidigare erhållna
+  data utan automatisk uppsägningsradering; inga nya API-rättigheter följer.
+  EODHD är fortfarande `Restricted` och får inte behandlas som WIKI:s
+  public-domain-minne. BB-132K:s separata disposal-frist påverkas inte.
   Dokumenterad plaintext-avvikelse är inte ett secure-erase/no-exposure-bevis. Se [F/G i frysdokumentet](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
 - Quarantine/drop/promotion ska behålla symlink-/traversal-/ZIP-/storleks-/schemagrindar och explicit
   promotionsreview. BB-122:s identitets-/venueintervall och ticker-reuse är inte lösta av nutida symbolregister;

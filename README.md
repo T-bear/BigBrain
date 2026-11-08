@@ -29,8 +29,11 @@ roadmap gate before real-money LIVE eligibility. Finance remains read-only `RESE
 
 BB-085 adds provider-tagged Finance backup, isolated restore verification and conservative
 quarantine cleanup. Public-domain WIKI memory and its exact derived lineage can enter an
-ordinary local backup; EODHD remains a separately inventoried subscription-only source with
-its deletion duty. Read-only API/Web distinguish backed-up, canonical and quarantined state.
+ordinary local backup; EODHD remains separately provider-tagged and restricted
+from WIKI-only automatic backups. Under issue #61, private EODHD retention
+survives cancellation without an automatic deletion deadline, but new
+acquisition and copies still require their own authorization.
+Read-only API/Web distinguish backed-up, canonical and quarantined state.
 
 BB-084 adds Finance's provider-neutral historical dataset quarantine and deterministic
 promotion boundary. A verified public-domain 2016 WIKI snapshot is promoted only as its own

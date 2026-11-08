@@ -34,7 +34,9 @@ the overview is derived on read and creates no independent backup artifact.
 
 BB-085 implements Finance provider-tagged backup. WIKI public-domain canonical memory plus
 exact WIKI-only feature/backtest/robustness lineage is eligible for local indefinite backup.
-EODHD stays outside that class and remains in its subscription/deletion inventory.
+EODHD stays outside that WIKI-only class: private retention is now
+`LongTerm/None` under issue #61, but EODHD remains separately classified
+as `Restricted` and is never automatically copied or restored.
 
 Maintenance commands (no provider calls):
 
@@ -53,10 +55,12 @@ Restore drills copy into isolated staging, verify SHA-256 and compare revision/c
 then remove staging; they never overwrite canonical state. Low disk fails before publication.
 Cleanup affects only retention-aged rejected raw payloads and retains manifests/audit evidence.
 
-BB-090 schema closure uses a separate full SQLite pre-migration snapshot only for migration recovery. Stop API/Web first, retain the snapshot inside the protected Finance backup inventory, hash it, and label every provider class: EODHD copies remain deletion-controlled, WIKI is public-domain, and Macro follows its revision rights. Run `finance-evidence-counts` on the source and an isolated copy, then `finance-schema-status` only on the copy. Production migration is allowed only when versions and all evidence counts match. `finance-schema-status` applies missing ordered migrations transactionally and is restart-safe; it never resets the database. The closure snapshot is not a new indefinite entitlement for provider-restricted payloads.
+BB-090 schema closure uses a separate full SQLite pre-migration snapshot only for migration recovery. Stop API/Web first, retain the snapshot inside the protected Finance backup inventory, hash it, and label every provider class: EODHD copies remain source-tagged and require separately approved scope,
+WIKI is public-domain, and Macro follows its revision rights. Run `finance-evidence-counts` on the source and an isolated copy, then `finance-schema-status` only on the copy. Production migration is allowed only when versions and all evidence counts match. `finance-schema-status` applies missing ordered migrations transactionally and is restart-safe; it never resets the database. The closure snapshot is not a new indefinite entitlement for provider-restricted payloads.
 
 Meal planner, shopping list, calendar, settings and lifecycle have named volumes but no
-approved restore drill. Sentinel socket state is ephemeral. Any operator-created EODHD copy
-must still join provider deletion inventory/deadline; BB-085 does not authorize one.
+approved restore drill. Sentinel socket state is ephemeral. Any operator-created EODHD copy must retain exact provider and
+provenance identity; no automatic cancellation deletion deadline applies
+under issue #61, and BB-085 does not authorize making a new copy.
 
 Grundstruktur. Ingen procedur är godkänd ännu; framtida runbooks ska skilja onlinebackup, restoretest, retention och moduldata.

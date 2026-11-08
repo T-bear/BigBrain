@@ -358,11 +358,16 @@ revisions reproduced identical checksums on repeated replay. API/Web recreation 
 the catalog and payload references, and the acquisition journal prevented a second same-day
 download; external request count remained eight.
 
-The EODHD scope is subscription-only. Account termination is explicit configuration, not a
-network inference. It blocks acquisition/replay immediately and creates a one-month deletion
-deadline. Preview and exact confirmation cover payloads, normalized observations, revisions
-and indexes; receipts retain counts/fingerprint but no licensed values. No backup workflow
-may include the Finance volume until it can enumerate/delete those copies too.
+The original BB-077 EODHD policy was subscription-only. **Issue #61
+(2026-11-08) supersedes its automatic deletion deadline only**: current
+first-party Terms/FAQ permit private retention of downloaded EODHD Free
+data and derived research after cancellation. Account termination remains
+explicit configuration (not a network inference) and blocks new acquisition
+and entitlement-gated replay; the database is not automatically purged.
+The existing optional deletion preview and exact confirmation still cover
+payloads, derived rows, revisions and indexes. EODHD remains provider-tagged
+and excluded from WIKI-only public-domain backups. A new copy requires
+separate owner approval; no Finance volume is implicitly backed up.
 
 ## Canonical market-data memory
 
