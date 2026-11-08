@@ -27,7 +27,7 @@ auktorisering för berörd åtgärd eller ändras scope krävs nytt beslut innan
 | --- | --- |
 | 1 | Autonom teknisk leverans, inklusive merge och deployment, med fokuserad verifiering, relevanta CI-kontroller och befintliga drift-/leverantörsgrindar. |
 | 2 | Autonom teknisk leverans med relevanta data-, åtkomst-, säkerhets- och återhämtningskontroller. Databasdeployment kräver separat granskning tills nivå 2-backupgrinden i avsnitt 3 är verifierad; grinden är fortsatt BLOCKED enligt backupunderlaget. |
-| 3 | Autonom merge och deployment inom på förhand godkänt uppdrag och riskram, först efter godkänd faktisk oberoende granskning av exakt kandidat-SHA/tree mot rätt main-baslinje. Granskningsutfall och kandidatidentitet dokumenteras; ändrad kandidat kräver ny tillämplig granskning. Ingen ny manuell SHA- eller deploymentauktorisering från ägaren krävs inom ramen. Finance är alltid nivå 3 och förblir fryst. |
+| 3 | Autonom merge och deployment inom på förhand godkänt uppdrag och riskram, först efter godkänd faktisk oberoende granskning av exakt kandidat-SHA/tree mot rätt main-baslinje. Granskningsutfall och kandidatidentitet dokumenteras; ändrad kandidat kräver ny tillämplig granskning. Ingen ny manuell SHA- eller deploymentauktorisering från ägaren krävs inom ramen. Finance är alltid nivå 3; aktuell frysningsstatus avgörs av senare kanoniskt ägarbeslut, inte av denna tabell. |
 
 Även delegerad merge ska binda exakt kandidat-SHA/tree till verifierad main-baslinje, kontrollerad
 diff och tillämpliga required checks. Verifiera oförändrade identiteter omedelbart före merge;

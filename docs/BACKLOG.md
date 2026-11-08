@@ -33,12 +33,16 @@ Befintlig drift och media lämnas orörda. [Ursprunglig post](history/backlog-be
 
 <a id="bigbrain-finance--policy-governed-autonomous-trading"></a>
 
-## Finance — fryst arbete och kvarstående krav
+<a id="finance--fryst-arbete-och-kvarstående-krav"></a>
 
-**FROZEN sedan 2026-10-16. RESEARCH / 0 SEK / NONE.**
-[Finance-frysningen](operations/finance-freeze-20261016.md) är kanonisk. G1/G2 är dokumenterat PASS,
-**G3a BLOCKED / G3b NOT RUN**. Ingen ny källa, grant, inferens, forskningssession, PAPER/LIVE/AUTO,
-brokerkoppling, deployment eller upptining. Befintlig drift lämnas orörd utan separat beslut.
+## Finance — återupptaget arbete och kvarstående krav
+
+**UPPTINAD 2026-11-08 genom ägarbeslut; RESEARCH / 0 SEK / NONE.**
+[Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08)
+häver den administrativa spärren. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**.
+Prioriterad planering är BB-045/073/082; ingen ny utveckling, forskning, grant, provider,
+datakopiering, migration, merge, deployment, modellkörning eller PAPER/LIVE/AUTO startas
+genom denna statusändring. Befintlig drift lämnas orörd utan separat beslut.
 
 ### Rättigheter, integritet och vetenskap
 
@@ -81,7 +85,7 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 
 ### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
 
-**FROZEN / full DoD inte stängd.** BB-045 prioritet P2, beroenden BB-044/046 och accepterad ADR0021;
+**ÖPPEN / full DoD inte stängd.** BB-045 prioritet P2, beroenden BB-044/046 och accepterad ADR0021;
 BB-073 prioritet P2, beroende BB-045 samt BB-071 och separat ägarbeslut för externa data.
 De gamla globala providerblocken är delvis ersatta av senare avgränsad EODHD-aktivering, inte av
 generellt tillstånd eller bevis för dagens drift. Bevara följande DoD utöver gränserna ovan:
@@ -101,7 +105,7 @@ generellt tillstånd eller bevis för dagens drift. Bevara följande DoD utöver
 - M5 policy maturation: tillförlitlig sector/spread-evidens, hypotetisk portfolioaggregation och
   exchange-calendar-förfining först när beroenden finns; inga fabricerade värden.
 - Prospektiv multi-real-session-evidens är en framtida observationsgrind, inte ett dagligt manuellt
-  uppdrag under frysningen. Genuine future EOD-sessioner före kvalitetsanspråk, ingen source stitching.
+  uppdrag utan separat auktorisering. Genuine future EOD-sessioner före kvalitetsanspråk, ingen source stitching.
 - BB-082, P1: längre nollkostnadshistorik kräver namngiven verifierbar källa eller normalt stödd
   bulk/API-väg med automation/lagring/proveniens klarlagd; budget och åtkomstkontroller består.
 
@@ -127,10 +131,13 @@ Cross-host coordination, lång-outage-backfill och automatisk vetenskaplig utvä
 Whole-host rollback inklusive authority, witness loss och automatisk repair ingår inte i releasebeviset;
 gamla grants får inte återaktiveras utan betrodd aktuell historik. [B003–009](history/backlog-before-doc-2b-20261024.md#historical-qwen-operational-gate).
 
-### Fryst forsknings- och exekveringsplan
+<a id="fryst-forsknings-och-exekveringsplan"></a>
 
-Följande öppna BB-ID:n behåller sina ursprungliga prioriteringar, DoD och beroenden. Alla omfattas
-av FROZEN oavsett äldre Planerad/Pågår. De är inga nya sprintuppdrag. BB-042:s epic kvarstår,
+### Kvarstående forsknings- och exekveringsplan
+
+Följande öppna BB-ID:n behåller sina ursprungliga prioriteringar, DoD och beroenden.
+Den administrativa Finance-frysningen är hävd, men inget av dessa BB-ID:n startas
+automatiskt och ingen gammal instruktion är ett exekveringsmandat. BB-042:s epic kvarstår,
 BB-082:s längre rättighetsklarerade historik är inte löst för alla instrument, och BB-053 är partiell.
 [Domänroadmap](architecture/finance/master-roadmap.md) styr sekvensen; rättigheter och skydd ovan gäller före varje steg.
 

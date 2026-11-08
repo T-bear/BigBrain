@@ -1,6 +1,48 @@
 # Finance — formell frysning och återupptagning, 2026-10-16
 
+## Aktuellt ägarbeslut — administrativ upptining 2026-11-08
+
+**UPPTINAD — ÄGARBESLUT 2026-11-08.** Ägaren har efter den tidigare,
+avgränsade upptiningen uttryckligen beslutat att häva Finance-frysningen
+som administrativ spärr och godkänt genomförandet av själva upptiningen.
+Detta beslut är senare än frysläget i avsnitt A–J nedan och ersätter deras
+**FROZEN**-status, men bevarar den daterade historiken, faktisk evidens
+och samtliga tekniska säkerhetsgrindar.
+
+- Finance får åter prioriteras för planering, dokumentation och separat
+  auktoriserade utvecklingsuppdrag med mål, scope, risknivå 3, verifierbar
+  DoD och stoppvillkor enligt [AGENTS](../../AGENTS.md) §4.
+  Den redan valda inriktningen BB-045/073/082 är planering, inte
+  automatisk forskning eller driftstart.
+- **Ingen automatisk exekvering:** detta dokumentationsbeslut tillåter
+  inte Qwen/G3a, G3b, nya providers eller grants, forskningssessioner,
+  modellkörningar, PAPER/LIVE/AUTO, migrations-/runtimeåtgärder,
+  datakopiering, rootåtgärder, deployment eller merge.
+  Sådana steg kräver separat tillämpligt uppdrag, kontroller och
+  auktorisering; inga gamla runbooks, grants eller review-PR:er
+  blir körbara genom upptiningen.
+- **Kända tekniska grindar kvar:** G1/G2 har daterat PASS;
+  **G3a BLOCKED / G3b NOT RUN**. Historiska P1-frågor om
+  hostisolering och exekveringsauktoritet är inte lösta genom
+  ägarbeslutet. Källrättigheter, retention, proveniens,
+  opåverkad holdout och fail-closed gäller oförändrat.
+- **RESEARCH / 0 SEK / NONE** består; ingen handelsauktoritet.
+  Release 1-mandaten v1/v1.1 löper som längst till 2026-11-18
+  enligt egna villkor och förnyas inte av detta beslut.
+  BB-132K-retention/disposition är ett separat ägarbeslut,
+  med dokumenterad granskningsfrist senast 2026-11-10
+  kl. 14.36.45 svensk tid (eller tidigare enligt källvillkor).
+- Git-baslinje för detta beslut: verifierad accepterad
+  `main` `93a31d2f31da37e8976feb47012c30eed7384e08`.
+  Ändringen avser endast dokumenterad administrativ status,
+  inte ett påstående om driftens aktuella tillstånd.
+  Tidigare frysta review-brancher förblir omärgade.
+
 ## A. Läs detta först
+
+> **Historisk status 2026-10-16:** administrativ FROZEN-status nedan är
+> ersatt av ägarbeslutet 2026-11-08 ovan. Tekniska fynd och daterad
+> evidens förblir giltiga inom respektive verifierat scope.
 
 **FROZEN — OWNER DECISION REQUIRED TO RESUME.** Ägarbeslut gäller hela Finance från
 2026-10-16 på obestämd tid. Denna kanoniska överlämning publiceras på befintlig review-branch;
@@ -27,6 +69,10 @@ Primära underlag: [AGENTS](../../AGENTS.md), [dokumentauktoritet](../indexes/do
 [hosting-runbook](https://github.com/T-bear/BigBrain/blob/378d43e9a33b217fef30de5d4f74ef58a0a01926/docs/operations/runbooks/finance-historical-hosting.md). Detta dokument ändrar inga tekniska kontrakt.
 
 ## B. Ägarbeslut och auktoritet
+
+> Avsnittet dokumenterar det ursprungliga frysningsbeslutet. Den
+> administrativa spärren hävdes genom senare ägarbeslut 2026-11-08;
+> behörighets- och säkerhetskrav kvarstår.
 
 Produktägaren har uttryckligen beslutat om omedelbar frysning av **hela Finance**, inte enbart
 historisk Qwen. Det äldre villkoret att självständig forskning först måste vara verifierat igång
