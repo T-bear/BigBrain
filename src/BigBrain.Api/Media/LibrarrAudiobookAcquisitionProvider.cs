@@ -83,7 +83,8 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
             var candidate = new AudiobookAcquisitionCandidate(
                 Id("work", title, raw.Author ?? author ?? string.Empty), editionId, title,
                 raw.Author ?? author, null, candidateLanguage, AudiobookLanguages.DisplayName(candidateLanguage),
-                Edition(raw), null, Year(item), null, "librarr", "available", confidence, Provenance(source));
+                Edition(raw), null, Year(item), null, "librarr", "available", confidence, Provenance(source),
+                Seeders: TrustedSeeders(item, source));
             if (!byRelease.TryGetValue(releaseKey, out var existing) || Prefer(candidate, existing))
                 byRelease[releaseKey] = candidate;
         }
@@ -223,6 +224,17 @@ public sealed class LibrarrAudiobookAcquisitionProvider(HttpClient http, MediaOp
     }
     private static string FormatSize(long bytes) => bytes >= 1_073_741_824 ? $"{bytes / 1_073_741_824d:0.0} GB" : $"{bytes / 1_048_576d:0} MB";
     private static int? Year(JsonElement item) => int.TryParse(Text(item, "year"), NumberStyles.None, CultureInfo.InvariantCulture, out var year) && year is >= 1000 and <= 9999 ? year : null;
+    // The pinned Librarr revision emits genuine counts for these two torrent
+    // sources. AudioBookBay emits a zero placeholder, not measured availability.
+    // A missing/invalid field is unknown, never an invented zero.
+    private static int? TrustedSeeders(JsonElement item, string source)
+    {
+        if (source is not ("prowlarr_audiobooks" or "tpb_audiobook")) return null;
+        if (!item.TryGetProperty("seeders", out var value) ||
+            value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var count) || count < 0)
+            return null;
+        return count;
+    }
     private static long? Number(JsonElement item, string name) => item.TryGetProperty(name, out var value) && value.TryGetInt64(out var number) ? number : null;
     private static string? Text(JsonElement item, string name) => item.ValueKind == JsonValueKind.Object && item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     private static string? NullIfWhiteSpace(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;

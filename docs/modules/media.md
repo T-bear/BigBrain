@@ -54,6 +54,22 @@ acceptance explicitly reported 2026-10-17. [Current status and deployment eviden
 Earlier BB-117 decisions remain history; no deferred provider work is reopened.
 
 
+## BB-157 — sökkvalitet och seeders (avgränsad kodändring)
+
+Fritextsökning reserverar den första av högst två sökvarianter för användarens
+originalfråga, även när Open Library föreslår kanonisk titel och serie.
+Identifierarsökning använder fortsatt kanoniska bokvarianter. Övriga
+metadata-, språk-, käll- och utgåvegränser är oförändrade.
+
+Librarrs befintliga resultatfält seeders förs endast vidare från Prowlarr
+och The Pirate Bay när ett icke-negativt heltal uttryckligen rapporterats.
+AudioBookBays noll är en platshållare och visas som okänt, aldrig
+som verifierad tillgänglighet. Webbgränssnittet visar uppgiften för
+torrentutgåvor; direktkällor får ingen missvisande seederetikett.
+Ingen ny sökkälla, nätverksbegäran, indexerbehörighet, automatisk
+hämtning eller ändring av BB-158:s frysta import-/driftflöden ingår.
+Sortering efter seeders och bredare BB-157-filter återstår.
+
 ## Mediekontroll — frontend review, 2026-10-17
 
 Media has one `media-control` entry replacing `downloads`, `media-jobs` and `jellyfin-overview`

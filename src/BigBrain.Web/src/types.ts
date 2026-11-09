@@ -1029,6 +1029,7 @@ export interface AudiobookAcquisitionCandidate {
   provenance?: string | null
   metadataWorkId?: string | null
   matchEvidence?: string | null
+  seeders?: number | null
 }
 export interface AudiobookAcquisitionJob {
   id: string

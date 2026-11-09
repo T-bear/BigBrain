@@ -281,6 +281,9 @@ export function AudiobookSearch({
                     .filter(Boolean)
                     .join(' · ')}
                 </p>
+                {['Prowlarr', 'The Pirate Bay', 'AudioBookBay'].includes(candidate.provenance ?? '') && (
+                  <p>Seeders: {candidate.seeders ?? 'okänt'}</p>
+                )}
                 {candidate.languageConfidence === 'probable' && <p>Språket är troligt, inte verifierat.</p>}
                 <BBButton
                   disabled={
