@@ -189,8 +189,10 @@ public static class AudiobookDiscoveryPlanner
         // A literal owner query is an immutable discovery identity. Author
         // metadata may add a representative work, but must never consume both
         // bounded slots and replace the text the owner actually entered.
-        if (inputLooksLikeAuthor)
-            Add(seeds, new(input.Original, null, null, "literal"));
+        // Free-text searches must retain the owner's exact search intent even
+        // when canonical metadata and series variants compete for two slots.
+        if (inputLooksLikeAuthor || input.Kind == AudiobookMetadataInputKinds.FreeText)
+            Add(seeds, new(input.Original, NullIfWhiteSpace(authorHint), null, "literal"));
         foreach (var work in works.Take(inputLooksLikeAuthor ? MaximumProviderSearches : 1))
         {
             var author = (work.Authors.Count > 0 ? work.Authors[0] : null) ?? NullIfWhiteSpace(authorHint);

@@ -67,6 +67,29 @@ public sealed class LibrarrAudiobookAcquisitionProviderTests
     }
 
     [Fact]
+    public async Task SearchExposesOnlyReportedTorrentSeederCounts()
+    {
+        var provider = Provider(_ => Json(HttpStatusCode.OK, """
+            {"results":[
+              {"source":"prowlarr_audiobooks","title":"Prowlarr Count","info_hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","seeders":42},
+              {"source":"tpb_audiobook","title":"TPB Count","info_hash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","seeders":5},
+              {"source":"audiobookbay","title":"ABB Placeholder","abb_url":"/abss/placeholder/","seeders":0},
+              {"source":"prowlarr_audiobooks","title":"Missing Count","info_hash":"cccccccccccccccccccccccccccccccccccccccc"},
+              {"source":"prowlarr_audiobooks","title":"Invalid Count","info_hash":"dddddddddddddddddddddddddddddddddddddddd","seeders":-1},
+              {"source":"prowlarr_audiobooks","title":"Non Numeric Count","info_hash":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","seeders":"10"}
+            ]}
+            """));
+        var values = await provider.SearchAsync("Boken", null, "sv", TestContext.Current.CancellationToken);
+        Assert.Equal(6, values.Count);
+        Assert.Equal(42, values.Single(x => x.Title == "Prowlarr Count").Seeders);
+        Assert.Equal(5, values.Single(x => x.Title == "TPB Count").Seeders);
+        Assert.Null(values.Single(x => x.Title == "ABB Placeholder").Seeders);
+        Assert.Null(values.Single(x => x.Title == "Missing Count").Seeders);
+        Assert.Null(values.Single(x => x.Title == "Invalid Count").Seeders);
+        Assert.Null(values.Single(x => x.Title == "Non Numeric Count").Seeders);
+    }
+
+    [Fact]
     public async Task SearchMapsApprovedAudioBookBayCandidateWithoutExposingItsPath()
     {
         var calls = 0;

@@ -60,9 +60,25 @@ public sealed class AudiobookMetadataTests
         var plan = AudiobookDiscoveryPlanner.Plan(AudiobookMetadataInput.Classify("The Wandering Inn"), [work], null);
         Assert.InRange(plan.Count, 1, AudiobookDiscoveryPlanner.MaximumProviderSearches);
         Assert.Equal("The Wandering Inn", plan[0].Query);
-        Assert.Equal("pirateaba", plan[0].Author);
+        Assert.Equal("literal", plan[0].MatchEvidence);
+        Assert.Null(plan[0].Author);
+        Assert.Equal("The Wandering Inn", plan[1].Query);
+        Assert.Equal("pirateaba", plan[1].Author);
         Assert.DoesNotContain(plan.GroupBy(value => (value.Query.ToLowerInvariant(), value.Author?.ToLowerInvariant())).Select(group => group.Count()), count => count > 1);
         Assert.Equal(6, AudiobookDiscoveryPlanner.MaximumUpstreamQueries);
+    }
+
+    [Fact]
+    public void FreeTextLiteralDoesNotGetDisplacedByCanonicalAndSeriesQueries()
+    {
+        var work = Work(series: "Wandering Inn", alternate: ["Wandering Inn"]);
+        var plan = AudiobookDiscoveryPlanner.Plan(AudiobookMetadataInput.Classify("Wandering"), [work], null);
+        Assert.Equal(2, plan.Count);
+        Assert.Equal("Wandering", plan[0].Query);
+        Assert.Equal("literal", plan[0].MatchEvidence);
+        Assert.Equal("The Wandering Inn", plan[1].Query);
+        Assert.Equal("pirateaba", plan[1].Author);
+        Assert.Equal("canonicalTitleAuthor", plan[1].MatchEvidence);
     }
 
     [Fact]
@@ -83,7 +99,7 @@ public sealed class AudiobookMetadataTests
     public void SeriesAndAlternateQueriesAreDeduplicated()
     {
         var work = Work(series: "Wandering Inn", alternate: ["The Wandering Inn", "Wandering Inn"]);
-        var plan = AudiobookDiscoveryPlanner.Plan(AudiobookMetadataInput.Classify("The Wandering Inn"), [work], null);
+        var plan = AudiobookDiscoveryPlanner.Plan(AudiobookMetadataInput.Classify("9780306406157"), [work], null);
         Assert.Equal(2, plan.Count);
         Assert.Equal("Wandering Inn", plan[1].Query);
         Assert.Equal("series", plan[1].MatchEvidence);

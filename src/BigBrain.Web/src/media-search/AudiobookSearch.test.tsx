@@ -94,6 +94,29 @@ test('discovery uses existing API, preserves opaque edition and requires explici
   expect(screen.getByRole('button', { name: 'Välj utgåva' })).toBeDisabled()
 })
 
+test('shows measured torrent seeders and explicit unknown without inventing direct-source counts', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve(
+        ok({
+          ...results,
+          discovery: [
+            { ...candidate, editionId: 'p', provenance: 'Prowlarr', seeders: 42 },
+            { ...candidate, editionId: 'a', provenance: 'AudioBookBay', seeders: null },
+            { ...candidate, editionId: 'l', provenance: 'LibriVox' },
+          ],
+        }),
+      ),
+    ),
+  )
+  start()
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  expect(await screen.findByText('Seeders: 42')).toBeInTheDocument()
+  expect(screen.getByText('Seeders: okänt')).toBeInTheDocument()
+  expect(screen.getAllByText(/^Seeders:/)).toHaveLength(2)
+})
+
 test('library uses only catalog reads and discloses the bounded search without changing progress', async () => {
   const fetch = vi.fn((url: string, init?: RequestInit) => {
     expect(init?.method ?? 'GET').toBe('GET')

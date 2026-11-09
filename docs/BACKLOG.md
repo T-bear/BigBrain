@@ -1152,7 +1152,11 @@ stängda vid en framtida produktbedömning:
 
 ### BB-157 — Media Release Availability Search
 
-- Status: **PLANNED / BACKLOG ONLY**. Preserved by BB-117; not implemented.
+- Status: **PARTIAL CODE SCOPE / DEPLOYMENT NOT IMPLIED**. Första avgränsade delen visar
+  verifierbart rapporterade seeders från Prowlarr/The Pirate Bay, okänt där
+  uppgiften saknas; källbunden visning och ursprunglig fritextsökning testas.
+  Seedersortering och bredare filter är fortfarande planerade, inte levererade.
+  [Kontrakt](modules/media.md#bb-157--sökkvalitet-och-seeders-avgränsad-kodändring).
 - When indexers actually provide it, expose truthful seeder count and allow sorting by seeders; never invent missing counts. Future filters may combine language and genre/category, for example Swedish children's audiobooks ordered by seeders.
 - Keep release/indexer availability distinct from BB-155 canonical book metadata. Measure provider capability and semantics before designing or implementing filters.
 

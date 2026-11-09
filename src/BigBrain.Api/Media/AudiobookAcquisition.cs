@@ -28,7 +28,7 @@ public sealed record AudiobookAcquisitionCandidate(
     string WorkId, string EditionId, string Title, string? Author, string? Narrator,
     string Language, string LanguageLabel, string? Edition, double? DurationSeconds,
     int? PublicationYear, string? CoverUrl, string Source, string Availability, string LanguageConfidence,
-    string? Provenance = null, string? MetadataWorkId = null, string? MatchEvidence = null);
+    string? Provenance = null, string? MetadataWorkId = null, string? MatchEvidence = null, int? Seeders = null);
 public sealed record AudiobookAcquisitionRequest(string EditionId, string Source, string Language);
 public sealed record AudiobookProviderJob(string ProviderJobId, string Status, string? Message);
 public sealed record AudiobookAcquisitionJob(
