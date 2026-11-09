@@ -559,6 +559,28 @@ class Deployment:
                       *[arg for source in files for arg in ('-f', str(source))],
                       *args, timeout=120, mutation=mutation)
 
+    @staticmethod
+    def standard_release_compose(path):
+        # Recognize only this runner's own private output from a previous
+        # release. Runtime configuration hashes must still be verified.
+        source = Path(path)
+        root = Path.home() / '.local/state/bigbrain-standard'
+        if (str(source) != path or source.name != 'release.json' or
+                source.parent.parent != root or
+                not re.fullmatch(r'run-[0-9a-f]{32}', source.parent.name)):
+            return False
+        try:
+            backup.no_symlinks(source)
+            directory = [root, source.parent]
+            if any(not p.is_dir() or p.stat().st_uid != os.geteuid() or
+                   stat.S_IMODE(p.stat().st_mode) != 0o700 for p in directory):
+                return False
+            info = source.lstat()
+            return (stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid()
+                    and stat.S_IMODE(info.st_mode) == 0o600)
+        except (OSError, backup.Blocked):
+            return False
+
     def discover_compose(self):
         if self.source is not None:
             return
@@ -568,7 +590,9 @@ class Deployment:
         self.reconstruct = any(labels[0][k] != labels[1][k] for k in keys)
         if self.reconstruct:
             # Only the diagnosed legacy API + ordinary Web combination is supported.
-            need(re.fullmatch(r'/var/lib/bigbrain-approved-ops/runs/[a-zA-Z0-9_-]+/release\.compose\.json', labels[0][keys[0]])
+            api_source = labels[0][keys[0]]
+            gateway = re.fullmatch(r'/var/lib/bigbrain-approved-ops/runs/[a-zA-Z0-9_-]+/release\.compose\.json', api_source)
+            need((gateway is not None or self.standard_release_compose(api_source))
                  and Path(labels[1][keys[0]]).name == 'compose.yaml'
                  and ',' not in labels[1][keys[0]], 'ComposeProvenanceMissing')
         selected = labels[1] if self.reconstruct else labels[0]
@@ -590,14 +614,40 @@ class Deployment:
         if self.reconstruct:
             web_hash = self.compose(self.source, 'config', '--hash', 'web').decode().split()
             need(web_hash == ['web', originals['web']['Config']['Labels'].get('com.docker.compose.config-hash')], 'ComposeRuntimeMismatch')
-            api = config['services']['api']
-            api['image'] = originals['api']['Image']
-            api.setdefault('labels', {})['org.opencontainers.image.revision'] = originals['api']['Config']['Labels']['org.opencontainers.image.revision']
-            env = originals['api']['Config']['Env']
-            need(env and all(isinstance(x, str) and re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', x) for x in env), 'RuntimeEnvironmentUnknown')
-            pairs = [x.split('=', 1) for x in env]
-            need(len({k for k, v in pairs}) == len(pairs), 'RuntimeEnvironmentAmbiguous')
-            api['environment'] = {k: v.replace('$', '$$') for k, v in pairs}
+            api_origin = originals['api']['Config']['Labels']['com.docker.compose.project.config_files']
+            if self.standard_release_compose(api_origin):
+                # A prior STANDARD release carries its exact API service, including
+                # mounts and environment, which may differ from today's Web template.
+                # Prove that PRIVATE source against the running API before using it.
+                api_hash = self.compose(Path(api_origin), 'config', '--hash', 'api').decode().split()
+                need(api_hash == ['api', originals['api']['Config']['Labels'].get('com.docker.compose.config-hash')],
+                     'ComposeRuntimeMismatch')
+                backup.no_symlinks(Path(api_origin))
+                with Path(api_origin).open('rb') as stream:
+                    info = os.fstat(stream.fileno())
+                    need(stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid()
+                         and stat.S_IMODE(info.st_mode) == 0o600, 'PrivateReleaseInvalid')
+                    private = json.load(stream)
+                need(isinstance(private, dict) and private.get('name') == PROJECT
+                     and isinstance(private.get('services'), dict)
+                     and set(private['services']) == set(ROLES), 'PrivateReleaseInvalid')
+                api = private['services']['api']
+                need(isinstance(api, dict) and api.get('image') == originals['api']['Image']
+                     and not any(k in api for k in ('build', 'depends_on', 'profiles', 'extends',
+                         'env_file', 'label_file', 'configs', 'secrets', 'develop', 'volumes_from', 'links')),
+                     'PrivateReleaseInvalid')
+                config['services']['api'] = copy.deepcopy(api)
+            else:
+                # Older approved gateway runtimes have no private STANDARD source;
+                # preserve their existing reconstruction and fail-closed boundaries.
+                api = config['services']['api']
+                api['image'] = originals['api']['Image']
+                api.setdefault('labels', {})['org.opencontainers.image.revision'] = originals['api']['Config']['Labels']['org.opencontainers.image.revision']
+                env = originals['api']['Config']['Env']
+                need(env and all(isinstance(x, str) and re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', x) for x in env), 'RuntimeEnvironmentUnknown')
+                pairs = [x.split('=', 1) for x in env]
+                need(len({k for k, v in pairs}) == len(pairs), 'RuntimeEnvironmentAmbiguous')
+                api['environment'] = {k: v.replace('$', '$$') for k, v in pairs}
             hashes = dict(line.split() for line in self.compose_model(config, 'config', '--hash', '*').decode().splitlines())
             rendered = json.loads(self.compose_model(config, 'config', '--format', 'json'))
             need(snapshot_matches(rendered, copy.deepcopy(config)), 'SnapshotChanged')

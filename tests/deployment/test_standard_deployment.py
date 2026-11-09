@@ -125,6 +125,7 @@ class StandardTests(unittest.TestCase):
         self.calls.append(('compose', args))
         if args[:2] == ('config', '--hash'):
             if args[-1] == 'web': return b'web web-hash\n'
+            if args[-1] == 'api': return b'api api-hash\n'
             return b'api api-hash\nweb web-hash\n'
         if args[0] == 'config':
             if path == self.source:
@@ -454,6 +455,130 @@ class StandardTests(unittest.TestCase):
         self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = '/one'
         self.dep.source = None
         with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'): self.dep.discover_compose()
+
+    def test_private_standard_release_is_recognized_with_exact_permissions(self):
+        self.mixed_compose()
+        state = self.root / '.local/state/bigbrain-standard'
+        run = state / ('run-' + 'a' * 32)
+        run.mkdir(parents=True, mode=0o700)
+        state.chmod(0o700)
+        run.chmod(0o700)
+        release = run / 'release.json'
+        release.write_text('{}')
+        release.chmod(0o600)
+        self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = str(release)
+        with patch.object(Path, 'home', return_value=self.root):
+            with patch.object(d, 'docker') as docker:
+                self.dep.discover_compose()
+                docker.assert_not_called()
+        self.assertTrue(self.dep.reconstruct)
+        self.assertEqual(self.dep.source, self.source)
+        self.assertEqual(self.dep.source_files, [self.source])
+
+    def test_private_standard_release_rejects_unknown_or_unsafe_sources(self):
+        self.mixed_compose()
+        state = self.root / '.local/state/bigbrain-standard'
+        run = state / ('run-' + 'b' * 32)
+        run.mkdir(parents=True, mode=0o700)
+        state.chmod(0o700)
+        run.chmod(0o700)
+        release = run / 'release.json'
+        release.write_text('{}')
+        release.chmod(0o600)
+        label = self.runtime['api']['Config']['Labels']
+        with patch.object(Path, 'home', return_value=self.root):
+            with patch.object(d, 'docker') as docker:
+                for value in (str(self.root / 'random/release.json'),
+                              str(state / 'run-other/release.json'),
+                              str(run / 'rollback.json'),
+                              str(release).replace('/release.json', '//release.json')):
+                    with self.subTest(value=value):
+                        label['com.docker.compose.project.config_files'] = value
+                        self.dep.source = None
+                        with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'):
+                            self.dep.discover_compose()
+                label['com.docker.compose.project.config_files'] = str(release)
+                for target, mode in ((state, 0o755), (run, 0o755), (release, 0o644)):
+                    before = target.stat().st_mode & 0o777
+                    with self.subTest(target=target):
+                        target.chmod(mode)
+                        self.dep.source = None
+                        with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'):
+                            self.dep.discover_compose()
+                        target.chmod(before)
+                release.unlink()
+                release.symlink_to(self.source)
+                self.dep.source = None
+                with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'):
+                    self.dep.discover_compose()
+                docker.assert_not_called()
+
+    def private_standard_fixture(self):
+        self.mixed_compose()
+        state = self.root / '.local/state/bigbrain-standard'
+        run = state / ('run-' + 'c' * 32)
+        run.mkdir(parents=True, mode=0o700)
+        state.chmod(0o700)
+        run.chmod(0o700)
+        private = run / 'release.json'
+        old = copy.deepcopy(self.config)
+        old['services']['api'] = {
+            'image': OLD,
+            'environment': {'FINANCE': 'false', 'LITERAL': 'literal$$VALUE'},
+            'volumes': [{'type': 'bind', 'source': '/previous', 'target': '/previous', 'read_only': True}],
+            'networks': {'default': None}, 'pull_policy': 'never',
+            'labels': {'org.opencontainers.image.revision': REV}}
+        private.write_text(json.dumps(old))
+        private.chmod(0o600)
+        self.runtime['api']['Config']['Labels']['com.docker.compose.project.config_files'] = str(private)
+        return private, old
+
+    def test_private_release_preserves_api_service_and_web_model(self):
+        private, old = self.private_standard_fixture()
+        with patch.object(Path, 'home', return_value=self.root), patch.object(
+                self.dep, 'compose_model', side_effect=self.model):
+            result = self.dep.configuration(self.runtime)
+        self.assertEqual(result['services']['api'], old['services']['api'])
+        self.assertEqual(result['services']['web'], self.config['services']['web'])
+        self.assertEqual(result['networks'], self.config['networks'])
+        self.assertNotEqual(result['services']['api']['volumes'], self.config['services']['api']['volumes'])
+        self.assertFalse(list(self.state.iterdir()))
+
+    def test_private_release_requires_matching_original_api_hash(self):
+        private, old = self.private_standard_fixture()
+        def mismatched(path, *args, **kw):
+            if path == private and args[:2] == ('config', '--hash'):
+                return b'api forged-api-hash\n'
+            return self.compose(path, *args, **kw)
+        with patch.object(Path, 'home', return_value=self.root), patch.object(
+                self.dep, 'compose_model', side_effect=self.model), patch.object(
+                self.dep, 'compose', side_effect=mismatched):
+            with self.assertRaisesRegex(d.Blocked, 'ComposeRuntimeMismatch'):
+                self.dep.configuration(self.runtime)
+
+    def test_private_release_rejects_untrusted_service_definition(self):
+        private, old = self.private_standard_fixture()
+        for invalid in ('build', 'depends_on', 'secrets'):
+            with self.subTest(field=invalid):
+                content = copy.deepcopy(old)
+                content['services']['api'][invalid] = {} if invalid != 'secrets' else ['SECRET']
+                private.write_text(json.dumps(content))
+                with patch.object(Path, 'home', return_value=self.root), patch.object(
+                        self.dep, 'compose_model', side_effect=self.model):
+                    with self.assertRaisesRegex(d.Blocked, 'PrivateReleaseInvalid'):
+                        self.dep.configuration(self.runtime)
+        private.write_text(json.dumps(old))
+
+    def test_private_release_does_not_bypass_reconstructed_hashes(self):
+        private, old = self.private_standard_fixture()
+        def wrong_hash(config, *args):
+            if args[:2] == ('config', '--hash'):
+                return b'api different\nweb web-hash\n'
+            return self.model(config, *args)
+        with patch.object(Path, 'home', return_value=self.root), patch.object(
+                self.dep, 'compose_model', side_effect=wrong_hash):
+            with self.assertRaisesRegex(d.Blocked, 'ComposeRuntimeMismatch'):
+                self.dep.configuration(self.runtime)
 
     def mixed_compose(self):
         self.source = self.root / 'compose.yaml'
