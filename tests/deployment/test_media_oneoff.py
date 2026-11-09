@@ -50,9 +50,15 @@ class MediaOneOffTests(unittest.TestCase):
             if d.MEDIA_ACCEPTED_SOURCE in args:
                 return getattr(self, 'new_source_delta', b'')
             if d.MEDIA_RUNNING_API in args:
-                return b'\0'.join(x.encode() for x in sorted(d.MEDIA_API | d.MEDIA_KEEP_FINANCE)) + b'\0'
+                paths = sorted(d.MEDIA_API | d.MEDIA_KEEP_FINANCE)
+                if getattr(self, 'extra_root_path', None):
+                    paths.append(self.extra_root_path)
+                return b'\0'.join(x.encode() for x in paths) + b'\0'
             if d.MEDIA_RUNNING_WEB in args:
-                return b'\0'.join(x.encode() for x in sorted(d.MEDIA_WEB)) + b'\0'
+                paths = sorted(d.MEDIA_WEB)
+                if getattr(self, 'extra_root_path', None):
+                    paths.append(self.extra_root_path)
+                return b'\0'.join(x.encode() for x in paths) + b'\0'
         raise AssertionError(args)
 
     def guard(self, media=True):
@@ -67,6 +73,13 @@ class MediaOneOffTests(unittest.TestCase):
         self.assertEqual(self.guard(), {})
         with self.assertRaisesRegex(d.Blocked, 'OutsideStandardScope'):
             self.guard(media=False)
+
+    def test_gitleaks_review_metadata_does_not_block_media_or_expand_scope(self):
+        self.extra_root_path = '.gitleaksignore'
+        self.guard()
+        self.extra_root_path = '.env'
+        with self.assertRaisesRegex(d.Blocked, 'OutsideMediaScope'):
+            self.guard()
 
     def test_other_source_changes_block_before_ci(self):
         self.new_source_delta = b'src/BigBrain.Api/Finance/Unrelated.cs\0'

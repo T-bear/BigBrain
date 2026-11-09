@@ -321,7 +321,8 @@ def git_guard(revision, originals, media_release=False):
                     relevant.add(path)
                 else:
                     need(path.startswith(('docs/', 'tests/', 'scripts/'))
-                         or path in {'AGENTS.md', '.github/workflows/ci.yml', 'README.md', 'ROADMAP.md'},
+                         or path in {'AGENTS.md', '.github/workflows/ci.yml', 'README.md',
+                                     'ROADMAP.md', '.gitleaksignore'},
                          'OutsideMediaScope')
             else:
                 need(path in APP_FILES or path.startswith(('docs/', 'tests/', 'scripts/'))
