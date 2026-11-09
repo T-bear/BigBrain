@@ -49,6 +49,19 @@ Valfri `--compose /absolute/compose.yaml` väljer en befintlig vanlig Compose-fi
 Ingen manuellt upplöst JSON, förbyggd image eller nytt root-godkännande behövs.
 Config-hash måste matcha körande API/Web. Okända/saknade inputs eller konflikter ger stopp;
 den skyddade gateway-filen behöver inte läsas om rekonstruktionen verifieras fullt ut.
+En äldre blandad runtime kan ha API:s Compose-ursprung i en tidigare STANDARD-körnings
+privata ~/.local/state/bigbrain-standard/run-<32 hex>/release.json i stället för
+gatewayens release.compose.json. Bara den egna operatörens absoluta sökväg med
+verifierat symlinkfritt innehåll, läge 0700 på state-/run-kataloger och 0600
+på den reguljära filen erkänns. API-servicen läses endast från den gamla
+STANDARD-filens privata snapshot efter att även dess ursprungliga
+Compose-hash verifierats mot det körande API:t. Den sammansatta modellen
+måste därefter ge exakt körande API- och Web-hash, och normalisering av
+konfigurationen får inte ändra snapshoten. Detta undviker att den
+nuvarande Web-mallens andra API-volymer eller miljöinställningar
+gissas fram. Samma hash-/snapshot-/rollbackkontroller
+fortsätter gälla. Detta ger ingen utökning av tillåtna API/Web-kodfiler,
+ingen Finance- eller BB-158-deployment och inget fristående drifttillstånd.
 
 1. Kontrollera aktuell remote main, ren checkout, PR #25:s commit i ancestry och fyra
    gröna main-jobb. Båda runtime-revisionerna måste vara tillgängliga Git-commits i
