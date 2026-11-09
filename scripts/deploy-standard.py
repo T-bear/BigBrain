@@ -32,6 +32,28 @@ ROLES = ('api', 'web')
 PROJECT = 'bigbrain-sprint1'
 MEMORY_FETCH = '283060d41f4494d2e5606f7c857fb82972e86094'
 CHECKS = {'backend', 'frontend', 'documentation', 'secrets'}
+# One bounded owner-requested Media release. The accepted source snapshot is fixed;
+# this mode is NOT a generic selective-deployment or future-upgrade mechanism.
+MEDIA_ACCEPTED_SOURCE = '2c48264c4d57650e639331398dc8d5ebaa52c691'
+MEDIA_RUNNING_API = '80fa231773dace31dda60ad0a32c69c1a42b5e50'
+MEDIA_RUNNING_WEB = 'acd5c295acc4e3772980fe8b98f3844a742d7267'
+MEDIA_COMPOSITE_LABEL = 'org.bigbrain.source.composite'
+MEDIA_KEEP_FINANCE = {
+    'src/BigBrain.Api/Finance/EodhdFinanceMarketData.cs',
+    'src/BigBrain.Api/Finance/FinanceDataProtection.cs',
+}
+MEDIA_API = {
+    'src/BigBrain.Api/Media/AudiobookAcquisition.cs',
+    'src/BigBrain.Api/Media/AudiobookMetadata.cs',
+    'src/BigBrain.Api/Media/LibrarrAudiobookAcquisitionProvider.cs',
+}
+MEDIA_WEB = {
+    'src/BigBrain.Web/src/media-search/AudiobookSearch.tsx',
+    'src/BigBrain.Web/src/media-search/AudiobookSearch.test.tsx',
+    'src/BigBrain.Web/src/types.ts',
+}
+MEDIA_INPUTS = ('src/', 'Directory.Build.props', 'global.json', '.dockerignore',
+                'compose.yaml', 'compose.override.yaml')
 SHA = r'[0-9a-f]{40}'
 IMAGE = r'sha256:[0-9a-f]{64}'
 SDK_VERSION = '10.0.302'
@@ -246,7 +268,7 @@ def legacy_web_provenance(image):
     return matches[0]
 
 
-def git_guard(revision, originals):
+def git_guard(revision, originals, media_release=False):
     need(re.fullmatch(SHA, revision), 'InvalidRevision')
     remote = command(['git', 'ls-remote', 'origin', 'refs/heads/main']).decode().split()
     need(remote and remote[0] == revision, 'NotCurrentRemoteMain')
@@ -254,6 +276,18 @@ def git_guard(revision, originals):
     need(not command(['git', 'status', '--porcelain', '--untracked-files=no']).strip(), 'TrackedChanges')
     command(['git', 'merge-base', '--is-ancestor', MEMORY_FETCH, revision])
     need(set(originals) == set(ROLES), 'MissingRuntimeBaseline')
+    for old in originals.values():
+        # Never treat this one-off composite image as a normal accepted Git build
+        # on a later release, even though its main ancestor remains recorded.
+        need(not old['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL),
+             'CompositeRuntimeRequiresReview')
+    if media_release:
+        command(['git', 'merge-base', '--is-ancestor', MEDIA_ACCEPTED_SOURCE, revision])
+        # Only scripts, tests and documentation may have changed since the
+        # reviewed source snapshot; Dockerfile and code drift must fail closed.
+        changed = command(['git', 'diff', '--no-renames', '--name-only', '-z',
+                           MEDIA_ACCEPTED_SOURCE, revision, '--', *MEDIA_INPUTS])
+        need(not changed.strip(b'\0'), 'MediaAcceptedSourceChanged')
     evidence = {}
     for role, old in originals.items():
         base = old['Config']['Labels'].get('org.opencontainers.image.revision', '')
@@ -266,19 +300,34 @@ def git_guard(revision, originals):
             evidence[role] = legacy_web_provenance(old['Image'])
             base = evidence[role]['revision']
             need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
+        if media_release:
+            need(base == (MEDIA_RUNNING_API if role == 'api' else MEDIA_RUNNING_WEB),
+                 'MediaRuntimeBaselineChanged')
         try:
             command(['git', 'merge-base', '--is-ancestor', base, revision])
         except Blocked:
             raise Blocked('OldRevisionNotAccepted') from None
         paths = command(['git', 'diff', '--no-renames', '--name-only', '-z', base, revision]).decode().split('\0')
+        expected = (MEDIA_API | MEDIA_KEEP_FINANCE) if role == 'api' else MEDIA_WEB
+        relevant = set()
         for path in filter(None, paths):
-            # API and Web may have been deployed from different accepted commits.
-            # The other application's delta is checked against ITS own baseline below.
+            # The other application's source is checked against its OWN baseline.
             other_role = 'web' if role == 'api' else 'api'
             if path.startswith(SOURCE_TREES[other_role]):
                 continue
-            need(path in APP_FILES or path.startswith(('docs/', 'tests/', 'scripts/'))
-                 or path in {'AGENTS.md', '.github/workflows/ci.yml'}, 'OutsideStandardScope')
+            if media_release:
+                if path.startswith('src/') or path in MEDIA_INPUTS:
+                    need(path in expected, 'OutsideMediaScope')
+                    relevant.add(path)
+                else:
+                    need(path.startswith(('docs/', 'tests/', 'scripts/'))
+                         or path in {'AGENTS.md', '.github/workflows/ci.yml', 'README.md', 'ROADMAP.md'},
+                         'OutsideMediaScope')
+            else:
+                need(path in APP_FILES or path.startswith(('docs/', 'tests/', 'scripts/'))
+                     or path in {'AGENTS.md', '.github/workflows/ci.yml'}, 'OutsideStandardScope')
+        if media_release:
+            need(relevant == expected, 'MediaInputsMissing')
     ci_green(revision)
     return evidence
 
@@ -519,8 +568,10 @@ def verify_private_copy(folder):
 
 
 class Deployment:
-    def __init__(self, revision, images, compose_file, state):
+    def __init__(self, revision, images, compose_file, state, media_release=False):
         self.revision, self.images, self.source, self.state = revision, images, compose_file, state
+        self.media_release = media_release
+        self.media_digest = None
         self.originals = {}
         self.changed = []
         self.folder = None
@@ -690,6 +741,8 @@ class Deployment:
             old = originals[role]
             healthy(old)
             prior = image_info(old['Image'])
+            need(not prior['Config'].get('Labels', {}).get(MEDIA_COMPOSITE_LABEL),
+                 'CompositeRuntimeRequiresReview')
             need(prior['Config'].get('Labels', {}).get('org.opencontainers.image.revision')
                  == old['Config']['Labels'].get('org.opencontainers.image.revision'), 'OldImageRevisionMismatch')
             need(all(old['Config'].get(k) == prior['Config'].get(k)
@@ -702,7 +755,7 @@ class Deployment:
                 need('VerifiedInitialNotBeforeUtc=' not in name, 'LegacyBootstrapPresent')
             self.originals[role] = old
             http_health(role)
-        self.provenance = git_guard(self.revision, self.originals)
+        self.provenance = git_guard(self.revision, self.originals, self.media_release)
         self.other_snapshot = self.others()
         self.rollback = release_config(self.config, {r: c['Image'] for r, c in self.originals.items()})
         self.release = copy.deepcopy(self.rollback)
@@ -800,6 +853,10 @@ class Deployment:
         contract = None
         for role, old in self.originals.items():
             prior, candidate = image_info(old['Image']), image_info(self.images[role])
+            if self.media_release and role == 'api':
+                need(self.media_digest is not None and
+                     candidate['Config'].get('Labels', {}).get(MEDIA_COMPOSITE_LABEL)
+                     == self.media_digest, 'MediaImageCompositionMismatch')
             need(candidate['Config'].get('Labels', {}).get('org.opencontainers.image.revision') == self.revision, 'ImageRevisionMismatch')
             need(all(candidate['Config'].get(k) == prior['Config'].get(k) for k in IMAGE_FIELDS if k != 'Env'), 'ImageRuntimeContractChanged')
             if candidate['Config'].get('Env') != prior['Config'].get('Env'):
@@ -829,10 +886,39 @@ class Deployment:
         self.release = release_config(self.config, self.images)
         for service in self.release['services'].values():
             service.setdefault('labels', {})['org.opencontainers.image.revision'] = self.revision
+        if self.media_release:
+            self.release['services']['api'].setdefault('labels', {})[MEDIA_COMPOSITE_LABEL] = self.media_digest
+
+    def media_source_overlay(self, source):
+        need(self.media_release and self.folder is not None
+             and self.originals['api']['Config']['Labels'].get('org.opencontainers.image.revision')
+             == MEDIA_RUNNING_API, 'MediaRuntimeBaselineChanged')
+        records = {}
+        for path in sorted(MEDIA_KEEP_FINANCE):
+            source_file = source / path
+            need(source_file.is_file() and not source_file.is_symlink(), 'MediaSourceMissing')
+            original_blob = command(['git', 'rev-parse', self.revision + ':' + path]).decode().strip()
+            need(hashlib.sha1(b'blob ' + str(source_file.stat().st_size).encode() + b'\0'
+                              + source_file.read_bytes()).hexdigest() == original_blob,
+                 'MediaArchiveMismatch')
+            prior = command(['git', 'show', MEDIA_RUNNING_API + ':' + path])
+            prior_blob = command(['git', 'rev-parse', MEDIA_RUNNING_API + ':' + path]).decode().strip()
+            need(hashlib.sha1(b'blob ' + str(len(prior)).encode() + b'\0'
+                              + prior).hexdigest() == prior_blob
+                 and original_blob != prior_blob, 'MediaFinanceBlobMismatch')
+            source_file.write_bytes(prior)
+            records[path] = {'acceptedMainBlob': original_blob, 'runningFinanceBlob': prior_blob}
+        manifest = {'acceptedMain': self.revision, 'acceptedSourceBase': MEDIA_ACCEPTED_SOURCE,
+                    'runningApiBase': MEDIA_RUNNING_API,
+                    'overlaidFinanceBlobs': records, 'mode': 'one-off-media-release'}
+        save(self.folder / 'media-composition.json', manifest)
+        self.media_digest = 'sha256:' + backup.digest(self.folder / 'media-composition.json')
+        return manifest
 
     def build_images(self):
         # No workspace/untracked file enters the context. Keep archive + base bindings.
-        need(git_guard(self.revision, self.originals) == self.provenance, 'BuildProvenanceChanged')
+        need(git_guard(self.revision, self.originals, self.media_release) == self.provenance,
+             'BuildProvenanceChanged')
         archive = self.folder / 'source.tar'
         command(['git', 'archive', '--format=tar', '--output=' + str(archive), self.revision], timeout=120)
         source = self.folder / 'source'
@@ -840,6 +926,8 @@ class Deployment:
         with tarfile.open(archive) as bundle:
             need(all(m.isfile() or m.isdir() for m in bundle.getmembers()), 'UnsupportedBuildTree')
             bundle.extractall(source, filter='data')
+        if self.media_release:
+            self.media_source_overlay(source)
         # Bounded workaround for the accepted 10.0.300/latestPatch contract.
         # Do not modify the archive, extracted sources or ordinary Dockerfiles.
         contract = json.loads((source / 'global.json').read_text())
@@ -891,10 +979,13 @@ class Deployment:
             pinned = self.folder / (role + '.Dockerfile')
             pinned.write_text('\n'.join(lines) + '\n')
             iid = self.folder / (role + '.iid')
+            composition_args = (['--label', MEDIA_COMPOSITE_LABEL + '=' + self.media_digest]
+                                if role == 'api' and self.media_release else [])
             docker('build', '--pull=false', '--file', str(pinned), '--iidfile', str(iid),
                    '--tag', f'bigbrain-standard-{role}:{self.revision}-{self.folder.name}',
                    '--label', 'org.opencontainers.image.revision=' + self.revision,
-                   '--build-arg', 'BIGBRAIN_REVISION=' + self.revision, str(source), timeout=1200, mutation=True)
+                   *composition_args, '--build-arg', 'BIGBRAIN_REVISION=' + self.revision,
+                   str(source), timeout=1200, mutation=True)
             self.images[role] = iid.read_text().strip()
             image_info(self.images[role])
             if role == 'api':
@@ -904,6 +995,7 @@ class Deployment:
             self.unchanged()
         self.bind_images()
         save(self.folder / 'build.json', {'revision': self.revision,
+             'mediaSourceComposition': self.media_digest,
              'tree': command(['git', 'rev-parse', self.revision + '^{tree}']).decode().strip(),
              'archiveSha256': backup.digest(archive), 'bases': bases, 'images': self.images,
              'runtime': self.runtime_build,
@@ -1032,6 +1124,10 @@ class Deployment:
     def runtime_matches(self, role, container, image):
         expected = copy.deepcopy(self.originals[role])
         expected['Config']['Env'] = self.expected_environment(role, image)
+        if self.media_release and role == 'api' and image != self.originals[role]['Image']:
+            if (self.media_digest is None or
+                    container['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL) != self.media_digest):
+                return False
         return container['Image'] == image and fingerprint(container) == fingerprint(expected)
 
     def wait_healthy(self, role, image):
@@ -1115,7 +1211,8 @@ class Deployment:
             save(self.folder / 'receipt.json', {'revision': self.revision, 'images': self.images,
                  'previous': {r: c['Image'] for r, c in self.originals.items()},
                  'backupId': folder.name, 'backupPath': str(folder.relative_to(self.folder)), 'backupManifestSha256': digest})
-            need(git_guard(self.revision, self.originals) == self.provenance, 'BuildProvenanceChanged')
+            need(git_guard(self.revision, self.originals, self.media_release) == self.provenance,
+                 'BuildProvenanceChanged')
             self.unchanged()
             self.data_identity()
             for role in ROLES:
@@ -1156,6 +1253,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--revision', required=True)
     parser.add_argument('--compose', type=Path, help='Optional ordinary Compose file; default discovers active files from runtime labels')
+    parser.add_argument('--media-release', action='store_true',
+                        help='One-off PR64 Media release preserving exact running Finance source')
     parser.add_argument('--execute', action='store_true', help='Separately authorized deployment; default is read-only preflight')
     args = parser.parse_args()
     os.umask(0o077)
@@ -1164,7 +1263,7 @@ def main():
         if name.startswith(('COMPOSE_', 'DOCKER_')):
             del os.environ[name]
     state = Path.home() / '.local/state/bigbrain-standard'
-    deployment = Deployment(args.revision, {}, args.compose, state)
+    deployment = Deployment(args.revision, {}, args.compose, state, media_release=args.media_release)
     if not args.execute:
         deployment.preflight()
         print('PREFLIGHT BLOCKED: data inventory/schema/backup DEFERRED to separately authorized --execute; no mutations performed')
@@ -1181,7 +1280,9 @@ def main():
         no_pending_run(state)
         deployment.preflight()
         deployment.execute()
-    print('PASS: API+Web replaced; iPhone/PWA and school source verification PENDING')
+    print('PASS: API+Web replaced; ' +
+          ('Media iPhone/PWA acceptance PENDING' if args.media_release
+           else 'iPhone/PWA and school source verification PENDING'))
 
 
 if __name__ == '__main__':

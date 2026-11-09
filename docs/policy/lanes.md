@@ -63,6 +63,32 @@ gissas fram. Samma hash-/snapshot-/rollbackkontroller
 fortsätter gälla. Detta ger ingen utökning av tillåtna API/Web-kodfiler,
 ingen Finance- eller BB-158-deployment och inget fristående drifttillstånd.
 
+### Engångsleverans – ljudbokssökning efter PR #64
+
+Endast för Media-releasen på accepterad källbas 2c48264c4d57650e639331398dc8d5ebaa52c691
+finns flaggan --media-release för det befintliga STANDARD-skriptet. Den
+är **inte** ett generellt utökat release-spår. API-baslinjen måste vara
+80fa231773dace31dda60ad0a32c69c1a42b5e50; Web-baslinjen måste
+vara verifierad genom BuildKit till acd5c295acc4e3772980fe8b98f3844a742d7267.
+Skriptet accepterar bara de tre exakt avsedda API-Media-filerna och de
+tre Web-Media-filerna. Från accepterad main-archive återförs endast de två
+Finance-källfilerna EodhdFinanceMarketData.cs och FinanceDataProtection.cs
+till verifierade Git-blobbar från körande API-baslinje.
+
+Den privata kompositionsmanifesten binds genom SHA-256 till den byggda API-imagen
+och till körande API-container; efterföljande STANDARD-körningar avvisar
+kompositbaslinjen tills nytt releasebeslut och ny granskning finns. En ny
+API-/Web-/bygginput, okänd runtime, ändrad Git-bashistorik eller saknade
+blobbar blockerar releasen. Befintlig CI, Compose-, backup-, prob-, dataskydds-
+och rollbackkontroll gäller oförändrat. Utan --execute är körningen skrivskyddad:
+
+    python3 scripts/deploy-standard.py --revision ACCEPTED_MAIN_SHA --media-release
+
+**Ingen merge eller deployment tillåts via checkpoint-publiceringen.** För
+--execute krävs en separat, giltig releaseauktorisering och oberoende
+granskning av exakt T2-kandidat, samt övriga redan bindande driftvillkor.
+Finance ändras inte; BB-158 förblir fryst.
+
 1. Kontrollera aktuell remote main, ren checkout, PR #25:s commit i ancestry och fyra
    gröna main-jobb. Båda runtime-revisionerna måste vara tillgängliga Git-commits i
    accepterad ancestry. Container- och image-etiketter måste matcha; en äldre Web-image
