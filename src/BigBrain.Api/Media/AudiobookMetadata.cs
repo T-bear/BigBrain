@@ -41,7 +41,8 @@ public sealed record AudiobookUniversalSearchResult(
     IReadOnlyList<AudiobookItem> Library,
     AudiobookMetadataResolution Metadata,
     IReadOnlyList<AudiobookAcquisitionCandidate> Discovery,
-    AudiobookAcquisitionProviderStatus Acquisition);
+    AudiobookAcquisitionProviderStatus Acquisition,
+    IReadOnlyList<AudiobookDiscoveryVariant> DiscoveryVariants);
 
 public interface IAudiobookMetadataProvider
 {
@@ -253,19 +254,23 @@ public sealed class AudiobookUniversalSearchService(
         var libraryQuery = works.Count > 0 ? works[0].CanonicalTitle : query.Original;
         var local = await library.GetLibraryAsync(0, 25, libraryQuery, null, token);
         AudiobookAcquisitionProviderStatus status;
-        IReadOnlyList<AudiobookAcquisitionCandidate> discovery;
+        IReadOnlyList<AudiobookAcquisitionCandidate> discovery = [];
+        IReadOnlyList<AudiobookDiscoveryVariant> variants = [];
         try
         {
             status = await acquisition.StatusAsync(token);
-            discovery = status.CanSearch
-                ? await acquisition.SearchVariantsAsync(seeds, normalizedLanguage, token)
-                : [];
+            if (status.CanSearch)
+            {
+                var outcome = await acquisition.SearchVariantsWithReportAsync(seeds, normalizedLanguage, token);
+                discovery = outcome.Candidates;
+                variants = outcome.Variants;
+            }
         }
         catch (AudiobookAcquisitionException exception)
         {
             status = new(AudiobookIntegrationStates.ConfiguredUnavailable, "unknown", false, false, false, exception.SafeMessage);
             discovery = [];
         }
-        return new(local.Items, resolution, discovery, status);
+        return new(local.Items, resolution, discovery, status, variants);
     }
 }

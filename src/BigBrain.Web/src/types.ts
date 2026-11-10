@@ -1070,11 +1070,18 @@ export interface AudiobookMetadataResolution {
   narratorSearchSupported: boolean
   message: string | null
 }
+export interface AudiobookDiscoveryVariant {
+  index: number
+  matchEvidence: string
+  state: 'complete' | 'empty' | 'failed'
+  candidateCount: number
+}
 export interface AudiobookSearchResponse {
   library: AudiobookItem[]
   metadata: AudiobookMetadataResolution
   discovery: AudiobookAcquisitionCandidate[]
   acquisition: AudiobookAcquisitionProviderStatus
+  discoveryVariants: AudiobookDiscoveryVariant[]
 }
 export interface AudiobookPlaybackTrack {
   index: number

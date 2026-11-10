@@ -66,6 +66,15 @@ och The Pirate Bay när ett icke-negativt heltal uttryckligen rapporterats.
 AudioBookBays noll är en platshållare och visas som okänt, aldrig
 som verifierad tillgänglighet. Webbgränssnittet visar uppgiften för
 torrentutgåvor; direktkällor får ingen missvisande seederetikett.
+Den avgränsade sökfortsättningen i PR #68 sorterar relevanta resultat före
+den slutliga 50-gränsen. Varje befintlig sökvariant rapporterar endast
+ordningsnummer, matchningsgrund, om den lyckades, gav noll resultat eller
+misslyckades, och antal funna utgåvor. Sökfrågor och leverantörsfel exponeras
+inte. Vid partiella sökfel visas en varning medan lyckade resultat bevaras.
+När Librarr uttryckligen avvisar en redan befintlig hämtning visar Web ett
+specifikt konfliktbesked nära bekräftelsen och hänvisar till befintliga jobb.
+Okända hämtfel kvarstår som osäkra utan automatisk upprepning.
+
 Ingen ny sökkälla, nätverksbegäran, indexerbehörighet, automatisk
 hämtning eller ändring av BB-158:s frysta import-/driftflöden ingår.
 Sortering efter seeders och bredare BB-157-filter återstår.

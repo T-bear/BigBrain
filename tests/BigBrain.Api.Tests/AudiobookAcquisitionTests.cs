@@ -132,6 +132,37 @@ public sealed class AudiobookAcquisitionTests : IDisposable
         Assert.Equal("edition", values[0].EditionId);
     }
 
+    [Fact]
+    public async Task VariantReportDistinguishesPartialFailureFromSuccessfulEmptySearch()
+    {
+        using var store = Store();
+        var provider = new FakeProvider
+        {
+            ResultsByQuery = new()
+            {
+                ["first"] = [Candidate("en", "Voice", "a"), Candidate("en", "Voice", "b")],
+                ["empty"] = []
+            },
+            FailingQuery = "broken"
+        };
+        var service = new AudiobookAcquisitionService(provider, store, TimeProvider.System);
+        var partial = await service.SearchVariantsWithReportAsync(
+            [new("first", null, null, "literal"),
+             new("broken", null, null, "canonicalTitleAuthor")],
+            "en", CancellationToken.None);
+        Assert.Equal(2, partial.Candidates.Count);
+        Assert.Equal([(1, "literal", "complete", 2), (2, "canonicalTitleAuthor", "failed", 0)],
+            partial.Variants.Select(x => (x.Index, x.MatchEvidence, x.State, x.CandidateCount)));
+
+        var empty = await service.SearchVariantsWithReportAsync(
+            [new("empty", null, null, "literal"), new("first", null, null, "canonicalTitle")],
+            "en", CancellationToken.None);
+        Assert.Equal(2, empty.Candidates.Count);
+        Assert.Equal([(1, "literal", "empty", 0), (2, "canonicalTitle", "complete", 2)],
+            empty.Variants.Select(x => (x.Index, x.MatchEvidence, x.State, x.CandidateCount)));
+        Assert.Equal(0, provider.RequestCount);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("x")]
