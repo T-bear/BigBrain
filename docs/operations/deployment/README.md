@@ -230,3 +230,30 @@ ska stoppas före switch; inga manuella Docker-rättighetsändringar.
 
 Detta är ny review-kod och ger inte automatiskt ett andra
 deploymentförsök. Befintliga review-/CI-/rollbackkrav gäller.
+
+### PR #76 – verifierat HTTP-fel och skyddad rollback (2026-11-10)
+
+Efter grön main-CI och godkänd preflight startade den nya Web-containern
+och rapporterade kortvarigt healthy, men fullständig HTTP-kontroll fick
+WebHealthTimeout. Releaseverktyget utförde **ROLLBACK PASS**. Tidigare
+Web-image återställdes, API:s containeridentitet, hälsa och image var
+oförändrade och main ändrades inte. Den gamla importlänken syns tills
+en senare godkänd Web-release faktiskt lyckas.
+
+Rotorsaken verifierades i den byggda kandidatimagen: Nginx-konfigurationen
+var nu läsbar (0644), men manifest.webmanifest och ikonfilerna hade mode
+0600 från det privata worktreet och Nginx gav HTTP 403. En korrigerad,
+isolerat byggd Web-image med chmod -R a+rX /app/dist passerade både
+icke-root läsbarhetsprov för samtliga statiska filer och verklig HTTP 200
+på startsida, JS, ikon, PWA-manifest och gamla importbokmärket.
+Den tidigare trasiga bilden misslyckades på ikon-HTTP 403 med exakt
+samma isolerade prov. Dessa är **förproduktionsbevis**, inte bevis för
+deployment eller faktisk iPhone/PWA-acceptans.
+
+Releasecheckpointen kräver därför att byggsteget normaliserar **endast**
+genererade publika filer. Före första produktionsbyte krävs både
+nätverkslös UID-101-läsbarhetskontroll och separat Nginx/HTTP-smoketest
+av **exakt kandidatimage**, i ett isolerat Docker-körningstillfälle
+utan hostportar, nätverksåtkomst, monterade volymer eller API-nycklar.
+Skripten ska fail-closed vid avvikelse. Detta är inte ett godkännande för
+att upprepa deployment utan accepterad ny PR, granskning och grön main-CI.
