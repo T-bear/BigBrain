@@ -95,6 +95,108 @@ class MediaOneOffTests(unittest.TestCase):
                 self.originals[role]['Config']['Labels']['org.opencontainers.image.revision'] = (
                     d.MEDIA_RUNNING_API if role == 'api' else d.MEDIA_RUNNING_WEB)
 
+    def test_followup_accepts_only_exact_previous_composite_and_five_media_sources(self):
+        previous = {
+            'api': original(d.MEDIA_FOLLOWUP_BASE),
+            'web': original(d.MEDIA_FOLLOWUP_BASE),
+        }
+        previous['api']['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = d.MEDIA_FOLLOWUP_COMPOSITE
+        revision = d.MEDIA_FOLLOWUP_SOURCE
+        changed = d.MEDIA_FOLLOWUP_API | d.MEDIA_FOLLOWUP_WEB
+
+        def command(args, *unused, **ignored):
+            if args[:2] == ['git', 'ls-remote']:
+                return (revision + '\trefs/heads/main').encode()
+            if args[:2] == ['git', 'rev-parse']:
+                return revision.encode()
+            if args[:2] == ['git', 'status']:
+                return b''
+            if args[:2] == ['git', 'merge-base']:
+                return b''
+            if args[:2] == ['git', 'cat-file']:
+                return b'commit'
+            if args[:2] == ['git', 'diff']:
+                paths = changed | set(getattr(self, 'unexpected_files', ()))
+                return b'\0'.join(path.encode() for path in sorted(paths)) + b'\0'
+            raise AssertionError(args)
+
+        def check(media_followup=True):
+            with patch.object(d, 'command', side_effect=command), \
+                 patch.object(d, 'ci_green') as ci, \
+                 patch.object(d, 'verify_media_followup_baseline') as receipt, \
+                 patch.object(d, 'MEMORY_FETCH', d.MEDIA_ACCEPTED_SOURCE):
+                result = d.git_guard(revision, previous, media_release=media_followup,
+                                     media_followup=media_followup)
+                if media_followup:
+                    receipt.assert_called_once_with(previous)
+                ci.assert_called_once_with(revision)
+                return result
+
+        self.assertEqual(check(), {})
+        with self.assertRaisesRegex(d.Blocked, 'CompositeRuntimeRequiresReview'):
+            check(media_followup=False)
+        previous['api']['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = 'sha256:' + 'f' * 64
+        with self.assertRaisesRegex(d.Blocked, 'CompositeRuntimeRequiresReview'):
+            check()
+        previous['api']['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = d.MEDIA_FOLLOWUP_COMPOSITE
+        previous['web']['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = d.MEDIA_FOLLOWUP_COMPOSITE
+        with self.assertRaisesRegex(d.Blocked, 'CompositeRuntimeRequiresReview'):
+            check()
+        previous['web']['Config']['Labels'].pop(d.MEDIA_COMPOSITE_LABEL)
+        self.unexpected_files = ('src/BigBrain.Api/Finance/FinanceDataProtection.cs',)
+        with self.assertRaisesRegex(d.Blocked, 'MediaFollowupSourceChanged'):
+            check()
+
+    def test_followup_requires_exact_private_receipt_and_finance_blob_identity(self):
+        previous = {
+            'api': original(d.MEDIA_FOLLOWUP_BASE),
+            'web': original(d.MEDIA_FOLLOWUP_BASE),
+        }
+        previous['api']['Image'] = 'sha256:' + 'a' * 64
+        previous['web']['Image'] = 'sha256:' + 'b' * 64
+        run = self.root / '.local/state/bigbrain-standard' / d.MEDIA_FOLLOWUP_RUN
+        run.mkdir(mode=0o700, parents=True)
+        blobs = {
+            path: {'acceptedMainBlob': 'a' * 40, 'runningFinanceBlob': 'b' * 40}
+            for path in d.MEDIA_KEEP_FINANCE
+        }
+        manifest = {'acceptedMain': d.MEDIA_FOLLOWUP_BASE,
+                    'acceptedSourceBase': d.MEDIA_ACCEPTED_SOURCE,
+                    'runningApiBase': d.MEDIA_RUNNING_API,
+                    'mode': 'one-off-media-release',
+                    'overlaidFinanceBlobs': blobs}
+        receipt = {'revision': d.MEDIA_FOLLOWUP_BASE,
+                   'images': {role: c['Image'] for role, c in previous.items()}}
+        for name, value in [('receipt.json', receipt), ('media-composition.json', manifest)]:
+            path = run / name
+            path.write_text(json.dumps(value))
+            path.chmod(0o600)
+        digest = 'sha256:' + d.backup.digest(run / 'media-composition.json')
+        def command(args, *unused, **ignored):
+            if args[:2] == ['git', 'rev-parse']:
+                return (b'b' * 40 if args[2].startswith(d.MEDIA_RUNNING_API) else b'a' * 40)
+            raise AssertionError(args)
+        with patch.object(d.Path, 'home', return_value=self.root), \
+             patch.object(d, 'MEDIA_FOLLOWUP_COMPOSITE', digest), \
+             patch.object(d, 'command', side_effect=command):
+            d.verify_media_followup_baseline(previous)
+            receipt['images']['api'] = 'sha256:' + 'c' * 64
+            (run / 'receipt.json').write_text(json.dumps(receipt))
+            with self.assertRaisesRegex(d.Blocked, 'MediaPriorReceiptMismatch'):
+                d.verify_media_followup_baseline(previous)
+
+    def test_followup_overlay_retains_pinned_finance_sources(self):
+        source, command = self.prepare()
+        self.dep.media_followup = True
+        self.dep.originals['api']['Config']['Labels']['org.opencontainers.image.revision'] = d.MEDIA_FOLLOWUP_BASE
+        with patch.object(d, 'command', side_effect=command):
+            manifest = self.dep.media_source_overlay(source)
+        self.assertEqual(manifest['mode'], 'reviewed-media-followup')
+        self.assertEqual(manifest['previousCompositeDigest'], d.MEDIA_FOLLOWUP_COMPOSITE)
+        self.assertEqual(manifest['acceptedSourceBase'], d.MEDIA_FOLLOWUP_BASE)
+        for path in d.MEDIA_KEEP_FINANCE:
+            self.assertEqual((source / path).read_bytes(), b'old-finance')
+
     def test_previous_composite_runtime_never_acts_as_normal_git_baseline(self):
         self.originals['api']['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = 'sha256:' + 'f' * 64
         with self.assertRaisesRegex(d.Blocked, 'CompositeRuntimeRequiresReview'):
