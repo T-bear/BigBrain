@@ -1,0 +1,3 @@
+FROM bigbrain-abs-build-base:bb158-sha180acad33d69
+COPY --chmod=0444 patch-scanner-concurrency.cjs /opt/bigbrain-build/patch-scanner.cjs
+RUN node /opt/bigbrain-build/patch-scanner.cjs && rm -f /opt/bigbrain-build/patch-scanner.cjs
