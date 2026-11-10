@@ -176,3 +176,23 @@ ljudfiler under den enda syntetiska ABS-katalogposten och ett lastScan-
 värde. I pinnad ABS 2.36.0 sätts library.lastScan först när
 scanLibrary har avslutats utan cancellation och save lyckats.
 Ett HTTP 200 på scan-POST eller en ensam synlig katalogpost räcker inte.
+
+### Syntetiskt bevis för ABS:s egen filövervakare
+
+Det fristående watcher-synthetic-e2e.cjs använder en helt separat ABS-server
+utan nätverksåtkomst eller hostportar med temporära privata testvolymer.
+Det kräver till skillnad från grundskanningstestet en **skrivbar syntetisk**
+audiobooks-katalog. Använd aldrig produktionsmedia eller produktionsmetadata.
+Skapa först 36 korta syntetiska MP3-filer med den tidigare dokumenterade
+metoden. Testet skapar en testadmin med slumpat temporärt lösenord och kör
+en enda uttrycklig scan-POST mot den isolerade instansen. Sedan kopierar det
+en testfil till en ny syntetisk bokmapp och skickar **ingen ytterligare
+scan-POST**. Därmed måste ABS:s egen watcher upptäcka den nya boken.
+
+Förväntat: först en post med exakt 36 ljudfiler och ett lastScan-värde
+efter avslutad skanning; därefter två biblioteksobjekt där den nya posten
+innehåller exakt en ljudfil. Den tekniken har verifierats med repo-byggd
+ABS-kandidat, 2 CPU/1 GiB/PID128, no-new-privileges och Tini som PID1,
+med noll nya PID-limitträffar. Detta är isolerad integrationsverifiering,
+inte automatiskt bevis för att en produktionsövervakare har rätt inställningar,
+fått filhändelsen eller redan registrerat den befintliga 36-spårsboken.
