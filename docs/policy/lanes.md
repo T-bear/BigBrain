@@ -89,6 +89,31 @@ och rollbackkontroll gäller oförändrat. Utan --execute är körningen skrivsk
 granskning av exakt T2-kandidat, samt övriga redan bindande driftvillkor.
 Finance ändras inte; BB-158 förblir fryst.
 
+### Granskad Media-uppföljning efter PR #68
+
+En separat uppföljningskörning kan använda flaggan --media-followup
+endast för main som innehåller den accepterade källbasen
+6efba7c9b265dbab0b7e3b14313994a102d2b87b utan ytterligare
+ändringar av bygginputs, från sammansatt API- och Web-baslinje
+102f1f021d9a802292be7442b148ab67121b375e.
+Det privata första releasekvittot, image-ID:n och kompositionsmanifesten
+måste verifieras till hashvärdet
+sha256:f91b24f75a7ccb07b822008f7213cfca2aabd425b84081549d6077e69ce7b1cf.
+Endast två API-sökfiler och tre Web-sökfiler får skilja sig i bygginputs.
+Finance-blobbarna återställs oförändrade från den första API-baslinjen
+80fa231773dace31dda60ad0a32c69c1a42b5e50. En annan release, okänd
+kompositruntime, ändrad Git-historik eller andra källfiler stoppas.
+Den ordinarie STANDARD-spärren kvarstår för efterföljande releaser.
+
+Skrivskyddad kontroll:
+
+    python3 scripts/deploy-standard.py --revision ACCEPTED_MAIN_SHA --media-followup
+
+Faktisk körning med --execute förutsätter accepterad main med detta
+releasekontrakt samt godkänd oberoende T2-granskning och separat
+releaseauktorisering. Samtliga tidigare CI-, backup-, image-, restart-,
+rollback- och hälsokontroller gäller. Denna PR deployar eller mergar inte.
+
 1. Kontrollera aktuell remote main, ren checkout, PR #25:s commit i ancestry och fyra
    gröna main-jobb. Båda runtime-revisionerna måste vara tillgängliga Git-commits i
    accepterad ancestry. Container- och image-etiketter måste matcha; en äldre Web-image
