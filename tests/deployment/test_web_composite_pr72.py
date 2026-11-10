@@ -1,5 +1,8 @@
 """Offline negative/contract tests for the isolated PR72 Web release tool."""
 import copy
+import json
+import os
+import tempfile
 import importlib.util
 from pathlib import Path
 import unittest
@@ -72,6 +75,52 @@ class CompositeReleaseTests(unittest.TestCase):
    with self.subTest(field=field):
     x=copy.deepcopy(base);x[field]=value
     with self.assertRaises(m.Blocked):m.web_shape(x)
+ def test_isolated_candidate_probe_never_uses_network_or_mounts(self):
+  image="sha256:"+"a"*64
+  with patch.object(m,"docker",return_value=b"") as mocked:
+   m.preflight_web_image(image)
+   a=mocked.call_args.args
+   self.assertEqual(a[0:3],("run","--rm","--network"))
+   self.assertIn("none",a)
+   self.assertIn("--read-only",a)
+   self.assertIn("--cap-drop",a)
+   self.assertIn("--user",a)
+   self.assertIn("101:101",a)
+   self.assertNotIn("--volume",a)
+   self.assertIn(image,a)
+   self.assertIn("test -r /etc/nginx/conf.d/default.conf",a[-1])
+  with patch.object(m,"docker",side_effect=m.Blocked("unreadable")):
+   with self.assertRaises(m.Blocked):m.preflight_web_image(image)
+
+ def test_previous_release_is_trusted_only_with_completed_rollback_receipt(self):
+  with tempfile.TemporaryDirectory() as d:
+   state=Path(d);state.chmod(0o700)
+   run=state/("run-"+"a"*32);run.mkdir(mode=0o700)
+   source=run/"previous.json";source.write_text("{}");source.chmod(0o600)
+   journal=run/"journal.jsonl";journal.write_text(json.dumps({"phase":"ROLLED_BACK"})+"\n");journal.chmod(0o600)
+   receipt=run/"candidate.json"
+   receipt.write_text(json.dumps({"source":m.REV,"previousImage":m.WEB_OLD,
+                                  "candidateImage":"sha256:"+"b"*64}))
+   receipt.chmod(0o600)
+   with patch.object(m,"STATE",state):
+    m.trusted_rollback_manifest(source)
+    journal.write_text(json.dumps({"phase":"SWITCH_STARTED"})+"\n")
+    with self.assertRaises(m.Blocked):m.trusted_rollback_manifest(source)
+    journal.write_text(json.dumps({"phase":"ROLLED_BACK"})+"\n")
+    receipt.write_text(json.dumps({"source":m.REV,"previousImage":"sha256:"+"c"*64,
+                                   "candidateImage":"sha256:"+"b"*64}))
+    with self.assertRaises(m.Blocked):m.trusted_rollback_manifest(source)
+    receipt.write_text(json.dumps({"source":m.REV,"previousImage":m.WEB_OLD,
+                                   "candidateImage":"sha256:"+"b"*64}))
+    receipt.chmod(0o644)
+    with self.assertRaises(m.Blocked):m.trusted_rollback_manifest(source)
+
+ def test_temporary_dockerfile_must_pin_config_mode(self):
+  source=FILE.read_text()
+  self.assertIn("COPY --chmod=0644 src/BigBrain.Web/nginx.conf",source)
+  self.assertIn("preflight_web_image(imageid)",source)
+  self.assertIn("trusted_rollback_manifest(source)",source)
+
  def test_known_pr_diff_restricts_source(self):
   self.assertEqual(len(m.CHANGED),11)
   self.assertFalse(any(x.startswith("src/BigBrain.Api/") for x in m.CHANGED))

@@ -118,6 +118,27 @@ def web_shape(c):
       "WebPrivilegeMountOrNetworkDrift")
  ports=c["HostConfig"].get("PortBindings",{}).get("8080/tcp",[])
  need(len(ports)==1 and ports[0].get("HostPort")=="13000","WebHostPortDrift")
+def trusted_rollback_manifest(source):
+ # A failed release may restore Web from its private previous.json. Require a
+ # completed rollback receipt before accepting that manifest as a new baseline.
+ need(source.name=="previous.json" and source.parent.parent==STATE
+      and re.fullmatch(r"run-[a-f0-9]{32}",source.parent.name),"UntrustedRollbackPath")
+ st=STATE.lstat()
+ need(st.st_uid==os.getuid() and stat.S_ISDIR(st.st_mode)
+      and st.st_mode&0o777==0o700 and not stat.S_ISLNK(st.st_mode),"UntrustedRollbackState")
+ journal_path=source.parent/"journal.jsonl"
+ receipt_path=source.parent/"candidate.json"
+ for path in (journal_path,receipt_path):
+  st=path.lstat()
+  need(st.st_uid==os.getuid() and stat.S_ISREG(st.st_mode)
+       and st.st_mode&0o077==0 and not stat.S_ISLNK(st.st_mode),"RollbackReceiptPermissions")
+ rows=journal_path.read_text().splitlines()
+ need(bool(rows) and json.loads(rows[-1]).get("phase")=="ROLLED_BACK","RollbackNotComplete")
+ receipt=json.loads(receipt_path.read_text())
+ need(receipt.get("source")==REV and receipt.get("previousImage")==WEB_OLD
+      and re.fullmatch(r"sha256:[0-9a-f]{64}",receipt.get("candidateImage","")),
+      "RollbackCandidateMismatch")
+
 def runtime():
  api,web=inspect(API),inspect(WEB)
  healthy(api);healthy(web)
@@ -126,12 +147,18 @@ def runtime():
  label=web["Config"]["Labels"]
  source=Path(label.get("com.docker.compose.project.config_files",""))
  root=Path.home()/".local/state/bigbrain-standard"
- need(source.name=="release.json" and re.fullmatch(r"run-[a-f0-9]{32}",source.parent.name)
-      and source.parent.parent==root,"UntrustedSourceManifest")
+ standard=(source.name=="release.json"
+           and re.fullmatch(r"run-[a-f0-9]{32}",source.parent.name)
+           and source.parent.parent==root)
+ rollback=(source.name=="previous.json"
+           and re.fullmatch(r"run-[a-f0-9]{32}",source.parent.name)
+           and source.parent.parent==STATE)
+ need(standard or rollback,"UntrustedSourceManifest")
  for p in (source.parent,source):
   st=p.lstat()
   need(st.st_uid==os.getuid() and st.st_mode&0o077==0 and not stat.S_ISLNK(st.st_mode)
        and (stat.S_ISDIR(st.st_mode) if p==source.parent else stat.S_ISREG(st.st_mode)),"ManifestPermissions")
+ if rollback:trusted_rollback_manifest(source)
  data=json.loads(source.read_text())
  need(data.get("name")=="bigbrain-sprint1"
       and data["networks"]["default"]=={"external":True,"name":"bigbrain-sprint1_default"},
@@ -171,6 +198,19 @@ def visible_link():
  a=docker("exec",WEB,"sh","-c",
      "if grep -q 'Förbered ljudimport från länk' /usr/share/nginx/html/assets/index-*.js; then echo PRESENT; else echo ABSENT; fi")
  return a.strip()==b"PRESENT"
+def preflight_web_image(sha):
+ # This catches restrictive git-worktree umask permissions before the first
+ # production mutation. No ports, API DNS, networks, secrets or media mounts.
+ docker("run","--rm","--network","none","--read-only","--cap-drop","ALL",
+        "--security-opt","no-new-privileges","--memory","64m",
+        "--memory-swap","64m","--pids-limit","24","--user","101:101",
+        "--entrypoint","/bin/sh",sha,"-c",
+        "test -r /etc/nginx/conf.d/default.conf && "
+        "test -s /usr/share/nginx/html/index.html && "
+        "ls /usr/share/nginx/html/assets/index-*.js >/dev/null 2>&1 && "
+        "! grep -q 'Förbered ljudimport från länk' /usr/share/nginx/html/assets/index-*.js",
+        timeout=45)
+
 def deployment(snapshot):
  api,web,spec,work=snapshot
  need(os.getuid()==1000,"OperatorUser")
@@ -195,11 +235,15 @@ def deployment(snapshot):
   df=src/"src/BigBrain.Web/Dockerfile"
   original=df.read_text()
   need(original.count("FROM node:20-alpine AS build")==1 and
-       original.count("FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime")==1,
+       original.count("FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime")==1 and
+       original.count("COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf")==1,
        "UnexpectedDockerfile")
+  # COPY otherwise inherits 0600 from the private, umask-077 worktree.
   df.write_text(original.replace("FROM node:20-alpine AS build","FROM "+NODE_BASE+" AS build")
                     .replace("FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime",
-                             "FROM "+NGINX_BASE+" AS runtime"))
+                             "FROM "+NGINX_BASE+" AS runtime")
+                    .replace("COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf",
+                             "COPY --chmod=0644 src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf"))
   pinned_image(NODE_BASE.split("@",1)[1])
   pinned_image(NGINX_BASE.split("@",1)[1])
   tag="bigbrain-web:bb72-"+REV
@@ -207,6 +251,7 @@ def deployment(snapshot):
          "--label","org.opencontainers.image.revision="+REV,str(src),timeout=1200)
   imageid=json.loads(docker("image","inspect",tag))[0]["Id"]
   pinned_image(imageid)
+  preflight_web_image(imageid)
   write(folder/"candidate.json",{"source":REV,"candidateImage":imageid,
                                  "previousImage":WEB_OLD})
   manifest=folder/"release.json"

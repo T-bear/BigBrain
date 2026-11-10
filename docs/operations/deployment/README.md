@@ -200,3 +200,33 @@ inte ett generellt releaseverktyg. Skriptet gör följande:
 
 Denna dokumentation innebär ingen frisläppning, driftsättning, generell
 root-auktorisering eller automatisk återstart av BB-158.
+
+### PR #73 – verklig Web-deployment misslyckades och återställdes 2026-11-10
+
+Produktionsförsöket efter PR #73 kördes mot accepterad main, med godkända
+förkontroller. Ny Web-image fick Nginx-fel Permission denied för
+/etc/nginx/conf.d/default.conf och kunde inte bli healthy. Isolerad
+UID-101-verifiering fastställde mode 0600 i kandidatens konfigurationsfil
+mot mode 0644 i den tidigare fungerande Web-imagen. Bygg-worktreets
+restriktiva umask hade fortplantats in i Docker COPY. Skriptet saknade
+en icke-root verifiering av imagefilernas läsbehörighet före Web-byte.
+
+**Automatisk rollback: PASS.** Föregående Web-image återställdes,
+Webs HTML/ikon svarar HTTP 200, API-containerns identitet och hälsa
+är oförändrade och inga databasåtgärder gjordes. Privata journalen
+slutar ROLLED_BACK; main förblev e8a43ac (PR #73).
+Den gamla BB-158-importlänken är därför fortfarande synlig.
+
+Vid rollback skapade Compose en privat Web-only previous.json med
+oförändrad konfigurationshash, men ny Compose-originsökväg.
+Korrigeringscheckpointen bevarar stoppreglerna: tillåt endast just
+den tidigare återställningsmanifesten från skyddad privat state,
+efter verifierad avslutad ROLLED_BACK och kandidat-/imagekvitto.
+Bygg kandidatens Nginx-konfiguration med explicit mode 0644 och
+kontrollera från UID 101 i nätverkslös, behörighetsbegränsad container
+att konfiguration och UI-assets är läsbara och den gamla länken
+saknas **före** det första produktionsbytet. Ogiltiga kandidater
+ska stoppas före switch; inga manuella Docker-rättighetsändringar.
+
+Detta är ny review-kod och ger inte automatiskt ett andra
+deploymentförsök. Befintliga review-/CI-/rollbackkrav gäller.
