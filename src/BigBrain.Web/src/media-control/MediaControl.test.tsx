@@ -72,6 +72,23 @@ test('overview has exactly three ordered links and performs no reads or polling'
   expect(screen.getByRole('heading', { name: 'Mediekontroll' })).toHaveFocus()
 })
 
+test('BB-158 stays hidden in flow and when opening an old direct import bookmark', () => {
+  go('/media/control/flow')
+  const view = mount()
+  expect(screen.queryByRole('link', { name: /Förbered ljudimport från länk/ })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Starta import/ })).not.toBeInTheDocument()
+  expect(reads.map(r => r.url)).toEqual(['/api/v1/modules/media/jobs?limit=50'])
+  view.unmount()
+
+  reads.length = 0
+  go('/media/control/import')
+  expect(mediaControlPage()).toBe('overview')
+  mount()
+  expect(screen.getByRole('heading', { level: 1, name: 'Mediekontroll' })).toBeInTheDocument()
+  expect(screen.queryByLabelText('Källänk')).not.toBeInTheDocument()
+  expect(reads).toEqual([])
+})
+
 test.each([
   ['Nedladdningskö', 'downloads', ['/api/v1/modules/media/downloads']],
   ['Medieflöde', 'flow', ['/api/v1/modules/media/jobs?limit=50']],

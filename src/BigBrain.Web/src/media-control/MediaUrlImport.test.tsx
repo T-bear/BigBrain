@@ -96,13 +96,13 @@ test('history distinguishes multiple files sharing DOI and shows failures honest
   expect(screen.queryByRole('button', { name: 'Starta import' })).not.toBeInTheDocument()
 })
 
-test('UX Lab specimen makes no requests; direct import route is preserved', () => {
+test('isolated specimen makes no requests; old bookmark falls back to overview', () => {
   const fetch = vi.fn()
   vi.stubGlobal('fetch', fetch)
   render(<MediaUrlImport specimen />)
   expect(screen.getByRole('button', { name: 'Analysera uppgifter och förhandsgranska' })).toBeDisabled()
   expect(fetch).not.toHaveBeenCalled()
-  expect(mediaControlPage('/media/control/import', '')).toBe('import')
+  expect(mediaControlPage('/media/control/import', '')).toBe('overview')
 })
 
 test.each([

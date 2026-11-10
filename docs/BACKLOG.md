@@ -16,10 +16,14 @@ acceptans är olika saker. Källhänvisningarnas B-nummer pekar på DOC-2B:s urs
 
 ### BB-158 — Media URL Import & Audio Extraction
 
-**FROZEN / OWNER DECISION REQUIRED TO RESUME sedan 2026-10-23**, hela BB-158:
-direkt MP3/M4A, YouTube, extraktion/konvertering, DOI/ISBN, Librarr-import, API/Web, tester och deployment.
-[Kanoniskt beslut och återupptagning](operations/bb158-freeze-20261023.md) styr, inte gamla launchpaket
-eller fortsättningsinstruktioner. Accepterad direktimport/valfri DOI/Sonarr-fix är inte bevis för
+**UPPTINAD FÖR UTVECKLING sedan 2026-11-10** enligt
+[ägarbeslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10).
+Ofärdigt UI döljs i separat kodkandidat; backendgrindar och drift bevaras.
+Först rättas [Audiobookshelf-skanning #70](https://github.com/T-bear/BigBrain/issues/70)
+och [Librarr-skanningsanrop #71](https://github.com/T-bear/BigBrain/issues/71).
+Hämtningsstatus och slut-till-slut-prov prioriteras sedan separat.
+YouTube/konvertering får ingen automatisk start, merge eller aktivering.
+Accepterad direktimport/valfri DOI/Sonarr-fix är inte bevis för
 aktuell drift: images, aktivering, importer, backup, biblioteksintegritet och recoveryutfall är UNKNOWN / NOT REVERIFIED.
 YouTube/ISBN/konvertering är inte implementerade; kontrollerad egress och verktygs-/resurs-/avbrottsisolering
 är ofullständigt verifierade. Ingen ny säkerhetsutredning följer av denna not.
@@ -29,7 +33,7 @@ format-/storleks-/tids-/resursgränser, scannerisolering, rättigheter till file
 överskrivning, import-ID/SHA/ABS-avstämning, separat bekräftelse och bevarad DOI/proveniens.
 Inga secrets eller godtyckliga shellkommandon från indata. Osäkra importer får inte automatiskt återställas
 eller köras om; backup/rollback, aktivitet och sessionsoberoende recovery måste senare verifieras.
-Befintlig drift och media lämnas orörda. [Ursprunglig post](history/backlog-before-doc-2b-20261024.md#bb-158--media-url-import--audio-extraction).
+Befintlig drift och media lämnas orörda av upptinings- och UI-kandidaten. [Ursprunglig post](history/backlog-before-doc-2b-20261024.md#bb-158--media-url-import--audio-extraction).
 
 <a id="bigbrain-finance--policy-governed-autonomous-trading"></a>
 
