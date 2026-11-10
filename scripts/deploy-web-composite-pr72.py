@@ -64,10 +64,17 @@ def http():
   with urlopen("http://127.0.0.1:13000"+route,timeout=4) as r:
    first=r.read(512)
    need(r.status==200 and (b"<html" in first.lower() if route=="/" else first.startswith(b"\x89PNG\r\n\x1a\n")),"BadWebHttp")
+# PR75 is a separately accepted, test-only CI repair on top of PR74.
+# All four paths remain exact-match: never permit arbitrary future changes.
+PR75_BASE="3fbdffc5d9957a898db9bef4e8d02a670d47b4fa"
+PR75_MERGE="49e16ed0bee978a7217b757d099ee73107ba1286"
+PR75_HEAD="4e4988f07cd7b6734c4e0c91cdef67ac3bd73641"
+PR75_TEST="tests/BigBrain.Api.Tests/MediaLookupRequestTests.cs"
 RELEASE_FILES={
  "scripts/deploy-web-composite-pr72.py",
  "tests/deployment/test_web_composite_pr72.py",
  "docs/operations/deployment/README.md",
+ PR75_TEST,
 }
 def ci_green(sha):
  checks=json.loads(run(["gh","api","repos/T-bear/BigBrain/commits/"+sha+"/check-runs?per_page=100"]))
@@ -85,14 +92,23 @@ def pr_and_source():
  need(not git("status","--porcelain","--untracked-files=no"),"TrackedChanges")
  need(set(git("diff","--name-only",BASE,REV).splitlines())==CHANGED,"UnreviewedPR72Diff")
  need(git("rev-parse",REV+"^1")==BASE,"UnexpectedPR72Base")
- # Release code must be the exact, separately reviewed tool merged on top of PR72.
+ need(git("rev-parse",PR75_MERGE+"^1")==PR75_BASE,"UnexpectedPR75Base")
+ need(set(git("diff","--name-only",PR75_BASE,PR75_MERGE).splitlines())
+      =={PR75_TEST},"UnreviewedPR75Diff")
+ need(git("rev-parse","HEAD:"+PR75_TEST)==git("rev-parse",PR75_MERGE+":"+PR75_TEST),
+      "PR75TestModified")
+ # Exact allowlist includes the separately verified PR75 test-only merge.
  need(set(git("diff","--name-only",REV,current).splitlines())==RELEASE_FILES,"UnreviewedReleaseToolDiff")
  need(git("hash-object","scripts/deploy-web-composite-pr72.py")
       ==git("rev-parse","HEAD:scripts/deploy-web-composite-pr72.py"),"ToolFileNotAccepted")
  pr=json.loads(run(["gh","api","repos/T-bear/BigBrain/pulls/72"]))
  need(pr.get("merged") is True and pr.get("merge_commit_sha")==REV
       and pr.get("head",{}).get("sha")=="47d6b7236dfcd918048d7034629db0b8d50839b7","PRIdentity")
- ci_green(REV);ci_green(current)
+ pr75=json.loads(run(["gh","api","repos/T-bear/BigBrain/pulls/75"]))
+ need(pr75.get("merged") is True and pr75.get("merge_commit_sha")==PR75_MERGE
+      and pr75.get("head",{}).get("sha")==PR75_HEAD
+      and pr75.get("base",{}).get("ref")=="main","PR75Identity")
+ ci_green(REV);ci_green(PR75_MERGE);ci_green(current)
 def compose_from_web(spec,image,revision):
  need(set(spec)=={"command","entrypoint","healthcheck","image","labels","networks",
                  "ports","pull_policy","restart","stop_grace_period"},"UnexpectedWebContract")

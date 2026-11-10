@@ -121,6 +121,17 @@ class CompositeReleaseTests(unittest.TestCase):
   self.assertIn("preflight_web_image(imageid)",source)
   self.assertIn("trusted_rollback_manifest(source)",source)
 
+ def test_pr75_is_only_allowed_additional_code_and_is_sha_pinned(self):
+  self.assertEqual(m.PR75_BASE,"3fbdffc5d9957a898db9bef4e8d02a670d47b4fa")
+  self.assertEqual(m.PR75_MERGE,"49e16ed0bee978a7217b757d099ee73107ba1286")
+  self.assertEqual(m.PR75_HEAD,"4e4988f07cd7b6734c4e0c91cdef67ac3bd73641")
+  self.assertEqual(m.RELEASE_FILES,{
+   "scripts/deploy-web-composite-pr72.py",
+   "tests/deployment/test_web_composite_pr72.py",
+   "docs/operations/deployment/README.md",
+   "tests/BigBrain.Api.Tests/MediaLookupRequestTests.cs"})
+  self.assertFalse(any(x.startswith("src/BigBrain.Api/") for x in m.RELEASE_FILES))
+
  def test_known_pr_diff_restricts_source(self):
   self.assertEqual(len(m.CHANGED),11)
   self.assertFalse(any(x.startswith("src/BigBrain.Api/") for x in m.CHANGED))
