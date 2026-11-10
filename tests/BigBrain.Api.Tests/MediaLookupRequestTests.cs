@@ -428,8 +428,15 @@ public sealed class MediaLookupRequestTests
             if (timeout) throw new TaskCanceledException("provider timeout");
             if (waitForCancellation)
             {
-                using var registration = cancellationToken.Register(() => CancellationObserved = true);
-                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                try
+                {
+                    await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    CancellationObserved = true;
+                    throw;
+                }
             }
             var results = Enumerable.Range(0, 15).Select(index =>
                 new MediaLookupResult(provider, index.ToString(System.Globalization.CultureInfo.InvariantCulture),
