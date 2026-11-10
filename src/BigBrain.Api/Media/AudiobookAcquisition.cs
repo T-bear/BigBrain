@@ -205,11 +205,12 @@ public sealed class AudiobookAcquisitionService(
             }
         }
         var preferredLanguage = AudiobookLanguages.Normalize(language);
-        return deduplicated.Values.Take(50)
+        return deduplicated.Values
             .OrderBy(x => MatchScore(x.MatchEvidence))
             .ThenBy(x => LanguagePreferenceScore(x, preferredLanguage))
             .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
-            .ThenBy(x => x.EditionId, StringComparer.Ordinal).ToArray();
+            .ThenBy(x => x.EditionId, StringComparer.Ordinal)
+            .Take(50).ToArray();
     }
     public async Task<AudiobookAcquisitionJob> RequestAsync(AudiobookAcquisitionCandidate candidate, CancellationToken token)
     {
