@@ -16,6 +16,7 @@ COPY infrastructure/librarr/patches/0005-pinned-native-source-policy.patch /tmp/
 COPY infrastructure/librarr/patches/0006-audiobookbay-parser-boundaries.patch /tmp/audiobookbay-parser-boundaries.patch
 COPY infrastructure/librarr/patches/0007-audiobookbay-query-case-normalization.patch /tmp/audiobookbay-query-case-normalization.patch
 COPY infrastructure/librarr/patches/0008-bounded-direct-audio-import.patch /tmp/direct-audio-import.patch
+COPY infrastructure/librarr/patches/0009-restricted-abs-scan-and-count-real-imports.patch /tmp/restricted-abs-scan.patch
 RUN cd source \
     && git apply --check /tmp/no-overwrite.patch \
     && git apply /tmp/no-overwrite.patch \
@@ -33,7 +34,9 @@ RUN cd source \
     && git apply /tmp/audiobookbay-query-case-normalization.patch \
     && git apply --check /tmp/direct-audio-import.patch \
     && git apply /tmp/direct-audio-import.patch \
-    && test -z "$(gofmt -l internal/api/direct_import.go internal/api/direct_import_test.go internal/api/router.go internal/db/db.go internal/db/direct_import.go internal/organize/direct_audio.go internal/organize/direct_audio_validation.go internal/organize/direct_m4a_validation.go internal/organize/direct_format_test.go internal/organize/direct_audio_test.go internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/search/searcher.go internal/search/prowlarr.go internal/search/discovery_query_test.go internal/api/download.go internal/api/search.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)"
+    && git apply --check /tmp/restricted-abs-scan.patch \
+    && git apply /tmp/restricted-abs-scan.patch \
+    && test -z "$(gofmt -l internal/api/direct_import.go internal/api/direct_import_test.go internal/api/router.go internal/db/db.go internal/db/direct_import.go internal/organize/direct_audio.go internal/organize/direct_audio_validation.go internal/organize/direct_m4a_validation.go internal/organize/direct_format_test.go internal/organize/direct_audio_test.go internal/organize/pipeline.go internal/organize/audiobook_conflict_test.go internal/organize/scan.go internal/organize/scan_test.go internal/organize/targets.go internal/organize/targets_test.go internal/search/source_policy.go internal/search/source_policy_test.go internal/search/audiobookbay.go internal/search/searcher.go internal/search/prowlarr.go internal/search/discovery_query_test.go internal/api/download.go internal/api/search.go internal/api/audiobook_provider_test.go internal/download/watcher.go internal/download/watcher_test.go cmd/librarr/main.go)"
 
 # Permission-sensitive tests must not inherit root's DAC override.
 RUN adduser -D -u 1000 builder && chown -R builder:builder /build /go

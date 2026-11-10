@@ -135,3 +135,31 @@ never trigger automatic rollback; all original data/volume hashes remain unchang
 operational fault tests and the concrete transient unit have **not been run/installed by this
 build-correction checkpoint**. This section is the requested proposal for review, not runtime
 verification or an expansion into general disaster recovery.
+
+## BB-158 issue #71 – isolerad granskningskandidat, ej driftsatt (2026-11-10)
+
+Patch 0009 bygger på det exakt pinnade Librarr-upstreamträdet och de åtta
+tidigare accepterade patcharna. Den ändrar enbart Librarrs anrop till
+Audiobookshelfs admin-skyddade skannings-API och uppföljningen av
+faktiska nya biblioteksrader. Den ger **inte** Librarr adminbehörighet,
+ändrar inga lösenord och skapar inga nya biblioteksskanningar.
+
+När katalogens ABS-identitet är ett vanligt begränsat konto ska Librarr
+inte anropa POST /api/libraries/{id}/scan, vare sig från ljudboksskannerns
+femminutersloop eller från ebook-importens ABS-anrop. Det är ABS:s egen
+bevakning/indexering som ska verifieras separat mot syntetiska filer
+före produktionsrelease. Endast AddItemWithOutcome.Inserted räknas som
+en faktisk ny Librarr-post; duplicates och DB-fel utlöser inga falska
+scan_import-aktiviteter och lämnar befintligt source_id orört.
+
+Negativa nätverks-/behörighetstester och återkommande samma-mapp-tester
+finns i den inbakade upstream-patchen. Isolerad Go 1.25-körning utan nätverk
+på aktuellt källträd: go test ./... PASS, inklusive alla befintliga
+api-, db-, organizer-, downloader- och providersviter. Produktionsutfall,
+driftsatta images, avsaknad av HTTP 403 över kontrollfönster och faktisk
+ABS-katalogidentitet **är ännu inte verifierade**; #71 förblir OPEN.
+
+Inget av detta är en ny generell deploymentauktorisation. Före release
+krävs korrekt riskgranskning, exakt byggd image, hälsokontroll,
+återställning/backup och grön CI på accepterad main. Ändra inte ABS:s
+PID-budget eller BigBrains playback-credentials som snabbfix.

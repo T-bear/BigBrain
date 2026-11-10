@@ -1,0 +1,317 @@
+diff --git a/internal/organize/scan.go b/internal/organize/scan.go
+index c24f5b3..78ad3a1 100644
+--- a/internal/organize/scan.go
++++ b/internal/organize/scan.go
+@@ -128,7 +128,7 @@ func (s *AudiobookScanner) scan() {
+ 			}
+ 		}
+ 
+-		_, _ = s.db.AddItem(&models.LibraryItem{
++		outcome, err := s.db.AddItemWithOutcome(&models.LibraryItem{
+ 			Title:     title,
+ 			Author:    author,
+ 			FilePath:  dir,
+@@ -137,14 +137,21 @@ func (s *AudiobookScanner) scan() {
+ 			Source:    "scan",
+ 			SourceID:  "scan-" + dir,
+ 		})
++		if err != nil {
++			slog.Warn("audiobook scan database insert failed", "error", err)
++			continue
++		}
++		if !outcome.Inserted {
++			// Existing paths and hashes must not count as a fresh import.
++			continue
++		}
+ 
+ 		_ = s.db.LogEvent("scan_import", title, "Auto-imported from audiobook scan", nil, "")
+ 		imported++
+ 	}
+ 
+-	// Trigger ABS scan ONCE after all imports (not per-directory).
+-	if imported > 0 && s.targets != nil {
+-		slog.Info("audiobook scanner triggering library scan", "imported", imported)
+-		s.targets.ImportAudiobook()
++	if imported > 0 {
++		// Do not issue an admin-only ABS scan. Native ABS watcher handles files.
++		slog.Info("audiobook scanner recorded new library items", "imported", imported)
+ 	}
+ }
+diff --git a/internal/organize/scan_test.go b/internal/organize/scan_test.go
+new file mode 100644
+index 0000000..436f4ab
+--- /dev/null
++++ b/internal/organize/scan_test.go
+@@ -0,0 +1,95 @@
++package organize
++
++import (
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/JeremiahM37/librarr/internal/config"
++	"github.com/JeremiahM37/librarr/internal/db"
++	"github.com/JeremiahM37/librarr/internal/models"
++)
++
++// Regression for the five-minute loop: an existing path can be present under
++// a different source ID. It is not a newly imported audiobook and must not
++// increment scan_import activity or trigger further work.
++func TestAudiobookScannerExistingPathNeverCountsAsNew(t *testing.T) {
++	root := t.TempDir()
++	audioDir := filepath.Join(root, "audio")
++	bookDir := filepath.Join(audioDir, "Test Author - Test Book")
++	if err := os.MkdirAll(bookDir, 0700); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(bookDir, "chapter.mp3"), []byte("synthetic-not-audio"), 0600); err != nil {
++		t.Fatal(err)
++	}
++
++	database, err := db.New(filepath.Join(root, "state", "librarr.db"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer database.Close()
++
++	existing, err := database.AddItemWithOutcome(&models.LibraryItem{
++		Title: "Test Book", FilePath: bookDir, MediaType: "audiobook",
++		Source: "torrent", SourceID: "existing-reliable-source",
++	})
++	if err != nil || !existing.Inserted {
++		t.Fatalf("seed existing item: inserted=%v err=%v", existing.Inserted, err)
++	}
++	initialEvents, err := database.CountActivity()
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	scanner := NewAudiobookScanner(&config.Config{AudiobookDir: audioDir}, database, nil)
++	scanner.scan()
++	scanner.scan()
++
++	count, err := database.CountItems("audiobook")
++	if err != nil {
++		t.Fatal(err)
++	}
++	events, err := database.CountActivity()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if count != 1 || events != initialEvents {
++		t.Fatalf("duplicate path must not generate scan imports: items=%d events_before=%d events_after=%d", count, initialEvents, events)
++	}
++	if database.HasSourceID("scan-" + bookDir) {
++		t.Fatal("duplicate must keep original source identity")
++	}
++}
++
++func TestAudiobookScannerNewItemIsRecordedOnce(t *testing.T) {
++	root := t.TempDir()
++	audioDir := filepath.Join(root, "audio")
++	bookDir := filepath.Join(audioDir, "Test Author - Test Book")
++	if err := os.MkdirAll(bookDir, 0700); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(bookDir, "chapter.mp3"), []byte("synthetic-not-audio"), 0600); err != nil {
++		t.Fatal(err)
++	}
++	database, err := db.New(filepath.Join(root, "state", "librarr.db"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer database.Close()
++
++	scanner := NewAudiobookScanner(&config.Config{AudiobookDir: audioDir}, database, nil)
++	scanner.scan()
++	scanner.scan()
++	count, err := database.CountItems("audiobook")
++	if err != nil {
++		t.Fatal(err)
++	}
++	events, err := database.CountActivity()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if count != 1 || events != 1 || !database.HasSourceID("scan-"+bookDir) {
++		t.Fatalf("one source directory must be recorded once: items=%d events=%d", count, events)
++	}
++}
+diff --git a/internal/organize/targets.go b/internal/organize/targets.go
+index f5e9927..50b6821 100644
+--- a/internal/organize/targets.go
++++ b/internal/organize/targets.go
+@@ -35,16 +35,17 @@ func NewLibraryTargets(cfg *config.Config) *LibraryTargets {
+ func (lt *LibraryTargets) ImportEbook(filePath, title, author string) {
+ 	lt.copyToCalibre(filePath, title, author)
+ 	lt.copyToKavitaEbook(filePath, title, author)
+-	lt.scanABSEbookLibrary()
++	// Audiobookshelf's scan endpoint is admin-only. Its native watcher owns indexing;
++	// never submit a privileged scan with Librarr's restricted catalogue token.
+ 	// Issue #98: ebooks landing in a Kavita library folder stayed invisible
+ 	// until someone scanned by hand — only manga ever asked Kavita to look.
+ 	lt.scanKavita(lt.cfg.KavitaEbookLibraryID)
+ }
+ 
+-// ImportAudiobook triggers ABS library scan.
+-func (lt *LibraryTargets) ImportAudiobook() {
+-	lt.scanABSAudiobookLibrary()
+-}
++// ImportAudiobook preserves the import hook without escalating Audiobookshelf access.
++// ABS's own file watcher owns catalogue indexing; its scan endpoint is admin-only.
++// Do not replace the restricted catalogue credential with an administrator token.
++func (lt *LibraryTargets) ImportAudiobook() {}
+ 
+ // ImportManga copies to Kavita and Komga manga libraries and triggers scans.
+ func (lt *LibraryTargets) ImportManga(filePath, seriesTitle string) {
+@@ -120,49 +121,6 @@ func (lt *LibraryTargets) copyToKavitaManga(filePath, seriesTitle string) {
+ 	slog.Info("copied to kavita manga library", "path", destPath)
+ }
+ 
+-// scanABSAudiobookLibrary triggers an Audiobookshelf audiobook library scan.
+-func (lt *LibraryTargets) scanABSAudiobookLibrary() {
+-	if !lt.cfg.HasAudiobookshelf() || lt.cfg.ABSLibraryID == "" {
+-		return
+-	}
+-	lt.absLibraryScan(lt.cfg.ABSLibraryID)
+-}
+-
+-// scanABSEbookLibrary triggers an Audiobookshelf ebook library scan.
+-func (lt *LibraryTargets) scanABSEbookLibrary() {
+-	if !lt.cfg.HasAudiobookshelf() || lt.cfg.ABSEbookLibraryID == "" {
+-		return
+-	}
+-	lt.absLibraryScan(lt.cfg.ABSEbookLibraryID)
+-}
+-
+-func (lt *LibraryTargets) absLibraryScan(libraryID string) {
+-	url := fmt.Sprintf("%s/api/libraries/%s/scan", lt.cfg.ABSURL, libraryID)
+-	req, err := http.NewRequest("POST", url, nil)
+-	if err != nil {
+-		slog.Error("abs scan request creation failed", "error", err)
+-		return
+-	}
+-	req.Header.Set("Authorization", "Bearer "+lt.cfg.ABSToken)
+-
+-	resp, err := lt.client.Do(req)
+-	if err != nil {
+-		// Include the configured base URL: the most common cause of a
+-		// failure here is a malformed ABS_URL, and the bare net/http error
+-		// ("unsupported protocol scheme") never says which URL it came from.
+-		slog.Error("abs scan failed", "library_id", libraryID, "abs_url", lt.cfg.ABSURL, "error", err)
+-		return
+-	}
+-	defer resp.Body.Close()
+-	io.Copy(io.Discard, resp.Body)
+-
+-	if resp.StatusCode < 300 {
+-		slog.Info("abs library scan triggered", "library_id", libraryID)
+-	} else {
+-		slog.Warn("abs scan returned non-success", "library_id", libraryID, "status", resp.StatusCode)
+-	}
+-}
+-
+ // scanKavita triggers a Kavita library scan. When libraryID is set only that
+ // library is scanned; otherwise every library is, which is the only correct
+ // default — Kavita's /api/Library/scan requires a libraryId query parameter
+diff --git a/internal/organize/targets_test.go b/internal/organize/targets_test.go
+index 465037b..8e3711a 100644
+--- a/internal/organize/targets_test.go
++++ b/internal/organize/targets_test.go
+@@ -21,59 +21,64 @@ func TestMain(m *testing.M) {
+ 	os.Exit(m.Run())
+ }
+ 
+-// TestImportAudiobook_TriggersScanWithSchemeLessConfiguredURL is the
+-// end-to-end regression for issue #92: an ABS URL configured without a scheme
+-// (typed as "audiobookshelf:13378" in the UI, or set that way in ABS_URL) made
+-// every scan die with `unsupported protocol scheme ""`, so nothing ever
+-// imported. config.Load must hand organize a URL net/http can dial.
+-func TestImportAudiobook_TriggersScanWithSchemeLessConfiguredURL(t *testing.T) {
++// TestImportAudiobook_NoAdminScanWithRestrictedToken verifies that the
++// normalized ABS URL remains valid without sending an admin-only scan request.
++// The real catalogue identity is intentionally non-admin.
++func TestImportAudiobook_NoAdminScanWithRestrictedToken(t *testing.T) {
+ 	var (
+-		mu     sync.Mutex
+-		hits   []string
+-		auth   string
+-		method string
++		mu   sync.Mutex
++		hits []string
+ 	)
+-
+ 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+ 		mu.Lock()
+-		hits = append(hits, r.URL.Path)
+-		auth = r.Header.Get("Authorization")
+-		method = r.Method
++		hits = append(hits, r.Method+" "+r.URL.Path)
+ 		mu.Unlock()
+-		w.WriteHeader(http.StatusOK)
++		w.WriteHeader(http.StatusForbidden)
+ 	}))
+ 	defer srv.Close()
+ 
+-	// Strip the scheme the test server hands us — this is exactly the value
+-	// the issue reporter had configured.
+-	schemeLess := strings.TrimPrefix(srv.URL, "http://")
+-
+ 	dir := t.TempDir()
+ 	t.Setenv("SETTINGS_FILE", filepath.Join(dir, "settings.json"))
+-	t.Setenv("ABS_URL", schemeLess)
+-	t.Setenv("ABS_TOKEN", "test-token")
++	t.Setenv("ABS_URL", strings.TrimPrefix(srv.URL, "http://"))
++	t.Setenv("ABS_TOKEN", "restricted-catalogue-token")
+ 	t.Setenv("ABS_LIBRARY_ID", "lib-1")
+ 
+ 	cfg := config.Load()
+ 	if cfg.ABSURL != srv.URL {
+ 		t.Fatalf("config.Load left ABSURL = %q, want %q", cfg.ABSURL, srv.URL)
+ 	}
+-
+ 	NewLibraryTargets(cfg).ImportAudiobook()
++	NewLibraryTargets(cfg).ImportAudiobook() // repeated scanner tick also cannot POST
+ 
+ 	mu.Lock()
+ 	defer mu.Unlock()
+-	if len(hits) != 1 {
+-		t.Fatalf("expected exactly 1 request to ABS, got %d: %v", len(hits), hits)
++	if len(hits) != 0 {
++		t.Fatalf("restricted token must never trigger ABS scans, got %v", hits)
+ 	}
+-	if hits[0] != "/api/libraries/lib-1/scan" {
+-		t.Errorf("path = %q, want /api/libraries/lib-1/scan", hits[0])
+-	}
+-	if method != http.MethodPost {
+-		t.Errorf("method = %q, want POST", method)
++}
++
++func TestImportEbook_NeverScansAudiobookshelfWithRestrictedToken(t *testing.T) {
++	var (
++		mu   sync.Mutex
++		hits int
++	)
++	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		mu.Lock()
++		hits++
++		mu.Unlock()
++		w.WriteHeader(http.StatusForbidden)
++	}))
++	defer srv.Close()
++	cfg := &config.Config{
++		ABSURL:            srv.URL,
++		ABSToken:          "restricted-catalogue-token",
++		ABSEbookLibraryID: "ebook-lib-1",
+ 	}
+-	if auth != "Bearer test-token" {
+-		t.Errorf("Authorization = %q, want Bearer test-token", auth)
++	NewLibraryTargets(cfg).ImportEbook(filepath.Join(t.TempDir(), "unrelated.epub"), "Title", "Author")
++	mu.Lock()
++	defer mu.Unlock()
++	if hits != 0 {
++		t.Fatalf("ebook import must not trigger admin-only ABS scans, got %d", hits)
+ 	}
+ }
+ 
