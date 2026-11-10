@@ -1,8 +1,11 @@
 # Media Module
 
-**BB-158 – FROZEN / OWNER DECISION REQUIRED TO RESUME (2026-10-23).** Hela BB-158 är fryst,
-inklusive direktimport, YouTube, DOI/ISBN, Librarr, tester och deployment. Äldre fortsättningsinstruktioner
-är vilande; befintlig drift lämnas orörd. [Kanonisk frysning](../operations/bb158-freeze-20261023.md).
+**BB-158 – UPPTINAD FÖR UTVECKLING sedan 2026-11-10.** Den experimentella
+direktimporten döljs från Medieflöde, gamla direktbokmärken och UX/UI Lab
+i denna review-kandidat, ej deployad. Historisk kod, backendgrindar,
+data och normal Media-funktionalitet bevaras. UI-döljning är inte
+serverbaserad säkerhet; ingen importfunktion aktiveras av beslutet.
+[Kanoniskt beslut](../operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10).
 
 
 ## BB-158 — optional DOI amendment (review, 2026-10-21)
@@ -18,7 +21,9 @@ retain their original scope and status.
 
 ## BB-158 — bounded direct audio import (review only, 2026-10-18)
 
-Mediekontroll → Medieflöde → Förbered ljudimport från länk retains `/media/control/import`.
+Historiskt fanns Medieflödes länk till direktimport. Den är dold i
+review-kandidaten och det gamla direktbokmärket visar Mediekontrolls
+översikt i stället för importformuläret; API lämnas oförändrat.
 Preview is network-free; explicit rights/details confirmation and a separate Start are required.
 The implemented subset transfers direct HTTPS MPEG-1 Layer III MP3 (bounded ID3/APEv2 text tags)
 and progressive AAC-LC M4A, limited to 64 MiB, to the existing Librarr import owner.

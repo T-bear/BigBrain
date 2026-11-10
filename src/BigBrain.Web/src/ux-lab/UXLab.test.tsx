@@ -9,6 +9,7 @@ describe('UX/UI Lab', () => {
   })
   it('renders stable identities, review vocabulary and shared production primitives', () => {
     render(<UXLab />)
+    expect(screen.queryByText('Ljudimport – explicit bekräftelse')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'UX/UI-labb' })).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { name: 'Actions / Button' })).toHaveLength(3)
     expect(screen.getAllByText('EXPERIMENTELL').length).toBeGreaterThan(0)
