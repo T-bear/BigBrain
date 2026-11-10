@@ -158,3 +158,45 @@ Detta innebär ingen ny deployment.
 build helper, external Compose pass-through and maintenance-only single acquisition. UNKNOWN
 revision is honest and blocks acquisition. Credentials do not enable observation runtime.
 Publication is not permission to deploy, recreate services, configure keys or call Alpaca.
+
+## BB-158 / PR #72 – föreslagen engångs-Web-release för sammansatt runtime (2026-11-10)
+
+**REVIEW-KANDIDAT, EJ GODKÄND FÖR EXECUTE.** Den vanliga deploy-web-only.sh
+avvisar PR #72 eftersom den även innehåller fem redan mergade dokumentfiler.
+Den generella deploy-standard.py avvisar den skyddade sammansatta
+API/Web-konfigurationen med CompositeRuntimeRequiresReview. Dessa spärrar
+får inte kringgås med manuellt Docker-byte eller uppluckrad generell policy.
+
+scripts/deploy-web-composite-pr72.py är en **engångsväg för exakt**
+main 3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9 och PR #72,
+inte ett generellt releaseverktyg. Skriptet gör följande:
+
+1. Skrivskyddad preflight: huvud-SHA och PR-identitet, exakt 11-filsdiff,
+   fyra gröna main-CI-jobb, rätt skyddade API-/Web-imageidentiteter,
+   tidigare Compose-hash, nätverk, Web-UID, HTTP, hälsa och lokala
+   basimages verifieras. Oförutsedd ändring stoppar.
+2. Efter separat godkänd oberoende granskning av **releaseverktygets exakta
+   checkpoint**, --execute med befintlig Web-lock: bygg endast Web från
+   accepterad SHA, med lokal digest-låst Node/Nginx-bas. API-image och
+   databaser byggs inte om.
+3. Skapa en privat 0600-manifestfil som innehåller **enbart Web-tjänsten**
+   och dess befintliga externa nätverk. Ingen API-miljö eller API-secrets
+   kopieras till Web. Granska löst Compose innan byte.
+4. Byt enbart Web med --no-deps --no-build --pull never; bevara gamla
+   Web-imagen. Verifiera health/HTTP/ikon, att den gamla importlänken
+   saknas samt att API och övriga containrar behållit identitet.
+5. Vid verifierat Web-fel: försök säkert återställa enbart den tidigare
+   Web-imagen. Okänd drift- eller rollbackstatus markeras
+   MANUAL_REVIEW; ingen blind retry eller databasrestore. Bevara
+   privat journal och tidigare images. iPhone/PWA-acceptans är separat.
+
+**Preflight (ingen containerändring):**
+
+    python3 scripts/deploy-web-composite-pr72.py
+
+**Senare, endast efter oberoende granskning och giltig releaseauktorisering:**
+
+    python3 scripts/deploy-web-composite-pr72.py --execute
+
+Denna dokumentation innebär ingen frisläppning, driftsättning, generell
+root-auktorisering eller automatisk återstart av BB-158.
