@@ -70,6 +70,35 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     }
 
     [Fact]
+    public async Task CanonicalMatchAfterFiftyLiteralCandidatesIsRankedBeforeFinalLimit()
+    {
+        using var store = Store();
+        var literal = Enumerable.Range(0, 50).Select(index =>
+            Candidate("en", "Voice", $"literal{index:D2}")).ToArray();
+        var canonical = Candidate("en", "Voice", "canonical");
+        var provider = new FakeProvider
+        {
+            ResultsByQuery = new Dictionary<string, IReadOnlyList<AudiobookAcquisitionCandidate>>
+            {
+                ["Broad Title"] = literal,
+                ["Exact Title"] = [canonical]
+            }
+        };
+        var service = new AudiobookAcquisitionService(provider, store, TimeProvider.System);
+        var values = await service.SearchVariantsAsync(
+            [new("Broad Title", null, null, "literal"),
+             new("Exact Title", "Author", "OL1", "canonicalTitleAuthor")],
+            "en", CancellationToken.None);
+
+        Assert.Equal(50, values.Count);
+        Assert.Equal("canonical", values[0].EditionId);
+        Assert.Equal("OL1", values[0].MetadataWorkId);
+        Assert.DoesNotContain(values, value => value.EditionId == "literal49");
+        Assert.Equal(2, provider.Searches.Count);
+        Assert.Equal(0, provider.RequestCount);
+    }
+
+    [Fact]
     public async Task EnglishPreferenceRanksEnglishFirstAndAllLanguagesAddsNoPreference()
     {
         using var store = Store();
@@ -101,6 +130,37 @@ public sealed class AudiobookAcquisitionTests : IDisposable
             [new("broken", null, null, "literal"), new("working", null, null, "literal")], "en", CancellationToken.None);
         Assert.Single(values);
         Assert.Equal("edition", values[0].EditionId);
+    }
+
+    [Fact]
+    public async Task VariantReportDistinguishesPartialFailureFromSuccessfulEmptySearch()
+    {
+        using var store = Store();
+        var provider = new FakeProvider
+        {
+            ResultsByQuery = new()
+            {
+                ["first"] = [Candidate("en", "Voice", "a"), Candidate("en", "Voice", "b")],
+                ["empty"] = []
+            },
+            FailingQuery = "broken"
+        };
+        var service = new AudiobookAcquisitionService(provider, store, TimeProvider.System);
+        var partial = await service.SearchVariantsWithReportAsync(
+            [new("first", null, null, "literal"),
+             new("broken", null, null, "canonicalTitleAuthor")],
+            "en", CancellationToken.None);
+        Assert.Equal(2, partial.Candidates.Count);
+        Assert.Equal([(1, "literal", "complete", 2), (2, "canonicalTitleAuthor", "failed", 0)],
+            partial.Variants.Select(x => (x.Index, x.MatchEvidence, x.State, x.CandidateCount)));
+
+        var empty = await service.SearchVariantsWithReportAsync(
+            [new("empty", null, null, "literal"), new("first", null, null, "canonicalTitle")],
+            "en", CancellationToken.None);
+        Assert.Equal(2, empty.Candidates.Count);
+        Assert.Equal([(1, "literal", "empty", 0), (2, "canonicalTitle", "complete", 2)],
+            empty.Variants.Select(x => (x.Index, x.MatchEvidence, x.State, x.CandidateCount)));
+        Assert.Equal(0, provider.RequestCount);
     }
 
     [Theory]
@@ -188,13 +248,20 @@ public sealed class AudiobookAcquisitionTests : IDisposable
     private sealed class FakeProvider : IAudiobookAcquisitionProvider
     {
         public IReadOnlyList<AudiobookAcquisitionCandidate> Results { get; init; } = [];
+        public Dictionary<string, IReadOnlyList<AudiobookAcquisitionCandidate>>? ResultsByQuery { get; init; }
         public bool Fail { get; init; }
         public string? FailingQuery { get; init; }
         public ConcurrentBag<string> Searches { get; } = [];
         public int RequestCount { get; private set; }
         public AudiobookProviderJob? JobStatus { get; set; }
         public Task<AudiobookAcquisitionProviderStatus> GetStatusAsync(CancellationToken token) => Fail ? throw new HttpRequestException() : Task.FromResult(new AudiobookAcquisitionProviderStatus("configuredHealthy", "fixture", true, true, true, null));
-        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token) { Searches.Add(query); return query == FailingQuery ? throw new HttpRequestException() : Task.FromResult(Results); }
+        public Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchAsync(string query, string? author, string language, CancellationToken token)
+        {
+            Searches.Add(query);
+            if (query == FailingQuery) throw new HttpRequestException();
+            return Task.FromResult(ResultsByQuery is not null && ResultsByQuery.TryGetValue(query, out var perQuery)
+                ? perQuery : Results);
+        }
         public Task<AudiobookProviderJob> RequestAsync(AudiobookAcquisitionRequest request, CancellationToken token) { RequestCount++; return Task.FromResult(new AudiobookProviderJob("provider-job", AudiobookAcquisitionStatuses.Queued, null)); }
         public Task<AudiobookProviderJob?> GetJobStatusAsync(string providerJobId, CancellationToken token) => Task.FromResult(JobStatus);
         public Task<AudiobookProviderJob> CancelAsync(string providerJobId, CancellationToken token) => Task.FromResult(new AudiobookProviderJob(providerJobId, AudiobookAcquisitionStatuses.Cancelled, null));

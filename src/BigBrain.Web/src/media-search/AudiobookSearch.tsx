@@ -6,6 +6,7 @@ import {
   getAudiobookOverview,
   requestAudiobookAcquisition,
   searchAudiobooks,
+  ApiError,
 } from '../api'
 import { BBButton, BBEmptyState, BBMediaArtwork, BBSelect, BBSurface } from '../components'
 import type {
@@ -17,6 +18,16 @@ import type {
 import { audiobookStatusLabel } from '../audiobooks/audiobookStatusLabel'
 import { MediaSearchForm } from './MediaSearchForm'
 import type { MediaSearchMode } from './MediaSearchModeSelector'
+
+const variantLabels: Record<string, string> = {
+  literal: 'Originalsökning',
+  identifier: 'Identifierare',
+  canonicalTitleAuthor: 'Titel och författare',
+  canonicalTitle: 'Boktitel',
+  alternateTitle: 'Alternativ titel',
+  series: 'Serie',
+  authorWork: 'Författarens bok',
+}
 
 export function AudiobookLibraryResults({ items }: { items: AudiobookItem[] }) {
   return (
@@ -66,6 +77,7 @@ export function AudiobookSearch({
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [requestError, setRequestError] = useState<string | null>(null)
   const [selected, setSelected] = useState<AudiobookAcquisitionCandidate | null>(null)
   const [job, setJob] = useState<AudiobookAcquisitionJob | null>(null)
   const [requesting, setRequesting] = useState(false)
@@ -98,6 +110,7 @@ export function AudiobookSearch({
     setLoading(false)
     setNotice(null)
     setError(null)
+    setRequestError(null)
   }
   async function submit() {
     if (query.trim().length < 2 || query.trim().length > 120) return
@@ -139,7 +152,7 @@ export function AudiobookSearch({
     mutation.current = true
     attempted.current.add(identity)
     setRequesting(true)
-    setError(null)
+    setRequestError(null)
     try {
       const result = await requestAudiobookAcquisition(candidate)
       if (mounted.current) {
@@ -147,9 +160,16 @@ export function AudiobookSearch({
         setSelected(null)
         trigger.current?.focus()
       }
-    } catch {
-      if (mounted.current)
-        setError('Hämtningens utfall kunde inte bekräftas. Kontrollera befintliga hämtningar innan du försöker igen.')
+    } catch (failure) {
+      if (mounted.current) {
+        setRequestError(
+          failure instanceof ApiError && failure.code === 'acquisitionConflict'
+            ? 'Utgåvan eller hämtningen finns redan. Kontrollera ”Visa senaste ljudbokshämtningar” nedan.'
+            : failure instanceof ApiError && failure.code === 'candidateExpired'
+              ? 'Sökresultatet har gått ut. Ladda om BigBrain och gör en ny sökning.'
+              : 'Hämtningens utfall kunde inte bekräftas. Kontrollera befintliga hämtningar innan du försöker igen.',
+        )
+      }
     } finally {
       mutation.current = false
       if (mounted.current) setRequesting(false)
@@ -234,6 +254,24 @@ export function AudiobookSearch({
       )}
       {search && (
         <>
+          {search.discoveryVariants?.some(variant => variant.state === 'failed') && (
+            <p role="status" className="notice notice--warning">
+              Sökresultaten kan vara ofullständiga: vissa sökvarianter misslyckades.
+            </p>
+          )}
+          {search.discoveryVariants?.length > 0 && (
+            <details>
+              <summary>Sökdiagnostik – {search.discoveryVariants.length} sökvarianter</summary>
+              <ul>
+                {search.discoveryVariants.map(variant => (
+                  <li key={variant.index}>
+                    Variant {variant.index} ({variantLabels[variant.matchEvidence] ?? variant.matchEvidence}):{' '}
+                    {variant.state === 'failed' ? 'misslyckades' : String(variant.candidateCount) + ' utgåvor'}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
           {search.metadata.works.length > 0 && (
             <section aria-label="Bokmetadata">
               <h3>Bokmetadata — inte bekräftad tillgänglighet</h3>
@@ -293,6 +331,7 @@ export function AudiobookSearch({
                   }
                   onClick={event => {
                     trigger.current = event.currentTarget
+                    setRequestError(null)
                     setSelected(candidate)
                   }}
                 >
@@ -337,6 +376,11 @@ export function AudiobookSearch({
                 Begär hämtning
               </BBButton>
             </div>
+            {requestError && (
+              <p role="alert" className="notice notice--error">
+                {requestError}
+              </p>
+            )}
           </div>
         </BBSurface>
       )}

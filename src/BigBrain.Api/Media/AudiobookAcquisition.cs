@@ -29,6 +29,11 @@ public sealed record AudiobookAcquisitionCandidate(
     string Language, string LanguageLabel, string? Edition, double? DurationSeconds,
     int? PublicationYear, string? CoverUrl, string Source, string Availability, string LanguageConfidence,
     string? Provenance = null, string? MetadataWorkId = null, string? MatchEvidence = null, int? Seeders = null);
+// Only structured outcomes: no user queries or upstream exception bodies.
+public sealed record AudiobookDiscoveryVariant(int Index, string MatchEvidence, string State, int CandidateCount);
+public sealed record AudiobookDiscoverySearchResult(
+    IReadOnlyList<AudiobookAcquisitionCandidate> Candidates,
+    IReadOnlyList<AudiobookDiscoveryVariant> Variants);
 public sealed record AudiobookAcquisitionRequest(string EditionId, string Source, string Language);
 public sealed record AudiobookProviderJob(string ProviderJobId, string Status, string? Message);
 public sealed record AudiobookAcquisitionJob(
@@ -171,13 +176,17 @@ public sealed class AudiobookAcquisitionService(
         SearchVariantsAsync([new(query, author, null, "literal")], language, token);
 
     public async Task<IReadOnlyList<AudiobookAcquisitionCandidate>> SearchVariantsAsync(
+        IReadOnlyList<AudiobookDiscoverySeed> seeds, string language, CancellationToken token) =>
+        (await SearchVariantsWithReportAsync(seeds, language, token)).Candidates;
+
+    public async Task<AudiobookDiscoverySearchResult> SearchVariantsWithReportAsync(
         IReadOnlyList<AudiobookDiscoverySeed> seeds, string language, CancellationToken token)
     {
         if (seeds.Count is < 1 or > AudiobookDiscoveryPlanner.MaximumProviderSearches)
             throw new AudiobookAcquisitionException("invalidQueryPlan", "Sökplanen är ogiltig.", StatusCodes.Status400BadRequest);
         foreach (var seed in seeds) ValidateSearch(seed.Query, seed.Author);
         var status = await StatusAsync(token);
-        if (!status.CanSearch) return [];
+        if (!status.CanSearch) return new([], []);
         var searches = seeds.Select(async seed =>
         {
             try
@@ -190,6 +199,10 @@ public sealed class AudiobookAcquisitionService(
         }).ToArray();
         var completed = await Task.WhenAll(searches);
         if (completed.All(result => result.Failed)) throw ProviderUnavailable();
+        var variants = completed.Select((result, index) =>
+            new AudiobookDiscoveryVariant(index + 1, result.Seed.MatchEvidence,
+                result.Failed ? "failed" : result.Values.Count == 0 ? "empty" : "complete",
+                result.Failed ? 0 : result.Values.Count)).ToArray();
         var deduplicated = new Dictionary<string, AudiobookAcquisitionCandidate>(StringComparer.Ordinal);
         foreach (var result in completed.Where(result => !result.Failed))
         {
@@ -205,11 +218,13 @@ public sealed class AudiobookAcquisitionService(
             }
         }
         var preferredLanguage = AudiobookLanguages.Normalize(language);
-        return deduplicated.Values.Take(50)
+        var candidates = deduplicated.Values
             .OrderBy(x => MatchScore(x.MatchEvidence))
             .ThenBy(x => LanguagePreferenceScore(x, preferredLanguage))
             .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
-            .ThenBy(x => x.EditionId, StringComparer.Ordinal).ToArray();
+            .ThenBy(x => x.EditionId, StringComparer.Ordinal)
+            .Take(50).ToArray();
+        return new(candidates, variants);
     }
     public async Task<AudiobookAcquisitionJob> RequestAsync(AudiobookAcquisitionCandidate candidate, CancellationToken token)
     {

@@ -38,6 +38,7 @@ const candidate: AudiobookAcquisitionCandidate = {
 const results: AudiobookSearchResponse = {
   library: [item],
   discovery: [candidate],
+  discoveryVariants: [],
   metadata: {
     query: { original: 'Boken', normalized: 'boken', kind: 'freeText' },
     state: 'notFound',
@@ -191,6 +192,51 @@ test('failed acquisition is not retried and its arbitrary error text is hidden',
   expect(screen.queryByText('private upstream body')).toBeNull()
   expect(screen.getByRole('button', { name: 'Begär hämtning' })).toBeDisabled()
   expect(fetch).toHaveBeenCalledTimes(2)
+})
+
+test('a known duplicate acquisition is explained beside confirmation without retrying', async () => {
+  const fetch = vi.fn((url: string) =>
+    url.includes('/search?')
+      ? Promise.resolve(ok(results))
+      : Promise.resolve({
+          ok: false,
+          json: async () => ({ code: 'acquisitionConflict', detail: 'private upstream details' }),
+        }),
+  )
+  vi.stubGlobal('fetch', fetch)
+  start()
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Välj utgåva' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Begär hämtning' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Utgåvan eller hämtningen finns redan')
+  expect(screen.getByRole('alert')).toHaveTextContent('Visa senaste ljudbokshämtningar')
+  expect(screen.queryByText('private upstream details')).toBeNull()
+  expect(screen.getByRole('button', { name: 'Begär hämtning' })).toBeDisabled()
+  expect(fetch).toHaveBeenCalledTimes(2)
+})
+
+test('partial search warns while showing outcome of each search variant', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve(
+        ok({
+          ...results,
+          discoveryVariants: [
+            { index: 1, matchEvidence: 'literal', state: 'complete', candidateCount: 2 },
+            { index: 2, matchEvidence: 'canonicalTitleAuthor', state: 'failed', candidateCount: 0 },
+          ],
+        }),
+      ),
+    ),
+  )
+  start()
+  fireEvent.click(screen.getByRole('button', { name: 'Sök' }))
+  expect(await screen.findByText(/Sökresultaten kan vara ofullständiga/)).toBeInTheDocument()
+  fireEvent.click(screen.getByText(/Sökdiagnostik/))
+  expect(screen.getByText(/Variant 1 \(Originalsökning\): 2 utgåvor/)).toBeInTheDocument()
+  expect(screen.getByText(/Variant 2 \(Titel och författare\): misslyckades/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Välj utgåva' })).toBeEnabled()
 })
 
 test('unconfigured discovery, empty results and missing playback link have truthful states', async () => {
