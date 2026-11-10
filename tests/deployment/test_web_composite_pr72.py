@@ -115,6 +115,33 @@ class CompositeReleaseTests(unittest.TestCase):
     receipt.chmod(0o644)
     with self.assertRaises(m.Blocked):m.trusted_rollback_manifest(source)
 
+ def test_dist_permissions_are_normalized_only_for_generated_assets(self):
+  source=FILE.read_text()
+  self.assertIn("RUN chmod -R a+rX /app/dist",source)
+  self.assertIn("find /usr/share/nginx/html -type f",source)
+  self.assertIn("smoke_web_image(imageid)",source)
+  self.assertIn("preflight_web_image(imageid)",source)
+
+ def test_isolated_web_smoke_gate_has_no_prod_ports_network_or_mounts(self):
+  with patch.object(m,"docker",return_value=b"") as mocked:
+   m.smoke_web_image("sha256:"+"a"*64)
+   args=mocked.call_args.args
+   self.assertEqual(args[0],"run")
+   self.assertIn("--rm",args)
+   self.assertIn("--network",args)
+   self.assertEqual(args[args.index("--network")+1],"none")
+   self.assertEqual(args[args.index("--user")+1],"101:101")
+   self.assertEqual(args[args.index("--add-host")+1],"api:127.0.0.1")
+   for forbidden in ("--publish","--network-alias","--mount","--volume","--privileged","--link"):
+    self.assertNotIn(forbidden,args)
+   sh=args[-1]
+   self.assertIn("nginx >/dev/null 2>&1",sh)
+   self.assertIn("/manifest.webmanifest",sh)
+   self.assertIn("/icons/bigbrain-32.png",sh)
+   self.assertIn("/media/control/import",sh)
+  with patch.object(m,"docker",side_effect=m.Blocked("HTTP_403")):
+   with self.assertRaises(m.Blocked):m.smoke_web_image("sha256:"+"a"*64)
+
  def test_temporary_dockerfile_must_pin_config_mode(self):
   source=FILE.read_text()
   self.assertIn("COPY --chmod=0644 src/BigBrain.Web/nginx.conf",source)

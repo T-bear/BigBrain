@@ -221,11 +221,32 @@ def preflight_web_image(sha):
         "--security-opt","no-new-privileges","--memory","64m",
         "--memory-swap","64m","--pids-limit","24","--user","101:101",
         "--entrypoint","/bin/sh",sha,"-c",
-        "test -r /etc/nginx/conf.d/default.conf && "
-        "test -s /usr/share/nginx/html/index.html && "
-        "ls /usr/share/nginx/html/assets/index-*.js >/dev/null 2>&1 && "
+        "set -eu; "
+        "test -r /etc/nginx/conf.d/default.conf; "
+        "test -s /usr/share/nginx/html/index.html; "
+        "ls /usr/share/nginx/html/assets/index-*.js >/dev/null 2>&1; "
+        "find /usr/share/nginx/html -type f | "
+        "while IFS= read -r path; do test -r \"$path\" || exit 1; done; "
         "! grep -q 'Förbered ljudimport från länk' /usr/share/nginx/html/assets/index-*.js",
         timeout=45)
+
+def smoke_web_image(sha):
+ # Mandatory isolated HTTP integration gate. Production Web/API stay untouched.
+ # No Docker network, host port, secrets, mounts or privileged user.
+ cmd=(
+  "nginx >/dev/null 2>&1; "
+  "for route in / /index.html /manifest.webmanifest /icons/bigbrain-32.png "
+  "/media/control/import /media/control/flow; do "
+  "wget -T 4 -qO /dev/null http://127.0.0.1:8080$route; done; "
+  "js=$(ls /usr/share/nginx/html/assets/index-*.js | head -1); "
+  "wget -T 4 -qO /dev/null http://127.0.0.1:8080/assets/$(basename \"$js\"); "
+  "! grep -q 'Förbered ljudimport från länk' \"$js\""
+ )
+ docker("run","--rm","--pull","never","--network","none",
+        "--add-host","api:127.0.0.1","--user","101:101",
+        "--cap-drop","ALL","--security-opt","no-new-privileges",
+        "--memory","128m","--memory-swap","128m","--pids-limit","32",
+        "--entrypoint","/bin/sh",sha,"-ec",cmd,timeout=65)
 
 def deployment(snapshot):
  api,web,spec,work=snapshot
@@ -252,10 +273,14 @@ def deployment(snapshot):
   original=df.read_text()
   need(original.count("FROM node:20-alpine AS build")==1 and
        original.count("FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime")==1 and
-       original.count("COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf")==1,
+       original.count("COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf")==1 and
+       original.count("RUN npm run build")==1,
        "UnexpectedDockerfile")
-  # COPY otherwise inherits 0600 from the private, umask-077 worktree.
+  # Vite copies public icons and manifest with worktree's restrictive 0600 modes.
+  # Change only generated dist, not source files, credentials or global umask.
   df.write_text(original.replace("FROM node:20-alpine AS build","FROM "+NODE_BASE+" AS build")
+                    .replace("RUN npm run build",
+                             "RUN npm run build\nRUN chmod -R a+rX /app/dist")
                     .replace("FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime",
                              "FROM "+NGINX_BASE+" AS runtime")
                     .replace("COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf",
@@ -268,6 +293,7 @@ def deployment(snapshot):
   imageid=json.loads(docker("image","inspect",tag))[0]["Id"]
   pinned_image(imageid)
   preflight_web_image(imageid)
+  smoke_web_image(imageid)
   write(folder/"candidate.json",{"source":REV,"candidateImage":imageid,
                                  "previousImage":WEB_OLD})
   manifest=folder/"release.json"
