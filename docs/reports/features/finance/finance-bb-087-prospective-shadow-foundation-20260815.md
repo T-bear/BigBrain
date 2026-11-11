@@ -239,3 +239,14 @@ PR #80 (three Audiobookshelf wrapper files only). The checkpoint fast-forwarded 
 baseline; no Finance/API/build input changed, so the 97-test evidence is reused. Solution Release
 build: **PASS**, zero warnings/errors. Targeted .NET formatting: **PASS**. Documentation initially
 rejected renamed STATUS metadata keys; required keys were restored and validation passed.
+
+
+Review continuation 2026-11-11: PR [#81](https://github.com/T-bear/BigBrain/pull/81),
+initial candidate `aa375d1894fa43b730a4195dba43481636b07215`, tree
+`22c0cdaf357bd0a85df540e025d370b499e89217`, passed all four CI jobs in
+[run 42967208569](https://github.com/T-bear/BigBrain/actions/runs/42967208569).
+A separate reviewer verified identities and inspected HTTP/state handling, then reported a P2:
+the new quota regression used a fixed start date while failure completion uses the real clock.
+The test now uses the actual persisted completion day, including midnight rollover. This changes
+only the isolated test, not production timestamps. That review stopped on a tool usage limit;
+it is **INCOMPLETE, not an independent level-3 approval**. Final-candidate review/CI remain required.
