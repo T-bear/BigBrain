@@ -1,5 +1,6 @@
 using System.Text;
 using BigBrain.Api.Finance;
+using BigBrain.Modules.Finance;
 using Microsoft.Data.Sqlite;
 
 namespace BigBrain.Api.Tests;
@@ -24,9 +25,14 @@ public sealed class FinanceShadowResearchTests : IDisposable
     [Fact]
     public void FutureObservationAppendsOutcomeWithoutRewritingPrediction()
     {
-        var t0 = DateTimeOffset.UtcNow.AddMinutes(1); var memory = Ready(t0); memory.RunShadowCycle(t0, true);
+        var source = DateOnly.FromDateTime(DateTimeOffset.UtcNow.AddDays(10).UtcDateTime);
+        while (!UsMarketCalendar.IsSession(source)) source = source.AddDays(1);
+        var t0 = new DateTimeOffset(source.ToDateTime(new TimeOnly(22, 0)), TimeSpan.Zero);
+        var memory = Ready(t0, source); memory.RunShadowCycle(t0, true);
         var before = memory.ShadowCatalog(null, "momentum", null, null, null, 50).Predictions.Single();
-        var instrument = EodhdCatalog.Watchlist.Single(x => x.Symbol == "AAPL"); var next = PreviousWeekday(DateOnly.FromDateTime(t0.UtcDateTime)).AddDays(1); while (next.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) next = next.AddDays(1); var t1 = t0.AddDays(3);
+        var instrument = EodhdCatalog.Watchlist.Single(x => x.Symbol == "AAPL");
+        var next = source.AddDays(1); while (!UsMarketCalendar.IsSession(next)) next = next.AddDays(1);
+        var t1 = new DateTimeOffset(next.ToDateTime(new TimeOnly(22, 0)), TimeSpan.Zero);
         memory.Store(instrument, [new(next, 130, 132, 129, 131, 131, 1000)], Encoding.UTF8.GetBytes("next"), next, next, t1.AddMinutes(-1), t1, 0);
         memory.BuildFeatures(); memory.RunShadowCycle(t1, true); memory.RunShadowCycle(t1.AddMinutes(1), true);
         var after = memory.ShadowPrediction(before.PredictionId)!;
@@ -146,11 +152,11 @@ public sealed class FinanceShadowResearchTests : IDisposable
         return System.Text.Json.JsonSerializer.Serialize(rows);
     }
 
-    private EodhdMarketMemory Ready(DateTimeOffset acquired)
+    private EodhdMarketMemory Ready(DateTimeOffset acquired, DateOnly? sourceSession = null)
     {
         var options = new EodhdFinanceOptions { Enabled = true, AccountActive = true, DatabasePath = Path.Combine(_root, "memory.db"), PayloadDirectory = Path.Combine(_root, "payloads") };
         var memory = new EodhdMarketMemory(options); var instrument = EodhdCatalog.Watchlist.Single(x => x.Symbol == "AAPL"); var bars = new List<EodhdDailyBar>();
-        var end = PreviousWeekday(DateOnly.FromDateTime(acquired.UtcDateTime)); var sessions = new List<DateOnly>(); for (var date = end; sessions.Count < 25; date = date.AddDays(-1)) if (date.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)) sessions.Add(date); sessions.Reverse(); for (var i = 0; i < sessions.Count; i++) { var close = 100 + i; bars.Add(new(sessions[i], close - 1, close + 1, close - 2, close, close, 1000 + i)); }
+        var end = sourceSession ?? PreviousWeekday(DateOnly.FromDateTime(acquired.UtcDateTime)); var sessions = new List<DateOnly>(); for (var date = end; sessions.Count < 25; date = date.AddDays(-1)) if (date.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)) sessions.Add(date); sessions.Reverse(); for (var i = 0; i < sessions.Count; i++) { var close = 100 + i; bars.Add(new(sessions[i], close - 1, close + 1, close - 2, close, close, 1000 + i)); }
         memory.Store(instrument, bars, Encoding.UTF8.GetBytes("fixture-25"), bars[0].Date, bars[^1].Date, acquired.AddMinutes(-1), acquired, 0); memory.BuildFeatures(); return memory;
     }
     private static DateOnly PreviousWeekday(DateOnly date) { date = date.AddDays(-1); while (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) date = date.AddDays(-1); return date; }

@@ -35,7 +35,11 @@ EODHD-cadence avstängd, senaste session 2026-10-02; 24 faktiskt pending, 858 ev
 
 Kandidaten rättar läsräknarna, nekar HTTP-start av autonom forskning, använder befintlig
 sessionskalender och begränsar cadence till ett försök per symbol/dygn även vid fel.
-Rättigheter, BB-132K-disposition, verifierad ingress, faktisk Finance-releaseväg/rollback,
+Den separat auktoriserade uppföljningen rättar även kausal utfallstilldelning och bevarar
+lagrade invalideringsorsaker; 139 fokuserade tester PASS. Slutmanifest v2 är ett olåst förslag.
+Båda äldre WIKI-backupernas faktiska byteantal/SHA-256 PASS; de täcker inte EODHD-journalen.
+Ägarens villkorade BB-132K-val A dokumenteras separat i draft PR #82, som lämnas orörd.
+Aktuella källrättigheter, BB-132K:s återstående dispositionsvillkor, verifierad ingress, Finance-releaseväg/rollback,
 full outcome-audit och låst #57-manifest kvarstår. Inga nya observationer eller forskningsresultat.
 [Samlad evidens, säkerhetsgränser, AAPL/DSR/PBO och nästa exakta steg](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11).
 Övriga modulstatusar ovan är inte omverifierade genom detta Finance-uppdrag.

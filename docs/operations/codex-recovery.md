@@ -41,9 +41,11 @@ Branch `checkpoint/finance-release1-20261111`, accepterad baseline
 `e63aaa4dc30718f2620f2880a6f2b847e6091d89`; kandidat/tree i Gitmetadata/PR.
 [Beständig implementation, runtime, tester och blockerare](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11).
 Inga produktionsdata, secrets, grants, containers eller inställningar ändrade; EODHD förblir avstängt.
-Nästa steg: granska exakt publicerad kandidat; inhämta aktuell kontobekräftelse och reserverat
-BB-132K-dispositionsbeslut. Verifiera sedan faktisk ingress och Finance-release-/recoverykontrakt,
-slutför kausal outcome-audit och slutligt förhandsregistrerat manifest före aktivering.
+Ny separat korrigeringsauktorisering 2026-11-11 omfattar kausalitet, bevarade orsaker och tekniskt
+underlag; ingen merge/deployment/aktivering. Följ samma PR #81. Ägarens villkorade BB-132K-val A
+ligger i separat draft PR #82 och lämnas orört. Granska slutkandidaten; nästa operativa steg kräver
+godkänd skyddad outcome-läsväg, befintliga backup-/restorekvitton och extern testklient/åtkomstväg.
+Manifest v2 är olåst. Inga av de 906 prognoserna/858 utfallen har ändrats.
 Ingen omkörning av gamla BB-132K-paket eller kringgång av STANDARD:s Finance-spärr.
 Orelaterade ospårade arbetsfiler bevarade. Fortsätt samma checkpoint; ingen historikskrivning.
 

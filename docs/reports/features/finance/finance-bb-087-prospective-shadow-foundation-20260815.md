@@ -250,3 +250,255 @@ the new quota regression used a fixed start date while failure completion uses t
 The test now uses the actual persisted completion day, including midnight rollover. This changes
 only the isolated test, not production timestamps. That review stopped on a tool usage limit;
 it is **INCOMPLETE, not an independent level-3 approval**. Final-candidate review/CI remain required.
+
+
+## Bounded causal correction — 2026-11-11
+
+**Current checkpoint scope: implementation, isolated tests, strictly read-only evidence and
+release preparation only. NO MERGE / DEPLOYMENT / ACTIVATION.** This later owner assignment
+separately authorizes correction of the reproduced #57 defects. Reverified main remains
+`e63aaa4dc30718f2620f2880a6f2b847e6091d89`; PR #81 began at
+`1690325f2735457b7f8e72ae75fd7e427e2b551d`, tree `ab9c719d083c86fae8994bbf3c4233233486c45b`.
+It is an implementation review checkpoint, not a characterization-only blocker branch.
+It already descends from that main; continue it under AGENTS §8 and checkpoint-workflow §9,
+without a parallel branch or history rewrite. Exact final SHA/tree, CI and review are in PR #81.
+PR #82 remains a separate draft at `ab76e7f2431804e0e8e7800429ed213eb7ec3081`, untouched.
+Both starting PR revisions had four successful CI jobs, rechecked for this assignment.
+
+PR #82 records the owner's **conditional BB-132K retention choice A**, with internal review
+by 2026-11-18 14:36 Europe/Stockholm. This supersedes this report's earlier statement that no
+later owner choice had been found. It is not source-by-source rights PASS, archive-integrity
+PASS, new copy/restore authority or retroactive extension of the November 10 deadline.
+The owner's statement is preserved by reference to [PR #82](https://github.com/T-bear/BigBrain/pull/82);
+its documentation is not imported, modified or merged here.
+
+### Corrected admission and preserved evidence
+
+[Exact synthetic counterexample](https://github.com/T-bear/BigBrain/issues/57#issuecomment-6796335408)
+reproduces the stored-prediction defect independently of the generation guard. New
+`shadow-outcome-causality-v2` admission in `FinanceShadowOutcomes.cs`:
+
+- Validates EODHD/Free/policy, instrument/symbol/provider-symbol/MIC, RESEARCH and the existing
+  horizon. Source session must be an exchange session. Source acquisition must follow its
+  conservative calendar close and equal the pinned prediction knowledge time; knowledge cutoff
+  must lie between source knowledge and prediction creation, and creation cannot be in the future.
+- Requires the **immediately next exchange session**, and prediction creation strictly before
+  its open. No substitution of a later available session when the target is missing. This is a
+  conservative tightening of v1 admission, not a rewrite of historical horizon identifiers.
+  Requiring pre-open prevents a post-event prediction from being rescued by a late import.
+- Independently requires outcome knowledge strictly after prediction creation and cutoff,
+  after the target's conservative close, and no later than evaluation. A genuinely future
+  target received late may still be evaluated; latency is retained, not counted as another session.
+- Selects the earliest stored target knowledge instant, before checking admissibility. An
+  invalid earlier revision is never skipped to select a convenient later revision; ties across
+  revision identities fail closed. Offset-bearing timestamps are parsed and compared as instants,
+  not ordered as SQLite text. Missing time zone, source revision or inconsistent revision time,
+  checksum-derived revision identity, mapping, price or feature lineage fails closed.
+- Resolves the reference close through the exact pinned source revision; requires feature
+  revision creation no later than cutoff, explicit membership of that source revision, and all
+  declared feature input revisions present and known by the cutoff.
+  Reads and outcome append share one SQLite transaction. Existing UNIQUE prediction linkage
+  preserves first outcome on repeated evaluation or later source corrections.
+- `InvalidateBrokenLineage` changes only evaluation state for newly broken lineage. It never
+  updates stored reasons, including already-invalidated rows. Original beliefs/causes remain
+  byte-for-byte evidence; no synthetic replacement cause is written into an old prediction.
+  The code predicate explains new invalidation; stored original reasons are not a new incident log.
+
+There is **no schema migration, historical repair or production invocation**. The version is
+bound to candidate code and the future manifest, not retroactively stamped onto old outcomes.
+Normal prediction generation and all pre-existing outcomes remain separate from this admission.
+
+The first focused run found an analyzer requirement (cached SearchValues) and an older
+clock-dependent future-outcome fixture that could forecast after target open. The implementation
+uses cached hash-character validation; the fixture now explicitly forecasts before a future
+session. Neither correction changes production records. Then **139 focused tests PASS, 0 FAIL,
+0 SKIP**, covering the exact reproduction, late imports, revisions, UTC offsets, open/close
+boundaries, holidays/DST, missing targets, invalid lineage, retained reasons and repeated reads/
+evaluation. Full solution Release build: PASS, zero warnings/errors. Targeted formatting,
+documentation (292 Markdown / 53 backlog IDs) and whitespace: PASS. Final CI and independent
+exact-candidate review are tracked at the checkpoint; no earlier CI result is attributed to later code.
+
+### Historical outcome audit and access — bounded results
+
+The [complete metadata audit](https://github.com/T-bear/BigBrain/issues/57#issuecomment-6796635237)
+is reused, not repeated: 906 predictions, 858 evaluated / 24 invalidated / 24 pending,
+66 logical revision pairs (42 evaluated/evaluated plus 24 evaluated/invalidated), zero collisions
+when both source and feature revisions participate. These remain historical material only.
+New read-only cadence GET again confirms 24/858/24, disabled and latest session 2026-10-02.
+
+**Actual contents of 858 outcome relations: BLOCKED, NOT READ.** The deployed GET contract
+exposes outcome existence, not each outcome's knowledge/revision/reference linkage. Host access
+to the Finance volume is denied; the already-running API image has no sqlite/sqlite3/python3
+reader. The existing historical inspection command is WIKI-specific and cannot audit these
+relations. No new binary, container, general endpoint, executable upload, database constructor,
+copy or privilege workaround was used. Needed next: an explicitly approved protected reader
+that opens the existing database with SQLite `Mode=ReadOnly`, one consistent deferred read
+transaction, no initialization/migration/cleanup, and returns only counts/commitments.
+It must reconcile all 858 links, exact source/target revision and mapping, parsed source/feature/
+creation/cutoff/outcome/evaluation times, next-session calendar, orphan/tied revisions, recomputed
+returns and immutable outcome IDs. Count all failure classes separately; do not mutate or
+reclassify historical evidence merely to make the audit pass. The synthetic tests prove corrected
+selection, **not** the historical ledger's actual temporal integrity.
+
+**Off-host ingress: BLOCKED.** No approved external LAN/Tailscale client or execution route was
+identified; a specific route was requested. No peer was accessed or third-party probe used.
+Existing same-host tests cannot establish isolation. Reinspection confirms both IPv4/IPv6 API
+publication on port 18080 and Web publication on 13000. Both source-visible Web proxy and direct
+API path need the external test matrix: approved LAN client, approved Tailnet client, a client
+that should be denied, IPv6 where routed, and each declared reverse-proxy ingress. Use health
+GET only (no provider data/write trigger); record allow/deny expectations, observed HTTP/TCP
+result and authenticated-client class without publishing addresses. Read approved ACL/NAT rules
+alongside these results. An absent route is UNKNOWN, not proof of protection.
+
+### Backup evidence and exact release/rollback preparation
+
+Current API compiled revision and OCI image, Web image/revision and healthy state were rechecked
+and match the runtime table above. Existing WIKI backup artifacts were read **in place** through
+the running container's existing identity using `stat` and `sha256sum`; nothing was copied.
+
+| Backup | Current byte/hash verification | Scope and limitation |
+| --- | --- | --- |
+| `finance-backup-3b093584173d74f6`, 2026-08-15 | PASS, 495977922 bytes; SHA-256 equals artifact and content fingerprints | PublicDomain NASDAQ-WIKI, 1 revision / 3722 observations / 1 feature revision / 183 backtests / 3 robustness evaluations. |
+| `finance-backup-8b549915b4e4129c`, 2026-08-16 | PASS, 495977949 bytes; SHA-256 equals artifact and content fingerprints | Same WIKI-only coverage. Neither contains the EODHD shadow journal or current whole-Finance state. |
+
+The existing maintenance `finance-backup-verify` CLI was **not invoked**: source review shows it
+first constructs writable EodhdMarketMemory and a protection store that cleans staging folders.
+Its name does not make it a strictly read-only path. Current byte/hash checks are not a new
+restore drill. Reuse the dated BB-085 WIKI drill only within that scope. Protected operator backup
+and receipt roots exist but are unreadable under current identity; six-database routine and
+historical owner receipts do not establish current daily coverage. **Unknown other backup sets
+are not reported as nonexistent.** No decryption/integrity check of BB-132K, restore or new backup.
+
+Read-only Compose resolution (secrets retained only in process memory) established:
+
+| Binding | Verified identity / required plan action |
+| --- | --- |
+| Current API rollback image | `sha256:9310e3cc8ea3484d94bcfeed78b005ba1aecb5724e4ca2cfc28fe9deb44ab047`; compiled `e8f3e62cc446cf52a89045d1a3ce7d4c3a2116ff`, existing Media composite receipt remains a separate check. |
+| Current Web, retained for release and rollback | `sha256:78f6a430905088dc7290e414e3082f10c12ad89d4e28c0426c10e4e3aaa2011a`; revision `3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9`. No Web change is required by this correction. |
+| Actual API Compose input SHA-256 | `e78259683d3c85ba93493b82959baea8a6e69b27e1171453552e2b59954bc798`; contains API+Web, 91 configured API environment values match runtime, 10 mounts, 2 networks, unless-stopped. |
+| Actual Web Compose input SHA-256 | `5167af60392d0c95bac51145cba4253f52bf71f7619b0ddb62db1faf3bdb9e1a`; Web-only, zero mounts, 1 network, unless-stopped. |
+| Runtime Compose config hashes | API `dac16f78fe96915408e0a53672b4c90a187c1845fdb6a58bf41a69067dfc0597`; Web `ded747dd2206f0ef4af491580b7a6cc58bfd8a1ce34c015a8b3c0d9e873a123c`. Private file paths remain in existing Compose labels, not Git. |
+| Observed Finance flags | Eodhd.Enabled=false; AccountActive=true (configuration only); entitlement end blank; ObservationRuntime.Enabled=true; AlpacaDailyObservation.Enabled=true; ResearchScheduler.Enabled=false; ResearchOperations.MaintenancePaused=true; Fred.Enabled=false. |
+| Proposed candidate API | Exact final accepted SHA/tree + immutable image digest and composition receipt **UNBOUND / NOT BUILT**. Do not invent an image ID or reuse a Media-only exception. |
+
+Prepared sequence for a **separately authorized** release: (1) revalidate these identities and
+current source/backup/ingress evidence; (2) bind accepted code, independent review, required CI,
+immutable built API digest and exact composite-source diff, including the previously pinned
+Finance policy blobs; (3) review startup behavior and a private resolved service configuration
+preserving all mounts, networks, secrets and unrelated services; (4) validate schema compatibility
+and protected rollback image against an authorized isolated backup before any restart;
+(5) only then use a specifically approved existing execution mechanism for the API service;
+(6) verify compiled identity, health, policy, counters and inactive workers. This task executes
+none of these deployment steps and does not produce an executable approval package.
+
+Rollback is **application-image-only** to the exact API digest above and unchanged Web identity,
+with identical protected data mounts/configuration. Never restore/drop databases, reset journals,
+regrant authority, prune images/volumes or restart other services. If schema/startup reconciliation
+would make the old image incompatible, stop for a reviewed recovery decision rather than restore.
+STANDARD explicitly excludes Finance; its Media exception cannot be reused.
+
+A restart is not inert: ObservationRuntime/Alpaca flags are already true; owner-drop scanning,
+constructor migrations/stale-run recovery and operations reconciliation can write independently
+of EODHD cadence. Enabling EODHD also enables existing startup feature/backtest/robustness workers.
+These must be reconciled with the future strictly model-free scope before any operational plan
+is executable. No flag was changed here. **Release/rollback readiness remains BLOCKED** on this
+startup/privilege contract and current Finance/dependent-store recovery evidence.
+
+### Issue 57 operational manifest draft v2 — NOT LOCKED
+
+This is the requested **reviewable proposed specification**, not approved research policy,
+manifest approval or cohort activation. It fills the earlier estimator/cost/calendar gaps.
+Before operational lock, bind a dated immutable UTF-8 manifest, SHA-256 of its exact bytes,
+approval reference, final accepted code/tree and release digest. All remain pending until rights,
+access, actual outcome audit, mapping and recovery gates pass. No first session/date is selected now.
+
+- Source: EODHD Free only; existing policy `eodhd-free-personal-v2026-08-11`, accepted retention
+  revision 2026-11-08. Current account attestation and source-specific rights references are
+  required fields, not inferred from AccountActive. No new source, grant or data request.
+- Universe/mapping: the eight instrument/provider-symbol pairs in the readiness table above,
+  unchanged. Verify their existing venue/identity evidence before lock. No replacement of a
+  delisted/unavailable symbol after seeing outcomes; record unavailable/invalid instrument-days.
+- Strategies: buy-and-hold/v1 `{}`; momentum/v1 `{period:20}`;
+  sma-crossover/v1 `{fastPeriod:10,slowPeriod:20}`. Parameter fingerprints respectively
+  `sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a`,
+  `sha256:50b7571dd68c97ae1dbd78ab570ec6669ba2dd5a11296c5c0ce90e7d54814465`,
+  `sha256:63e3c6043aa162377b9e5e1f3bcfcd8822193d7f3105307c4c4633ed77775329`.
+- Features: `core-daily-v1`, `daily-feature-engine-v1`, all 21 definitions and 12-decimal
+  AwayFromZero rounding from DailyFeatureEngine.cs. Set fingerprint
+  `sha256:50b70854a70ee7dd9ab67cae83defe6c8b7183388e9c5a487cc879cd0d521a5a`.
+  Momentum uses raw `close[t]-close[t-20]`; SMA uses raw mean10/mean20; ties select TargetFlat.
+  Snapshot exact blobs for engine, strategies, EODHD adapter/policy, shadow admission and calendar
+  in the final manifest; source and feature revisions/knowledge cutoffs are pinned per prediction.
+- Calendar: `us-equities-ny-v1`, America/New_York opens 09:30; retain its **conservative 16:00
+  close bound**, including early-close days, and the 22:00 UTC provider window. Freeze the complete
+  ordered upcoming session list for a maximum of 240 exchange sessions at lock, validated against
+  [NYSE's published 2026–2028 calendar](https://ir.theice.com/press/news-details/2025/NYSE-Group-Announces-2026-2027-and-2028-Holiday-and-Early-Closings-Calendar/).
+  That official calendar confirms early closes on 2026-11-27 and 2026-12-24; the code does not
+  model 13:00 closes, so its later admission bound is deliberately conservative. Unexpected closure
+  or calendar divergence pauses admission and requires a prospective amendment, not silent date
+  replacement. This draft does not certify arbitrary historical/future calendar accuracy.
+- Start/horizon: first source EOD session whose forecast can be created after lock and before
+  the immediately following session's open. The first target must still be genuinely future.
+  Prediction knowledge <= cutoff <= creation < target open < target conservative close <=
+  target knowledge <= evaluation. Admission version `shadow-outcome-causality-v2`; existing
+  serialized horizon remains `next-eligible-source-session-close-v1`.
+- Selection: for each target-session/instrument/strategy/parameters/horizon, select the earliest
+  valid prediction by creation time using only then-known evidence. Keep all source/feature
+  revisions as audit records; conflicting same-instant candidates invalidate that key. Do not
+  substitute a later prediction when the selected one becomes invalid. Freeze original target
+  revision at its earliest unambiguous knowledge instant; later corrections are separate sensitivity
+  evidence and never replace primary rows. All 906 pre-lock records are excluded by cohort identity.
+- Accrual: a session qualifies for primary paired analysis only when all eight instruments and
+  all three strategies have valid pre-open predictions and valid causal outcomes. Missing,
+  insufficient, invalidated, corporate-action-unresolved and interrupted sessions remain in the
+  ordered ledger with reasons. Accrue the first 120 qualifying sessions within the predeclared
+  maximum 240; stop on the 120th irrespective of sign. If fewer qualify by 240, report insufficient
+  evidence; no automatic extension or restarting to remove losses. Record each session once,
+  not 24 independent experiments. Serial dependence is not assumed absent.
+- Primary estimators: let `r[i,t]=rawClose[i,target]/rawClose[i,source]-1`,
+  `y[i,t]=1(r[i,t]>0)` and `p[s,i,t]=1(TargetLong)`, otherwise 0 for TargetFlat.
+  `A[s,t]=(1/8)*sum_i 1(p[s,i,t]=y[i,t])`; zero return counts as nonpositive, matching the journal.
+  Always-long passive baseline is `A[L,t]=(1/8)*sum_i y[i,t]`; always-flat is also reported.
+  Report `mean_t A[s,t]` and paired `mean_t D[s,t]`, where `D=A[s,t]-A[L,t]`, on the identical
+  120 complete sessions. Buy-and-hold is a baseline sanity check, not an independent discovery.
+  Publish each instrument/strategy's coverage and directional counts, with losses and zero returns.
+- Uncertainty: for each reported session-mean series X, `e[t]=X[t]-mean(X)` on valid sessions,
+  zero elsewhere in the fixed calendar ledger; `n` is the count of valid sessions. Use Bartlett
+  HAC lag 5: `SE²=(sum_t e[t]²+2*sum_{l=1..5}(1-l/6)*sum_t e[t]*e[t-l])/n²`.
+  Report approximate `mean ± 1.96*SE`, n and coverage; preserve calendar gaps when forming lags.
+  These are descriptive approximate intervals, not independent-binomial guarantees or a trading
+  acceptance test. Both active strategies are always reported; no best-strategy selection,
+  significance promotion or multiplicity-adjusted success claim. DSR/PBO/calibration stay
+  NOT_EVALUABLE; no probability forecast exists.
+- Cost sensitivity: predeclare one-way combined cost `c` in `{0,5,10,25,50}` basis points.
+  Report `q[s,i,t,c]=p[s,i,t]*r[i,t]-2*(c/10000)*p[s,i,t]`, equally averaged over the same eight
+  instruments and sessions; compare to identical-cost always-long and zero-position baselines.
+  This is a daily round-trip **close-based signal sensitivity proxy**, not an executable strategy
+  return: the source close precedes the forecast. No fills, spread model, dividends, leverage,
+  borrow, portfolio P&L, annualized Sharpe or profitability is inferred. Raw split/action-ambiguous
+  intervals are invalid for primary analysis until independently resolved; no retroactive data fix.
+- Reporting/interruptions: preserve missingness, acquisition/evaluation latency, negative and
+  invalid outcomes, all attempts/revisions and gate failures. No performance-driven parameter
+  changes, backfill, instrument replacement or window reset. Any strategy/source/feature/policy
+  change requires a separately timestamped future cohort/amendment; preserve the original cohort.
+  120 sessions permits evidence-adequacy review only. Tail/regime/drawdown claims unsupported by
+  this directional journal remain NOT_EVALUABLE, not synthetic assurances.
+
+### Gate disposition and next exact step
+
+| Gate | Result for this checkpoint |
+| --- | --- |
+| Current identities, unchanged unrelated work/PR #82 | PASS, reverified; no merge/deployment. |
+| Synthetic causal/revision/invalidation regression | PASS, 139 focused tests; no historical data edited. |
+| Full 858-outcome audit | BLOCKED: missing approved protected reader; metadata-only evidence reused. |
+| External ingress | BLOCKED: missing approved off-host client/route and verified effective ACLs. |
+| WIKI backup artifact integrity | PASS for the two exact August artifacts, source-limited. |
+| Daily current Finance/dependent-store backup and isolated recovery | BLOCKED: protected operator evidence inaccessible; WIKI scope insufficient; no new restore authorized. |
+| Exact executable Finance release/rollback | BLOCKED: candidate image/approved mechanism and startup/compatibility/recovery binding outstanding. |
+| Operational manifest | DRAFT v2, specified above; NOT LOCKED / NOT APPROVED / NOT STARTED. |
+| EODHD/research/production changes in this task | NOT RUN, explicitly outside authority. |
+
+Complete independent review of final PR #81 SHA/tree and its CI. Then end this bounded assignment.
+Next technical work, if separately authorized: approve a narrowly protected read-only outcome
+reader and supply existing operator backup/restore evidence plus approved off-host test vantage;
+use those results to resolve the concrete operational gates before any manifest lock or activation.

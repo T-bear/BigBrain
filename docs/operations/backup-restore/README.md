@@ -23,6 +23,19 @@ Syntetiska tester ersätter inte verkligt backupunderlag. Återställningsprovet
 eller skriva till produktionsdatabaser. Ingen ny backuplösning, scheduler eller körning beställs här.
 Databasändringen behöver fortfarande sin egen riskmotiverade recovery och granskning.
 
+## Finance Release 1 — skrivskyddad verifiering 2026-11-11
+
+Båda inventerade WIKI-backuperna från 2026-08-15/16 finns kvar: faktiska filstorlekar och SHA-256
+matchar manifestens artefakt-/content-fingerprints (**PASS**, utan kopiering eller restore).
+[Exakta identiteter, datatäckning och läsmetod](../../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#backup-evidence-and-exact-releaserollback-preparation).
+Detta styrker enbart respektive äldre PublicDomain WIKI-artefakt, inte aktuella EODHD-utfall,
+daglig backup eller återställningsbarhet av hela Finance/dependent-store-releasen.
+Skyddade operatörsbackup-/kvittoområden finns men är inte läsbara under aktuell identitet;
+inga slutsatser om att övriga backuper saknas. Ny restore är inte auktoriserad eller utförd.
+Den befintliga maintenance-kommandovägen konstruerar skrivande lagring och rensar staging;
+`finance-backup-verify` är därför inte använd som en strikt skrivskyddad CLI.
+Nivå-2-grindens kvarstående evidenskrav och Finance nivå 3 gäller fortsatt.
+
 ## Befintligt modulunderlag
 
 Nedan bevaras tidigare modulbeskrivningar och deras begränsningar. De är inte körorder;

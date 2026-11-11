@@ -53,8 +53,11 @@ full BB-045/073-DoD är fortsatt öppen. [Aktuell evidens och konkreta aktiverin
 Nya verifierade kodfynd: obehörig HTTP-trigger för beständig forskning, statusräknare som
 ignorerar utfall, vardagskalender som inte utesluter börshelgdagar och upprepade felanrop
 som kan överskrida Free-kvoten. Dessa korrigeras i kandidaten, ännu inte i drift.
-Kvar: avgränsad utfalls-/kausalitets- och immutable-lineage-verifiering, aktiveringsmanifest,
-privat åtkomstgräns, BB-132K-beslut och granskad release-/backupväg. Ingen issueprioritet ändras;
+Separat auktoriserad uppföljning korrigerar utfallsväljarens kausalitet och bevarar lagrade
+invalideringsorsaker; syntetiska regressioner PASS, inga historiska poster ändrade.
+Kvar: faktisk audit av 858 utfallsrelationer via godkänd skyddad läsväg, låsning av förberett
+manifest v2, extern åtkomstverifiering, BB-132K:s villkor (ägarval A i separat draft PR #82)
+och granskad release-/backupväg. Ingen issueprioritet ändras;
 #54/#59/#60 behåller egna scopes, #56/#58 återöppnas inte och #57 stängs inte.
 
 ### Rättigheter, integritet och vetenskap
