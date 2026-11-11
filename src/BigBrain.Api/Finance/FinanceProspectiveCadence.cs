@@ -1,4 +1,5 @@
 using System.Globalization;
+using BigBrain.Modules.Finance;
 using System.Text.Json;
 using BigBrain.Api.SystemRecovery;
 using Microsoft.Data.Sqlite;
@@ -20,7 +21,8 @@ internal sealed record FinanceCadenceSnapshot(bool Enabled, string Provider, str
 internal static class FinanceCadenceSchedule
 {
     internal static bool IsProviderWindow(DateTimeOffset nowUtc, int startHour) =>
-        nowUtc.Offset == TimeSpan.Zero && nowUtc.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday && nowUtc.Hour >= startHour;
+        nowUtc.Offset == TimeSpan.Zero && startHour is >= 0 and <= 23 && nowUtc.Hour >= startHour &&
+        UsMarketCalendar.Session(DateOnly.FromDateTime(nowUtc.UtcDateTime)) is { } session && nowUtc >= session.CloseUtc;
 }
 
 internal sealed partial class EodhdMarketMemory
@@ -52,12 +54,12 @@ internal sealed partial class EodhdMarketMemory
         DateTimeOffset? lastSuccess = reader.IsDBNull(1) ? null : DateTimeOffset.Parse(reader.GetString(1), CultureInfo.InvariantCulture);
         var outcome = reader.GetString(2); DateOnly? session = reader.IsDBNull(3) ? null : DateOnly.Parse(reader.GetString(3), CultureInfo.InvariantCulture); reader.Close();
         var shadow = ShadowCatalog(null, null, null, null, null, 200); var now = DateTimeOffset.UtcNow;
-        var invalidated = Scalar(connection, "SELECT COUNT(*) FROM shadow_predictions WHERE state='Invalidated'");
-        var next = !enabled ? "Cadence disabled" : !clockIntegrity ? "Waiting for clock integrity" : FinanceCadenceSchedule.IsProviderWindow(now, startHour) ? "Eligible for bounded provider check" : "Waiting for next weekday EOD provider window";
+        var invalidated = shadow.Invalidated;
+        var next = !enabled ? "Cadence disabled" : !clockIntegrity ? "Waiting for clock integrity" : FinanceCadenceSchedule.IsProviderWindow(now, startHour) ? "Eligible for bounded provider check" : "Waiting for next US exchange-session EOD provider window";
         return new(enabled, Provider, "CURRENT EOD / PROSPECTIVE EOD", outcome.Contains("failure", StringComparison.Ordinal) ? "Degraded" : "Healthy", lastCheck, lastSuccess, session,
             shadow.Predictions.Select(x => (DateTimeOffset?)x.CreatedAtUtc).Max(), TimeOrNull(connection, "SELECT MAX(evaluated_utc) FROM shadow_outcomes"),
             shadow.Pending, shadow.Evaluated, invalidated, clockIntegrity, next,
-            $"internal check every {checkMinutes} minutes; at most one successful provider cycle per UTC day, weekdays after {startHour}:00 UTC", "RESEARCH");
+            $"internal check every {checkMinutes} minutes; at most one successful provider cycle per UTC day, US exchange sessions after close and {startHour}:00 UTC", "RESEARCH");
     }
 
     private static DateTimeOffset? TimeOrNull(SqliteConnection connection, string sql) { using var command = connection.CreateCommand(); command.CommandText = sql; var value = command.ExecuteScalar() as string; return value is null ? null : DateTimeOffset.Parse(value, CultureInfo.InvariantCulture); }
@@ -75,7 +77,7 @@ internal sealed class FinanceProspectiveCadenceWorker(EodhdFinanceOptions provid
         while (!stoppingToken.IsCancellationRequested)
         {
             var now = DateTimeOffset.UtcNow;
-            if (provider.Enabled && provider.AccountActive && recovery.MayStartTimeSensitiveWork)
+            if (EodhdEntitlement.AllowsAcquisition(provider, now) && recovery.MayStartTimeSensitiveWork)
             {
                 try
                 {
@@ -102,7 +104,8 @@ internal sealed class FinanceProspectiveCadenceWorker(EodhdFinanceOptions provid
     {
         var to = DateOnly.FromDateTime(now.UtcDateTime); var from = to.AddYears(-1); var requested = 0; var succeeded = 0;
         var before = memory.LatestEodhdSession();
-        using var adapter = new EodhdAdapter(provider);
+        // One durable attempt per symbol/day, including failures. No hidden transport retries.
+        using var adapter = new EodhdAdapter(provider with { MaximumRetries = 0 });
         foreach (var instrument in EodhdCatalog.Watchlist)
         {
             if (!memory.ShouldAcquire(instrument.ProviderSymbol, to)) continue;

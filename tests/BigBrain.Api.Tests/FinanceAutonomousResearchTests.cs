@@ -212,6 +212,30 @@ public sealed class FinanceAutonomousResearchTests
         Assert.Equal(ResearchIntegrityState.Fail, integrity.State);
     }
 
+    [Theory]
+    [InlineData(true, true, ResearchIntegrityState.Pass)]
+    [InlineData(false, true, ResearchIntegrityState.Fail)]
+    [InlineData(true, false, ResearchIntegrityState.Fail)]
+    public void IntegrityV2PassIsOnlyTheDeclaredChallengerScreenNotDsrOrPbo(bool selectionPass, bool untouched, ResearchIntegrityState expected)
+    {
+        var evidence = Evidence(.10m, .10m, RobustnessVerdict.MoreRobust);
+        var partition = new ResearchDataPartition(new(2025, 1, 2), new(2025, 5, 30), new(2025, 6, 3), new(2025, 8, 29),
+            new(2025, 9, 3), new(2025, 12, 31), 100, 60, 40, 1);
+        evidence = evidence with
+        {
+            CostSensitivity = evidence.CostSensitivity with { Points = [evidence.CostSensitivity.Points[0], evidence.CostSensitivity.Points[0] with { CostModel = "cost-stress-v1" }] },
+            SelectionGovernance = new("selection-v2", partition, "fixture-family", 3, "validation-excess", "family-breadth-fail-closed-v1",
+                [], "fixture-trial", "fixture-holdout", untouched ? HoldoutEvidenceState.Untouched : HoldoutEvidenceState.Evaluated,
+                HoldoutEvidenceState.Evaluated, untouched ? 0 : 1, .10m, .10m, 1m,
+                selectionPass ? SelectionGovernanceOutcome.Pass : SelectionGovernanceOutcome.InsufficientData, [], [])
+        };
+        var result = FinanceResearchContracts.Assess(evidence, 3, FinanceResearchContracts.Complexity(1, 1, 1, 3), true, true);
+        Assert.Equal("research-integrity-v2", result.Version);
+        Assert.Equal(expected, result.State);
+        Assert.Contains(result.Checks, x => x.Id == "dsr" && x.State == ResearchIntegrityState.NotEvaluable);
+        Assert.Contains(result.Checks, x => x.Id == "pbo-cscv" && x.State == ResearchIntegrityState.NotEvaluable);
+    }
+
     private static RobustnessEvaluationResult Evidence(decimal trainReturn, decimal testReturn, RobustnessVerdict robustness)
     {
         var metrics = new BacktestMetrics(100, 110, .1m, trainReturn, null, -.05m, null, .1m, 1m, 10, 5, 5, 1m, 1m, 1m, .05m, .05m);

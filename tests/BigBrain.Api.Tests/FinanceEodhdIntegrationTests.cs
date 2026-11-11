@@ -42,6 +42,35 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task SingleAttemptFailureCannotSpendMoreQuotaOnRetryOrRestart()
+    {
+        var options = Options(token: "fixture") with { MaximumRetries = 0 };
+        var instrument = EodhdCatalog.Watchlist.Single(x => x.Symbol == "AAPL");
+        var now = DateTimeOffset.UtcNow;
+        var day = DateOnly.FromDateTime(now.UtcDateTime);
+        var memory = new EodhdMarketMemory(options);
+        var id = memory.RecordStarted(instrument, day.AddYears(-1), day, now);
+        var handler = new SequenceHandler(HttpStatusCode.TooManyRequests, HttpStatusCode.OK, Fixture());
+        using var adapter = new EodhdAdapter(options, handler);
+        await Assert.ThrowsAsync<HttpRequestException>(() => adapter.FetchAsync(instrument.ProviderSymbol, day.AddYears(-1), day, TestContext.Current.CancellationToken));
+        memory.RecordFailure(instrument, day.AddYears(-1), day, now, "HttpRequestException", id);
+        // Use the persisted completion day, including a possible UTC-midnight rollover.
+        using var connection = new SqliteConnection($"Data Source={options.DatabasePath}");
+        connection.Open();
+        using var completed = connection.CreateCommand();
+        completed.CommandText = "SELECT completed_utc FROM acquisitions WHERE id=$id";
+        completed.Parameters.AddWithValue("$id", id);
+        day = DateOnly.FromDateTime(DateTimeOffset.Parse((string)completed.ExecuteScalar()!, System.Globalization.CultureInfo.InvariantCulture).UtcDateTime);
+        Assert.Equal(1, handler.Calls);
+        Assert.False(memory.ShouldAcquire(instrument.ProviderSymbol, day));
+        var reopened = new EodhdMarketMemory(options);
+        Assert.False(reopened.ShouldAcquire(instrument.ProviderSymbol, day));
+        Assert.True(reopened.ShouldAcquire(instrument.ProviderSymbol, day.AddDays(1)));
+        Assert.Equal(1, reopened.RuntimeEvidence().AcquisitionAttempts);
+        Assert.Equal(0, reopened.RuntimeEvidence().Observations);
+    }
+
+    [Fact]
     public void DurableStoreIsIdempotentRestartSafeAndReplayDeterministic()
     {
         var options = Options(); var instrument = EodhdCatalog.Watchlist.Single(value => value.Symbol == "AAPL");

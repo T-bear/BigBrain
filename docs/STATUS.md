@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-08 — Finance-ägarbeslut om upptining; övrig DOC-2A-status daterad 2026-10-24.
-- Verifierad mot commit: `93a31d2f31da37e8976feb47012c30eed7384e08` (Finance-upptining; övrig DOC-2A-status är daterad 2026-10-24).
-- Runtime senast verifierad: ingen ny runtimekontroll i DOC-2A; daterad driftevidens har sitt eget scope.
+- Senast uppdaterad: 2026-11-11 — Finance Release 1-checkpoint; övriga uppgifter behåller egna datum.
+- Verifierad mot commit: `e63aaa4dc30718f2620f2880a6f2b847e6091d89`; kandidat ännu inte accepterad.
+- Runtime senast verifierad: Finance/API/Web skrivskyddat 2026-11-11; se Release 1 nedan. Övrig äldre evidens är inte omverifierad.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -14,7 +14,7 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 | Område | Gällande beslut och kvarstående begränsningar |
 | --- | --- |
-| Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. AAPL-observation senast dokumenterat aktiverad och forskning pausad; aktuell runtime, authority, mapping och journal är inte omverifierade. |
+| Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; aktuell API-komposit, journalräknare och kvarstående aktiveringshinder redovisas under Release 1 nedan. G3a/G3b är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
 
 Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
@@ -23,6 +23,26 @@ Befintlig drift lämnas orörd. Finance-rättigheter, retention, BB-132K:s fakti
 retentions-/dispositionsfrist och dataintegritet förblir bindande; privat status är okänd. Se
 [kanonisk drift-/retentiongräns](operations/finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation).
 Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant eller skapar handelsauktoritet.
+
+## Finance Release 1 — 2026-11-11
+
+**REVIEW CHECKPOINT / INTE DEPLOYAD / ÅTERAKTIVERING BLOCKERAD.** Nytt ägarauktoriserat
+nivå-3-uppdrag utgår från main `e63aaa4dc30718f2620f2880a6f2b847e6091d89`.
+Skrivskyddad driftkontroll: API `e8f3e62cc446cf52a89045d1a3ce7d4c3a2116ff` är en Media-komposit
+med äldre Finance-policy; Web `3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9`. Båda healthy.
+EODHD-cadence avstängd, senaste session 2026-10-02; 24 faktiskt pending, 858 evaluated,
+24 invalidated. `/shadow/status` visar fortfarande felaktigt 882 pending i drift.
+
+Kandidaten rättar läsräknarna, nekar HTTP-start av autonom forskning, använder befintlig
+sessionskalender och begränsar cadence till ett försök per symbol/dygn även vid fel.
+Den separat auktoriserade uppföljningen rättar även kausal utfallstilldelning och bevarar
+lagrade invalideringsorsaker; 139 fokuserade tester PASS. Slutmanifest v2 är ett olåst förslag.
+Båda äldre WIKI-backupernas faktiska byteantal/SHA-256 PASS; de täcker inte EODHD-journalen.
+Ägarens villkorade BB-132K-val A dokumenteras separat i draft PR #82, som lämnas orörd.
+Aktuella källrättigheter, BB-132K:s återstående dispositionsvillkor, verifierad ingress, Finance-releaseväg/rollback,
+full outcome-audit och låst #57-manifest kvarstår. Inga nya observationer eller forskningsresultat.
+[Samlad evidens, säkerhetsgränser, AAPL/DSR/PBO och nästa exakta steg](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11).
+Övriga modulstatusar ovan är inte omverifierade genom detta Finance-uppdrag.
 
 ## Aktuell leveransacceptans – Skollunch 2026-11-03
 

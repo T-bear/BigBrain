@@ -32,18 +32,22 @@ sessionsoberoende återhämtningsgrindar är inte stängda genom dokumentationsf
 Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återupptagningsprotokoll.
 [Historiska checkpointförlopp](../history/codex-recovery-before-doc-2a-20261024.md#bb-158--sonarr-queue-duration-correction-2026-10-21).
 
-## Finance — fryst, skydds- och återhämtningsgrindar kvarstår
+## Finance Release 1 — 2026-11-11
 
-**FROZEN / OWNER DECISION REQUIRED TO RESUME. RESEARCH / 0 SEK / NONE.**
-[Finance-frysningen](finance-freeze-20261016.md) styr före äldre commissioning och fortsättningsnoter.
-G1/G2 är dokumenterade PASS; G3a BLOCKED och G3b NOT RUN. Aktuell host-, journal-, mapping-,
-artefakt- och authority-status är inte omverifierad. Ingen grantförnyelse, inferens eller aktivering.
-
-[Rättigheter, retention, dataintegritet och BB-132K:s disposal-frister](finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation)
-kräver fortsatt efterlevnad; faktisk privat deadline/disposal-status är okänd och frysningen
-förlänger inga frister. Inga privata artefakter granskas eller åtgärdas med stöd av DOC-2A.
-[Historiska recoveryförlopp](../history/codex-recovery-before-doc-2a-20261024.md#historical-qwen-integration--2026-10-16)
-är bevarad evidens, inte aktiva exekveringsgodkännanden.
+**INTERRUPTED — MANUAL REVIEW REQUIRED** för release/återaktivering, ingen avbruten driftoperation.
+Den äldre DOC-2A-notens administrativa frysning ersätts av upptiningen 2026-11-08 och
+ägarens avgränsade Release 1-uppdrag. G3a/G3b ger fortsatt ingen modellauktoritet.
+Branch `checkpoint/finance-release1-20261111`, accepterad baseline
+`e63aaa4dc30718f2620f2880a6f2b847e6091d89`; kandidat/tree i Gitmetadata/PR.
+[Beständig implementation, runtime, tester och blockerare](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11).
+Inga produktionsdata, secrets, grants, containers eller inställningar ändrade; EODHD förblir avstängt.
+Ny separat korrigeringsauktorisering 2026-11-11 omfattar kausalitet, bevarade orsaker och tekniskt
+underlag; ingen merge/deployment/aktivering. Följ samma PR #81. Ägarens villkorade BB-132K-val A
+ligger i separat draft PR #82 och lämnas orört. Granska slutkandidaten; nästa operativa steg kräver
+godkänd skyddad outcome-läsväg, befintliga backup-/restorekvitton och extern testklient/åtkomstväg.
+Manifest v2 är olåst. Inga av de 906 prognoserna/858 utfallen har ändrats.
+Ingen omkörning av gamla BB-132K-paket eller kringgång av STANDARD:s Finance-spärr.
+Orelaterade ospårade arbetsfiler bevarade. Fortsätt samma checkpoint; ingen historikskrivning.
 
 ## Övriga öppna verifierings- och acceptansfrågor
 
