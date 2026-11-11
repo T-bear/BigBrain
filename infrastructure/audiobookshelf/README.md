@@ -196,3 +196,28 @@ ABS-kandidat, 2 CPU/1 GiB/PID128, no-new-privileges och Tini som PID1,
 med noll nya PID-limitträffar. Detta är isolerad integrationsverifiering,
 inte automatiskt bevis för att en produktionsövervakare har rätt inställningar,
 fått filhändelsen eller redan registrerat den befintliga 36-spårsboken.
+
+### Hårt slut på wrappern även vid blockerad stdout (BB-158 #70)
+
+En reproducerad incidentklass fanns kvar trots fyra samtidiga scannerjobb:
+när själva native proben lyckas med stor metadatautdata, men anroparen
+slutar läsa stdout, kan Node-supervisorn stå kvar efter att native-process
+och dess tidigare 60-sekundersgräns upphört. Isolerat syntetiskt
+512-KiB-test utan stdout-konsument visade framgångsrik native-probe och
+en ännu levande supervisor efter 2,7 sekunder med kortad testdeadline.
+
+Wrapperns main-CLI har därför även en **absolut hard-stop** från start
+till avslutat skrivande av stdout, max 60 sekunder och inte förlängningsbar
+via CLI. Vid blockerad avläsning blir exit-koden icke-noll. Native-child
+har fortsatt sin egen timeout och separat BusyBox-watchdog. Testseamen
+kan endast i processen sänka tidsgränsen för syntetisk regression.
+Detta är en konkret verifierad läckväg, men den historiska exakta orsaken
+till flera 20-dagars-PID:ar kan inte säkert retrodiagnosticeras.
+
+För att även vanliga timeoutfel ska kunna skickas som små, sanerade JSON-fel
+behåller CLI:n en cleanup-/utströmsreserv **inom** 60-sekundersgränsen:
+högst 59 sekunder för native-analysen och upp till en sekund för
+reaping/output. Ett separat test verifierar att en medvetet blockerad
+native-analys fortfarande ger icke-noll-kod och sanerat deadline-fel
+före den totala tidsgränsen. Under oförutsedd blockering av stdout är
+icke-noll hard-stop fortfarande sista fail-closed-skyddet.
