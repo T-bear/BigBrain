@@ -265,7 +265,7 @@ internal sealed partial class EodhdMarketMemory
     internal bool ShouldAcquire(string providerSymbol, DateOnly utcDate)
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open(); using var command = connection.CreateCommand();
-        command.CommandText = "SELECT completed_utc FROM acquisitions WHERE provider_symbol=$symbol AND outcome IN ('success','started','interrupted') ORDER BY started_utc DESC,id DESC LIMIT 1";
+        command.CommandText = "SELECT completed_utc FROM acquisitions WHERE provider_symbol=$symbol AND outcome IN ('success','started','interrupted','failure') ORDER BY started_utc DESC,id DESC LIMIT 1";
         command.Parameters.AddWithValue("$symbol", providerSymbol); var value = command.ExecuteScalar() as string;
         return value is null || DateOnly.FromDateTime(DateTimeOffset.Parse(value, CultureInfo.InvariantCulture).UtcDateTime) < utcDate;
     }

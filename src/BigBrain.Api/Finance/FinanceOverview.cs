@@ -44,10 +44,11 @@ internal sealed partial class EodhdMarketMemory
     private FinanceOverviewProspective ProspectiveOverview()
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
-        var invalidated = Scalar(connection, "SELECT COUNT(*) FROM shadow_predictions WHERE state='Invalidated'");
-        var valid = Scalar(connection, "SELECT COUNT(*) FROM shadow_predictions WHERE state!='Invalidated'");
-        var evaluated = Scalar(connection, "SELECT COUNT(*) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated'");
-        var pending = Math.Max(0, valid - evaluated); var correct = Scalar(connection, "SELECT COUNT(*) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated' AND o.direction_result='CORRECT'");
+        var counts = ReadShadowCounts(connection);
+        var invalidated = counts.GetValueOrDefault(nameof(FinanceShadowState.Invalidated));
+        var valid = counts.Values.Sum() - invalidated;
+        var evaluated = counts.GetValueOrDefault(nameof(FinanceShadowState.Evaluated));
+        var pending = counts.GetValueOrDefault(nameof(FinanceShadowState.Pending)); var correct = Scalar(connection, "SELECT COUNT(*) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated' AND o.direction_result='CORRECT'");
         var incorrect = Scalar(connection, "SELECT COUNT(*) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated' AND o.direction_result='INCORRECT'");
         decimal? mean = null; using (var avg = connection.CreateCommand()) { avg.CommandText = "SELECT AVG(CAST(o.realized_return AS REAL)) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated'"; var value = avg.ExecuteScalar(); if (value is double number) mean = (decimal)number; }
         var curve = new List<FinanceOverviewCurvePoint>(); decimal cumulative = 0; using (var command = connection.CreateCommand()) { command.CommandText = "SELECT o.target_session,AVG(CAST(o.realized_return AS REAL)) FROM shadow_outcomes o JOIN shadow_predictions p ON p.prediction_id=o.prediction_id WHERE p.state!='Invalidated' GROUP BY o.target_session ORDER BY o.target_session"; using var reader = command.ExecuteReader(); while (reader.Read()) { var value = (decimal)reader.GetDouble(1); cumulative = (1 + cumulative) * (1 + value) - 1; curve.Add(new(DateOnly.Parse(reader.GetString(0), CultureInfo.InvariantCulture), cumulative)); } }

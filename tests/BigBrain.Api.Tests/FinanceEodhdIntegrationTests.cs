@@ -42,6 +42,28 @@ public sealed class FinanceEodhdIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task SingleAttemptFailureCannotSpendMoreQuotaOnRetryOrRestart()
+    {
+        var options = Options(token: "fixture") with { MaximumRetries = 0 };
+        var instrument = EodhdCatalog.Watchlist.Single(x => x.Symbol == "AAPL");
+        var now = new DateTimeOffset(2026, 11, 11, 22, 0, 0, TimeSpan.Zero);
+        var day = DateOnly.FromDateTime(now.UtcDateTime);
+        var memory = new EodhdMarketMemory(options);
+        var id = memory.RecordStarted(instrument, day.AddYears(-1), day, now);
+        var handler = new SequenceHandler(HttpStatusCode.TooManyRequests, HttpStatusCode.OK, Fixture());
+        using var adapter = new EodhdAdapter(options, handler);
+        await Assert.ThrowsAsync<HttpRequestException>(() => adapter.FetchAsync(instrument.ProviderSymbol, day.AddYears(-1), day, TestContext.Current.CancellationToken));
+        memory.RecordFailure(instrument, day.AddYears(-1), day, now, "HttpRequestException", id);
+        Assert.Equal(1, handler.Calls);
+        Assert.False(memory.ShouldAcquire(instrument.ProviderSymbol, day));
+        var reopened = new EodhdMarketMemory(options);
+        Assert.False(reopened.ShouldAcquire(instrument.ProviderSymbol, day));
+        Assert.True(reopened.ShouldAcquire(instrument.ProviderSymbol, day.AddDays(1)));
+        Assert.Equal(1, reopened.RuntimeEvidence().AcquisitionAttempts);
+        Assert.Equal(0, reopened.RuntimeEvidence().Observations);
+    }
+
+    [Fact]
     public void DurableStoreIsIdempotentRestartSafeAndReplayDeterministic()
     {
         var options = Options(); var instrument = EodhdCatalog.Watchlist.Single(value => value.Symbol == "AAPL");

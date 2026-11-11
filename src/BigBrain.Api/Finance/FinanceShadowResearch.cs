@@ -18,7 +18,7 @@ internal sealed record FinanceShadowOutcome(string OutcomeId, string PredictionI
     DateTimeOffset EvaluatedAtUtc);
 internal sealed record FinanceShadowCatalog(DateTimeOffset GeneratedAtUtc, string OperatingMode, string ObservationClass,
     IReadOnlyList<FinanceShadowPrediction> Predictions, int Total, int Pending, int Evaluated, int Insufficient, int Missed,
-    string EvidenceMaturity);
+    string EvidenceMaturity, int Invalidated = 0);
 internal sealed record FinanceShadowStatus(string OperatingMode, string Provider, string ObservationClass, bool JournalHealthy,
     bool TemporalIntegrity, int Pending, DateTimeOffset? LastPredictionUtc, DateTimeOffset? LastOutcomeUtc, string AutomaticTrigger,
     string ExecutionAuthority);
@@ -37,6 +37,19 @@ internal static class FinanceShadowIdentity
 
 internal sealed partial class EodhdMarketMemory
 {
+    // Invalidated lineage remains excluded even when an immutable outcome exists.
+    private const string EffectiveShadowState = "CASE WHEN p.state='Invalidated' THEN 'Invalidated' WHEN o.outcome_id IS NOT NULL THEN 'Evaluated' ELSE p.state END";
+
+    private static Dictionary<string, int> ReadShadowCounts(SqliteConnection connection)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"SELECT {EffectiveShadowState},COUNT(*) FROM shadow_predictions p LEFT JOIN shadow_outcomes o ON o.prediction_id=p.prediction_id GROUP BY {EffectiveShadowState}";
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        using var reader = command.ExecuteReader();
+        while (reader.Read()) counts[reader.GetString(0)] = reader.GetInt32(1);
+        return counts;
+    }
+
     private static void InitializeShadowStorage(SqliteConnection connection)
     {
         using var command = connection.CreateCommand(); command.CommandText = """
@@ -112,12 +125,11 @@ internal sealed partial class EodhdMarketMemory
         if (state is not null && !Enum.TryParse<FinanceShadowState>(state, true, out _)) throw new ArgumentException("Unknown shadow state.", nameof(state));
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         var all = ReadPredictions(connection, instrument, strategy, state, from, to, limit);
-        using var counts = connection.CreateCommand(); counts.CommandText = "SELECT CASE WHEN o.outcome_id IS NOT NULL THEN 'Evaluated' ELSE p.state END,COUNT(*) FROM shadow_predictions p LEFT JOIN shadow_outcomes o ON o.prediction_id=p.prediction_id GROUP BY CASE WHEN o.outcome_id IS NOT NULL THEN 'Evaluated' ELSE p.state END";
-        var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase); using (var reader = counts.ExecuteReader()) while (reader.Read()) map[reader.GetString(0)] = reader.GetInt32(1);
+        var map = ReadShadowCounts(connection);
         var total = map.Values.Sum(); return new(DateTimeOffset.UtcNow, "RESEARCH", "CURRENT EOD / PROSPECTIVE EOD", all, total,
             map.GetValueOrDefault(nameof(FinanceShadowState.Pending)), map.GetValueOrDefault(nameof(FinanceShadowState.Evaluated)),
             map.GetValueOrDefault(nameof(FinanceShadowState.InsufficientData)), map.GetValueOrDefault(nameof(FinanceShadowState.MissedProspectiveWindow)),
-            total < 20 ? "BOOTSTRAPPING" : total < 100 ? "EARLY" : "DEVELOPING");
+            total < 20 ? "BOOTSTRAPPING" : total < 100 ? "EARLY" : "DEVELOPING", map.GetValueOrDefault(nameof(FinanceShadowState.Invalidated)));
     }
 
     internal FinanceShadowPrediction? ShadowPrediction(string id)
@@ -130,8 +142,8 @@ internal sealed partial class EodhdMarketMemory
     {
         using var connection = new SqliteConnection(ConnectionString); connection.Open();
         static DateTimeOffset? Time(SqliteConnection c, string sql) { using var x = c.CreateCommand(); x.CommandText = sql; var v = x.ExecuteScalar() as string; return v is null ? null : DateTimeOffset.Parse(v, CultureInfo.InvariantCulture); }
-        using var count = connection.CreateCommand(); count.CommandText = "SELECT COUNT(*) FROM shadow_predictions WHERE state='Pending'";
-        return new("RESEARCH", Provider, "CURRENT EOD / PROSPECTIVE EOD", true, temporalIntegrity, Convert.ToInt32(count.ExecuteScalar(), CultureInfo.InvariantCulture),
+        var pending = ReadShadowCounts(connection).GetValueOrDefault(nameof(FinanceShadowState.Pending));
+        return new("RESEARCH", Provider, "CURRENT EOD / PROSPECTIVE EOD", true, temporalIntegrity, pending,
             Time(connection, "SELECT MAX(created_utc) FROM shadow_predictions"), Time(connection, "SELECT MAX(evaluated_utc) FROM shadow_outcomes"),
             "after durable EOD acquisition/recovery; idempotent source-state scan", "NONE — research evidence only; no orders");
     }
@@ -150,7 +162,7 @@ internal sealed partial class EodhdMarketMemory
       """; x.ExecuteNonQuery(); }
     private static int InsertPrediction(SqliteConnection c, FinanceShadowPrediction p) { using var x = c.CreateCommand(); x.CommandText = "INSERT OR IGNORE INTO shadow_predictions VALUES($id,$i,$s,$d,$p,$r,$o,$k,$f,$si,$sv,$pf,$signal,$h,$created,$state,$mode,$reasons)"; foreach (var v in new[] { ("$id", (object)p.PredictionId), ("$i", p.InstrumentId), ("$s", p.Symbol), ("$d", p.SessionDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), ("$p", p.Provider), ("$r", p.SourceRevisionId), ("$o", p.ObservationKnowledgeUtc.ToString("O")), ("$k", p.KnowledgeCutoffUtc.ToString("O")), ("$f", p.FeatureRevisionId), ("$si", p.StrategyId), ("$sv", p.StrategyVersion), ("$pf", p.ParameterFingerprint), ("$signal", p.Signal), ("$h", p.Horizon), ("$created", p.CreatedAtUtc.ToString("O")), ("$state", p.State.ToString()), ("$mode", p.OperatingMode), ("$reasons", JsonSerializer.Serialize(p.ReasonCodes)) }) x.Parameters.AddWithValue(v.Item1, v.Item2); return x.ExecuteNonQuery(); }
     private static void EvaluatePending(SqliteConnection c, DateTimeOffset now) { var pending = ReadPredictions(c, null, null, nameof(FinanceShadowState.Pending), null, null, 2000); foreach (var p in pending) { using var x = c.CreateCommand(); x.CommandText = "SELECT session_date,close,acquired_utc,revision_id FROM observations WHERE provider=$p AND instrument_id=$i AND session_date>$d AND acquired_utc<=$k ORDER BY session_date,acquired_utc,revision_id LIMIT 1"; x.Parameters.AddWithValue("$p", Provider); x.Parameters.AddWithValue("$i", p.InstrumentId); x.Parameters.AddWithValue("$d", p.SessionDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)); x.Parameters.AddWithValue("$k", now.ToString("O")); using var r = x.ExecuteReader(); if (!r.Read()) continue; var target = DateOnly.Parse(r.GetString(0), CultureInfo.InvariantCulture); var close = decimal.Parse(r.GetString(1), CultureInfo.InvariantCulture); var known = DateTimeOffset.Parse(r.GetString(2), CultureInfo.InvariantCulture); var revision = r.GetString(3); r.Close(); using var original = c.CreateCommand(); original.CommandText = "SELECT close FROM observations WHERE instrument_id=$i AND session_date=$d AND revision_id=$r"; original.Parameters.AddWithValue("$i", p.InstrumentId); original.Parameters.AddWithValue("$d", p.SessionDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)); original.Parameters.AddWithValue("$r", p.SourceRevisionId); var reference = decimal.Parse((string)original.ExecuteScalar()!, CultureInfo.InvariantCulture); var ret = close / reference - 1; var direction = p.Signal == nameof(ResearchIntentKind.TargetLong) ? (ret > 0 ? "CORRECT" : "INCORRECT") : p.Signal == nameof(ResearchIntentKind.TargetFlat) ? (ret <= 0 ? "CORRECT" : "INCORRECT") : "NOT_APPLICABLE"; var oid = FinanceShadowIdentity.Outcome(p.PredictionId, revision, target); Execute(c, null, "INSERT OR IGNORE INTO shadow_outcomes VALUES($o,$p,$d,$r,$k,$a,$b,$return,$result,$e)", ("$o", oid), ("$p", p.PredictionId), ("$d", target.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), ("$r", revision), ("$k", known.ToString("O")), ("$a", reference.ToString(CultureInfo.InvariantCulture)), ("$b", close.ToString(CultureInfo.InvariantCulture)), ("$return", ret.ToString(CultureInfo.InvariantCulture)), ("$result", direction), ("$e", now.ToString("O"))); } }
-    private static List<FinanceShadowPrediction> ReadPredictions(SqliteConnection c, string? instrument, string? strategy, string? state, DateOnly? from, DateOnly? to, int limit) { using var x = c.CreateCommand(); x.CommandText = "SELECT p.prediction_id,p.instrument_id,p.symbol,p.session_date,p.provider,p.source_revision_id,p.observation_knowledge_utc,p.knowledge_cutoff_utc,p.feature_revision_id,p.strategy_id,p.strategy_version,p.parameter_fingerprint,p.signal,p.horizon,p.created_utc,CASE WHEN o.outcome_id IS NOT NULL THEN 'Evaluated' ELSE p.state END,p.operating_mode,p.reasons_json FROM shadow_predictions p LEFT JOIN shadow_outcomes o ON o.prediction_id=p.prediction_id WHERE ($i IS NULL OR p.instrument_id=$i) AND ($strategy IS NULL OR p.strategy_id=$strategy) AND ($state IS NULL OR CASE WHEN o.outcome_id IS NOT NULL THEN 'Evaluated' ELSE p.state END=$state) AND ($from IS NULL OR p.session_date >= $from) AND ($to IS NULL OR p.session_date <= $to) ORDER BY p.session_date DESC,p.prediction_id LIMIT $limit"; x.Parameters.AddWithValue("$i", instrument ?? (object)DBNull.Value); x.Parameters.AddWithValue("$strategy", strategy ?? (object)DBNull.Value); x.Parameters.AddWithValue("$state", state ?? (object)DBNull.Value); x.Parameters.AddWithValue("$from", from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? (object)DBNull.Value); x.Parameters.AddWithValue("$to", to?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? (object)DBNull.Value); x.Parameters.AddWithValue("$limit", limit); using var r = x.ExecuteReader(); var a = new List<FinanceShadowPrediction>(); while (r.Read()) a.Add(new(r.GetString(0), r.GetString(1), r.GetString(2), DateOnly.Parse(r.GetString(3), CultureInfo.InvariantCulture), r.GetString(4), r.GetString(5), DateTimeOffset.Parse(r.GetString(6), CultureInfo.InvariantCulture), DateTimeOffset.Parse(r.GetString(7), CultureInfo.InvariantCulture), r.GetString(8), r.GetString(9), r.GetString(10), r.GetString(11), r.GetString(12), r.GetString(13), DateTimeOffset.Parse(r.GetString(14), CultureInfo.InvariantCulture), Enum.Parse<FinanceShadowState>(r.GetString(15)), r.GetString(16), JsonSerializer.Deserialize<string[]>(r.GetString(17)) ?? [])); return a; }
+    private static List<FinanceShadowPrediction> ReadPredictions(SqliteConnection c, string? instrument, string? strategy, string? state, DateOnly? from, DateOnly? to, int limit) { using var x = c.CreateCommand(); x.CommandText = $"SELECT p.prediction_id,p.instrument_id,p.symbol,p.session_date,p.provider,p.source_revision_id,p.observation_knowledge_utc,p.knowledge_cutoff_utc,p.feature_revision_id,p.strategy_id,p.strategy_version,p.parameter_fingerprint,p.signal,p.horizon,p.created_utc,{EffectiveShadowState},p.operating_mode,p.reasons_json FROM shadow_predictions p LEFT JOIN shadow_outcomes o ON o.prediction_id=p.prediction_id WHERE ($i IS NULL OR p.instrument_id=$i) AND ($strategy IS NULL OR p.strategy_id=$strategy) AND ($state IS NULL OR {EffectiveShadowState}=$state) AND ($from IS NULL OR p.session_date >= $from) AND ($to IS NULL OR p.session_date <= $to) ORDER BY p.session_date DESC,p.prediction_id LIMIT $limit"; x.Parameters.AddWithValue("$i", instrument ?? (object)DBNull.Value); x.Parameters.AddWithValue("$strategy", strategy ?? (object)DBNull.Value); x.Parameters.AddWithValue("$state", state ?? (object)DBNull.Value); x.Parameters.AddWithValue("$from", from?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? (object)DBNull.Value); x.Parameters.AddWithValue("$to", to?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? (object)DBNull.Value); x.Parameters.AddWithValue("$limit", limit); using var r = x.ExecuteReader(); var a = new List<FinanceShadowPrediction>(); while (r.Read()) a.Add(new(r.GetString(0), r.GetString(1), r.GetString(2), DateOnly.Parse(r.GetString(3), CultureInfo.InvariantCulture), r.GetString(4), r.GetString(5), DateTimeOffset.Parse(r.GetString(6), CultureInfo.InvariantCulture), DateTimeOffset.Parse(r.GetString(7), CultureInfo.InvariantCulture), r.GetString(8), r.GetString(9), r.GetString(10), r.GetString(11), r.GetString(12), r.GetString(13), DateTimeOffset.Parse(r.GetString(14), CultureInfo.InvariantCulture), Enum.Parse<FinanceShadowState>(r.GetString(15)), r.GetString(16), JsonSerializer.Deserialize<string[]>(r.GetString(17)) ?? [])); return a; }
 }
 
 internal sealed class FinanceShadowWorker(EodhdFinanceOptions options, EodhdMarketMemory memory, SystemRecoveryCoordinator recovery, ILogger<FinanceShadowWorker> logger) : BackgroundService

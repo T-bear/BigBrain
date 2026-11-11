@@ -1,5 +1,6 @@
 using System.Text;
 using BigBrain.Api.Finance;
+using Microsoft.Data.Sqlite;
 
 namespace BigBrain.Api.Tests;
 
@@ -58,6 +59,91 @@ public sealed class FinanceShadowResearchTests : IDisposable
         Assert.Equal("Healthy", overview.Cadence.Health); Assert.Null(overview.Cadence.LastProviderCheckUtc); Assert.Null(overview.Cadence.LastSuccessfulAcquisitionUtc);
         memory.RecordCadenceCheck(now, true, true, "provider-check-no-new-session"); overview = memory.Overview(provider, new FinanceCadenceOptions(), true);
         Assert.Equal(now, overview.Cadence.LastProviderCheckUtc); Assert.Equal(now, overview.Cadence.LastSuccessfulAcquisitionUtc); Assert.True(overview.Cadence.ClockIntegrity); Assert.Equal("RESEARCH", overview.Cadence.OperatingMode);
+    }
+
+    [Fact]
+    public void ReadModelsAgreeForOutcomesInvalidationAndRevisionsWithoutChangingEvidence()
+    {
+        var options = new EodhdFinanceOptions { DatabasePath = Path.Combine(_root, "counts.db"), PayloadDirectory = Path.Combine(_root, "payloads") };
+        var memory = new EodhdMarketMemory(options);
+        using var connection = new SqliteConnection($"Data Source={options.DatabasePath}");
+        connection.Open();
+        foreach (var (id, state) in new[] { ("pending", "Pending"), ("revision-a", "Pending"), ("revision-b", "Pending"),
+            ("evaluated", "Pending"), ("invalid", "Invalidated"), ("invalid-outcome", "Invalidated"),
+            ("insufficient", "InsufficientData"), ("missed", "MissedProspectiveWindow") })
+        {
+            using var insert = connection.CreateCommand();
+            insert.CommandText = """
+                INSERT INTO shadow_predictions VALUES($id,'US:XNAS:AAPL','AAPL','2026-10-02','EODHD',$revision,
+                '2026-10-02T22:00:00Z','2026-10-02T22:01:00Z','fixture-feature','momentum','v1','fixture-parameters',
+                'TargetLong','next-eligible-source-session-close-v1','2026-10-02T22:01:00Z',$state,'RESEARCH','[]');
+                """;
+            insert.Parameters.AddWithValue("$id", "shadow-" + id);
+            insert.Parameters.AddWithValue("$revision", "fixture-" + id);
+            insert.Parameters.AddWithValue("$state", state);
+            insert.ExecuteNonQuery();
+        }
+        foreach (var id in new[] { "evaluated", "invalid-outcome" })
+        {
+            using var insert = connection.CreateCommand();
+            insert.CommandText = """
+                INSERT OR IGNORE INTO shadow_outcomes VALUES($id,$prediction,'2026-10-05','fixture-future',
+                '2026-10-05T22:00:00Z','100','101','0.01','CORRECT','2026-10-05T22:01:00Z');
+                """;
+            insert.Parameters.AddWithValue("$id", "outcome-" + id);
+            insert.Parameters.AddWithValue("$prediction", "shadow-" + id);
+            Assert.Equal(1, insert.ExecuteNonQuery());
+            Assert.Equal(0, insert.ExecuteNonQuery());
+        }
+        var before = EvidenceSnapshot(connection);
+        for (var repeat = 0; repeat < 2; repeat++)
+        {
+            var catalog = memory.ShadowCatalog(null, null, null, null, null, 50);
+            var cadence = memory.CadenceSnapshot(false, true, 22, 30);
+            var overview = memory.Overview(options, new FinanceCadenceOptions(), true);
+            Assert.Equal(8, catalog.Total);
+            Assert.Equal(3, catalog.Pending);
+            Assert.Equal(1, catalog.Evaluated);
+            Assert.Equal(2, catalog.Invalidated);
+            Assert.Equal(1, catalog.Insufficient);
+            Assert.Equal(1, catalog.Missed);
+            Assert.Equal(catalog.Pending, memory.ShadowStatus(true).Pending);
+            Assert.Equal(catalog.Pending, cadence.Pending);
+            Assert.Equal(catalog.Evaluated, cadence.Evaluated);
+            Assert.Equal(catalog.Invalidated, cadence.Invalidated);
+            Assert.Equal(catalog.Pending, overview.Prospective.Pending);
+            Assert.Equal(catalog.Evaluated, overview.Prospective.Evaluated);
+            Assert.Equal(catalog.Invalidated, overview.Prospective.Invalidated);
+            Assert.Equal(2, memory.ShadowCatalog(null, null, "Invalidated", null, null, 50).Predictions.Count);
+            Assert.Equal(FinanceShadowState.Invalidated, memory.ShadowPrediction("shadow-invalid-outcome")!.State);
+        }
+        Assert.Equal(before, EvidenceSnapshot(connection));
+    }
+
+    [Theory]
+    [InlineData(2026, 11, 26, 22, false)] // Thanksgiving
+    [InlineData(2026, 11, 27, 22, true)]  // Early close: conservative EOD window still safe
+    [InlineData(2026, 12, 25, 22, false)]
+    [InlineData(2027, 1, 1, 22, false)]
+    [InlineData(2026, 11, 11, 20, false)] // Winter close has not happened
+    [InlineData(2026, 7, 2, 19, false)]   // Summer close has not happened
+    [InlineData(2026, 11, 11, 22, true)]
+    public void ProviderWindowRequiresAnExchangeSessionAndCompletedClose(int year, int month, int day, int hour, bool expected)
+    {
+        Assert.Equal(expected, FinanceCadenceSchedule.IsProviderWindow(new(year, month, day, hour, 0, 0, TimeSpan.Zero), 0));
+    }
+
+    private static string EvidenceSnapshot(SqliteConnection connection)
+    {
+        var rows = new List<object[]>();
+        foreach (var table in new[] { "shadow_predictions", "shadow_outcomes" })
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT * FROM {table} ORDER BY 1";
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) { var row = new object[reader.FieldCount]; reader.GetValues(row); rows.Add(row); }
+        }
+        return System.Text.Json.JsonSerializer.Serialize(rows);
     }
 
     private EodhdMarketMemory Ready(DateTimeOffset acquired)
