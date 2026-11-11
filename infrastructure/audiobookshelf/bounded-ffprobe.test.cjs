@@ -96,6 +96,46 @@ setTimeout(()=>process.kill(process.pid,'SIGKILL'),500);`);
   await new Promise(resolve=>setTimeout(resolve,1600));
   gone(Number(fs.readFileSync(pidfile,'utf8')));
 });
+test('CLI deadline retains sanitized native timeout response inside total budget', {timeout:4500},async()=>{
+  const driver=path.join(tmp,'main-deadline.cjs');
+  fs.writeFileSync(driver,
+    'require('+JSON.stringify(wrapper)+').main(["3"],{executable:"/bin/sleep",limits:{milliseconds:1200}})');
+  const started=Date.now();
+  const r=await runFile(process.execPath,[driver]);
+  assert.equal(r.code,1);
+  assert.match(JSON.parse(r.stdout).error.string,/deadline exceeded/);
+  assert.ok(Date.now()-started<2000,'end-to-end deadline exceeded');
+});
+test('successful large output cannot trap the supervisor when the caller stops reading', {timeout:6500},async()=>{
+  const file=path.join(tmp,'synthetic-512k.out');
+  const driver=path.join(tmp,'blocked-output-supervisor.cjs');
+  fs.writeFileSync(file,Buffer.alloc(512*1024,0x42));
+  const code=[
+    'const {main,probe}=require('+JSON.stringify(wrapper)+');',
+    'const opts={executable:"/bin/cat",limits:{milliseconds:1200,stdout:8388608,stderr:262144}};',
+    '(async()=>{const r=await probe(['+JSON.stringify(file)+'],opts);',
+    'if(r.code!==0||r.stdout.length!==524288)throw Error("test probe did not succeed");',
+    'await main(['+JSON.stringify(file)+'],opts)})().catch(()=>process.exit(90));'
+  ].join('');
+  fs.writeFileSync(driver,code);
+  const child=spawn(process.execPath,[driver],{stdio:['ignore','pipe','ignore']});
+  // Deliberately do not attach a data reader to child.stdout.
+  const started=Date.now();
+  let guard;
+  try {
+    const timeout=new Promise((_,reject)=>{
+      guard=setTimeout(()=>{child.kill('SIGKILL');reject(Error('supervisor did not terminate after 1.2s budget'))},4800);
+    });
+    const [exitCode,signal]=await Promise.race([once(child,'close'),timeout]);
+    const elapsed=Date.now()-started;
+    assert.equal(exitCode,1,'blocked stdout must fail closed with nonzero exit');
+    assert.equal(signal,null);
+    assert.ok(elapsed>=850 && elapsed<4500,'unexpected supervisor deadline '+elapsed);
+  } finally {
+    clearTimeout(guard);
+    if(child.exitCode===null && child.signalCode===null)child.kill('SIGKILL');
+  }
+});
 test('actual production limits and cgroups, no capabilities, no-new-privileges',()=>{
   assert.deepEqual(limits,{milliseconds:60000,stdout:8388608,stderr:262144});
   assert.equal(process.env.SOURCE,'docker'); // ABS skips its downloader/version substitution in this image.

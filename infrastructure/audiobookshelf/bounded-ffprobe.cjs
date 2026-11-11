@@ -66,14 +66,39 @@ function probe(args, options = {}) {
   });
 }
 
-async function main() {
-  const result = await probe(process.argv.slice(2));
+// The per-child timeout does not bound writing a successful result to stdout:
+// an abandoned or non-reading ABS caller can leave this Node process blocked
+// indefinitely in pipe backpressure. Keep an independent hard lifecycle budget
+// from invocation start through the last stdout byte, with no CLI override.
+async function main(args = process.argv.slice(2), options = {}) {
+  const requested = options.limits?.milliseconds;
+  const duration = Number.isFinite(requested) && requested > 0
+    ? Math.min(requested, limits.milliseconds) : limits.milliseconds;
+  // Reserve a bounded cleanup/output slice INSIDE the total lifetime cap.
+  // The ordinary CLI gets 59s native probing and up to 1s for child reaping
+  // and flushing a sanitized failure response. The in-process test seam may
+  // only shorten the total cap, never extend the production 60s ceiling.
+  const grace = Math.min(1000, Math.floor(duration / 2));
+  const nativeOptions = {
+    ...options,
+    limits: { ...options.limits, milliseconds: Math.max(1, duration - grace) }
+  };
+  const resultPromise = probe(args, nativeOptions).catch(() => failure('supervisor failed'));
+  const watchdog = setTimeout(() => {
+    // stdout cannot be trusted to drain. Forced nonzero exit is preferable
+    // to unbounded task lifetime or falsely successful partial metadata.
+    process.exit(1);
+  }, duration);
+  const result = await resultPromise;
   process.exitCode = result.code;
   process.stdout.on('error', () => { process.exitCode = 1; });
+  const clearWatchdog = () => clearTimeout(watchdog);
+  process.stdout.once('finish', clearWatchdog);
+  process.stdout.once('close', clearWatchdog);
   process.stdout.end(result.stdout);
 }
 if (require.main === module) main().catch(() => {
   process.exitCode = 1;
   process.stdout.end(failure('supervisor failed').stdout);
 });
-module.exports = { probe, limits };
+module.exports = { probe, limits, main };
