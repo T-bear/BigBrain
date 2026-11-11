@@ -89,3 +89,110 @@ On failure, stop rollout. Revert only the added override using preserved origina
 recreating ABS only if safe and approved. Never restore an older database or delete uncertain
 imports to retry. No schema migration is introduced by this hook, but normal ABS startup can
 write state; preserve all new state and stop if rollback compatibility is uncertain.
+
+## BB-158 #70 – isolerad scannerkandidat med faktisk max-samtidighet fyra (2026-11-10)
+
+**Endast granskningskandidat, inte godkänd eller driftsatt.** Den aktiva ABS
+2.36.0-bilden sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e
+har en källhash för /app/server/scanner/AudioFileScanner.js som är
+2d16ef07c3f1ee2b026980f36f9efd31fd297b6f21d74073591bea8b74c90901.
+patch-scanner-concurrency.cjs kontrollerar exakt denna hash och att endast
+en batchSize=32 förekommer, och ändrar **endast** scanners batchSize till 4.
+Vid annan basimage/källa avbryts byggprocessen; ingen generell patch mot
+ABS-upstream eller obevakad versionuppgradering tillåts.
+
+Dockerfile.concurrency4 använder en **lokal**, explicit pinnad basimage-tag
+bigbrain-abs-build-base:bb158-sha180acad33d69. Den ska skapas först efter
+att den lokala Docker-imageidentiteten verifierats exakt mot ovanstående
+fullständiga SHA256. Bygg därefter med --pull=false och --network none, och
+bevara både den ursprungliga ABS-imagen och tidigare runtime- och
+Compose-konfiguration. Publicera aldrig bas-taggen utan integritetskontroll.
+
+Den negativa scannerkonkurrenskontrollen på ursprungsimagen gav 32
+samtidiga analyser och misslyckades enligt max-fyra-kontraktet. Den
+positiva kontrollen på en derivatimage från samma bas slutförde 36 av 36
+uppgifter med maxConcurrent=4. En komplett Audiobookshelf 2.36.0-server
+startades därefter i en separat nätverkslös container, read-only med
+UID1000, inga extra capabilities, ingen privilegiehöjning, 2 CPU/1 GiB
+och PID-gräns128, med enbart syntetiska config/metadata/media. Efter
+ett enda godkänt syntetiskt scan?force=0 registrerade den 1 indexerad
+bok med 36 MP3-filer och lastScan, pids.events max=0. Alla containrar
+togs bort efter testet. Testprogrammen i denna katalog använder endast
+syntetiska identiteter och genererar tillfälligt testlösenord vid körning.
+
+**Reproducerbara skyddsgrindar för en godkänd granskningskandidat:**
+
+1. Kontrollera att rätt main, källhash, exakt image-SHA och resurser
+   gäller. Skapa lokal bas-tag först efter image-inspect-jämförelse.
+2. Bygg Dockerfile.concurrency4 helt offline och kör
+   concurrency.test.cjs under båda images med network none, read-only,
+   2 CPU, PID128, cap-drop ALL och no-new-privileges.
+3. Kör e2e-synthetic-scan.cjs endast **inuti** en isolerad färsk
+   Audiobookshelf-container med enbart privat syntetiskt bibliotek,
+   utan portpublicering, nätverksåtkomst eller produktionsvolymer.
+   Skapa 36 syntetiska MP3-filer med lokal ffmpeg i privat testkatalog.
+   Kräv en indexerad testbok, bevisad scan completion, noll nya
+   pids.events/max och inga kvarhängande probes.
+4. Komplettera med deterministiskt test av signal/timeout/process-
+   lifecycle vid pressad PID-budget, granska rollback och
+   config/metadata-backup, och först därefter föreslå skyddad release.
+
+**Kvarstående DoD:** de historiskt långlivade PID:arnas specifika
+exit/close-orsak är ännu inte helt fastställd. En lyckad syntetisk
+skanning är inte bevis för att en full produktionsskanning blir trygg.
+Kör inte produktionens hela bibliotek som test och öka inte PID-taket
+som snabbfix. Inga användarfiler, playbackprogress eller databaser
+ska raderas eller återställas utan separat säker recoverygrind.
+
+### Fyra samtidiga avbrott och processavveckling (isolerat test)
+
+Det nya four-probe-lifecycle.test.cjs kör fyra samtidiga native
+sleep-prober med kortad test-timeout, följt av fyra samtidiga
+SIGTERM-avbrott av JS-supervisorn. Kör i ABS 2.36.0-imagen med exakt
+128 PID, 2 CPU, 1 GiB, network none, read-only, capabilities borttagna
+och inga produktionsvolymer. Testet kräver kontrollerad avvisning,
+noll nya PID-gränsträffar och inga kvarvarande processer efter deadline.
+
+**Verifierad avvecklingsdetalj:** BusyBox timeout startar en oberoende
+watchdog i separat processgrupp. När JS-supervisorn avbryts kan watchdogen
+fortsätta en kort tid trots att själva native-barnet har dödats; den
+är borta när dess separat kortade 2-sekunders testdeadline passerats.
+Att kräva att även denna watchdog försvinner inom 150 ms skulle vara
+ett felaktigt test. Provet **bevisar inte** varför äldre wrapperprocesser
+fanns kvar i 20 dagar; den orsaken måste fortfarande betraktas som
+ej verifierad och följas under drift efter lämplig granskad release.
+
+**Viktig testuppställning:** behåll originalimens tini som PID1.
+En testspecifik Docker-överstyrning till Node som PID1 producerade
+oreapade timeout-zombier och gav ett missvisande negativt resultat.
+Med oförändrad tini/PID1 passerade fyra parallella native-timeouts och
+fyra parallella SIGTERM-avbrott två på varandra följande isolerade prov:
+noll cgroup PID-limitträffar och inga kvarvarande timeout-, sleep-
+eller zombieprocesser efter den oberoende watchdogens tidsgräns.
+Containeruppsättning och init/reaping är en del av det som testas.
+
+För integritet ska e2e-synthetic-scan.cjs kräva **exakt 36**
+ljudfiler under den enda syntetiska ABS-katalogposten och ett lastScan-
+värde. I pinnad ABS 2.36.0 sätts library.lastScan först när
+scanLibrary har avslutats utan cancellation och save lyckats.
+Ett HTTP 200 på scan-POST eller en ensam synlig katalogpost räcker inte.
+
+### Syntetiskt bevis för ABS:s egen filövervakare
+
+Det fristående watcher-synthetic-e2e.cjs använder en helt separat ABS-server
+utan nätverksåtkomst eller hostportar med temporära privata testvolymer.
+Det kräver till skillnad från grundskanningstestet en **skrivbar syntetisk**
+audiobooks-katalog. Använd aldrig produktionsmedia eller produktionsmetadata.
+Skapa först 36 korta syntetiska MP3-filer med den tidigare dokumenterade
+metoden. Testet skapar en testadmin med slumpat temporärt lösenord och kör
+en enda uttrycklig scan-POST mot den isolerade instansen. Sedan kopierar det
+en testfil till en ny syntetisk bokmapp och skickar **ingen ytterligare
+scan-POST**. Därmed måste ABS:s egen watcher upptäcka den nya boken.
+
+Förväntat: först en post med exakt 36 ljudfiler och ett lastScan-värde
+efter avslutad skanning; därefter två biblioteksobjekt där den nya posten
+innehåller exakt en ljudfil. Den tekniken har verifierats med repo-byggd
+ABS-kandidat, 2 CPU/1 GiB/PID128, no-new-privileges och Tini som PID1,
+med noll nya PID-limitträffar. Detta är isolerad integrationsverifiering,
+inte automatiskt bevis för att en produktionsövervakare har rätt inställningar,
+fått filhändelsen eller redan registrerat den befintliga 36-spårsboken.
