@@ -1306,12 +1306,12 @@ frysningsbeslut har oförändrad auktoritet; arkivets current/next är inte aktu
 
 ### BB-159 — Rootless image-identitet före obevakad TEST
 
-**LÖST i verifierad kodkandidat; oberoende runtimegranskning utan P0/P1.** Efter nytt uttryckligt
+**LÖST / accepterad main via PR84, oberoende nivå3-review och exakt main-CI PASS.** Efter nytt uttryckligt
 fortsättningsbeslut har BB-159 egen risk3-ram/cap2h/max2 reparationer,0/2 använda; U2:s2/2
 nollställs inte. Privat containerd-imagelager behåller CI-paketets exakta OCI-identiteter utan
 svagare validator. Verkliga resurs-/nät-/reset-/motoromstartsprov PASS och säker reträtt till
 manuell U1 demonstrerad; produktionens12 containeridentiteter/images/starttider oförändrade.
-Rootless stoppad/disabled inför slutacceptans, obevakad U3 ännu DEFERRED.
+Rootless stoppad/disabled efter säker reträtt; förgodkänd U3 implementeras, aktivering ännu DEFERRED.
 [Kanonisk evidens](operations/runbooks/test-environment.md#bb-159-runtime-evidence--2026-11-13).
 
 ### BB-160 — SDK-feature-band för framtida ren produktionsimage-build
@@ -1323,3 +1323,11 @@ TEST-only derivering till10.0.300 och verifierade byggen; produktions-Dockerfile
 ändrades inte i TEST-uppdraget. DoD inför en framtida berörd produktionsbuild: välj och
 granska kompatibel SDK-feature-band/pin och verifiera en verklig ren image-build utan
 att tysta SDK-grinden eller utvidga Finance-/deploymentmandatet.
+
+### BB-161 — TEST-banner över modalhuvud i syntetisk webbläsarpilot
+
+**Verifierad / P2, blockerar inte PREDEPLOY.** Firefox140 ESR vid1366×768 visar att den
+fasta gula TEST-bannern överlappar överkanten av inköpslistans helskärmsmodal. Varutillägg,
+synligt innehåll och omladdning fungerar i det faktiska pilotprovet; UI/PWA-acceptans är
+inte lämnad. Framtida avgränsad förbättring: ge TEST-overlay/modalhuvud kompatibelt utrymme
+utan produktions-UI-ändring och verifiera berörda viewportar. Ingen ny designloop nu.

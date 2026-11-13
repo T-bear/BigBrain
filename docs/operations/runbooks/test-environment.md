@@ -690,3 +690,106 @@ checks are bound in the delivery PR; merge remains conditional on those checks. 
 closes the BB-159 compatibility work, not U3 unattended boot/logout or UI acceptance.
 The preapproved U3 implementation may follow accepted BB-159 without another owner click;
 activation still requires its own verified controls and any genuinely privileged host action.
+
+## U3 automation implementation — 2026-11-13
+
+Start condition: BB-159 merged after exact independent level3 review and four successful
+required candidate checks. Baseline `d50b366c59730422ec670de44d5377999448f262`, tree
+`febfb882c4d9d40bf92c23b8b13f5ccb7925d7a9`. Parent verifies exact post-merge CI before
+installing new runtime controls. This is the existing preapproved U3, risk2, estimate3–6
+active hours/cap6h, maximum2 repairs for the whole task,0/2 used. Earlier hosted-only
+expected-red proof remains valid; its fixture PR85 stays closed/unmerged. U2's exhausted
+budget and BB-159's separate0/2 do not reset U3.
+
+Choose the existing synthetic shopping-list Web/API flow as the harmless UI/data pilot:
+add a clearly named synthetic item, verify visible rendering and API persistence/restart,
+then validate own-fixture reset. No product redesign or Finance execution. Browser worker
+evidence is separate from owner iPhone/PWA acceptance.
+
+Minimal implementation: a separately installed fixed operator task wrapper, private
+pending-task manifest/receipts, focused tests and a bounded user service. Worker submission
+triggers one verified task; no timer, remote branch polling, new daemon queue, token,
+subscription or vendor SDK. Existing engine/controller/template stay fixed. Candidate
+inputs cannot select commands, installation paths, engine, bind/client or resource policy.
+GitHub repository/source/tree/actor/ref/run/artifact and secret/package outcomes must be
+verified before archive load; red functional outcomes are retained honestly. Installed
+pause prevents new work; failure uses bounded safe cleanup/restoration without repair loops.
+This remains an external operations tool under ADR0041, outside API/Web/Brain/Sentinel.
+
+DoD (five):
+1. Fixed installed wrapper admits only exact trusted owned package tasks, verifies provenance
+   and bounded archives, excludes credentials from candidate processes and retains receipts.
+2. Worker submission runs bounded lifecycle without owner approval; pause, duplicate-task
+   rejection, interruption and one safe restoration are verified with focused negative tests.
+3. Reuse applicable BB-159 isolation and hosted-red evidence; actually verify new automatic
+   start/probe/reset/failure behavior and harmless shopping-list browser/data pilot.
+4. Verify sessions-independent user-service ownership/limits and safe stop; no false boot/
+   logout persistence claim. Any required privileged host action is prepared only after
+   review/install readiness; no rootful Docker or sudo-policy bypass.
+5. Independent fixed-control review before installation, applicable CI and canonical dated
+   status/limitations; owner receives only short summary and concrete test card when needed.
+
+Predetermined exit: at cap preserve completed work and the safe manual TEST slot, disable
+failing automation and record the exact remaining blocker. No third repair/design loop;
+P2/P3 to existing backlog, independent authorized parts may finish. No production mutation.
+
+BB-159 delivery verification: PR84 merged to
+`d50b366c59730422ec670de44d5377999448f262`, tree
+`febfb882c4d9d40bf92c23b8b13f5ccb7925d7a9`; exact independent review and all four
+required candidate/main checks PASS (main run43450793145). No further deployment was
+needed for that reconciliation. U3 source work now proceeds on that accepted baseline.
+
+### U3 existing-profile browser evidence
+
+Actual Firefox140 ESR headless browser on the known manual151ab3a profile renders the
+correct TEST SHA, switches to Family, submits a unique synthetic shopping item, opens
+shopping mode and still shows the item after refresh: four checks PASS, screenshot
+visually inspected. This is worker browser evidence, not owner iPhone/PWA acceptance or
+new automatic lifecycle evidence. The submitted fixtures are synthetic and retained.
+
+Earlier observer mistakes are not product failures: the expanded shopping widget shows
+a count rather than item names until shopping mode opens, and the initial test script
+had a quoting error. A separate headless run exited SIGSEGV at439MiB under a192-task QA
+cap; its EOF handling was corrected and that owned QA process stopped. A later stock-HTTP
+browser run under a512-task/768MiB/one-CPU/90s QA bound completed. A preceding netReset
+is not conclusively attributed; sampled relay children peaked at1 in the passing run.
+No evidence justifies changing the fixed four-client relay or opening an isolation loop.
+A recurrence that blocks the final automatic pilot must be investigated within U3's cap.
+
+Read-only persistence prerequisite: user linger is currently no; enabled user units were
+inventoried and contain desktop/audio/keyring facilities, no enabled BigBrain/Finance or
+TEST task/engine unit. Enabling linger affects the operator user manager's lifetime, not
+just this task. No change is made during preparation. The known sudo policy does not
+permit this administrative action; do not bypass it through rootful Docker. Prepare all
+controls and runtime evidence before requesting the single narrowly required owner action.
+
+### U3 fixed-control source candidate
+
+Implemented, not installed: fixed task wrapper plus user unit, with71 focused tests PASS
+(38 new/33 existing), static unit/syntax/documentation/diff checks PASS. The unit uses
+explicit clean environment, no automatic restart,45min maximum lifetime,90s stop timeout,
+whole-owned-cgroup cleanup, one CPU/512MiB/64 tasks and4GiB file-size bound. It does not
+add user mount-namespace sandbox settings requiring new privileges. Engine remains the
+separately reviewed rootless user unit; no controller/Compose/engine change.
+
+Private installed config binds wrapper hash, accepted base/workflow hash and exact sealed
+rootless controller hashes/path/bind policy. `submit` reads only a small strict JSON
+manifest: task_id, source_sha, tree, run_id, attempt, artifact_id, pr_number (0 only for
+workflow dispatch), runtime_seconds30–1800. It invokes the fixed user service; no candidate
+command/path/hook, inherited credential, remote polling or background queue. GitHub auth
+is used only by fixed fetch commands; Docker and candidate lifecycle use private empty
+client config and the fixed rootless socket.
+
+One pending manifest and durable private task receipts serialize work and reject replay,
+unknown interrupted state and drift. Before Docker load, GitHub source/ref/run/artifact,
+trusted workflow and actual secrets/package results, bounded ZIP/tar contents and checksums
+are verified. Successful stopped tasks retain the verified package as last-known-good.
+Replacement discards only own synthetic fixtures. Failure permits one code/package
+restoration with fresh fixtures; no database rollback claim. Pause stops owned work and
+retains fixtures; resume cannot clear an unknown unfinished receipt. Rootful is never a
+wrapper engine/fallback target: parent owns that preserved manual retreat.
+
+Current verification limits: source tests are not real artifact/service or unattended
+acceptance. Independent exact fixed-control review, hosted artifact and real service/
+rollback/pause tests precede activation. Rootless first-task resources must be verified
+empty through the existing installed controller; preserve the original rootful fallback.

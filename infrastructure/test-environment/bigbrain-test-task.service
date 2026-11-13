@@ -1,0 +1,26 @@
+[Unit]
+Description=BigBrain bounded synthetic TEST task (external ops control)
+Requires=bigbrain-test-rootless.service
+After=bigbrain-test-rootless.service
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/env -i PATH=/usr/bin:/bin HOME=%h LANG=C.UTF-8 /usr/bin/python3 -I %h/.local/lib/bigbrain-test-task/test-environment-task.py run
+WorkingDirectory=%h/.local/state/bigbrain-test-task
+Restart=no
+RuntimeMaxSec=45min
+TimeoutStopSec=90
+KillMode=control-group
+KillSignal=SIGTERM
+SendSIGKILL=yes
+UMask=0077
+NoNewPrivileges=yes
+CPUQuota=100%
+MemoryMax=512M
+TasksMax=64
+LimitFSIZE=4294967296
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=default.target
