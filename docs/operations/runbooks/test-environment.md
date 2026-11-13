@@ -1,6 +1,6 @@
 # Synthetic TEST environment — U1–U3
 
-2026-11-13: **manual synthetic slot installed and runtime verified below; external T22 PASS (owner report), manual synthetic TEST ready; unattended automation DEFERRED**.
+2026-11-13: **U3 BLOCKED/PARTIAL; experimental PR87 NOT MERGEABLE; BB-159 rootless hardening remains accepted; manual fallback restoration PENDING; unattended activation DEFERRED**.
 Authority is owned solely by the
 [TEST owner decision](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
 The external operator boundary is described in
@@ -11,7 +11,7 @@ is future architecture preparation only; it adds no current delivery gate, agent
 
 ## Ordered tasks, start conditions and limits
 
-The owner authorized U1 → U2 → U3, each with its own time and repair budget. This worktree
+The owner authorized U1 → U2 → U3, each with its own time and repair budget. The initial U1 checkpoint described next is dated history; current U3 scope/evidence is recorded at the end of this runbook. That worktree
 implements **U1 only** on `checkpoint/test-environment-u1-20261113`, accepted main
 `e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree
 `24f249d76092dc8c3a242ed664ed139dc2eb4d9b`. Parent fetched and independently verified this main baseline before implementation and
@@ -26,7 +26,7 @@ No real model/provider/order or new host privilege is authorized.
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
 | U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 0/2 used; independent hosted proof PASS, local/unattended activation DEFERRED |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 2/2 exhausted; core partial PASS, DoD3 browser P1 BB-162; rollback/pause/manual restoration PENDING; unattended activation DEFERRED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
@@ -56,7 +56,7 @@ U2 DoD (planned, no implementation here):
 4. Record success or bounded failure within 4 h / two repairs; no silent privilege widening.
 5. Preserve manual U1 on failure and mark unattended U3 deferred; document safe recovery.
 
-U3 DoD (planned, no implementation here):
+Original U3 DoD (retained scope; later implementation/outcome below):
 
 1. Choose an authorized harmless UI/data pilot with no Finance, providers or production data.
 2. Bind trusted source/image/provenance to the permitted U1/U2 runtime scope.
@@ -690,3 +690,236 @@ checks are bound in the delivery PR; merge remains conditional on those checks. 
 closes the BB-159 compatibility work, not U3 unattended boot/logout or UI acceptance.
 The preapproved U3 implementation may follow accepted BB-159 without another owner click;
 activation still requires its own verified controls and any genuinely privileged host action.
+
+## U3 automation implementation — 2026-11-13
+
+Start condition: BB-159 merged after exact independent level3 review and four successful
+required candidate checks. Baseline `d50b366c59730422ec670de44d5377999448f262`, tree
+`febfb882c4d9d40bf92c23b8b13f5ccb7925d7a9`. Parent verifies exact post-merge CI before
+installing new runtime controls. This is the existing preapproved U3, risk2, estimate3–6
+active hours/cap6h, maximum2 repairs for the whole task,0/2 at start (now2/2 exhausted; outcome below). Earlier hosted-only
+expected-red proof remains valid; its fixture PR85 stays closed/unmerged. U2's exhausted
+budget and BB-159's separate0/2 do not reset U3.
+
+Choose the existing synthetic shopping-list Web/API flow as the harmless UI/data pilot:
+add a clearly named synthetic item, verify visible rendering and API persistence/restart,
+then validate own-fixture reset. No product redesign or Finance execution. Browser worker
+evidence is separate from owner iPhone/PWA acceptance.
+
+Minimal implementation: a separately installed fixed operator task wrapper, private
+pending-task manifest/receipts, focused tests and a bounded user service. Worker submission
+triggers one verified task; no timer, remote branch polling, new daemon queue, token,
+subscription or vendor SDK. Existing engine/controller/template stay fixed. Candidate
+inputs cannot select commands, installation paths, engine, bind/client or resource policy.
+GitHub repository/source/tree/actor/ref/run/artifact and secret/package outcomes must be
+verified before archive load; red functional outcomes are retained honestly. Installed
+pause prevents new work; failure uses bounded safe cleanup/restoration without repair loops.
+This remains an external operations tool under ADR0041, outside API/Web/Brain/Sentinel.
+
+DoD (five):
+1. Fixed installed wrapper admits only exact trusted owned package tasks, verifies provenance
+   and bounded archives, excludes credentials from candidate processes and retains receipts.
+2. Worker submission runs bounded lifecycle without owner approval; pause, duplicate-task
+   rejection, interruption and one safe restoration are verified with focused negative tests.
+3. Reuse applicable BB-159 isolation and hosted-red evidence; actually verify new automatic
+   start/probe/reset/failure behavior and harmless shopping-list browser/data pilot.
+4. Verify sessions-independent user-service ownership/limits and safe stop; no false boot/
+   logout persistence claim. Any required privileged host action is prepared only after
+   review/install readiness; no rootful Docker or sudo-policy bypass.
+5. Independent fixed-control review before installation, applicable CI and canonical dated
+   status/limitations; owner receives only short summary and concrete test card when needed.
+
+Predetermined exit: at cap preserve completed work and the safe manual TEST slot, disable
+failing automation and record the exact remaining blocker. No third repair/design loop;
+P2/P3 to existing backlog, independent authorized parts may finish. No production mutation.
+
+BB-159 delivery verification: PR84 merged to
+`d50b366c59730422ec670de44d5377999448f262`, tree
+`febfb882c4d9d40bf92c23b8b13f5ccb7925d7a9`; exact independent review and all four
+required candidate/main checks PASS (main run43450793145). No further deployment was
+needed for that reconciliation. U3 source work now proceeds on that accepted baseline.
+
+### U3 existing-profile browser evidence
+
+Actual Firefox140 ESR headless browser on the known manual151ab3a profile renders the
+correct TEST SHA, switches to Family, submits a unique synthetic shopping item, opens
+shopping mode and still shows the item after refresh: four checks PASS, screenshot
+visually inspected. This is worker browser evidence, not owner iPhone/PWA acceptance or
+new automatic lifecycle evidence. The submitted fixtures are synthetic and retained.
+
+Earlier observer mistakes are not product failures: the expanded shopping widget shows
+a count rather than item names until shopping mode opens, and the initial test script
+had a quoting error. A separate headless run exited SIGSEGV at439MiB under a192-task QA
+cap; its EOF handling was corrected and that owned QA process stopped. A later stock-HTTP
+browser run under a512-task/768MiB/one-CPU/90s QA bound completed. A preceding netReset
+is not conclusively attributed; sampled relay children peaked at1 in the passing run.
+No evidence justifies changing the fixed four-client relay or opening an isolation loop.
+A recurrence that blocks the final automatic pilot must be investigated within U3's cap.
+
+Read-only persistence prerequisite: user linger is currently no; enabled user units were
+inventoried and contain desktop/audio/keyring facilities, no enabled BigBrain/Finance or
+TEST task/engine unit. Enabling linger affects the operator user manager's lifetime, not
+just this task. No change is made during preparation. The known sudo policy does not
+permit this administrative action; do not bypass it through rootful Docker. Prepare all
+controls and runtime evidence before requesting the single narrowly required owner action.
+
+### U3 fixed-control source candidate
+
+Initial source checkpoint, before later installation/runtime below: fixed task wrapper plus user unit, with71 focused tests PASS
+(38 new/33 existing), static unit/syntax/documentation/diff checks PASS. The unit uses
+explicit clean environment, no automatic restart,45min maximum lifetime,90s stop timeout,
+whole-owned-cgroup cleanup, one CPU/512MiB/64 tasks and4GiB file-size bound. It does not
+add user mount-namespace sandbox settings requiring new privileges. Engine remains the
+separately reviewed rootless user unit; no controller/Compose/engine change.
+
+Private installed config binds wrapper hash, accepted base/workflow hash and exact sealed
+rootless controller hashes/path/bind policy. `submit` reads only a small strict JSON
+manifest: task_id, source_sha, tree, run_id, attempt, artifact_id, pr_number (0 only for
+workflow dispatch), runtime_seconds30–1800. It invokes the fixed user service; no candidate
+command/path/hook, inherited credential, remote polling or background queue. GitHub auth
+is used only by fixed fetch commands; Docker and candidate lifecycle use private empty
+client config and the fixed rootless socket.
+
+One pending manifest and durable private task receipts serialize work and reject replay,
+unknown interrupted state and drift. Before Docker load, GitHub source/ref/run/artifact,
+trusted workflow and actual secrets/package results, bounded ZIP/tar contents and checksums
+are verified. Successful stopped tasks retain the verified package as last-known-good.
+Replacement discards only own synthetic fixtures. Failure permits one code/package
+restoration with fresh fixtures; no database rollback claim. Pause stops owned work and
+retains fixtures; resume cannot clear an unknown unfinished receipt. Rootful is never a
+wrapper engine/fallback target: parent owns that preserved manual retreat.
+
+Verification limits at that source checkpoint: source tests are not real artifact/service or unattended
+acceptance. Independent exact fixed-control review, hosted artifact and real service/
+rollback/pause tests precede activation. Rootless first-task resources must be verified
+empty through the existing installed controller; preserve the original rootful fallback.
+
+### U3 first fixed-control review — repair1/2
+
+Independent exact review of `8fd0ec575dfc8706d91013ad7381273dc96856b6`, tree
+`bb2de7b9c2343ccc0a470ac8d07292e71c1c8842`, finds two P1s; no installation or merge
+clearance. First, asynchronous relay launch immediately followed by probe can race the
+controller's nonblocking lifecycle lock, affecting both normal start and restoration.
+Second, staging-space admission omits actual image-import/unpacked-layer space in the
+separate engine filesystem, risking shared-disk exhaustion. Required corrections: bounded
+actual relay-listening readiness before probe; conservative bounded import/unpacked sizes
+and actual engine-filesystem headroom before Docker load, including compressed layers.
+Both are handled in one bounded repair attempt1/2, not separate per-error counters.
+Original controller/isolation, manual fallback and production remain unchanged.
+
+Read-only integration preflight of the actual GitHub identity function PASS for both
+initial U3 run43454287914 (all five jobs successful) and existing expected-red
+run43427194286/PR85 (frontend failure; backend/documentation/secrets/package success).
+Exact current owned refs, source/tree, PR/tested SHA, accepted workflow hash and GitHub
+artifact digests were verified against the real API. No archive download, Docker load
+or candidate execution occurred in these identity probes. This confirms protocol/API
+compatibility and honest red-outcome admission, not runtime acceptance or closure of
+source P1s. The closed expected-red PR85 remains NEVER MERGE.
+
+Repair1/2 source verification: actual fixed relay readiness now precedes probe for normal
+start and restoration, with bounded cancellation/timeout/early-exit and pipe cleanup.
+Archive inspection measures decoded gzip layer bytes and logical file payloads; a
+conservative import bound (maximum6GiB) plus2GiB additional free headroom is checked on
+the validated actual engine DockerRootDir filesystem immediately before load. No new
+privileged quota or image/identity policy change. Actual preserved package inspection
+PASS:155225600 outer bytes,351619584 decoded layer bytes,346101683 logical file bytes;
+calculated import reserve2040192870 bytes. Source tests78 PASS, seven new focused cases
+including compressed-layer and engine-headroom rejection before load. Independent
+re-review and actual service execution remain pending; this is one completed repair,
+not two per-error attempts. The original manual fallback is still active.
+
+### U3 first runtime and final transport repair2/2
+
+The installed reviewed085fbc6 wrapper accepts the real expected-red GitHub identity and
+starts its independent bounded user service after the caller exits, even with poisoned
+caller engine/token/proxy/provider variables. The154366984-byte ZIP download makes
+progress but reaches its exact300s fetch deadline (16:00:55–16:05:55 UTC). Receipt is
+rejected before archive creation/verification, Docker load or any candidate container.
+Unit memory peak179175424 bytes; no PID-limit event. This is transport capacity evidence,
+not a startup/isolation/identity failure. Rootless resources are verified empty and the
+manual rootful slot is restored for the final repair.
+
+Repair2/2 changes only the raw artifact-fetch deadline from300s to900s. Metadata remains
+60s; whole user-service lifetime stays45min, including fetch/import/serving/cleanup. No
+automatic retry, additional credential, permission, quota, engine, identity or network
+change. A requested serving duration remains subject to that total cap. Prior exact
+control review applies to unchanged code; necessary focused verification covers this
+single changed bound before replacing the installed wrapper/hash. After the final bounded
+trial, any further blocker invokes the predetermined safe exit: preserve completed
+hardening and manual TEST, defer automation, retain evidence; no third repair or new loop.
+
+
+## U3 bounded outcome — BLOCKED/PARTIAL 2026-11-13
+
+**Final bounded outcome: BLOCKED/PARTIAL; PR87 experimental NOT MERGEABLE; manual synthetic TEST restored.**
+This supersedes earlier same-day ready/not-installed/pending-source statements only for
+U3's current outcome. It does not revoke accepted BB-159 hardening or import failed U3
+code into accepted main. This outcome worktree contains documentation only, based on
+accepted `d50b366c59730422ec670de44d5377999448f262`. Actual rollback, pause and final safe retreat are verified below; no failed code is promoted.
+
+### VERIFIED
+
+- Source candidate `40a8bdba877b8502d4699173d0badbb9289a4cf6`, tree
+  `c5faf7c63834e16b762d40b9a0784d1592b2931b`, [PR87](https://github.com/T-bear/BigBrain/pull/87):
+  78 focused tests and all five CI jobs PASS in run43459885018. Installed wrapper SHA256
+  `dcfccce4d39930932e46db8082af103b4907b54f33739b638968640de87ce076`.
+  These are source/control facts, not a successful complete U3 pilot.
+- After the bounded download correction, the real expected-red package task progressed
+  through fetching/verified/replacing/serving/succeeded. Functional red status stayed red;
+  secrets/package admission and local allowed-client/LAN-source/LAN-destination/IPv6
+  checks PASS. Its cold browser add failed with NetworkError; browser pilot NOT PASS.
+- Normal green core task PASS: actual HTTP health, succeeded receipt, matching
+  last-known-good and duplicate-ID rejection without pending work. Serving began
+  16:26:53 UTC; core succeeded16:27:27. Green cold browser rendered TEST/Family and
+  the newly added synthetic item, but Refresh failed with netReset16:27:10, during
+  Serving and before its deadline. Private runtime/browser/core proofs retain detail;
+  no private endpoints, identities or paths are published here.
+- Both repair batches are exhausted (2/2). Independent review confirms a P1 against
+  U3 DoD3. No more UI reruns/fixes are authorized within this exhausted task.
+
+| Independent checks and final safe exit | Current result |
+| --- | --- |
+| One owned rollback and fresh-fixture restoration | PASS: one injected owned-relay failure, one own reset/start restoration; previous request/source retained, fresh resources, stopped afterward |
+| Pause/rejected paused submission/explicit idle resume | PASS: aborted receipt, stopped own containers, rejected paused submission, explicit resume leaves idle |
+| Final rootless/task safe stop and preserved manual rootful restoration/health | PASS: persistent PAUSED, both units stopped/disabled; original manual containers/images restored; ordered relay and HTTP/assets/SHA probe PASS |
+| Final noninterference reconciliation | PASS: all12 original production IDs/images/starttimes unchanged; only own synthetic resources mutated |
+
+### INTERPRETATION
+
+Core task/CI success does not establish the required harmless browser/data pilot.
+The fresh green failure occurred before expiry; a task-duration explanation is not
+established. Root cause remains unverified; no attribution to the four-client relay
+cap, browser settings or a new isolation defect is justified. Earlier manual-profile
+browser PASS retains its original scope. BB-161 banner overlap remains a separate P2.
+No product UI change or new owner PWA gate is introduced by this outcome.
+
+Unattended activation is DEFERRED. Linger remains no; no owner linger action occurred
+or is requested while the required pilot is blocked. Accepted BB-159 rootless control
+and original manual fallback resources are preserved; manual restoration/health is verified PASS. The stopped experimental task/engine remain
+disabled and PAUSED; this does not claim complete U3 or owner UI/PWA acceptance. Authority/checkpoint/AGENTS, Finance, production,
+backup and existing access/resource boundaries remain unchanged.
+
+### PROPOSAL — no start order
+
+[BB-162](../../BACKLOG.md#bb-162--u3-browsertransport-blockerar-harmless-pilot) records the
+verified transport blocker and a possible new risk2 task: estimate1–2h/cap2h/max2 repairs,
+five bounded criteria for diagnosis, a minimal proven fix, cold-browser add/refresh with
+existing bounds, focused regression/independent fixed-control review/CI and safe retreat.
+It is not a continuation order or reset of U3's exhausted counter. No new architecture,
+platform, token, cost or automatic repair loop is proposed.
+
+Actual final controls: original manual control75e4023 and image151ab3a are active again;
+rootless/task units are stopped and disabled, pending work absent and PAUSED persists.
+No linger, host privilege, production provider/model/order or backup decision changed.
+A fresh status check also returned HTTP200/Healthy from the manual TEST endpoint.
+
+### Manual synthetic Finance can proceed independently
+
+The U3 browser blocker defers unattended automation; it does not suspend the existing
+[synthetic TEST mandate](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
+A trusted Finance candidate can be packaged, provenance/isolation checked and run in the
+manual synthetic slot within that mandate, with its affected test card. This requires
+candidate preparation and verification; the preserved151ab3a image is not a claim that
+the current Finance worker branch is deployed. Non-synthetic Finance and production
+remain subject to their existing separate requirements. BB-162 is a proposed transport
+follow-up, not a prerequisite owner approval for already authorized synthetic testing.

@@ -10,27 +10,38 @@ Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga
 [aktiv recovery](operations/codex-recovery.md) behåller sina respektive ansvar.
 Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc-2a-20261024.md).
 
-## Syntetisk TEST U1 — 2026-11-13
+## Syntetisk TEST — 2026-11-13
 
-**Manuell syntetisk TEST READY; BB-159:s rootless-runtimeprov HARDENING_PASS, oberoende evidensgranskning utan P0/P1.**
-BB-159 risk3/cap2h/max2 reparationer har0/2 använda; tidigare U2-tak2/2 ligger kvar.
-Exakta ursprungliga OCI-image-ID:n fungerar med privat containerd-imagelager utan svagare
-admission. Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, rootless-kontroll
-`8ed7b5a77bb36faebd37053599420ef3a2f49328`. Verkliga isolerings-/resursprov20/20,
-livscykel/lokal åtkomst15/15, motoromstart8/8 och levande nät-/lagringsprov14/14 PASS.
-Tidigare extern T22 PASS återanvänds som **ägarrapporterad evidens** för oförändrad
-host, adress, tillåtelselista och relaypolicy; färska rootless lokala åtkomstprov PASS.
-Detta är inte ny extern mätning eller UI/PWA-acceptans.
-Säker reträtt är demonstrerad: den manuella rootful-slotten kör åter originalkontrollen
-`75e4023c828922d05b6e9f3419be68fdd56f56cb` och originalimages, med HTTP-probe PASS.
-Alla12 produktionscontainrars ID:n/images/starttider är oförändrade. Rootless-motorn är
-stoppad/disabled efter demonstrerad säker reträtt; inga timers/autostart eller produktionsändringar.
-U3:s obevakade aktivering är ännu DEFERRED; dess förgodkända implementation kan följa
-efter accepterad BB-159. Exakt slutrevision, review och obligatorisk CI binds i PR. [Hosted-only-provet PR85](https://github.com/T-bear/BigBrain/pull/85)
-är PASS med avsiktligt rött funktionstest och grönt paket; provgrenen ska aldrig mergas.
-[Detaljer och kvarstående steg](operations/runbooks/test-environment.md#bb-159-runtime-evidence--2026-11-13).
-[Agent Independence](architecture/agent-independence.md) är framtida krav utan integration,
-kostnad eller ny PREDEPLOY-grind. Finance-/produktions- och backupgrindar ändras inte.
+**U3 BLOCKED / PARTIAL; experimentell PR87 NOT MERGEABLE. Manuell syntetisk TEST återställd och HTTP-verifierad.**
+BB-159:s rootless-härdning är fortsatt accepterad via PR84/main
+`d50b366c59730422ec670de44d5377999448f262`, med oberoende nivå3-review och exakt
+main-CI run43450793145 PASS. Den accepterade kontrollen och bevarade manuella
+rootful-resurserna ersätts inte av U3:s experimentella kod.
+
+**Verifierat:** U3-kandidat `40a8bdba877b8502d4699173d0badbb9289a4cf6`, tree
+`c5faf7c63834e16b762d40b9a0784d1592b2931b`, har78 fokuserade tester PASS och
+alla fem CI-jobb PASS i run43459885018. Installerad wrapper har SHA256
+`dcfccce4d39930932e46db8082af103b4907b54f33739b638968640de87ce076`.
+Röd funktionell status bevarades vid verklig paket-/taskkörning; grön core, verklig
+HTTP-health, last-known-good och duplicate-ID-avvisning PASS. Browserpilot på grön
+kandidat visar tillagd syntetisk vara, men Refresh ger netReset under Serving,
+före uppdragets tidsgräns. Röd kallstartspilot gav NetworkError vid varutillägg.
+
+**Bedömning:** oberoende review klassar detta som P1 mot U3 DoD3; orsak är inte
+fastställd och tillskrivs inte reläets fyrklientsgräns. U3:s2/2 reparationer är
+förbrukade; ingen ytterligare UI-omkörning/fix eller obevakad aktivering. Rollback (exakt en återställning med nya fixtures), paus/avvisad pausad inlämning och
+uttrycklig återgång till idle är PASS. Slutlig reträtt är verifierad: rootless och
+task-tjänsten stoppade/disabled, beständig PAUSED, manuell rootful HTTP-probe PASS;
+alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Linger är no; inget ägarsteg för linger har utförts eller begärs nu.
+[Verifierat utfall och blockerare](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
+U3-blockeraren gäller automatiken. Befintligt [TEST-mandat](operations/checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13)
+medger fortsatt helt syntetisk Finance i den manuella slotten. En ny Finance-kandidat
+behöver eget verifierat paket och sina berörda tester före körning/testkort; detta
+underlag påstår inte att Finance-kandidaten redan är installerad eller accepterad.
+
+[BB-162](BACKLOG.md#bb-162--u3-browsertransport-blockerar-harmless-pilot) är ett förslag
+utan startorder; BB-161:s banneröverlapp kvarstår som P2. Agent Independence är framtida
+krav; Finance-/produktions- och backupgrindar ändras inte.
 
 ## Frysningar och operativa osäkerheter
 

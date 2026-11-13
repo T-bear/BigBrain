@@ -1306,12 +1306,14 @@ frysningsbeslut har oförändrad auktoritet; arkivets current/next är inte aktu
 
 ### BB-159 — Rootless image-identitet före obevakad TEST
 
-**LÖST i verifierad kodkandidat; oberoende runtimegranskning utan P0/P1.** Efter nytt uttryckligt
+**LÖST / accepterad main via PR84, oberoende nivå3-review och exakt main-CI PASS.** Efter nytt uttryckligt
 fortsättningsbeslut har BB-159 egen risk3-ram/cap2h/max2 reparationer,0/2 använda; U2:s2/2
 nollställs inte. Privat containerd-imagelager behåller CI-paketets exakta OCI-identiteter utan
 svagare validator. Verkliga resurs-/nät-/reset-/motoromstartsprov PASS och säker reträtt till
 manuell U1 demonstrerad; produktionens12 containeridentiteter/images/starttider oförändrade.
-Rootless stoppad/disabled inför slutacceptans, obevakad U3 ännu DEFERRED.
+Rootless stoppades/disabled vid BB-159:s verifierade reträtt. Senare U3-prov är separat
+BLOCKED/PARTIAL; slutlig manuell återställning efter dessa prov är PENDING. BB-159:s
+accepterade härdning kvarstår; ingen obevakad aktivering.
 [Kanonisk evidens](operations/runbooks/test-environment.md#bb-159-runtime-evidence--2026-11-13).
 
 ### BB-160 — SDK-feature-band för framtida ren produktionsimage-build
@@ -1323,3 +1325,40 @@ TEST-only derivering till10.0.300 och verifierade byggen; produktions-Dockerfile
 ändrades inte i TEST-uppdraget. DoD inför en framtida berörd produktionsbuild: välj och
 granska kompatibel SDK-feature-band/pin och verifiera en verklig ren image-build utan
 att tysta SDK-grinden eller utvidga Finance-/deploymentmandatet.
+
+### BB-161 — TEST-banner över modalhuvud i syntetisk webbläsarpilot
+
+**Verifierad / P2, blockerar inte PREDEPLOY.** Firefox140 ESR vid1366×768 visar att den
+fasta gula TEST-bannern överlappar överkanten av inköpslistans helskärmsmodal. Varutillägg,
+synligt innehåll och omladdning fungerar i det tidigare manuella rootful-provet på151ab3a; detta bevisar inte U3-piloten. UI/PWA-acceptans är
+inte lämnad. Framtida avgränsad förbättring: ge TEST-overlay/modalhuvud kompatibelt utrymme
+utan produktions-UI-ändring och verifiera berörda viewportar. Ingen ny designloop nu.
+
+
+### BB-162 — U3 browsertransport blockerar harmless pilot
+
+**Verifierad P1 / U3 DoD3; nytt avgränsat uppdrag endast FÖRESLAGET, INGEN STARTORDER.**
+Röd kallstartspilot gav NetworkError vid syntetiskt varutillägg. Grön automatisk task
+visade tillagd vara, men Refresh gav netReset16:27:10 UTC under Serving
+(16:26:53–16:27:27), före taskgränsen. Core/health/last-good/duplicate-ID PASS och
+alla fem CI-jobb i run43459885018 ändrar inte detta browserutfall. Oberoende review
+bekräftar blockeraren. Rotorsak är **inte verifierad**; reläets fyrklientsgräns är inte
+bevisad orsak. Tidigare manuell profils fyra browserkontroller PASS gäller sitt eget
+scope. BB-161:s separata banneröverlapp förblir P2.
+
+U3 har förbrukat2/2 reparationer och avslutas med kvarstående blockerare; inga fler
+UI-omkörningar/fixar i detta uppdrag. Experimentell [PR87](https://github.com/T-bear/BigBrain/pull/87)
+är NOT MERGEABLE. Accepterad rootless-härdning bevaras; rollback/paus och slutlig
+manuell återställning är verifierade PASS i [utfallet](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
+
+**Förslag, kräver nytt uttryckligt avgränsat uppdrag:** risk2, uppskattning1–2 aktiva
+timmar/cap2h, högst2 reparationer; ingen arkitektur-/plattform-/token-/kostnadsökning.
+Föreslagen DoD (högst fem):
+1. Diagnostisera lokal browsertransport med faktisk korrelation, utan privilegieändring.
+2. Inför endast en minimal korrigering vars behov stöds av den verifierade orsaken.
+3. Kall browserstart: syntetiskt varutillägg synligt och Refresh PASS inom Serving;
+   åtkomst-/nät-/volym-/nyckelavgränsningar och verkställda resurstak bevaras.
+4. Fokuserad regression, oberoende exakt fixed-control-review före installation och
+   tillämplig CI; tidigare röda resultat och begränsningar redovisas ärligt.
+5. Verifiera säker manuell reträtt; vid tak/blockerare behåll säker drift, stoppa och
+   dokumentera utfallet utan ny reparationsloop eller obevakad aktivering.
