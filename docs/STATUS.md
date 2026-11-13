@@ -24,7 +24,11 @@ U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. Ägarens installation a
 U2 nådde rootless motorstart efter2/2 reparationer men avvisade image-ID-formatet före
 kandidatstart. Rootless-motorn är stoppad och avaktiverad för autostart; ingen tredje loop.
 Manuell rootful slot och alla14 ursprungliga rootful containeridentiteter är oförändrade.
-Obevakad U3 är DEFERRED; endast oberoende hosted-verifiering fortsätter.
+Obevakad U3 är DEFERRED; [hosted-only paketeringsprov PR85](https://github.com/T-bear/BigBrain/pull/85) har PASS:
+avsiktligt rött frontendtest och grönt verifierat kandidatpaket med ärligt redovisade utfall.
+Ingen image från provet kördes lokalt.
+U2-koden är ett [blockerat leveransexperiment i PR84](https://github.com/T-bear/BigBrain/pull/84),
+inte accepterad rootless-implementation; denna statuspublicering ändrar ingen körkontroll.
 [Exakt åtkomstevidens och avgränsad operatörsåtgärd](operations/runbooks/test-environment.md#owner-access-confirmation-and-u2-preflight--2026-11-13).
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
 ingen integration, kostnad eller ny grind för pågående PREDEPLOY.

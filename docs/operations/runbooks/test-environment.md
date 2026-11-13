@@ -25,8 +25,8 @@ No real model/provider/order or new host privilege is authorized.
 | Task | Start condition | Risk / estimate / cap | Repair budget and current use |
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
-| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, prerequisite preflight BLOCKED (see current outcome) |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | At most 2; 0 used, NOT STARTED |
+| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 0/2 used; independent hosted proof PASS, local/unattended activation DEFERRED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
@@ -515,6 +515,8 @@ Agent Independence remains a future requirement without new costs or current gat
 
 ## U2 bounded execution — 2026-11-13
 
+The U2 source described here is an **unaccepted experiment** in [draft PR84](https://github.com/T-bear/BigBrain/pull/84). Accepted main still supplies the U1 rootful controller. Publishing this outcome does not accept or install the failed rootless candidate.
+
 Current U2 branch `checkpoint/test-environment-u2-20261113` starts from accepted main
 `d7d6d75a4e62d62bc33612ff1c8a73e21ed8ecfc` (U1 merged, exact main CI green). Risk3,
 estimate2–4 activehours/cap4h, max2 repairs for the whole U2, original five DoD criteria
@@ -578,3 +580,36 @@ Unattended U3 remains DEFERRED. Independently permitted hosted CI/metadata verif
 may continue within U3's own scope; it cannot claim local hardening or trigger deployment.
 This failed code checkpoint is not a merge candidate. Keep operational identities/raw
 receipts private; publish the sanitized outcome and retain accepted-main status separately.
+
+## Independent U3 hosted-only pilot — 2026-11-13
+
+The preapproved U3 scope permits independent hosted verification after the recorded U2
+outcome; local/unattended activation remains DEFERRED. Risk2, original estimate3–6h/cap6h,
+max2 repairs,0/2 used. [Expected-red checkpoint PR85](https://github.com/T-bear/BigBrain/pull/85)
+adds one named failing Vitest assertion and no product logic/UI/provider/credential change.
+It is NEVER MERGE and no resulting image is locally admitted or deployed.
+
+DoD for this independent proof: (1) preserve actual existing CI outcomes and the named
+expected-red functional result; (2) build both images despite frontend failure while
+requiring secrets success; (3) bind package to exact owned source/tree/ref/run; (4) verify
+artifact metadata/checksums without local execution; (5) record the actual proof outcome
+without claiming rootless hardening, local automation or UI acceptance. An intentionally
+red test is evidence, not a defect to repair or a permission to weaken required checks.
+
+Pilot source `9b3ff06f744d9b4bc3013406b329968971159d8b`, tree
+`f2691b4912515c1b6c620ea3e77b17f521996120`, hosted run43427194286. Current result **HOSTED_PROOF_PASS**. Frontend test step failed at the deliberately named
+assertion; formatting passed. Backend/documentation/secrets PASS; both image builds and
+package upload PASS. Verified exact source/tree/owned ref/run, artifact entry allowlist,
+checksums, image metadata and manifest test outcomes (frontend=failure, other three=success).
+Overall workflow failure is the expected red signal, not suppressed or relabelled green.
+No package image was loaded or executed locally. No new isolation or repair loop.
+
+The artifact archive SHA256 is
+`7ef7732ced0bb55e949250fb894f2a97e6d922a3ff3b42527842e410ef469917`.
+The expected-red fixture remains outside accepted main and is never a merge candidate.
+The hosted proof completes only the independent transport/metadata slice of U3; automatic
+local admission/lifecycle/pilot are still DEFERRED by the failed U2 hardening condition.
+Rootless ID comparison specifically found OCI image-index descriptors from the CI store
+versus config IDs in the classic store; equal config/layers never authorizes substituting
+a tag or silently changing the installed identity protocol. Deferred work is recorded in
+[the canonical backlog](../../BACKLOG.md#predeploy--verifierade-uppskjutna-hinder-2026-11-13).
