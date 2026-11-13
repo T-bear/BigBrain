@@ -1,6 +1,6 @@
 # Synthetic TEST environment — U1–U3
 
-2026-11-13: **local U1 implementation for parent review; not installed, ready or runtime verified**.
+2026-11-13: **manual synthetic slot installed and runtime verified below; external T22 PARTIAL, user test release BLOCKED**.
 Authority is owned solely by the
 [TEST owner decision](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
 The external operator boundary is described in
@@ -205,7 +205,8 @@ operator-supplied. Never populate them from production `.env`, credentials or da
 
 ## Test cards and current evidence
 
-All runtime cards below are **NOT RUN as of 2026-11-13**. Offline mocks do not satisfy them.
+The table below defines the original runtime cards. Dated actual results are recorded in
+[Runtime evidence and access handoff](#runtime-evidence-and-access-handoff--2026-11-13); earlier NOT RUN statements describe the initial handoff. Offline mocks do not satisfy runtime cards.
 Record each actual result against candidate/image/control hashes, Engine/Compose versions,
 rootful/rootless scope, timestamp and private evidence reference. Runtime card failures consume
 the applicable bounded task repair budget, not a fresh budget per error. Original U1 remains
@@ -417,3 +418,55 @@ requires exactly those six local named volumes. Host paths, foreign volume names
 missing entries, duplicates and changed modes reject. New tests cover these real cases.
 Original created resources are retained until validated exact-ID cleanup; a newly reviewed
 control snapshot is installed for the next bounded start. No third correction or isolation loop.
+
+## Runtime evidence and access handoff — 2026-11-13
+
+Verified image candidate `151ab3af61c0124855b6086df264ca10dd651e8c`, tree
+`3c940b20c8ff084cecce573ea28bf8019d4d621d`, hosted run `43400474399`. Artifact
+allowlist/checksums, source/run/tree, exact image IDs/labels and loaded images verified.
+Reviewed installed control `75e4023c828922d05b6e9f3419be68fdd56f56cb`, tree
+`3fb4985a8fcdca01971aedd6350c1a3c43944441`; all five checks green in hosted run
+`43402396784`. Focused suite **29 PASS / 0 SKIP**; documentation/diff verification PASS.
+Independent source review cleared the client-admission and exact-named-volume corrections
+on those exact control identities; it did not certify runtime by source inspection.
+
+| Required card | Actual dated evidence | Status |
+| --- | --- | --- |
+| T04 | Actual nonroot Web/API; served TEST banner/exact image SHA, JS/CSS MIME/bodies, manifest/icons; fresh slot reprobed | PASS |
+| T05 | API through Web; shopping GET schema and invalid-name 400 Problem Details/code | PASS for stated synthetic contract |
+| T06 | Unique synthetic shopping item survives clean stop/start with the same exact images | PASS |
+| T11 | Effective/actual env/mounts audited; poisoned caller env excluded; own-container Docker socket/operator home absent; no production mount/key | PASS |
+| T12 | Isolated bridge and negative TCP canaries for host/Tailscale/LAN/known gateway/external paths; actual IPv6 host canary denied | PASS for v1 accident boundary |
+| T15 | Actual cgroup CPU/memory/PID limits; bounded child CPU throttling, memory OOM confinement and process-limit enforcement; zero effective caps/NoNewPrivs/seccomp | PASS |
+| T16 | Real foreign volume/name/label collisions and symlink rejected before mutation; original IDs retained; exact own reset then clean reinitialization | PASS |
+| T22 | Allowed local probe source succeeds; explicitly LAN-bound local client rejected; LAN destination and IPv6 destinations denied; single selected IPv4 listener/no container port | PARTIAL: external allowed and denied peers NOT RUN |
+
+Private receipts contain **20 boundary checks** and **15 lifecycle/local-access checks**,
+plus the scoped live IPv6 canary. The bridge has **no host IPv4**, but Linux retains a
+host link-local IPv6 address. Both candidate interfaces have IPv6 disabled and only IPv6
+loopback; a real API-container Bash TCP attempt to a listening host link-local canary
+returned Network is unreachable and no connection arrived. This supersedes any implication
+that isolated IPv4 gateway mode alone removes every host IPv6 address. No host policy was changed.
+
+The first relay/probe invocation failed because parent launched them concurrently and the
+nonblocking lifecycle lock rejected relay startup. Ordered startup and unchanged `probe
+--restart` then passed. This was an orchestration correction without a third code repair.
+The six approved named volumes were reset after all collision fixtures were removed by
+their verified probe identities. Fresh Web/API are running with empty synthetic shopping
+data; no timers/autostart. All **12 original production containers retain identical IDs,
+images and start times**. Old never-started fixtures were removed by verified exact IDs;
+the obsolete control seal was retired. No production backup/restore or deployment is claimed.
+
+**T22 remains PARTIAL, not READY and not a released user test link.** A distinct local
+source-bound client proves relay admission, not a remote Tailscale peer/ACL path. The
+remaining human boundary is a bounded external access-verification handoff: an allowlisted
+owner iOS peer must get Healthy, a real unlisted/denied peer must be refused, IPv6 and
+LAN access must be refused. Supply only private health-verification endpoints for this
+card, not a general application release. Record actual results before T22 PASS or release;
+no exception to the owner's condition is claimed. Owner UI/PWA acceptance remains NOT RUN.
+
+Original U1 **2/2** and U1-R1 **2/2** repair budgets remain exhausted; no third code repair.
+U2 NOT STARTED pending safe U1 acceptance; observed missing newuidmap/newgidmap remain a
+rootless prerequisite gap, not an invitation to install packages or widen privileges.
+Unattended U3 remains DEFERRED. Agent Independence stays documented future architecture
+only; no external agent, vendor SDK, subscription or additional release gate was added.

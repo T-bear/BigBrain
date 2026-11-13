@@ -12,23 +12,20 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**U1-R1 källrättning verifierad; hosted paket/runtime PENDING, inte READY eller accepterad.**
-Branch `checkpoint/test-environment-u1-20261113`, start-SHA
-`96b3a06518fd4fd567a1dd6b114637dc84e6b0cb`; parent-verifierad main
-`e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree `24f249d76092dc8c3a242ed664ed139dc2eb4d9b`.
-Compose-normalisering, secrets-grind, ursprungliga testkort/mandat och TEST-specifik SDK
-10.0.300-derivering är korrigerade i källan. U1 förblir ofullständig, 2/2 reparationer
-förbrukade; auktoriserad U1-R1 risk 3, tak 2 h, 2/2 reparationer använda (klientlista och faktisk Engine-volymrepresentation).
-Initialt 24 tester och fyra CI-kontroller PASS återanvänds endast som historik;
-paketbygge i run `43383141697` FAIL (SDK 10.0.404), inga imageartefakter finns.
-29 fokuserade tester PASS, verklig Compose-kanonisering PASS, dokumentationsvalidator PASS.
-Hosted run `43400474399` helt grön inklusive kandidatpaket för `151ab3a`;
-första start nekad före körning av blanket Binds-kontroll; exakt named-volume-jämförelse
-rättad. Ny kontrollsnapshot väntar verifiering; runtime NOT RUN, ingen användarlänk.
+**Installerad manuell syntetisk Web/API-slot; T22 PARTIAL, användarfrisläppning BLOCKED.**
+Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
+kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; båda hosted CI-körningarna gröna
+inklusive kandidatpaket. 29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16
+PASS inom dokumenterat syntetiskt scope. Omstart, CPU/minne/processgränser, negativa
+nätprov, främmande-resursavvisning och tom återstart verifierade. Inga produktionsdata/nycklar.
+Tillåten/nekad lokal klient och IPv6/LAN-bindning verifierade; extern tillåten/nekad
+Tailscale-klient återstår för T22. Endast avgränsat health-verifieringskort lämnas för
+återstående kontroll; ingen READY eller generell testlänk. iPhone/PWA-acceptans NOT RUN.
+Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider oförändrade.
+U1 2/2 och U1-R1 2/2 reparationer förbrukade; U2 NOT STARTED, obevakad U3 DEFERRED.
+[Exakt evidens och återstående åtkomstprov](operations/runbooks/test-environment.md#runtime-evidence-and-access-handoff--2026-11-13).
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
-ingen agentintegration, kostnad eller ny PREDEPLOY-grind.
-U2 NOT STARTED (säker U1 saknas); obevakad U3 DEFERRED.
-[U1-R1 scope, DoD och evidens](operations/runbooks/test-environment.md#u1-r1-bounded-correction--2026-11-13).
+ingen integration, kostnad eller ny grind för pågående PREDEPLOY.
 
 ## Frysningar och operativa osäkerheter
 
