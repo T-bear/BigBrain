@@ -13,6 +13,7 @@ import stat
 import subprocess
 import tarfile
 import tempfile
+import threading
 import unittest
 from unittest.mock import Mock, patch
 import warnings
@@ -642,6 +643,176 @@ class TestTask(unittest.TestCase):
                 runner.docker_load(runner.folder)
         self.assertEqual(process.call_count, 1)
         self.assertEqual(process.call_args.args[0][1], "info")
+
+    def relay_pipe(self):
+        read_fd, write_fd = os.pipe()
+        child = Mock(pid=987654321)
+        child.stdout = os.fdopen(read_fd, "rb", buffering=0)
+        child.poll.return_value = None
+        self.addCleanup(lambda: child.stdout.close())
+        self.addCleanup(os.close, write_fd)
+        return child, write_fd
+
+    def test_relay_delayed_partial_listening_line_precedes_probe(self):
+        runner = tool.Runner(TASK, self.cfg, self.folder())
+        child, writer = self.relay_pipe()
+        sent = threading.Event()
+        def publish():
+            os.write(writer, tool.RELAY_READY[:10])
+            sent.wait(0.02)
+            sent.set()
+            os.write(writer, tool.RELAY_READY[10:])
+        thread = threading.Thread(target=publish)
+        thread.start()
+        def command(name, *args, **kwargs):
+            if name == "probe":
+                self.assertTrue(sent.is_set())
+        runner.control = Mock(side_effect=command)
+        with patch.object(tool, "config", return_value=self.cfg), \
+             patch.object(tool.subprocess, "Popen", return_value=child) as popen, \
+             patch.object(tool, "terminate"):
+            runner.render_start({"images": {"api": "a", "web": "w"}}, TASK, runner.folder)
+            runner.stop_relay()
+        thread.join(timeout=1)
+        self.assertFalse(thread.is_alive())
+        self.assertEqual(popen.call_args.kwargs["stdout"], subprocess.PIPE)
+        self.assertEqual(popen.call_args.kwargs["env"], tool.control_env(self.cfg))
+        self.assertTrue(child.stdout.closed)
+
+    def test_relay_death_timeout_and_bad_signal_close_pipe_without_probe(self):
+        for failure in ("death", "timeout", "wrong-line"):
+            runner = tool.Runner(TASK, self.cfg, self.state)
+            child, writer = self.relay_pipe()
+            if failure == "death":
+                child.poll.return_value = 1
+            elif failure == "wrong-line":
+                os.write(writer, b"PASS not listening\n")
+            ready = runner.relay_ready
+            runner.control = Mock()
+            with self.subTest(failure=failure), \
+                 patch.object(tool, "config", return_value=self.cfg), \
+                 patch.object(tool.subprocess, "Popen", return_value=child), \
+                 patch.object(tool, "terminate") as terminate, \
+                 patch.object(runner, "relay_ready", side_effect=lambda: ready(timeout=0.01)):
+                with self.assertRaises(tool.Rejected):
+                    runner.start_relay()
+                terminate.assert_called_once_with(child)
+            self.assertTrue(child.stdout.closed)
+            self.assertIsNone(runner.relay)
+            runner.control.assert_not_called()
+
+    def test_pause_interrupts_relay_readiness_and_cleans_owned_child(self):
+        runner = tool.Runner(TASK, self.cfg, self.folder())
+        child, _ = self.relay_pipe()
+        with patch.object(tool, "config", return_value=self.cfg), \
+             patch.object(tool.subprocess, "Popen", return_value=child), \
+             patch.object(tool.select, "select", side_effect=lambda *args:
+                          (tool.CANCEL.set() or ([], [], []))), \
+             patch.object(tool, "terminate") as terminate:
+            with self.assertRaises(tool.Aborted):
+                runner.start_relay()
+        terminate.assert_called_once_with(child)
+        self.assertTrue(child.stdout.closed)
+        self.assertIsNone(runner.relay)
+
+    def test_rollback_uses_same_listening_handshake_before_probe(self):
+        runner = tool.Runner(TASK, self.cfg, self.folder())
+        runner.previous = (runner.folder, {"images": {"api": "a", "web": "w"}}, TASK)
+        child, writer = self.relay_pipe()
+        os.write(writer, tool.RELAY_READY)
+        calls = []
+        runner.control = Mock(side_effect=lambda name, *a, **kw: calls.append(name))
+        with patch.object(tool, "config", return_value=self.cfg), \
+             patch.object(tool.subprocess, "Popen", return_value=child), \
+             patch.object(tool, "terminate"), \
+             patch.object(runner, "relay_ready", wraps=runner.relay_ready) as ready:
+            runner.rollback()
+        ready.assert_called_once()
+        self.assertEqual(calls, ["reset", "render", "validate", "start", "probe", "stop"])
+        self.assertTrue(child.stdout.closed)
+        self.assertEqual(tool.document(runner.folder / "receipt.json")["phase"], "rolled-back")
+
+    def layer_archive(self, folder, payload=None):
+        layer = self.tar_bytes([("actual-file", tarfile.REGTYPE, payload or b"layer-data"),
+                                ("link", tarfile.SYMTYPE, b"")])
+        outer = self.tar_bytes([("blobs/sha256/layer", tarfile.REGTYPE, gzip.compress(layer))])
+        path = folder / "images.tar.gz"
+        path.write_bytes(gzip.compress(outer))
+        os.chmod(path, 0o600)
+        return path, layer, outer
+
+    def test_oci_gzip_stats_count_actual_logical_payload_and_raw_layer(self):
+        folder = self.folder()
+        path, layer, outer = self.layer_archive(folder)
+        stats = tool.inspect_tar(path)
+        self.assertEqual(stats["outer_bytes"], len(outer))
+        self.assertEqual(stats["layer_stream_bytes"], len(layer))
+        self.assertEqual(stats["unpacked_bytes"], len(b"layer-data"))
+        self.assertEqual(stats["members"], 3)
+        path.write_bytes(gzip.compress(self.tar_bytes([("layer.tar", tarfile.REGTYPE, layer)])))
+        self.assertEqual(tool.inspect_tar(path)["unpacked_bytes"], len(b"layer-data"))
+
+    def test_small_compressed_layer_bomb_rejected_before_load(self):
+        folder = self.folder()
+        path, _, _ = self.layer_archive(folder, b"0" * 65536)
+        self.assertLess(path.stat().st_size, 1024)
+        with patch.object(tool, "MAX_UNPACKED", 1024), \
+             patch.object(tool, "process") as process, self.assertRaises(tool.Rejected):
+            tool.inspect_tar(path)
+        process.assert_not_called()
+        # Expansion in zero padding is counted too, even with no file headers.
+        padding = gzip.compress(bytes(65536))
+        path.write_bytes(gzip.compress(self.tar_bytes([("blobs/sha256/pad", tarfile.REGTYPE, padding)])))
+        with patch.object(tool, "MAX_LAYER_STREAM", 1024), self.assertRaises(tool.Rejected):
+            tool.inspect_tar(path)
+
+    def test_staging_fits_but_actual_engine_space_blocks_load_and_keeps_headroom(self):
+        folder = self.folder()
+        path, _, _ = self.layer_archive(folder)
+        stats = tool.inspect_tar(path)
+        reserve = tool.import_reserve(stats)
+        daemon_root = self.controller / "docker"
+        daemon_root.mkdir(mode=0o700)
+        engine = {"ID": "fixed-daemon", "SecurityOptions": ["name=rootless", "name=seccomp"],
+                  "CgroupVersion": "2", "CgroupDriver": "systemd", "DockerRootDir": str(daemon_root)}
+        runner = tool.Runner(TASK, self.cfg, folder)
+        original_lstat = Path.lstat
+        original_private = tool.private
+        def private(path, directory=False):
+            if not str(path).startswith("/run/user/"):
+                return original_private(path, directory=directory)
+        sock = Mock(st_mode=stat.S_IFSOCK | 0o600, st_uid=os.getuid())
+        def lstat(path):
+            return sock if path.name == "docker.sock" else original_lstat(path)
+        trace = []
+        def process(argv, *args, **kwargs):
+            trace.append(argv[1])
+            return json.dumps(engine).encode()
+        def statvfs(path):
+            self.assertEqual(path, daemon_root)
+            trace.append("engine-space")
+            return Mock(f_bavail=reserve + tool.HOST_HEADROOM - 1, f_frsize=1)
+        with patch.object(tool, "config", return_value=self.cfg), \
+             patch.object(tool, "private", side_effect=private), patch.object(tool.Path, "lstat", new=lstat), \
+             patch.object(tool, "document", return_value={"engine": {"id": "fixed-daemon"}}), \
+             patch.object(tool, "process", side_effect=process), \
+             patch.object(tool.os, "statvfs", side_effect=statvfs), \
+             patch.object(tool.shutil, "disk_usage", return_value=Mock(free=16 * 1024**3)):
+            tool.budget()  # Staging passes independently.
+            with self.assertRaises(tool.Rejected):
+                runner.docker_load(folder)
+            self.assertEqual(trace, ["info", "engine-space"])
+            trace.clear()
+            with patch.object(tool.os, "statvfs", side_effect=lambda root:
+                              (trace.append("engine-space") or
+                               Mock(f_bavail=reserve + tool.HOST_HEADROOM, f_frsize=1))):
+                runner.docker_load(folder)
+            self.assertEqual(trace, ["info", "engine-space", "load"])
+            trace.clear()
+            with patch.object(tool, "MAX_UNPACKED", 1), self.assertRaises(tool.Rejected):
+                runner.docker_load(folder)
+            self.assertEqual(trace, ["info"])  # Bomb stops before space check AND load.
+
 
 if __name__ == "__main__":
     unittest.main()

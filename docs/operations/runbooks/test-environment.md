@@ -1,6 +1,6 @@
 # Synthetic TEST environment — U1–U3
 
-2026-11-13: **manual synthetic slot installed and runtime verified below; external T22 PASS (owner report), manual synthetic TEST ready; unattended automation DEFERRED**.
+2026-11-13: **manual synthetic TEST ready; BB-159 rootless hardening accepted; U3 corrected source awaiting independent review, not installed; unattended activation DEFERRED**.
 Authority is owned solely by the
 [TEST owner decision](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
 The external operator boundary is described in
@@ -11,7 +11,7 @@ is future architecture preparation only; it adds no current delivery gate, agent
 
 ## Ordered tasks, start conditions and limits
 
-The owner authorized U1 → U2 → U3, each with its own time and repair budget. This worktree
+The owner authorized U1 → U2 → U3, each with its own time and repair budget. The initial U1 checkpoint described next is dated history; current U3 scope/evidence is recorded at the end of this runbook. That worktree
 implements **U1 only** on `checkpoint/test-environment-u1-20261113`, accepted main
 `e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree
 `24f249d76092dc8c3a242ed664ed139dc2eb4d9b`. Parent fetched and independently verified this main baseline before implementation and
@@ -26,7 +26,7 @@ No real model/provider/order or new host privilege is authorized.
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
 | U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 0/2 used; independent hosted proof PASS, local/unattended activation DEFERRED |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 1/2 used for first source-review batch; hosted proof PASS, new local/unattended activation NOT RUN |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
@@ -793,3 +793,37 @@ Current verification limits: source tests are not real artifact/service or unatt
 acceptance. Independent exact fixed-control review, hosted artifact and real service/
 rollback/pause tests precede activation. Rootless first-task resources must be verified
 empty through the existing installed controller; preserve the original rootful fallback.
+
+### U3 first fixed-control review — repair1/2
+
+Independent exact review of `8fd0ec575dfc8706d91013ad7381273dc96856b6`, tree
+`bb2de7b9c2343ccc0a470ac8d07292e71c1c8842`, finds two P1s; no installation or merge
+clearance. First, asynchronous relay launch immediately followed by probe can race the
+controller's nonblocking lifecycle lock, affecting both normal start and restoration.
+Second, staging-space admission omits actual image-import/unpacked-layer space in the
+separate engine filesystem, risking shared-disk exhaustion. Required corrections: bounded
+actual relay-listening readiness before probe; conservative bounded import/unpacked sizes
+and actual engine-filesystem headroom before Docker load, including compressed layers.
+Both are handled in one bounded repair attempt1/2, not separate per-error counters.
+Original controller/isolation, manual fallback and production remain unchanged.
+
+Read-only integration preflight of the actual GitHub identity function PASS for both
+initial U3 run43454287914 (all five jobs successful) and existing expected-red
+run43427194286/PR85 (frontend failure; backend/documentation/secrets/package success).
+Exact current owned refs, source/tree, PR/tested SHA, accepted workflow hash and GitHub
+artifact digests were verified against the real API. No archive download, Docker load
+or candidate execution occurred in these identity probes. This confirms protocol/API
+compatibility and honest red-outcome admission, not runtime acceptance or closure of
+source P1s. The closed expected-red PR85 remains NEVER MERGE.
+
+Repair1/2 source verification: actual fixed relay readiness now precedes probe for normal
+start and restoration, with bounded cancellation/timeout/early-exit and pipe cleanup.
+Archive inspection measures decoded gzip layer bytes and logical file payloads; a
+conservative import bound (maximum6GiB) plus2GiB additional free headroom is checked on
+the validated actual engine DockerRootDir filesystem immediately before load. No new
+privileged quota or image/identity policy change. Actual preserved package inspection
+PASS:155225600 outer bytes,351619584 decoded layer bytes,346101683 logical file bytes;
+calculated import reserve2040192870 bytes. Source tests78 PASS, seven new focused cases
+including compressed-layer and engine-headroom rejection before load. Independent
+re-review and actual service execution remain pending; this is one completed repair,
+not two per-error attempts. The original manual fallback is still active.

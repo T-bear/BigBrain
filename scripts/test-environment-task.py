@@ -29,6 +29,7 @@ from pathlib import Path, PurePosixPath
 import pwd
 import tempfile
 import re
+import select
 import shutil
 import signal
 import stat
@@ -56,7 +57,13 @@ FILES = {"images.tar.gz", "images.json", "build.json", "package.json", "SHA256SU
 CONTROL = {"test-environment.py", "compose.test.yaml", "EMPTY", "installation.json"}
 MAX_ZIP = 2 * 1024**3
 MAX_EXPANDED = 4 * 1024**3
-MAX_TAR = 12 * 1024**3
+MAX_TAR = 2 * 1024**3
+MAX_LAYER_STREAM = 3 * 1024**3
+MAX_UNPACKED = 2 * 1024**3
+MAX_IMPORT = 6 * 1024**3
+HOST_HEADROOM = 2 * 1024**3
+RELAY_READY = b"RELAY listening on selected interface; client ACL acceptance remains separate\n"
+RELAY_READY_TIMEOUT = 45
 MAX_STATE = 16 * 1024**3
 TERMINAL = {"succeeded", "rejected", "aborted", "rolled-back"}
 CANCEL = threading.Event()
@@ -435,10 +442,67 @@ class SafeTarInfo(tarfile.TarInfo):
         return super()._proc_member(archive)
 
 
+class PrefixedReader:
+    def __init__(self, prefix, source):
+        self.prefix, self.source = prefix, source
+
+    def read(self, size=-1):
+        require(size >= 0, "unbounded archive read rejected")
+        chunk, self.prefix = self.prefix[:size], self.prefix[size:]
+        return chunk + self.source.read(size - len(chunk))
+
+
+class LayerTarInfo(tarfile.TarInfo):
+    def _proc_member(self, archive):
+        # Layers legitimately contain links and bounded PAX names. Never extract.
+        require(self.type != tarfile.GNUTYPE_SPARSE and
+                (self.type not in (tarfile.XHDTYPE, tarfile.XGLTYPE,
+                                  tarfile.GNUTYPE_LONGNAME, tarfile.GNUTYPE_LONGLINK)
+                 or self.size <= 65536), "layer sparse/extended header limit")
+        return super()._proc_member(archive)
+
+
+def tar_tail(archive):
+    while True:
+        tail = archive.fileobj.read(1024 * 1024)
+        if not tail:
+            break
+        require(not tail.strip(bytes([0])), "nonzero trailing/concatenated tar rejected")
+
+
+def inspect_layer(source, stats):
+    stream = LimitedReader(source, MAX_LAYER_STREAM - stats["layer_stream_bytes"])
+    initial = stream.remaining
+    with tarfile.open(fileobj=stream, mode="r|", tarinfo=LayerTarInfo) as archive:
+        for item in archive:
+            stats["members"] += 1
+            require(stats["members"] <= 200000 and not item.issparse() and
+                    (item.isfile() or item.isdir() or item.issym() or item.islnk()),
+                    "layer member/count rejected")
+            require(0 <= item.size <= MAX_UNPACKED - stats["unpacked_bytes"],
+                    "layer logical size limit")
+            if item.isfile():
+                # Read actual payload, not just header sizes or compressed blob size.
+                payload = archive.extractfile(item)
+                actual = 0
+                while True:
+                    checkpoint()
+                    chunk = payload.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    actual += len(chunk)
+                    stats["unpacked_bytes"] += len(chunk)
+                    require(stats["unpacked_bytes"] <= MAX_UNPACKED, "layer expansion limit")
+                require(actual == item.size, "truncated layer file")
+        tar_tail(archive)
+    stats["layer_stream_bytes"] += initial - stream.remaining
+
+
 def inspect_tar(path):
-    # Never extract Docker's archive. Stream through bounded gzip INCLUDING padding
-    # and trailing bytes, rejecting links, sparse files, duplicate paths and bombs.
+    # Bound both the outer save archive and actual compressed OCI layer expansion.
+    # No extraction or Docker action. Classic layer.tar and OCI raw tar also count.
     seen = set()
+    stats = {"outer_bytes": 0, "layer_stream_bytes": 0, "unpacked_bytes": 0, "members": 0}
     with gzip.open(path, "rb") as raw:
         stream = LimitedReader(raw, MAX_TAR)
         with tarfile.open(fileobj=stream, mode="r|", tarinfo=SafeTarInfo) as archive:
@@ -446,21 +510,64 @@ def inspect_tar(path):
             for item in archive:
                 name = item.name
                 parts = PurePosixPath(name).parts
-                require(name and not name.startswith("/") and "\\" not in name and
-                        ".." not in parts and "." not in name.split("/") and name.rstrip("/") == str(PurePosixPath(name)) and
+                require(name and not name.startswith("/") and chr(92) not in name and
+                        ".." not in parts and "." not in name.split("/") and
+                        name.rstrip("/") == str(PurePosixPath(name)) and
                         str(PurePosixPath(name)) not in seen and
                         (item.isfile() or item.isdir()) and not item.issparse(),
                         "tar member type/path/duplicate rejected")
                 require(item.size >= 0 and item.size <= MAX_TAR, "tar member size")
                 seen.add(str(PurePosixPath(name)))
+                stats["members"] += 1
                 total += item.size
-                require(len(seen) <= 100000 and total <= MAX_TAR, "tar count/size limit")
-            # Read through tarfile's buffered stream, not around its read-ahead.
-            while True:
-                tail = archive.fileobj.read(1024 * 1024)
-                if not tail:
-                    break
-                require(not tail.strip(bytes([0])), "nonzero trailing/concatenated tar rejected")
+                require(stats["members"] <= 200000 and total <= MAX_TAR, "tar count/size limit")
+                if item.isfile():
+                    payload = archive.extractfile(item)
+                    prefix = payload.read(512)
+                    wrapped = PrefixedReader(prefix, payload)
+                    require(not prefix.startswith(bytes.fromhex("28b52ffd")),
+                            "unsupported zstd layer rejected")
+                    if prefix.startswith(bytes.fromhex("1f8b")):
+                        with gzip.GzipFile(fileobj=wrapped) as layer:
+                            inspect_layer(layer, stats)
+                    else:
+                        is_tar = name.endswith("/layer.tar") or name == "layer.tar"
+                        if len(prefix) == 512:
+                            try:
+                                tarfile.TarInfo.frombuf(prefix, "utf-8", "surrogateescape")
+                                is_tar = True
+                            except tarfile.HeaderError:
+                                is_tar = is_tar or not prefix.strip(bytes([0]))
+                        if is_tar:
+                            inspect_layer(wrapped, stats)
+                        else:
+                            # Read metadata/opaque blobs too; truncated bytes cannot hide.
+                            while wrapped.read(1024 * 1024):
+                                checkpoint()
+            tar_tail(archive)
+        stats["outer_bytes"] = MAX_TAR - stream.remaining
+    import_reserve(stats)
+    return stats
+
+
+def import_reserve(stats):
+    # Temporary/save + content store, uncompressed layer streams + snapshots,
+    # repeated small-file allocation/metadata. No deduplication credit is assumed.
+    reserve = (2 * stats["outer_bytes"] + 2 * stats["layer_stream_bytes"] +
+               2 * stats["unpacked_bytes"] + 8192 * stats["members"] + 256 * 1024**2)
+    require(reserve <= MAX_IMPORT, "conservative image import limit")
+    return reserve
+
+
+def engine_headroom(engine, stats):
+    root = Path(engine["DockerRootDir"])
+    outside_git(root)
+    info = root.lstat()
+    require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.getuid() and
+            not stat.S_IMODE(info.st_mode) & 0o022, "unsafe daemon storage root")
+    available = os.statvfs(root)
+    require(available.f_bavail * available.f_frsize >= import_reserve(stats) + HOST_HEADROOM,
+            "insufficient actual engine filesystem import headroom")
 
 
 def verify_package(folder, task, identity):
@@ -564,6 +671,11 @@ class Runner:
                 any(x.split(",", 1)[0] == "name=seccomp" for x in engine["SecurityOptions"]) and
                 engine["CgroupVersion"] == "2" and engine["CgroupDriver"] == "systemd",
                 "rootless daemon identity/security mismatch")
+        stats = inspect_tar(package_dir / "images.tar.gz")
+        checkpoint()
+        # Last operation before load: reserve against the validated daemon's real FS,
+        # independently of staging and without assuming current dedup/cache contents.
+        engine_headroom(engine, stats)
         process(["/usr/bin/docker", "load", "--input", str(package_dir / "images.tar.gz")],
                 control_env(self.cfg), Path(self.cfg["controller"]), timeout=300)
 
@@ -572,12 +684,41 @@ class Runner:
         self.relay = subprocess.Popen(
             ["/usr/bin/python3", "-I", str(Path(self.cfg["controller"]) / "test-environment.py"), "relay"],
             cwd=self.cfg["controller"], env=control_env(self.cfg), stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0, start_new_session=True)
+        try:
+            self.relay_ready()
+        except BaseException:
+            self.stop_relay()
+            raise
+
+    def relay_ready(self, timeout=RELAY_READY_TIMEOUT):
+        deadline = time.monotonic() + timeout
+        line = b""
+        while True:
+            checkpoint()
+            require(self.relay.poll() is None, "relay exited before readiness")
+            remaining = deadline - time.monotonic()
+            require(remaining > 0, "relay readiness deadline")
+            readable, _, _ = select.select([self.relay.stdout], [], [], min(0.25, remaining))
+            if not readable:
+                continue
+            data = os.read(self.relay.stdout.fileno(), 513 - len(line))
+            require(data, "relay stdout closed before readiness")
+            line += data
+            require(len(line) <= 512, "relay readiness output limit")
+            if bytes([10]) in line:
+                require(line == RELAY_READY and self.relay.poll() is None,
+                        "relay listening signal mismatch or exit")
+                return
 
     def stop_relay(self):
         if self.relay is not None:
-            terminate(self.relay)
-            self.relay = None
+            child, self.relay = self.relay, None
+            try:
+                terminate(child)
+            finally:
+                if child.stdout is not None:
+                    child.stdout.close()
 
     def previous_good(self):
         root = Path(self.cfg["controller"])
