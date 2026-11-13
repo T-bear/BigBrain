@@ -18,11 +18,12 @@ Branch `checkpoint/test-environment-u1-20261113`, start-SHA
 `e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree `24f249d76092dc8c3a242ed664ed139dc2eb4d9b`.
 Compose-normalisering, secrets-grind, ursprungliga testkort/mandat och TEST-specifik SDK
 10.0.300-derivering är korrigerade i källan. U1 förblir ofullständig, 2/2 reparationer
-förbrukade; auktoriserad U1-R1 risk 3, tak 2 h, 0/2 reparationer använda.
+förbrukade; auktoriserad U1-R1 risk 3, tak 2 h, 1/2 reparationer använda (installerad klientlista efter konkret T22-fynd).
 Initialt 24 tester och fyra CI-kontroller PASS återanvänds endast som historik;
 paketbygge i run `43383141697` FAIL (SDK 10.0.404), inga imageartefakter finns.
-26 fokuserade tester PASS, verklig Compose-kanonisering PASS, dokumentationsvalidator PASS.
-Korrigerat hosted bygge PENDING; runtime NOT RUN, ingen installation eller användarlänk.
+28 fokuserade tester PASS, verklig Compose-kanonisering PASS, dokumentationsvalidator PASS.
+Hosted run `43400474399` helt grön inklusive kandidatpaket för `151ab3a`;
+separat rättad kontrollrevision väntar oberoende granskning. Runtime NOT RUN, ingen användarlänk.
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
 ingen agentintegration, kostnad eller ny PREDEPLOY-grind.
 U2 NOT STARTED (säker U1 saknas); obevakad U3 DEFERRED.

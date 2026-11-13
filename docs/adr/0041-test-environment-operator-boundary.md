@@ -27,7 +27,9 @@ own labeled volumes. Parent's 2026-11-13 experiment found isolated-bridge Docker
 publication unusable and verified a fixed operator TCP-to-exec relay. U1 therefore has
 no container published ports: the manually started installed CLI binds only the selected
 Tailscale IPv4:13001 and forwards bytes through a fixed, exact-Web-ID `docker exec` to
-Web loopback:8080. Clients cannot select a command, container or destination. Four concurrent
+Web loopback:8080. Clients cannot select a command, container or destination. An explicit operator-installed
+client IPv4 allowlist rejects other sources before any Docker action; destination binding
+alone does not authorize traffic routed over a different interface. Four concurrent
 connections, bounded buffers, 30-second connection deadlines, 35-second in-container exec
 deadlines and owned-child cleanup bound this relay. It is outside all product processes;
 no extra service/container, credential, bridge address or host configuration is introduced.

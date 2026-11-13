@@ -65,7 +65,9 @@ trafik men att Docker-publicerad port inte fungerade. Parentens implementationsf
 tillåter därför en fast manuell operator-relä i installerat CLI: endast vald Tailscale-IP:13001
 till exakt verifierad Web-container via fast `docker exec`/loopback:8080. Ingen klientstyrd
 destination/kommando, extra container, host-konfiguration eller privilegieökning; anslutningar,
-tid och egna barnprocesser begränsas. Containrarna har då inga publicerade portar.
+tid och egna barnprocesser begränsas. En uttrycklig klientlista installeras med kontrollen
+och kontrolleras före reläets Docker-anrop; kandidatens render-steg får inte ändra den.
+Containrarna har då inga publicerade portar.
 
 Parent ChatGPT genomför oberoende review före installation av fast kontrollmall/validator.
 Subprocessens tillfälliga offline-/publiceringsbegränsningar begränsar inte ägarens

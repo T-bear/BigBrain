@@ -64,7 +64,7 @@ class TestPolicy(unittest.TestCase):
     def slot(self):
         slot = object.__new__(tool.Slot)
         slot.root, slot.p, slot.expected, slot.images = Path("/unused"), self.p, self.expected, self.images
-        slot.seal = {"files": {}}
+        slot.seal = {"files": {}, "allowed_clients": ["100.64.0.1"]}
         return slot
 
     def test_valid_inspect_fixture(self):
@@ -261,6 +261,26 @@ class TestPolicy(unittest.TestCase):
         with self.assertRaises(tool.Rejected):
             tool.validate_container(info, "api", self.p, self.expected, self.images["api"], "e" * 64)
 
+    def test_installed_clients_reject_wildcards_ranges_ipv6_and_missing_policy(self):
+        self.assertEqual(tool.client_addresses(["100.64.0.2", "100.64.0.1"]), ["100.64.0.1", "100.64.0.2"])
+        for values in (None, [], ["0.0.0.0"], ["192.0.2.1"], ["100.64.0.0/10"],
+                       ["::1"], ["100.64.0.1", "100.64.0.1"], ["100.64.0.1; echo nope"]):
+            with self.subTest(values=values), self.assertRaises(tool.Rejected):
+                tool.client_addresses(values)
+
+    def test_relay_denies_unlisted_sources_before_target_or_exec(self):
+        slot = self.slot()
+        for address in ("192.0.2.1", "100.64.0.2", "::1"):
+            client = MagicMock()
+            with patch.object(slot, "relay_target") as target, patch.object(tool.subprocess, "Popen") as spawn:
+                self.assertFalse(slot.accept_client(client, (address, 4567)))
+                client.close.assert_called_once()
+                target.assert_not_called()
+                spawn.assert_not_called()
+        client = MagicMock()
+        self.assertTrue(slot.accept_client(client, ("100.64.0.1", 4567)))
+        client.close.assert_not_called()
+
     def test_relay_command_has_no_network_selected_arguments(self):
         args = tool.relay_argv("2" * 64)
         self.assertEqual(args, ["/usr/bin/docker", "exec", "-i", "2" * 64, "/bin/busybox", "timeout",
@@ -353,7 +373,7 @@ class TestPolicy(unittest.TestCase):
             (root / "client").mkdir()
             for name, data in {"test-environment.py": b"reviewed", "compose.test.yaml": b"{}", "EMPTY": b""}.items():
                 (root / name).write_bytes(data)
-            seal = {"version": 1, "files": {p.name: tool.digest(p) for p in root.iterdir() if p.is_file()}}
+            seal = {"version": 1, "allowed_clients": ["100.64.0.1"], "files": {p.name: tool.digest(p) for p in root.iterdir() if p.is_file()}}
             (root / "installation.json").write_text(json.dumps(seal))
             tool.installation(root)
             for name in ("test-environment.py", "compose.test.yaml", "EMPTY"):

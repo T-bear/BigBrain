@@ -253,9 +253,24 @@ def locked(root, name="lock"):
         yield
 
 
+def client_addresses(values):
+    require(isinstance(values, list) and 1 <= len(values) <= 16, "explicit installed client allowlist required")
+    result = []
+    for value in values:
+        try:
+            address = ipaddress.IPv4Address(value)
+        except (ipaddress.AddressValueError, TypeError):
+            raise Rejected("exact Tailscale IPv4 client required") from None
+        require(address in ipaddress.IPv4Network("100.64.0.0/10"), "client outside Tailscale range")
+        result.append(str(address))
+    require(len(result) == len(set(result)), "duplicate allowed client")
+    return sorted(result)
+
+
 def installation(root):
     seal = read_json(root / "installation.json")
     require(seal.get("version") == 1, "installation version mismatch")
+    client_addresses(seal.get("allowed_clients"))
     for name in ("test-environment.py", "compose.test.yaml", "EMPTY"):
         path = root / name
         require(not path.is_symlink() and digest(path) == seal["files"][name], "installed control file drift")
@@ -264,7 +279,8 @@ def installation(root):
     return seal
 
 
-def snapshot(destination, revision):
+def snapshot(destination, revision, clients=None):
+    allowed_clients = client_addresses(clients)
     require(bool(SHA.fullmatch(revision or "")), "reviewed control SHA required")
     destination = Path(destination).absolute()
     require(not destination.exists(), "installation destination already exists")
@@ -278,7 +294,7 @@ def snapshot(destination, revision):
     (destination / "client").mkdir(mode=0o700)
     files = {n: digest(destination / n) for n in ("test-environment.py", "compose.test.yaml", "EMPTY")}
     write_json(destination / "installation.json", {"version": 1, "control_revision": revision,
-               "slot": uuid.uuid4().hex, "files": files})
+               "slot": uuid.uuid4().hex, "files": files, "allowed_clients": allowed_clients})
     for name in [*files, "installation.json"]:
         (destination / name).chmod(0o400)
 
@@ -451,13 +467,15 @@ class Slot:
                     try:
                         while not cancelled.is_set():
                             try:
-                                client, _ = listener.accept()
+                                client, peer = listener.accept()
                             except socket.timeout:
                                 # A reset/new candidate retires this relay. Stop alone may
                                 # preserve it across a deliberate same-ID restart test.
                                 state = read_json(self.root / "state.json")
                                 if state.get("containers", {}).get("web") != ids["web"]:
                                     break
+                                continue
+                            if not self.accept_client(client, peer):
                                 continue
                             if not capacity.acquire(blocking=False):
                                 client.close()
@@ -468,6 +486,14 @@ class Slot:
                     finally:
                         cancelled.set()
                 self.receipt("relay-stopped")
+
+    def accept_client(self, client, peer):
+        # Destination binding is insufficient for traffic routed over another interface.
+        # The operator installs this policy once; candidate render cannot change it.
+        if peer[0] not in self.seal["allowed_clients"]:
+            client.close()
+            return False
+        return True
 
     def relay_connection(self, client, web_id, cancelled, capacity):
         child = None
@@ -629,6 +655,7 @@ def main():
     parser.add_argument("command", choices=["snapshot", "validate", "render", "start", "status", "stop", "reset", "probe", "relay"])
     parser.add_argument("--destination")
     parser.add_argument("--control-sha")
+    parser.add_argument("--allow-client", action="append", help="snapshot only: exact approved Tailscale IPv4, include local probe")
     parser.add_argument("--candidate-sha")
     parser.add_argument("--api-image")
     parser.add_argument("--web-image")
@@ -640,7 +667,7 @@ def main():
     os.umask(0o077)
     if args.command == "snapshot":
         require(args.destination is not None, "destination required")
-        snapshot(args.destination, args.control_sha)
+        snapshot(args.destination, args.control_sha, args.allow_client)
         print("SNAPSHOT created; review installed control hashes before runtime")
         return
     if args.command == "validate" and not (ROOT / "installation.json").exists():

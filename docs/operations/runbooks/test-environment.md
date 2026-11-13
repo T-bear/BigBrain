@@ -182,7 +182,8 @@ operator-supplied. Never populate them from production `.env`, credentials or da
 
    ```sh
    python3 "$CONTROL_SOURCE/scripts/test-environment.py" snapshot \
-     --destination "$INSTALL_DIR" --control-sha "$REVIEWED_CONTROL_SHA"
+     --destination "$INSTALL_DIR" --control-sha "$REVIEWED_CONTROL_SHA" \
+     --allow-client "$TEST_BIND_IP" --allow-client "$APPROVED_CLIENT_IPV4"
    python3 "$INSTALL_DIR/test-environment.py" render \
      --candidate-sha "$CANDIDATE_SHA" --api-image "$API_IMAGE_ID" --web-image "$WEB_IMAGE_ID" \
      --bind-ip "$TEST_BIND_IP" --package "$PACKAGE_DIR/package.json"
@@ -378,3 +379,26 @@ negative mutation tests remain required and passed. Anonymous MCR manifest looku
 SDK 10.0.300 is available. The four initial source/document blockers are corrected; hosted
 package build, loaded-image validation and actual runtime cards remain pending. U1-R1
 repairs 0/2. Agent Independence is documented as the owner's future requirement only.
+
+### U1-R1 repair 1 — installed client policy
+
+Independent source review of `151ab3a` identified conditional LAN routing to the
+Tailscale destination address: destination binding alone did not authorize the source.
+This is a verified missing source check and a technically motivated exposure scenario,
+not an observed production intrusion. Mandatory original T22 is the requirement.
+
+Repair **1/2** installs an exact IPv4 client allowlist in the control snapshot's seal.
+Use repeated `snapshot --allow-client` for the local probe address and explicitly selected
+owner clients. No CIDR, wildcard, IPv6 or omitted list is accepted. Candidate `render`
+cannot select clients. The relay checks accepted peer source before capacity, Docker
+inspection or exec, retaining Tailscale ACLs and the fixed target. Control-policy changes
+require a newly reviewed installation. This is the existing trusted-operator accident
+boundary; seal files do not isolate against a malicious Docker administrator.
+
+**28 focused tests PASS / 0 SKIP** after this repair. Corrected hosted run
+`43400474399` is **all green**, including both image builds and artifact upload, for
+candidate `151ab3af61c0124855b6086df264ca10dd651e8c`, tree
+`3c940b20c8ff084cecce573ea28bf8019d4d621d`. A separately reviewed later control revision
+may operate those exact candidate images; record control and candidate identities
+separately, and keep the served banner at the actual image revision. This is not permission
+to substitute stale images silently. Actual runtime/client cards remain NOT RUN.
