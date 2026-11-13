@@ -613,3 +613,32 @@ Rootless ID comparison specifically found OCI image-index descriptors from the C
 versus config IDs in the classic store; equal config/layers never authorizes substituting
 a tag or silently changing the installed identity protocol. Deferred work is recorded in
 [the canonical backlog](../../BACKLOG.md#predeploy--verifierade-uppskjutna-hinder-2026-11-13).
+
+## BB-159 compatibility task — owner continuation 2026-11-13
+
+After the bounded U2 stop the owner explicitly says “Fortsätt” in response to the
+identified next BB-159 task. This is a new **risk3** compatibility task, estimate1–2 active
+hours/cap2h, at most2 repairs, initially0/2. Original U2 remains2/2 exhausted; its history
+is not reset. Continue the same preserved checkpoint branch, merging accepted main
+`256bc5c08111f7b4919cc8d2b6d76590aae8fa94` without rewriting failed history.
+
+Initial implementation aligns the private rootless engine with the producer's native
+containerd image store: enable the supported feature and remove the classic overlay2
+driver override. No validator relaxation, tag substitution, derived ID mapping, new
+namespace design, daemon context change or production operation. Existing private classic
+image cache is retained, not deleted; it contains no application containers/data.
+
+DoD (five):
+1. Real original hosted archive loads and exact package image IDs/OCI source labels pass
+   unchanged fixed admission in rootless mode.
+2. Rootless engine/user namespace/private socket/daemon identity and actual host UID
+   mapping verified; original production remains unchanged.
+3. Affected T04–T06/T11/T12/T15/T16/T22 rerun within synthetic scope, including actual
+   cgroup child enforcement, negative network/client checks and fixture reset.
+4. Engine/application restart persistence and safe owned rollback demonstrated, keeping
+   the original manual slot as retrievable fallback. No unattended activation before PASS.
+5. Dated evidence, source-of-truth updates, independent exact-candidate review and
+   applicable CI; no false owner UI/PWA/Finance/production acceptance.
+
+At cap retain safe results, stop the failing operation and preserve/restore U1; no new
+repair loop. Existing preapproved U3 can continue only after its start conditions hold.

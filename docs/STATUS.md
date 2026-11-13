@@ -13,6 +13,8 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 ## Syntetisk TEST U1 — 2026-11-13
 
 **Manuell syntetisk TEST READY; U2 HARDENING_NOT_PASS, manuell rootful slot bevarad.**
+BB-159 pågår efter nytt uttryckligt fortsättningsbeslut; tidigare U2-tak2/2 ligger kvar.
+Ny uppgiftsram risk3/cap2h/max2 reparationer,0/2 använda. Ingen ny härdnings-PASS ännu.
 Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
 kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körningar gröna.
 29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16 PASS inom beskrivet scope.
