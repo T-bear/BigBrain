@@ -827,3 +827,23 @@ calculated import reserve2040192870 bytes. Source tests78 PASS, seven new focuse
 including compressed-layer and engine-headroom rejection before load. Independent
 re-review and actual service execution remain pending; this is one completed repair,
 not two per-error attempts. The original manual fallback is still active.
+
+### U3 first runtime and final transport repair2/2
+
+The installed reviewed085fbc6 wrapper accepts the real expected-red GitHub identity and
+starts its independent bounded user service after the caller exits, even with poisoned
+caller engine/token/proxy/provider variables. The154366984-byte ZIP download makes
+progress but reaches its exact300s fetch deadline (16:00:55–16:05:55 UTC). Receipt is
+rejected before archive creation/verification, Docker load or any candidate container.
+Unit memory peak179175424 bytes; no PID-limit event. This is transport capacity evidence,
+not a startup/isolation/identity failure. Rootless resources are verified empty and the
+manual rootful slot is restored for the final repair.
+
+Repair2/2 changes only the raw artifact-fetch deadline from300s to900s. Metadata remains
+60s; whole user-service lifetime stays45min, including fetch/import/serving/cleanup. No
+automatic retry, additional credential, permission, quota, engine, identity or network
+change. A requested serving duration remains subject to that total cap. Prior exact
+control review applies to unchanged code; necessary focused verification covers this
+single changed bound before replacing the installed wrapper/hash. After the final bounded
+trial, any further blocker invokes the predetermined safe exit: preserve completed
+hardening and manual TEST, defer automation, retain evidence; no third repair or new loop.

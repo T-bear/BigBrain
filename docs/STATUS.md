@@ -23,7 +23,7 @@ levande nät-/lagringsprov PASS. Tidigare extern T22 är uttryckligen återanvä
 Den manuella rootful-slotten är återställd med originalkontroll/images och HTTP PASS;
 alla12 produktionscontainer-ID:n/images/starttider är oförändrade. Rootless är stoppad/
 disabled tills U3:s installerade kontroll är granskad och verifierad. Inga timers/autostart.
-U3 fortsätter inom förgodkänd risk2-ram/cap6h/max2 reparationer,1/2 använd för första reviewbatchens två P1; rättad kandidat inväntar oberoende review. 78 fokuserade tester PASS. En fast
+U3 fortsätter inom förgodkänd risk2-ram/cap6h/max2 reparationer,2/2 används: första reviewbatchens två P1 är rättade/granskade; sista ändringen gäller verkligt uppmätt hämtningstak. 78 fokuserade tester PASS. En fast
 uppdragswrapper och user-service förbereder i kodkandidaten betrodda syntetiska kandidater med
 paus och säker återgång; obevakad aktivering/persistens och pilot är ännu NOT RUN.
 [U3 scope och DoD](operations/runbooks/test-environment.md#u3-automation-implementation--2026-11-13).

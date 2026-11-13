@@ -295,7 +295,7 @@ def gh(endpoint, raw=False, output=None):
             "GitHub endpoint rejected")
     argv = ["/usr/bin/gh", "api", "--hostname", "github.com", "-H",
             "Accept: application/vnd.github.raw+json" if raw else "Accept: application/vnd.github+json", endpoint]
-    data = process(argv, gh_env(), STATE, timeout=300 if output else 60,
+    data = process(argv, gh_env(), STATE, timeout=900 if output else 60,
                    output=output, limit=MAX_ZIP if output else 2 * 1024 * 1024)
     return data if raw or output else decode(data)
 
