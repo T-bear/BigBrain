@@ -1,5 +1,11 @@
 # BigBrain – architecture baseline and future direction
 
+## Agent Independence — ägarbeslut 2026-11-13
+
+BigBrain äger arbetskedjan; externa AI-agenter ska vara utbytbara och individuellt
+avaktiverbara. [Kanoniskt beslut och framtida acceptanskriterier](docs/architecture/agent-independence.md).
+Arkitekturförberedelse, ingen integration eller ny PREDEPLOY-grind; befintliga ADR:er och Finance-regler kvarstår.
+
 ## BB-132F observation runtime — review implementation, 2026-10-03
 
 A disabled-by-default Finance hosted service composes existing recovery, Alpaca daily transport and
