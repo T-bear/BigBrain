@@ -12,7 +12,7 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**Manuell syntetisk TEST READY; härdning U2 BLOCKED på installationsförutsättning.**
+**Manuell syntetisk TEST READY; U2 HARDENING_NOT_PASS, manuell rootful slot bevarad.**
 Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
 kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körningar gröna.
 29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16 PASS inom beskrivet scope.
@@ -20,9 +20,15 @@ kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körnin
 som **ägarrapporterad evidens**, inte självständigt uppmätt av worker. UI/PWA-acceptans NOT RUN.
 Slotten använder endast egna syntetiska resurser, inga riktiga nycklar/providers/modeller/order.
 Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider verifierades oförändrade.
-U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. U2-förkontroll visar saknade
-uidmap/slirp4netns; befintlig sudo-gateway tillåter inte installation. Oförändrad manuell slot
-bevaras, obevakad U3 DEFERRED. U2 0/2 reparationer använda, ingen privilegieökning gjord.
+U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. Ägarens installation av uidmap/slirp4netns är verifierad och rootless-förkontrollen passerar.
+U2 nådde rootless motorstart efter2/2 reparationer men avvisade image-ID-formatet före
+kandidatstart. Rootless-motorn är stoppad och avaktiverad för autostart; ingen tredje loop.
+Manuell rootful slot och alla14 ursprungliga rootful containeridentiteter är oförändrade.
+Obevakad U3 är DEFERRED; [hosted-only paketeringsprov PR85](https://github.com/T-bear/BigBrain/pull/85) har PASS:
+avsiktligt rött frontendtest och grönt verifierat kandidatpaket med ärligt redovisade utfall.
+Ingen image från provet kördes lokalt.
+U2-koden är ett [blockerat leveransexperiment i PR84](https://github.com/T-bear/BigBrain/pull/84),
+inte accepterad rootless-implementation; denna statuspublicering ändrar ingen körkontroll.
 [Exakt åtkomstevidens och avgränsad operatörsåtgärd](operations/runbooks/test-environment.md#owner-access-confirmation-and-u2-preflight--2026-11-13).
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
 ingen integration, kostnad eller ny grind för pågående PREDEPLOY.
