@@ -67,9 +67,10 @@ till exakt verifierad Web-container via fast `docker exec`/loopback:8080. Ingen 
 destination/kommando, extra container, host-konfiguration eller privilegieökning; anslutningar,
 tid och egna barnprocesser begränsas. Containrarna har då inga publicerade portar.
 
-Den aktuella U1-implementationen utförs endast offline: ingen commit/push/merge,
-installation, lokal image-build/-download eller host-runtime. Parent ChatGPT granskar
-före host-runtime i detta uppdrag. Minst T04–T06, T11, T12, T15, T16 och T22 ska ha
+Parent ChatGPT genomför oberoende review före installation av fast kontrollmall/validator.
+Subprocessens tillfälliga offline-/publiceringsbegränsningar begränsar inte ägarens
+förhandsgodkända U1 → U2 → U3-mandat. Serien fortsätter när respektive startvillkor är
+uppfyllt inom sin budget, utan extra ägarklick. Minst T04–T06, T11, T12, T15, T16 och T22 ska ha
 verkligt PASS innan användarlänk lämnas. Om U2 inte klaras inom budget bevaras säker
 manuell slot och obevakad U3 skjuts upp; ingen förnyad reparationsloop.
 [TEST-runbooken](runbooks/test-environment.md) äger uppdragens DoD, testkort och körinstruktioner.

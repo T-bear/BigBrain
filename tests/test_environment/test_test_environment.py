@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("test_environment", ROOT / "scripts/test-environment.py")
 tool = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(tool)
+BUILD_SPEC = importlib.util.spec_from_file_location("test_build", ROOT / "scripts/test-candidate-dockerfile.py")
+build = importlib.util.module_from_spec(BUILD_SPEC)
+BUILD_SPEC.loader.exec_module(build)
 
 
 def fixture():
@@ -122,6 +125,46 @@ class TestPolicy(unittest.TestCase):
         actual["services"]["api"]["networks"]["test"]["ipv4_address"] = "100.64.0.2"
         with self.assertRaises(tool.Rejected):
             tool.validate_effective(actual, self.expected)
+
+    def test_compose_531_defaults_and_negative_mutations(self):
+        actual = copy.deepcopy(self.expected)
+        for service in actual["services"].values():
+            for key in ("mem_limit", "memswap_limit"):
+                service[key] = str(service[key])
+            service["cpus"] = str(service["cpus"])
+            service["networks"]["test"] = None
+            for mount in service.get("volumes", []):
+                mount["volume"] = {}
+        actual["networks"]["test"]["ipam"] = {}
+        tool.validate_effective(actual, self.expected)
+        for value in ({"driver": "default"}, {"config": []}, None, [], {"unknown": True}):
+            mutated = copy.deepcopy(actual)
+            mutated["networks"]["test"]["ipam"] = value
+            with self.subTest(ipam=value), self.assertRaises(tool.Rejected):
+                tool.validate_effective(mutated, self.expected)
+        for key in ("mem_limit", "memswap_limit"):
+            for value in ("0", "1", "1g", "1.0", "+123", "-1", " 123", "１２３", "123\n"):
+                mutated = copy.deepcopy(actual)
+                mutated["services"]["api"][key] = value
+                with self.subTest(key=key, value=value), self.assertRaises(tool.Rejected):
+                    tool.validate_effective(mutated, self.expected)
+        for section in (actual["networks"]["test"], actual["services"]["api"]):
+            section["unknown"] = {}
+            with self.assertRaises(tool.Rejected):
+                tool.validate_effective(actual, self.expected)
+            del section["unknown"]
+
+    def test_test_sdk_derivation_changes_only_build_from(self):
+        source = (ROOT / "src/BigBrain.Api/Dockerfile").read_text()
+        sdk = json.loads((ROOT / "global.json").read_text())["sdk"]
+        derived = build.derive(source, sdk)
+        self.assertEqual(derived.splitlines()[1:], source.splitlines()[1:])
+        self.assertEqual(derived.splitlines()[0], "FROM mcr.microsoft.com/dotnet/sdk:10.0.300 AS build")
+        for changed in (source.replace("sdk:10.0 ", "sdk:10.0.404 "), source + "FROM mcr.microsoft.com/dotnet/sdk:10.0 AS extra\n"):
+            with self.assertRaises(ValueError):
+                build.derive(changed, sdk)
+        with self.assertRaises(ValueError):
+            build.derive(source, sdk | {"version": "10.0.400"})
 
     def test_image_contract_tampering(self):
         for change in [lambda c: c["Config"]["Labels"].update({"org.opencontainers.image.revision": "0" * 40}),
@@ -335,7 +378,13 @@ class TestPolicy(unittest.TestCase):
         self.assertIn("persist-credentials: false", text)
         self.assertNotIn("continue-on-error", text)
         self.assertNotIn("self-hosted", text)
-        self.assertNotIn("secrets.", text.split("  test-candidate-package:", 1)[1])
+        package = text.split("  test-candidate-package:", 1)[1]
+        self.assertIn("needs.secrets.result == 'success'", package.split("runs-on:", 1)[0])
+        self.assertNotRegex(package.replace("needs.secrets.result", "NEEDS_RESULT"), r"\bsecrets\s*(?:\.|\[)")
+        for job in ("backend", "frontend", "documentation"):
+            self.assertNotIn("needs." + job + ".result == 'success'", package)
+        self.assertIn('scripts/test-candidate-dockerfile.py', package)
+        self.assertIn("'build': json.loads((p / 'build.json').read_text())", package)
 
 
 if __name__ == "__main__":

@@ -131,6 +131,9 @@ def normalized(config):
         service.setdefault("command", [])
         if "cpus" in service:
             service["cpus"] = float(service["cpus"])
+        for key in ("mem_limit", "memswap_limit"):
+            if isinstance(service.get(key), str) and re.fullmatch(r"[0-9]+", service[key]):
+                service[key] = int(service[key])
         for network, options in service.get("networks", {}).items():
             if options in (None, {}, {"priority": 0}):
                 service["networks"][network] = None
@@ -143,6 +146,9 @@ def normalized(config):
                 del mount["read_only"]
             if mount.get("volume") == {}:
                 del mount["volume"]
+    for network in value.get("networks", {}).values():
+        if network.get("ipam") == {}:
+            del network["ipam"]
     return value
 
 

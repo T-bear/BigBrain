@@ -6,27 +6,32 @@ Authority is owned solely by the
 The external operator boundary is described in
 [Proposed ADR 0041](../../adr/0041-test-environment-operator-boundary.md).
 ADR 0001 remains Accepted; ADR 0002 remains Proposed. AGENTS is unchanged.
+The owner-approved [Agent Independence requirement](../../architecture/agent-independence.md)
+is future architecture preparation only; it adds no current delivery gate, agent integration or cost.
 
 ## Ordered tasks, start conditions and limits
 
 The owner authorized U1 → U2 → U3, each with its own time and repair budget. This worktree
 implements **U1 only** on `checkpoint/test-environment-u1-20261113`, accepted main
 `e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree
-`24f249d76092dc8c3a242ed664ed139dc2eb4d9b`. The initially clean local HEAD and local
-`origin/main` match that baseline. Remote was not fetched or independently refreshed in
-this offline task. No commit, push, merge, install, image build/download, Docker call,
-host/user/network/firewall change, sudo, credential access or production data access is authorized here.
-Parent ChatGPT reviews the resulting diff before any host runtime. No real model/provider/order.
+`24f249d76092dc8c3a242ed664ed139dc2eb4d9b`. Parent fetched and independently verified this main baseline before implementation and
+again at review. U1-R1 starts on the clean existing branch at
+`96b3a06518fd4fd567a1dd6b114637dc84e6b0cb`. The current correction subprocess is limited to
+source/docs and focused offline checks; parent owns read-only Docker validation, publication,
+hosted CI/artifacts and runtime when admitted. These subprocess limits do not narrow the
+owner's series mandate. Parent independently reviews fixed control before installation.
+No real model/provider/order or new host privilege is authorized.
 
 | Task | Start condition | Risk / estimate / cap | Repair budget and current use |
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
-| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; separate bounded execution turn | 3; 2–4 h / 4 h | At most 2; 0 used, NOT STARTED |
+| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, NOT STARTED |
 | U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | At most 2; 0 used, NOT STARTED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
-new design loop or automatic next task. P0/P1 stops the affected operation; P2/P3 goes to
+or new design loop. Advance to the next preapproved task when its start conditions hold;
+no new owner click or separate execution-turn approval is required. P0/P1 stops the affected operation; P2/P3 goes to
 the existing backlog if a concrete deferred issue is found. No speculative redesign.
 
 U1 DoD (five criteria; runtime portions remain pending in this offline handoff):
@@ -137,20 +142,29 @@ to make cleanup pass. Do not remove an image while its slot needs lifecycle vali
 
 The additional `test-candidate-package` hosted CI job depends on all four existing jobs with
 `always()` and `!cancelled()`. Their failures remain failures; no `continue-on-error` is added.
-Both image builds are mandatory. PR head must belong to this repository, PR author and actor
+Secret scanning must succeed (`needs.secrets.result == 'success'`); failed, skipped or
+cancelled secret checks block packaging. Red backend/frontend/documentation outcomes may
+be recorded without changing their checks. Both image builds are mandatory. PR head must belong to this repository, PR author and actor
 must be the owner, and branch must be `checkpoint/...`. Dispatch resolves only an exact
 `checkpoint/...` branch. GitHub checks the selected commit's author login and records its exact
 SHA/tree before checkout; a moved PR head rejects. No public/fork PR can select this local path.
 There is no local runner, deployment job, runtime dispatch hook or per-run approval button.
 Checkout does not persist credentials; no token/secret is passed to Docker builds.
 
-The artifact contains `images.tar.gz`, `images.json`, `package.json`, `SHA256SUMS`.
+The artifact contains `images.tar.gz`, `images.json`, `build.json`, `package.json`, `SHA256SUMS`.
+The TEST build derives a temporary Dockerfile from the production API Dockerfile, strictly
+replacing only its single SDK FROM with `mcr.microsoft.com/dotnet/sdk:10.0.300` and checking
+`global.json` version/rollForward. Production Dockerfile/global.json and ASPNET 10 are unchanged.
+`build.json` and package metadata record the selected SDK image and source/derivative SHA256;
+the checksum manifest covers this provenance. No local heavy build is required.
 Package metadata records source SHA/tree/ref, workflow run/attempt, actual four job statuses,
 the tested SHA (PR merge ref may differ from candidate head), image IDs/available repository
 digests and file checksums. Docker-save images often have **no registry RepoDigest**; the exact
 local image IDs are content digests. Tests of a PR merge ref are never claimed as head tests.
 Review the trusted GitHub run and checksums before loading. Self-declared package fields alone
-are not authentication. Hosted builds and artifact availability are currently **NOT RUN**.
+are not authentication. Initial hosted API package build **FAIL** in run `43383141697`: floating SDK 10.0 selected
+10.0.404, incompatible with repository 10.0.300/latestPatch. No candidate image artifacts
+exist. Corrected hosted build and artifact availability remain **PENDING**.
 
 The following are later parent/operator instructions, **not commands executed in this turn**.
 Keep all concrete addresses, client identities, resource endpoints and paths private. Parameters:
@@ -160,9 +174,9 @@ operator-supplied. Never populate them from production `.env`, credentials or da
 
 1. Parent reviews this diff and the owned candidate/run. Obtain the hosted artifact through
    the existing trusted GitHub session, verify exact source/tree/run and `SHA256SUMS` in the
-   package directory. A red backend/frontend status is allowed for synthetic testing, recorded
+   package directory. A successful secrets check is mandatory. A red backend/frontend/documentation status is allowed for synthetic testing, recorded
    honestly, and is never merge acceptance. No local build/download fallback is implicit.
-2. In the separately authorized runtime phase, load the checksum-verified archive with
+2. After the existing runtime admission conditions hold, load the checksum-verified archive with
    `docker load --input "$PACKAGE_DIR/images.tar.gz"`. Read the two exact IDs from package.json,
    compare loaded image inspect, and create the reviewed snapshot once:
 
@@ -193,34 +207,38 @@ operator-supplied. Never populate them from production `.env`, credentials or da
 All runtime cards below are **NOT RUN as of 2026-11-13**. Offline mocks do not satisfy them.
 Record each actual result against candidate/image/control hashes, Engine/Compose versions,
 rootful/rootless scope, timestamp and private evidence reference. Runtime card failures consume
-the same U1 task repair budget, not a fresh budget per error. No raw private facts in this table.
+the applicable bounded task repair budget, not a fresh budget per error. Original U1 remains
+2/2 exhausted; the explicitly authorized U1-R1 correction has its own cap below. No raw private facts in this table.
 
 | Card | Verification and required result |
 | --- | --- |
-| T01 | Trusted same-repo owned branch and author; exact source/tree/run; fork/public trigger rejected. Hosted artifact available. |
-| T02 | Verify artifact checksums, loaded image IDs and OCI source revision/kind. Reject tag, digest/revision mismatch and missing provenance. |
-| T03 | Render from sealed installation under poisoned caller env; no inherited Compose/.env/proxy/key settings. Unknown template option rejected. |
-| **T04** | Actual rootful container inspect and own-container `/proc` show nonroot UID, zero effective capabilities, NoNewPrivs, seccomp and enforced CPU/memory/PID/log limits; only two services. |
-| **T05** | Actual internal bridge has isolated gateway option and IPv6 off. Own-container connections to operator-approved harmless external IPv4/IPv6/DNS canaries fail; ordinary internal bridge alone is insufficient. No real provider request. |
-| **T06** | Parent's harmless network experiment: host bridge interface has no assigned host IPv4/IPv6 address; container cannot reach harmless host/LAN/other-network canaries, including known gateway/host routes. No probing production services. |
-| T07 | Web can reach API on the sole own network; neither service has any published port or other network attachment. |
-| T08 | All real database paths are on own writable volumes, first-start copy-up ownership works without root helpers; source/config assets readable by nonroot. |
-| T09 | API effective configuration disables providers/scheduler/real reasoner/Sentinel; no keys, model artifacts or host clock mount. No real data inspected. |
-| T10 | Real attempt to start tampered mount/network/env/image/port/capability configuration rejected before start. Use disposable own fixtures only. |
-| **T11** | `probe` gets actual HTML TEST + short SHA, exact revision, correct JS/CSS MIME and bodies, manifest/icons and API `/health` through Web. No SPA fallback mistaken for assets. |
-| **T12** | Reset requires exact own-fixture confirmation and audit; mismatched name/label/external-volume/foreign attachment fixtures reject before mutation. Confirm only own fixture data deleted and fresh slot works. |
-| T13 | Safe baseline comparison shows no other containers, volumes, worktrees or production configuration changed by slot lifecycle; inspect metadata only, no production data. |
-| T14 | Concurrent lifecycle invocation fails immediately under lock; no overlapping reset/start or stale candidate adoption. |
-| **T15** | `probe --restart` persists unique synthetic shopping item across actual stop/start; no autostart policy. Reset deletes fixture, rebuild starts empty. |
-| **T16** | User-selected IP is actually assigned to the Tailscale interface; fixed operator relay binds only that IP:13001. Authorized client succeeds, unauthorized client denied by existing ACL; no LAN/wildcard/IPv6 listener exposure or container published port. Client ACL evidence NOT RUN until supplied/tested. |
-| T17 | Failure after start stops only validated IDs; logs/receipts bounded and private; partial creation retained safely. |
-| T18 | Test banner remains visible on narrow viewport/PWA and production image contains no TEST banner/flag. Owner UX approval remains PENDING. |
-| T19 | Candidate with red backend/frontend results can still produce both usable hosted images; missing/failed build cannot publish successful package. |
-| T20 | Exact image environment/config and declared image volumes/healthcheck inspected; unexpected additions rejected. Image content trust is owned-source review, not label cryptography. |
-| T21 | Private receipts contain provenance and exact owned resources; published summary contains no literal host IPs/private homes/raw logs. |
-| **T22** | Installed CLI/template hashes match reviewed source; candidate's Compose/CLI cannot change installed control. Installed drift rejected. Explicit EMPTY/project directory used; no new host privileges. Relay pins exact Web ID/image; client bytes cannot choose command/target. Saturation refuses excess connections, deadline/disconnect/stop cleans owned client children and container exec ends by its timeout; no hidden background lifetime. |
+| T01 | Source identity: trusted same-repo owned branch/author; exact source SHA/tree/run, image IDs and OCI revision; reject public/fork source. |
+| T02 | Record the four actual CI outcomes (backend/frontend/documentation/secrets) and tested SHA. Red functional results allowed; secrets success mandatory, both package builds required. |
+| T03 | Package admission rejects corrupt digests, extra files, traversal, symlinks and oversized input before loading; verify trusted run/checksums. |
+| **T04** | Actual nonroot execution, readable configuration/static assets, correct JS/CSS MIME and bodies; no SPA fallback mistaken for assets. |
+| **T05** | Actual API through Web proxy, response schema and Problem Details on errors; `/health` alone is insufficient. |
+| **T06** | Restart persists unique synthetic fixture with the exact same image IDs; `probe --restart` checks the shopping item. |
+| T07 | Synthetic database migration and reset: correct schema, own fixture reset and fresh initialization; no production restore. |
+| T08 | Concurrency/idempotency/single slot: overlapping lifecycle denied, repeated actions safe, no stale candidate adoption. |
+| T09 | Interruption/failure: stop only validated owned IDs, retain safe partial state and private bounded recovery evidence. |
+| T10 | Bounded OOM, timeout and disk failure probes with safe owned-fixture recovery; never exhaust host resources. |
+| **T11** | Host/data/mounts/env isolation: no production socket/data/operator home; clean environment, only own writable volumes, no changes to foreign resources. |
+| **T12** | Candidate network denies production routes, host gateway and external IPv4/IPv6 using harmless approved canaries; no production service probing. Inspect isolated bridge plus actual negative connections. |
+| T13 | Credential absence and synthetic canary checks; no real keys, provider credentials or inherited secrets. |
+| T14 | Source/admission rejects extra mounts, candidate Compose/control replacement, unexpected image environment/volumes/healthcheck and any unrecognized effective configuration before start. |
+| **T15** | Real cgroup CPU/memory/process enforcement and bounded probes; inspect limits alone does not prove enforcement. Verify nonroot/capabilities/NoNewPrivs/seccomp and bounded logs/tmpfs. |
+| **T16** | Cleanup preserves foreign names, label collisions, unknown volumes and symlinks; reject before mutation, confirm/audit only own-fixture deletion and safe reinitialization. |
+| T17 | UI/PWA separate owner acceptance: visible TEST + short SHA on narrow viewport/PWA; production has no TEST flag. Owner approval NOT RUN. |
+| T18 | Synthetic Finance only: fixture paths/configuration, no real providers/models/market data/orders; no Finance production or nonsynthetic acceptance. |
+| T19 | Sentinel integration **NOT RUN**, no stub; `Enabled=false`. No Sentinel integration PASS inferred. |
+| T20 | Media stubbed tests only; **NOT RUN** if no actual stubbed tests/evidence. No real provider requests. |
+| T21 | Calendar/family synthetic fixture behavior and persistence; no real household data. |
+| **T22** | Allowed/denied clients IPv4/IPv6: only selected assigned Tailscale IPv4:13001, no wildcard/LAN/IPv6 listener or container published port. Verify authorized success and unauthorized denial by existing ACL. Fixed exact-Web-ID relay rejects target changes and bounds saturation, deadlines, disconnect/stop and child cleanup. |
 
-T05/T06 require more than Docker `network inspect`: isolated mode is intended to remove the
+These are the original report v1.2 identities. Mandatory before a user link:
+**T04–T06, T11, T12, T15, T16, T22** with these meanings. Offline PASS is never card PASS.
+
+T12 requires more than Docker `network inspect`: isolated mode is intended to remove the
 bridge's host address, while ordinary internal bridges have one. Inspect flags express intent;
 read-only host interface observation and harmless negative connections establish actual behavior.
 Parent's 2026-11-13 handoff reports an actual harmless experiment using an owned cached Python
@@ -263,6 +281,7 @@ installation, provider/model call, browser session or client Tailscale ACL check
 
 - `compose.test.yaml`
 - `scripts/test-environment.py`
+- `scripts/test-candidate-dockerfile.py`
 - `tests/test_environment/test_test_environment.py`
 - `infrastructure/test-environment/Dockerfile.api`
 - `infrastructure/test-environment/Dockerfile.web`
@@ -279,13 +298,12 @@ AGENTS, production Compose/Dockerfiles and API/Web product source are unchanged.
 report rounds, speculative backlog items or recovery note are needed for an uninterrupted
 offline review handoff; runtime remains expressly pending. If interrupted, use only the existing
 [recovery note](../codex-recovery.md), preserving this worktree and the original private slot state.
-The concurrently supplied `TEST-U1-PARENT-HANDOFF.md` belongs to parent, is preserved unchanged,
-and must be excluded from publication; its relevant sanitized network finding is retained above.
 
 ## Independent parent review and bounded exit — 2026-11-13
 
-**BLOCKED for merge, installation, runtime and user link.** This section supersedes the
-implementation handoff's readiness and authority descriptions above. The owner authorized
+**Historical initial-candidate findings and bounded exit, retained without resetting U1.**
+The initial candidate was BLOCKED for merge, installation, runtime and user link.
+The U1-R1 section below records the authorized correction and its distinct verification status. The owner authorized
 the complete U1 → U2 → U3 series with conditional starts; the subprocess's offline-only
 restriction was not a restriction on the owner's mandate. Remote main was fetched and
 independently checked by the parent before implementation, and checked again after review:
@@ -299,7 +317,7 @@ PASS. These checks do not establish real application runtime or negate the block
 | Finding | Evidence class and mandatory source | Reproduction / consequence |
 | --- | --- | --- |
 | P1 Compose compatibility | Verified host observation; U1 DoD actual installed validator before start | Compose 5.3.1 serializes both memory values as digit strings and adds network IPAM defaults. `validate_effective` rejects this unchanged canonical template. Parent's read-only config probe reproduces rejection before any container creation. Runtime must stay blocked. |
-| P1 test-card identity | Verified source comparison; owner's v1.2 minimum T04–T06/T11/T12/T15/T16/T22 | The table above reassigns existing IDs. In v1.2 T04=nonroot/static assets, T05=API/proxy, T06=restart, T11=host/data, T12=network, T15=actual cgroup CPU/memory/process enforcement, T16=foreign-resource-safe cleanup, T22=allowed/denied IPv4/IPv6 clients. T19=Sentinel NOT RUN, not red CI packaging. Keep these original meanings before claiming acceptance. No mandatory card has a candidate-runtime PASS. |
+| P1 test-card identity | Verified source comparison; owner's v1.2 minimum T04–T06/T11/T12/T15/T16/T22 | The initial candidate table reassigned existing IDs (restored in U1-R1). In v1.2 T04=nonroot/static assets, T05=API/proxy, T06=restart, T11=host/data, T12=network, T15=actual cgroup CPU/memory/process enforcement, T16=foreign-resource-safe cleanup, T22=allowed/denied IPv4/IPv6 clients. T19=Sentinel NOT RUN, not red CI packaging. Keep these original meanings before claiming acceptance. No mandatory card has a candidate-runtime PASS. |
 | P1 canonical mandate drift | Verified document comparison; explicit owner's preapproved series and checkpoint delegation | The proposed canonical TEST paragraph incorrectly promotes the worker's temporary no-push/offline-only instructions into standing authority, and the runbook says no automatic next task. These are not the owner's decision; do not merge those restrictions. The preapproved series can advance when its actual start conditions hold. |
 | P1 package admission condition | Verified workflow source; synthetic-only no-keys requirement and U1 accident protection | The job allows failed `needs.secrets.result` through its `always()` condition. Red functional tests may be packaged, but failed secret checks must not qualify. A package from this candidate must never be locally admitted after a failed secrets check. Hosted inspection of an otherwise clean owned source does not authorize runtime. |
 
@@ -310,7 +328,7 @@ acceptance remain unknown. Rootless prerequisites were observed read-only: subor
 UID/GID ranges and rootless setup tooling exist; `newuidmap` and `newgidmap` are absent.
 That is a U2 prerequisite gap, not authority to install host packages or widen privileges.
 
-Predetermined exit applied: preserve this unaccepted checkpoint and publish it for review;
+Initial U1 predetermined exit applied: preserve this unaccepted checkpoint and publish it for review;
 continue only independent existing hosted CI/evidence. **No third U1 repair, no merge,
 no installation, no test slot, no timer/autostart.** U2 is NOT STARTED because its safe-U1
 start condition is absent; unattended U3 is DEFERRED, counters 0/2 each. No dependent work
@@ -320,3 +338,43 @@ There is no safe U1 application slot to retain; existing production remains unto
 Parent raw probes and exact resource identities remain private. The public checkpoint is
 reviewable evidence, not accepted source of truth. Owner UX/PWA acceptance remains NOT RUN;
 no owner test card is issued until an admitted slot exists and that control is needed.
+
+## U1-R1 bounded correction — 2026-11-13
+
+Owner asked “Hur löser vi det?” after the four blockers; parent architect authorized this
+bounded correction on the same checkpoint. Risk **3**, estimate **1–2 active hours**, cap **2 h**,
+maximum **2 repairs total**. Initial combined implementation is not a repair retry; **0/2 used**.
+Original U1 remains failed/incomplete with **2/2 exhausted**, never reset. At cap preserve
+work and evidence; no runtime, new privilege or redesign loop. Parent performs Docker validation,
+commit/push, hosted CI/artifact verification and admitted runtime; no extra owner approval is added.
+
+DoD (five criteria):
+
+1. Reproduce Compose 5.3.1 memory digit strings and exactly empty network `ipam: {}`;
+   normalize only those known defaults, retain negative mutation rejection.
+2. Require secrets-success for packaging while recording red functional CI unchanged.
+3. Restore original report v1.2 T01–T22 and preapproved U1 → U2 → U3 conditional mandate.
+4. Hosted TEST package builds with repository SDK feature band, recording derived Dockerfile
+   hash and SDK without altering production behavior.
+5. Focused Python/documentation/diff checks and honest dated status; runtime **NOT RUN**.
+
+Initial fixes implement these source/documentation corrections, including the concrete
+package failure in run `43383141697` (SDK 10.0.404 vs 10.0.300/latestPatch). These edits do
+not establish hosted build success or resolve runtime acceptance by assertion. Parent's
+unchanged 24-test PASS outside the sandbox and four CI checks PASS on `96b3a06` are reused
+as **initial-candidate evidence only**. Parent's read-only Compose observation confirms
+network IPAM exactly `{}`. No image artifact exists from the failed package build.
+
+Correction verification: **PENDING** focused checks and independent parent verification.
+Corrected hosted package build/artifact verification **PENDING**; all candidate runtime cards
+**NOT RUN**, no install or user link, no owner UX approval. U2 NOT STARTED until safe U1;
+unattended U3 DEFERRED until U2 succeeds. Historical initial findings above remain evidence,
+not a claim that corrected code has passed their runtime/hosted acceptance conditions.
+
+Parent correction verification — 2026-11-13: **26 PASS / 0 SKIP**, documentation validator
+PASS (295 Markdown / 53 backlog IDs), diff check PASS. The unchanged real Compose 5.3.1
+canonical output from the private read-only probe now passes the corrected validator;
+negative mutation tests remain required and passed. Anonymous MCR manifest lookup confirms
+SDK 10.0.300 is available. The four initial source/document blockers are corrected; hosted
+package build, loaded-image validation and actual runtime cards remain pending. U1-R1
+repairs 0/2. Agent Independence is documented as the owner's future requirement only.

@@ -12,15 +12,21 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**BLOCKED: ej accepterad, installerad eller runtime-verifierad.** Kandidat på
-`checkpoint/test-environment-u1-20261113`, accepterad main fortsatt
-`e63aaa4dc30718f2620f2880a6f2b847e6091d89`. Första oberoende review fann blockerande
-Compose-kompatibilitet, omnumrerade testkort, mandatglidning och saknat secrets-villkor
-för paketering. U1:s två reparationsförsök är förbrukade; ingen tredje loop eller merge.
-24 fokuserade tester, dokumentationsvalidator och diffkontroll PASS hos granskaren;
-det bevisar inte fungerande testslot. Separat nät-/reläprov PASS avser tom provimage.
-U2 NOT STARTED (säker U1-slot saknas); obevakad U3 DEFERRED. Ingen användarlänk.
-[Exakta fynd, fast utgång, kvarstående prov och uppdragsramar](operations/runbooks/test-environment.md#independent-parent-review-and-bounded-exit--2026-11-13).
+**U1-R1 källrättning verifierad; hosted paket/runtime PENDING, inte READY eller accepterad.**
+Branch `checkpoint/test-environment-u1-20261113`, start-SHA
+`96b3a06518fd4fd567a1dd6b114637dc84e6b0cb`; parent-verifierad main
+`e63aaa4dc30718f2620f2880a6f2b847e6091d89`, tree `24f249d76092dc8c3a242ed664ed139dc2eb4d9b`.
+Compose-normalisering, secrets-grind, ursprungliga testkort/mandat och TEST-specifik SDK
+10.0.300-derivering är korrigerade i källan. U1 förblir ofullständig, 2/2 reparationer
+förbrukade; auktoriserad U1-R1 risk 3, tak 2 h, 0/2 reparationer använda.
+Initialt 24 tester och fyra CI-kontroller PASS återanvänds endast som historik;
+paketbygge i run `43383141697` FAIL (SDK 10.0.404), inga imageartefakter finns.
+26 fokuserade tester PASS, verklig Compose-kanonisering PASS, dokumentationsvalidator PASS.
+Korrigerat hosted bygge PENDING; runtime NOT RUN, ingen installation eller användarlänk.
+[Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
+ingen agentintegration, kostnad eller ny PREDEPLOY-grind.
+U2 NOT STARTED (säker U1 saknas); obevakad U3 DEFERRED.
+[U1-R1 scope, DoD och evidens](operations/runbooks/test-environment.md#u1-r1-bounded-correction--2026-11-13).
 
 ## Frysningar och operativa osäkerheter
 

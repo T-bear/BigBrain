@@ -71,7 +71,7 @@ jobs:
     name: TEST candidate package (not a required acceptance check)
     needs: [backend, frontend, documentation, secrets]
     if: >-
-      ${{ always() && !cancelled() && github.repository == 'T-bear/BigBrain' &&
+      ${{ always() && !cancelled() && needs.secrets.result == 'success' && github.repository == 'T-bear/BigBrain' &&
           github.actor == github.repository_owner &&
           ((github.event_name == 'pull_request' &&
             github.event.pull_request.head.repo.full_name == github.repository &&
@@ -114,7 +114,9 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git rev-parse HEAD^{tree})" = "$SOURCE_TREE"
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/test_environment -p 'test_*.py' -q
-          docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f src/BigBrain.Api/Dockerfile -t bb-test-api-source .
+          mkdir test-package
+          python3 scripts/test-candidate-dockerfile.py "$RUNNER_TEMP/Dockerfile.test-api" > test-package/build.json
+          docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f "$RUNNER_TEMP/Dockerfile.test-api" -t bb-test-api-source .
           docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f infrastructure/test-environment/Dockerfile.api -t bb-test-api-package .
           docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f infrastructure/test-environment/Dockerfile.web -t bb-test-web-package .
       - name: Save images and exact provenance
@@ -125,7 +127,6 @@ jobs:
           TEST_RESULTS: ${{ toJSON(needs) }}
           TESTED_SHA: ${{ github.sha }}
         run: |
-          mkdir test-package
           docker image inspect bb-test-api-package bb-test-web-package > test-package/images.json
           docker save bb-test-api-package bb-test-web-package | gzip -1 > test-package/images.tar.gz
           python3 - <<'PY'
@@ -147,6 +148,7 @@ jobs:
               'workflow_run': os.environ['GITHUB_RUN_ID'], 'workflow_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
               'tests': {k: v['result'] for k, v in json.loads(os.environ['TEST_RESULTS']).items()},
               'tested_sha': os.environ['TESTED_SHA'],
+              'build': json.loads((p / 'build.json').read_text()),
               'images': {k: v['Id'] for k, v in zip(('api', 'web'), images)},
               'repo_digests': {k: v.get('RepoDigests', []) for k, v in zip(('api', 'web'), images)},
               'checksums': checksums,
