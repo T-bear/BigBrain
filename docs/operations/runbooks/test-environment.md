@@ -550,3 +550,31 @@ directories `/usr/sbin:/usr/bin:/sbin:/bin`; no caller/user path, credential or 
 is added. This is the final bounded source repair. Controller clean client environment
 remains `/usr/bin:/bin` because its commands use explicit Docker paths. Rootful fallback
 remains unchanged; another blocking failure causes safe stop without a third loop.
+
+### U2 predetermined exit — hardening NOT PASS
+
+The final repaired unit starts: real rootless Docker29.6.2, cgroupv2/systemd and overlay2
+private storage verified, host daemon UID1000, user unit not enabled. The initial readiness
+observer timed out at3s while the engine continued initializing; a subsequent read confirmed
+API readiness. No additional engine restart or source repair was made for that observation.
+
+Exact hosted image archive checksums passed and both images loaded into the private engine.
+Admission then failed closed before **any candidate container** was created: the hosted
+Docker29 image metadata identifies descriptor/manifest digests, while the deliberately
+configured classic image store reports config image IDs. The IDs differ although runtime
+configurations, source-revision labels and RootFS layer lists compare equal. The fixed
+validator correctly refuses to substitute tags or unproven identities. This is a real
+producer/consumer identity-format compatibility blocker; source review and33 unit tests
+do not prove runtime admission.
+
+**U2 repairs2/2 exhausted; HARDENING_NOT_PASS.** No third change of image-store/backend,
+identity protocol or namespace design is attempted. Rootless user unit is **stopped and
+disabled**; private images/config/evidence and checkpoint are retained. Rootful manual TEST
+was never stopped or changed: all14 original rootful container IDs/images/starttimes,
+including the two TEST containers, are identical to the preflight baseline. Production
+remains untouched. The installed U1 control and accepted T22 still apply to the manual slot.
+
+Unattended U3 remains DEFERRED. Independently permitted hosted CI/metadata verification
+may continue within U3's own scope; it cannot claim local hardening or trigger deployment.
+This failed code checkpoint is not a merge candidate. Keep operational identities/raw
+receipts private; publish the sanitized outcome and retain accepted-main status separately.

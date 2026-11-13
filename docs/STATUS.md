@@ -12,7 +12,7 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**Manuell syntetisk TEST READY; härdning U2 pågår efter verifierad paketinstallation.**
+**Manuell syntetisk TEST READY; U2 HARDENING_NOT_PASS, manuell rootful slot bevarad.**
 Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
 kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körningar gröna.
 29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16 PASS inom beskrivet scope.
@@ -21,9 +21,10 @@ som **ägarrapporterad evidens**, inte självständigt uppmätt av worker. UI/PW
 Slotten använder endast egna syntetiska resurser, inga riktiga nycklar/providers/modeller/order.
 Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider verifierades oförändrade.
 U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. Ägarens installation av uidmap/slirp4netns är verifierad och rootless-förkontrollen passerar.
-U2 använder separat användarmotor; första start nekades av en verifierad flaggkonflikt.
-Kompatibilitetsrättning1/2 behåller nätverkssandboxen. Manuell rootful slot bevaras;
-rootless HARDENING_PASS är ännu inte styrkt och obevakad U3 är fortsatt DEFERRED.
+U2 nådde rootless motorstart efter2/2 reparationer men avvisade image-ID-formatet före
+kandidatstart. Rootless-motorn är stoppad och avaktiverad för autostart; ingen tredje loop.
+Manuell rootful slot och alla14 ursprungliga rootful containeridentiteter är oförändrade.
+Obevakad U3 är DEFERRED; endast oberoende hosted-verifiering fortsätter.
 [Exakt åtkomstevidens och avgränsad operatörsåtgärd](operations/runbooks/test-environment.md#owner-access-confirmation-and-u2-preflight--2026-11-13).
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
 ingen integration, kostnad eller ny grind för pågående PREDEPLOY.
