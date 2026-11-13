@@ -211,7 +211,12 @@ def validate_container(info, name, p, expected, image_info, network_id):
     require(host.get("ReadonlyRootfs") is True and not host.get("Privileged"), "container privilege mismatch")
     require(host.get("CapDrop") == ["ALL"] and not host.get("CapAdd"), "capabilities mismatch")
     require(host.get("SecurityOpt") == ["no-new-privileges:true"], "security options mismatch")
-    for key in ("Binds", "Devices", "DeviceRequests", "VolumesFrom", "ExtraHosts", "Links",
+    # Engine also uses Binds strings for named volumes; permit only exact own mappings.
+    binds = host.get("Binds") or []
+    expected_binds = [PROJECT + "-" + v["source"] + ":" + v["target"] + ":rw"
+                      for v in service.get("volumes", [])]
+    require(not binds or sorted(binds) == sorted(expected_binds), "unapproved named-volume or host bind")
+    for key in ("Devices", "DeviceRequests", "VolumesFrom", "ExtraHosts", "Links",
                 "Dns", "DnsSearch", "DnsOptions", "GroupAdd", "Sysctls", "DeviceCgroupRules"):
         require(not host.get(key), "unexpected host access option")
     require(host.get("PidMode", "") == "" and host.get("IpcMode") in ("private", "") and

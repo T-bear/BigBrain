@@ -402,3 +402,18 @@ candidate `151ab3af61c0124855b6086df264ca10dd651e8c`, tree
 may operate those exact candidate images; record control and candidate identities
 separately, and keep the served banner at the actual image revision. This is not permission
 to substitute stale images silently. Actual runtime/client cards remain NOT RUN.
+
+### U1-R1 repair 2 — real Engine named-volume representation
+
+The first admitted start stopped **before either container ran**: Engine 29.6.2 represents
+the six approved named volumes in HostConfig.Binds as exact `name:target:rw` strings. The
+old blanket Binds rejection misclassified those volume mappings. Read-only diagnosis of
+actual container copies confirms all other container fields and all network/volume metadata
+match the template. No installed policy was edited and no failed acceptance was marked PASS.
+
+Repair **2/2** accepts only the complete exact multiset of the installed own volume mappings
+(or absent Binds on Engines using structured mounts); the independent Mounts check still
+requires exactly those six local named volumes. Host paths, foreign volume names, extra or
+missing entries, duplicates and changed modes reject. New tests cover these real cases.
+Original created resources are retained until validated exact-ID cleanup; a newly reviewed
+control snapshot is installed for the next bounded start. No third correction or isolation loop.

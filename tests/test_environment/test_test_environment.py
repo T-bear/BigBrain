@@ -281,6 +281,19 @@ class TestPolicy(unittest.TestCase):
         self.assertTrue(slot.accept_client(client, ("100.64.0.1", 4567)))
         client.close.assert_not_called()
 
+    def test_real_engine_named_volume_binds_and_host_bind_rejection(self):
+        info = copy.deepcopy(self.inventory["containers"][0])
+        info["HostConfig"]["Binds"] = ["bb-test-u1-" + v["source"] + ":" + v["target"] + ":rw"
+                                      for v in self.expected["services"]["api"]["volumes"]]
+        tool.validate_container(info, "api", self.p, self.expected, self.images["api"], "e" * 64)
+        valid = list(info["HostConfig"]["Binds"])
+        for binds in (["/var/run/docker.sock:/var/run/docker.sock:rw"], valid + ["/home:/host:ro"],
+                      valid[:-1], [valid[0]] * len(valid), [x.replace(":rw", ":ro") for x in valid],
+                      [x.replace("bb-test-u1-", "production-") for x in valid]):
+            info["HostConfig"]["Binds"] = binds
+            with self.subTest(binds=binds), self.assertRaises(tool.Rejected):
+                tool.validate_container(info, "api", self.p, self.expected, self.images["api"], "e" * 64)
+
     def test_relay_command_has_no_network_selected_arguments(self):
         args = tool.relay_argv("2" * 64)
         self.assertEqual(args, ["/usr/bin/docker", "exec", "-i", "2" * 64, "/bin/busybox", "timeout",
