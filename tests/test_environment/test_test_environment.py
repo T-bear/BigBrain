@@ -5,12 +5,14 @@ import json
 import os
 from pathlib import Path
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
 import threading
 import unittest
 from unittest.mock import MagicMock, patch
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("test_environment", ROOT / "scripts/test-environment.py")
@@ -372,6 +374,86 @@ class TestPolicy(unittest.TestCase):
         self.assertIn("--env-file", args)
         self.assertEqual(args[args.index("--env-file") + 1], str(root / "EMPTY"))
         self.assertEqual(args[args.index("--project-directory") + 1], str(root))
+
+    def test_rootless_metadata_binds_identity_mode_and_cgroups(self):
+        profile = {"mode": "rootless", "uid": os.getuid(), "id": "dedicated-daemon"}
+        info = {"ID": profile["id"], "SecurityOptions": ["name=seccomp,profile=builtin", "name=rootless"],
+                "CgroupVersion": "2", "CgroupDriver": "systemd"}
+        tool.validate_engine(info, tool.engine_profile({"engine": profile}))
+        for change in ({"ID": "other-daemon"}, {"SecurityOptions": ["name=seccomp"]},
+                       {"SecurityOptions": ["name=rootless"]}, {"CgroupVersion": "1"},
+                       {"CgroupDriver": "cgroupfs"}):
+            with self.subTest(change=change), self.assertRaises(tool.Rejected):
+                tool.validate_engine(info | change, profile)
+        for change in ({"mode": "tcp://evil"}, {"uid": os.getuid() + 1}, {"id": ""}, {"host": "/evil"}):
+            with self.subTest(change=change), self.assertRaises(tool.Rejected):
+                tool.engine_profile({"engine": profile | change})
+        tool.validate_engine({"SecurityOptions": ["name=seccomp,profile=builtin"]}, tool.engine_profile({}))
+        with self.assertRaises(tool.Rejected):
+            tool.validate_engine(info, tool.engine_profile({}))
+        with self.assertRaises(tool.Rejected):
+            tool.engine_profile({"engine": None})
+
+    def test_rootless_socket_rejects_symlink_owner_type_and_public_parent(self):
+        uid = os.getuid()
+        directory = SimpleNamespace(st_mode=stat.S_IFDIR | 0o700, st_uid=uid)
+        endpoint = SimpleNamespace(st_mode=stat.S_IFSOCK | 0o600, st_uid=uid)
+        with patch.object(Path, "lstat", side_effect=[directory, directory, endpoint]):
+            self.assertEqual(str(tool.rootless_socket()), f"/run/user/{uid}/bigbrain-test-rootless/docker.sock")
+        for index, replacement in (
+                (0, SimpleNamespace(st_mode=stat.S_IFLNK | 0o777, st_uid=uid)),
+                (1, SimpleNamespace(st_mode=stat.S_IFDIR | 0o755, st_uid=uid)),
+                (1, SimpleNamespace(st_mode=stat.S_IFDIR | 0o700, st_uid=uid + 1)),
+                (2, SimpleNamespace(st_mode=stat.S_IFLNK | 0o777, st_uid=uid)),
+                (2, SimpleNamespace(st_mode=stat.S_IFREG | 0o600, st_uid=uid)),
+                (2, SimpleNamespace(st_mode=stat.S_IFSOCK | 0o600, st_uid=uid + 1))):
+            metadata = [directory, directory, endpoint]
+            metadata[index] = replacement
+            with self.subTest(index=index, replacement=replacement), \
+                 patch.object(Path, "lstat", side_effect=metadata), self.assertRaises(tool.Rejected):
+                tool.rootless_socket()
+
+    def test_rootless_snapshot_and_clients_ignore_inherited_engine(self):
+        root = Path("/synthetic-installation")
+        fixed = Path(f"/run/user/{os.getuid()}/bigbrain-test-rootless/docker.sock")
+        info = {"ID": "dedicated-daemon", "SecurityOptions": ["name=seccomp", "name=rootless"],
+                "CgroupVersion": "2", "CgroupDriver": "systemd"}
+        seal = {}
+        contamination = {"DOCKER_HOST": "tcp://evil", "DOCKER_CONTEXT": "evil", "DOCKER_CONFIG": "/evil",
+                         "DOCKER_TLS_VERIFY": "1", "DOCKER_CERT_PATH": "/evil", "HOME": "/evil"}
+        with patch.dict(os.environ, contamination), patch.object(tool, "rootless_socket", return_value=fixed), \
+             patch.object(tool.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout=json.dumps(info))) as docker:
+            tool.bind_rootless_engine(root, seal)
+            env = docker.call_args.kwargs["env"]
+            self.assertEqual(docker.call_args.args[0], ["/usr/bin/docker", "info", "--format", "{{json .}}"])
+            self.assertEqual(seal["engine"], {"mode": "rootless", "uid": os.getuid(), "id": info["ID"]})
+            with patch.object(Path, "exists", return_value=True), patch.object(tool, "read_json", return_value=seal):
+                self.assertEqual(tool.clean_environment(root), env)
+                tool.run(root, "info")
+                self.assertEqual(docker.call_args.kwargs["env"], env)
+                slot = self.slot()
+                slot.root = root
+                client, capacity = MagicMock(), threading.BoundedSemaphore(1)
+                capacity.acquire()
+                with patch.object(slot, "relay_target"), patch.object(tool, "pump"), \
+                     patch.object(tool.subprocess, "Popen") as spawn:
+                    slot.relay_connection(client, "2" * 64, threading.Event(), capacity)
+                self.assertEqual(spawn.call_args.kwargs["env"], env)
+            self.assertEqual(env["DOCKER_HOST"], "unix://" + str(fixed))
+            self.assertEqual(env["DOCKER_CONFIG"], str(root / "client"))
+            self.assertNotIn("DOCKER_CONTEXT", env)
+            self.assertNotIn("DOCKER_TLS_VERIFY", env)
+
+    def test_preflight_rejects_changed_daemon_before_compose_or_images(self):
+        slot = self.slot()
+        slot.seal["engine"] = {"mode": "rootless", "uid": os.getuid(), "id": "installed"}
+        info = {"ID": "replacement", "SecurityOptions": ["name=seccomp", "name=rootless"],
+                "CgroupVersion": "2", "CgroupDriver": "systemd"}
+        with patch.object(tool, "run", return_value=json.dumps(info)) as docker, \
+             patch.object(tool, "compose") as compose, self.assertRaises(tool.Rejected):
+            slot.preflight()
+        docker.assert_called_once_with(slot.root, "info", "--format", "{{json .}}")
+        compose.assert_not_called()
 
     def test_concurrent_lifecycle_fails_without_wait(self):
         with tempfile.TemporaryDirectory() as directory:

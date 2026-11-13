@@ -1,0 +1,12 @@
+{
+  "exec-opts": [
+    "native.cgroupdriver=systemd"
+  ],
+  "features": {
+    "containerd-snapshotter": true
+  },
+  "log-driver": "json-file",
+  "labels": [
+    "io.bigbrain.test.engine=rootless"
+  ]
+}

@@ -12,26 +12,25 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**Manuell syntetisk TEST READY; U2 HARDENING_NOT_PASS, manuell rootful slot bevarad.**
-Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
-kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körningar gröna.
-29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16 PASS inom beskrivet scope.
-Ägaren bekräftar samtliga fyra externa T22-förväntningar med “Allt är grönt”: T22 PASS
-som **ägarrapporterad evidens**, inte självständigt uppmätt av worker. UI/PWA-acceptans NOT RUN.
-Slotten använder endast egna syntetiska resurser, inga riktiga nycklar/providers/modeller/order.
-Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider verifierades oförändrade.
-U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. Ägarens installation av uidmap/slirp4netns är verifierad och rootless-förkontrollen passerar.
-U2 nådde rootless motorstart efter2/2 reparationer men avvisade image-ID-formatet före
-kandidatstart. Rootless-motorn är stoppad och avaktiverad för autostart; ingen tredje loop.
-Manuell rootful slot och alla14 ursprungliga rootful containeridentiteter är oförändrade.
-Obevakad U3 är DEFERRED; [hosted-only paketeringsprov PR85](https://github.com/T-bear/BigBrain/pull/85) har PASS:
-avsiktligt rött frontendtest och grönt verifierat kandidatpaket med ärligt redovisade utfall.
-Ingen image från provet kördes lokalt.
-U2-koden är ett [blockerat leveransexperiment i PR84](https://github.com/T-bear/BigBrain/pull/84),
-inte accepterad rootless-implementation; denna statuspublicering ändrar ingen körkontroll.
-[Exakt åtkomstevidens och avgränsad operatörsåtgärd](operations/runbooks/test-environment.md#owner-access-confirmation-and-u2-preflight--2026-11-13).
-[Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
-ingen integration, kostnad eller ny grind för pågående PREDEPLOY.
+**Manuell syntetisk TEST READY; BB-159:s rootless-runtimeprov HARDENING_PASS, oberoende evidensgranskning utan P0/P1.**
+BB-159 risk3/cap2h/max2 reparationer har0/2 använda; tidigare U2-tak2/2 ligger kvar.
+Exakta ursprungliga OCI-image-ID:n fungerar med privat containerd-imagelager utan svagare
+admission. Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, rootless-kontroll
+`8ed7b5a77bb36faebd37053599420ef3a2f49328`. Verkliga isolerings-/resursprov20/20,
+livscykel/lokal åtkomst15/15, motoromstart8/8 och levande nät-/lagringsprov14/14 PASS.
+Tidigare extern T22 PASS återanvänds som **ägarrapporterad evidens** för oförändrad
+host, adress, tillåtelselista och relaypolicy; färska rootless lokala åtkomstprov PASS.
+Detta är inte ny extern mätning eller UI/PWA-acceptans.
+Säker reträtt är demonstrerad: den manuella rootful-slotten kör åter originalkontrollen
+`75e4023c828922d05b6e9f3419be68fdd56f56cb` och originalimages, med HTTP-probe PASS.
+Alla12 produktionscontainrars ID:n/images/starttider är oförändrade. Rootless-motorn är
+stoppad/disabled efter demonstrerad säker reträtt; inga timers/autostart eller produktionsändringar.
+U3:s obevakade aktivering är ännu DEFERRED; dess förgodkända implementation kan följa
+efter accepterad BB-159. Exakt slutrevision, review och obligatorisk CI binds i PR. [Hosted-only-provet PR85](https://github.com/T-bear/BigBrain/pull/85)
+är PASS med avsiktligt rött funktionstest och grönt paket; provgrenen ska aldrig mergas.
+[Detaljer och kvarstående steg](operations/runbooks/test-environment.md#bb-159-runtime-evidence--2026-11-13).
+[Agent Independence](architecture/agent-independence.md) är framtida krav utan integration,
+kostnad eller ny PREDEPLOY-grind. Finance-/produktions- och backupgrindar ändras inte.
 
 ## Frysningar och operativa osäkerheter
 

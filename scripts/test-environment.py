@@ -20,6 +20,7 @@ import re
 import select
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import time
@@ -73,11 +74,72 @@ def template_path():
     return installed if installed.exists() else ROOT.parent / "compose.test.yaml"
 
 
+def engine_profile(seal):
+    # Missing profile is the original U1 rootful installation, never auto-detect.
+    profile = seal.get("engine")
+    if profile is None:
+        require("engine" not in seal, "invalid installed engine")
+        return {"mode": "rootful"}
+    require(isinstance(profile, dict) and set(profile) == {"mode", "uid", "id"},
+            "invalid installed engine")
+    require(profile["mode"] == "rootless" and type(profile["uid"]) is int and
+            profile["uid"] == os.getuid(), "installed engine mode/owner mismatch")
+    require(isinstance(profile["id"], str) and bool(profile["id"].strip()), "installed daemon identity missing")
+    return profile
+
+
+def rootless_socket():
+    path = Path(f"/run/user/{os.getuid()}/bigbrain-test-rootless/docker.sock")
+    # lstat rejects symlinks at every runtime component, including the socket.
+    for parent in (path.parent.parent, path.parent):
+        info = parent.lstat()
+        require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.getuid() and
+                stat.S_IMODE(info.st_mode) == 0o700, "rootless runtime must be private and owned")
+    info = path.lstat()
+    require(stat.S_ISSOCK(info.st_mode) and info.st_uid == os.getuid(),
+            "rootless socket must be an owned non-symlink socket")
+    return path
+
+
 def clean_environment(root):
-    # No HOME, proxy, Docker context, COMPOSE_*, .env, or provider inheritance.
+    # Only operator-installed policy selects an engine; never candidate or env.
+    seal_path = root / "installation.json"
+    profile = engine_profile(read_json(seal_path)) if seal_path.exists() else {"mode": "rootful"}
+    host = "unix://" + str(rootless_socket()) if profile["mode"] == "rootless" else "unix:///var/run/docker.sock"
     return {"PATH": "/usr/bin:/bin", "HOME": str(root / "client"),
-            "DOCKER_CONFIG": str(root / "client"),
-            "DOCKER_HOST": "unix:///var/run/docker.sock", "LANG": "C.UTF-8"}
+            "DOCKER_CONFIG": str(root / "client"), "DOCKER_HOST": host, "LANG": "C.UTF-8"}
+
+
+def validate_engine(info, profile):
+    security = info.get("SecurityOptions") or []
+    require(isinstance(security, list) and all(isinstance(entry, str) for entry in security),
+            "invalid daemon security metadata")
+    require(any(entry.split(",", 1)[0] == "name=seccomp" for entry in security), "default seccomp required")
+    rootless = "name=rootless" in security
+    require(rootless == (profile["mode"] == "rootless"), "daemon engine mode mismatch")
+    if profile["mode"] == "rootless":
+        require(info.get("ID") == profile["id"], "daemon identity mismatch")
+        require(info.get("CgroupVersion") == "2" and info.get("CgroupDriver") == "systemd",
+                "rootless requires cgroup v2/systemd")
+
+
+def bind_rootless_engine(root, seal):
+    # Snapshot alone may query an unsealed daemon, using the same private client
+    # environment and fixed socket as all later commands. No context is consulted.
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(root / "client"),
+           "DOCKER_CONFIG": str(root / "client"), "LANG": "C.UTF-8",
+           "DOCKER_HOST": "unix://" + str(rootless_socket())}
+    try:
+        result = subprocess.run(["/usr/bin/docker", "info", "--format", "{{json .}}"],
+                                cwd=root, env=env, text=True, capture_output=True, timeout=120, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        raise Rejected("Docker unavailable during rootless snapshot") from None
+    require(result.returncode == 0, "Docker snapshot metadata unavailable")
+    info = json.loads(result.stdout)
+    profile = {"mode": "rootless", "uid": os.getuid(), "id": info.get("ID")}
+    engine_profile({"engine": profile})
+    validate_engine(info, profile)
+    seal["engine"] = profile
 
 
 def run(root, *args):
@@ -276,6 +338,7 @@ def installation(root):
     seal = read_json(root / "installation.json")
     require(seal.get("version") == 1, "installation version mismatch")
     client_addresses(seal.get("allowed_clients"))
+    engine_profile(seal)
     for name in ("test-environment.py", "compose.test.yaml", "EMPTY"):
         path = root / name
         require(not path.is_symlink() and digest(path) == seal["files"][name], "installed control file drift")
@@ -284,22 +347,26 @@ def installation(root):
     return seal
 
 
-def snapshot(destination, revision, clients=None):
+def snapshot(destination, revision, clients=None, engine="rootful"):
+    require(engine in ("rootful", "rootless"), "invalid snapshot engine")
     allowed_clients = client_addresses(clients)
     require(bool(SHA.fullmatch(revision or "")), "reviewed control SHA required")
     destination = Path(destination).absolute()
     require(not destination.exists(), "installation destination already exists")
     require(not any((parent / ".git").exists() for parent in [destination, *destination.parents]),
             "installation must be outside candidate worktrees")
-    # No sudo, package install, service, timer, Docker call or candidate hook.
+    # No install/service/mutation/hook; only rootless snapshots query Docker info.
     destination.mkdir(mode=0o700)
     shutil.copyfile(Path(__file__), destination / "test-environment.py")
     shutil.copyfile(template_path(), destination / "compose.test.yaml")
     (destination / "EMPTY").write_bytes(b"")
     (destination / "client").mkdir(mode=0o700)
     files = {n: digest(destination / n) for n in ("test-environment.py", "compose.test.yaml", "EMPTY")}
-    write_json(destination / "installation.json", {"version": 1, "control_revision": revision,
-               "slot": uuid.uuid4().hex, "files": files, "allowed_clients": allowed_clients})
+    seal = {"version": 1, "control_revision": revision, "slot": uuid.uuid4().hex,
+            "files": files, "allowed_clients": allowed_clients}
+    if engine == "rootless":
+        bind_rootless_engine(destination, seal)
+    write_json(destination / "installation.json", seal)
     for name in [*files, "installation.json"]:
         (destination / name).chmod(0o400)
 
@@ -324,9 +391,8 @@ class Slot:
                 "control_files": self.seal["files"], **extra}) + "\n")
 
     def preflight(self):
-        security = json.loads(run(self.root, "info", "--format", "{{json .SecurityOptions}}"))
-        require(not any("rootless" in entry for entry in security), "U1 validates rootful only; U2 not implemented")
-        require(any("seccomp" in entry for entry in security), "default seccomp required")
+        profile = engine_profile(self.seal)
+        validate_engine(json.loads(run(self.root, "info", "--format", "{{json .}}")), profile)
         validate_effective(json.loads(compose(self.root, "config", "--format", "json")), self.expected)
         for name in ("api", "web"):
             info = json.loads(run(self.root, "image", "inspect", self.p[name]))[0]
@@ -659,6 +725,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["snapshot", "validate", "render", "start", "status", "stop", "reset", "probe", "relay"])
     parser.add_argument("--destination")
+    parser.add_argument("--engine", choices=["rootful", "rootless"], help="operator snapshot only; default rootful")
     parser.add_argument("--control-sha")
     parser.add_argument("--allow-client", action="append", help="snapshot only: exact approved Tailscale IPv4, include local probe")
     parser.add_argument("--candidate-sha")
@@ -669,10 +736,11 @@ def main():
     parser.add_argument("--confirm")
     parser.add_argument("--restart", action="store_true")
     args = parser.parse_args()
+    require(args.engine is None or args.command == "snapshot", "engine selection is snapshot only")
     os.umask(0o077)
     if args.command == "snapshot":
         require(args.destination is not None, "destination required")
-        snapshot(args.destination, args.control_sha, args.allow_client)
+        snapshot(args.destination, args.control_sha, args.allow_client, args.engine or "rootful")
         print("SNAPSHOT created; review installed control hashes before runtime")
         return
     if args.command == "validate" and not (ROOT / "installation.json").exists():
