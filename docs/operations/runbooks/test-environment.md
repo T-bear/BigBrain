@@ -948,3 +948,21 @@ DoD (five):
 At cap preserve results and safe manual TEST, stop the failing operation without a new
 repair/design loop. Ordinary implementation choices remain delegated. Completion refers
 to the defined synthetic PREDEPLOY delivery, not an unprovable absence of all future bugs.
+
+### BB-162 initial transport correction
+
+Verified controlled same-service experiment: six allowlisted persistent HTTP/1.1 health
+connections yield four Healthy responses and two ConnectionResetError outcomes; one
+capacity-rejection receipt is recorded. A real BusyBox exec exits0.007s after stdin EOF,
+so no EOF-cleanup or nginx modification is justified. The first natural-browser observer
+did not reach the page: its15s session deadline was shorter than observed cold startup;
+that is observer evidence, not a reproduced application failure. A second bounded natural
+observation uses a60s private QA session bound; no deployed control policy changes for it.
+
+A real loopback concurrency regression against the relay function reproduces rejection
+of the fifth legitimate persistent connection. Initial minimal delivery correction sets
+one fixed operator connection bound to8 for semaphore/backlog/pool/receipts. It is never
+candidate-selected. Source admission, exact target, bytes/deadlines, resource caps and
+cleanup are unchanged. The regression requires six accepted connections and continued
+bounded rejection/one sanitized receipt above the installed limit. This establishes a
+verified failure mode; complete cold-browser/runtime acceptance still must pass.

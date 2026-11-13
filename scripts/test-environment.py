@@ -29,6 +29,7 @@ import urllib.request
 import uuid
 
 PROJECT = "bb-test-u1"
+RELAY_CONNECTIONS = 8
 SLOT_LABEL = "io.bigbrain.test.slot"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 IMAGE = re.compile(r"sha256:[0-9a-f]{64}\Z")
@@ -526,16 +527,16 @@ class Slot:
                 self.relay_target(ids["web"])
                 self.internal_health(ids["web"])
             cancelled = threading.Event()
-            capacity = threading.BoundedSemaphore(4)
+            capacity = threading.BoundedSemaphore(RELAY_CONNECTIONS)
             capacity_notice_recorded = False
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
                 # No wildcard, IPv6, SO_REUSEPORT or fallback bind.
                 listener.bind((self.p["bind"], 13001))
-                listener.listen(4)
+                listener.listen(RELAY_CONNECTIONS)
                 listener.settimeout(0.5)
-                self.receipt("relay-listening", web_id=ids["web"], max_connections=4, timeout_seconds=30)
+                self.receipt("relay-listening", web_id=ids["web"], max_connections=RELAY_CONNECTIONS, timeout_seconds=30)
                 print("RELAY listening on selected interface; client ACL acceptance remains separate", flush=True)
-                with ThreadPoolExecutor(max_workers=4) as workers:
+                with ThreadPoolExecutor(max_workers=RELAY_CONNECTIONS) as workers:
                     try:
                         while not cancelled.is_set():
                             try:
@@ -553,7 +554,7 @@ class Slot:
                                 client.close()
                                 if not capacity_notice_recorded:
                                     # One sanitized observation per relay, never per request.
-                                    self.receipt("relay-capacity-rejected", max_connections=4)
+                                    self.receipt("relay-capacity-rejected", max_connections=RELAY_CONNECTIONS)
                                     capacity_notice_recorded = True
                                 continue
                             workers.submit(self.relay_connection, client, ids["web"], cancelled, capacity)
