@@ -26,6 +26,7 @@ Avsaknad av tillgång ger inte rätt att kringgå behörigheter eller skyddsregl
 | Remote Desktop Commander | Avgränsad serverdiagnostik, läsning och oprivilegierade syntetiska tester | Åtkomst styrs av faktisk session och hostbehörighet. Ingen generell sudo/root eller påverkan på produktion utan uttryckligt tillstånd. |
 | Termius och `/home/enigma/bigbrain-pr.sh` | Ägarstyrd publicering av små, isolerade patchar med diffgranskning och `PUBLICERA` | Använd befintligt patch-/checkpointflöde; ingen automatisk merge/deployment och inga manuella filöverföringar. |
 | Context7 | Versionsnära dokumentation för bibliotek och API:er | Använd när aktuell primärdokumentation kan påverka lösningen; verifiera sedan mot projektets faktiska versioner. |
+| Wolfram (ChatGPT-plugin) | Matematiska och statistiska kontrollberäkningar för Finance, t.ex. avkastning, Sharpe-kvot, drawdown och backtestmått | Ansluten till ChatGPT, inte direkt till BigBrain. Ersätter inte dataproveniens, rättighetskontroll eller oberoende nivå 3-granskning och ger ingen handels- eller deploymentauktoritet. |
 | Acumen | Förberedande kontroll av ändrad extern kunskap inför research | Externt underlag ersätter inte projektets accepterade kontrakt eller egen verifiering. |
 | Webbsökning och officiell dokumentation | Aktuella beroenden, leverantörskrav, standarder och källor | Bedöm källtrovärdighet och dataskydd; publicera inte interna uppgifter i sökningar. |
 
