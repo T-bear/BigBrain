@@ -642,3 +642,51 @@ DoD (five):
 
 At cap retain safe results, stop the failing operation and preserve/restore U1; no new
 repair loop. Existing preapproved U3 can continue only after its start conditions hold.
+
+## BB-159 runtime evidence — 2026-11-13
+
+**Verified:** original archived package151 image IDs and source labels pass unchanged
+rootless admission with control `8ed7b5a77bb36faebd37053599420ef3a2f49328`, tree
+`8f8aa100fdf2b3899f66488edcf42d0f23beb2c8`. Only the reviewed daemon JSON changes the
+image store; unit/controller stay as previously reviewed. Rootless Docker29 uses overlayfs
+through its private containerd snapshotter; actual snapshotter paths/storage are inside
+operator-owned private daemon state. Host daemon UID1000; both candidate user namespaces
+map namespace0 to operator1000 and1–65536 to subordinate100000–165535. Candidate users
+remain1654/101 with zero effective caps, NoNewPrivs and seccomp. No new privilege.
+
+| Actual evidence | Result and scope |
+| --- | --- |
+| Package identity | Exact original hosted OCI index IDs, original source labels and archive checksums PASS; no tag substitution or ID remapping |
+| T04–T06 | Served SHA/banner/assets/manifest/icons, synthetic API schema/Problem Details and fixture persistence across application restart PASS |
+| T11/T12/T15 | 20 boundary checks PASS: absent host/socket mounts, exact cgroup caps and bounded child CPU throttling/OOM/PID enforcement; negative network paths |
+| T16/T22 local | 15 lifecycle/access checks PASS: collisions/symlink reject before mutation, own reset/fresh start, allowlisted local client succeeds; LAN source/destination and IPv6 refused |
+| Engine lifecycle | 8 checks PASS: user namespace/socket, actual user-unit restart, stable daemon and container identities, fixture persistence, autostart disabled |
+| Live network/storage | 14 checks PASS: listening Tailnet/LAN/IPv6 canaries have positive host controls; candidate connections denied with no arrivals; actual candidate route has no default gateway, eth0 IPv6 disabled and only IPv6 loopback; slirp gateway host-loopback attempt denied; private snapshotter storage ownership verified |
+| Safe rollback/noninterference | Rootless slot/motor stopped; preserved rootful TEST containers/images restarted and HTTP probe PASS; all12 production IDs/images/starttimes unchanged |
+
+**Interpretation:** external T22 results from the earlier explicit owner confirmation are
+applicable reused evidence, not a new external test. Host/Tailscale configuration, selected
+IP/port, exact three-client allowlist and relay admission/transport functions are unchanged.
+Fresh rootless local positive/negative access and real end-to-end HTTP checks cover the
+changed backend. No owner UI/PWA acceptance is inferred. Relay capacity/deadline/cleanup
+bounds are supported by unchanged-source review and focused regression tests; not every
+kill-escalation/deadline branch was directly exercised in this task.
+
+**Limitations:** rootless isolates candidate execution, not a misled operator/worker that
+already possesses rootful Docker access. Only trusted owned worker branches are admitted;
+untrusted PR execution remains outside v1. No production data/keys, real providers/models,
+market data/orders or money. Daily backup/real restore gate remains BLOCKED. Linger remains
+disabled; unattended boot/logout persistence is a U3 concern, not claimed by this rehearsal.
+
+BB-159 repairs0/2; original U2 remains2/2 exhausted. Runtime verification closes the known
+compatibility blocker; final HARDENING_PASS requires independent review and applicable CI
+on the final exact candidate. No new architecture loop or report round. Until acceptance,
+manual rootful TEST remains the active safe slot; rootless resources are retained stopped.
+Private receipts bind identities/timestamps; only this sanitized evidence is published.
+
+Independent runtime/evidence review concludes scoped **HARDENING_PASS**, no outstanding
+P0/P1 and no further runtime/relay gate required. Final exact candidate/tree and required
+checks are bound in the delivery PR; merge remains conditional on those checks. This
+closes the BB-159 compatibility work, not U3 unattended boot/logout or UI acceptance.
+The preapproved U3 implementation may follow accepted BB-159 without another owner click;
+activation still requires its own verified controls and any genuinely privileged host action.

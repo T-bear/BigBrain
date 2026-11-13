@@ -1306,15 +1306,13 @@ frysningsbeslut har oförändrad auktoritet; arkivets current/next är inte aktu
 
 ### BB-159 — Rootless image-identitet före obevakad TEST
 
-**BLOCKED / P1 för U2-acceptans, inte för fungerande manuell U1.** I det avgränsade
-U2-provet rapporterar CI-paketet Docker29 OCI-index/descriptor-ID medan vald klassisk
-imagelagring i rootless-motorn rapporterar config-ID. Samma source-label/runtimeconfig/
-RootFS-lager verifierade; exakta ID:n skiljer och admission avvisar före kandidatstart.
-Rootless-motorn är stoppad/disabled efter2/2 reparationer; ingen tredje loop är beställd.
-DoD för ett separat framtida beslutat arbete: verifiera producent/konsumentens identity-
-kontrakt med verkligt paket, behåll digestbunden fail-closed admission och klara de
-berörda resurs-/nät-/livscykelproven. Inga taggsubstitutioner eller nya privilegier följer
-av denna post. [Kanonisk evidens](operations/runbooks/test-environment.md#u2-predetermined-exit--hardening-not-pass).
+**LÖST i verifierad kodkandidat; oberoende runtimegranskning utan P0/P1.** Efter nytt uttryckligt
+fortsättningsbeslut har BB-159 egen risk3-ram/cap2h/max2 reparationer,0/2 använda; U2:s2/2
+nollställs inte. Privat containerd-imagelager behåller CI-paketets exakta OCI-identiteter utan
+svagare validator. Verkliga resurs-/nät-/reset-/motoromstartsprov PASS och säker reträtt till
+manuell U1 demonstrerad; produktionens12 containeridentiteter/images/starttider oförändrade.
+Rootless stoppad/disabled inför slutacceptans, obevakad U3 ännu DEFERRED.
+[Kanonisk evidens](operations/runbooks/test-environment.md#bb-159-runtime-evidence--2026-11-13).
 
 ### BB-160 — SDK-feature-band för framtida ren produktionsimage-build
 
