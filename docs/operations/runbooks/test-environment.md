@@ -923,3 +923,28 @@ candidate preparation and verification; the preserved151ab3a image is not a clai
 the current Finance worker branch is deployed. Non-synthetic Finance and production
 remain subject to their existing separate requirements. BB-162 is a proposed transport
 follow-up, not a prerequisite owner approval for already authorized synthetic testing.
+
+## BB-162 execution — owner authorization 2026-11-13
+
+The owner explicitly authorizes continuing the fix until PREDEPLOY is fully ready, with
+completion notice. New bounded risk2 task: estimate1–2 active hours/cap2h, maximum2
+repairs, initially0/2; U3 remains2/2 exhausted. Continue its preserved branch/history,
+merging accepted main e2635e53edced5db106f7d6366809633f3c1b966 (exact main CI PASS).
+The owner also requires the known TEST-only banner issue BB-161 closed in this delivery.
+No new vendor, subscription, model/provider or production scope.
+
+DoD (five):
+1. Correlate real cold-browser transport failure with its cause using bounded, sanitized
+   evidence; implement the minimal supported correction without broadening host authority.
+2. Fix the known TEST banner/modal obstruction and verify desktop/mobile controls.
+3. Actual automatic synthetic candidate: cold start/add/refresh PASS, retained honest red
+   outcomes, original access/network/volume/key boundaries and enforced resource caps.
+4. Verify pause/interruption/one safe restoration and intended sessions-independent
+   operation; preserve manual fallback. Any genuinely privileged persistence step waits
+   until all review/install/runtime preparation is complete, never bypass sudo policy.
+5. Independent fixed-control review before installation, exact applicable CI/merge and
+   canonical facts; no completion notice while known PREDEPLOY delivery errors remain.
+
+At cap preserve results and safe manual TEST, stop the failing operation without a new
+repair/design loop. Ordinary implementation choices remain delegated. Completion refers
+to the defined synthetic PREDEPLOY delivery, not an unprovable absence of all future bugs.

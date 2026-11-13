@@ -527,6 +527,7 @@ class Slot:
                 self.internal_health(ids["web"])
             cancelled = threading.Event()
             capacity = threading.BoundedSemaphore(4)
+            capacity_notice_recorded = False
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
                 # No wildcard, IPv6, SO_REUSEPORT or fallback bind.
                 listener.bind((self.p["bind"], 13001))
@@ -550,6 +551,10 @@ class Slot:
                                 continue
                             if not capacity.acquire(blocking=False):
                                 client.close()
+                                if not capacity_notice_recorded:
+                                    # One sanitized observation per relay, never per request.
+                                    self.receipt("relay-capacity-rejected", max_connections=4)
+                                    capacity_notice_recorded = True
                                 continue
                             workers.submit(self.relay_connection, client, ids["web"], cancelled, capacity)
                     except KeyboardInterrupt:
