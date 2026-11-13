@@ -1,6 +1,6 @@
 # Synthetic TEST environment — U1–U3
 
-2026-11-13: **manual synthetic TEST ready; BB-159 rootless hardening accepted; U3 corrected source awaiting independent review, not installed; unattended activation DEFERRED**.
+2026-11-13: **U3 BLOCKED/PARTIAL; experimental PR87 NOT MERGEABLE; BB-159 rootless hardening remains accepted; manual fallback restoration PENDING; unattended activation DEFERRED**.
 Authority is owned solely by the
 [TEST owner decision](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
 The external operator boundary is described in
@@ -26,7 +26,7 @@ No real model/provider/order or new host privilege is authorized.
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
 | U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 1/2 used for first source-review batch; hosted proof PASS, new local/unattended activation NOT RUN |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 2/2 exhausted; core partial PASS, DoD3 browser P1 BB-162; rollback/pause/manual restoration PENDING; unattended activation DEFERRED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
@@ -56,7 +56,7 @@ U2 DoD (planned, no implementation here):
 4. Record success or bounded failure within 4 h / two repairs; no silent privilege widening.
 5. Preserve manual U1 on failure and mark unattended U3 deferred; document safe recovery.
 
-U3 DoD (planned, no implementation here):
+Original U3 DoD (retained scope; later implementation/outcome below):
 
 1. Choose an authorized harmless UI/data pilot with no Finance, providers or production data.
 2. Bind trusted source/image/provenance to the permitted U1/U2 runtime scope.
@@ -697,7 +697,7 @@ Start condition: BB-159 merged after exact independent level3 review and four su
 required candidate checks. Baseline `d50b366c59730422ec670de44d5377999448f262`, tree
 `febfb882c4d9d40bf92c23b8b13f5ccb7925d7a9`. Parent verifies exact post-merge CI before
 installing new runtime controls. This is the existing preapproved U3, risk2, estimate3–6
-active hours/cap6h, maximum2 repairs for the whole task,0/2 used. Earlier hosted-only
+active hours/cap6h, maximum2 repairs for the whole task,0/2 at start (now2/2 exhausted; outcome below). Earlier hosted-only
 expected-red proof remains valid; its fixture PR85 stays closed/unmerged. U2's exhausted
 budget and BB-159's separate0/2 do not reset U3.
 
@@ -765,7 +765,7 @@ controls and runtime evidence before requesting the single narrowly required own
 
 ### U3 fixed-control source candidate
 
-Implemented, not installed: fixed task wrapper plus user unit, with71 focused tests PASS
+Initial source checkpoint, before later installation/runtime below: fixed task wrapper plus user unit, with71 focused tests PASS
 (38 new/33 existing), static unit/syntax/documentation/diff checks PASS. The unit uses
 explicit clean environment, no automatic restart,45min maximum lifetime,90s stop timeout,
 whole-owned-cgroup cleanup, one CPU/512MiB/64 tasks and4GiB file-size bound. It does not
@@ -789,7 +789,7 @@ restoration with fresh fixtures; no database rollback claim. Pause stops owned w
 retains fixtures; resume cannot clear an unknown unfinished receipt. Rootful is never a
 wrapper engine/fallback target: parent owns that preserved manual retreat.
 
-Current verification limits: source tests are not real artifact/service or unattended
+Verification limits at that source checkpoint: source tests are not real artifact/service or unattended
 acceptance. Independent exact fixed-control review, hosted artifact and real service/
 rollback/pause tests precede activation. Rootless first-task resources must be verified
 empty through the existing installed controller; preserve the original rootful fallback.
@@ -847,3 +847,79 @@ control review applies to unchanged code; necessary focused verification covers 
 single changed bound before replacing the installed wrapper/hash. After the final bounded
 trial, any further blocker invokes the predetermined safe exit: preserve completed
 hardening and manual TEST, defer automation, retain evidence; no third repair or new loop.
+
+
+## U3 bounded outcome — BLOCKED/PARTIAL 2026-11-13
+
+**Final bounded outcome: BLOCKED/PARTIAL; PR87 experimental NOT MERGEABLE; manual synthetic TEST restored.**
+This supersedes earlier same-day ready/not-installed/pending-source statements only for
+U3's current outcome. It does not revoke accepted BB-159 hardening or import failed U3
+code into accepted main. This outcome worktree contains documentation only, based on
+accepted `d50b366c59730422ec670de44d5377999448f262`. Actual rollback, pause and final safe retreat are verified below; no failed code is promoted.
+
+### VERIFIED
+
+- Source candidate `40a8bdba877b8502d4699173d0badbb9289a4cf6`, tree
+  `c5faf7c63834e16b762d40b9a0784d1592b2931b`, [PR87](https://github.com/T-bear/BigBrain/pull/87):
+  78 focused tests and all five CI jobs PASS in run43459885018. Installed wrapper SHA256
+  `dcfccce4d39930932e46db8082af103b4907b54f33739b638968640de87ce076`.
+  These are source/control facts, not a successful complete U3 pilot.
+- After the bounded download correction, the real expected-red package task progressed
+  through fetching/verified/replacing/serving/succeeded. Functional red status stayed red;
+  secrets/package admission and local allowed-client/LAN-source/LAN-destination/IPv6
+  checks PASS. Its cold browser add failed with NetworkError; browser pilot NOT PASS.
+- Normal green core task PASS: actual HTTP health, succeeded receipt, matching
+  last-known-good and duplicate-ID rejection without pending work. Serving began
+  16:26:53 UTC; core succeeded16:27:27. Green cold browser rendered TEST/Family and
+  the newly added synthetic item, but Refresh failed with netReset16:27:10, during
+  Serving and before its deadline. Private runtime/browser/core proofs retain detail;
+  no private endpoints, identities or paths are published here.
+- Both repair batches are exhausted (2/2). Independent review confirms a P1 against
+  U3 DoD3. No more UI reruns/fixes are authorized within this exhausted task.
+
+| Independent checks and final safe exit | Current result |
+| --- | --- |
+| One owned rollback and fresh-fixture restoration | PASS: one injected owned-relay failure, one own reset/start restoration; previous request/source retained, fresh resources, stopped afterward |
+| Pause/rejected paused submission/explicit idle resume | PASS: aborted receipt, stopped own containers, rejected paused submission, explicit resume leaves idle |
+| Final rootless/task safe stop and preserved manual rootful restoration/health | PASS: persistent PAUSED, both units stopped/disabled; original manual containers/images restored; ordered relay and HTTP/assets/SHA probe PASS |
+| Final noninterference reconciliation | PASS: all12 original production IDs/images/starttimes unchanged; only own synthetic resources mutated |
+
+### INTERPRETATION
+
+Core task/CI success does not establish the required harmless browser/data pilot.
+The fresh green failure occurred before expiry; a task-duration explanation is not
+established. Root cause remains unverified; no attribution to the four-client relay
+cap, browser settings or a new isolation defect is justified. Earlier manual-profile
+browser PASS retains its original scope. BB-161 banner overlap remains a separate P2.
+No product UI change or new owner PWA gate is introduced by this outcome.
+
+Unattended activation is DEFERRED. Linger remains no; no owner linger action occurred
+or is requested while the required pilot is blocked. Accepted BB-159 rootless control
+and original manual fallback resources are preserved; manual restoration/health is verified PASS. The stopped experimental task/engine remain
+disabled and PAUSED; this does not claim complete U3 or owner UI/PWA acceptance. Authority/checkpoint/AGENTS, Finance, production,
+backup and existing access/resource boundaries remain unchanged.
+
+### PROPOSAL — no start order
+
+[BB-162](../../BACKLOG.md#bb-162--u3-browsertransport-blockerar-harmless-pilot) records the
+verified transport blocker and a possible new risk2 task: estimate1–2h/cap2h/max2 repairs,
+five bounded criteria for diagnosis, a minimal proven fix, cold-browser add/refresh with
+existing bounds, focused regression/independent fixed-control review/CI and safe retreat.
+It is not a continuation order or reset of U3's exhausted counter. No new architecture,
+platform, token, cost or automatic repair loop is proposed.
+
+Actual final controls: original manual control75e4023 and image151ab3a are active again;
+rootless/task units are stopped and disabled, pending work absent and PAUSED persists.
+No linger, host privilege, production provider/model/order or backup decision changed.
+A fresh status check also returned HTTP200/Healthy from the manual TEST endpoint.
+
+### Manual synthetic Finance can proceed independently
+
+The U3 browser blocker defers unattended automation; it does not suspend the existing
+[synthetic TEST mandate](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
+A trusted Finance candidate can be packaged, provenance/isolation checked and run in the
+manual synthetic slot within that mandate, with its affected test card. This requires
+candidate preparation and verification; the preserved151ab3a image is not a claim that
+the current Finance worker branch is deployed. Non-synthetic Finance and production
+remain subject to their existing separate requirements. BB-162 is a proposed transport
+follow-up, not a prerequisite owner approval for already authorized synthetic testing.
