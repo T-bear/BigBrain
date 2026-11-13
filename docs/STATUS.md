@@ -10,6 +10,18 @@ Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga
 [aktiv recovery](operations/codex-recovery.md) behåller sina respektive ansvar.
 Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc-2a-20261024.md).
 
+## Syntetisk TEST U1 — 2026-11-13
+
+**BLOCKED: ej accepterad, installerad eller runtime-verifierad.** Kandidat på
+`checkpoint/test-environment-u1-20261113`, accepterad main fortsatt
+`e63aaa4dc30718f2620f2880a6f2b847e6091d89`. Första oberoende review fann blockerande
+Compose-kompatibilitet, omnumrerade testkort, mandatglidning och saknat secrets-villkor
+för paketering. U1:s två reparationsförsök är förbrukade; ingen tredje loop eller merge.
+24 fokuserade tester, dokumentationsvalidator och diffkontroll PASS hos granskaren;
+det bevisar inte fungerande testslot. Separat nät-/reläprov PASS avser tom provimage.
+U2 NOT STARTED (säker U1-slot saknas); obevakad U3 DEFERRED. Ingen användarlänk.
+[Exakta fynd, fast utgång, kvarstående prov och uppdragsramar](operations/runbooks/test-environment.md#independent-parent-review-and-bounded-exit--2026-11-13).
+
 ## Frysningar och operativa osäkerheter
 
 | Område | Gällande beslut och kvarstående begränsningar |

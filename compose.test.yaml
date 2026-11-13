@@ -1,0 +1,226 @@
+{
+  "name": "bb-test-u1",
+  "services": {
+    "api": {
+      "image": "${TEST_API_IMAGE:?required}",
+      "container_name": "bb-test-u1-api",
+      "pull_policy": "never",
+      "user": "1654:1654",
+      "entrypoint": [
+        "dotnet",
+        "BigBrain.Finance.Hosting.dll"
+      ],
+      "command": [],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cpus": 0.75,
+      "mem_limit": 1207959552,
+      "memswap_limit": 1207959552,
+      "pids_limit": 64,
+      "restart": "no",
+      "stop_grace_period": "35s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "5m",
+          "max-file": "2"
+        }
+      },
+      "networks": {
+        "test": null
+      },
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      },
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=67108864,mode=1777"
+      ],
+      "environment": {
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "DOTNET_EnableDiagnostics": "0",
+        "Sentinel__Enabled": "false",
+        "Finance__ObservationRuntime__Enabled": "false",
+        "Finance__AlpacaDailyObservation__Enabled": "false",
+        "Finance__AlpacaDailyObservation__ApiKey": "",
+        "Finance__AlpacaDailyObservation__ApiSecret": "",
+        "Finance__TwelveDataObservation__Enabled": "false",
+        "Finance__TwelveDataObservation__ApiKey": "",
+        "Finance__Eodhd__Enabled": "false",
+        "Finance__Eodhd__AccountActive": "false",
+        "Finance__Eodhd__ApiToken": "",
+        "Finance__Fred__Enabled": "false",
+        "Finance__Fred__ApiKey": "",
+        "Finance__ResearchScheduler__Enabled": "false",
+        "Finance__ResearchOperations__MaintenancePaused": "true",
+        "Finance__RecurringLocalReasoner__Enabled": "false",
+        "Media__Requests__Enabled": "false",
+        "Media__SmartShuffle__Enabled": "false",
+        "Media__Librarr__DirectAudioImportEnabled": "false",
+        "Calendar__DatabasePath": "/calendar-data/calendar.db",
+        "Settings__DatabasePath": "/settings-data/settings.db",
+        "MealPlanner__DatabasePath": "/data/meal-planner.db",
+        "MealPlanner__SchoolMeals__Enabled": "false",
+        "MealPlanner__SchoolMeals__RosenfeldtEnabled": "false",
+        "MealPlanner__SchoolMeals__MusikugglanEnabled": "false",
+        "ShoppingList__DatabasePath": "/shopping-data/shopping-list.db",
+        "Media__Audiobookshelf__AcquisitionDatabasePath": "/data/audiobook-acquisition.db",
+        "SystemRecovery__DatabasePath": "/lifecycle-data/lifecycle.db",
+        "SystemRecovery__ClockSyncDirectory": "/lifecycle-data/no-host-clock",
+        "Finance__Eodhd__DatabasePath": "/finance-data/eodhd-market-memory.db",
+        "Finance__Eodhd__PayloadDirectory": "/finance-data/eodhd-payloads",
+        "Finance__Datasets__QuarantineDirectory": "/finance-data/dataset-quarantine",
+        "Finance__Datasets__OwnerDropDirectory": "/finance-data/market-data-drop",
+        "Finance__DataProtection__BackupDirectory": "/finance-data/backups",
+        "Finance__DataProtection__RestoreStagingDirectory": "/finance-data/restore-staging",
+        "Finance__Fred__QuarantineDirectory": "/finance-data/macro-quarantine",
+        "Media__Jellyfin__ApiKey": "",
+        "Media__Jellyfin__BaseUrl": "http://127.0.0.1:9",
+        "Media__Sonarr__ApiKey": "",
+        "Media__Sonarr__BaseUrl": "http://127.0.0.1:9",
+        "Media__Radarr__ApiKey": "",
+        "Media__Radarr__BaseUrl": "http://127.0.0.1:9",
+        "Media__Prowlarr__ApiKey": "",
+        "Media__Prowlarr__BaseUrl": "http://127.0.0.1:9",
+        "Media__Audiobookshelf__ApiKey": "",
+        "Media__Audiobookshelf__BaseUrl": "http://127.0.0.1:9",
+        "Media__Librarr__ApiKey": "",
+        "Media__Librarr__BaseUrl": "http://127.0.0.1:9",
+        "Media__QBittorrent__ApiKey": "",
+        "Media__QBittorrent__BaseUrl": "http://127.0.0.1:9",
+        "Media__Audiobookshelf__PlaybackApiKey": ""
+      },
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "data",
+          "target": "/data"
+        },
+        {
+          "type": "volume",
+          "source": "shopping",
+          "target": "/shopping-data"
+        },
+        {
+          "type": "volume",
+          "source": "calendar",
+          "target": "/calendar-data"
+        },
+        {
+          "type": "volume",
+          "source": "settings",
+          "target": "/settings-data"
+        },
+        {
+          "type": "volume",
+          "source": "finance",
+          "target": "/finance-data"
+        },
+        {
+          "type": "volume",
+          "source": "lifecycle",
+          "target": "/lifecycle-data"
+        }
+      ]
+    },
+    "web": {
+      "image": "${TEST_WEB_IMAGE:?required}",
+      "container_name": "bb-test-u1-web",
+      "pull_policy": "never",
+      "user": "101:101",
+      "entrypoint": [
+        "nginx"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cpus": 0.25,
+      "mem_limit": 402653184,
+      "memswap_limit": 402653184,
+      "pids_limit": 64,
+      "restart": "no",
+      "stop_grace_period": "10s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "5m",
+          "max-file": "2"
+        }
+      },
+      "networks": {
+        "test": null
+      },
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      },
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=67108864,mode=1777"
+      ]
+    }
+  },
+  "networks": {
+    "test": {
+      "name": "bb-test-u1-net",
+      "driver": "bridge",
+      "internal": true,
+      "enable_ipv6": false,
+      "driver_opts": {
+        "com.docker.network.bridge.gateway_mode_ipv4": "isolated"
+      },
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    }
+  },
+  "volumes": {
+    "data": {
+      "name": "bb-test-u1-data",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    },
+    "shopping": {
+      "name": "bb-test-u1-shopping",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    },
+    "calendar": {
+      "name": "bb-test-u1-calendar",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    },
+    "settings": {
+      "name": "bb-test-u1-settings",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    },
+    "finance": {
+      "name": "bb-test-u1-finance",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    },
+    "lifecycle": {
+      "name": "bb-test-u1-lifecycle",
+      "labels": {
+        "io.bigbrain.test.slot": "${TEST_SLOT_ID:?required}"
+      }
+    }
+  }
+}

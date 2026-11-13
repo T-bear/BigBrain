@@ -26,6 +26,7 @@ When sources disagree, use this order and resolve the inconsistency explicitly:
 
 ## Entry points
 
+- [Synthetic TEST U1–U3](../operations/runbooks/test-environment.md): offline U1 implementation, task budgets, runtime test cards and operator boundary.
 - [Start here / continuity](../START-HERE.md): uppgiftsstyrd läsguide och hänvisning till beständig handoff.
 - [Product roadmap](../../ROADMAP.md): direction and domain-roadmap delegation.
 - [BB-130 ordered stabilization plan](../architecture/bb-130-stabilization.md): historical phase scope and DoD; not a current sprint order.
