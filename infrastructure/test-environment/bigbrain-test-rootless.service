@@ -1,0 +1,26 @@
+[Unit]
+Description=BigBrain synthetic TEST rootless Docker engine
+Documentation=https://docs.docker.com/engine/security/rootless/
+
+[Service]
+Type=exec
+Delegate=yes
+RuntimeDirectory=bigbrain-test-rootless
+RuntimeDirectoryMode=0700
+StateDirectory=bigbrain-test-rootless
+StateDirectoryMode=0700
+ExecStart=/usr/bin/env -i PATH=/usr/bin:/bin HOME=%h USER=%u LOGNAME=%u LANG=C.UTF-8 XDG_RUNTIME_DIR=%t XDG_CONFIG_HOME=%S/bigbrain-test-rootless/config DBUS_SESSION_BUS_ADDRESS=unix:path=%t/bus DOCKER_CONFIG=%S/bigbrain-test-rootless/client DOCKERD_ROOTLESS_ROOTLESSKIT_STATE_DIR=%t/bigbrain-test-rootless/rootlesskit DOCKERD_ROOTLESS_ROOTLESSKIT_NET=slirp4netns DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=builtin DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=true DOCKERD_ROOTLESS_ROOTLESSKIT_SLIRP4NETNS_SANDBOX=true DOCKERD_ROOTLESS_ROOTLESSKIT_SLIRP4NETNS_SECCOMP=true /usr/bin/dockerd-rootless.sh --host=unix://%t/bigbrain-test-rootless/docker.sock --data-root=%S/bigbrain-test-rootless/docker --exec-root=%t/bigbrain-test-rootless/exec --pidfile=%t/bigbrain-test-rootless/dockerd.pid --config-file=%S/bigbrain-test-rootless/daemon.json
+Restart=no
+TimeoutStartSec=60
+TimeoutStopSec=60
+KillMode=mixed
+CPUAccounting=yes
+MemoryAccounting=yes
+TasksAccounting=yes
+CPUQuota=100%
+MemoryMax=1536M
+TasksMax=256
+UMask=0077
+
+[Install]
+WantedBy=default.target

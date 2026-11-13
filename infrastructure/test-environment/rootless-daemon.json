@@ -1,0 +1,7 @@
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "features": {"containerd-snapshotter": false},
+  "storage-driver": "overlay2",
+  "log-driver": "json-file",
+  "labels": ["io.bigbrain.test.engine=rootless"]
+}
