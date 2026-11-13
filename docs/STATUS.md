@@ -27,9 +27,10 @@ samtidiga anslutningar PASS, overflow avvisas; inga nya PID-/minnesgränshändel
 Aktuell paus/aborted/avvisad inlämning/idle-resume och exakt en säker återgång PASS.
 Slutlig kandidatgranskning/CI/merge, sessionslivslängd efter sista
 utloggning och fysisk iPhone/PWA-acceptans återstår. Linger=no; inga nya hostprivilegier.
-Rootless är nu PAUSED/stoppat efter återgångsprovet. Den manuella rootful-reservens
-resurser bevaras; återstart nådde inte sin12-försöks hälsogräns och stoppades säkert.
-Kallstartsdiagnos återstår; reservslotten påstås inte Healthy.
+Rootless är PAUSED/stoppat efter återgångsprovet. Manuell reservslot151ab3a är återställd
+och HTTP/assets-verifierad efter ett avgränsat kallstartsprov (health5,88s, inga resursfel).
+En föregående kort hälsokontroll stoppade starten säkert; orsaken till den fördröjningen
+är inte fastställd och ingen ny startpolicy har införts.
 Alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Ingen Finance-kandidat
 påstås installerad. Agent Independence är framtida krav. Finance-/produktions-/backupgrindar
 ändras inte och helt syntetisk TEST innebär inga riktiga nycklar/providers/modeller/order.

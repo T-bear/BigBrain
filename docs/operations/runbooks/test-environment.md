@@ -1024,3 +1024,25 @@ startup logs and Web received connection-refused/502 before the guard stopped bo
 containers. Its volumes and exact resources remain intact; it is SAFE_STOPPED, not Healthy.
 No blind retry or completion claim follows. A bounded cold-start diagnosis is pending.
 This does not invalidate the completed browser/pause/restoration evidence above.
+
+### BB-162 final repair1 checkpoint and administrative handoff
+
+The independently cleared private cold-start measurement subsequently PASS: health at5.88s,
+API/Web PID and memory events0. The prior short-window failure remains unexplained; no
+readiness policy or second source repair was introduced. The unchanged manual control75
+relay and full HTTP/assets probe then PASS on retained image151ab3a. Manual fallback is
+restored; it is not the new automatic candidate. Rootless/task remain paused/stopped/disabled.
+The12 original production identities/images/starttimes remain unchanged.
+
+Repair1 source checkpoint a7af031f287c287565c190ba208e3691ce2e8c40,
+tree7263c3b63896af33d918f06e96d6f01567c8c485; CI43517323063 applies to that exact
+unit/docs change. This final documentation reconciliation does not alter executable bits.
+Review checkpoint only: BB-162 DoD4 still requires intended lifetime verification. Existing
+unit starts are on-demand, so enabling the task at boot is not required. Linger=no currently.
+The narrow remaining administrator preparation is `sudo loginctl enable-linger enigma` on
+the BigBrain host, followed by readback and intended-lifetime verification. No generic sudo
+expansion or production action is requested. Do not bypass the existing sudo policy.
+Afterward verify the current published candidate and CI, complete the applicable exact review
+and delegated merge. Physical owner iPhone/PWA acceptance remains separate; provide its
+private verified URL/revision and3–5-step card only when that candidate is actually serving.
+Do not announce full readiness from this manual fallback or Healthy alone.
