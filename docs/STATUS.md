@@ -12,36 +12,27 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST — 2026-11-13
 
-**U3 BLOCKED / PARTIAL; experimentell PR87 NOT MERGEABLE. Manuell syntetisk TEST återställd och HTTP-verifierad.**
-BB-159:s rootless-härdning är fortsatt accepterad via PR84/main
-`d50b366c59730422ec670de44d5377999448f262`, med oberoende nivå3-review och exakt
-main-CI run43450793145 PASS. Den accepterade kontrollen och bevarade manuella
-rootful-resurserna ersätts inte av U3:s experimentella kod.
+**BB-162 PÅGÅR; tekniska browserprov PASS, full PREDEPLOY ännu INTE KLAR.**
+PR87 är reviewkandidat, inte accepterad main. BB-159:s härdning är accepterad via
+PR84/main d50b366; gamla U3:s utfall och förbrukade2/2 finns i
+[runbookens historiska utfall](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
 
-**Verifierat:** U3-kandidat `40a8bdba877b8502d4699173d0badbb9289a4cf6`, tree
-`c5faf7c63834e16b762d40b9a0784d1592b2931b`, har78 fokuserade tester PASS och
-alla fem CI-jobb PASS i run43459885018. Installerad wrapper har SHA256
-`dcfccce4d39930932e46db8082af103b4907b54f33739b638968640de87ce076`.
-Röd funktionell status bevarades vid verklig paket-/taskkörning; grön core, verklig
-HTTP-health, last-known-good och duplicate-ID-avvisning PASS. Browserpilot på grön
-kandidat visar tillagd syntetisk vara, men Refresh ger netReset under Serving,
-före uppdragets tidsgräns. Röd kallstartspilot gav NetworkError vid varutillägg.
+BB-162 är uttryckligen auktoriserat, risk2, reparationsförsök1/2. Kandidat5fd3153 har
+81 fokuserade tester och alla fem CI-jobb PASS. Rootless automatisk task med granskad
+TasksMax256: kall desktop och liten faktisk450px-viewport PASS för varutillägg och
+vardera tre omladdningar; BB-161:s banner/knappar verifierade även visuellt. Åtta
+samtidiga anslutningar PASS, overflow avvisas; inga nya PID-/minnesgränshändelser.
+[Exakt evidens och avgränsning](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
 
-**Bedömning:** oberoende review klassar detta som P1 mot U3 DoD3; orsak är inte
-fastställd och tillskrivs inte reläets fyrklientsgräns. U3:s2/2 reparationer är
-förbrukade; ingen ytterligare UI-omkörning/fix eller obevakad aktivering. Rollback (exakt en återställning med nya fixtures), paus/avvisad pausad inlämning och
-uttrycklig återgång till idle är PASS. Slutlig reträtt är verifierad: rootless och
-task-tjänsten stoppade/disabled, beständig PAUSED, manuell rootful HTTP-probe PASS;
-alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Linger är no; inget ägarsteg för linger har utförts eller begärs nu.
-[Verifierat utfall och blockerare](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
-U3-blockeraren gäller automatiken. Befintligt [TEST-mandat](operations/checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13)
-medger fortsatt helt syntetisk Finance i den manuella slotten. En ny Finance-kandidat
-behöver eget verifierat paket och sina berörda tester före körning/testkort; detta
-underlag påstår inte att Finance-kandidaten redan är installerad eller accepterad.
-
-[BB-162](BACKLOG.md#bb-162--u3-browsertransport-blockerar-harmless-pilot) är ett förslag
-utan startorder; BB-161:s banneröverlapp kvarstår som P2. Agent Independence är framtida
-krav; Finance-/produktions- och backupgrindar ändras inte.
+Aktuell paus/aborted/avvisad inlämning/idle-resume och exakt en säker återgång PASS.
+Slutlig kandidatgranskning/CI/merge, sessionslivslängd efter sista
+utloggning och fysisk iPhone/PWA-acceptans återstår. Linger=no; inga nya hostprivilegier.
+Rootless är nu PAUSED/stoppat efter återgångsprovet. Den manuella rootful-reservens
+resurser bevaras; återstart nådde inte sin12-försöks hälsogräns och stoppades säkert.
+Kallstartsdiagnos återstår; reservslotten påstås inte Healthy.
+Alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Ingen Finance-kandidat
+påstås installerad. Agent Independence är framtida krav. Finance-/produktions-/backupgrindar
+ändras inte och helt syntetisk TEST innebär inga riktiga nycklar/providers/modeller/order.
 
 ## Frysningar och operativa osäkerheter
 

@@ -966,3 +966,61 @@ candidate-selected. Source admission, exact target, bytes/deadlines, resource ca
 cleanup are unchanged. The regression requires six accepted connections and continued
 bounded rejection/one sanitized receipt above the installed limit. This establishes a
 verified failure mode; complete cold-browser/runtime acceptance still must pass.
+
+### BB-162 measured task process ceiling — repair 1
+
+The initial eight-connection delivery candidate5fd3153 passed all five CI jobs and
+its bounded core task completed, but a cold Firefox140esr browser failed at synthetic
+QuickAdd with NetworkError. Banner source and family navigation passed; subsequent
+refresh and mobile acceptance were not reached. The task cgroup recorded pids.events
+max2 while both application-container PID event counters were0. Task memory events
+were all0 and peak memory was approximately378MB. This identifies a real task process
+ceiling violation; its causal contribution to the browser failure remains to be tested.
+Docker client Go threads count against the unit TasksMax64, separately from container
+PIDs64. Repair1 installs an independently cleared bounded TasksMax256 for the external task unit only; CPU,
+memory, deadline, eight-connection limit, container PID caps and isolation stay fixed.
+Independent exact-unit clearance preceded installation. The actual eight-persistent-connection
+canary passes all eight Healthy replies and rejects overflow. Task peak81, PID events0,
+memory events0, memory peak516374528 bytes within536870912. A first browser observation
+checked QuickAdd after a fixed short sleep: item not yet visible, no NetworkError observed.
+That is NOT_YET_ACCEPTED, not evidence of a new network failure. A bounded20s outcome
+wait replaces that private observer sleep; package, transport and limits stay fixed.
+This intermediate observer result is superseded by the bounded browser PASS below.
+Old U3 repair2/2 remains exhausted and is not reset. No production operation is included.
+
+Observer correction note: an attempted fetch-timing wrapper caused its own Window-binding
+TypeError in the private QA browser. That run is invalid for application acceptance and
+is retained as observer failure. The wrapper was removed entirely; subsequent observation
+uses passive Performance entries and bounded DOM-result waits. A later page showed the
+first short-window fixture retained, establishing that its POST eventually succeeded.
+No application, nginx, network, package or additional deployed limit changed for this.
+
+### BB-162 repair1 browser evidence — 2026-11-13
+
+Exact hosted application source5fd315376fdb9adad93ce48346e0747981697214,
+tree4a6694e6ad68479a6fadc16b15d68cafebbc6010, run43508942692,
+artifact14077503189, sealed controller5fd3153 plus independently cleared unit hash
+c62f9f73173114a177663a7aeadc2f003391e3df379104939db1a32109b3d7e0.
+Both fresh Firefox140esr profiles PASS: TEST SHA, family navigation, synthetic item
+addition, three actual page refreshes preserving the item, banner/modal/header alignment,
+visible hit-tested Back control and fitting banner. Desktop screenshot inspected at1366;
+small-window request390 produced actual450x758 viewport (Firefox minimum), honestly recorded.
+This is automated small-viewport acceptance, not physical iPhone/PWA owner acceptance.
+Both screenshot layouts were visually inspected. No connection preferences changed.
+Eight persistent actual health requests PASS and ninth rejected; task peak81, no PID or
+memory-limit events, peak516374528 bytes. Application container caps/readonly/cap-drop,
+no published ports, own volume mounts and internal IPv4-only network re-inspected PASS.
+Prior BB-159 boundary/UID canaries retain their explicitly scoped evidence; no broader
+untrusted-code protection or all-future-bugs guarantee is claimed. Current pause/aborted, rejection of paused submissions and explicit resume-to-idle PASS
+on the same task. Single restoration now PASS: taskc2a21a59a0e0431daee8823fe50d4616 was interrupted
+by terminating only its revalidated owned relay; exactly one own reset/start restored the
+previous request/source with fresh container identities, then stopped. Fixture data undo
+is not claimed. Final source review/CI/merge and logout-lifetime preparation remain pending.
+
+Safe-exit reconciliation: the rootless task is PAUSED, both rootless units stopped/disabled,
+and last receipt is the intentionally induced rolled-back outcome. The preserved manual
+rootful fallback start did not pass its12-attempt readiness window: API had not emitted
+startup logs and Web received connection-refused/502 before the guard stopped both owned
+containers. Its volumes and exact resources remain intact; it is SAFE_STOPPED, not Healthy.
+No blind retry or completion claim follows. A bounded cold-start diagnosis is pending.
+This does not invalidate the completed browser/pause/restoration evidence above.

@@ -17,7 +17,8 @@ UMask=0077
 NoNewPrivileges=yes
 CPUQuota=100%
 MemoryMax=512M
-TasksMax=64
+# Eight bounded Docker clients plus admission/cleanup; Go threads count as tasks.
+TasksMax=256
 LimitFSIZE=4294967296
 StandardOutput=null
 StandardError=null
