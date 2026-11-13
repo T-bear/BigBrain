@@ -1337,14 +1337,15 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-**Verifierad P1 / U3 DoD3; BB-162 uttryckligen auktoriserat och PÅGÅR 2026-11-13.**
+**Tekniskt verifierad rättning; slutreview/CI/merge pågår; fysisk iPhone/PWA återstår.**
 Initial kandidat5fd3153 hade CI/core PASS men kall Firefox gav NetworkError vid
 QuickAdd. Task-cgroup pids.events max2, API/Web max0. Försök1/2 höjer endast
 styrtjänstens TasksMax64 till256 efter oberoende granskning. Därefter PASS för kall
 desktop/liten faktisk450px-viewport, varutillägg och vardera tre Refresh; åtta samtidiga
 anslutningar PASS, overflow avvisas, PID-/minneshändelser0. Paus/aborted, avvisad
-pausad inlämning och uttrycklig idle-resume PASS. Exakt en återgång med nya fixtures PASS. Slutreview/CI/merge,
-sista-utloggningslivslängd och fysisk iPhone/PWA-acceptans återstår. U3:s tidigare2/2 nollställs inte.
+pausad inlämning och uttrycklig idle-resume PASS. Exakt en återgång med nya fixtures PASS. Sessionsoberoende PASS genom verifierad
+linger-konfiguration, systemd-kontrakt och submitter-oberoende runtime. Faktisk sista-utloggning/reboot
+är NOT RUN. Slutreview/CI/merge och fysisk iPhone/PWA-acceptans återstår. U3:s tidigare2/2 nollställs inte.
 [Exakt evidens](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
 
 Historisk U3-evidens: Röd kallstartspilot gav NetworkError vid syntetiskt varutillägg. Grön automatisk task

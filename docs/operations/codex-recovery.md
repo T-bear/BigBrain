@@ -5,21 +5,6 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
-## BB-162 — 2026-11-13 — INTERRUPTED — SAFE TO RESUME
-
-Aktiv checkpoint: checkpoint/test-environment-u3-automation-20261113; accepterad bas
-main e2635e5, senaste källändring a7af031 (unit/docs), CI43517323063. Exakt aktuell
-publicerings-SHA/tree hämtas från GitHub före fortsatt arbete. REVIEW CHECKPOINT, ej merge.
-BB-162 risk2: försök1/2, gamla U3:s2/2 är inte återställda. Kodprov81 och docs/diff PASS.
-Kall desktop/liten faktisk450px-viewport: add/tre Refresh/banner PASS; verklig capacity8,
-paus/avvisad inlämning/idle-resume och exakt en återgång PASS. Ingen fysisk iPhone-acceptans.
-Rootlesskontroll5fd3153 och taskunit256 är granskade; rootless/task PAUSED/stoppade/disabled.
-Manuell reservkontroll75/image151ab3a återställd, HTTP/assets PASS; produktionens12 identiteter
-oförändrade. Se [kanonisk evidens](runbooks/test-environment.md#bb-162-final-repair1-checkpoint-and-administrative-handoff).
-Nästa exakta steg: smal administrativ linger-förberedelse, verifiera avsedd livslängd,
-aktuell kandidat/CI/exakt review och delegerad merge. Därefter fysisk iPhone/PWA-testkort.
-Inga nya reparationsloopar, privilegiebypasser, providers/modeller/order eller Finance-drift.
-
 ## DOC-2A — publicerad beslutspunkt
 
 Fas A `338459078e9130cd7f500fbfc182ec245f65d28a` och hanteringen av U1–U3 är ägargodkända.

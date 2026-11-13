@@ -12,7 +12,7 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST — 2026-11-13
 
-**BB-162 PÅGÅR; tekniska browserprov PASS, full PREDEPLOY ännu INTE KLAR.**
+**BB-162 tekniskt verifierat; slutreview/CI/merge pågår, fysisk iPhone/PWA återstår.**
 PR87 är reviewkandidat, inte accepterad main. BB-159:s härdning är accepterad via
 PR84/main d50b366; gamla U3:s utfall och förbrukade2/2 finns i
 [runbookens historiska utfall](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
@@ -25,12 +25,12 @@ samtidiga anslutningar PASS, overflow avvisas; inga nya PID-/minnesgränshändel
 [Exakt evidens och avgränsning](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
 
 Aktuell paus/aborted/avvisad inlämning/idle-resume och exakt en säker återgång PASS.
-Slutlig kandidatgranskning/CI/merge, sessionslivslängd efter sista
-utloggning och fysisk iPhone/PWA-acceptans återstår. Linger=no; inga nya hostprivilegier.
-Rootless är PAUSED/stoppat efter återgångsprovet. Manuell reservslot151ab3a är återställd
-och HTTP/assets-verifierad efter ett avgränsat kallstartsprov (health5,88s, inga resursfel).
-En föregående kort hälsokontroll stoppade starten säkert; orsaken till den fördröjningen
-är inte fastställd och ingen ny startpolicy har införts.
+Ägarens administrativa förberedelse är verifierad: Linger=yes. Konfiguration, installerat
+systemd-kontrakt och nytt prov som överlever submitter ger sessionsoberoende PASS.
+Faktisk sista-utloggning och reboot är NOT RUN; inga orelaterade sessioner avslutas.
+Källcheckpointa7af031 och docs4259db4 har alla fem CI-jobb PASS. Ny syntetisk ägarpilot
+använder verifierat paket4259db4; manuell reserv är HTTP-verifierad och bevarad/stoppad
+under pilot. Den tidigare fördröjda reservstarten är oförklarad historik; inget nytt startvillkor.
 Alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Ingen Finance-kandidat
 påstås installerad. Agent Independence är framtida krav. Finance-/produktions-/backupgrindar
 ändras inte och helt syntetisk TEST innebär inga riktiga nycklar/providers/modeller/order.

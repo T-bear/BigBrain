@@ -1046,3 +1046,25 @@ Afterward verify the current published candidate and CI, complete the applicable
 and delegated merge. Physical owner iPhone/PWA acceptance remains separate; provide its
 private verified URL/revision and3–5-step card only when that candidate is actually serving.
 Do not announce full readiness from this manual fallback or Healthy alone.
+
+### BB-162 configured session independence — 2026-11-13
+
+Owner completed the narrow administrative preparation. Fresh readback: Linger=yes and
+persistent root-owned linger file. User manager active; task and rootless units have no
+BindsTo/PartOf session dependencies. Task requires the fixed rootless unit and remains
+on-demand/disabled, not boot-enabled. A new bounded user-service proof survived its
+submitting process: PPID stayed the user-manager PID, cgroup under app.slice, result
+persisted afterward. Earlier actual task evidence also establishes submitter independence.
+The installed loginctl manual specifies that lingering keeps this manager after logout.
+Independent review accepts this combined contract/configuration/runtime evidence as PASS
+for risk2 DoD4. Actual all-sessions logout and reboot tests are NOT RUN; existing unrelated
+sessions are preserved. No destructive logout gate or boot-recovery claim is introduced.
+
+Executable repair source a7af031 and documentation checkpoint4259db4 both have all five
+CI jobs PASS (43517323063 and43518131801 respectively). Repair budget remains1/2.
+Final source publication/review/merge follows this evidence; physical owner iPhone/PWA
+acceptance remains separate and must not be inferred from technical browser tests.
+A fresh synthetic owner pilot uses package4259db4/run43518131801/artifact14081732284;
+its application/controller inputs equal the browser-verified5fd3153 apart from source
+revision branding; later documentation-only reconciliation does not alter these inputs.
+Manual fallback resources are retained and stopped while this automatic pilot is active.
