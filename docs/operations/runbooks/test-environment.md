@@ -25,8 +25,8 @@ No real model/provider/order or new host privilege is authorized.
 | Task | Start condition | Risk / estimate / cap | Repair budget and current use |
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
-| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, prerequisite preflight BLOCKED (see current outcome) |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | At most 2; 0 used, NOT STARTED |
+| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 0/2 used; independent hosted proof PASS, local/unattended activation DEFERRED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
