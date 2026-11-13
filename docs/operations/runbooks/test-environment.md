@@ -512,3 +512,41 @@ review the rootless control before use. Package presence alone is not hardening 
 network/resource/lifecycle behavior must still be verified. Until then retain the known
 manual rootful slot and keep unattended U3 DEFERRED; no new isolation/repair loop.
 Agent Independence remains a future requirement without new costs or current gates.
+
+## U2 bounded execution — 2026-11-13
+
+Current U2 branch `checkpoint/test-environment-u2-20261113` starts from accepted main
+`d7d6d75a4e62d62bc33612ff1c8a73e21ed8ecfc` (U1 merged, exact main CI green). Risk3,
+estimate2–4 activehours/cap4h, max2 repairs for the whole U2, original five DoD criteria
+above unchanged. The owner reports prerequisite installation; worker directly verifies
+uidmap/slirp4netns installed and newuidmap/newgidmap root-owned setuid. Official installed
+rootless setup-tool check PASS; usernamespace/netns, existing UID/GID ranges, user bus
+and delegated CPU/memory/pids cgroupv2 prerequisites PASS. No additional sudo/group/root
+privilege is added. Existing rootful manual slot remains the fixed rollback target.
+
+Reviewed engine source uses a dedicated **user** unit, private runtime/state/config,
+Unix socket only, explicit clean environment, slirp network sandbox/seccomp and disabled
+host loopback. It is manually started, **not enabled**; production daemon and default
+Docker context are unchanged. Source units/config are separate from API/Web/Brain and
+ordinary candidate render cannot replace their engine/profile. Rootless snapshots seal
+mode/operatorUID/daemonID and fixed private socket; wrong owner/type/symlink, wrong
+daemon/mode/cgroup driver and inherited engine environment reject.
+
+Initial rootless launch failed before candidate execution: installed Docker29 launcher
+defaults detached netns while RootlessKit rejects its combination with explicit slirp
+sandbox. **Repair1/2** explicitly selects the installed launcher's supported attached
+netns mode, keeping sandbox/seccomp and disabled hostloopback. No weakened application
+policy, new host network rule, production change or architecture loop. Actual rootless
+readiness, resource/network/lifecycle tests remain PENDING, not HARDENING_PASS.
+
+System user lingering is currently disabled. This does not block the manual U2 rehearsal;
+logout/boot persistence must be addressed and actually verified only in the preapproved
+U3 automation scope. No linger or unit-autostart change has been made during U2.
+
+U2 repair2/2: the next bootstrap exited127 at the installed launcher's `nsenter ...
+sysctl` call. `/usr/sbin/sysctl` is present/executable (procps installed) but the initial
+clean PATH excluded sbin. The owned engine unit now includes only trusted system
+directories `/usr/sbin:/usr/bin:/sbin:/bin`; no caller/user path, credential or privilege
+is added. This is the final bounded source repair. Controller clean client environment
+remains `/usr/bin:/bin` because its commands use explicit Docker paths. Rootful fallback
+remains unchanged; another blocking failure causes safe stop without a third loop.
