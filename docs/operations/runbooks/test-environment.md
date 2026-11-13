@@ -25,8 +25,8 @@ No real model/provider/order or new host privilege is authorized.
 | Task | Start condition | Risk / estimate / cap | Repair budget and current use |
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
-| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, prerequisite preflight BLOCKED (see current outcome) |
-| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | At most 2; 0 used, NOT STARTED |
+| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | 2/2 used, HARDENING_NOT_PASS; rootless stopped/disabled, manual U1 retained |
+| U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | 0/2 used; independent hosted proof PASS, local/unattended activation DEFERRED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
 independent already authorized work. Failed U2 defers unattended U3. No reset of counters,
@@ -512,3 +512,104 @@ review the rootless control before use. Package presence alone is not hardening 
 network/resource/lifecycle behavior must still be verified. Until then retain the known
 manual rootful slot and keep unattended U3 DEFERRED; no new isolation/repair loop.
 Agent Independence remains a future requirement without new costs or current gates.
+
+## U2 bounded execution — 2026-11-13
+
+The U2 source described here is an **unaccepted experiment** in [draft PR84](https://github.com/T-bear/BigBrain/pull/84). Accepted main still supplies the U1 rootful controller. Publishing this outcome does not accept or install the failed rootless candidate.
+
+Current U2 branch `checkpoint/test-environment-u2-20261113` starts from accepted main
+`d7d6d75a4e62d62bc33612ff1c8a73e21ed8ecfc` (U1 merged, exact main CI green). Risk3,
+estimate2–4 activehours/cap4h, max2 repairs for the whole U2, original five DoD criteria
+above unchanged. The owner reports prerequisite installation; worker directly verifies
+uidmap/slirp4netns installed and newuidmap/newgidmap root-owned setuid. Official installed
+rootless setup-tool check PASS; usernamespace/netns, existing UID/GID ranges, user bus
+and delegated CPU/memory/pids cgroupv2 prerequisites PASS. No additional sudo/group/root
+privilege is added. Existing rootful manual slot remains the fixed rollback target.
+
+Reviewed engine source uses a dedicated **user** unit, private runtime/state/config,
+Unix socket only, explicit clean environment, slirp network sandbox/seccomp and disabled
+host loopback. It is manually started, **not enabled**; production daemon and default
+Docker context are unchanged. Source units/config are separate from API/Web/Brain and
+ordinary candidate render cannot replace their engine/profile. Rootless snapshots seal
+mode/operatorUID/daemonID and fixed private socket; wrong owner/type/symlink, wrong
+daemon/mode/cgroup driver and inherited engine environment reject.
+
+Initial rootless launch failed before candidate execution: installed Docker29 launcher
+defaults detached netns while RootlessKit rejects its combination with explicit slirp
+sandbox. **Repair1/2** explicitly selects the installed launcher's supported attached
+netns mode, keeping sandbox/seccomp and disabled hostloopback. No weakened application
+policy, new host network rule, production change or architecture loop. Actual rootless
+readiness, resource/network/lifecycle tests remain PENDING, not HARDENING_PASS.
+
+System user lingering is currently disabled. This does not block the manual U2 rehearsal;
+logout/boot persistence must be addressed and actually verified only in the preapproved
+U3 automation scope. No linger or unit-autostart change has been made during U2.
+
+U2 repair2/2: the next bootstrap exited127 at the installed launcher's `nsenter ...
+sysctl` call. `/usr/sbin/sysctl` is present/executable (procps installed) but the initial
+clean PATH excluded sbin. The owned engine unit now includes only trusted system
+directories `/usr/sbin:/usr/bin:/sbin:/bin`; no caller/user path, credential or privilege
+is added. This is the final bounded source repair. Controller clean client environment
+remains `/usr/bin:/bin` because its commands use explicit Docker paths. Rootful fallback
+remains unchanged; another blocking failure causes safe stop without a third loop.
+
+### U2 predetermined exit — hardening NOT PASS
+
+The final repaired unit starts: real rootless Docker29.6.2, cgroupv2/systemd and overlay2
+private storage verified, host daemon UID1000, user unit not enabled. The initial readiness
+observer timed out at3s while the engine continued initializing; a subsequent read confirmed
+API readiness. No additional engine restart or source repair was made for that observation.
+
+Exact hosted image archive checksums passed and both images loaded into the private engine.
+Admission then failed closed before **any candidate container** was created: the hosted
+Docker29 image metadata identifies descriptor/manifest digests, while the deliberately
+configured classic image store reports config image IDs. The IDs differ although runtime
+configurations, source-revision labels and RootFS layer lists compare equal. The fixed
+validator correctly refuses to substitute tags or unproven identities. This is a real
+producer/consumer identity-format compatibility blocker; source review and33 unit tests
+do not prove runtime admission.
+
+**U2 repairs2/2 exhausted; HARDENING_NOT_PASS.** No third change of image-store/backend,
+identity protocol or namespace design is attempted. Rootless user unit is **stopped and
+disabled**; private images/config/evidence and checkpoint are retained. Rootful manual TEST
+was never stopped or changed: all14 original rootful container IDs/images/starttimes,
+including the two TEST containers, are identical to the preflight baseline. Production
+remains untouched. The installed U1 control and accepted T22 still apply to the manual slot.
+
+Unattended U3 remains DEFERRED. Independently permitted hosted CI/metadata verification
+may continue within U3's own scope; it cannot claim local hardening or trigger deployment.
+This failed code checkpoint is not a merge candidate. Keep operational identities/raw
+receipts private; publish the sanitized outcome and retain accepted-main status separately.
+
+## Independent U3 hosted-only pilot — 2026-11-13
+
+The preapproved U3 scope permits independent hosted verification after the recorded U2
+outcome; local/unattended activation remains DEFERRED. Risk2, original estimate3–6h/cap6h,
+max2 repairs,0/2 used. [Expected-red checkpoint PR85](https://github.com/T-bear/BigBrain/pull/85)
+adds one named failing Vitest assertion and no product logic/UI/provider/credential change.
+It is NEVER MERGE and no resulting image is locally admitted or deployed.
+
+DoD for this independent proof: (1) preserve actual existing CI outcomes and the named
+expected-red functional result; (2) build both images despite frontend failure while
+requiring secrets success; (3) bind package to exact owned source/tree/ref/run; (4) verify
+artifact metadata/checksums without local execution; (5) record the actual proof outcome
+without claiming rootless hardening, local automation or UI acceptance. An intentionally
+red test is evidence, not a defect to repair or a permission to weaken required checks.
+
+Pilot source `9b3ff06f744d9b4bc3013406b329968971159d8b`, tree
+`f2691b4912515c1b6c620ea3e77b17f521996120`, hosted run43427194286. Current result **HOSTED_PROOF_PASS**. Frontend test step failed at the deliberately named
+assertion; formatting passed. Backend/documentation/secrets PASS; both image builds and
+package upload PASS. Verified exact source/tree/owned ref/run, artifact entry allowlist,
+checksums, image metadata and manifest test outcomes (frontend=failure, other three=success).
+Overall workflow failure is the expected red signal, not suppressed or relabelled green.
+No package image was loaded or executed locally. No new isolation or repair loop.
+
+The artifact archive SHA256 is
+`7ef7732ced0bb55e949250fb894f2a97e6d922a3ff3b42527842e410ef469917`.
+The expected-red fixture remains outside accepted main and is never a merge candidate.
+The hosted proof completes only the independent transport/metadata slice of U3; automatic
+local admission/lifecycle/pilot are still DEFERRED by the failed U2 hardening condition.
+Rootless ID comparison specifically found OCI image-index descriptors from the CI store
+versus config IDs in the classic store; equal config/layers never authorizes substituting
+a tag or silently changing the installed identity protocol. Deferred work is recorded in
+[the canonical backlog](../../BACKLOG.md#predeploy--verifierade-uppskjutna-hinder-2026-11-13).

@@ -1301,3 +1301,27 @@ Alla 290 ursprungsavsnitt, även tidigare Klar/Avvisad, finns i
 [DOC-2B:s destinationsmappning](reports/documentation/doc-2b-backlog-roadmap-inventory-20261024.md#fas-b--förlustfri-konsolidering-2026-10-24)
 visar källpositioner, arkivdestinationer, U1–U3 och synliga K1–K7-krav. Kanoniska kontrakt och
 frysningsbeslut har oförändrad auktoritet; arkivets current/next är inte aktuella körorder.
+
+## PREDEPLOY — verifierade uppskjutna hinder 2026-11-13
+
+### BB-159 — Rootless image-identitet före obevakad TEST
+
+**BLOCKED / P1 för U2-acceptans, inte för fungerande manuell U1.** I det avgränsade
+U2-provet rapporterar CI-paketet Docker29 OCI-index/descriptor-ID medan vald klassisk
+imagelagring i rootless-motorn rapporterar config-ID. Samma source-label/runtimeconfig/
+RootFS-lager verifierade; exakta ID:n skiljer och admission avvisar före kandidatstart.
+Rootless-motorn är stoppad/disabled efter2/2 reparationer; ingen tredje loop är beställd.
+DoD för ett separat framtida beslutat arbete: verifiera producent/konsumentens identity-
+kontrakt med verkligt paket, behåll digestbunden fail-closed admission och klara de
+berörda resurs-/nät-/livscykelproven. Inga taggsubstitutioner eller nya privilegier följer
+av denna post. [Kanonisk evidens](operations/runbooks/test-environment.md#u2-predetermined-exit--hardening-not-pass).
+
+### BB-160 — SDK-feature-band för framtida ren produktionsimage-build
+
+**Bekräftad / P2 utanför pågående TEST-leverans; ingen startorder.** Hosted run43383141697
+visade att produktionens befintliga API-Dockerfile med flytande SDK10.0 valde10.0.404,
+vilket inte uppfyllde global.json10.0.300/latestPatch. TEST-paketeringen har en strikt
+TEST-only derivering till10.0.300 och verifierade byggen; produktions-Dockerfile/global.json
+ändrades inte i TEST-uppdraget. DoD inför en framtida berörd produktionsbuild: välj och
+granska kompatibel SDK-feature-band/pin och verifiera en verklig ren image-build utan
+att tysta SDK-grinden eller utvidga Finance-/deploymentmandatet.
