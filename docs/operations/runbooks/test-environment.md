@@ -1,6 +1,6 @@
 # Synthetic TEST environment — U1–U3
 
-2026-11-13: **manual synthetic slot installed and runtime verified below; external T22 PARTIAL, user test release BLOCKED**.
+2026-11-13: **manual synthetic slot installed and runtime verified below; external T22 PASS (owner report), manual synthetic TEST ready; unattended automation DEFERRED**.
 Authority is owned solely by the
 [TEST owner decision](../checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).
 The external operator boundary is described in
@@ -25,7 +25,7 @@ No real model/provider/order or new host privilege is authorized.
 | Task | Start condition | Risk / estimate / cap | Repair budget and current use |
 | --- | --- | --- | --- |
 | U1 manual synthetic slot | Explicit 2026-11-13 scope; baseline/worktree checked; offline implementation first | 3, host operations boundary; 4–8 h / 8 h | 2 of 2 used: fixed relay after parent-reported port failure; then explicit socketpair SKIP for sandbox EPERM and final verification. No automatic repair budget remains. |
-| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, NOT STARTED |
+| U2 rootless/hardening | U1 safe manual slot retained and its runtime evidence available; within the preapproved series | 3; 2–4 h / 4 h | At most 2; 0 used, prerequisite preflight BLOCKED (see current outcome) |
 | U3 harmless UI/data pilot | Safe U1 and U2 outcome recorded; no Finance; unattended work requires successful U2 | 2; 3–6 h / 6 h | At most 2; 0 used, NOT STARTED |
 
 At a cap, retain results and the safe manual slot, stop the failing task and continue only
@@ -470,3 +470,45 @@ U2 NOT STARTED pending safe U1 acceptance; observed missing newuidmap/newgidmap 
 rootless prerequisite gap, not an invitation to install packages or widen privileges.
 Unattended U3 remains DEFERRED. Agent Independence stays documented future architecture
 only; no external agent, vendor SDK, subscription or additional release gate was added.
+
+## Owner access confirmation and U2 preflight — 2026-11-13
+
+**Owner-reported evidence:** in reply to the four-item external T22 verification card the
+owner states “Allt är grönt”. Record the four expected outcomes as confirmed: allowed
+iOS/Tailscale client Healthy; actual unlisted Tailscale client refused over IPv4; IPv6
+refused; Wi-Fi/LAN destination refused with Tailscale disabled. These external outcomes
+are owner reported, not independently instrumented by the worker. Combined with the
+previous actual server probes, **T22 PASS and manual synthetic TEST READY**. This section
+supersedes earlier current-state PARTIAL/BLOCKED statements, which remain dated history.
+It grants no UI/PWA acceptance, production deployment, provider/model/order authority or
+Finance risk downgrade. The installed image/control identities remain unchanged.
+
+All eight minimum card groups T04–T06, T11, T12, T15, T16 and T22 now have their stated
+evidence. U1/U1-R1 delivery can complete under existing delegation after exact candidate
+review and required CI. Installed control stays `75e4023c828922d05b6e9f3419be68fdd56f56cb`;
+served candidate stays `151ab3af61c0124855b6086df264ca10dd651e8c`, independently recorded
+from any later documentation/merge SHA. No routine redeployment or new test loop is needed.
+
+U2 begins its already authorized read-only prerequisite preflight. **BLOCKED pending a
+narrow privileged host installation**, not HARDENING_PASS. `newuidmap`, `newgidmap`,
+`slirp4netns` and `pasta` are absent; rootlesskit and subordinate UID/GID mappings exist.
+The operator's noninteractive sudo policy allows only the existing approved-ops backup/
+start/status entry points, not package installation. Do not use rootful Docker to install
+host packages, extend sudo rules or repurpose those entry points. No rootless daemon,
+new identity, firewall, systemd unit, timer or autostart was installed. U2 repairs **0/2**.
+
+Unprivileged `apt-get --simulate --no-install-recommends install uidmap slirp4netns`
+reports four new Debian packages: uidmap, slirp4netns, libsubid5 and libslirp0; **zero
+upgrades/removals** using the current cached package lists. A simulation is not installation
+or a guarantee that repositories remain unchanged. No autoremove/upgrade is authorized.
+The owner/operator action needed to unblock the prepared prerequisite is:
+
+```sh
+sudo apt-get install --no-install-recommends uidmap slirp4netns
+```
+
+After installation is confirmed, resume U2 within its original 4 h/two-repair limit and
+review the rootless control before use. Package presence alone is not hardening success:
+network/resource/lifecycle behavior must still be verified. Until then retain the known
+manual rootful slot and keep unattended U3 DEFERRED; no new isolation/repair loop.
+Agent Independence remains a future requirement without new costs or current gates.

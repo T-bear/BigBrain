@@ -12,18 +12,18 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST U1 — 2026-11-13
 
-**Installerad manuell syntetisk Web/API-slot; T22 PARTIAL, användarfrisläppning BLOCKED.**
+**Manuell syntetisk TEST READY; härdning U2 BLOCKED på installationsförutsättning.**
 Imagekandidat `151ab3af61c0124855b6086df264ca10dd651e8c`, separat installerad/granskad
-kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; båda hosted CI-körningarna gröna
-inklusive kandidatpaket. 29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16
-PASS inom dokumenterat syntetiskt scope. Omstart, CPU/minne/processgränser, negativa
-nätprov, främmande-resursavvisning och tom återstart verifierade. Inga produktionsdata/nycklar.
-Tillåten/nekad lokal klient och IPv6/LAN-bindning verifierade; extern tillåten/nekad
-Tailscale-klient återstår för T22. Endast avgränsat health-verifieringskort lämnas för
-återstående kontroll; ingen READY eller generell testlänk. iPhone/PWA-acceptans NOT RUN.
-Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider oförändrade.
-U1 2/2 och U1-R1 2/2 reparationer förbrukade; U2 NOT STARTED, obevakad U3 DEFERRED.
-[Exakt evidens och återstående åtkomstprov](operations/runbooks/test-environment.md#runtime-evidence-and-access-handoff--2026-11-13).
+kontroll `75e4023c828922d05b6e9f3419be68fdd56f56cb`; relevanta hosted CI-körningar gröna.
+29 fokuserade tester PASS; verkliga T04–T06, T11, T12, T15 och T16 PASS inom beskrivet scope.
+Ägaren bekräftar samtliga fyra externa T22-förväntningar med “Allt är grönt”: T22 PASS
+som **ägarrapporterad evidens**, inte självständigt uppmätt av worker. UI/PWA-acceptans NOT RUN.
+Slotten använder endast egna syntetiska resurser, inga riktiga nycklar/providers/modeller/order.
+Alla 12 ursprungliga produktionscontainrars identiteter/images/starttider verifierades oförändrade.
+U1 och U1-R1 har 2/2 reparationer vardera, utan ny loop. U2-förkontroll visar saknade
+uidmap/slirp4netns; befintlig sudo-gateway tillåter inte installation. Oförändrad manuell slot
+bevaras, obevakad U3 DEFERRED. U2 0/2 reparationer använda, ingen privilegieökning gjord.
+[Exakt åtkomstevidens och avgränsad operatörsåtgärd](operations/runbooks/test-environment.md#owner-access-confirmation-and-u2-preflight--2026-11-13).
 [Agent Independence](architecture/agent-independence.md) är dokumenterat framtida ägarkrav;
 ingen integration, kostnad eller ny grind för pågående PREDEPLOY.
 
