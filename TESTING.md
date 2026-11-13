@@ -35,11 +35,11 @@ redovisas separat och kan endast godkännas av ägaren.
 
 Kontrollera [frysningsregistret](docs/operations/freezes.md) innan körning:
 
-- [Finance](docs/operations/finance-freeze-20261016.md) är **FROZEN — RESEARCH / 0 SEK / NONE;
+- [Finance](docs/operations/finance-freeze-20261016.md) är **UPPTINAD 2026-11-08 — RESEARCH / 0 SEK / NONE;
   G3a BLOCKED, G3b NOT RUN**. Äldre testkommandon återaktiverar inte grants, modeller,
   providers, PAPER/LIVE/AUTO, brokerkoppling eller trading.
-- [BB-158](docs/operations/bb158-freeze-20261023.md) är **FROZEN i sin helhet**, inklusive
-  direktimport, DOI/ISBN, YouTube, Librarr, tester, säkerhetsexperiment och deployment.
+- [BB-158](docs/operations/bb158-freeze-20261023.md) är **UPPTINAD FÖR UTVECKLING 2026-11-10**.
+  Utvecklingsbeslutet ger inte i sig deployment- eller driftauktorisering.
 
 Ingen fryst körning eller driftkontroll följer av denna guide. Upptining kräver nytt uttryckligt
 ägarbeslut och auktoriserad scope/DoD. Befintlig drift lämnas orörd. Historiska next-, retry-,
@@ -130,7 +130,7 @@ samt föreskriven UI-bekräftelse; äldre playbackprov är inte generellt testti
 [ADR 0013](docs/adr/0013-safe-qbittorrent-download-removal-boundary.md)/[ADR 0016](docs/adr/0016-safe-download-control-command-and-partial-batch-boundary.md)
 behåller destruktiva, Arr-, Retry- och partial-batch-grindar; BB-019–023:s destruktiva verifiering
 är inte godkänd genom denna guide. Mediekontrolls merge bevisar inte full fysisk acceptans.
-BB-158:s frysning gäller även när äldre importtester finns i arkivet.
+BB-158:s utvecklingsupptining 2026-11-10 gör inte äldre importtester till aktuella körorder.
 
 [Family View](docs/architecture/family-view-family-coordination.md) använder källmodulernas
 ägarskap; [Meal Planner](docs/knowledge/meal-planner.md) och [Shopping List](docs/knowledge/shopping-list.md)

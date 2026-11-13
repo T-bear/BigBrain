@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: Exact owned checkpoint branch (checkpoint/...)
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -60,3 +66,104 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-candidate-package:
+    name: TEST candidate package (not a required acceptance check)
+    needs: [backend, frontend, documentation, secrets]
+    if: >-
+      ${{ always() && !cancelled() && needs.secrets.result == 'success' && github.repository == 'T-bear/BigBrain' &&
+          github.actor == github.repository_owner &&
+          ((github.event_name == 'pull_request' &&
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.event.pull_request.user.login == github.repository_owner &&
+            startsWith(github.event.pull_request.head.ref, 'checkpoint/')) ||
+           (github.event_name == 'workflow_dispatch' && startsWith(inputs.candidate_ref, 'checkpoint/'))) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Resolve owned exact source before running candidate code
+        id: source
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const branch = context.eventName === 'pull_request'
+              ? context.payload.pull_request.head.ref : context.payload.inputs.candidate_ref;
+            if (!/^checkpoint\/[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(branch) || branch.includes('..'))
+              throw new Error('Only an exact owned checkpoint branch is permitted');
+            const ref = await github.rest.git.getRef({...context.repo, ref: 'heads/' + branch});
+            const sha = ref.data.object.sha;
+            if (context.eventName === 'pull_request' && sha !== context.payload.pull_request.head.sha)
+              throw new Error('Branch moved; run a fresh package job');
+            const commit = await github.rest.repos.getCommit({...context.repo, ref: sha});
+            if (commit.data.author?.login !== owner) throw new Error('Candidate author must be repository owner');
+            core.setOutput('sha', sha);
+            core.setOutput('tree', commit.data.commit.tree.sha);
+            core.setOutput('ref', 'refs/heads/' + branch);
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+          persist-credentials: false
+      - name: Build both exact-source images (mandatory even when tests are red)
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          SOURCE_TREE: ${{ steps.source.outputs.tree }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git rev-parse HEAD^{tree})" = "$SOURCE_TREE"
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/test_environment -p 'test_*.py' -q
+          mkdir test-package
+          python3 scripts/test-candidate-dockerfile.py "$RUNNER_TEMP/Dockerfile.test-api" > test-package/build.json
+          docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f "$RUNNER_TEMP/Dockerfile.test-api" -t bb-test-api-source .
+          docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f infrastructure/test-environment/Dockerfile.api -t bb-test-api-package .
+          docker build --build-arg "BIGBRAIN_REVISION=$SOURCE_SHA" -f infrastructure/test-environment/Dockerfile.web -t bb-test-web-package .
+      - name: Save images and exact provenance
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          SOURCE_TREE: ${{ steps.source.outputs.tree }}
+          SOURCE_REF: ${{ steps.source.outputs.ref }}
+          TEST_RESULTS: ${{ toJSON(needs) }}
+          TESTED_SHA: ${{ github.sha }}
+        run: |
+          docker image inspect bb-test-api-package bb-test-web-package > test-package/images.json
+          docker save bb-test-api-package bb-test-web-package | gzip -1 > test-package/images.tar.gz
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          p = Path('test-package')
+          images = json.loads((p / 'images.json').read_text())
+          sha = os.environ['SOURCE_SHA']
+          for info, kind in zip(images, ('api', 'web')):
+              assert info['Config']['Labels']['org.opencontainers.image.revision'] == sha
+              assert info['Config']['Labels']['io.bigbrain.test.kind'] == kind
+          checksums = {}
+          for path in p.iterdir():
+              with path.open('rb') as f:
+                  checksums[path.name] = hashlib.file_digest(f, 'sha256').hexdigest()
+          manifest = {
+              'source_sha': sha, 'tree': os.environ['SOURCE_TREE'], 'ref': os.environ['SOURCE_REF'],
+              'repository': os.environ['GITHUB_REPOSITORY'], 'trusted_owner': True,
+              'workflow_run': os.environ['GITHUB_RUN_ID'], 'workflow_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'tests': {k: v['result'] for k, v in json.loads(os.environ['TEST_RESULTS']).items()},
+              'tested_sha': os.environ['TESTED_SHA'],
+              'build': json.loads((p / 'build.json').read_text()),
+              'images': {k: v['Id'] for k, v in zip(('api', 'web'), images)},
+              'repo_digests': {k: v.get('RepoDigests', []) for k, v in zip(('api', 'web'), images)},
+              'checksums': checksums,
+              'scope': 'Synthetic TEST only; image IDs are content digests; registry digests may be absent.'
+          }
+          (p / 'package.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          paths = sorted(p.iterdir())
+          with (p / 'SHA256SUMS').open('w') as out:
+              for path in paths:
+                  with path.open('rb') as f:
+                      out.write(hashlib.file_digest(f, 'sha256').hexdigest() + '  ' + path.name + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-candidate-${{ steps.source.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-package/
+          retention-days: 7
+          if-no-files-found: error

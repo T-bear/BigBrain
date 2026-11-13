@@ -65,5 +65,8 @@ Recovery används för avbrott/opublicerad delta, inte som en parallell statusra
 
 Uppfylld DoD avslutar uppdraget. Ingen automatisk fortsättning, ny sprint eller aktivering.
 Review och P0/P1 följer [AGENTS avsnitt 7](../AGENTS.md#7-review-och-blockerare);
-merge kräver exakt SHA-godkännande och deployment separat auktorisering enligt
-[avsnitt 8](../AGENTS.md#8-git-och-review-checkpoints).
+merge och deployment följer uppdragets uttryckliga mandat och risknivå enligt
+[checkpoint-arbetsflödet](operations/checkpoint-workflow.md#delegerad-teknisk-leverans-efter-uttryckligt-ikraftträdande).
+Exakt kandidat-SHA/tree och tillämpliga kontroller ska verifieras; separat exakt
+SHA-godkännande krävs inte rutinmässigt inom giltig delegering. Syntetisk TEST följer
+[det avgränsade ägarbeslutet](operations/checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13).

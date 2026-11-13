@@ -1,0 +1,20 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY src/BigBrain.Web/package*.json ./
+RUN npm ci
+COPY src/BigBrain.Web/ ./
+RUN npm run build
+ARG BIGBRAIN_REVISION
+RUN node -e 'const fs=require("fs"); const sha=process.argv[1]; if(!/^[a-f0-9]{40}$/.test(sha))process.exit(1); const p="dist/index.html"; let html=fs.readFileSync(p,"utf8"); html=html.replace("<body>",`<body><aside id="bb-test-banner" style="position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#ffdf00;color:#111;text-align:center;font:700 16px/28px sans-serif;pointer-events:none">TEST · ${sha.slice(0,12)} · synthetic data</aside>`); fs.writeFileSync(p,html); const m="dist/manifest.webmanifest"; const manifest=JSON.parse(fs.readFileSync(m)); manifest.name="BigBrain TEST "+sha.slice(0,12); manifest.short_name="BB TEST"; fs.writeFileSync(m,JSON.stringify(manifest)); fs.writeFileSync("dist/test-revision.txt",sha+"\n");' "$BIGBRAIN_REVISION"
+
+FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
+ARG BIGBRAIN_REVISION
+LABEL org.opencontainers.image.revision=$BIGBRAIN_REVISION io.bigbrain.test.kind="web"
+USER root
+COPY src/BigBrain.Web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+RUN chmod 0444 /etc/nginx/conf.d/default.conf && find /usr/share/nginx/html -type d -exec chmod 0755 {} + && find /usr/share/nginx/html -type f -exec chmod 0444 {} +
+USER 101:101
+EXPOSE 8080
+ENTRYPOINT ["nginx"]
+CMD ["-g", "daemon off;"]

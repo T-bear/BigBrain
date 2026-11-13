@@ -1,0 +1,7 @@
+# Build the existing API Dockerfile as bb-test-api-source in the same hosted job.
+FROM bb-test-api-source AS runtime
+ARG BIGBRAIN_REVISION
+LABEL org.opencontainers.image.revision=$BIGBRAIN_REVISION io.bigbrain.test.kind="api"
+# The source Dockerfile already prepares these empty directories for the app UID.
+USER 1654:1654
+ENTRYPOINT ["dotnet", "BigBrain.Finance.Hosting.dll"]

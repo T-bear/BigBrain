@@ -42,6 +42,42 @@ Teknisk leverans är inte manuell produktacceptans. Obligatorisk iPhone/PWA-acce
 kontroller får inte registrera den som PASS. Två reviewvarv, två automatiska reparationsförsök
 och resursramen i avsnitt 7 gäller även delegerad leverans.
 
+### Syntetisk TEST — ägarbeslut 2026-11-13
+
+Endast syntetisk TEST med Web/API, utan verkliga nycklar, data, providers, modeller,
+marknadsdata eller order, är **inte deployment i delegeringstabellen ovan**. Ingen nivå
+3-kandidatgranskning krävs före sådan syntetisk körning, även när Finance-kod ingår.
+Finance är fortsatt alltid nivå 3 för merge, produktion och icke-syntetisk D3/G3,
+verkliga modeller/providers/marknadsdata. Undantaget ger aldrig rätt att ändra sin egen
+worker-isolering eller andra host-/produktgränser. Produktionsdatabasens backupgrind är BLOCKED.
+
+Ägaren har auktoriserat U1 → U2 → U3 med separata budgetar och högst två automatiska
+reparationsförsök **per uppdrag**, inte per fel. U1 får först använda en manuellt
+worker-startad, icke-privilegierad slot på rootful Docker med installerad fast mall/validator,
+exakta image-ID:n, egna resurser, ren miljö, endast vald Tailscale-adress och hårda resursgränser.
+Inga timers eller autostart. Endast betrodd egen workerbranch, aldrig publik/fork-PR,
+får vara källa till lokal exekvering. Workers får bygga, starta om och exec:a egna
+testcontainrar, återställa/radera egna fixtures och köra negativa tester/röda kandidater
+inom dessa gränser. Det är inte produktions-, credential- eller leverantörsauktoritet.
+
+Parentens avgränsade nätprov 2026-11-13 visade att isolated bridge blockerade utgående
+trafik men att Docker-publicerad port inte fungerade. Parentens implementationsförtydligande
+tillåter därför en fast manuell operator-relä i installerat CLI: endast vald Tailscale-IP:13001
+till exakt verifierad Web-container via fast `docker exec`/loopback:8080. Ingen klientstyrd
+destination/kommando, extra container, host-konfiguration eller privilegieökning; anslutningar,
+tid och egna barnprocesser begränsas. En uttrycklig klientlista installeras med kontrollen
+och kontrolleras före reläets Docker-anrop; kandidatens render-steg får inte ändra den.
+Containrarna har då inga publicerade portar.
+
+Parent ChatGPT genomför oberoende review före installation av fast kontrollmall/validator.
+Subprocessens tillfälliga offline-/publiceringsbegränsningar begränsar inte ägarens
+förhandsgodkända U1 → U2 → U3-mandat. Serien fortsätter när respektive startvillkor är
+uppfyllt inom sin budget, utan extra ägarklick. Minst T04–T06, T11, T12, T15, T16 och T22 ska ha
+verkligt PASS innan användarlänk lämnas. Om U2 inte klaras inom budget bevaras säker
+manuell slot och obevakad U3 skjuts upp; ingen förnyad reparationsloop.
+[TEST-runbooken](runbooks/test-environment.md) äger uppdragens DoD, testkort och körinstruktioner.
+Detta stycke äger TEST-auktoriteten; runbooken ger inga ytterligare befogenheter.
+
 ### Publicering och spårbarhet för båda godkännandevägarna
 
 Verifiera `origin/main` före och efter push och att remote HEAD matchar publicerad lokal HEAD.
