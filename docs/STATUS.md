@@ -35,7 +35,11 @@ tidigare giltig evidens; Linger och unitgränser omverifierade. Faktisk sista-ut
 är NOT RUN; fysisk iPhone/PWA-acceptans återstår. PR87:s metadata skiljer kandidat från accepterad main.
 Ägarens extra60min omfattade dessa två prov. Nytt ägarbeslut medger nu slutreview, merge
 och en avgränsad ägar-UX-slot, med oförändrade säkerhetsgränser och utan korrigeringsloop.
-BB162 reparation1/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.
+BB162 reparation2/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.
+
+Aktuell slut-CI fann en asynkron SchoolLunch-testassertion före terminal rendering;
+sista reparationsförsöket rättar endast testets väntan på samma felmeddelande. Ny exakt
+frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår som evidens.
 
 ## Frysningar och operativa osäkerheter
 

@@ -1272,3 +1272,20 @@ loop. Existing BB162 repair1/2 and U3 exhausted2/2 are unchanged. DoD (five):
 No real Finance keys/data/providers/models/orders, new privileges, timers/autostart or
 isolation changes. Any active failure stops safely; retain completed work without retries.
 Checkpoint delegation already separates technical delivery from manual product acceptance.
+
+
+#### Closeout CI terminal-wait correction — repair2/2, 2026-11-14
+
+Current candidate37a59b1 CI43587453993 exposed one required frontend failure
+(270PASS/1FAIL): the existing SchoolLunch stale-menu/error test waited only for two mock
+API calls, then synchronously expected an alert. The captured DOM was still loading.
+The inspected component resolves rejection through asynchronous catch/state rendering.
+This current CI failure is independent of the accepted historical startup uncertainty.
+
+The bounded test correction waits for the same expected terminal alert before asserting
+the unchanged exact error text, two API calls and absence of stale/fixture content.
+No product/API/provider code, timeout increase, sleep, skipped assertion, retry setting
+or installed control changes. BB162 repair2/2 is now consumed; U3 remains exhausted2/2.
+A fresh full CI on the corrected exact candidate must PASS before merge. Superseded
+candidate37's red outcome is retained; older green results do not replace this check.
+No local frontend test is claimed: dependencies are absent; hosted CI is the verification.

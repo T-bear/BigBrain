@@ -1350,7 +1350,7 @@ historisk rättning eller verifierad mänsklig faktor påstås. [Ägarbeslut](op
 Task/rootless PAUSED/stoppade/disabled, ny legitim last-good från verklig succeeded,
 manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ägarbeslutet medger nu
 ett avgränsat iPhone/PWA-test genom samma kontroll; inget diagnostik-/reparationsomtag.
-BB162 reparation1/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA återstår;
+BB162 reparation2/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA återstår;
 [PR87](https://github.com/T-bear/BigBrain/pull/87) redovisar exakt slutreview/CI/merge. Inget fullständigt färdigbesked före ägaracceptans.
 [Exakt aktuell evidens och avgränsning](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
