@@ -5,24 +5,19 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
-## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
+## PREDEPLOY scanner false-positive correction — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
 
-Ägaren avslutar orsaksjakten för historiskt4259db4 och accepterar okänd kvarstående orsak
-utifrån aktuella PASS. Mänsklig faktor är endast hypotes. [Bindande ändringsbeslut och DoD](runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14)
-medger slutreview/merge/en ägar-UX-slot, risk2, cap45 aktiva minuter, ingen reparationsloop.
-Branch checkpoint/test-environment-u3-automation-20261113; main e2635e5 verifierad oförändrad.
-Hämta exakt publicerings-SHA/tree före review/merge. Föregående04f5d06 alla fem CI PASS. Kandidat37 CI43587453993 har ett terminal-wait-testfel;
-aktuell rättning ändrar endast testets väntan på samma alert. Hämta ny exakt SHA och full CI;
-merge får ske först efter dess PASS. Inga produktions-/kontrolländringar.
-Installerad kontroll72fdea8 oförändrad; last-good task95/sourcee5 har aktuellt PASS och
-matchande request/control/receipt. Task/rootless PAUSED/stoppade/disabled, ingen pending;
-manuell reserv75/image151 återställd. Produktions12 oförändrade i senaste verifiering.
-Återuppta från faktisk [PR87-status](https://github.com/T-bear/BigBrain/pull/87): slutreview/merge/main-CI kan ha slutförts efter denna not.
-Verifiera metadata innan åtgärd; utför inte en redan genomförd merge igen. Ägar-UX kräver verklig Serving och verifierad kandidat.
-PR-artefakter kan binda gammal syntetisk merge-test-SHA: efter merge använd befintlig
-workflow_dispatch på oförändrad bevarad checkpoint om nytt tillämpligt paket behövs;
-ändra aldrig proveniens/validator för att få det godkänt. UX är PENDING tills ägaren godkänner.
-BB162 reparation2/2 och gamla U3:s2/2 oförändrade; bevara orelaterade filer.
+Technical PR87 merged at e7e8c59 with exact main-CI43588390865 PASS. Preserved checkpoint
+branch fast-forwarded to that accepted main without history rewriting. Owner explicitly
+authorizes one exact historical fingerprint exception and full-history rescan, cap20min,
+risk2, single attempt; BB1622/2 and old U3 exhausted2/2 remain unchanged.
+[Exact scope and verification](runbooks/test-environment.md#owner-approved-historical-scanner-false-positive--2026-11-14)
+bind the known benign Git-commit reference, not a real key. Dispatch43588396681 failed
+full-history secrets scanning; current correction needs fresh full-history PASS and exact
+review/CI before merge. No workflow or installed controller changes, no scan bypass.
+Fetch actual checkpoint SHA/tree and current PR metadata before any action.
+Rootless/task remain PAUSED/inactive/disabled, no pending owner window; manual fallback
+is preserved. Owner iPhone/PWA acceptance remains PENDING; do not infer it from CI.
 
 ## DOC-2A — publicerad beslutspunkt
 
