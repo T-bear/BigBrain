@@ -33,6 +33,12 @@ produktionsidentiteter/images/starttider oförändrade. Ingen Finance-kandidat p
 Fysisk ägaracceptans på iPhone/PWA och accepterad-main-leverans återstår. Agent Independence
 är framtida krav; Finance-/produktions-/backupgrindar och syntetisk TEST-avgränsning gäller.
 
+Ny felinsamling72fdea8 är källimplementerad och oberoende granskad utan P0/P1;
+87 fokuserade tester samt dokumentations-/diffkontroller PASS. Ej installerad eller
+driftverifierad; startfelet är inte löst. Återstående aktiv tidsram kan inte styrkas
+från befintlig redovisning; ingen ny driftloop startas.
+[Avgränsning och återupptagning](operations/runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14).
+
 ## Frysningar och operativa osäkerheter
 
 | Område | Gällande beslut och kvarstående begränsningar |

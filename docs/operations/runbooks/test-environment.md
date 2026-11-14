@@ -1152,3 +1152,19 @@ Before installation, require exact independent control review and a bounded inst
 rollback plan that preserves valid provenance and never silently adopts an old last-good
 receipt under changed control hashes. Existing fallback and paused rootless/task are
 unchanged. No completion notice, merge clearance or second corrective repair is claimed.
+
+
+Independent source-preparation review of72fdea8765c20c1efd764453df094aa05d3315ad,
+tree5436c4dca40eca09522b5cee7cfdc9f55368ab50 found no P0/P1. The87 focused tests,
+documentation295files/57IDs and diff checks PASS. This is source clearance only.
+The four diagnostic commands are bounded; filesystem I/O has no unconditional global
+deadline. Proposed separate-snapshot/provenance transition is sound in principle.
+
+**RESOURCE HOLD, NOT A NEW TECHNICAL FAILURE:** the preserved record contains the original
+two-active-hour cap but no reliable cumulative active-time balance. Available time must
+not be fabricated. Source preparation is preserved and no installation or live trial has
+been performed. The next concrete work is one reviewed control transition, one controlled
+synthetic failure proving retained evidence/cleanup, and at most one ordinary automatic
+candidate observation. Any continued resource allocation must be explicitly bounded;
+neither old repair counter is reset. An inconclusive observation cannot trigger another
+loop or claim startup stability. The original startup P1 and owner UX acceptance remain.

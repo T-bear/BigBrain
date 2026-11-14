@@ -1337,6 +1337,12 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
+Diagnostik72fdea8: privat felunderlag före cleanup implementerat,87 tester PASS,
+oberoende källreview utan P0/P1. Ej installerat/driftverifierat och inte en startfelsrättning.
+Återstående aktiv tidsram saknar verifierbar balans; inget nytt driftprov startat.
+[Exakt fortsättningspunkt](operations/runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14).
+
+
 **BLOCKED / P1: intermittent automatstart; tidigare fel är inte förklarat.**
 2026-11-14: ett instrumenterat automatprov på a4d9bb2 avslutades succeeded efter60s
 Serving. API lyssnade efter10,457s; sju health-exec misslyckades, åttonde och senare

@@ -10,12 +10,14 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 Owner prioritizes stabilization before synthetic Finance. Active preserved branch
 checkpoint/test-environment-u3-automation-20261113; accepted main e2635e5 unchanged.
 Prior checkpoint321e1e0 CI43575807049 all five checks PASS. New diagnostic-only controller
-patch and regression tests are prepared; fetch exact published checkpoint before review.
+patch72fdea8/tree5436c4d has independent source review without P0/P1 and87 tests PASS.
+Fetch exact latest publication before continuing.
 [Scope, limits and evidence contract](runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14)
 is the single detailed record. No installed control/config/runtime change, no new live trial.
 BB-162 repair1/2 and original2-active-hour cap remain; old U3 remains2/2 exhausted.
 The4259db4 startup failure is still unexplained: BLOCKED/P1, PR87 not mergeable.
-Next: exact independent patch review; before any installation prepare bounded provenance/
+Original remaining active-time balance cannot be established: RESOURCE HOLD, no live trial.
+Next: bounded continued resource allocation; before any installation prepare provenance/
 last-good transition and safe rollback, never rewrite receipts to manufacture adoption.
 Rootless/task remain PAUSED/stopped/disabled, legitimate last-good a4d9bb2 retained;
 manual control75/image151 fallback preserved. Physical iPhone/PWA acceptance still pending.
