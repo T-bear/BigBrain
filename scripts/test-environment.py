@@ -29,6 +29,7 @@ import urllib.request
 import uuid
 
 PROJECT = "bb-test-u1"
+RELAY_CONNECTIONS = 8
 SLOT_LABEL = "io.bigbrain.test.slot"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 IMAGE = re.compile(r"sha256:[0-9a-f]{64}\Z")
@@ -42,6 +43,14 @@ BASE_ENV_KEYS = {
 
 class Rejected(Exception):
     pass
+
+
+class DockerRejected(Rejected):
+    def __init__(self, result):
+        super().__init__("Docker command failed; no raw output published")
+        self.returncode = result.returncode
+        # Private failure evidence only; never included in str(error)/public receipt.
+        self.private_output = (result.stdout + result.stderr)[-8192:]
 
 
 def require(condition, reason):
@@ -150,8 +159,60 @@ def run(root, *args):
     except (OSError, subprocess.TimeoutExpired):
         raise Rejected("Docker unavailable or command timed out; inspect private slot state") from None
     # Docker output can contain private paths, addresses or application messages.
-    require(result.returncode == 0, "Docker command failed; no raw output published")
+    if result.returncode != 0:
+        raise DockerRejected(result)
     return result.stdout
+
+
+
+def diagnostic_docker(root, *args):
+    """Read-only, exact-ID diagnostic: 2s/64KiB, always reap our own CLI."""
+    child = subprocess.Popen(["/usr/bin/docker", *args], cwd=root,
+        env=clean_environment(root), stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    data = bytearray()
+    status = "complete"
+    deadline = time.monotonic() + 2
+    try:
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                status = "timeout"
+                break
+            ready, _, _ = select.select([child.stdout], [], [], remaining)
+            if not ready:
+                status = "timeout"
+                break
+            chunk = os.read(child.stdout.fileno(), min(4096, 65537 - len(data)))
+            if not chunk:
+                try:
+                    child.wait(timeout=max(0.01, deadline - time.monotonic()))
+                except subprocess.TimeoutExpired:
+                    status = "timeout"
+                break
+            data.extend(chunk)
+            if len(data) > 65536:
+                status = "truncated"
+                break
+    finally:
+        if child.poll() is None:
+            child.kill()
+        child.wait(timeout=2)
+        child.stdout.close()
+    return {"status": status, "returncode": child.returncode,
+            "output": bytes(data[:65536]).decode("utf-8", errors="replace")}
+
+
+def diagnostic_cgroup(path):
+    values = {}
+    for name in ("pids.current", "pids.events", "memory.current", "memory.peak",
+                 "memory.events", "cpu.stat"):
+        try:
+            with (path / name).open("r", encoding="ascii") as source:
+                values[name] = source.read(4096).strip()
+        except (OSError, UnicodeError):
+            values[name] = None
+    return values
 
 
 def compose(root, *args):
@@ -452,25 +513,86 @@ class Slot:
         ids = self.audit(inventory)
         self.save_state(inventory)
         self.receipt("validated-before-start", containers=ids)
+        self.health_attempts = []
+        began = time.monotonic()
+        stage = "start-api"
         try:
             for name in ("api", "web"):
+                stage = "start-" + name
                 run(self.root, "container", "start", ids[name])
+            stage = "post-start-audit"
             self.audit(self.inventory())
+            stage = "internal-health"
             self.internal_health(ids["web"])
-        except BaseException:
-            # Only exact IDs which passed pre-start validation; keep fixture data.
-            run(self.root, "container", "stop", "--time", "35", *ids.values())
-            self.receipt("start-failed-stopped")
+        except BaseException as error:
+            # Diagnostic failure must never suppress exact-owned cleanup.
+            try:
+                self.failure_evidence(ids, stage, began, error)
+            except Exception:
+                pass
+            finally:
+                # Only exact IDs which passed pre-start validation; keep fixture data.
+                run(self.root, "container", "stop", "--time", "35", *ids.values())
+                self.receipt("start-failed-stopped")
             raise
         self.receipt("started-internal-health-pass", external_http="NOT RUN", rootless="NOT RUN", client_acl="NOT RUN", isolation="PENDING")
 
+    def failure_evidence(self, ids, stage, began, error):
+        # Installed operations tool, outside API/Web/Brain. No candidate-selected paths.
+        profile = engine_profile(self.seal)
+        base = Path("/sys/fs/cgroup/user.slice") / f"user-{os.getuid()}.slice" / f"user@{os.getuid()}.service"
+        evidence = {"version": 1, "candidate": self.p["candidate"],
+            "stage": stage, "elapsed_seconds": round(time.monotonic() - began, 3),
+            "failure_type": type(error).__name__,
+            "docker_exit": getattr(error, "returncode", None),
+            "private_error": getattr(error, "private_output", None),
+            "health_attempts": getattr(self, "health_attempts", []), "containers": {}}
+        if profile["mode"] == "rootless":
+            evidence["task_cgroup"] = diagnostic_cgroup(base / "app.slice/bigbrain-test-task.service")
+            evidence["engine_cgroup"] = diagnostic_cgroup(base / "app.slice/bigbrain-test-rootless.service")
+        for name in ("api", "web"):
+            cid = ids[name]
+            require(re.fullmatch(r"[0-9a-f]{64}", cid) is not None, "invalid diagnostic target")
+            observed = diagnostic_docker(self.root, "container", "inspect", cid)
+            row = {"id": cid, "inspect_status": observed["status"]}
+            evidence["containers"][name] = row
+            try:
+                require(observed["status"] == "complete" and observed["returncode"] == 0,
+                        "diagnostic inspect unavailable")
+                info = json.loads(observed["output"])[0]
+                require(info["Id"] == cid and info["Image"] == self.p[name] and
+                        owned(info["Config"].get("Labels"), self.p["slot"]) and
+                        info["Config"]["Labels"].get("com.docker.compose.service") == name,
+                        "diagnostic identity mismatch")
+                row["state"] = {key: info["State"].get(key) for key in
+                    ("Status", "Running", "ExitCode", "OOMKilled", "StartedAt", "FinishedAt")}
+                row["logs"] = diagnostic_docker(self.root, "logs", "--timestamps", "--tail", "80", cid)
+                if profile["mode"] == "rootless":
+                    row["cgroup"] = diagnostic_cgroup(base / "user.slice" / ("docker-" + cid + ".scope"))
+            except (Rejected, ValueError, KeyError, TypeError, IndexError):
+                row["identity_verified"] = False
+                continue
+            row["identity_verified"] = True
+        path = self.root / ("start-failure-" + uuid.uuid4().hex + ".json")
+        write_json(path, evidence)
+        # Only the opaque filename/hash enters the general receipt.
+        self.receipt("start-failure-evidence", file=path.name, sha256=digest(path))
+
     def internal_health(self, web_id):
+        attempts = []
+        self.health_attempts = attempts
+        began = time.monotonic()
         for attempt in range(12):
             try:
                 body = run(self.root, "exec", web_id, "/bin/busybox", "wget", "-T", "3", "-q", "-O", "-", "http://127.0.0.1:8080/health")
                 require(body.strip() == "Healthy", "internal Web/API health failed")
+                attempts.append({"attempt": attempt + 1, "elapsed_seconds": round(time.monotonic() - began, 3),
+                                 "outcome": "healthy"})
                 return
-            except Rejected:
+            except Rejected as error:
+                attempts.append({"attempt": attempt + 1, "elapsed_seconds": round(time.monotonic() - began, 3),
+                    "outcome": "rejected", "failure_type": type(error).__name__,
+                    "docker_exit": getattr(error, "returncode", None)})
                 if attempt == 11:
                     raise
                 time.sleep(1)
@@ -526,15 +648,16 @@ class Slot:
                 self.relay_target(ids["web"])
                 self.internal_health(ids["web"])
             cancelled = threading.Event()
-            capacity = threading.BoundedSemaphore(4)
+            capacity = threading.BoundedSemaphore(RELAY_CONNECTIONS)
+            capacity_notice_recorded = False
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
                 # No wildcard, IPv6, SO_REUSEPORT or fallback bind.
                 listener.bind((self.p["bind"], 13001))
-                listener.listen(4)
+                listener.listen(RELAY_CONNECTIONS)
                 listener.settimeout(0.5)
-                self.receipt("relay-listening", web_id=ids["web"], max_connections=4, timeout_seconds=30)
+                self.receipt("relay-listening", web_id=ids["web"], max_connections=RELAY_CONNECTIONS, timeout_seconds=30)
                 print("RELAY listening on selected interface; client ACL acceptance remains separate", flush=True)
-                with ThreadPoolExecutor(max_workers=4) as workers:
+                with ThreadPoolExecutor(max_workers=RELAY_CONNECTIONS) as workers:
                     try:
                         while not cancelled.is_set():
                             try:
@@ -550,6 +673,10 @@ class Slot:
                                 continue
                             if not capacity.acquire(blocking=False):
                                 client.close()
+                                if not capacity_notice_recorded:
+                                    # One sanitized observation per relay, never per request.
+                                    self.receipt("relay-capacity-rejected", max_connections=RELAY_CONNECTIONS)
+                                    capacity_notice_recorded = True
                                 continue
                             workers.submit(self.relay_connection, client, ids["web"], cancelled, capacity)
                     except KeyboardInterrupt:

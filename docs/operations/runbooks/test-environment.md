@@ -923,3 +923,369 @@ candidate preparation and verification; the preserved151ab3a image is not a clai
 the current Finance worker branch is deployed. Non-synthetic Finance and production
 remain subject to their existing separate requirements. BB-162 is a proposed transport
 follow-up, not a prerequisite owner approval for already authorized synthetic testing.
+
+## BB-162 execution — owner authorization 2026-11-13
+
+The owner explicitly authorizes continuing the fix until PREDEPLOY is fully ready, with
+completion notice. New bounded risk2 task: estimate1–2 active hours/cap2h, maximum2
+repairs, initially0/2; U3 remains2/2 exhausted. Continue its preserved branch/history,
+merging accepted main e2635e53edced5db106f7d6366809633f3c1b966 (exact main CI PASS).
+The owner also requires the known TEST-only banner issue BB-161 closed in this delivery.
+No new vendor, subscription, model/provider or production scope.
+
+DoD (five):
+1. Correlate real cold-browser transport failure with its cause using bounded, sanitized
+   evidence; implement the minimal supported correction without broadening host authority.
+2. Fix the known TEST banner/modal obstruction and verify desktop/mobile controls.
+3. Actual automatic synthetic candidate: cold start/add/refresh PASS, retained honest red
+   outcomes, original access/network/volume/key boundaries and enforced resource caps.
+4. Verify pause/interruption/one safe restoration and intended sessions-independent
+   operation; preserve manual fallback. Any genuinely privileged persistence step waits
+   until all review/install/runtime preparation is complete, never bypass sudo policy.
+5. Independent fixed-control review before installation, exact applicable CI/merge and
+   canonical facts; no completion notice while known PREDEPLOY delivery errors remain.
+
+At cap preserve results and safe manual TEST, stop the failing operation without a new
+repair/design loop. Ordinary implementation choices remain delegated. Completion refers
+to the defined synthetic PREDEPLOY delivery, not an unprovable absence of all future bugs.
+
+### BB-162 initial transport correction
+
+Verified controlled same-service experiment: six allowlisted persistent HTTP/1.1 health
+connections yield four Healthy responses and two ConnectionResetError outcomes; one
+capacity-rejection receipt is recorded. A real BusyBox exec exits0.007s after stdin EOF,
+so no EOF-cleanup or nginx modification is justified. The first natural-browser observer
+did not reach the page: its15s session deadline was shorter than observed cold startup;
+that is observer evidence, not a reproduced application failure. A second bounded natural
+observation uses a60s private QA session bound; no deployed control policy changes for it.
+
+A real loopback concurrency regression against the relay function reproduces rejection
+of the fifth legitimate persistent connection. Initial minimal delivery correction sets
+one fixed operator connection bound to8 for semaphore/backlog/pool/receipts. It is never
+candidate-selected. Source admission, exact target, bytes/deadlines, resource caps and
+cleanup are unchanged. The regression requires six accepted connections and continued
+bounded rejection/one sanitized receipt above the installed limit. This establishes a
+verified failure mode; complete cold-browser/runtime acceptance still must pass.
+
+### BB-162 measured task process ceiling — repair 1
+
+The initial eight-connection delivery candidate5fd3153 passed all five CI jobs and
+its bounded core task completed, but a cold Firefox140esr browser failed at synthetic
+QuickAdd with NetworkError. Banner source and family navigation passed; subsequent
+refresh and mobile acceptance were not reached. The task cgroup recorded pids.events
+max2 while both application-container PID event counters were0. Task memory events
+were all0 and peak memory was approximately378MB. This identifies a real task process
+ceiling violation; its causal contribution to the browser failure remains to be tested.
+Docker client Go threads count against the unit TasksMax64, separately from container
+PIDs64. Repair1 installs an independently cleared bounded TasksMax256 for the external task unit only; CPU,
+memory, deadline, eight-connection limit, container PID caps and isolation stay fixed.
+Independent exact-unit clearance preceded installation. The actual eight-persistent-connection
+canary passes all eight Healthy replies and rejects overflow. Task peak81, PID events0,
+memory events0, memory peak516374528 bytes within536870912. A first browser observation
+checked QuickAdd after a fixed short sleep: item not yet visible, no NetworkError observed.
+That is NOT_YET_ACCEPTED, not evidence of a new network failure. A bounded20s outcome
+wait replaces that private observer sleep; package, transport and limits stay fixed.
+This intermediate observer result is superseded by the bounded browser PASS below.
+Old U3 repair2/2 remains exhausted and is not reset. No production operation is included.
+
+Observer correction note: an attempted fetch-timing wrapper caused its own Window-binding
+TypeError in the private QA browser. That run is invalid for application acceptance and
+is retained as observer failure. The wrapper was removed entirely; subsequent observation
+uses passive Performance entries and bounded DOM-result waits. A later page showed the
+first short-window fixture retained, establishing that its POST eventually succeeded.
+No application, nginx, network, package or additional deployed limit changed for this.
+
+### BB-162 repair1 browser evidence — 2026-11-13
+
+Exact hosted application source5fd315376fdb9adad93ce48346e0747981697214,
+tree4a6694e6ad68479a6fadc16b15d68cafebbc6010, run43508942692,
+artifact14077503189, sealed controller5fd3153 plus independently cleared unit hash
+c62f9f73173114a177663a7aeadc2f003391e3df379104939db1a32109b3d7e0.
+Both fresh Firefox140esr profiles PASS: TEST SHA, family navigation, synthetic item
+addition, three actual page refreshes preserving the item, banner/modal/header alignment,
+visible hit-tested Back control and fitting banner. Desktop screenshot inspected at1366;
+small-window request390 produced actual450x758 viewport (Firefox minimum), honestly recorded.
+This is automated small-viewport acceptance, not physical iPhone/PWA owner acceptance.
+Both screenshot layouts were visually inspected. No connection preferences changed.
+Eight persistent actual health requests PASS and ninth rejected; task peak81, no PID or
+memory-limit events, peak516374528 bytes. Application container caps/readonly/cap-drop,
+no published ports, own volume mounts and internal IPv4-only network re-inspected PASS.
+Prior BB-159 boundary/UID canaries retain their explicitly scoped evidence; no broader
+untrusted-code protection or all-future-bugs guarantee is claimed. Current pause/aborted, rejection of paused submissions and explicit resume-to-idle PASS
+on the same task. Single restoration now PASS: taskc2a21a59a0e0431daee8823fe50d4616 was interrupted
+by terminating only its revalidated owned relay; exactly one own reset/start restored the
+previous request/source with fresh container identities, then stopped. Fixture data undo
+is not claimed. Final source review/CI/merge and logout-lifetime preparation remain pending.
+
+Safe-exit reconciliation: the rootless task is PAUSED, both rootless units stopped/disabled,
+and last receipt is the intentionally induced rolled-back outcome. The preserved manual
+rootful fallback start did not pass its12-attempt readiness window: API had not emitted
+startup logs and Web received connection-refused/502 before the guard stopped both owned
+containers. Its volumes and exact resources remain intact; it is SAFE_STOPPED, not Healthy.
+No blind retry or completion claim follows. A bounded cold-start diagnosis is pending.
+This does not invalidate the completed browser/pause/restoration evidence above.
+
+### BB-162 final repair1 checkpoint and administrative handoff
+
+The independently cleared private cold-start measurement subsequently PASS: health at5.88s,
+API/Web PID and memory events0. The prior short-window failure remains unexplained; no
+readiness policy or second source repair was introduced. The unchanged manual control75
+relay and full HTTP/assets probe then PASS on retained image151ab3a. Manual fallback is
+restored; it is not the new automatic candidate. Rootless/task remain paused/stopped/disabled.
+The12 original production identities/images/starttimes remain unchanged.
+
+Repair1 source checkpoint a7af031f287c287565c190ba208e3691ce2e8c40,
+tree7263c3b63896af33d918f06e96d6f01567c8c485; CI43517323063 applies to that exact
+unit/docs change. This final documentation reconciliation does not alter executable bits.
+Review checkpoint only: BB-162 DoD4 still requires intended lifetime verification. Existing
+unit starts are on-demand, so enabling the task at boot is not required. Linger=no currently.
+The narrow remaining administrator preparation is `sudo loginctl enable-linger enigma` on
+the BigBrain host, followed by readback and intended-lifetime verification. No generic sudo
+expansion or production action is requested. Do not bypass the existing sudo policy.
+Afterward verify the current published candidate and CI, complete the applicable exact review
+and delegated merge. Physical owner iPhone/PWA acceptance remains separate; provide its
+private verified URL/revision and3–5-step card only when that candidate is actually serving.
+Do not announce full readiness from this manual fallback or Healthy alone.
+
+### BB-162 configured session independence — 2026-11-13
+
+Owner completed the narrow administrative preparation. Fresh readback: Linger=yes and
+persistent root-owned linger file. User manager active; task and rootless units have no
+BindsTo/PartOf session dependencies. Task requires the fixed rootless unit and remains
+on-demand/disabled, not boot-enabled. A new bounded user-service proof survived its
+submitting process: PPID stayed the user-manager PID, cgroup under app.slice, result
+persisted afterward. Earlier actual task evidence also establishes submitter independence.
+The installed loginctl manual specifies that lingering keeps this manager after logout.
+Independent review accepts this combined contract/configuration/runtime evidence as PASS
+for risk2 DoD4. Actual all-sessions logout and reboot tests are NOT RUN; existing unrelated
+sessions are preserved. No destructive logout gate or boot-recovery claim is introduced.
+
+Executable repair source a7af031 and documentation checkpoint4259db4 both have all five
+CI jobs PASS (43517323063 and43518131801 respectively). Repair budget remains1/2.
+Final source publication/review/merge follows this evidence; physical owner iPhone/PWA
+acceptance remains separate and must not be inferred from technical browser tests.
+A fresh synthetic owner pilot uses package4259db4/run43518131801/artifact14081732284;
+its application/controller inputs equal the browser-verified5fd3153 apart from source
+revision branding; later documentation-only reconciliation does not alter these inputs.
+Manual fallback resources are retained and stopped while this automatic pilot is active.
+
+### BB-162 fresh owner-pilot startup failure — merge blocked
+
+Fresh owner-pilot task7abbbef3b3a147d6acea5cdbd06c429d using verified package4259db4
+never reached Serving. Validated-before-start22:27:11 UTC, start-failed-stopped22:27:35;
+exactly one restoration of5fd3153 then passed internal/HTTP/assets health and stopped.
+Final receipt is rolled-back, not succeeded. The24s includes startup and cleanup and
+is not proof of a health timeout. Source a4d9bb2 CI is SUCCESS, but independent conditional
+merge clearance is withdrawn: current P1 against automatic lifecycle acceptance. No merge
+or owner test link is offered. A single bounded instrumented observation of the unchanged
+candidate is prepared to correlate health outcome, listening time, exit/OOM and PID/memory
+events before selecting any second repair. Session-independence evidence remains valid.
+
+### BB-162 bounded automatic observation — 2026-11-14
+
+**VERIFIED:** one unchanged-wrapper automatic task7a971062602d43dd916add0e99fc5896,
+sourcea4d9bb2d44e74c71edd692a4d9d59e26ad3c17f7,
+tree1e9d5bab114f452a446fc7c4a5d918c556f73e3f, CI43519113162 all five jobs PASS,
+artifact14082901031, terminal succeeded. Runtime60s begins at Serving. Fixed controller5fd3153,
+reviewed task unit256 and original CPU/memory/network/credential boundaries unchanged.
+The previous last-good request was restored and its existing hash checked before submission;
+no last-good pointer rewrite or adoption of the operator diagnostic was used.
+
+Passive Docker events correlated exact exec/container IDs, exit statuses and nanosecond
+timestamps. API start08:16:14.662823 UTC; listening08:16:25.120024 UTC, about10.457s later.
+Seven actual initial health executions exited1; the eighth exited0. The later ninth exited0
+and belongs to relay readiness, not the initial start loop. No additional health calls,
+restarts or lifecycle lock were introduced by observation. Serving and HTTP/assets passed;
+the bounded task stopped its owned containers successfully without rollback.
+
+The task reached its536870912-byte memory ceiling: memory.events max76, oom0, oom_kill0;
+max events first appeared during verified/import before API startup. Task PID events max0.
+Both app containers and the rootless engine recorded PID/memory max/OOM events0. Missing
+cgroup files after service exit are unavailable evidence, not zeros. These observations do
+not establish memory pressure as the cause of the earlier failure. The private raw observation
+is bound by SHA256040e48949d854f75632a0487454df2ba3b0451491535b5cab027d01259350dd2.
+
+**INTERPRETATION:** this candidate's automatic run passed, but the earlier4259db4 startup
+failure was not reproduced or explained. This does not prove that the12-attempt guard is
+incorrect or justify extending it. The intermittent-start P1 and merge block remain.
+No second source repair is selected; BB-162 remains1/2 and old U3 remains2/2 exhausted.
+This experiment did not repeat browser or physical owner acceptance.
+
+**SAFE EXIT / VERIFIED:** observer children reaped, no pending task, legitimate automatic
+last-good nowa4d9bb2 with matching request/receipt hashes. Rootless/task PAUSED/stopped/disabled;
+linger remains enabled. Preserved manual control75/image151ab3a restored, fixed relay readiness
+then HTTP/assets PASS. All12 original production IDs/images/starttimes unchanged.
+Stop this diagnostic series as agreed; no additional automatic trial or policy change follows
+an inconclusive result. Physical iPhone/PWA acceptance and exact accepted-main delivery remain
+pending; manual fallback/Healthy and this isolated success are not full PREDEPLOY readiness.
+
+
+### BB-162 retained failure evidence — owner stabilization priority 2026-11-14
+
+The owner prioritizes stabilizing automatic PREDEPLOY before synthetic Finance work,
+to avoid later manual babysitting. This authorizes the concrete diagnostic preparation
+below, not a reset of BB-162's existing risk2/two-active-hour/repair1-of2 limits or U3's
+exhausted2-of2. The existing five-point DoD and safe manual fallback remain in force.
+
+**IMPLEMENTED / OFFLINE VERIFIED, NOT INSTALLED:** the fixed operations controller now
+retains a private startup-failure JSON before stopping its exact prevalidated API/Web IDs.
+It records the observed stage, elapsed time, actual health attempt outcomes/Docker exit
+codes, identity-rechecked narrow container State, task/engine/container cgroup counters,
+and bounded raw log tails. Missing counters are null, not zero. Each diagnostic Docker
+read has a two-second read/wait deadline, at most64KiB before decoding and a two-second
+kill/reap bound; at most four such reads are made. Raw log/error content is untrusted,
+potentially sensitive private evidence, never sanitized publication material. Only an
+opaque file basename and SHA256 enter the ordinary receipt. Files are private0600 and
+remain after reset/rollback; application containers do not gain host access.
+
+Collector/write/hash failure cannot bypass the original exact-ID stop. No new retries,
+readiness extension, resource increase, engine/credential/network/mount change, autostart
+or provider/model/order access is introduced. This follows ADR0041's external operations
+boundary; it does not move Docker control into API, Web or Brain.
+
+**NOT A STARTUP FIX / NOT READY:** evidence retention does not explain the4259db4 failure.
+Offline forced failures verify collection-before-cleanup, unchanged12 health attempts,
+foreign identity rejection, bounded output/time with child reaping, missing counters and
+private-only output. Actual installed failure retention and deliberate synthetic-failure
+acceptance are NOT RUN. No new automatic runtime observation is started by this patch.
+Before installation, require exact independent control review and a bounded installation/
+rollback plan that preserves valid provenance and never silently adopts an old last-good
+receipt under changed control hashes. Existing fallback and paused rootless/task are
+unchanged. No completion notice, merge clearance or second corrective repair is claimed.
+
+
+Independent source-preparation review of72fdea8765c20c1efd764453df094aa05d3315ad,
+tree5436c4dca40eca09522b5cee7cfdc9f55368ab50 found no P0/P1. The87 focused tests,
+documentation295files/57IDs and diff checks PASS. This is source clearance only.
+The four diagnostic commands are bounded; filesystem I/O has no unconditional global
+deadline. Proposed separate-snapshot/provenance transition is sound in principle.
+
+**RESOURCE HOLD, NOT A NEW TECHNICAL FAILURE:** the preserved record contains the original
+two-active-hour cap but no reliable cumulative active-time balance. Available time must
+not be fabricated. Source preparation is preserved and no installation or live trial has
+been performed. The next concrete work is one reviewed control transition, one controlled
+synthetic failure proving retained evidence/cleanup, and at most one ordinary automatic
+candidate observation. Any continued resource allocation must be explicitly bounded;
+neither old repair counter is reset. An inconclusive observation cannot trigger another
+loop or claim startup stability. The original startup P1 and owner UX acceptance remain.
+
+
+### BB-162 owner-approved bounded installation and probes — 2026-11-14
+
+The owner explicitly approves up to60 additional active minutes for installation, one
+controlled synthetic failure and one ordinary automatic candidate observation, followed
+by stop if unclear. This resolves the preceding RESOURCE HOLD for this concrete work;
+it does not reset BB162 repair1/2 or old U3 exhausted2/2 and authorizes no new loop.
+Risk2; existing five-point DoD and all Finance/production boundaries remain unchanged.
+Exact reviewed control72fdea8 is installed as a separate sealed rootless snapshot; old
+configuration, request, state, last-good pointer and receipt are archived byte-for-byte.
+A preparation stopped before any application start when Type=exec engine was not yet
+Docker-ready. The private harness now checks actual engine identity/readiness within30s;
+this is dependency preflight, not an application retry/readiness change or a claimed
+explanation of the historical intermittent startup failure.
+
+Controlled negative runtime PASS: one freshly validated own synthetic API was deliberately
+killed; actual fixed CLI exhausted the unchanged12 health attempts, retained narrow private
+failure evidence (API exit137) before stopping both own containers, and retained that file
+after fixture reset. Evidence SHA256 d2d994045da01f346c33f59ce6801307aa876424070901757947db852b6b486e.
+Ordinary automatic observation is next; no completion/merge clearance follows from this
+negative test. The current automatic candidate is e5e1bb3d1c8d8ba61762689fa5613319d5dec439,
+treef374a1d6b3299f11265e852f2d4e68e8a7f2c300, CI43577605906 all five jobs PASS.
+
+
+#### Bounded installation/probe outcome — VERIFIED 2026-11-14
+
+The authorized controlled failure and exactly one ordinary automatic task are complete.
+No further runtime trial or corrective repair follows from this inconclusive startup
+diagnosis. This outcome supersedes the earlier source-only/RESOURCE HOLD state for
+diagnostic retention; it does not close the historical startup P1.
+
+- **INSTALLED / NEGATIVE RUNTIME PASS:** reviewed external control72fdea8, controller
+  SHA256 fade367604c9bfe44026353d31c7984cb153573813f4d324b92ad4a94e52a1c6,
+  runs under a new sealed installation. The deliberate own-API kill produced API137,
+  OOMKilled=false and12 actual failed health attempts. Raw private failure evidence was
+  retained before stop and survived fixture reset. Exit137 was the deliberate kill,
+  not an inferred OOM. Its evidence hash is recorded above.
+- **AUTOMATIC / BROWSER PASS:** actual task95e4e5638ce14a81abde240e431b6481 used exact
+  source e5e1bb3d1c8d8ba61762689fa5613319d5dec439/tree f374a1d6b3299f11265e852f2d4e68e8a7f2c300,
+  CI43577605906/attempt1/artifact14107710751, ZIP digest
+  a835f343a17fcf908462979876a47c930d24e9658ac36b65a30255b917217094.
+  All five CI jobs PASS; package records the PR test-context SHA
+  1ec048ace78e3881db832bdee01ee18883447f11 separately from exact-source image builds.
+  API image fb15fffbe95014d17590d15f824ae75675fe86c0896554f427118cbead9241b4,
+  Web8584a38522cd74507d3aac85f872568549c796409fadeecfefb036069667f66c.
+  API listened11.900s after its actual start; eight initial health execs failed, ninth
+  succeeded, tenth was the separate relay check. No readiness extension was installed.
+  Cold Firefox desktop1366x682 and actual small450x758 (requested390; Firefox minimum450)
+  each passed synthetic add/three real refreshes/banner/header hit-test and fit.
+  Both screenshots were visually inspected. This is not physical iPhone/PWA acceptance.
+- **TERMINAL / RESOURCE PASS:** normal420s Serving ended succeeded at09:22:17Z
+  (10:22:17 Europe/Stockholm), no rollback in this ordinary task. Passive549sample record
+  SHA256 72e9db3a2080f3a196cdfce51f0a863d18aa75ac98a23bffc4add39d44910277.
+  Task observed PID peak80 with TasksMax256; memory.peak394104832 bytes below512MiB.
+  Task, engine and both app containers had observed PID-limit, memory-limit and OOM
+  event counters0. Engine series includes the preceding controlled-negative run.
+  Missing post-exit counters remain unavailable, not fabricated zero.
+- **PROVENANCE / SAFE EXIT PASS:** new last-good is created only by that genuine wrapper
+  succeeded receipt, with matching current request/control/receipt hashes. Old pointer
+  and receipt bytes remain historical and unchanged. Task/rootless are PAUSED/stopped,
+  both units disabled, no pending task; unchanged manual control75/image151 restored
+  with HTTP/assets PASS. Original12 production IDs/images/start times match before/after.
+  Pause CLI returned1 when signalling the already inactive task, after writing PAUSED;
+  the nonzero result is retained explicitly. Verified PAUSED/inactive state and the
+  separate stop/restoration checks establish safe exit; this is not a blanket claim
+  that every cleanup command returned0. Unit CPU/memory/PID limits, sealed controller
+  hashes, Linger=yes and absence of session linkage were rechecked unchanged.
+- **INTERPRETATION / BLOCKED:** the old4259db4 startup failure did not recur and remains
+  unexplained. The two successful observations (earlier a4, current e5) do not prove its
+  cause repaired. PREDEPLOY stays BLOCKED/P1 and PR87 stays draft/not mergeable.
+  Physical owner acceptance and exact accepted-main delivery remain pending.
+  No production/real Finance keys/data/providers/models/orders were used. BB162 remains
+  repair1/2; U3 stays exhausted2/2. The added60-minute allowance was bounded here with
+  a conservative wall stop before10:00Z, counting waits; no resource cap is silently reset.
+
+
+### BB-162 owner decision — close historical cause investigation 2026-11-14
+
+After the completed negative/automatic/browser evidence above, the owner accepts ending
+the investigation of the earlier sporadic startup failure and explicitly confirms final
+review, merge and the short owner iPhone/PWA test. Its cause remains UNKNOWN; human error
+is an unverified hypothesis. No source fix of that historical cause is asserted.
+
+This is an explicit change to BB162 DoD1 and its earlier closeout condition: proof of the
+historical4259db4 root cause is no longer required for technical acceptance/merge when
+current controls and runtime tests pass. The owner accepts that residual risk under
+AGENTS7. The historical P1 is dispositioned by this owner decision, not by a claim that
+it was reproduced/repaired. A current reproducible startup/transport/safety failure
+still blocks the affected delivery. Private retained failure evidence remains enabled.
+
+Closeout scope stays risk2: record this decision, exact final review/CI/merge, and one
+bounded synthetic owner UX window using the unchanged installed wrapper and limits.
+Estimated15–30 active minutes, cap45 active minutes; no corrective repair or diagnosis
+loop. Existing BB162 repair1/2 and U3 exhausted2/2 are unchanged. DoD (five):
+1. Preserve old evidence and owner risk disposition with no invented cause/fix.
+2. Confirm exact reviewed candidate/tree/main/diff and applicable green CI before merge.
+3. Preserve history and verify published merge identity and applicable merge-SHA CI.
+4. Admit the exact trusted synthetic package through unchanged controls, verify URL/SHA,
+   preserve production and safe pause/abort/last-good/fallback boundaries.
+5. Give owner a3–5step iPhone/PWA test card; keep manual UX PENDING until explicit acceptance.
+No real Finance keys/data/providers/models/orders, new privileges, timers/autostart or
+isolation changes. Any active failure stops safely; retain completed work without retries.
+Checkpoint delegation already separates technical delivery from manual product acceptance.
+
+
+#### Closeout CI terminal-wait correction — repair2/2, 2026-11-14
+
+Current candidate37a59b1 CI43587453993 exposed one required frontend failure
+(270PASS/1FAIL): the existing SchoolLunch stale-menu/error test waited only for two mock
+API calls, then synchronously expected an alert. The captured DOM was still loading.
+The inspected component resolves rejection through asynchronous catch/state rendering.
+This current CI failure is independent of the accepted historical startup uncertainty.
+
+The bounded test correction waits for the same expected terminal alert before asserting
+the unchanged exact error text, two API calls and absence of stale/fixture content.
+No product/API/provider code, timeout increase, sleep, skipped assertion, retry setting
+or installed control changes. BB162 repair2/2 is now consumed; U3 remains exhausted2/2.
+A fresh full CI on the corrected exact candidate must PASS before merge. Superseded
+candidate37's red outcome is retained; older green results do not replace this check.
+No local frontend test is claimed: dependencies are absent; hosted CI is the verification.

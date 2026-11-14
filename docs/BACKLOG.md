@@ -1328,17 +1328,43 @@ att tysta SDK-grinden eller utvidga Finance-/deploymentmandatet.
 
 ### BB-161 — TEST-banner över modalhuvud i syntetisk webbläsarpilot
 
-**Verifierad / P2, blockerar inte PREDEPLOY.** Firefox140 ESR vid1366×768 visar att den
-fasta gula TEST-bannern överlappar överkanten av inköpslistans helskärmsmodal. Varutillägg,
-synligt innehåll och omladdning fungerar i det tidigare manuella rootful-provet på151ab3a; detta bevisar inte U3-piloten. UI/PWA-acceptans är
-inte lämnad. Framtida avgränsad förbättring: ge TEST-overlay/modalhuvud kompatibelt utrymme
-utan produktions-UI-ändring och verifiera berörda viewportar. Ingen ny designloop nu.
-
+**Tekniskt rättad/verifierad i BB-162:s kandidat; fysisk iPhone/PWA-acceptans återstår.**
+Kandidat5fd3153 reserverar28px för bannern även över helskärmsmodalen, endast i TEST-image.
+Kall desktop och faktisk450px-viewport PASS för titel/Back-hit-test, bannertext och modalhöjd;
+båda skärmbilderna visuellt granskade. Ingen produktions-UI-ändring. Tidigare överlapp var
+P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leverans.
+[Verifiering och avgränsning](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-**Verifierad P1 / U3 DoD3; nytt avgränsat uppdrag endast FÖRESLAGET, INGEN STARTORDER.**
-Röd kallstartspilot gav NetworkError vid syntetiskt varutillägg. Grön automatisk task
+**Tekniskt verifierad; historisk P1 riskaccepterad av ägaren2026-11-14. Ägar-UX PENDING; exakt teknisk leverans följer PR87.**
+2026-11-14: felinsamling72fdea8 installerad efter oberoende review, verkligt negativprov
+PASS (12 health-fel/API137, underlag före cleanup och efter reset). Ett enda ägargodkänt
+automatprov e5e1bb3, CI43577605906 alla fem PASS, slutade succeeded efter420s Serving.
+Desktop och faktisk450px-viewport: kall start/varutillägg/tre Refresh/banner/header PASS.
+API lyssnade efter11.900s; åtta initiala health-fel före lyckad nionde. Task PID-peak80,
+minnespeak394104832bytes och observerade PID-/minnesgräns-/OOM-händelser0.
+Historiskt4259db4-fel återkom inte; orsaken är okänd. Ägaren avslutar uttryckligen
+orsaksjakten och accepterar kvarstående osäkerhet med bibehållen felinsamling. Ingen
+historisk rättning eller verifierad mänsklig faktor påstås. [Ägarbeslut](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
+Task/rootless PAUSED/stoppade/disabled, ny legitim last-good från verklig succeeded,
+manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ägarbeslutet medger nu
+ett avgränsat iPhone/PWA-test genom samma kontroll; inget diagnostik-/reparationsomtag.
+BB162 reparation2/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA återstår;
+[PR87](https://github.com/T-bear/BigBrain/pull/87) redovisar exakt slutreview/CI/merge. Inget fullständigt färdigbesked före ägaracceptans.
+[Exakt aktuell evidens och avgränsning](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
+
+Initial kandidat5fd3153 hade CI/core PASS men kall Firefox gav NetworkError vid
+QuickAdd. Task-cgroup pids.events max2, API/Web max0. Försök1/2 höjer endast
+styrtjänstens TasksMax64 till256 efter oberoende granskning. Därefter PASS för kall
+desktop/liten faktisk450px-viewport, varutillägg och vardera tre Refresh; åtta samtidiga
+anslutningar PASS, overflow avvisas, PID-/minneshändelser0. Paus/aborted, avvisad
+pausad inlämning och uttrycklig idle-resume PASS. Exakt en återgång med nya fixtures PASS. Sessionsoberoende PASS genom verifierad
+linger-konfiguration, systemd-kontrakt och submitter-oberoende runtime. Faktisk sista-utloggning/reboot
+är NOT RUN. Slutreview/CI/merge och fysisk iPhone/PWA-acceptans återstår. U3:s tidigare2/2 nollställs inte.
+[Exakt evidens](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
+
+Historisk U3-evidens: Röd kallstartspilot gav NetworkError vid syntetiskt varutillägg. Grön automatisk task
 visade tillagd vara, men Refresh gav netReset16:27:10 UTC under Serving
 (16:26:53–16:27:27), före taskgränsen. Core/health/last-good/duplicate-ID PASS och
 alla fem CI-jobb i run43459885018 ändrar inte detta browserutfall. Oberoende review
@@ -1351,9 +1377,9 @@ UI-omkörningar/fixar i detta uppdrag. Experimentell [PR87](https://github.com/T
 är NOT MERGEABLE. Accepterad rootless-härdning bevaras; rollback/paus och slutlig
 manuell återställning är verifierade PASS i [utfallet](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
 
-**Förslag, kräver nytt uttryckligt avgränsat uppdrag:** risk2, uppskattning1–2 aktiva
+**Ursprungligt förslag, senare uttryckligen auktoriserat enligt runbooken:** risk2, uppskattning1–2 aktiva
 timmar/cap2h, högst2 reparationer; ingen arkitektur-/plattform-/token-/kostnadsökning.
-Föreslagen DoD (högst fem):
+Ursprunglig DoD (aktuell auktoriserad precisering finns i runbooken):
 1. Diagnostisera lokal browsertransport med faktisk korrelation, utan privilegieändring.
 2. Inför endast en minimal korrigering vars behov stöds av den verifierade orsaken.
 3. Kall browserstart: syntetiskt varutillägg synligt och Refresh PASS inom Serving;

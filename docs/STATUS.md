@@ -10,38 +10,36 @@ Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga
 [aktiv recovery](operations/codex-recovery.md) behåller sina respektive ansvar.
 Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc-2a-20261024.md).
 
-## Syntetisk TEST — 2026-11-13
+## Syntetisk TEST — 2026-11-14
 
-**U3 BLOCKED / PARTIAL; experimentell PR87 NOT MERGEABLE. Manuell syntetisk TEST återställd och HTTP-verifierad.**
-BB-159:s rootless-härdning är fortsatt accepterad via PR84/main
-`d50b366c59730422ec670de44d5377999448f262`, med oberoende nivå3-review och exakt
-main-CI run43450793145 PASS. Den accepterade kontrollen och bevarade manuella
-rootful-resurserna ersätts inte av U3:s experimentella kod.
+**Tekniska prov PASS; ägaren har accepterat den historiska startosäkerheten och avslutat orsaksjakten.**
+Orsaken är fortsatt okänd. Fysisk iPhone/PWA-acceptans är PENDING. Reviewbas är main e2635e5;
+aktuell exakt teknisk leverans, granskning, CI och merge redovisas i [PR87](https://github.com/T-bear/BigBrain/pull/87). [Ägarbeslut och avgränsad slutföring](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
+Felinsamling72fdea8 är nu separat installerad och verkligt negativtestad: privat underlag
+sparas före exakt egen cleanup och finns kvar efter reset. Oberoende kontrollreview och87
+fokuserade tester PASS; inga ändrade retries, readiness-, resurs- eller isoleringsgränser.
 
-**Verifierat:** U3-kandidat `40a8bdba877b8502d4699173d0badbb9289a4cf6`, tree
-`c5faf7c63834e16b762d40b9a0784d1592b2931b`, har78 fokuserade tester PASS och
-alla fem CI-jobb PASS i run43459885018. Installerad wrapper har SHA256
-`dcfccce4d39930932e46db8082af103b4907b54f33739b638968640de87ce076`.
-Röd funktionell status bevarades vid verklig paket-/taskkörning; grön core, verklig
-HTTP-health, last-known-good och duplicate-ID-avvisning PASS. Browserpilot på grön
-kandidat visar tillagd syntetisk vara, men Refresh ger netReset under Serving,
-före uppdragets tidsgräns. Röd kallstartspilot gav NetworkError vid varutillägg.
+Exakt en ägargodkänd automatisk observation på e5e1bb3/tree f374a1d, CI43577605906
+alla fem jobb PASS, slutade succeeded09:22:17Z efter420s Serving. Kall Firefox desktop
+och faktisk450px-viewport: varutillägg/tre Refresh/TEST-banner/header PASS, visuellt granskat.
+API lyssnade efter11.900s; åttonde misslyckade hälsokontrollen följdes av lyckad nionde.
+Task PID-peak80, minnespeak394104832bytes; task/engine/API/Web utan observerade
+PID-/minnesgränshändelser eller OOM. Detta visar aktuellt PASS; ingen rättning av den okända historiska orsaken påstås.
+[Exakt prov, proveniens, evidensgränser och safe exit](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
-**Bedömning:** oberoende review klassar detta som P1 mot U3 DoD3; orsak är inte
-fastställd och tillskrivs inte reläets fyrklientsgräns. U3:s2/2 reparationer är
-förbrukade; ingen ytterligare UI-omkörning/fix eller obevakad aktivering. Rollback (exakt en återställning med nya fixtures), paus/avvisad pausad inlämning och
-uttrycklig återgång till idle är PASS. Slutlig reträtt är verifierad: rootless och
-task-tjänsten stoppade/disabled, beständig PAUSED, manuell rootful HTTP-probe PASS;
-alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Linger är no; inget ägarsteg för linger har utförts eller begärs nu.
-[Verifierat utfall och blockerare](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
-U3-blockeraren gäller automatiken. Befintligt [TEST-mandat](operations/checkpoint-workflow.md#syntetisk-test--ägarbeslut-2026-11-13)
-medger fortsatt helt syntetisk Finance i den manuella slotten. En ny Finance-kandidat
-behöver eget verifierat paket och sina berörda tester före körning/testkort; detta
-underlag påstår inte att Finance-kandidaten redan är installerad eller accepterad.
+Ny last-good e5e1bb3 kommer från verkligt succeeded-kvitto med matchande request/control;
+äldre kvitton/pointer är oförändrade historiska bytes. Rootless/task PAUSED/stoppade/disabled,
+ingen pending; manuell reserv151ab3a återställd med HTTP/assets PASS. Produktions12
+oförändrade. Paus/avbrott/en säker återgång samt avsedd sessionsoberoende drift återanvänder
+tidigare giltig evidens; Linger och unitgränser omverifierade. Faktisk sista-utloggning/reboot
+är NOT RUN; fysisk iPhone/PWA-acceptans återstår. PR87:s metadata skiljer kandidat från accepterad main.
+Ägarens extra60min omfattade dessa två prov. Nytt ägarbeslut medger nu slutreview, merge
+och en avgränsad ägar-UX-slot, med oförändrade säkerhetsgränser och utan korrigeringsloop.
+BB162 reparation2/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.
 
-[BB-162](BACKLOG.md#bb-162--u3-browsertransport-blockerar-harmless-pilot) är ett förslag
-utan startorder; BB-161:s banneröverlapp kvarstår som P2. Agent Independence är framtida
-krav; Finance-/produktions- och backupgrindar ändras inte.
+Aktuell slut-CI fann en asynkron SchoolLunch-testassertion före terminal rendering;
+sista reparationsförsöket rättar endast testets väntan på samma felmeddelande. Ny exakt
+frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår som evidens.
 
 ## Frysningar och operativa osäkerheter
 

@@ -5,6 +5,25 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
+## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
+
+Ägaren avslutar orsaksjakten för historiskt4259db4 och accepterar okänd kvarstående orsak
+utifrån aktuella PASS. Mänsklig faktor är endast hypotes. [Bindande ändringsbeslut och DoD](runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14)
+medger slutreview/merge/en ägar-UX-slot, risk2, cap45 aktiva minuter, ingen reparationsloop.
+Branch checkpoint/test-environment-u3-automation-20261113; main e2635e5 verifierad oförändrad.
+Hämta exakt publicerings-SHA/tree före review/merge. Föregående04f5d06 alla fem CI PASS. Kandidat37 CI43587453993 har ett terminal-wait-testfel;
+aktuell rättning ändrar endast testets väntan på samma alert. Hämta ny exakt SHA och full CI;
+merge får ske först efter dess PASS. Inga produktions-/kontrolländringar.
+Installerad kontroll72fdea8 oförändrad; last-good task95/sourcee5 har aktuellt PASS och
+matchande request/control/receipt. Task/rootless PAUSED/stoppade/disabled, ingen pending;
+manuell reserv75/image151 återställd. Produktions12 oförändrade i senaste verifiering.
+Återuppta från faktisk [PR87-status](https://github.com/T-bear/BigBrain/pull/87): slutreview/merge/main-CI kan ha slutförts efter denna not.
+Verifiera metadata innan åtgärd; utför inte en redan genomförd merge igen. Ägar-UX kräver verklig Serving och verifierad kandidat.
+PR-artefakter kan binda gammal syntetisk merge-test-SHA: efter merge använd befintlig
+workflow_dispatch på oförändrad bevarad checkpoint om nytt tillämpligt paket behövs;
+ändra aldrig proveniens/validator för att få det godkänt. UX är PENDING tills ägaren godkänner.
+BB162 reparation2/2 och gamla U3:s2/2 oförändrade; bevara orelaterade filer.
+
 ## DOC-2A — publicerad beslutspunkt
 
 Fas A `338459078e9130cd7f500fbfc182ec245f65d28a` och hanteringen av U1–U3 är ägargodkända.
