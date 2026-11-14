@@ -1,3 +1,5 @@
 04c9271f6532bf7e657e10b47d7b74ef1d71ab11:docs/security/finance-threat-model.md:generic-api-key:9
 # PR #66: public accepted Git commit SHA, not an API credential.
 d76c5d5db17aa0e43cff4769164e7fe135ffc7be:scripts/deploy-standard.py:generic-api-key:38
+# Verified historical Git-main commit reference; exact finding only, not a credential.
+029ef0d9d96ddcabff80649138d5f2dd0272c55e:docs/reports/features/finance/finance-release1-readonly-preparation-20261106.md:generic-api-key:8

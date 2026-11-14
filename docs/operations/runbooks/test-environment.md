@@ -1289,3 +1289,32 @@ or installed control changes. BB162 repair2/2 is now consumed; U3 remains exhaus
 A fresh full CI on the corrected exact candidate must PASS before merge. Superseded
 candidate37's red outcome is retained; older green results do not replace this check.
 No local frontend test is claimed: dependencies are absent; hosted CI is the verification.
+
+
+### Owner-approved historical scanner false positive — 2026-11-14
+
+Technical PR87 merged as e7e8c59d036f8c439e2ffb429854b0c52974e7d5; exact main
+CI43588390865 passed backend/frontend/documentation/secrets (candidate packaging correctly
+skipped for a main push). Owner-window dispatch43588396681 then failed secrets scanning:
+workflow_dispatch scans full history and identified a Git-main commit reference in a
+historical Finance preparation report as generic-api-key. Read-only verification of the
+single matched backtick value established40 hexadecimal characters and an existing Git
+object of type commit, in the documented Git-main context. No credential is used.
+
+After the exhausted BB162 repair budget was explained, the owner explicitly approves
+one separately bounded false-positive correction and full-history rescan: risk2, max20
+active minutes, one exact fingerprint exception, no iteration/reset of BB162 or U3 counters.
+The existing .gitleaksignore receives only this single historical
+commit/path/rule/line fingerprint:
+
+    029ef0d9d96ddcabff80649138d5f2dd0272c55e:docs/reports/features/finance/finance-release1-readonly-preparation-20261106.md:generic-api-key:8
+
+Existing exceptions remain unchanged. No broad expression, scan skip, provider/key access,
+workflow/validator change, history rewrite or runtime/isolation mutation is authorized.
+
+DoD (five): verify the benign commit reference; add only its exact fingerprint; independent
+exact-diff review; fresh full-history secrets scan and applicable CI PASS; preserve honest
+published status and safe paused/manual state. The unchanged checkpoint workflow_dispatch
+must demonstrate full-history PASS; ordinary PR/main scan ranges do not substitute for it.
+Any further real finding stops this bounded task without another repair. Owner iPhone/PWA
+acceptance remains PENDING and no new test link is claimed by this change alone.
