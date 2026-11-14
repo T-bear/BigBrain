@@ -1243,3 +1243,32 @@ diagnostic retention; it does not close the historical startup P1.
   No production/real Finance keys/data/providers/models/orders were used. BB162 remains
   repair1/2; U3 stays exhausted2/2. The added60-minute allowance was bounded here with
   a conservative wall stop before10:00Z, counting waits; no resource cap is silently reset.
+
+
+### BB-162 owner decision — close historical cause investigation 2026-11-14
+
+After the completed negative/automatic/browser evidence above, the owner accepts ending
+the investigation of the earlier sporadic startup failure and explicitly confirms final
+review, merge and the short owner iPhone/PWA test. Its cause remains UNKNOWN; human error
+is an unverified hypothesis. No source fix of that historical cause is asserted.
+
+This is an explicit change to BB162 DoD1 and its earlier closeout condition: proof of the
+historical4259db4 root cause is no longer required for technical acceptance/merge when
+current controls and runtime tests pass. The owner accepts that residual risk under
+AGENTS7. The historical P1 is dispositioned by this owner decision, not by a claim that
+it was reproduced/repaired. A current reproducible startup/transport/safety failure
+still blocks the affected delivery. Private retained failure evidence remains enabled.
+
+Closeout scope stays risk2: record this decision, exact final review/CI/merge, and one
+bounded synthetic owner UX window using the unchanged installed wrapper and limits.
+Estimated15–30 active minutes, cap45 active minutes; no corrective repair or diagnosis
+loop. Existing BB162 repair1/2 and U3 exhausted2/2 are unchanged. DoD (five):
+1. Preserve old evidence and owner risk disposition with no invented cause/fix.
+2. Confirm exact reviewed candidate/tree/main/diff and applicable green CI before merge.
+3. Preserve history and verify published merge identity and applicable merge-SHA CI.
+4. Admit the exact trusted synthetic package through unchanged controls, verify URL/SHA,
+   preserve production and safe pause/abort/last-good/fallback boundaries.
+5. Give owner a3–5step iPhone/PWA test card; keep manual UX PENDING until explicit acceptance.
+No real Finance keys/data/providers/models/orders, new privileges, timers/autostart or
+isolation changes. Any active failure stops safely; retain completed work without retries.
+Checkpoint delegation already separates technical delivery from manual product acceptance.

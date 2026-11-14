@@ -7,20 +7,19 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 
 ## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
 
-Ägarens extra60min för installation/ett kontrollerat fel/ett automatprov är slutfört och
-stoppat enligt villkoret om oklart utfall. Ingen process väntar på nya uppdrag här.
-Aktiv branch checkpoint/test-environment-u3-automation-20261113; main e2635e5 oförändrad.
-Runtime e5e1bb3/tree f374a1d, CI43577605906 alla fem PASS; kontroll72fdea8 installerad.
-[Enda detaljerade provutfallet](runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14)
-skiljer negativt felprov, succeeded420s och webbläsar-PASS från kvarstående startup-P1.
-Task95e4e5638ce14a81abde240e431b6481 är terminal succeeded, inte en ny körorder.
-Ny last-good är legitimt skapad med matchande request/control/receipt; äldre bytes bevarade.
-Rootless/task PAUSED/stoppade/disabled, ingen pending, manuell reserv75/image151 återställd
-HTTP/assets PASS; produktions12 oförändrade. Pausens terminala signalavvisning är bevarad.
-Hämta exakt publicerings-SHA före fortsättning. Kvar: konkret evidensgrundad rättning av
-det gamla startfelet, tillämplig slutreview/CI/main och fysisk iPhone/PWA-acceptans.
-BB162 reparation1/2 och gamla U3:s2/2 är oförändrade. Inget nytt omtag utan nytt konkret
-avgränsat uppdrag; inga spekulativa policy-/readiness-ändringar eller Finance/prod-mutationer.
+Ägaren avslutar orsaksjakten för historiskt4259db4 och accepterar okänd kvarstående orsak
+utifrån aktuella PASS. Mänsklig faktor är endast hypotes. [Bindande ändringsbeslut och DoD](runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14)
+medger slutreview/merge/en ägar-UX-slot, risk2, cap45 aktiva minuter, ingen reparationsloop.
+Branch checkpoint/test-environment-u3-automation-20261113; main e2635e5 verifierad oförändrad.
+Hämta exakt publicerings-SHA/tree före review/merge. Föregående04f5d06 alla fem CI PASS.
+Installerad kontroll72fdea8 oförändrad; last-good task95/sourcee5 har aktuellt PASS och
+matchande request/control/receipt. Task/rootless PAUSED/stoppade/disabled, ingen pending;
+manuell reserv75/image151 återställd. Produktions12 oförändrade i senaste verifiering.
+Nästa: exakt slutreview/CI, merge med bevarad historik, exakt main-CI, därefter ägar-UX-slot.
+PR-artefakter kan binda gammal syntetisk merge-test-SHA: efter merge använd befintlig
+workflow_dispatch på oförändrad bevarad checkpoint om nytt tillämpligt paket behövs;
+ändra aldrig proveniens/validator för att få det godkänt. UX är PENDING tills ägaren godkänner.
+BB162 reparation1/2 och gamla U3:s2/2 oförändrade; bevara orelaterade filer.
 
 ## DOC-2A — publicerad beslutspunkt
 

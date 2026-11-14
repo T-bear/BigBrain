@@ -12,8 +12,9 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST — 2026-11-14
 
-**BB-162 BLOCKED / P1: det tidigare sporadiska automatstartfelet är ännu inte förklarat.**
-Accepterad main e2635e5 är oförändrad; PR87 är draft och ej mergebar.
+**Tekniska prov PASS; ägaren har accepterat den historiska startosäkerheten och avslutat orsaksjakten.**
+Orsaken är fortsatt okänd. Exakt slutreview/CI/merge och fysisk iPhone/PWA-acceptans återstår;
+accepterad main e2635e5 är ännu oförändrad. [Ägarbeslut och avgränsad slutföring](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
 Felinsamling72fdea8 är nu separat installerad och verkligt negativtestad: privat underlag
 sparas före exakt egen cleanup och finns kvar efter reset. Oberoende kontrollreview och87
 fokuserade tester PASS; inga ändrade retries, readiness-, resurs- eller isoleringsgränser.
@@ -23,7 +24,7 @@ alla fem jobb PASS, slutade succeeded09:22:17Z efter420s Serving. Kall Firefox d
 och faktisk450px-viewport: varutillägg/tre Refresh/TEST-banner/header PASS, visuellt granskat.
 API lyssnade efter11.900s; åttonde misslyckade hälsokontrollen följdes av lyckad nionde.
 Task PID-peak80, minnespeak394104832bytes; task/engine/API/Web utan observerade
-PID-/minnesgränshändelser eller OOM. Detta är inte bevis för att det gamla felet är rättat.
+PID-/minnesgränshändelser eller OOM. Detta visar aktuellt PASS; ingen rättning av den okända historiska orsaken påstås.
 [Exakt prov, proveniens, evidensgränser och safe exit](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
 Ny last-good e5e1bb3 kommer från verkligt succeeded-kvitto med matchande request/control;
@@ -32,7 +33,8 @@ ingen pending; manuell reserv151ab3a återställd med HTTP/assets PASS. Produkti
 oförändrade. Paus/avbrott/en säker återgång samt avsedd sessionsoberoende drift återanvänder
 tidigare giltig evidens; Linger och unitgränser omverifierade. Faktisk sista-utloggning/reboot
 är NOT RUN; fysisk iPhone/PWA-acceptans och accepterad-main-leverans återstår.
-Ägarens extra60min omfattade dessa två prov; inget nytt omtag eller korrigeringsloop startas.
+Ägarens extra60min omfattade dessa två prov. Nytt ägarbeslut medger nu slutreview, merge
+och en avgränsad ägar-UX-slot, med oförändrade säkerhetsgränser och utan korrigeringsloop.
 BB162 reparation1/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.
 
 ## Frysningar och operativa osäkerheter

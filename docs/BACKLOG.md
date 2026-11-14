@@ -1337,16 +1337,19 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-**BLOCKED / P1: det tidigare sporadiska automatstartfelet är inte förklarat.**
+**Tekniskt verifierad; historisk P1 riskaccepterad av ägaren2026-11-14. Slutreview/merge och ägar-UX återstår.**
 2026-11-14: felinsamling72fdea8 installerad efter oberoende review, verkligt negativprov
 PASS (12 health-fel/API137, underlag före cleanup och efter reset). Ett enda ägargodkänt
 automatprov e5e1bb3, CI43577605906 alla fem PASS, slutade succeeded efter420s Serving.
 Desktop och faktisk450px-viewport: kall start/varutillägg/tre Refresh/banner/header PASS.
 API lyssnade efter11.900s; åtta initiala health-fel före lyckad nionde. Task PID-peak80,
 minnespeak394104832bytes och observerade PID-/minnesgräns-/OOM-händelser0.
-Historiskt4259db4-fel återskapades inte; orsaken och en rättning är fortfarande okända.
+Historiskt4259db4-fel återkom inte; orsaken är okänd. Ägaren avslutar uttryckligen
+orsaksjakten och accepterar kvarstående osäkerhet med bibehållen felinsamling. Ingen
+historisk rättning eller verifierad mänsklig faktor påstås. [Ägarbeslut](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
 Task/rootless PAUSED/stoppade/disabled, ny legitim last-good från verklig succeeded,
-manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ingen ytterligare körning.
+manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ägarbeslutet medger nu
+ett avgränsat iPhone/PWA-test genom samma kontroll; inget diagnostik-/reparationsomtag.
 BB162 reparation1/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA och accepterad
 main-leverans återstår; inget färdigbesked.
 [Exakt aktuell evidens och avgränsning](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
