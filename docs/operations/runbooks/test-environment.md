@@ -1068,3 +1068,53 @@ A fresh synthetic owner pilot uses package4259db4/run43518131801/artifact1408173
 its application/controller inputs equal the browser-verified5fd3153 apart from source
 revision branding; later documentation-only reconciliation does not alter these inputs.
 Manual fallback resources are retained and stopped while this automatic pilot is active.
+
+### BB-162 fresh owner-pilot startup failure — merge blocked
+
+Fresh owner-pilot task7abbbef3b3a147d6acea5cdbd06c429d using verified package4259db4
+never reached Serving. Validated-before-start22:27:11 UTC, start-failed-stopped22:27:35;
+exactly one restoration of5fd3153 then passed internal/HTTP/assets health and stopped.
+Final receipt is rolled-back, not succeeded. The24s includes startup and cleanup and
+is not proof of a health timeout. Source a4d9bb2 CI is SUCCESS, but independent conditional
+merge clearance is withdrawn: current P1 against automatic lifecycle acceptance. No merge
+or owner test link is offered. A single bounded instrumented observation of the unchanged
+candidate is prepared to correlate health outcome, listening time, exit/OOM and PID/memory
+events before selecting any second repair. Session-independence evidence remains valid.
+
+### BB-162 bounded automatic observation — 2026-11-14
+
+**VERIFIED:** one unchanged-wrapper automatic task7a971062602d43dd916add0e99fc5896,
+sourcea4d9bb2d44e74c71edd692a4d9d59e26ad3c17f7,
+tree1e9d5bab114f452a446fc7c4a5d918c556f73e3f, CI43519113162 all five jobs PASS,
+artifact14082901031, terminal succeeded. Runtime60s begins at Serving. Fixed controller5fd3153,
+reviewed task unit256 and original CPU/memory/network/credential boundaries unchanged.
+The previous last-good request was restored and its existing hash checked before submission;
+no last-good pointer rewrite or adoption of the operator diagnostic was used.
+
+Passive Docker events correlated exact exec/container IDs, exit statuses and nanosecond
+timestamps. API start08:16:14.662823 UTC; listening08:16:25.120024 UTC, about10.457s later.
+Seven actual initial health executions exited1; the eighth exited0. The later ninth exited0
+and belongs to relay readiness, not the initial start loop. No additional health calls,
+restarts or lifecycle lock were introduced by observation. Serving and HTTP/assets passed;
+the bounded task stopped its owned containers successfully without rollback.
+
+The task reached its536870912-byte memory ceiling: memory.events max76, oom0, oom_kill0;
+max events first appeared during verified/import before API startup. Task PID events max0.
+Both app containers and the rootless engine recorded PID/memory max/OOM events0. Missing
+cgroup files after service exit are unavailable evidence, not zeros. These observations do
+not establish memory pressure as the cause of the earlier failure. The private raw observation
+is bound by SHA256040e48949d854f75632a0487454df2ba3b0451491535b5cab027d01259350dd2.
+
+**INTERPRETATION:** this candidate's automatic run passed, but the earlier4259db4 startup
+failure was not reproduced or explained. This does not prove that the12-attempt guard is
+incorrect or justify extending it. The intermittent-start P1 and merge block remain.
+No second source repair is selected; BB-162 remains1/2 and old U3 remains2/2 exhausted.
+This experiment did not repeat browser or physical owner acceptance.
+
+**SAFE EXIT / VERIFIED:** observer children reaped, no pending task, legitimate automatic
+last-good nowa4d9bb2 with matching request/receipt hashes. Rootless/task PAUSED/stopped/disabled;
+linger remains enabled. Preserved manual control75/image151ab3a restored, fixed relay readiness
+then HTTP/assets PASS. All12 original production IDs/images/starttimes unchanged.
+Stop this diagnostic series as agreed; no additional automatic trial or policy change follows
+an inconclusive result. Physical iPhone/PWA acceptance and exact accepted-main delivery remain
+pending; manual fallback/Healthy and this isolated success are not full PREDEPLOY readiness.

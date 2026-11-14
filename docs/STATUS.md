@@ -10,30 +10,28 @@ Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga
 [aktiv recovery](operations/codex-recovery.md) behåller sina respektive ansvar.
 Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc-2a-20261024.md).
 
-## Syntetisk TEST — 2026-11-13
+## Syntetisk TEST — 2026-11-14
 
-**BB-162 tekniskt verifierat; slutreview/CI/merge pågår, fysisk iPhone/PWA återstår.**
-PR87 är reviewkandidat, inte accepterad main. BB-159:s härdning är accepterad via
-PR84/main d50b366; gamla U3:s utfall och förbrukade2/2 finns i
-[runbookens historiska utfall](operations/runbooks/test-environment.md#u3-bounded-outcome--blockedpartial-2026-11-13).
+**BB-162 BLOCKED / P1: tidigare automatstartsfel är inte förklarat; PR87 är ej mergebar.**
+Accepterad main är e2635e5; rootless-härdningen via PR84/main d50b366 är fortsatt accepterad.
+BB-161:s TEST-banner och desktop/liten faktisk450px-viewport har verifierade add/tre Refresh/
+knappkontroller. Paus, avvisad inlämning, idle-resume och exakt en återgång har PASS.
+Sessionsoberoende är kontrakts-/konfigurations-/runtimeverifierat med Linger=yes; faktisk
+sista-utloggning/reboot är NOT RUN och inga orelaterade sessioner avslutades.
 
-BB-162 är uttryckligen auktoriserat, risk2, reparationsförsök1/2. Kandidat5fd3153 har
-81 fokuserade tester och alla fem CI-jobb PASS. Rootless automatisk task med granskad
-TasksMax256: kall desktop och liten faktisk450px-viewport PASS för varutillägg och
-vardera tre omladdningar; BB-161:s banner/knappar verifierade även visuellt. Åtta
-samtidiga anslutningar PASS, overflow avvisas; inga nya PID-/minnesgränshändelser.
-[Exakt evidens och avgränsning](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
+Ett avgränsat instrumenterat automatprov på a4d9bb2 passerade2026-11-14: API lyssnade
+efter10,457s, sjunde misslyckade hälsokontrollen följdes av lyckad åttonde; senare reläprov
+PASS och task succeeded efter60s Serving. Käll-CI43519113162 har alla fem jobb PASS.
+Provet återskapade inte det tidigare4259db4-startfelet; ingen orsak eller andra källreparation
+är fastställd. Budget1/2 kvarstår, gamla U3:s2/2 nollställs inte. Inga nya omkörningsloopar.
+[Exakt evidens och tolkning](operations/runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14).
 
-Aktuell paus/aborted/avvisad inlämning/idle-resume och exakt en säker återgång PASS.
-Ägarens administrativa förberedelse är verifierad: Linger=yes. Konfiguration, installerat
-systemd-kontrakt och nytt prov som överlever submitter ger sessionsoberoende PASS.
-Faktisk sista-utloggning och reboot är NOT RUN; inga orelaterade sessioner avslutas.
-Källcheckpointa7af031 och docs4259db4 har alla fem CI-jobb PASS. Ny syntetisk ägarpilot
-använder verifierat paket4259db4; manuell reserv är HTTP-verifierad och bevarad/stoppad
-under pilot. Den tidigare fördröjda reservstarten är oförklarad historik; inget nytt startvillkor.
-Alla12 ursprungliga produktions-ID:n/images/starttider oförändrade. Ingen Finance-kandidat
-påstås installerad. Agent Independence är framtida krav. Finance-/produktions-/backupgrindar
-ändras inte och helt syntetisk TEST innebär inga riktiga nycklar/providers/modeller/order.
+Task nådde512MiB (max76, OOM0); appcontainrar/engine utan nya PID-/minneshändelser.
+Detta bevisar inte orsaken till tidigare startfel. Rootless/task är PAUSED/stoppade/disabled;
+verifierad manuell reserv151ab3a är återställd med HTTP/assets PASS. Alla12 ursprungliga
+produktionsidentiteter/images/starttider oförändrade. Ingen Finance-kandidat påstås installerad.
+Fysisk ägaracceptans på iPhone/PWA och accepterad-main-leverans återstår. Agent Independence
+är framtida krav; Finance-/produktions-/backupgrindar och syntetisk TEST-avgränsning gäller.
 
 ## Frysningar och operativa osäkerheter
 

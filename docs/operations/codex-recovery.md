@@ -5,6 +5,21 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
+## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
+
+Avgränsat instrumenterat automatprov är avslutat; ingen fortsatt omkörning är beställd av
+utfallet. Aktiv branch checkpoint/test-environment-u3-automation-20261113, bas main e2635e5;
+källcheckpoint a4d9bb2/tree1e9d5ba, CI43519113162 PASS. Hämta aktuell publicerings-SHA.
+Reparation1/2; tidigare U3:s2/2 nollställs inte. Ny task7a971062602d43dd916add0e99fc5896
+succeeded, men gamla4259db4-startfelet är inte förklarat: BLOCKED/P1, PR87 ej mergebar.
+[Enda detaljerade diagnosunderlaget](runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14)
+skiljer verkliga hälsokontroller, resursevidens och tolkning. Ingen andra källrättning vald.
+Rootless/task PAUSED/stoppade/disabled, Linger=yes, ingen pending. Last-good a4d9bb2 är
+legitim automatisk succeeded med matchande request/receipt; ingen implicit adoption.
+Manuell kontroll75/image151 återställd, HTTP/assets PASS; originalproduktion12 oförändrad.
+Nästa arbete kräver en konkret evidensgrundad diagnos-/åtgärdsplan, inte fler blinda försök.
+Fysisk iPhone/PWA-acceptans och accepterad-main-leverans återstår. Bevara alla orelaterade filer.
+
 ## DOC-2A — publicerad beslutspunkt
 
 Fas A `338459078e9130cd7f500fbfc182ec245f65d28a` och hanteringen av U1–U3 är ägargodkända.

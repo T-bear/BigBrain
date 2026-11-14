@@ -1337,7 +1337,14 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-**Tekniskt verifierad rättning; slutreview/CI/merge pågår; fysisk iPhone/PWA återstår.**
+**BLOCKED / P1: intermittent automatstart; tidigare fel är inte förklarat.**
+2026-11-14: ett instrumenterat automatprov på a4d9bb2 avslutades succeeded efter60s
+Serving. API lyssnade efter10,457s; sju health-exec misslyckades, åttonde och senare
+reläkontroll PASS. Tidigare4259db4-startfel återskapades inte och orsaken är okänd.
+Ingen andra källreparation eller längre readiness-gräns är evidensgrundad; budget1/2.
+Diagnosserien stoppas utan ny loop, rootless PAUSED/stoppat och manuell reserv HTTP-verifierad.
+[Detaljer och evidensgränser](operations/runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14).
+
 Initial kandidat5fd3153 hade CI/core PASS men kall Firefox gav NetworkError vid
 QuickAdd. Task-cgroup pids.events max2, API/Web max0. Försök1/2 höjer endast
 styrtjänstens TasksMax64 till256 efter oberoende granskning. Därefter PASS för kall
