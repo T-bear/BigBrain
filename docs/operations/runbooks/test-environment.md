@@ -1318,3 +1318,39 @@ published status and safe paused/manual state. The unchanged checkpoint workflow
 must demonstrate full-history PASS; ordinary PR/main scan ranges do not substitute for it.
 Any further real finding stops this bounded task without another repair. Owner iPhone/PWA
 acceptance remains PENDING and no new test link is claimed by this change alone.
+
+
+### PREDEPLOY owner acceptance complete — 2026-11-14
+
+**ACCEPTED within the defined synthetic PREDEPLOY scope.** The owner explicitly reported
+tests1–4 green and then “Test 5 grön” for Safari/home-screen acceptance. This is physical
+owner-reported iPhone/PWA acceptance, not an automated browser attestation. It closes the
+previously pending acceptance of BB-161/BB-162; no claim of universal future bug freedom.
+
+Exact runtime source ea49df8434790bb852419bbe8426ce110f651854, tree
+d096ac4f59f3e2cf006029a872f1cc91179c27f1, accepted via [PR90](https://github.com/T-bear/BigBrain/pull/90)
+merge942ff65ed27fa754075a345558cecca204833173. Technical exact-candidate review and earlier
+repair evidence remain linked through [PR87](https://github.com/T-bear/BigBrain/pull/87).
+Full-history dispatch43599601005: all five jobs PASS,597 commits scanned, no leaks;
+artifact14115314766 ZIP SHA2565079f7facec91d7b511ace3df5f057b5949bb2c46709841c515d1f0884580c21.
+Exact accepted-main CI43600071273: four required jobs PASS; main-push package skipped.
+PR90's exception is the single reviewed benign historical fingerprint, with no scan bypass.
+
+The owner explicitly requested a second bounded window after the first expired. Unchanged
+installed wrapper/control started task a7f3b06739b54c58b1f8610fdf148806, Serving17:25:26Z,
+normal1800s expiry17:55:26Z (18:55 Stockholm). Exact banner/source and HTTP were rechecked
+at owner acceptance17:38:48Z. The first owner task c375f46727b349efb196a97adfa8e4a2 ended
+normally succeeded14:10:55Z with paused/idle cleanup, manual HTTP/assets PASS and the
+original12 production identities/images/start times unchanged. The second window retains
+its existing bounded cleanup; owner acceptance does not extend runtime or enable autostart.
+Private URL, raw receipts and owner acceptance record remain private; no production action.
+
+Desktop/small-viewport cold start, item addition and three reloads, banner/modal checks,
+package provenance, installed isolation/resource limits, pause/abort/one safe rollback and
+intended submitter-independent runtime reuse the linked unchanged-control evidence above.
+Actual last-session logout/reboot remains NOT RUN and is outside the verified contract.
+The historical startup cause remains UNKNOWN, explicitly risk-accepted by the owner;
+no historical cause fix or verified human error is claimed. BB1622/2 and old U3 exhausted2/2
+remain unchanged. No real Finance key/data/provider/model/order was admitted. Finance merge,
+production and non-synthetic restrictions remain in force. No new repair loop or next
+implementation is authorized by acceptance. Completion-only PREDEPLOY watch can now end.
