@@ -5,19 +5,17 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
-## PREDEPLOY scanner false-positive correction — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
+## PREDEPLOY — avslutat inom beslutat scope, 2026-11-14
 
-Technical PR87 merged at e7e8c59 with exact main-CI43588390865 PASS. Preserved checkpoint
-branch fast-forwarded to that accepted main without history rewriting. Owner explicitly
-authorizes one exact historical fingerprint exception and full-history rescan, cap20min,
-risk2, single attempt; BB1622/2 and old U3 exhausted2/2 remain unchanged.
-[Exact scope and verification](runbooks/test-environment.md#owner-approved-historical-scanner-false-positive--2026-11-14)
-bind the known benign Git-commit reference, not a real key. Dispatch43588396681 failed
-full-history secrets scanning; current correction needs fresh full-history PASS and exact
-review/CI before merge. No workflow or installed controller changes, no scan bypass.
-Fetch actual checkpoint SHA/tree and current PR metadata before any action.
-Rootless/task remain PAUSED/inactive/disabled, no pending owner window; manual fallback
-is preserved. Owner iPhone/PWA acceptance remains PENDING; do not infer it from CI.
+Det tidigare scanneravbrottet är avslutat genom PR90/main942ff65, exakt historisk
+fingerprint, fullhistorik597 commits och tillämplig CI PASS. Ägaren har därefter uttryckligen
+godkänt test1–4 samt test5 (Safari/hemskärm). Ingen fortsatt reparationsloop eller aktivt
+PREDEPLOY-implementationsavbrott återstår. [Kanonisk slutacceptans](runbooks/test-environment.md#predeploy-owner-acceptance-complete--2026-11-14)
+anger exakt källa, artefakt, review/CI, andra tidsbegränsade testfönstret och evidensgränser.
+Andra fönstrets normala sluttid är18:55 Stockholm; installerad cleanup gäller oförändrad.
+Ingen permanent/bootdrift, produktionsändring eller Finance-aktivering följer. Historisk
+startosäkerhet förblir uttryckligen riskaccepterad, inte orsaksförklarad. Övrig recovery nedan
+är orörd och har eget scope.
 
 ## DOC-2A — publicerad beslutspunkt
 

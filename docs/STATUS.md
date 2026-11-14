@@ -12,6 +12,16 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST — 2026-11-14
 
+**ACCEPTERAD inom beslutat syntetiskt PREDEPLOY-scope.** Ägaren har uttryckligen godkänt
+mobiltest1–4 och Safari/hemskärmstest5 den14 november. Kandidat ea49df843479,
+accepterad via PR90/main942ff65; exakt runtime, paket/CI och evidensgränser finns i
+[slutacceptansen](operations/runbooks/test-environment.md#predeploy-owner-acceptance-complete--2026-11-14).
+Inga kända öppna fel i den avgränsade leveransen; historisk startorsak är fortsatt okänd
+och riskaccepterad. Ingen garanti mot framtida fel eller utökad Finance-/produktionsrätt.
+TEST är tidsbegränsad och sessionsoberoende, inte permanent eller startad vid boot.
+
+### Bevarad verifieringshistorik före slutacceptansen
+
 **Tekniska prov PASS; ägaren har accepterat den historiska startosäkerheten och avslutat orsaksjakten.**
 Orsaken är fortsatt okänd. Fysisk iPhone/PWA-acceptans är PENDING. Reviewbas är main e2635e5;
 aktuell exakt teknisk leverans, granskning, CI och merge redovisas i [PR87](https://github.com/T-bear/BigBrain/pull/87). [Ägarbeslut och avgränsad slutföring](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).

@@ -1328,6 +1328,10 @@ att tysta SDK-grinden eller utvidga Finance-/deploymentmandatet.
 
 ### BB-161 — TEST-banner över modalhuvud i syntetisk webbläsarpilot
 
+**KLAR inom beslutat scope — ägaracceptans2026-11-14.** Mobiltest1–4 och Safari/hemskärmstest5
+är uttryckligen godkända. [Exakt slutacceptans och kvarstående evidensgränser](operations/runbooks/test-environment.md#predeploy-owner-acceptance-complete--2026-11-14).
+Följande är bevarad historik före detta godkännande.
+
 **Tekniskt rättad/verifierad i BB-162:s kandidat; fysisk iPhone/PWA-acceptans återstår.**
 Kandidat5fd3153 reserverar28px för bannern även över helskärmsmodalen, endast i TEST-image.
 Kall desktop och faktisk450px-viewport PASS för titel/Back-hit-test, bannertext och modalhöjd;
@@ -1336,6 +1340,10 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 [Verifiering och avgränsning](operations/runbooks/test-environment.md#bb-162-repair1-browser-evidence--2026-11-13).
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
+
+**KLAR inom beslutat scope — ägaracceptans2026-11-14.** Mobiltest1–4 och Safari/hemskärmstest5
+är uttryckligen godkända. [Exakt slutacceptans och kvarstående evidensgränser](operations/runbooks/test-environment.md#predeploy-owner-acceptance-complete--2026-11-14).
+Följande är bevarad historik före detta godkännande.
 
 **Tekniskt verifierad; historisk P1 riskaccepterad av ägaren2026-11-14. Ägar-UX PENDING; exakt teknisk leverans följer PR87.**
 2026-11-14: felinsamling72fdea8 installerad efter oberoende review, verkligt negativprov
