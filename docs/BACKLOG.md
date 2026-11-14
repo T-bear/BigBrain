@@ -1337,7 +1337,7 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-**Tekniskt verifierad; historisk P1 riskaccepterad av ägaren2026-11-14. Slutreview/merge och ägar-UX återstår.**
+**Tekniskt verifierad; historisk P1 riskaccepterad av ägaren2026-11-14. Ägar-UX PENDING; exakt teknisk leverans följer PR87.**
 2026-11-14: felinsamling72fdea8 installerad efter oberoende review, verkligt negativprov
 PASS (12 health-fel/API137, underlag före cleanup och efter reset). Ett enda ägargodkänt
 automatprov e5e1bb3, CI43577605906 alla fem PASS, slutade succeeded efter420s Serving.
@@ -1350,8 +1350,8 @@ historisk rättning eller verifierad mänsklig faktor påstås. [Ägarbeslut](op
 Task/rootless PAUSED/stoppade/disabled, ny legitim last-good från verklig succeeded,
 manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ägarbeslutet medger nu
 ett avgränsat iPhone/PWA-test genom samma kontroll; inget diagnostik-/reparationsomtag.
-BB162 reparation1/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA och accepterad
-main-leverans återstår; inget färdigbesked.
+BB162 reparation1/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA återstår;
+[PR87](https://github.com/T-bear/BigBrain/pull/87) redovisar exakt slutreview/CI/merge. Inget fullständigt färdigbesked före ägaracceptans.
 [Exakt aktuell evidens och avgränsning](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
 Initial kandidat5fd3153 hade CI/core PASS men kall Firefox gav NetworkError vid

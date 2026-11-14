@@ -13,8 +13,8 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 ## Syntetisk TEST — 2026-11-14
 
 **Tekniska prov PASS; ägaren har accepterat den historiska startosäkerheten och avslutat orsaksjakten.**
-Orsaken är fortsatt okänd. Exakt slutreview/CI/merge och fysisk iPhone/PWA-acceptans återstår;
-accepterad main e2635e5 är ännu oförändrad. [Ägarbeslut och avgränsad slutföring](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
+Orsaken är fortsatt okänd. Fysisk iPhone/PWA-acceptans är PENDING. Reviewbas är main e2635e5;
+aktuell exakt teknisk leverans, granskning, CI och merge redovisas i [PR87](https://github.com/T-bear/BigBrain/pull/87). [Ägarbeslut och avgränsad slutföring](operations/runbooks/test-environment.md#bb-162-owner-decision--close-historical-cause-investigation-2026-11-14).
 Felinsamling72fdea8 är nu separat installerad och verkligt negativtestad: privat underlag
 sparas före exakt egen cleanup och finns kvar efter reset. Oberoende kontrollreview och87
 fokuserade tester PASS; inga ändrade retries, readiness-, resurs- eller isoleringsgränser.
@@ -32,7 +32,7 @@ Ny last-good e5e1bb3 kommer från verkligt succeeded-kvitto med matchande reques
 ingen pending; manuell reserv151ab3a återställd med HTTP/assets PASS. Produktions12
 oförändrade. Paus/avbrott/en säker återgång samt avsedd sessionsoberoende drift återanvänder
 tidigare giltig evidens; Linger och unitgränser omverifierade. Faktisk sista-utloggning/reboot
-är NOT RUN; fysisk iPhone/PWA-acceptans och accepterad-main-leverans återstår.
+är NOT RUN; fysisk iPhone/PWA-acceptans återstår. PR87:s metadata skiljer kandidat från accepterad main.
 Ägarens extra60min omfattade dessa två prov. Nytt ägarbeslut medger nu slutreview, merge
 och en avgränsad ägar-UX-slot, med oförändrade säkerhetsgränser och utan korrigeringsloop.
 BB162 reparation1/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.

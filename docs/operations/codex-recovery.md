@@ -15,7 +15,8 @@ Hämta exakt publicerings-SHA/tree före review/merge. Föregående04f5d06 alla 
 Installerad kontroll72fdea8 oförändrad; last-good task95/sourcee5 har aktuellt PASS och
 matchande request/control/receipt. Task/rootless PAUSED/stoppade/disabled, ingen pending;
 manuell reserv75/image151 återställd. Produktions12 oförändrade i senaste verifiering.
-Nästa: exakt slutreview/CI, merge med bevarad historik, exakt main-CI, därefter ägar-UX-slot.
+Återuppta från faktisk [PR87-status](https://github.com/T-bear/BigBrain/pull/87): slutreview/merge/main-CI kan ha slutförts efter denna not.
+Verifiera metadata innan åtgärd; utför inte en redan genomförd merge igen. Ägar-UX kräver verklig Serving och verifierad kandidat.
 PR-artefakter kan binda gammal syntetisk merge-test-SHA: efter merge använd befintlig
 workflow_dispatch på oförändrad bevarad checkpoint om nytt tillämpligt paket behövs;
 ändra aldrig proveniens/validator för att få det godkänt. UX är PENDING tills ägaren godkänner.
