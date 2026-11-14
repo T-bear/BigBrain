@@ -1118,3 +1118,37 @@ then HTTP/assets PASS. All12 original production IDs/images/starttimes unchanged
 Stop this diagnostic series as agreed; no additional automatic trial or policy change follows
 an inconclusive result. Physical iPhone/PWA acceptance and exact accepted-main delivery remain
 pending; manual fallback/Healthy and this isolated success are not full PREDEPLOY readiness.
+
+
+### BB-162 retained failure evidence — owner stabilization priority 2026-11-14
+
+The owner prioritizes stabilizing automatic PREDEPLOY before synthetic Finance work,
+to avoid later manual babysitting. This authorizes the concrete diagnostic preparation
+below, not a reset of BB-162's existing risk2/two-active-hour/repair1-of2 limits or U3's
+exhausted2-of2. The existing five-point DoD and safe manual fallback remain in force.
+
+**IMPLEMENTED / OFFLINE VERIFIED, NOT INSTALLED:** the fixed operations controller now
+retains a private startup-failure JSON before stopping its exact prevalidated API/Web IDs.
+It records the observed stage, elapsed time, actual health attempt outcomes/Docker exit
+codes, identity-rechecked narrow container State, task/engine/container cgroup counters,
+and bounded raw log tails. Missing counters are null, not zero. Each diagnostic Docker
+read has a two-second read/wait deadline, at most64KiB before decoding and a two-second
+kill/reap bound; at most four such reads are made. Raw log/error content is untrusted,
+potentially sensitive private evidence, never sanitized publication material. Only an
+opaque file basename and SHA256 enter the ordinary receipt. Files are private0600 and
+remain after reset/rollback; application containers do not gain host access.
+
+Collector/write/hash failure cannot bypass the original exact-ID stop. No new retries,
+readiness extension, resource increase, engine/credential/network/mount change, autostart
+or provider/model/order access is introduced. This follows ADR0041's external operations
+boundary; it does not move Docker control into API, Web or Brain.
+
+**NOT A STARTUP FIX / NOT READY:** evidence retention does not explain the4259db4 failure.
+Offline forced failures verify collection-before-cleanup, unchanged12 health attempts,
+foreign identity rejection, bounded output/time with child reaping, missing counters and
+private-only output. Actual installed failure retention and deliberate synthetic-failure
+acceptance are NOT RUN. No new automatic runtime observation is started by this patch.
+Before installation, require exact independent control review and a bounded installation/
+rollback plan that preserves valid provenance and never silently adopts an old last-good
+receipt under changed control hashes. Existing fallback and paused rootless/task are
+unchanged. No completion notice, merge clearance or second corrective repair is claimed.

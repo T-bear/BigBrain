@@ -7,18 +7,19 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 
 ## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
 
-Avgränsat instrumenterat automatprov är avslutat; ingen fortsatt omkörning är beställd av
-utfallet. Aktiv branch checkpoint/test-environment-u3-automation-20261113, bas main e2635e5;
-källcheckpoint a4d9bb2/tree1e9d5ba, CI43519113162 PASS. Hämta aktuell publicerings-SHA.
-Reparation1/2; tidigare U3:s2/2 nollställs inte. Ny task7a971062602d43dd916add0e99fc5896
-succeeded, men gamla4259db4-startfelet är inte förklarat: BLOCKED/P1, PR87 ej mergebar.
-[Enda detaljerade diagnosunderlaget](runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14)
-skiljer verkliga hälsokontroller, resursevidens och tolkning. Ingen andra källrättning vald.
-Rootless/task PAUSED/stoppade/disabled, Linger=yes, ingen pending. Last-good a4d9bb2 är
-legitim automatisk succeeded med matchande request/receipt; ingen implicit adoption.
-Manuell kontroll75/image151 återställd, HTTP/assets PASS; originalproduktion12 oförändrad.
-Nästa arbete kräver en konkret evidensgrundad diagnos-/åtgärdsplan, inte fler blinda försök.
-Fysisk iPhone/PWA-acceptans och accepterad-main-leverans återstår. Bevara alla orelaterade filer.
+Owner prioritizes stabilization before synthetic Finance. Active preserved branch
+checkpoint/test-environment-u3-automation-20261113; accepted main e2635e5 unchanged.
+Prior checkpoint321e1e0 CI43575807049 all five checks PASS. New diagnostic-only controller
+patch and regression tests are prepared; fetch exact published checkpoint before review.
+[Scope, limits and evidence contract](runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14)
+is the single detailed record. No installed control/config/runtime change, no new live trial.
+BB-162 repair1/2 and original2-active-hour cap remain; old U3 remains2/2 exhausted.
+The4259db4 startup failure is still unexplained: BLOCKED/P1, PR87 not mergeable.
+Next: exact independent patch review; before any installation prepare bounded provenance/
+last-good transition and safe rollback, never rewrite receipts to manufacture adoption.
+Rootless/task remain PAUSED/stopped/disabled, legitimate last-good a4d9bb2 retained;
+manual control75/image151 fallback preserved. Physical iPhone/PWA acceptance still pending.
+Preserve unrelated files; no speculative readiness extension or new repair/design loop.
 
 ## DOC-2A — publicerad beslutspunkt
 

@@ -255,6 +255,113 @@ class TestPolicy(unittest.TestCase):
         self.assertEqual(docker.call_args.args, (slot.root, "container", "stop", "--time", "35", "1" * 64, "2" * 64))
         self.assertEqual(docker.call_count, 3)
 
+    def test_start_failure_evidence_precedes_cleanup_even_when_collector_fails(self):
+        for stage in ("start-api", "internal-health"):
+            with self.subTest(stage=stage):
+                slot = self.slot()
+                order = []
+                def docker(*args):
+                    order.append(args[1])
+                    if stage == "start-api" and args[1:3] == ("container", "start"):
+                        raise tool.DockerRejected(SimpleNamespace(
+                            returncode=125, stdout="", stderr="private runtime failure"))
+                def retain(*args):
+                    order.append("evidence")
+                    self.assertEqual(args[1], stage)
+                    raise OSError("full disk")
+                with patch.object(slot, "inventory", return_value=self.inventory), \
+                     patch.object(slot, "save_state"), patch.object(slot, "receipt"), \
+                     patch.object(slot, "failure_evidence", side_effect=retain), \
+                     patch.object(slot, "internal_health", side_effect=tool.Rejected("probe")), \
+                     patch.object(tool, "run", side_effect=docker), self.assertRaises(tool.Rejected):
+                    slot.start()
+                self.assertLess(order.index("evidence"), len(order) - 1)
+                self.assertEqual(order[-1], "container")
+
+    def test_private_failure_evidence_is_bound_to_owned_ids_and_not_public_output(self):
+        slot = self.slot()
+        slot.health_attempts = [{"attempt": 12, "outcome": "rejected"}]
+        calls = []
+        def observe(root, *args):
+            calls.append(args)
+            if args[:2] == ("container", "inspect"):
+                info = copy.deepcopy(self.inventory["containers"][0 if args[-1] == "1" * 64 else 1])
+                info["State"].update(ExitCode=137, OOMKilled=True, Status="exited",
+                                     Error="must never appear in narrowed state")
+                return {"status": "complete", "returncode": 0, "output": json.dumps([info])}
+            return {"status": "complete", "returncode": 0, "output": "PRIVATE_LOG_CANARY"}
+        with tempfile.TemporaryDirectory() as directory:
+            slot.root = Path(directory)
+            with patch.object(tool, "diagnostic_docker", side_effect=observe), \
+                 patch.object(slot, "receipt") as receipt:
+                slot.failure_evidence({"api": "1" * 64, "web": "2" * 64},
+                    "internal-health", tool.time.monotonic(), tool.Rejected("safe"))
+            paths = list(slot.root.glob("start-failure-*.json"))
+            self.assertEqual(len(paths), 1)
+            self.assertEqual(stat.S_IMODE(paths[0].stat().st_mode), 0o600)
+            data = json.loads(paths[0].read_text())
+            self.assertEqual(data["containers"]["api"]["state"]["ExitCode"], 137)
+            self.assertTrue(data["containers"]["api"]["state"]["OOMKilled"])
+            self.assertNotIn("Error", data["containers"]["api"]["state"])
+            self.assertIn("PRIVATE_LOG_CANARY", paths[0].read_text())
+            self.assertNotIn("PRIVATE_LOG_CANARY", str(receipt.call_args))
+            self.assertEqual(receipt.call_args.kwargs["sha256"], tool.digest(paths[0]))
+            self.assertEqual(len(calls), 4)
+
+    def test_failure_diagnostic_never_reads_logs_or_cgroups_of_changed_identity(self):
+        slot = self.slot()
+        slot.seal["engine"] = {"mode": "rootless", "uid": os.getuid(), "id": "fixed"}
+        bad = copy.deepcopy(self.inventory["containers"][0])
+        bad["Config"]["Labels"][tool.SLOT_LABEL] = "f" * 32
+        observed = {"status": "complete", "returncode": 0, "output": json.dumps([bad])}
+        with tempfile.TemporaryDirectory() as directory:
+            slot.root = Path(directory)
+            with patch.object(tool, "diagnostic_docker", return_value=observed) as docker, \
+                 patch.object(tool, "diagnostic_cgroup", return_value={}) as counters, \
+                 patch.object(slot, "receipt"):
+                slot.failure_evidence({"api": "1" * 64, "web": "2" * 64},
+                    "internal-health", tool.time.monotonic(), tool.Rejected("safe"))
+            self.assertEqual(docker.call_count, 2)
+            self.assertTrue(all(c.args[1:3] == ("container", "inspect") for c in docker.call_args_list))
+            self.assertEqual(counters.call_count, 2)  # fixed task and engine only
+            data = json.loads(next(slot.root.glob("start-failure-*.json")).read_text())
+            self.assertTrue(all(row["identity_verified"] is False for row in data["containers"].values()))
+
+    def test_health_failure_records_all_attempts_without_raw_body_and_keeps_original_policy(self):
+        slot = self.slot()
+        private = tool.DockerRejected(SimpleNamespace(returncode=1, stdout="", stderr="PRIVATE_ERROR_CANARY"))
+        with patch.object(tool, "run", side_effect=private), patch.object(tool.time, "sleep") as delay, \
+             self.assertRaises(tool.DockerRejected):
+            slot.internal_health("2" * 64)
+        self.assertEqual(len(slot.health_attempts), 12)
+        self.assertEqual(delay.call_count, 11)
+        self.assertTrue(all(row["docker_exit"] == 1 for row in slot.health_attempts))
+        self.assertNotIn("PRIVATE_ERROR_CANARY", json.dumps(slot.health_attempts))
+        self.assertNotIn("PRIVATE_ERROR_CANARY", str(private))
+
+    def test_diagnostic_cli_output_and_time_are_bounded_and_children_reaped(self):
+        actual_popen = subprocess.Popen
+        for program, expected in (("import os; os.write(1, b'x'*100000)", "truncated"),
+                                  ("import time; time.sleep(20)", "timeout")):
+            children = []
+            def spawn(*args, **kwargs):
+                children.append(actual_popen([sys.executable, "-c", program],
+                    stdin=kwargs["stdin"], stdout=kwargs["stdout"], stderr=kwargs["stderr"]))
+                return children[-1]
+            with patch.object(tool.subprocess, "Popen", side_effect=spawn), \
+                 patch.object(tool, "clean_environment", return_value={}):
+                began = tool.time.monotonic()
+                result = tool.diagnostic_docker(Path("/unused"), "logs", "1" * 64)
+            self.assertEqual(result["status"], expected)
+            self.assertLessEqual(len(result["output"]), 65536)
+            self.assertLess(tool.time.monotonic() - began, 5)
+            self.assertIsNotNone(children[0].poll())
+            self.assertTrue(children[0].stdout.closed)
+
+    def test_missing_cgroup_is_unavailable_not_zero(self):
+        self.assertTrue(all(value is None for value in
+            tool.diagnostic_cgroup(Path("/nonexistent-bigbrain-cgroup")).values()))
+
     def test_network_id_can_be_unassigned_only_before_start(self):
         info = self.inventory["containers"][0]
         info["NetworkSettings"]["Networks"]["bb-test-u1-net"]["NetworkID"] = ""
