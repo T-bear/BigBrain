@@ -1168,3 +1168,78 @@ synthetic failure proving retained evidence/cleanup, and at most one ordinary au
 candidate observation. Any continued resource allocation must be explicitly bounded;
 neither old repair counter is reset. An inconclusive observation cannot trigger another
 loop or claim startup stability. The original startup P1 and owner UX acceptance remain.
+
+
+### BB-162 owner-approved bounded installation and probes — 2026-11-14
+
+The owner explicitly approves up to60 additional active minutes for installation, one
+controlled synthetic failure and one ordinary automatic candidate observation, followed
+by stop if unclear. This resolves the preceding RESOURCE HOLD for this concrete work;
+it does not reset BB162 repair1/2 or old U3 exhausted2/2 and authorizes no new loop.
+Risk2; existing five-point DoD and all Finance/production boundaries remain unchanged.
+Exact reviewed control72fdea8 is installed as a separate sealed rootless snapshot; old
+configuration, request, state, last-good pointer and receipt are archived byte-for-byte.
+A preparation stopped before any application start when Type=exec engine was not yet
+Docker-ready. The private harness now checks actual engine identity/readiness within30s;
+this is dependency preflight, not an application retry/readiness change or a claimed
+explanation of the historical intermittent startup failure.
+
+Controlled negative runtime PASS: one freshly validated own synthetic API was deliberately
+killed; actual fixed CLI exhausted the unchanged12 health attempts, retained narrow private
+failure evidence (API exit137) before stopping both own containers, and retained that file
+after fixture reset. Evidence SHA256 d2d994045da01f346c33f59ce6801307aa876424070901757947db852b6b486e.
+Ordinary automatic observation is next; no completion/merge clearance follows from this
+negative test. The current automatic candidate is e5e1bb3d1c8d8ba61762689fa5613319d5dec439,
+treef374a1d6b3299f11265e852f2d4e68e8a7f2c300, CI43577605906 all five jobs PASS.
+
+
+#### Bounded installation/probe outcome — VERIFIED 2026-11-14
+
+The authorized controlled failure and exactly one ordinary automatic task are complete.
+No further runtime trial or corrective repair follows from this inconclusive startup
+diagnosis. This outcome supersedes the earlier source-only/RESOURCE HOLD state for
+diagnostic retention; it does not close the historical startup P1.
+
+- **INSTALLED / NEGATIVE RUNTIME PASS:** reviewed external control72fdea8, controller
+  SHA256 fade367604c9bfe44026353d31c7984cb153573813f4d324b92ad4a94e52a1c6,
+  runs under a new sealed installation. The deliberate own-API kill produced API137,
+  OOMKilled=false and12 actual failed health attempts. Raw private failure evidence was
+  retained before stop and survived fixture reset. Exit137 was the deliberate kill,
+  not an inferred OOM. Its evidence hash is recorded above.
+- **AUTOMATIC / BROWSER PASS:** actual task95e4e5638ce14a81abde240e431b6481 used exact
+  source e5e1bb3d1c8d8ba61762689fa5613319d5dec439/tree f374a1d6b3299f11265e852f2d4e68e8a7f2c300,
+  CI43577605906/attempt1/artifact14107710751, ZIP digest
+  a835f343a17fcf908462979876a47c930d24e9658ac36b65a30255b917217094.
+  All five CI jobs PASS; package records the PR test-context SHA
+  1ec048ace78e3881db832bdee01ee18883447f11 separately from exact-source image builds.
+  API image fb15fffbe95014d17590d15f824ae75675fe86c0896554f427118cbead9241b4,
+  Web8584a38522cd74507d3aac85f872568549c796409fadeecfefb036069667f66c.
+  API listened11.900s after its actual start; eight initial health execs failed, ninth
+  succeeded, tenth was the separate relay check. No readiness extension was installed.
+  Cold Firefox desktop1366x682 and actual small450x758 (requested390; Firefox minimum450)
+  each passed synthetic add/three real refreshes/banner/header hit-test and fit.
+  Both screenshots were visually inspected. This is not physical iPhone/PWA acceptance.
+- **TERMINAL / RESOURCE PASS:** normal420s Serving ended succeeded at09:22:17Z
+  (10:22:17 Europe/Stockholm), no rollback in this ordinary task. Passive549sample record
+  SHA256 72e9db3a2080f3a196cdfce51f0a863d18aa75ac98a23bffc4add39d44910277.
+  Task observed PID peak80 with TasksMax256; memory.peak394104832 bytes below512MiB.
+  Task, engine and both app containers had observed PID-limit, memory-limit and OOM
+  event counters0. Engine series includes the preceding controlled-negative run.
+  Missing post-exit counters remain unavailable, not fabricated zero.
+- **PROVENANCE / SAFE EXIT PASS:** new last-good is created only by that genuine wrapper
+  succeeded receipt, with matching current request/control/receipt hashes. Old pointer
+  and receipt bytes remain historical and unchanged. Task/rootless are PAUSED/stopped,
+  both units disabled, no pending task; unchanged manual control75/image151 restored
+  with HTTP/assets PASS. Original12 production IDs/images/start times match before/after.
+  Pause CLI returned1 when signalling the already inactive task, after writing PAUSED;
+  the nonzero result is retained explicitly. Verified PAUSED/inactive state and the
+  separate stop/restoration checks establish safe exit; this is not a blanket claim
+  that every cleanup command returned0. Unit CPU/memory/PID limits, sealed controller
+  hashes, Linger=yes and absence of session linkage were rechecked unchanged.
+- **INTERPRETATION / BLOCKED:** the old4259db4 startup failure did not recur and remains
+  unexplained. The two successful observations (earlier a4, current e5) do not prove its
+  cause repaired. PREDEPLOY stays BLOCKED/P1 and PR87 stays draft/not mergeable.
+  Physical owner acceptance and exact accepted-main delivery remain pending.
+  No production/real Finance keys/data/providers/models/orders were used. BB162 remains
+  repair1/2; U3 stays exhausted2/2. The added60-minute allowance was bounded here with
+  a conservative wall stop before10:00Z, counting waits; no resource cap is silently reset.

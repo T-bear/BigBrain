@@ -12,32 +12,28 @@ Alla tidigare statusförlopp finns i [historikarkivet](history/status-before-doc
 
 ## Syntetisk TEST — 2026-11-14
 
-**BB-162 BLOCKED / P1: tidigare automatstartsfel är inte förklarat; PR87 är ej mergebar.**
-Accepterad main är e2635e5; rootless-härdningen via PR84/main d50b366 är fortsatt accepterad.
-BB-161:s TEST-banner och desktop/liten faktisk450px-viewport har verifierade add/tre Refresh/
-knappkontroller. Paus, avvisad inlämning, idle-resume och exakt en återgång har PASS.
-Sessionsoberoende är kontrakts-/konfigurations-/runtimeverifierat med Linger=yes; faktisk
-sista-utloggning/reboot är NOT RUN och inga orelaterade sessioner avslutades.
+**BB-162 BLOCKED / P1: det tidigare sporadiska automatstartfelet är ännu inte förklarat.**
+Accepterad main e2635e5 är oförändrad; PR87 är draft och ej mergebar.
+Felinsamling72fdea8 är nu separat installerad och verkligt negativtestad: privat underlag
+sparas före exakt egen cleanup och finns kvar efter reset. Oberoende kontrollreview och87
+fokuserade tester PASS; inga ändrade retries, readiness-, resurs- eller isoleringsgränser.
 
-Ett avgränsat instrumenterat automatprov på a4d9bb2 passerade2026-11-14: API lyssnade
-efter10,457s, sjunde misslyckade hälsokontrollen följdes av lyckad åttonde; senare reläprov
-PASS och task succeeded efter60s Serving. Käll-CI43519113162 har alla fem jobb PASS.
-Provet återskapade inte det tidigare4259db4-startfelet; ingen orsak eller andra källreparation
-är fastställd. Budget1/2 kvarstår, gamla U3:s2/2 nollställs inte. Inga nya omkörningsloopar.
-[Exakt evidens och tolkning](operations/runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14).
+Exakt en ägargodkänd automatisk observation på e5e1bb3/tree f374a1d, CI43577605906
+alla fem jobb PASS, slutade succeeded09:22:17Z efter420s Serving. Kall Firefox desktop
+och faktisk450px-viewport: varutillägg/tre Refresh/TEST-banner/header PASS, visuellt granskat.
+API lyssnade efter11.900s; åttonde misslyckade hälsokontrollen följdes av lyckad nionde.
+Task PID-peak80, minnespeak394104832bytes; task/engine/API/Web utan observerade
+PID-/minnesgränshändelser eller OOM. Detta är inte bevis för att det gamla felet är rättat.
+[Exakt prov, proveniens, evidensgränser och safe exit](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
-Task nådde512MiB (max76, OOM0); appcontainrar/engine utan nya PID-/minneshändelser.
-Detta bevisar inte orsaken till tidigare startfel. Rootless/task är PAUSED/stoppade/disabled;
-verifierad manuell reserv151ab3a är återställd med HTTP/assets PASS. Alla12 ursprungliga
-produktionsidentiteter/images/starttider oförändrade. Ingen Finance-kandidat påstås installerad.
-Fysisk ägaracceptans på iPhone/PWA och accepterad-main-leverans återstår. Agent Independence
-är framtida krav; Finance-/produktions-/backupgrindar och syntetisk TEST-avgränsning gäller.
-
-Ny felinsamling72fdea8 är källimplementerad och oberoende granskad utan P0/P1;
-87 fokuserade tester samt dokumentations-/diffkontroller PASS. Ej installerad eller
-driftverifierad; startfelet är inte löst. Återstående aktiv tidsram kan inte styrkas
-från befintlig redovisning; ingen ny driftloop startas.
-[Avgränsning och återupptagning](operations/runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14).
+Ny last-good e5e1bb3 kommer från verkligt succeeded-kvitto med matchande request/control;
+äldre kvitton/pointer är oförändrade historiska bytes. Rootless/task PAUSED/stoppade/disabled,
+ingen pending; manuell reserv151ab3a återställd med HTTP/assets PASS. Produktions12
+oförändrade. Paus/avbrott/en säker återgång samt avsedd sessionsoberoende drift återanvänder
+tidigare giltig evidens; Linger och unitgränser omverifierade. Faktisk sista-utloggning/reboot
+är NOT RUN; fysisk iPhone/PWA-acceptans och accepterad-main-leverans återstår.
+Ägarens extra60min omfattade dessa två prov; inget nytt omtag eller korrigeringsloop startas.
+BB162 reparation1/2 och gamla U3:s2/2 nollställs inte. Ingen Finance-kandidat installerad.
 
 ## Frysningar och operativa osäkerheter
 

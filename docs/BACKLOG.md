@@ -1337,19 +1337,19 @@ P2, men ägaren inkluderade uttryckligen rättningen i aktuell PREDEPLOY-leveran
 
 ### BB-162 — U3 browsertransport blockerar harmless pilot
 
-Diagnostik72fdea8: privat felunderlag före cleanup implementerat,87 tester PASS,
-oberoende källreview utan P0/P1. Ej installerat/driftverifierat och inte en startfelsrättning.
-Återstående aktiv tidsram saknar verifierbar balans; inget nytt driftprov startat.
-[Exakt fortsättningspunkt](operations/runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14).
-
-
-**BLOCKED / P1: intermittent automatstart; tidigare fel är inte förklarat.**
-2026-11-14: ett instrumenterat automatprov på a4d9bb2 avslutades succeeded efter60s
-Serving. API lyssnade efter10,457s; sju health-exec misslyckades, åttonde och senare
-reläkontroll PASS. Tidigare4259db4-startfel återskapades inte och orsaken är okänd.
-Ingen andra källreparation eller längre readiness-gräns är evidensgrundad; budget1/2.
-Diagnosserien stoppas utan ny loop, rootless PAUSED/stoppat och manuell reserv HTTP-verifierad.
-[Detaljer och evidensgränser](operations/runbooks/test-environment.md#bb-162-bounded-automatic-observation--2026-11-14).
+**BLOCKED / P1: det tidigare sporadiska automatstartfelet är inte förklarat.**
+2026-11-14: felinsamling72fdea8 installerad efter oberoende review, verkligt negativprov
+PASS (12 health-fel/API137, underlag före cleanup och efter reset). Ett enda ägargodkänt
+automatprov e5e1bb3, CI43577605906 alla fem PASS, slutade succeeded efter420s Serving.
+Desktop och faktisk450px-viewport: kall start/varutillägg/tre Refresh/banner/header PASS.
+API lyssnade efter11.900s; åtta initiala health-fel före lyckad nionde. Task PID-peak80,
+minnespeak394104832bytes och observerade PID-/minnesgräns-/OOM-händelser0.
+Historiskt4259db4-fel återskapades inte; orsaken och en rättning är fortfarande okända.
+Task/rootless PAUSED/stoppade/disabled, ny legitim last-good från verklig succeeded,
+manuell reserv HTTP/assets PASS och produktions12 oförändrade. Ingen ytterligare körning.
+BB162 reparation1/2; gamla U3:s2/2 nollställs inte. Fysisk iPhone/PWA och accepterad
+main-leverans återstår; inget färdigbesked.
+[Exakt aktuell evidens och avgränsning](operations/runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14).
 
 Initial kandidat5fd3153 hade CI/core PASS men kall Firefox gav NetworkError vid
 QuickAdd. Task-cgroup pids.events max2, API/Web max0. Försök1/2 höjer endast

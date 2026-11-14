@@ -7,21 +7,20 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 
 ## BB-162 — 2026-11-14 — INTERRUPTED — SAFE TO RESUME
 
-Owner prioritizes stabilization before synthetic Finance. Active preserved branch
-checkpoint/test-environment-u3-automation-20261113; accepted main e2635e5 unchanged.
-Prior checkpoint321e1e0 CI43575807049 all five checks PASS. New diagnostic-only controller
-patch72fdea8/tree5436c4d has independent source review without P0/P1 and87 tests PASS.
-Fetch exact latest publication before continuing.
-[Scope, limits and evidence contract](runbooks/test-environment.md#bb-162-retained-failure-evidence--owner-stabilization-priority-2026-11-14)
-is the single detailed record. No installed control/config/runtime change, no new live trial.
-BB-162 repair1/2 and original2-active-hour cap remain; old U3 remains2/2 exhausted.
-The4259db4 startup failure is still unexplained: BLOCKED/P1, PR87 not mergeable.
-Original remaining active-time balance cannot be established: RESOURCE HOLD, no live trial.
-Next: bounded continued resource allocation; before any installation prepare provenance/
-last-good transition and safe rollback, never rewrite receipts to manufacture adoption.
-Rootless/task remain PAUSED/stopped/disabled, legitimate last-good a4d9bb2 retained;
-manual control75/image151 fallback preserved. Physical iPhone/PWA acceptance still pending.
-Preserve unrelated files; no speculative readiness extension or new repair/design loop.
+Ägarens extra60min för installation/ett kontrollerat fel/ett automatprov är slutfört och
+stoppat enligt villkoret om oklart utfall. Ingen process väntar på nya uppdrag här.
+Aktiv branch checkpoint/test-environment-u3-automation-20261113; main e2635e5 oförändrad.
+Runtime e5e1bb3/tree f374a1d, CI43577605906 alla fem PASS; kontroll72fdea8 installerad.
+[Enda detaljerade provutfallet](runbooks/test-environment.md#bounded-installationprobe-outcome--verified-2026-11-14)
+skiljer negativt felprov, succeeded420s och webbläsar-PASS från kvarstående startup-P1.
+Task95e4e5638ce14a81abde240e431b6481 är terminal succeeded, inte en ny körorder.
+Ny last-good är legitimt skapad med matchande request/control/receipt; äldre bytes bevarade.
+Rootless/task PAUSED/stoppade/disabled, ingen pending, manuell reserv75/image151 återställd
+HTTP/assets PASS; produktions12 oförändrade. Pausens terminala signalavvisning är bevarad.
+Hämta exakt publicerings-SHA före fortsättning. Kvar: konkret evidensgrundad rättning av
+det gamla startfelet, tillämplig slutreview/CI/main och fysisk iPhone/PWA-acceptans.
+BB162 reparation1/2 och gamla U3:s2/2 är oförändrade. Inget nytt omtag utan nytt konkret
+avgränsat uppdrag; inga spekulativa policy-/readiness-ändringar eller Finance/prod-mutationer.
 
 ## DOC-2A — publicerad beslutspunkt
 
