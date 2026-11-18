@@ -580,6 +580,126 @@ class StandardTests(unittest.TestCase):
             with self.assertRaisesRegex(d.Blocked, 'ComposeRuntimeMismatch'):
                 self.dep.configuration(self.runtime)
 
+    def test_prior_composite_only_from_completed_private_standard_receipt(self):
+        state = self.root / '.local/state/bigbrain-standard'
+        run = state / ('run-' + 'e' * 32)
+        run.mkdir(parents=True, mode=0o700)
+        state.chmod(0o700)
+        run.chmod(0o700)
+        private = run / 'release.json'
+        private.write_text('{}')
+        private.chmod(0o600)
+        receipt = run / 'receipt.json'
+        receipt.write_text(json.dumps({'images': {'api': OLD}, 'revision': REV}))
+        receipt.chmod(0o600)
+        journal = run / 'journal.jsonl'
+        journal.write_text('{"phase":"PREPARING"}\n{"phase":"PASS"}\n')
+        journal.chmod(0o600)
+        current = copy.deepcopy(self.runtime['api'])
+        current['Config']['Labels'].update({
+            d.MEDIA_COMPOSITE_LABEL: d.PR103_LEGACY_COMPOSITE,
+            'com.docker.compose.project.config_files': str(private),
+            'org.opencontainers.image.revision': REV})
+        with patch.object(Path, 'home', return_value=self.root):
+            self.assertTrue(d.accepted_prior_standard_composite(current))
+            current['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = 'sha256:' + '0' * 64
+            self.assertFalse(d.accepted_prior_standard_composite(current))
+            current['Config']['Labels'][d.MEDIA_COMPOSITE_LABEL] = d.PR103_LEGACY_COMPOSITE
+            for file, data in ((receipt, {'images': {'api': NEW}, 'revision': REV}),):
+                file.write_text(json.dumps(data))
+                self.assertFalse(d.accepted_prior_standard_composite(current))
+                file.write_text(json.dumps({'images': {'api': OLD}, 'revision': REV}))
+            journal.write_text('{"phase":"PREPARING"}\n{"phase":"ROLLBACK_FAILED"}\n')
+            self.assertFalse(d.accepted_prior_standard_composite(current))
+            journal.write_text('{"phase":"PASS"}\n')
+            receipt.chmod(0o644)
+            self.assertFalse(d.accepted_prior_standard_composite(current))
+            receipt.chmod(0o600)
+            self.assertTrue(d.accepted_prior_standard_composite(current))
+
+    def test_web_runtime_cache_parent_metadata_is_not_a_general_exemption(self):
+        original = copy.deepcopy(self.runtime['web'])
+        with patch.object(d, 'docker', return_value=(
+                b'C /var\nC /var/cache\nA /var/cache/nginx/client_temp\n')):
+            self.assertIsNone(d.writable_layer('web', original, {}))
+        for change in (b'A /var\n', b'D /var/cache\n', b'C /etc/nginx\n'):
+            with self.subTest(change=change), patch.object(d, 'docker', return_value=change):
+                with self.assertRaisesRegex(d.Blocked, 'RollbackImageHasRuntimeRepairs'):
+                    d.writable_layer('web', original, {})
+
+    def private_dual_release_fixture(self):
+        api_source, old = self.private_standard_fixture()
+        root = self.root / '.local/state/bigbrain-web-composite'
+        run = root / ('run-' + 'd' * 32)
+        run.mkdir(parents=True, mode=0o700)
+        root.chmod(0o700)
+        run.chmod(0o700)
+        web_source = run / 'release.json'
+        web = {'name': d.PROJECT, 'networks': copy.deepcopy(old['networks']),
+               'services': {'web': copy.deepcopy(old['services']['web'])}}
+        # Compose emits an empty IPAM object for external network definitions.
+        web['networks']['default']['ipam'] = {}
+        web_source.write_text(json.dumps(web))
+        web_source.chmod(0o600)
+        self.runtime['web']['Config']['Labels']['com.docker.compose.project.config_files'] = str(web_source)
+        self.config = web
+        self.dep.source = None
+        return api_source, web_source, old
+
+    def test_private_dual_release_preserves_api_volumes_and_web(self):
+        api_source, web_source, old = self.private_dual_release_fixture()
+        with patch.object(Path, 'home', return_value=self.root), patch.object(
+                self.dep, 'compose_model', side_effect=self.model):
+            result = self.dep.configuration(self.runtime)
+        self.assertTrue(self.dep.private_web)
+        self.assertEqual(self.dep.source, web_source)
+        self.assertEqual(result['services']['api'], old['services']['api'])
+        self.assertEqual(result['services']['web'], old['services']['web'])
+        self.assertEqual(result['networks'], old['networks'])
+        self.assertEqual(result['volumes'], old['volumes'])
+
+    def test_private_dual_release_rejects_unsafe_web_source_and_mismatch(self):
+        api_source, web_source, old = self.private_dual_release_fixture()
+        with patch.object(Path, 'home', return_value=self.root):
+            for value in (self.root / 'unknown/release.json',
+                          web_source.parent / 'rollback.json'):
+                self.runtime['web']['Config']['Labels']['com.docker.compose.project.config_files'] = str(value)
+                self.dep.source = None
+                with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'):
+                    self.dep.discover_compose()
+            self.runtime['web']['Config']['Labels']['com.docker.compose.project.config_files'] = str(web_source)
+            for path, mode in ((web_source.parent.parent, 0o755),
+                               (web_source.parent, 0o755), (web_source, 0o644)):
+                original = path.stat().st_mode & 0o777
+                path.chmod(mode)
+                self.dep.source = None
+                try:
+                    with self.assertRaisesRegex(d.Blocked, 'ComposeProvenanceMissing'):
+                        self.dep.discover_compose()
+                finally: path.chmod(original)
+            for malicious in ({'build': '.'}, {'secrets': ['bad']}, {'image': NEW}):
+                content = copy.deepcopy(self.config)
+                content['services']['web'].update(malicious)
+                self.config = content
+                web_source.write_text(json.dumps(content))
+                self.dep.source = None
+                with patch.object(self.dep, 'compose_model', side_effect=self.model):
+                    with self.assertRaisesRegex(d.Blocked, 'PrivateWebReleaseInvalid'):
+                        self.dep.configuration(self.runtime)
+                self.config = copy.deepcopy({
+                    'name': d.PROJECT, 'networks': copy.deepcopy(old['networks']),
+                    'services': {'web': copy.deepcopy(old['services']['web'])}})
+                self.config['networks']['default']['ipam'] = {}
+                web_source.write_text(json.dumps(self.config))
+            content = copy.deepcopy(self.config)
+            content['networks']['default']['name'] = 'wrong-network'
+            self.config = content
+            web_source.write_text(json.dumps(content))
+            self.dep.source = None
+            with patch.object(self.dep, 'compose_model', side_effect=self.model):
+                with self.assertRaisesRegex(d.Blocked, 'PrivateNetworkMismatch'):
+                    self.dep.configuration(self.runtime)
+
     def mixed_compose(self):
         self.source = self.root / 'compose.yaml'
         self.source.write_text('{}')
