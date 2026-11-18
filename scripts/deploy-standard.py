@@ -38,6 +38,9 @@ MEDIA_ACCEPTED_SOURCE = '2c48264c4d57650e639331398dc8d5ebaa52c691'
 MEDIA_RUNNING_API = '80fa231773dace31dda60ad0a32c69c1a42b5e50'
 MEDIA_RUNNING_WEB = 'acd5c295acc4e3772980fe8b98f3844a742d7267'
 MEDIA_COMPOSITE_LABEL = 'org.bigbrain.source.composite'
+# Exactly the already deployed, owner-accepted STANDARD Media composite.
+# This permit is for migration FROM this rollback image, never for new builds.
+PR103_LEGACY_COMPOSITE = 'sha256:7e67217c811035086102ae1f9998806251dd79a34b682bb7eda06f3913866854'
 # One further source-only Media release: current deployed composite -> PR #68.
 # This permission is bounded to the exact accepted commit and exact live images.
 MEDIA_FOLLOWUP_SOURCE = '6efba7c9b265dbab0b7e3b14313994a102d2b87b'
@@ -283,6 +286,32 @@ def legacy_web_provenance(image):
     return matches[0]
 
 
+def accepted_prior_standard_composite(container):
+    """Verify one legacy composite against a private, completed STANDARD receipt."""
+    labels = container['Config'].get('Labels', {})
+    if labels.get(MEDIA_COMPOSITE_LABEL) != PR103_LEGACY_COMPOSITE:
+        return False
+    source = labels.get('com.docker.compose.project.config_files', '')
+    if not Deployment.standard_release_compose(source):
+        return False
+    folder = Path(source).parent
+    receipt, journal = folder / 'receipt.json', folder / 'journal.jsonl'
+    try:
+        for file in (receipt, journal):
+            backup.no_symlinks(file)
+            info = file.lstat()
+            if not (stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid()
+                    and stat.S_IMODE(info.st_mode) == 0o600):
+                return False
+        proof = json.loads(receipt.read_text())
+        history = [json.loads(line)['phase'] for line in journal.read_text().splitlines()]
+        return (history and history[-1] == 'PASS'
+                and proof.get('images', {}).get('api') == container['Image']
+                and proof.get('revision') == labels.get('org.opencontainers.image.revision'))
+    except (OSError, ValueError, KeyError, TypeError, backup.Blocked):
+        return False
+
+
 def git_guard(revision, originals, media_release=False, media_followup=False):
     need(re.fullmatch(SHA, revision), 'InvalidRevision')
     remote = command(['git', 'ls-remote', 'origin', 'refs/heads/main']).decode().split()
@@ -294,8 +323,10 @@ def git_guard(revision, originals, media_release=False, media_followup=False):
     need(not media_followup or media_release, 'MediaFollowupModeInvalid')
     for role, old in originals.items():
         label = old['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL)
-        allowed = (media_followup and role == 'api'
-                   and label == MEDIA_FOLLOWUP_COMPOSITE)
+        allowed = ((media_followup and role == 'api'
+                    and label == MEDIA_FOLLOWUP_COMPOSITE)
+                   or (not media_release and role == 'api'
+                       and accepted_prior_standard_composite(old)))
         need(allowed or not label, 'CompositeRuntimeRequiresReview')
     if media_followup:
         # The review PR moves main; pin the accepted SOURCE and permit only
@@ -427,6 +458,11 @@ def writable_layer(role, container, service):
     for row in docker('diff', container['Id']).decode().splitlines():
         if role == 'api' and row == 'A /host-timesync':
             identity = timesync_identity(container, service)
+            continue
+        # The approved unprivileged Nginx image creates cache directories;
+        # Docker reports its two parent directories as metadata-changed.
+        # Only C, never A/D, and no other path receives this exception.
+        if role == 'web' and row in ('C /var', 'C /var/cache'):
             continue
         need(re.fullmatch(r'[ACD] /.+', row) and any(row[2:] == p or row[2:].startswith(p + '/')
              for p in ('/tmp', '/var/cache/nginx', '/var/run', '/run')), 'RollbackImageHasRuntimeRepairs')
@@ -648,6 +684,7 @@ class Deployment:
         self.probes = set()
         self.env_files = []
         self.reconstruct = False
+        self.private_web = False
         self.provenance = {}
         self.timesync = None
         self.data = None
@@ -679,11 +716,12 @@ class Deployment:
                       *args, timeout=120, mutation=mutation)
 
     @staticmethod
-    def standard_release_compose(path):
-        # Recognize only this runner's own private output from a previous
-        # release. Runtime configuration hashes must still be verified.
+    def trusted_private_release(path, state_name):
+        # Recognize only the two existing deployers' privately owned outputs.
+        # Neither name/path alone grants authority: content and BOTH runtime
+        # Compose hashes are independently verified below.
         source = Path(path)
-        root = Path.home() / '.local/state/bigbrain-standard'
+        root = Path.home() / '.local/state' / state_name
         if (str(source) != path or source.name != 'release.json' or
                 source.parent.parent != root or
                 not re.fullmatch(r'run-[0-9a-f]{32}', source.parent.name)):
@@ -700,6 +738,14 @@ class Deployment:
         except (OSError, backup.Blocked):
             return False
 
+    @staticmethod
+    def standard_release_compose(path):
+        return Deployment.trusted_private_release(path, 'bigbrain-standard')
+
+    @staticmethod
+    def web_composite_release_compose(path):
+        return Deployment.trusted_private_release(path, 'bigbrain-web-composite')
+
     def discover_compose(self):
         if self.source is not None:
             return
@@ -708,12 +754,16 @@ class Deployment:
         need(all(l.get(k) for l in labels for k in keys), 'ComposeProvenanceMissing')
         self.reconstruct = any(labels[0][k] != labels[1][k] for k in keys)
         if self.reconstruct:
-            # Only the diagnosed legacy API + ordinary Web combination is supported.
-            api_source = labels[0][keys[0]]
+            # Only known API origins and known Web origins are permitted.
+            # The private Web release must be paired with a private STANDARD API
+            # release, never with a legacy gateway reconstruction.
+            api_source, web_source = labels[0][keys[0]], labels[1][keys[0]]
             gateway = re.fullmatch(r'/var/lib/bigbrain-approved-ops/runs/[a-zA-Z0-9_-]+/release\.compose\.json', api_source)
+            self.private_web = self.web_composite_release_compose(web_source)
+            ordinary_web = Path(web_source).name == 'compose.yaml'
             need((gateway is not None or self.standard_release_compose(api_source))
-                 and Path(labels[1][keys[0]]).name == 'compose.yaml'
-                 and ',' not in labels[1][keys[0]], 'ComposeProvenanceMissing')
+                 and (ordinary_web or (self.private_web and self.standard_release_compose(api_source)))
+                 and ',' not in web_source, 'ComposeProvenanceMissing')
         selected = labels[1] if self.reconstruct else labels[0]
         self.source_files = [Path(x) for x in selected[keys[0]].split(',')]
         self.source = self.source_files[0]
@@ -733,6 +783,18 @@ class Deployment:
         if self.reconstruct:
             web_hash = self.compose(self.source, 'config', '--hash', 'web').decode().split()
             need(web_hash == ['web', originals['web']['Config']['Labels'].get('com.docker.compose.config-hash')], 'ComposeRuntimeMismatch')
+            if self.private_web:
+                # The previously accepted Web-only release is itself a private
+                # one-service Compose snapshot, never a full application.
+                need(config.get('name') == PROJECT and
+                     set(config.get('services', {})) == {'web'} and
+                     not config.get('volumes') and
+                     isinstance(config['services']['web'], dict) and
+                     config['services']['web'].get('image') == originals['web']['Image'] and
+                     not any(k in config['services']['web'] for k in
+                             ('build', 'depends_on', 'profiles', 'extends', 'env_file',
+                              'label_file', 'configs', 'secrets', 'develop',
+                              'volumes_from', 'links')), 'PrivateWebReleaseInvalid')
             api_origin = originals['api']['Config']['Labels']['com.docker.compose.project.config_files']
             if self.standard_release_compose(api_origin):
                 # A prior STANDARD release carries its exact API service, including
@@ -755,7 +817,20 @@ class Deployment:
                      and not any(k in api for k in ('build', 'depends_on', 'profiles', 'extends',
                          'env_file', 'label_file', 'configs', 'secrets', 'develop', 'volumes_from', 'links')),
                      'PrivateReleaseInvalid')
-                config['services']['api'] = copy.deepcopy(api)
+                if self.private_web:
+                    # Reconstruct only from two independently proven, unchanged
+                    # private releases. Preserve API mounts, volumes and Media
+                    # networks, and Web's exact existing service definition.
+                    need(set(config.get('networks', {})).issubset(private.get('networks', {})) and
+                         all(isinstance(v, dict) and v.get('ipam', {}) == {} and
+                             {k: value for k, value in v.items() if k != 'ipam'}
+                             == private['networks'][k]
+                             for k, v in config.get('networks', {}).items()), 'PrivateNetworkMismatch')
+                    web = copy.deepcopy(config['services']['web'])
+                    config = copy.deepcopy(private)
+                    config['services']['web'] = web
+                else:
+                    config['services']['api'] = copy.deepcopy(api)
             else:
                 # Older approved gateway runtimes have no private STANDARD source;
                 # preserve their existing reconstruction and fail-closed boundaries.
@@ -810,9 +885,11 @@ class Deployment:
             healthy(old)
             prior = image_info(old['Image'])
             label = prior['Config'].get('Labels', {}).get(MEDIA_COMPOSITE_LABEL)
-            allowed = (self.media_followup and role == 'api'
-                       and label == MEDIA_FOLLOWUP_COMPOSITE
-                       and label == old['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL))
+            allowed = ((self.media_followup and role == 'api'
+                        and label == MEDIA_FOLLOWUP_COMPOSITE
+                        and label == old['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL))
+                       or (not self.media_release and role == 'api'
+                           and accepted_prior_standard_composite(old)))
             need(allowed or not label, 'CompositeRuntimeRequiresReview')
             need(prior['Config'].get('Labels', {}).get('org.opencontainers.image.revision')
                  == old['Config']['Labels'].get('org.opencontainers.image.revision'), 'OldImageRevisionMismatch')

@@ -4,6 +4,28 @@ Appliance boot/shutdown uses the [lifecycle runbook](../runbooks/bigbrain-applia
 Docker and `bigbrain.service` must be enabled. The unit performs Compose preflight/readiness
 and bounded stop without embedding secrets. External media and `/mnt/media` are noncritical.
 
+## BigBrain #101 – stöd för dubbla tidigare privata releaser (kandidat 2026-11-18)
+
+Den generella STANDARD API+Web-runnern har en avgränsad kompatibilitetskorrigering
+för när API kör ett godkänt privat STANDARD-releaserecept medan Web kör ett separat
+godkänt privat Web-composite-recept. Båda måste ha verifierad sökväg, ägare och
+filrättigheter, oförändrade tjänstdefinitioner, överensstämmande Docker Compose
+config-hashar och samma existerande nätverksidentitet. API:s volymer och Media-nät
+bevaras. Inga godtyckliga releasefiler, nya nätverk eller inlästa hemligheter
+accepteras som bevis enbart utifrån filnamn.
+
+För den exakta tidigare API-composite som är känd från driften krävs dessutom
+privat STANDARD-kvittens med korrekt API-image/revision och journalens avslutande
+PASS. En annan composite, utebliven kvittens, oväntad filändring eller oklart
+nätverk ska fortfarande blockera. Endast Nginx-cachekatalogernas observerade
+metadataändringar i `/var` och `/var/cache` tillåts som extra rollback-lagerposter;
+nya/raderade föräldrakataloger och andra filer nekas.
+
+**Status:** kodkandidat och syntetiska regressionstester. Inte produktion. Den
+ordinarie deploymenten får användas först efter accepterad main, fullständig
+relevant CI och obligatorisk nivå-3-granskning av exakt kandidat. Ingen direkt
+`docker compose up`-genväg och ingen datamigrering ingår.
+
 ## Finance EODHD Free
 
 EODHD is disabled by default. The named `finance-market-data` volume is mounted only into
