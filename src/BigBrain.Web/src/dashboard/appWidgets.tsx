@@ -16,6 +16,7 @@ import { ShoppingList } from '../shopping-list/ShoppingList'
 import { SmartShuffle } from '../smart-shuffle/SmartShuffle'
 import { CalendarWidget } from '../calendar/Calendar'
 import { FinanceObservation } from '../finance/FinanceObservation'
+import { FinanceAccessGate } from '../finance/FinanceAccessGate'
 import { SystemRecovery } from '../system-recovery/SystemRecovery'
 import { ApplicationWidgetRegistry, DashboardRegistry } from './widgetFramework'
 import { AppIcon } from '../AppIcon'
@@ -383,7 +384,11 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       minimumSize: 'large',
       supportedViews: ['finance'],
       permissions: ['finance.research.read'],
-      render: () => <FinanceObservation />,
+      render: () => (
+        <FinanceAccessGate>
+          <FinanceObservation />
+        </FinanceAccessGate>
+      ),
     },
     {
       id: 'ai-overview',

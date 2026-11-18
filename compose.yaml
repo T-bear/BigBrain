@@ -81,6 +81,8 @@ services:
       Sentinel__TrustedServerCertificatePath: /run/bigbrain/identity/server-trust.p12
       Sentinel__ProofPrivateKeyPath: /run/bigbrain/identity/proof-private.pem
       Sentinel__ProofKeyId: local-control-plane
+      Security__FinanceAccessRequired: "true"
+      Security__FinanceAccessToken: ${BIGBRAIN_FINANCE_ACCESS_TOKEN:-}
       Media__TimeoutSeconds: ${MEDIA__TIMEOUTSECONDS:-3}
       Media__Requests__Enabled: ${MEDIA__REQUESTS__ENABLED:-true}
       Media__Requests__DefaultSearchAfterAdd: ${MEDIA__REQUESTS__DEFAULTSEARCHAFTERADD:-false}
@@ -136,7 +138,7 @@ services:
       - default
       - media
     ports:
-      - "18080:8080"
+      - "127.0.0.1:18080:8080"
     healthcheck:
       test:
         [
