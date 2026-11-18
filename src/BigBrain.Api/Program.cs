@@ -300,7 +300,24 @@ public partial class Program
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 
+        builder.Services.AddSingleton(services => MediaIngressGuard.Parse(
+            services.GetRequiredService<IConfiguration>()["Security:MediaIngressDeniedCidrs"]));
         var app = builder.Build();
+
+        // Block Finance access from the inventoried Media network and host gateway.
+        // Enforce before Finance handlers; do not trust client-supplied proxy headers.
+        app.Use(async (context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments("/api/v1/modules/finance") &&
+                context.RequestServices.GetRequiredService<MediaIngressGuard>()
+                    .IsDenied(context.Connection.RemoteIpAddress))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return;
+            }
+
+            await next(context);
+        });
 
         app.UseExceptionHandler();
         app.UseStatusCodePages();
