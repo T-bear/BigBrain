@@ -5,7 +5,11 @@ let memoryToken = ''
 
 export function getFinanceAccessToken(): string {
   if (memoryToken) return memoryToken
-  try { memoryToken = sessionStorage.getItem(key) ?? '' } catch { /* storage disabled */ }
+  try {
+    memoryToken = sessionStorage.getItem(key) ?? ''
+  } catch {
+    /* storage disabled */
+  }
   return memoryToken
 }
 
@@ -14,7 +18,9 @@ export function setFinanceAccessToken(value: string) {
   try {
     if (value) sessionStorage.setItem(key, value)
     else sessionStorage.removeItem(key)
-  } catch { /* in-memory only */ }
+  } catch {
+    /* in-memory only */
+  }
 }
 
 export function financeAccessHeaders(url: string): Record<string, string> {

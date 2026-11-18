@@ -58,7 +58,11 @@ export class ApiError extends Error {
 }
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal, headers: financeAccessHeaders(url), cache: url.startsWith('/api/v1/modules/finance') ? 'no-store' : 'default' })
+  const response = await fetch(url, {
+    signal,
+    headers: financeAccessHeaders(url),
+    cache: url.startsWith('/api/v1/modules/finance') ? 'no-store' : 'default',
+  })
 
   if (!response.ok) {
     const problem = (await response.json().catch(() => null)) as { code?: string; detail?: string } | null

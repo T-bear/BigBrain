@@ -384,7 +384,11 @@ export function createAppWidgetRegistry(data: AppWidgetData) {
       minimumSize: 'large',
       supportedViews: ['finance'],
       permissions: ['finance.research.read'],
-      render: () => <FinanceAccessGate><FinanceObservation /></FinanceAccessGate>,
+      render: () => (
+        <FinanceAccessGate>
+          <FinanceObservation />
+        </FinanceAccessGate>
+      ),
     },
     {
       id: 'ai-overview',
