@@ -392,8 +392,9 @@ test('cold Finance requests no inactive global data and no system polling', asyn
   await act(async () => {
     await vi.advanceTimersByTimeAsync(15_000)
   })
+  // Locked Finance must never read observation data before explicit unlock.
+  expect(screen.getByText('Finance är låst')).toBeInTheDocument()
   expect(fetchMock.mock.calls.map(call => String((call as unknown[])[0])).sort()).toEqual([
-    '/api/v1/modules/finance/observation',
     '/api/v1/settings/theme',
   ])
 })

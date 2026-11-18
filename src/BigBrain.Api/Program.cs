@@ -300,22 +300,30 @@ public partial class Program
         builder.Services.AddSingleton<IModuleRegistry>(
             new InMemoryModuleRegistry([SystemModule.Definition, DockerModule.Definition, MediaModule.Definition, MealPlannerModule.Definition, ShoppingListModule.Definition, CalendarModule.Definition, FinanceModule.Definition]));
 
-        builder.Services.AddSingleton(services => MediaIngressGuard.Parse(
-            services.GetRequiredService<IConfiguration>()["Security:MediaIngressDeniedCidrs"]));
+        // Production Finance API requires a privately provisioned bearer token.
+        // Test hosts and non-production developers may supply an explicit isolated token.
+        builder.Services.AddSingleton(services => new FinanceAccessGuard(
+            services.GetRequiredService<IConfiguration>().GetValue<bool>("Security:FinanceAccessRequired"),
+            services.GetRequiredService<IConfiguration>()["Security:FinanceAccessToken"]));
         var app = builder.Build();
+        // Reject a misconfigured production deployment before accepting traffic.
+        _ = app.Services.GetRequiredService<FinanceAccessGuard>();
 
-        // Block Finance access from the inventoried Media network and host gateway.
-        // Enforce before Finance handlers; do not trust client-supplied proxy headers.
+        // The first Finance handler is always authenticated irrespective of
+        // direct Docker transport, host-published API ports, proxies or source IP.
         app.Use(async (context, next) =>
         {
-            if (context.Request.Path.StartsWithSegments("/api/v1/modules/finance") &&
-                context.RequestServices.GetRequiredService<MediaIngressGuard>()
-                    .IsDenied(context.Connection.RemoteIpAddress))
+            if (context.Request.Path.StartsWithSegments("/api/v1/modules/finance"))
             {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return;
+                context.Response.Headers.CacheControl = "no-store";
+                var guard = context.RequestServices.GetRequiredService<FinanceAccessGuard>();
+                if (!guard.Allows(context.Request.Headers.Authorization.ToString()))
+                {
+                    context.Response.Headers.WWWAuthenticate = "Bearer realm=BigBrainFinance";
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
             }
-
             await next(context);
         });
 

@@ -46,6 +46,7 @@ import type {
   AudiobookOverview,
   AudiobookSearchResponse,
 } from './types'
+import { financeAccessHeaders } from './finance/financeAccess'
 
 export class ApiError extends Error {
   public constructor(
@@ -57,7 +58,7 @@ export class ApiError extends Error {
 }
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal })
+  const response = await fetch(url, { signal, headers: financeAccessHeaders(url), cache: url.startsWith('/api/v1/modules/finance') ? 'no-store' : 'default' })
 
   if (!response.ok) {
     const problem = (await response.json().catch(() => null)) as { code?: string; detail?: string } | null
@@ -70,7 +71,7 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
 async function sendJson<T>(url: string, method: 'POST' | 'PUT', body: unknown): Promise<T> {
   const response = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...financeAccessHeaders(url) },
     body: JSON.stringify(body),
   })
   if (!response.ok) {
