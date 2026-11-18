@@ -1,73 +1,59 @@
 # BigBrain – permanenta arbetsregler
 
+BigBrain är ett privat hemmaprojekt. Pengar och behörighetsgränser skyddas hårt; resten får gå sönder, rullas tillbaka och återskapas. En regel som inte skyddar mot ekonomisk skada, dataförlust eller överskridna behörighetsgränser ska vara kort eller saknas.
+
 ## 1. Roller och auktoritet
 
 - Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.
 - ChatGPT är systemarkitekt och oberoende granskare; Codex är Lead Developer som implementerar, verifierar, committar och pushar inom auktoriserat scope samt genomför merge enligt avsnitt 8.
-- Arbeta endast inom detta repository. Följ accepterad `ARCHITECTURE.md` och ADR:er. Vid arkitekturell oklarhet eller konflikt: stoppa och fråga före implementation.
-- GitHub main är source of truth för accepterat arbete; aktiv checkpoint-branch för publicerat, ännu ej accepterat arbete. Working tree och recovery beskriver opublicerade avvikelser. Publicering, tester eller review innebär aldrig ägaracceptans, merge- eller deploymenttillstånd.
+- Arbeta endast inom detta repository. Följ accepterad `ARCHITECTURE.md` och ADR:er. Vid arkitekturell konflikt: stoppa och fråga före implementation.
+- GitHub main är source of truth för accepterat arbete; aktiv checkpoint-branch för publicerat, ännu ej accepterat arbete. Publicering, tester eller review innebär aldrig ägaracceptans, merge- eller deploymenttillstånd.
 - Owner UX approval registreras endast efter uttryckligt ägargodkännande.
 
 <a id="kiss--keep-it-simple-stupid"></a>
 ## 2. KISS och uppgiftsstyrd kontext
 
-Läs alltid AGENTS.md och verifiera Git-baslinje och working tree; välj relevant kontext via [START-HERE](docs/START-HERE.md) och kontrollera [frysningar](docs/operations/freezes.md).
-Inspektera befintlig kod och kontrakt före ändring. Utöka läsningen vid konkret risk, osäkerhet, beroende eller konflikt.
-Fullständig rutinläsning krävs inte; motivera konkret risk, konflikt eller större avvikelse, inte varje extra läsning.
-KISS ska beaktas före implementation och vid arkitekturreview; välj enklast möjliga lösning som uppfyller kraven.
-Återanvänd befintliga komponenter och integrationer; undvik onödiga beroenden, abstraktioner, lager, tjänster och parallella lösningar.
-Ytterligare komplexitet kräver konkret verifierat ansvar och behov.
-Undvik microservices, message brokers, Redis, Kubernetes och dynamiska plugins tills behovet verifierats och arkitekturbeslut dokumenterats.
-Förenkling får inte försämra säkerhet, korrekthet, tillförlitlighet eller underhållbarhet.
+Läs AGENTS.md, verifiera Git-baslinje och working tree, och läs därefter bara den kontext uppgiften kräver via [START-HERE](docs/START-HERE.md). Kontrollera [frysningar](docs/operations/freezes.md). Historik och äldre rapporter läses bara vid riktad felsökning eller när ett aktuellt dokument hänvisar dit.
+Välj enklaste lösning som uppfyller kraven och återanvänd befintliga komponenter. Undvik nya beroenden, lager och tjänster utan verifierat behov. Förenkling får inte försämra säkerhet eller korrekthet.
 
 ## 3. Riskbaserad arbetsinsats
 
-[Risknivåer och arbetsinsats](docs/policy/risk-policy.md) gäller: nivå 1 hemmabekvämlighet, nivå 2 data/åtkomst, nivå 3 Finance/pengar/kritiska privilegier.
-Risknivå anges i uppdraget; använd högre nivå vid osäkerhet. Codex får inte sänka den för att undvika review. Finance är alltid nivå 3.
-LOW/MEDIUM/HIGH avser arbetsinsats. Kör fokuserad verifiering och återanvänd giltig evidens; risknivå ger ingen ny auktorisering.
+[Risknivåer och arbetsinsats](docs/policy/risk-policy.md) gäller. Risknivån följer vad en ändring kan göra och vilken åtkomst koden faktiskt har, inte vilken modul den ligger i:
+
+- Nivå 1, experiment och bekvämlighet: UI, media, prototyper, testdata, dokumentation och isolerad forskning utan ekonomiska eller privilegierade förmågor.
+- Nivå 2, normal drift: beständiga data, databasstruktur, API-beteende, schemaläggning och åtkomst till hushållsdata.
+- Nivå 3, ekonomisk säkerhet: order, PAPER/LIVE, handels- eller kapitalauktoritet, ekonomiska nycklar eller konton, root, sudo, Docker-root, Docker-socket, administratörsåtkomst, en väg från en vanlig modul till dessa, samt ändringar av skyddsreglerna själva.
+
+Finance med handelsförmåga är alltid nivå 3. Finance RESEARCH på historisk data är nivå 2 först när ägaren i `docs/STATUS.md` har noterat att isoleringsvillkoren och RESEARCH-garantin i risk-policyn är verifierade; tills dess är Finance nivå 3.
+Risknivå anges i uppdraget. Vid verklig osäkerhet om en nivå 3-trigger används den högre nivån; Codex får inte sänka nivån för att undvika granskning. Risknivå ger ingen ny auktorisering.
 Tillfällig nivå 2-grind: självständig deployment av databasändringar får inte aktiveras förrän
 verifierad daglig backup av viktiga databaser och minst ett lyckat isolerat återställningsprov
 från en verklig backup finns dokumenterade i [backupunderlaget](docs/operations/backup-restore/README.md#nivå-2-grind--evidens-och-återstående-verifiering).
-Tills dess krävs separat granskning av sådan deployment. Syntetiska tester eller enstaka
-backupkörningar bevisar inte daglig backup. Godkänd grind ersätter inte andra driftvillkor.
-Compute Economy tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview,
-fail-closed-beteende, dokumentation, vetenskaplig integritet eller migrationssäkerhet.
-Finance-korrekthet, dataintegritet, säkerhet och arkitektur har företräde framför kreditbesparing.
+Tills dess krävs separat granskning av sådan deployment. Provet görs en gång och därefter periodiskt, inte per ändring.
+Förenkling tar bort redundant arbete, aldrig nödvändig verifiering, säkerhetsreview, fail-closed-beteende eller migrationssäkerhet. Finance-korrekthet, dataintegritet och säkerhet har företräde framför kreditbesparing.
 
 ## 4. Scope och Definition of Done
 
-Fastställ mål, scope, faktisk risk, verifierbar DoD, obligatoriska kontroller och uttryckliga godkännandegränser före nytt eller utökat uppdrag.
-DoD ska vara proportionell utan fast antal kriterier; saknas den får agenten undersöka och föreslå den.
-Implementation väntar då på ägarens eller arkitektens godkännande inom ägarens auktoriserade scope.
-Ändra inte mål eller acceptanskriterier med förbättringsidéer. Konkreta säkerhetsfel, korrekthetsbrister, arkitekturkonflikter och obligatoriska krav måste hanteras.
-Nytt scope kräver ägarbeslut; dokumentera uppskjutna idéer i befintlig backlog. Uppfylld DoD avslutar uppdraget utan automatisk sprint, checkpoint eller förbättringsloop.
-Beskriv mål, scope, acceptanskriterier och stoppvillkor, inte permanenta regler på nytt.
-Undvik kontrollomgångar, separata agentkörningar, vänteloopar och administration utan nödvändig verifiering; extra arbete/stopp kräver konkret risk, avvikelse, krav eller ägarbeslut.
-Ett kontrollmoment är inte automatiskt ett nytt godkännandesteg eller uppdrag; obligatoriska skyddsgränser får aldrig kringgås.
+Fastställ mål, scope, faktisk risk, verifierbar DoD och uttryckliga godkännandegränser före nytt eller utökat uppdrag. DoD är proportionell, normalt 5–8 punkter; saknas den får agenten föreslå den och invänta godkännande.
+Ändra inte mål eller acceptanskriterier med förbättringsidéer; uppskjutna idéer går till befintlig backlog. Nytt scope kräver ägarbeslut. Uppfylld DoD avslutar uppdraget utan automatisk sprint, checkpoint eller förbättringsloop.
+Undvik kontrollomgångar, vänteloopar och administration utan nödvändig verifiering. Ett kontrollmoment är inte automatiskt ett nytt godkännandesteg; obligatoriska skyddsgränser får aldrig kringgås.
 
 ## 5. Säkerhet och arkitektur
 
 - Lägg aldrig hemligheter, lösenord, tokens eller API-nycklar i kod, loggar eller frontend.
 - Montera aldrig Docker-socketen i API eller Web. Använd minsta behörighet för processer, containers, API:er och användare.
-- Destruktiva funktioner kräver tydlig auktorisering, uttrycklig bekräftelse och audit. Radera eller skriv aldrig över användardata.
-- Ändra inte andra servercontainers, tjänster eller konfigurationer utan uttryckligt uppdrag; ändra aldrig andra containers eller deras data som bieffekt av utveckling eller test.
-- Moduler får inte läsa eller skriva andra modulers datalager direkt. Externa tjänster kapslas bakom adapters. Alla publika API:er versionssätts; alla API-fel använder Problem Details.
-- `BigBrain.Brain` innehåller endast AI-orkestrering enligt `ARCHITECTURE.md`, inte generell kod. AI får endast använda deklarerade capabilities och strukturerade verktygskontrakt genom det vanliga auktoriserade API:t. Godtycklig tredjepartskod får inte laddas i API, Web eller Brain.
-- Finance-skydd, vetenskapliga krav, risk-, provider-, rättighets-, lineage- och kapitalgränser gäller oförändrat. Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet.
-- Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar kräver nivå 3, oberoende granskning, avgränsade och återkallbara rättigheter samt sanerad loggning. Docker-gruppåtkomst till rootful Docker är root-ekvivalent; en wrapper gör inte användaren OS-isolerad. Ägargodkännande ersätter inte teknisk verifiering av privilegiegränsen.
+- Vanliga moduler (Media, Family, UI, experiment) får inte nå Finance-nycklar, handelsfunktioner, Docker-socketen eller administrativa privilegier. Gränsen upprätthålls av OS-rättigheter, containerisolering och nätverksregler, inte bara av instruktioner till agenter.
+- Destruktiva funktioner kräver tydlig auktorisering, uttrycklig bekräftelse och audit. Radera eller skriv aldrig över användardata. Ändra inte andra containers, tjänster eller konfigurationer utan uttryckligt uppdrag.
+- Moduler läser eller skriver inte andra modulers datalager direkt. Externa tjänster kapslas bakom adapters; publika API:er versionssätts och API-fel använder Problem Details.
+- `BigBrain.Brain` innehåller endast AI-orkestrering. AI får bara använda deklarerade capabilities genom det auktoriserade API:t; godtycklig tredjepartskod laddas inte i API, Web eller Brain.
+- Finance-ADR:erna om risk, rättigheter, lineage, vetenskaplig integritet och kapitalgränser gäller som tekniska krav. Dokumentationspublicering och RESEARCH ger ingen tradingbehörighet. Före simulerad eller riktig handel krävs separat ägarbeslut och förlustgränser som inte enbart beror på strategikod.
+- Permanenta generella root-, sudo- och Docker-root-ekvivalenta privilegieökningar kräver nivå 3, oberoende granskning, avgränsade och återkallbara rättigheter samt sanerad loggning. Docker-gruppåtkomst till rootful Docker är root-ekvivalent. Ägargodkännande ersätter inte teknisk verifiering av privilegiegränsen.
 
 ## 6. Dokumentation – minsta beständiga sanning
 
-**NO UNDOCUMENTED SIGNIFICANT WORK:** betydande arkitektur-, status-, backlog-, roadmap-, runtime-, säkerhets- och återhämtningsbeslut samt viktiga lärdomar ska bevaras i rätt kanoniskt underlag.
-Chatt och terminalhistorik är inte bestående source of truth. Dokumentation ingår i DoD.
-Uppdatera först befintliga kanoniska dokument; läs/uppdatera inte hela trädet rutinmässigt. Länka i stället för att duplicera samma ansvar.
-Ingen rutinmässig post-merge-dokumentationscommit; avstäm endast verkligt bestående nya fakta.
-STATUS är aktuell nulägesbild, inte arbetslogg. Bevara relevant ersatt historik i befintligt arkiv, helst i samma commit; ingen ny arkivstruktur eller hård radgräns.
-Skilj planerat, implementerat, automatiskt verifierat, deployat, manuellt verifierat, blockerat, känt begränsat och ersatt. Påstå aldrig färdigstatus utan evidens.
-Datera runtime-/testuppgifter och ange scope; historik bevisar inte aktuellt tillstånd. Registrera nya verifierade buggar, begränsningar och uppskjutna funktioner som inte löses i uppdraget.
-Backlog blir klar först vid verifierad DoD; BB-ID:n ska vara unika. Ändra inte andra posters status/prioritet utan evidens.
-Separat sanerad rapport/katalogpost behövs när beslut, risk, teknisk evidens eller spårbarhet motiverar det; små ändringar behöver ingen parallell rapport.
-Fullare rapporter får vara interna, men relevant sanerad kunskap ska publiceras i GitHub. Publicera aldrig hemligheter, interna identiteter, privata adresser, råa känsliga loggar, känsliga paths eller förbjudna data.
+Betydande arkitektur-, status-, runtime-, säkerhets- och återhämtningsbeslut bevaras i rätt kanoniskt dokument; chatt är inte source of truth. Uppdatera först befintliga kanoniska dokument och länka i stället för att duplicera. Läs eller uppdatera inte hela trädet rutinmässigt, och små ändringar behöver varken separat rapport eller post-merge-dokumentationscommit.
+STATUS är nulägesbild, inte arbetslogg. Skilj planerat, implementerat, verifierat, deployat, blockerat och ersatt; påstå aldrig färdigstatus utan evidens och datera runtime- och testuppgifter. Nya verifierade buggar och uppskjutna funktioner registreras i backlog med unika BB-ID:n.
+Separat sanerad rapport behövs bara när beslut, risk eller spårbarhet motiverar det. Publicera aldrig hemligheter, interna identiteter, privata adresser, råa känsliga loggar eller känsliga paths.
 
 ## 7. Review och blockerare
 
@@ -87,60 +73,36 @@ Granskaren rekommenderar blockering. Produktägaren beslutar om kvarstående ris
 Riskacceptans upphäver inte obligatoriska krav utan ett uttryckligt ändringsbeslut.
 
 Högst två ordinarie reviewvarv. Därefter redovisas kvarstående hinder och ägaren beslutar om fortsatt avgränsat arbete, minskat scope, uppskjutning eller stopp.
-Verifierade P0/P1 får aldrig kringgås för att nå en rundgräns; fortsatt nödvändig verifiering är inte förbjuden.
-Klassificeringen ersätter inte befintliga säkerhets-, Finance-, blocker- eller godkännanderegler.
+Verifierade P0/P1 får aldrig kringgås för att nå en rundgräns.
 Andra varvet fokuserar på tidigare blockerare och tillkommande diff. Nyupptäckta verkliga P0/P1 får inte nedklassificeras enbart för att koden är oförändrad.
 Nya P2/P3 i oförändrad kod öppnar inte nya iterationsloopar. Tvåvarvstaket begränsar automatiska granskningsloopar, inte obligatorisk säkerhetsverifiering.
-
-Efter policyinförandet följs de fem första verkliga deploymenterna upp i den
-[befintliga deploymentdokumentationen](docs/operations/deployment/README.md#uppföljning-av-riskpolicyn).
-Registrera extra ägaringrepp, blockerade leveranser och rollbacks med faktisk evidens; obligatorisk
-iPhone/PWA-acceptans räknas separat. Målet är högst två extra ägaringrepp totalt över fem
-deploymenter, aldrig ett skäl att kringgå en grind eller dölja ett stopp. Ingen konstgjord
-redeployment för mätning. Kontrollera först verklig runtime för en SchoolLunch-pilot och utför
-den först efter antagen policy och uppfyllda driftgrindar inom redan giltig auktorisering.
+Oberoende granskning krävs på nivå 3 och där ett leveransspår i [lanes.md](docs/policy/lanes.md) uttryckligen kräver den. I övrigt räcker CI och agentens egenkontroll.
 
 [Granskarbeteende](docs/operations/review-guide.md) styr reparationsförsök, säker rollback, resursram och oberoende GitHub-review vid ”Codex är klar”.
 
 <a id="permanent-checkpoint-branch-workflow"></a>
 ## 8. Git och Review Checkpoints
 
-Riskpolicyn har trätt i kraft enligt [ägarbeslutet](docs/operations/deployment/README.md#ägarbeslut-om-riskpolicyns-ikraftträdande--2026-10-27), endast för nya uttryckligen auktoriserade uppdrag.
-[Checkpoint-arbetsflödet](docs/operations/checkpoint-workflow.md) styr delegering, publicering och historisk väg.
-En bounded checkpoint-branch från verifierad `origin/main`; fortsätt samma branch genom review,
-inte en parallell implementation. Bevara orelaterat arbete och användarens ändringar. Ingen reset,
-rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skriv inte över eller
-återställ befintliga ändringar.
+[Checkpoint-arbetsflödet](docs/operations/checkpoint-workflow.md) styr delegering, publicering och historisk väg. Denna version gäller för nya uttryckligen auktoriserade uppdrag.
+En bounded checkpoint-branch från verifierad `origin/main`; fortsätt samma branch genom review, inte en parallell implementation. Bevara orelaterat arbete och användarens ändringar. Ingen reset, rebase, amend, squash, force push eller historieskrivning av reviewhistorik. Skriv inte över eller återställ befintliga ändringar.
 Ingen merge utan verifierad kandidat-SHA/tree, main-baslinje, diff och required checks enligt risknivå; nivå 3 kräver faktisk oberoende kandidatgranskning.
 Vid avvikelse eller blockerande kontroll: stoppa. Verifiera publicerad main och CI på exakt merge-SHA före deployment.
 Ingen delegering kringgår GitHub-skydd, gateway, root-approvals, backup/recovery, leverantörsvillkor, ekonomiska gränser eller bindande P0/P1.
-Separata reserverade ägarbeslut och obligatorisk iPhone/PWA-acceptans kvarstår enligt arbetsflödet; CI ersätter aldrig manuell acceptans.
+Reserverade ägarbeslut (nytt scope, ny kostnad eller ekonomisk risk, upptining) och obligatorisk iPhone/PWA-acceptans kvarstår; CI ersätter aldrig manuell acceptans.
 
 ## 9. Avbrott och blockerad implementation
 
-Vid avbrott: bevara giltigt working-tree-arbete; kasta eller gör inte om det. Sammanhängande
-ofullständigt arbete får publiceras som REVIEW CHECKPOINT, aldrig som obestyrkt Merge Candidate.
-Använd endast [codex-recovery](docs/operations/codex-recovery.md) för återhämtningsnoten, med
-`INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`.
-Noten ska när möjligt ange baseline/SHA, git status, filer, klart/återstående, tester/build,
-blockerare/antaganden och nästa exakta åtgärd. Inga hemligheter eller känsliga driftuppgifter.
+Vid avbrott: bevara giltigt working-tree-arbete. Ofullständigt arbete får publiceras som REVIEW CHECKPOINT, aldrig som obestyrkt Merge Candidate. Använd endast [codex-recovery](docs/operations/codex-recovery.md) för återhämtningsnoten, med `INTERRUPTED — SAFE TO RESUME` eller `INTERRUPTED — MANUAL REVIEW REQUIRED`, utan hemligheter.
 [Avbrott och blocker-handoff](docs/operations/checkpoint-workflow.md#9-avbrott-och-blockerad-implementation) gäller; en blocker-branch får inte mergas.
 
 ## 10. Långvariga processer
 
 Följ [reglerna för långvariga processer](docs/operations/checkpoint-workflow.md#10-långvariga-processer): ingen aktiv vänteloop utan ny information, avvikelse eller beslutspunkt.
-Verifiera livslängd, ägarskap, resursgränser, beständiga resultat och säker fel-/avbrottshantering; använd befintliga mekanismer och sanerad recovery.
 
 ## 11. Kort sluthandoff
 
-Ge kort evidensbaserad handoff, normalt cirka tio rader, med länkar till fördjupad evidens.
-Ange mål/status, branch, accepterad baseline, exakt verifierad remote-SHA/tree, ändrade filer/beteenden och kontroller med PASS/FAIL/PENDING/SKIP.
-Ange återanvänd evidens, kvarstående risker/blockerare, nästa beslut och dokumentationsändringar/skuld eller granskning utan uppdateringsbehov.
-Vid beslut ska exakt behövligt godkännande framgå; begär inte redan givet godkännande.
-GitHub-underlaget ska återskapa mål, scope/non-goals, implementation, verifiering, betydande experiment/fel, invariants och artefakt-/runtime-/modellproveniens.
-Anpassa omfattningen efter risk; inga obligatoriska långa rapportblock, särskild sista mening eller parallella rapporter. Betydande fakta bevaras enligt §6.
-Före godkännandefrågan ska underlaget vara färdigt och nödvändig teknisk återhämtningsstatus finnas i enda recovery-noten; duplicera inte publicerad evidens där.
-Misslyckade/ej körda kontroller får aldrig beskrivas som gröna.
+Ge kort evidensbaserad handoff, normalt cirka tio rader med länkar till fördjupad evidens: mål/status, branch, verifierad remote-SHA/tree, ändrade filer och beteenden, kontroller med PASS/FAIL/PENDING/SKIP, kvarstående risker och nästa beslut.
+Begär inte redan givet godkännande. Misslyckade eller ej körda kontroller får aldrig beskrivas som gröna. Inga obligatoriska långa rapportblock; anpassa omfattningen efter risk.
 
 ## 12. Befintliga frysningar och beslut
 
