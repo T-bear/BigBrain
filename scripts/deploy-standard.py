@@ -44,8 +44,10 @@ PR103_LEGACY_COMPOSITE = 'sha256:7e67217c811035086102ae1f9998806251dd79a34b682bb
 # One-off delivery of the already accepted #101 Finance ingress change. Changes
 # to source/build inputs after this accepted tree are not part of this release.
 FINANCE_INGRESS_SOURCE = '38698f3377327dfe8c18ae29ef720935faf24b23'
-FINANCE_INGRESS_API_BASE = 'e8f3e62cc446cf52a89045d1a3ce7d4c3a2116ff'
-FINANCE_INGRESS_WEB_BASE = '3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9'
+FINANCE_INGRESS_RUNTIME_REVISIONS = {
+    'api': 'e8f3e62cc446cf52a89045d1a3ce7d4c3a2116ff',
+    'web': '3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9',
+}
 FINANCE_INGRESS_ENV_KEY = 'BIGBRAIN_FINANCE_ACCESS_TOKEN'
 # This one-off release uses the owner's existing persistent env file, not the
 # historical Web-composite build worktree (which has no .env).
@@ -400,8 +402,7 @@ def git_guard(revision, originals, media_release=False, media_followup=False, fi
             base = evidence[role]['revision']
             need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
         if finance_ingress_release:
-            need(base == (FINANCE_INGRESS_API_BASE if role == 'api'
-                          else FINANCE_INGRESS_WEB_BASE), 'FinanceIngressBaselineChanged')
+            need(base == FINANCE_INGRESS_RUNTIME_REVISIONS[role], 'FinanceIngressBaselineChanged')
         if media_followup:
             need(base == MEDIA_FOLLOWUP_BASE, 'MediaRuntimeBaselineChanged')
         elif media_release:

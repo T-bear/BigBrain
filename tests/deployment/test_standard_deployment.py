@@ -1481,8 +1481,8 @@ class GitGuardTests(unittest.TestCase):
         with patch.object(d, 'ROOT', self.root), patch.object(d, 'command', side_effect=command), \
              patch.object(d, 'MEMORY_FETCH', self.api_base), \
              patch.object(d, 'FINANCE_INGRESS_SOURCE', source), \
-             patch.object(d, 'FINANCE_INGRESS_API_BASE', self.api_base), \
-             patch.object(d, 'FINANCE_INGRESS_WEB_BASE', self.web_base), \
+             patch.object(d, 'FINANCE_INGRESS_RUNTIME_REVISIONS',
+                          {'api': self.api_base, 'web': self.web_base}), \
              patch.object(d, 'ci_green'):
             GIT_GUARD(self.revision, self.originals, finance_ingress_release=True)
             self.write('scripts/deploy-standard.py', 'authorized release-tool correction')
