@@ -318,3 +318,24 @@ Verifieringskedja:
 förslag.** Kod, test och dokumentation måste granskas oberoende och accepteras
 i main innan verktyget får --execute. Ingen frysning hävs. GitHub-merge av
 #108 ska ske separat enligt aktuell besluts- och driftkedja.
+
+
+### PR #108 – GitHub-krävd branchuppdatering före merge (2026-11-19)
+
+Efter accepterad PR #109 krävde GitHub att PR #108 uppdaterades mot ny
+`main`. Den skyddade uppdateringen skapade ett nytt merge-head
+`f3b9f5958b69dc41af44ee726e78612ad8f7900d` med föräldrar
+`60f8818a7aa46e39c29e729bdf537fe9b1f27765` (ursprunglig
+granskad Web-kandidat) och `d96813b1850adbf667529c87f5940c37f52b99d8`
+(accepterat releaseverktyg). GitHub merge av PR #108 är
+`0b5f9fc8d8c20f271b00700c491665fbef3a7b8b`; obligatorisk
+main-CI blev grön. De fyra ursprungliga Web-filerna är oförändrade.
+
+Den ursprungliga releasegrinden kräver exakt tidigare head och stoppar
+korrekt med `PR108NotAccepted`. Föreslagen korrigering accepterar
+**endast** den dokumenterade, exakta uppdaterade head-identiteten och
+verifierar båda dess föräldrar, att den ingår i accepterad main,
+befintlig PR-merge, exakt diff/bygginput och gröna CI. Ingen generell
+tillåtelse för andra framtida head, inga förändringar i behörighet,
+rollback, image eller runtime. Korrigeringen ska publiceras och granskas
+som separat nivå-3-checkpoint innan `--execute` får användas.

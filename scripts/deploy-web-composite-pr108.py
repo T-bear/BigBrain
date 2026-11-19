@@ -21,6 +21,9 @@ from urllib.request import urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE="60f8818a7aa46e39c29e729bdf537fe9b1f27765"
+UPDATED_HEAD="f3b9f5958b69dc41af44ee726e78612ad8f7900d"
+RELEASE_TOOL_MERGE="d96813b1850adbf667529c87f5940c37f52b99d8"
+
 BASE="873013d2c2f2c0c326acdec7eebd35c87c642ce5"
 REV=SOURCE  # replaced by exact accepted merge SHA in pr_and_source()
 WEB_OLD="sha256:f9e4c19fa059edf400a489607b5481a2093b4ba89f5ea276d11dd03ba1d75f96"
@@ -86,8 +89,15 @@ def pr_and_source():
  need(set(git("diff","--name-only",BASE,SOURCE).splitlines())==CHANGED,
       "UnreviewedPR108Diff")
  pr=json.loads(run(["gh","api","repos/T-bear/BigBrain/pulls/108"]))
- need(pr.get("merged") is True and pr.get("head",{}).get("sha")==SOURCE
+ need(pr.get("merged") is True and pr.get("head",{}).get("sha")==UPDATED_HEAD
       and pr.get("base",{}).get("ref")=="main", "PR108NotAccepted")
+ # GitHub required a normal merge of release-tool main into the PR branch.
+ # Authenticate both exact parents; never accept a changed PR head by name alone.
+ need(git("rev-parse",UPDATED_HEAD+"^1")==SOURCE
+      and git("rev-parse",UPDATED_HEAD+"^2")==RELEASE_TOOL_MERGE,
+      "PR108UpdateParentsChanged")
+ need(git("merge-base",UPDATED_HEAD,current)==UPDATED_HEAD,
+      "PR108UpdatedHeadNotAccepted")
  merged=pr.get("merge_commit_sha")
  need(bool(re.fullmatch(r"[a-f0-9]{40}",merged or "")),"PR108MergeUnknown")
  # The accepted release must include PR108's exact merge, regardless of
