@@ -3,3 +3,7 @@
 d76c5d5db17aa0e43cff4769164e7fe135ffc7be:scripts/deploy-standard.py:generic-api-key:38
 # Verified historical Git-main commit reference; exact finding only, not a credential.
 029ef0d9d96ddcabff80649138d5f2dd0272c55e:docs/reports/features/finance/finance-release1-readonly-preparation-20261106.md:generic-api-key:8
+# PR #107: two exact false positives from public Git commit identifiers (40 hex),
+# not credential material. Do not suppress any other line, key or rule.
+f29f3f1d3ee7898e7324be8d7ae1fc1b531a1cfc:scripts/deploy-standard.py:generic-api-key:47
+d2f1cdfb37a4e1948abad638c3032fb8ebd98c6d:scripts/deploy-standard.py:generic-api-key:48
