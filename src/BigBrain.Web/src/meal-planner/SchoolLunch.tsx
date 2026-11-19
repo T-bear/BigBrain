@@ -41,14 +41,7 @@ function expireMenu(menu: SchoolMealWeek): SchoolMealWeek {
   }
 }
 
-export function SchoolLunch({
-  allowFixture = import.meta.env.DEV,
-  offlinePreview = false,
-}: {
-  allowFixture?: boolean
-  offlinePreview?: boolean
-}) {
-  const [fixture, setFixture] = useState(false)
+export function useSchoolLunchMenus(fixture = false, offlinePreview = false) {
   const [menus, setMenus] = useState<Record<string, SchoolMealWeek>>({})
   const [failed, setFailed] = useState<string[]>([])
   useEffect(() => {
@@ -133,6 +126,19 @@ export function SchoolLunch({
       window.clearTimeout(timer)
     }
   }, [menus])
+
+  return { menus, failed }
+}
+
+export function SchoolLunch({
+  allowFixture = import.meta.env.DEV,
+  offlinePreview = false,
+}: {
+  allowFixture?: boolean
+  offlinePreview?: boolean
+}) {
+  const [fixture, setFixture] = useState(false)
+  const { menus, failed } = useSchoolLunchMenus(fixture, offlinePreview)
 
   return (
     <section className="school-lunch meal-planner__week card" aria-label="Skolmat">

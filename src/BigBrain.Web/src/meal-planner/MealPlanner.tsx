@@ -14,7 +14,8 @@ import {
   setMealPlannerDay,
   updateMealPlannerMeal,
 } from '../api'
-import { SchoolLunch } from './SchoolLunch'
+import { useSchoolLunchMenus } from './SchoolLunch'
+import type { SchoolMealWeek } from '../api'
 import { CollapsibleModule } from '../dashboard/CollapsibleModule'
 import type { MealPlannerDay, MealPlannerMeal, MealPlannerSchedule, MealPlannerTag } from '../types'
 
@@ -32,7 +33,6 @@ const tabs = [
   { id: 'meals', label: 'Maträtter' },
   { id: 'generate', label: 'Generera' },
   { id: 'saved', label: 'Sparade' },
-  { id: 'school', label: 'Skolmat' },
 ] as const
 type MealPlannerTab = (typeof tabs)[number]['id']
 
@@ -79,6 +79,44 @@ function findSummaryDay(schedules: MealPlannerSchedule[], today: string) {
     : null
 }
 
+function SchoolLunchForDay({ date, menus }: { date: string; menus: Record<string, SchoolMealWeek> }) {
+  const dishesFor = (schoolId: string): string[] | null => {
+    const menu = menus[schoolId]
+    if (menu?.status !== 'published') return null
+    const day = menu.days.find(item => item.date === date)
+    return day?.status === 'published' ? day.dishes : null
+  }
+
+  const rosenfeldt = dishesFor('rosenfeldt')
+  const musikugglan = dishesFor('musikugglan')
+  if (!rosenfeldt && !musikugglan) return null
+
+  // Rosenfeldt RSS has two ordered options in the reviewed source/fixtures:
+  // vegetarian first and regular second. Do not guess for unexpected counts.
+  const regular =
+    rosenfeldt?.length === 1
+      ? rosenfeldt[0]
+      : rosenfeldt?.length === 2
+        ? rosenfeldt[1]
+        : rosenfeldt
+          ? 'Kontrollera lunchalternativ'
+          : 'Ingen uppgift'
+
+  return (
+    <div className="meal-planner__meal-entry meal-planner__school-entry">
+      <div className="meal-planner__day-meal">
+        <small>Lunch</small>
+        <span>
+          <strong>Rosenfeldt:</strong> {regular}
+        </span>
+        <span>
+          <strong>Musikugglan:</strong> {musikugglan?.length ? musikugglan.join(' / ') : 'Ingen uppgift'}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export function MealPlanner({
   expanded = true,
   onToggle = () => undefined,
@@ -119,6 +157,7 @@ export function MealPlanner({
   const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(true)
   const replaceActionRef = useRef<HTMLButtonElement>(null)
+  const { menus: schoolMenus } = useSchoolLunchMenus()
 
   useEffect(() => {
     if (replaceKey) window.requestAnimationFrame(() => replaceActionRef.current?.focus({ preventScroll: true }))
@@ -314,15 +353,6 @@ export function MealPlanner({
           </div>
 
           <section
-            aria-labelledby="meal-planner-tab-school"
-            hidden={activeTab !== 'school'}
-            id="meal-planner-panel-school"
-            role="tabpanel"
-          >
-            <SchoolLunch />
-          </section>
-
-          <section
             aria-labelledby="meal-planner-tab-schedule"
             hidden={activeTab !== 'schedule'}
             id="meal-planner-panel-schedule"
@@ -376,6 +406,7 @@ export function MealPlanner({
                             </span>
                           </div>
                           <div className="meal-planner__day-meals">
+                            <SchoolLunchForDay date={date} menus={schoolMenus} />
                             {dayMeals.map(day => {
                               const key = `${day.date}:${day.mealType}`
                               return (

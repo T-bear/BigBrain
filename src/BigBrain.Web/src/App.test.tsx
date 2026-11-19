@@ -219,10 +219,10 @@ test('starts on the calm Home launcher and keeps family tools in Family', async 
   expect(screen.getByRole('heading', { level: 1, name: 'Familj' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Dashboardinställningar' })).toHaveAttribute('aria-haspopup', 'dialog')
   expect(await screen.findByRole('tab', { name: 'Matsedel' })).toHaveAttribute('aria-selected', 'true')
-  fireEvent.click(screen.getByRole('tab', { name: 'Skolmat' }))
-  expect(screen.getByRole('tabpanel', { name: 'Skolmat' })).toBeVisible()
-  expect(container.querySelectorAll('.school-lunch')).toHaveLength(1)
-  expect(container.querySelector('.school-lunch')?.closest('[data-family-section]')).toHaveAttribute(
+  expect(screen.queryByRole('tab', { name: 'Skolmat' })).not.toBeInTheDocument()
+  expect(screen.getByRole('tabpanel', { name: 'Matsedel' })).toBeVisible()
+  expect(container.querySelectorAll('.school-lunch')).toHaveLength(0)
+  expect(container.querySelector('#meal-planner-panel-schedule')?.closest('[data-family-section]')).toHaveAttribute(
     'data-family-section',
     'meal-plan',
   )
