@@ -207,6 +207,9 @@ class CompositeReleaseTests(unittest.TestCase):
     ("rev-parse","HEAD"):main,
     ("status","--porcelain","--untracked-files=no"):"",
     ("rev-parse",m.SOURCE+"^1"):m.BASE,
+    ("rev-parse",m.UPDATED_HEAD+"^1"):m.SOURCE,
+    ("rev-parse",m.UPDATED_HEAD+"^2"):m.RELEASE_TOOL_MERGE,
+    ("merge-base",m.UPDATED_HEAD,main):m.UPDATED_HEAD,
     ("diff","--name-only",m.BASE,m.SOURCE):"\n".join(m.CHANGED),
     ("diff","--name-only",m.BASE,main):"\n".join(m.CHANGED|m.RELEASE_FILES),
     ("merge-base",main,main):main,
@@ -223,7 +226,7 @@ class CompositeReleaseTests(unittest.TestCase):
   try:
    with patch.object(m,"git",side_effect=git),patch.object(m,"run",
       return_value=json.dumps({"merged":True,
-        "head":{"sha":m.SOURCE},"base":{"ref":"main"},
+        "head":{"sha":m.UPDATED_HEAD},"base":{"ref":"main"},
         "merge_commit_sha":main}).encode()),patch.object(m,"ci_green") as ci:
     m.pr_and_source()
     self.assertEqual(m.REV,main)
@@ -241,6 +244,9 @@ class CompositeReleaseTests(unittest.TestCase):
    if args==("rev-parse","HEAD"):return main
    if args==("status","--porcelain","--untracked-files=no"):return ""
    if args==("rev-parse",m.SOURCE+"^1"):return m.BASE
+   if args==("rev-parse",m.UPDATED_HEAD+"^1"):return m.SOURCE
+   if args==("rev-parse",m.UPDATED_HEAD+"^2"):return m.RELEASE_TOOL_MERGE
+   if args==("merge-base",m.UPDATED_HEAD,main):return m.UPDATED_HEAD
    if args==("diff","--name-only",m.BASE,m.SOURCE):return "\n".join(m.CHANGED)
    if args==("merge-base",main,main):return main
    if args==("merge-base",m.SOURCE,main):return m.SOURCE
@@ -248,9 +254,47 @@ class CompositeReleaseTests(unittest.TestCase):
     return "\n".join(m.CHANGED|m.RELEASE_FILES|{"src/BigBrain.Api/Program.cs"})
    raise AssertionError(str(args))
   with patch.object(m,"git",side_effect=git),patch.object(m,"run",
-      return_value=json.dumps({"merged":True,"head":{"sha":m.SOURCE},
+      return_value=json.dumps({"merged":True,"head":{"sha":m.UPDATED_HEAD},
       "base":{"ref":"main"},"merge_commit_sha":main}).encode()),patch.object(m,"ci_green") as ci:
    with self.assertRaisesRegex(m.Blocked,"UnexpectedAcceptedMainDiff"):
+    m.pr_and_source()
+   ci.assert_not_called()
+
+ def test_unreviewed_pr_head_rejected_before_release(self):
+  main="a"*40
+  def git(*args):
+   return {
+    ("ls-remote","origin","refs/heads/main"):main+" refs/heads/main",
+    ("rev-parse","HEAD"):main,
+    ("status","--porcelain","--untracked-files=no"):"",
+    ("rev-parse",m.SOURCE+"^1"):m.BASE,
+    ("diff","--name-only",m.BASE,m.SOURCE):"\n".join(m.CHANGED),
+   }[args]
+  with patch.object(m,"git",side_effect=git),patch.object(m,"run",
+      return_value=json.dumps({"merged":True,
+      "head":{"sha":"f"*40},"base":{"ref":"main"},
+      "merge_commit_sha":main}).encode()),patch.object(m,"ci_green") as ci:
+   with self.assertRaisesRegex(m.Blocked,"PR108NotAccepted"):
+    m.pr_and_source()
+   ci.assert_not_called()
+
+ def test_updated_head_with_unapproved_parent_rejected_before_release(self):
+  main="a"*40
+  def git(*args):
+   return {
+    ("ls-remote","origin","refs/heads/main"):main+" refs/heads/main",
+    ("rev-parse","HEAD"):main,
+    ("status","--porcelain","--untracked-files=no"):"",
+    ("rev-parse",m.SOURCE+"^1"):m.BASE,
+    ("rev-parse",m.UPDATED_HEAD+"^1"):"f"*40,
+    ("rev-parse",m.UPDATED_HEAD+"^2"):m.RELEASE_TOOL_MERGE,
+    ("diff","--name-only",m.BASE,m.SOURCE):"\n".join(m.CHANGED),
+   }[args]
+  with patch.object(m,"git",side_effect=git),patch.object(m,"run",
+      return_value=json.dumps({"merged":True,
+      "head":{"sha":m.UPDATED_HEAD},"base":{"ref":"main"},
+      "merge_commit_sha":main}).encode()),patch.object(m,"ci_green") as ci:
+   with self.assertRaisesRegex(m.Blocked,"PR108UpdateParentsChanged"):
     m.pr_and_source()
    ci.assert_not_called()
 
