@@ -26,3 +26,38 @@ Frontend har en enkel upplåsningspanel för Finance. Koden hålls per flik i se
 5. Verifiera main-CI på exakt merge-SHA innan drift samt faktisk runtime efter drift. Dokumentera endast sanerade resultat.
 
 Den nya gränsen skyddar Finance HTTP-rutterna mot Media utan token. Den är **inte** ett fullständigt systemomfattande IAM, och blockerar inte andra API-moduler; XSS, komprometterad betrodd klient, stulna nycklar, okrypterad transport och backend-kodens Finance-volymbehörigheter är separata risker. Ingen ny trading- eller marknadsdatabehörighet följer av detta.
+
+
+## Avgränsad produktionsrelease för accepterad #101-kod (2026-11-19)
+
+Den accepterade Finance-ingresskoden från PR #103 finns i main men det tidigare
+STANDARD-spåret avvisar korrekt en bredare API/Web-ändring än dess ursprungliga
+Skollunch-allowlist. Varken en allmän allowlistutvidgning eller direkt
+`docker compose up` är en säker releaseväg.
+
+En separat, **ännu ej mergad eller driftsatt kandidat** lägger därför till
+`--finance-ingress-release` i det befintliga STANDARD-verktyget. Flaggan är
+engångsbunden till accepterat källträd `38698f3`, de två specifika
+existerande API-/Web-baslinjerna och oförändrade senare app-/bygginputs.
+Tidigare granskad dual-private Compose-proveniens, fyra required main-CI,
+signerade releaseimages, databasbackup, isolerade start-/omstartsprov och
+rollback fortsätter att gälla. Ett nytt huvud-SHA är tillåtet endast om
+käll-/bygginputsen överensstämmer exakt med den accepterade basen; releaseverktyget
+och dess testsuite kräver vanlig checkpoint, CI och oberoende nivå-3-granskning.
+
+I engångskandidaten hämtas en 64-teckens hexkod endast från den redan
+skyddade befintliga drift-`.env` med mode 0600, aldrig från source archive.
+Ny API-konfiguration får **endast** två nya miljönycklar:
+`Security__FinanceAccessRequired=true` och `Security__FinanceAccessToken`;
+befintlig API-hostport `18080` binds till `127.0.0.1`.
+Web och övriga API-mounts, nätverk och miljöinställningar bevaras.
+Den föregående konfigurationen, inklusive den tidigare portbindningen,
+sparas separat som rollback. Ett nytt API-byte måste klara exakt
+runtimeidentitet för ny Finance-miljö och hostbindning.
+
+Lokalt 2026-11-19 har fokuserade och breda syntetiska deploymenttester
+samt skrivskyddad serverdiagnostik av release-/rollbackkonfiguration
+körts. Detta är inte evidens för ett faktiskt containerbyte eller för
+positiv/negativ Media–Finance-isolering i produktion. Releasen kräver
+fortfarande oberoende granskning, accepterad main/merge-CI och verklig
+föreskriven deployment med efterkontroller innan #101 kan slutrapporteras.

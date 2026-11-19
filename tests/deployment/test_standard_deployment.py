@@ -986,6 +986,101 @@ class StandardTests(unittest.TestCase):
                 bad()
             self.dep.preflight()
 
+    def test_finance_ingress_secret_requires_private_strong_unique_hex(self):
+        env = self.root / '.env'
+        token = 'a' * 64
+        env.write_text('OTHER=ignored\nBIGBRAIN_FINANCE_ACCESS_TOKEN=' + token + '\n')
+        env.chmod(0o600)
+        self.assertEqual(d.finance_ingress_secret(self.root), token)
+        env.chmod(0o644)
+        with self.assertRaisesRegex(d.Blocked, 'FinanceSecretPermissions'):
+            d.finance_ingress_secret(self.root)
+        env.chmod(0o600)
+        for text in ('short', 'a' * 63, 'G' * 64, 'a' * 64 + 'b'):
+            env.write_text('BIGBRAIN_FINANCE_ACCESS_TOKEN=' + text + '\n')
+            with self.assertRaisesRegex(d.Blocked, 'FinanceSecretInvalid'):
+                d.finance_ingress_secret(self.root)
+        env.write_text('BIGBRAIN_FINANCE_ACCESS_TOKEN=' + token +
+                       '\nBIGBRAIN_FINANCE_ACCESS_TOKEN=' + token + '\n')
+        with self.assertRaisesRegex(d.Blocked, 'FinanceSecretInvalid'):
+            d.finance_ingress_secret(self.root)
+        env.unlink()
+        other = self.root / 'separate'
+        other.write_text('BIGBRAIN_FINANCE_ACCESS_TOKEN=' + token + '\n')
+        other.chmod(0o600)
+        env.symlink_to(other)
+        with self.assertRaises(d.Blocked):
+            d.finance_ingress_secret(self.root)
+
+    def finance_ingress_fixture(self):
+        self.dep.finance_ingress_release = True
+        self.dep.finance_ingress_token = 'a' * 64
+        api = self.dep.config['services']['api']
+        api['ports'] = [{'target': 8080, 'published': '18080', 'protocol': 'tcp'}]
+        old = self.dep.originals['api']
+        old['HostConfig']['PortBindings'] = {
+            '8080/tcp': [{'HostIp': '', 'HostPort': '18080'}]}
+        old['Config']['Env'] = ['LITERAL=before']
+        self.dep.release = d.release_config(self.dep.config, {'api': NEW, 'web': NEW})
+        self.dep.rollback = d.release_config(self.dep.config, {'api': OLD, 'web': OLD})
+        return old
+
+    def test_finance_ingress_changes_only_candidate_and_preserves_rollback(self):
+        old = self.finance_ingress_fixture()
+        before = copy.deepcopy(self.dep.config)
+        rollback = copy.deepcopy(self.dep.rollback)
+        self.dep.apply_finance_ingress()
+        self.assertEqual(self.dep.rollback, rollback)
+        self.assertEqual(self.dep.config, before)
+        api = self.dep.release['services']['api']
+        self.assertEqual(api['ports'][0]['host_ip'], '127.0.0.1')
+        self.assertEqual(api['environment']['Security__FinanceAccessRequired'], 'true')
+        self.assertEqual(api['environment']['Security__FinanceAccessToken'], 'a' * 64)
+        self.assertEqual(self.dep.release['services']['web'],
+                         rollback['services']['web'] | {'image': NEW})
+        self.assertEqual(self.dep.release['volumes'], rollback['volumes'])
+        self.assertEqual(self.dep.release['networks'], rollback['networks'])
+        self.assertEqual(old['Config']['Env'], ['LITERAL=before'])
+
+    def test_finance_ingress_rejects_other_ports_configured_guard_and_weak_token(self):
+        self.finance_ingress_fixture()
+        self.dep.finance_ingress_token = 'weak'
+        with self.assertRaisesRegex(d.Blocked, 'FinanceSecretInvalid'):
+            self.dep.apply_finance_ingress()
+        self.dep.finance_ingress_token = 'a' * 64
+        self.dep.config['services']['api']['ports'][0]['published'] = '9999'
+        with self.assertRaisesRegex(d.Blocked, 'FinanceIngressPortBaseline'):
+            self.dep.apply_finance_ingress()
+        self.dep.config['services']['api']['ports'][0]['published'] = '18080'
+        self.dep.config['services']['api']['environment']['Security__FinanceAccessRequired'] = 'false'
+        with self.assertRaisesRegex(d.Blocked, 'FinanceAccessAlreadyConfigured'):
+            self.dep.apply_finance_ingress()
+
+    def test_finance_ingress_runtime_fingerprint_accepts_only_scoped_port_and_env(self):
+        old = self.finance_ingress_fixture()
+        candidate = copy.deepcopy(old)
+        candidate['Image'] = NEW
+        candidate['Config']['Env'] = self.dep.expected_environment('api', NEW)
+        candidate['HostConfig']['PortBindings']['8080/tcp'] = [
+            {'HostIp': '127.0.0.1', 'HostPort': '18080'}]
+        self.assertTrue(self.dep.runtime_matches('api', candidate, NEW))
+        for wrong in ('0.0.0.0', '::', ''):
+            changed = copy.deepcopy(candidate)
+            changed['HostConfig']['PortBindings']['8080/tcp'][0]['HostIp'] = wrong
+            self.assertFalse(self.dep.runtime_matches('api', changed, NEW))
+        changed = copy.deepcopy(candidate)
+        changed['Config']['Env'].append('UNEXPECTED=true')
+        self.assertFalse(self.dep.runtime_matches('api', changed, NEW))
+        changed = copy.deepcopy(candidate)
+        changed['Config']['Env'][-1] = 'Security__FinanceAccessToken=' + 'b' * 64
+        self.assertFalse(self.dep.runtime_matches('api', changed, NEW))
+        changed = copy.deepcopy(candidate)
+        changed['HostConfig']['PortBindings']['1234/tcp'] = [
+            {'HostIp': '127.0.0.1', 'HostPort': '1234'}]
+        self.assertFalse(self.dep.runtime_matches('api', changed, NEW))
+        self.assertTrue(self.dep.runtime_matches('api', old, OLD))
+        self.assertFalse(self.dep.runtime_matches('api', candidate, OLD))
+
     def test_preflight_is_read_only(self):
         self.preflight()
         self.assertFalse(list(self.state.iterdir()))
@@ -1375,6 +1470,31 @@ class GitGuardTests(unittest.TestCase):
                 patch.object(d, 'MEMORY_FETCH', self.api_base), patch.object(d, 'ci_green') as ci:
             GIT_GUARD(self.revision, self.originals)
             ci.assert_called_once_with(self.revision)
+
+    def test_finance_one_off_source_pin_allows_ops_only_but_rejects_app_drift(self):
+        source = self.revision
+        real_command = d.command
+        def command(args, *a, **kw):
+            if args[:2] == ['git', 'ls-remote']:
+                return (self.revision + '\trefs/heads/main').encode()
+            return real_command(args, *a, **kw)
+        with patch.object(d, 'ROOT', self.root), patch.object(d, 'command', side_effect=command), \
+             patch.object(d, 'MEMORY_FETCH', self.api_base), \
+             patch.object(d, 'FINANCE_INGRESS_SOURCE', source), \
+             patch.object(d, 'FINANCE_INGRESS_API_BASE', self.api_base), \
+             patch.object(d, 'FINANCE_INGRESS_WEB_BASE', self.web_base), \
+             patch.object(d, 'ci_green'):
+            GIT_GUARD(self.revision, self.originals, finance_ingress_release=True)
+            self.write('scripts/deploy-standard.py', 'authorized release-tool correction')
+            self.revision = self.commit()
+            GIT_GUARD(self.revision, self.originals, finance_ingress_release=True)
+            self.write('src/BigBrain.Api/Program.cs', 'unreviewed app delta')
+            self.revision = self.commit()
+            with self.assertRaisesRegex(d.Blocked, 'FinanceIngressSourceChanged'):
+                GIT_GUARD(self.revision, self.originals, finance_ingress_release=True)
+            self.originals['api']['Config']['Labels']['org.opencontainers.image.revision'] = self.web_base
+            with self.assertRaisesRegex(d.Blocked, 'FinanceIngressSourceChanged|FinanceIngressBaselineChanged'):
+                GIT_GUARD(self.revision, self.originals, finance_ingress_release=True)
 
     def test_accepted_web_delta_is_compared_to_web_baseline_not_older_api(self):
         self.assertIn(self.web_file, self.git('diff', '--name-only', self.api_base, self.revision))

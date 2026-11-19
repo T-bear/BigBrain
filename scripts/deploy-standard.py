@@ -41,6 +41,15 @@ MEDIA_COMPOSITE_LABEL = 'org.bigbrain.source.composite'
 # Exactly the already deployed, owner-accepted STANDARD Media composite.
 # This permit is for migration FROM this rollback image, never for new builds.
 PR103_LEGACY_COMPOSITE = 'sha256:7e67217c811035086102ae1f9998806251dd79a34b682bb7eda06f3913866854'
+# One-off delivery of the already accepted #101 Finance ingress change. Changes
+# to source/build inputs after this accepted tree are not part of this release.
+FINANCE_INGRESS_SOURCE = '38698f3377327dfe8c18ae29ef720935faf24b23'
+FINANCE_INGRESS_API_BASE = 'e8f3e62cc446cf52a89045d1a3ce7d4c3a2116ff'
+FINANCE_INGRESS_WEB_BASE = '3112868d73c7ef986b4fba5c9a09eb0deb9cd0f9'
+FINANCE_INGRESS_ENV_KEY = 'BIGBRAIN_FINANCE_ACCESS_TOKEN'
+# This one-off release uses the owner's existing persistent env file, not the
+# historical Web-composite build worktree (which has no .env).
+FINANCE_INGRESS_ENV_DIRECTORY = Path.home() / 'BigBrain/apps/bigbrain'
 # One further source-only Media release: current deployed composite -> PR #68.
 # This permission is bounded to the exact accepted commit and exact live images.
 MEDIA_FOLLOWUP_SOURCE = '6efba7c9b265dbab0b7e3b14313994a102d2b87b'
@@ -312,7 +321,28 @@ def accepted_prior_standard_composite(container):
         return False
 
 
-def git_guard(revision, originals, media_release=False, media_followup=False):
+def finance_ingress_secret(project_directory):
+    """Load only an existing private, high-entropy secret; never write/log it."""
+    path = project_directory / '.env'
+    need(project_directory.is_absolute(), 'FinanceSecretLocation')
+    try:
+        backup.no_symlinks(path)
+        info = path.lstat()
+        need(stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid()
+             and info.st_nlink == 1 and stat.S_IMODE(info.st_mode) == 0o600,
+             'FinanceSecretPermissions')
+        with path.open('r', encoding='utf-8') as stream:
+            values = [line.rstrip('\r\n').split('=', 1)[1]
+                      for line in stream
+                      if line.startswith(FINANCE_INGRESS_ENV_KEY + '=')]
+    except (OSError, UnicodeError, backup.Blocked):
+        raise Blocked('FinanceSecretUnavailable') from None
+    need(len(values) == 1 and re.fullmatch(r'[0-9a-f]{64}', values[0]) is not None,
+         'FinanceSecretInvalid')
+    return values[0]
+
+
+def git_guard(revision, originals, media_release=False, media_followup=False, finance_ingress_release=False):
     need(re.fullmatch(SHA, revision), 'InvalidRevision')
     remote = command(['git', 'ls-remote', 'origin', 'refs/heads/main']).decode().split()
     need(remote and remote[0] == revision, 'NotCurrentRemoteMain')
@@ -321,6 +351,17 @@ def git_guard(revision, originals, media_release=False, media_followup=False):
     command(['git', 'merge-base', '--is-ancestor', MEMORY_FETCH, revision])
     need(set(originals) == set(ROLES), 'MissingRuntimeBaseline')
     need(not media_followup or media_release, 'MediaFollowupModeInvalid')
+    need(not (finance_ingress_release and media_release), 'ReleaseModesConflict')
+    if finance_ingress_release:
+        command(['git', 'merge-base', '--is-ancestor', FINANCE_INGRESS_SOURCE, revision])
+        # Only an immutable, already accepted source+build input tree may enter
+        # the one-off release. Later fixes to THIS script/tests/docs are allowed.
+        change = command(['git', 'diff', '--no-renames', '--name-only', '-z',
+                          FINANCE_INGRESS_SOURCE, revision, '--',
+                          'src/', 'compose.yaml', 'compose.test.yaml',
+                          'Directory.Build.props', 'global.json', '.dockerignore',
+                          'infrastructure/'])
+        need(not change.strip(b'\0'), 'FinanceIngressSourceChanged')
     for role, old in originals.items():
         label = old['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL)
         allowed = ((media_followup and role == 'api'
@@ -358,6 +399,9 @@ def git_guard(revision, originals, media_release=False, media_followup=False):
             evidence[role] = legacy_web_provenance(old['Image'])
             base = evidence[role]['revision']
             need(command(['git', 'cat-file', '-t', base]).strip() == b'commit', 'OldRevisionUnavailable')
+        if finance_ingress_release:
+            need(base == (FINANCE_INGRESS_API_BASE if role == 'api'
+                          else FINANCE_INGRESS_WEB_BASE), 'FinanceIngressBaselineChanged')
         if media_followup:
             need(base == MEDIA_FOLLOWUP_BASE, 'MediaRuntimeBaselineChanged')
         elif media_release:
@@ -377,7 +421,16 @@ def git_guard(revision, originals, media_release=False, media_followup=False):
             other_role = 'web' if role == 'api' else 'api'
             if path.startswith(SOURCE_TREES[other_role]):
                 continue
-            if media_release:
+            if finance_ingress_release:
+                # The one-off source input tree is pinned above. Other changes
+                # may only be tests/docs/deployment script and policy metadata.
+                need(path.startswith(('src/', 'infrastructure/', 'docs/', 'tests/', 'scripts/'))
+                     or path in {'compose.yaml', 'compose.test.yaml',
+                                 'Directory.Build.props', 'global.json', '.dockerignore',
+                                 'AGENTS.md', '.github/workflows/ci.yml', 'README.md',
+                                 'ROADMAP.md', 'ARCHITECTURE.md', 'TESTING.md',
+                                 '.gitleaksignore'}, 'FinanceIngressUnexpectedPath')
+            elif media_release:
                 if path.startswith('src/') or path in MEDIA_INPUTS:
                     need(path in expected, 'OutsideMediaScope')
                     relevant.add(path)
@@ -671,11 +724,13 @@ def verify_private_copy(folder):
 
 class Deployment:
     def __init__(self, revision, images, compose_file, state, media_release=False,
-                 media_followup=False):
+                 media_followup=False, finance_ingress_release=False):
         self.revision, self.images, self.source, self.state = revision, images, compose_file, state
         self.media_release = media_release or media_followup
         self.media_followup = media_followup
         self.media_digest = None
+        self.finance_ingress_release = finance_ingress_release
+        self.finance_ingress_token = None
         self.originals = {}
         self.changed = []
         self.folder = None
@@ -904,18 +959,45 @@ class Deployment:
             self.originals[role] = old
             http_health(role)
         self.provenance = git_guard(self.revision, self.originals, self.media_release,
-                                    self.media_followup)
+                                    self.media_followup, self.finance_ingress_release)
+        if self.finance_ingress_release:
+            self.finance_ingress_token = finance_ingress_secret(FINANCE_INGRESS_ENV_DIRECTORY)
         self.other_snapshot = self.others()
         self.rollback = release_config(self.config, {r: c['Image'] for r, c in self.originals.items()})
         self.release = copy.deepcopy(self.rollback)
         if self.images:
             self.bind_images()
+        if self.finance_ingress_release:
+            self.apply_finance_ingress()
         # Resolve existing resource IDs; no creation is permitted by the execution snapshot.
         for kind, noun in (('networks', 'network'), ('volumes', 'volume')):
             for value in self.release.get(kind, {}).values():
                 docker(noun, 'inspect', value['name'])
         self.sources = volume_sources(self.originals['api'])
         self.unchanged()
+
+    def apply_finance_ingress(self):
+        """Modify only new candidate API env/port. Rollback remains byte-for-byte old."""
+        need(self.finance_ingress_release and self.finance_ingress_token is not None
+             and re.fullmatch(r'[0-9a-f]{64}', self.finance_ingress_token),
+             'FinanceSecretInvalid')
+        source = self.config['services']['api']
+        target = self.release['services']['api']
+        need(isinstance(source.get('environment'), dict)
+             and isinstance(target.get('environment'), dict)
+             and not any(key in source['environment'] for key in
+                         ('Security__FinanceAccessRequired', 'Security__FinanceAccessToken')),
+             'FinanceAccessAlreadyConfigured')
+        old_ports = source.get('ports')
+        need(isinstance(old_ports, list) and len(old_ports) == 1
+             and old_ports[0].get('target') == 8080
+             and str(old_ports[0].get('published')) == '18080'
+             and old_ports[0].get('host_ip') in (None, '', '0.0.0.0'),
+             'FinanceIngressPortBaseline')
+        # No mutation to the base configuration/rollback service.
+        target['environment']['Security__FinanceAccessRequired'] = 'true'
+        target['environment']['Security__FinanceAccessToken'] = self.finance_ingress_token
+        target['ports'][0]['host_ip'] = '127.0.0.1'
 
     def helper_data(self, make_backup=False):
         need(self.folder is not None, 'HelperRequiresExecute')
@@ -1033,6 +1115,8 @@ class Deployment:
                             'env': expected['Config']['Env']}
         self.runtime_contract = contract
         self.release = release_config(self.config, self.images)
+        if self.finance_ingress_release:
+            self.apply_finance_ingress()
         for service in self.release['services'].values():
             service.setdefault('labels', {})['org.opencontainers.image.revision'] = self.revision
         if self.media_release:
@@ -1074,7 +1158,8 @@ class Deployment:
     def build_images(self):
         # No workspace/untracked file enters the context. Keep archive + base bindings.
         need(git_guard(self.revision, self.originals, self.media_release,
-                       self.media_followup) == self.provenance, 'BuildProvenanceChanged')
+                       self.media_followup, self.finance_ingress_release)
+             == self.provenance, 'BuildProvenanceChanged')
         archive = self.folder / 'source.tar'
         command(['git', 'archive', '--format=tar', '--output=' + str(archive), self.revision], timeout=120)
         source = self.folder / 'source'
@@ -1274,12 +1359,30 @@ class Deployment:
         if role == 'api' and contract is not None and image != self.originals[role]['Image']:
             need(image == self.images[role] == contract['image']
                  and self.originals[role]['Image'] == contract['original'], 'RuntimeImageBindingChanged')
-            return contract['env']
-        return self.originals[role]['Config']['Env']
+            value = list(contract['env'])
+        else:
+            value = list(self.originals[role]['Config']['Env'])
+        if role == 'api' and self.finance_ingress_release and image != self.originals[role]['Image']:
+            need(self.finance_ingress_token is not None, 'FinanceSecretInvalid')
+            need(not any(x.startswith(('Security__FinanceAccessRequired=',
+                                      'Security__FinanceAccessToken=')) for x in value),
+                 'FinanceAccessAlreadyConfigured')
+            value += ['Security__FinanceAccessRequired=true',
+                      'Security__FinanceAccessToken=' + self.finance_ingress_token]
+        return value
 
     def runtime_matches(self, role, container, image):
         expected = copy.deepcopy(self.originals[role])
         expected['Config']['Env'] = self.expected_environment(role, image)
+        if role == 'api' and self.finance_ingress_release and image != self.originals[role]['Image']:
+            bindings = expected['HostConfig'].get('PortBindings', {})
+            old = bindings.get('8080/tcp', [])
+            if not (len(bindings) == 1 and len(old) == 1 and
+                    old[0].get('HostIp') in ('', '0.0.0.0') and
+                    old[0].get('HostPort') == '18080'):
+                return False
+            expected['HostConfig']['PortBindings']['8080/tcp'] = [
+                {'HostIp': '127.0.0.1', 'HostPort': '18080'}]
         if self.media_release and role == 'api' and image != self.originals[role]['Image']:
             if (self.media_digest is None or
                     container['Config']['Labels'].get(MEDIA_COMPOSITE_LABEL) != self.media_digest):
@@ -1368,7 +1471,8 @@ class Deployment:
                  'previous': {r: c['Image'] for r, c in self.originals.items()},
                  'backupId': folder.name, 'backupPath': str(folder.relative_to(self.folder)), 'backupManifestSha256': digest})
             need(git_guard(self.revision, self.originals, self.media_release,
-                           self.media_followup) == self.provenance, 'BuildProvenanceChanged')
+                           self.media_followup, self.finance_ingress_release)
+                 == self.provenance, 'BuildProvenanceChanged')
             self.unchanged()
             self.data_identity()
             for role in ROLES:
@@ -1413,6 +1517,8 @@ def main():
                         help='One-off PR64 Media release preserving exact running Finance source')
     parser.add_argument('--media-followup', action='store_true',
                         help='Reviewed PR68 follow-up from exact Media composite baseline only')
+    parser.add_argument('--finance-ingress-release', action='store_true',
+                        help='One-off #101 accepted source/runtime Finance security release')
     parser.add_argument('--execute', action='store_true', help='Separately authorized deployment; default is read-only preflight')
     args = parser.parse_args()
     os.umask(0o077)
@@ -1422,8 +1528,11 @@ def main():
             del os.environ[name]
     state = Path.home() / '.local/state/bigbrain-standard'
     need(not (args.media_followup and args.media_release), 'MediaReleaseModeConflict')
+    need(not (args.finance_ingress_release and (args.media_followup or args.media_release)),
+         'ReleaseModesConflict')
     deployment = Deployment(args.revision, {}, args.compose, state,
-                            media_release=args.media_release, media_followup=args.media_followup)
+                            media_release=args.media_release, media_followup=args.media_followup,
+                            finance_ingress_release=args.finance_ingress_release)
     if not args.execute:
         deployment.preflight()
         print('PREFLIGHT BLOCKED: data inventory/schema/backup DEFERRED to separately authorized --execute; no mutations performed')
