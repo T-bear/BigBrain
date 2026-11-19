@@ -279,3 +279,42 @@ av **exakt kandidatimage**, i ett isolerat Docker-körningstillfälle
 utan hostportar, nätverksåtkomst, monterade volymer eller API-nycklar.
 Skripten ska fail-closed vid avvikelse. Detta är inte ett godkännande för
 att upprepa deployment utan accepterad ny PR, granskning och grön main-CI.
+
+
+## PR #108 – isolerad Web-only-release mot privat STANDARD-runtime (kandidat 2026-11-19)
+
+**Föreslagen nivå-3-releaseverktygskorrigering, inte godkänd för execute.**
+PR #108 innehåller fyra UI-/testfiler (skolmat över middag, Rosenfeldts
+ordinarie alternativ; ingen API- eller DB-ändring). Ägarens UX-scope är
+godkänt och alla fyra PR-kontroller är gröna. Nuvarande Web kör däremot
+från en privat, journalförd STANDARD-releasekomposition och kan **inte**
+säkert återskapas med vanliga scripts/deploy-web-only.sh, eftersom Compose-
+hash och Web-användarkontrakt skiljer sig. Det gamla skriptet ska inte köras
+för #108 och den befintliga checkpointen ska inte återställas.
+
+scripts/deploy-web-composite-pr108.py är ett **föreslaget engångsverktyg**
+med enbart Web-byte. Det är inte en alternativ generell releasekanal.
+Verifieringskedja:
+- --runtime-only: skrivskyddad verifiering av nuvarande Web/API, privata
+  STANDARD-manifestets ägare/läge, dess sista journal-PASS, två exakta Compose-
+  hashar, image-digests, UID 101, nätverk, portar, mountfri Web och HTTP.
+- Ordinarie preflight kräver att releaseverktygets **separata PR först** är
+  accepterad med tillämplig oberoende risk-3-granskning; dessutom ska #108
+  vara mergad med exakt original-head och ingå i aktuell main utan andra
+  bygginputändringar. Båda #108-head och aktuell main ska ha fyra gröna CI.
+  PR-ordningen är valfri, men ingen ytterligare fil eller kodändring tolereras.
+- Ett framtida --execute använder delad release-lock, skyddat privat kvitto,
+  lokal digest-låst Node/Nginx och en isolerad Web-bildprob utan nätverk,
+  samt återanvänder den redan godkända privata Web-composite-katalogen som
+  STANDARD-runnern validerar vid senare releaser.
+  hemligheter eller produktionsportar. Endast Web-tjänsten kan återskapas via
+  exakt verifierat, tvångsbegränsat privat Compose-manifest; API, Finance,
+  Media och databaser lämnas orörda. Okänt utfall stoppar med MANUAL_REVIEW
+  utan blind omstart. Vid verifierat misslyckande används endast gammal
+  Web-image/privat rollbackrecept.
+- Separat manuell iPhone/PWA-acceptans krävs efter eventuell deployment.
+
+**Ingen merge/deployment ingår i checkpoint-publicering eller i detta
+förslag.** Kod, test och dokumentation måste granskas oberoende och accepteras
+i main innan verktyget får --execute. Ingen frysning hävs. GitHub-merge av
+#108 ska ske separat enligt aktuell besluts- och driftkedja.
