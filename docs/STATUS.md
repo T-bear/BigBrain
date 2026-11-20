@@ -58,6 +58,13 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 | Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. AAPL-observation senast dokumenterat aktiverad och forskning pausad; aktuell runtime, authority, mapping och journal är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
 
+Finance #57, 2026-11-20: separat **REVIEW CHECKPOINT**, risk 3, från main `1e3d2034`:
+skyddad utfallsaudit som isolerat offlinebibliotek, 73 syntetiska tester PASS. Ingen produktionsläsning,
+merge, deployment eller aktivering. PR #81/#82 är oförändrade. [Design, evidens, aktuella grindar och
+nästa skyddade operatörssteg](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#protected-outcome-audit-design-checkpoint--2026-11-20).
+Nov 19 accepterad ingressfix återanvänds som daterad evidens; bredare isolering och faktisk
+858-utfallsaudit kvarstår blockerade. Manifestet är olåst och Finance kvarstår nivå 3.
+
 Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
 är inte körorder. Nytt tekniskt scope kräver tillämplig DoD/auktorisering och separata driftbeslut.
 Befintlig drift lämnas orörd. Finance-rättigheter, retention, BB-132K:s faktiska

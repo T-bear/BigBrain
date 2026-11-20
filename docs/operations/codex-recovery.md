@@ -44,18 +44,26 @@ sessionsoberoende återhämtningsgrindar är inte stängda genom dokumentationsf
 Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återupptagningsprotokoll.
 [Historiska checkpointförlopp](../history/codex-recovery-before-doc-2a-20261024.md#bb-158--sonarr-queue-duration-correction-2026-10-21).
 
-## Finance — fryst, skydds- och återhämtningsgrindar kvarstår
+## Finance — återupptagen offline-audit, 2026-11-20
 
-**FROZEN / OWNER DECISION REQUIRED TO RESUME. RESEARCH / 0 SEK / NONE.**
-[Finance-frysningen](finance-freeze-20261016.md) styr före äldre commissioning och fortsättningsnoter.
-G1/G2 är dokumenterade PASS; G3a BLOCKED och G3b NOT RUN. Aktuell host-, journal-, mapping-,
-artefakt- och authority-status är inte omverifierad. Ingen grantförnyelse, inferens eller aktivering.
+**INTERRUPTED — MANUAL REVIEW REQUIRED** gäller skyddad produktionsgranskning/återaktivering,
+inte ett avbrutet driftkommando. Administrativt upptinad enligt
+[ägarbeslutet](finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08);
+RESEARCH / 0 SEK / NONE och risk 3 kvarstår. Äldre FROZEN-text är ersatt, inte förnyad.
 
-[Rättigheter, retention, dataintegritet och BB-132K:s disposal-frister](finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation)
-kräver fortsatt efterlevnad; faktisk privat deadline/disposal-status är okänd och frysningen
-förlänger inga frister. Inga privata artefakter granskas eller åtgärdas med stöd av DOC-2A.
-[Historiska recoveryförlopp](../history/codex-recovery-before-doc-2a-20261024.md#historical-qwen-integration--2026-10-16)
-är bevarad evidens, inte aktiva exekveringsgodkännanden.
+Det återupptagna offlineuppdraget finns på `checkpoint/finance-outcome-audit-20261120` från
+main `1e3d203477cc81e8b1e58780dd4a758926469b7d`. [Enda tekniska auditunderlaget](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#protected-outcome-audit-design-checkpoint--2026-11-20)
+anger implementation, 73 syntetiska tester, återanvänd evidens och exakta grindar.
+Publiceringens SHA/tree, CI och reviewstatus finns i dess PR. PR #81:s tidigare arbete vid
+`afcf5d79` och separat PR #82 är bevarade; inga orelaterade arbetsfiler/worktrees ändrades.
+
+Nästa exakta steg: oberoende granskning av auditkandidaten och förslaget till skyddad operatörsväg.
+Ingen faktisk outcome-läsning före separat rättighets-/operatörsgodkännande och verifierad
+oföränderlig komplett offlinebild. Ingen implicit snapshot/kopia, produktionsrestart, merge,
+deployment, providerbegäran eller manifestlåsning. BB-132K-attestering bevaras; passerad
+omprövningsdag ger varken automatisk förlängning eller automatisk raderingsrätt.
+[Äldre historiska recoveryförlopp](../history/codex-recovery-before-doc-2a-20261024.md#historical-qwen-integration--2026-10-16)
+är inte aktiva körorder.
 
 ## Övriga öppna verifierings- och acceptansfrågor
 

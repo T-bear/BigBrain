@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="../../tools/BigBrain.Finance.OutcomeAudit/BigBrain.Finance.OutcomeAudit.csproj" />
+    <None Include="../../src/BigBrain.Api/Finance/EodhdFinanceMarketData.cs" Link="schema/EodhdFinanceMarketData.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/BigBrain.Api/Finance/FinanceShadowResearch.cs" Link="schema/FinanceShadowResearch.cs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../src/BigBrain.Api/Finance/FinanceFeatureStore.cs" Link="schema/FinanceFeatureStore.cs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
