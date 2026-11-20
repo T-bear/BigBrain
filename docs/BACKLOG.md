@@ -106,9 +106,9 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 
 2026-11-20, senare integrationsuppdrag: PR #81 `afcf5d79` och PR #111 `1d332cd8` sammanförs
 endast på ny `checkpoint/finance-integration-20261120`. Integrationens lokala Release-build och 170 fokuserade syntetiska tester är PASS;
-publicering, required CI och oberoende granskningsbeslut är PENDING; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
+publicerad Draft PR #112; required CI och oberoende granskningsbeslut följs separat; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 Inget BB-ID stängs. De 73 testerna nedan är den första auditcheckpointens daterade resultat;
-ägarens uppgift om 86 på slutheaden är inte en ny integrationskörning. PR #82 förblir separat.
+86/86 audit-tester är nu även verifierade lokalt på integrationskandidaten. PR #82 förblir separat.
 
 2026-11-20: #57:s separat auktoriserade offline-audit har implementerats och kvalificerats med
 73 syntetiska tester på ny review-checkpoint från main `1e3d2034`. [Underlag och kvarstående

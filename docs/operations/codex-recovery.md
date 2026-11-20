@@ -55,8 +55,8 @@ Kombinerad Release-build PASS med 0 fel/varningar; 86/86 isolerade audit-tester
 och 84/84 fokuserade Finance API-tester PASS; `dotnet format --verify-no-changes`
 PASS. Kod- och testevidens från båda granskade källor är byteidentisk.
 Dokumentationsmetadata justerades efter lokal verifiering. Ingen produktionsdata
-lästes eller ändrades. Separat publiceringscommit, required GitHub CI och
-oberoende risk-3-review är ännu inte godkända; ingen merge/deployment.
+lästes eller ändrades. Integrationen är publicerad som Draft PR #112; required GitHub CI och
+oberoende risk-3-review måste verifieras på exakt slutkandidat; ingen merge/deployment.
 [Samlad integrationsrapport](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 
 Ägaren har återupptagit det kreditavbrutna integrationsuppdraget, risk 3, på

@@ -657,7 +657,7 @@ Remote Desktop-miljön har slutfört dokumentkonflikterna och lokala merge-commi
 (`48fc319` för PR #81, `6917ced` för PR #111). Release solution build
 PASS med 0 varningar/fel; 86/86 audit-tester och 84/84 fokuserade Finance/API-tester
 PASS; `dotnet format --verify-no-changes` PASS. Dokumentationsmetadata och
-recovery uppdateras inom denna checkpoint. GitHub required CI, publicering och
+recovery uppdateras inom denna checkpoint. Publicering har genomförts som Draft PR #112; GitHub required CI och
 oberoende integration-review kvarstår som egna grindar. Den nedanstående
 BLOCKED-tabellen avser Codex sandboxens tidigare tillstånd, inte den
 senare Remote Desktop-verifieringen. Ingen produktionsåtkomst, merge till

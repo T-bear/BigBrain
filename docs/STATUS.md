@@ -58,19 +58,19 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 | Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; daterad API-komposit och journalräknare redovisas under Release 1 nedan; aktuell runtime är inte omverifierad. G3a/G3b är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
 
-Finance #57, 2026-11-20: ägarauktoriserad **integration / risk 3**, lokalt avbruten före
-full verifiering och publicering. PR #81:s exakta head `afcf5d79` är mergad endast till
-`checkpoint/finance-integration-20261120`; PR #111 `1d332cd8` finns i pågående lokal merge.
-Båda implementationerna är byteidentiska med källornas berörda kod/tester. Två dokumentkonflikter
-är lösta i arbetsfiler men inte stagade eftersom Gitmetadata är skrivskyddade i sandboxen.
-Release build/format och syntetiska regressioner är **PENDING**, inte återanvänt PASS för integrationen.
-[Integrationsunderlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20)
-och [exakt recovery](operations/codex-recovery.md#finance--integration-återupptagen-2026-11-20).
-Tidigare 73 tester hör till auditens första checkpoint; slutheadens 86 tester och oberoende review
-är ägarangivet källunderlag, inte ny lokal körning. PR #81/#111:s brancher och PR #82 är orörda.
-Nov 19 accepterad ingressfix återanvänds som daterad evidens; bredare isolering och faktisk
-858-utfallsaudit kvarstår blockerade. Manifestet är olåst; ingen realdata, snapshot, skyddad
-operatörskörning, provider/modell/trading, merge till main eller deployment har utförts.
+Finance #57, 2026-11-20: ägarauktoriserad **risk-3-integration** publicerad som
+[Draft PR #112](https://github.com/T-bear/BigBrain/pull/112) på
+`checkpoint/finance-integration-20261120`, separat från accepterad main.
+PR #81:s kausalitetsändring och PR #111:s isolerade offline-audit har sammanförts
+med bevarad historik och båda dokumentkonflikterna lösta. Kod/tester matchar
+källcommits; lokal Release-build och format PASS, 86/86 audit-tester och 84/84
+fokuserade Finance/API-tester PASS. Dokumentationsverifiering PASS.
+Required GitHub CI och oberoende review av den exakta integrationskandidaten
+är separata grindar, inte lokalt självintygade PASS.
+PR #81/#111:s brancher och PR #82 är orörda. De 858 historiska utfallen
+är NOT READ, manifestet olåst och bredare Finance-isolering blockerad.
+Ingen realdata, snapshot, skyddad operatörskörning, provider/modell/trading,
+merge till main eller deployment. [Kanonisk integrationsrapport](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 
 Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
 är inte körorder. Nytt tekniskt scope kräver tillämplig DoD/auktorisering och separata driftbeslut.
