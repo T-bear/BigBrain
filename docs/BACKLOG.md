@@ -104,6 +104,19 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 
 ### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
 
+2026-11-20, senare integrationsuppdrag: PR #81 `afcf5d79` och PR #111 `1d332cd8` sammanförs
+endast på ny `checkpoint/finance-integration-20261120`. Integrationens tester och publicering
+är PENDING på grund av sandboxbegränsningar; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
+Inget BB-ID stängs. De 73 testerna nedan är den första auditcheckpointens daterade resultat;
+ägarens uppgift om 86 på slutheaden är inte en ny integrationskörning. PR #82 förblir separat.
+
+2026-11-20: #57:s separat auktoriserade offline-audit har implementerats och kvalificerats med
+73 syntetiska tester på ny review-checkpoint från main `1e3d2034`. [Underlag och kvarstående
+driftgrind](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#protected-outcome-audit-design-checkpoint--2026-11-20).
+Faktisk 858-utfallsaudit är NOT READ, manifestet olåst och vetenskaplig DoD fortsatt **öppen**.
+PR #81:s kausalitetskorrigering och PR #82 bevaras oförändrade; ingen ny kohort eller aktivering.
+
+
 **ÖPPEN / full DoD inte stängd.** BB-045 prioritet P2, beroenden BB-044/046 och accepterad ADR0021;
 BB-073 prioritet P2, beroende BB-045 samt BB-071 och separat ägarbeslut för externa data.
 De gamla globala providerblocken är delvis ersatta av senare avgränsad EODHD-aktivering, inte av

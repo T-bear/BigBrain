@@ -8,11 +8,13 @@
     <Project Path="src/BigBrain.Sentinel.Contracts/BigBrain.Sentinel.Contracts.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/BigBrain.Finance.OutcomeAudit.Tests/BigBrain.Finance.OutcomeAudit.Tests.csproj" />
     <Project Path="tests/BigBrain.Reasoner.ProofWorker/BigBrain.Reasoner.ProofWorker.csproj" />
     <Project Path="tests/BigBrain.Api.Tests/BigBrain.Api.Tests.csproj" />
     <Project Path="tests/BigBrain.Sentinel.Tests/BigBrain.Sentinel.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="tools/BigBrain.Finance.OutcomeAudit/BigBrain.Finance.OutcomeAudit.csproj" />
     <Project Path="tools/BigBrain.Finance.PersistenceBenchmarks/BigBrain.Finance.PersistenceBenchmarks.csproj" />
   </Folder>
 </Solution>

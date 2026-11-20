@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-11 — Finance Release 1-checkpoint; övriga uppgifter behåller egna datum.
-- Verifierad mot commit: `e63aaa4dc30718f2620f2880a6f2b847e6091d89`; kandidat ännu inte accepterad.
-- Runtime senast verifierad: Finance/API/Web skrivskyddat 2026-11-11; se Release 1 nedan. Övrig äldre evidens är inte omverifierad.
+- Senast uppdaterad: 2026-11-20 — Finance-integration lokalt avbruten; övriga uppgifter behåller egna datum.
+- Integrationsbaseline: `1e3d203477cc81e8b1e58780dd4a758926469b7d`; ingen accepterad eller publicerad integrationskandidat.
+- Runtime: inte omverifierad i integrationen. Nov 11-evidens nedan är historisk; senare daterat underlag finns i auditrapporten.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -55,8 +55,22 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 
 | Område | Gällande beslut och kvarstående begränsningar |
 | --- | --- |
-| Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; aktuell API-komposit, journalräknare och kvarstående aktiveringshinder redovisas under Release 1 nedan. G3a/G3b är inte omverifierade. |
+| Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; daterad API-komposit och journalräknare redovisas under Release 1 nedan; aktuell runtime är inte omverifierad. G3a/G3b är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
+
+Finance #57, 2026-11-20: ägarauktoriserad **integration / risk 3**, lokalt avbruten före
+full verifiering och publicering. PR #81:s exakta head `afcf5d79` är mergad endast till
+`checkpoint/finance-integration-20261120`; PR #111 `1d332cd8` finns i pågående lokal merge.
+Båda implementationerna är byteidentiska med källornas berörda kod/tester. Två dokumentkonflikter
+är lösta i arbetsfiler men inte stagade eftersom Gitmetadata är skrivskyddade i sandboxen.
+Release build/format och syntetiska regressioner är **PENDING**, inte återanvänt PASS för integrationen.
+[Integrationsunderlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20)
+och [exakt recovery](operations/codex-recovery.md#finance--integration-återupptagen-2026-11-20).
+Tidigare 73 tester hör till auditens första checkpoint; slutheadens 86 tester och oberoende review
+är ägarangivet källunderlag, inte ny lokal körning. PR #81/#111:s brancher och PR #82 är orörda.
+Nov 19 accepterad ingressfix återanvänds som daterad evidens; bredare isolering och faktisk
+858-utfallsaudit kvarstår blockerade. Manifestet är olåst; ingen realdata, snapshot, skyddad
+operatörskörning, provider/modell/trading, merge till main eller deployment har utförts.
 
 Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
 är inte körorder. Nytt tekniskt scope kräver tillämplig DoD/auktorisering och separata driftbeslut.
@@ -66,6 +80,9 @@ retentions-/dispositionsfrist och dataintegritet förblir bindande; privat statu
 Ingen dokumentflytt stänger en recovery- eller säkerhetsgrind, förnyar grant eller skapar handelsauktoritet.
 
 ## Finance Release 1 — 2026-11-11
+
+Daterad historik från PR #81; inte dagens runtime eller integrationens testresultat. Senare
+auditunderlag ovan uppdaterar ingress-/runtimeevidens inom sitt scope.
 
 **REVIEW CHECKPOINT / INTE DEPLOYAD / ÅTERAKTIVERING BLOCKERAD.** Nytt ägarauktoriserat
 nivå-3-uppdrag utgår från main `e63aaa4dc30718f2620f2880a6f2b847e6091d89`.
