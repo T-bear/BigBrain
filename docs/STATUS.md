@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-20 — Finance-integration lokalt avbruten; övriga uppgifter behåller egna datum.
-- Integrationsbaseline: `1e3d203477cc81e8b1e58780dd4a758926469b7d`; ingen accepterad eller publicerad integrationskandidat.
-- Runtime: inte omverifierad i integrationen. Nov 11-evidens nedan är historisk; senare daterat underlag finns i auditrapporten.
+- Senast uppdaterad: 2026-11-20 — Finance-integration sammanförd lokalt och syntetiskt testad; oberoende review/CI återstår.
+- Verifierad mot commit: `1e3d203477cc81e8b1e58780dd4a758926469b7d` (accepterad main); separat integrationscheckpoint är inte accepterad i main.
+- Runtime senast verifierad: ingen runtimekontroll i denna integration; Nov 11-evidens nedan är historisk.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.

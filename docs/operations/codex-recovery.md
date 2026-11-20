@@ -46,19 +46,18 @@ Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återup
 
 ## Finance — integration återupptagen, 2026-11-20
 
-**INTERRUPTED — SAFE TO RESUME** för lokal integration. Sandboxen nekade Gitmetadata-skrivning
-(`index.lock`, read-only filesystem) efter PR #81-mergen; GitHub API och NuGet är otillgängliga.
-HEAD `48fc3192540c4323566e96f79fb7ef48f44238c6`, tree
-`93064bf3f7bf21802984347fef16697e87adcaeb`; detta är endast sparad PR #81-merge, inte slutkandidat.
-MERGE_HEAD är PR #111 nedan. Två konflikter är lösta i arbetsfiler men indexet är fortfarande
-unmerged. Bevara filerna och pågående merge; ingen abort/reset/rebase. STATUS/BACKLOG och
-rapportens integrationsavsnitt har också opublicerade ändringar. Ingen säkerhetsregel ändrades.
-[Fullständig lokal evidens och återstående kontroller](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
-Kod-/testidentitet och bevarade rapportavsnitt PASS; dokumentverifiering BLOCKED av `spawnSync git EPERM`,
-restore BLOCKED av NU1801. Release build/format/regressioner, secrets, CI och ny oberoende review PENDING.
-Ingen push/Draft PR. Inga kodreparationsförsök förbrukade; högst två gäller fortsatt.
-Nästa säkra steg i tillåten miljö: verifiera oförändrade baslinjer, stage:a upplösta konflikter och
-kanoniska dokument, slutför PR #111-mergen, kör kontrollerna och publicera för review enligt scope.
+**LOKAL INTEGRATION GENOMFÖRD — REVIEW PENDING.** Codex sandbox nekade
+Gitmetadata-skrivning och NuGetåtkomst, men efter Codex avslut slutfördes
+de två upplösta dokumentkonflikterna i den auktoriserade Remote Desktop-miljön.
+PR #81-mergen `48fc3192540c4323566e96f79fb7ef48f44238c6` bevarades;
+PR #111-mergen sparades som `6917cede66e8ca18e516bb2833923ebcfab81faf`.
+Kombinerad Release-build PASS med 0 fel/varningar; 86/86 isolerade audit-tester
+och 84/84 fokuserade Finance API-tester PASS; `dotnet format --verify-no-changes`
+PASS. Kod- och testevidens från båda granskade källor är byteidentisk.
+Dokumentationsmetadata justerades efter lokal verifiering. Ingen produktionsdata
+lästes eller ändrades. Separat publiceringscommit, required GitHub CI och
+oberoende risk-3-review är ännu inte godkända; ingen merge/deployment.
+[Samlad integrationsrapport](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 
 Ägaren har återupptagit det kreditavbrutna integrationsuppdraget, risk 3, på
 `checkpoint/finance-integration-20261120` från verifierad main

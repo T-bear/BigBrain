@@ -105,8 +105,8 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 ### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
 
 2026-11-20, senare integrationsuppdrag: PR #81 `afcf5d79` och PR #111 `1d332cd8` sammanförs
-endast på ny `checkpoint/finance-integration-20261120`. Integrationens tester och publicering
-är PENDING på grund av sandboxbegränsningar; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
+endast på ny `checkpoint/finance-integration-20261120`. Integrationens lokala Release-build och 170 fokuserade syntetiska tester är PASS;
+publicering, required CI och oberoende granskningsbeslut är PENDING; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 Inget BB-ID stängs. De 73 testerna nedan är den första auditcheckpointens daterade resultat;
 ägarens uppgift om 86 på slutheaden är inte en ny integrationskörning. PR #82 förblir separat.
 

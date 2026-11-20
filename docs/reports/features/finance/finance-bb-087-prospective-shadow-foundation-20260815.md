@@ -652,6 +652,17 @@ Issues #55/#57 remain open; #54/#59/#60 retain their own scope.
 
 ## Owner-authorized integration checkpoint — 2026-11-20
 
+**Verifierad fortsättning efter Codex sandbox-avbrott:** den auktoriserade
+Remote Desktop-miljön har slutfört dokumentkonflikterna och lokala merge-commits
+(`48fc319` för PR #81, `6917ced` för PR #111). Release solution build
+PASS med 0 varningar/fel; 86/86 audit-tester och 84/84 fokuserade Finance/API-tester
+PASS; `dotnet format --verify-no-changes` PASS. Dokumentationsmetadata och
+recovery uppdateras inom denna checkpoint. GitHub required CI, publicering och
+oberoende integration-review kvarstår som egna grindar. Den nedanstående
+BLOCKED-tabellen avser Codex sandboxens tidigare tillstånd, inte den
+senare Remote Desktop-verifieringen. Ingen produktionsåtkomst, merge till
+main eller deployment har utförts.
+
 **INTERRUPTED — SAFE TO RESUME / NOT A MERGE CANDIDATE.** The owner resumed the credit-blocked
 risk-3 integration on `checkpoint/finance-integration-20261120`, based on verified GitHub main
 `1e3d203477cc81e8b1e58780dd4a758926469b7d`. Scope is the two exact reviewed implementations,
