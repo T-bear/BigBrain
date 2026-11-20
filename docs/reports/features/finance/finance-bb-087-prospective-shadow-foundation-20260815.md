@@ -1069,3 +1069,41 @@ Remote Desktop connection:
 - No deployment, merge, source access, real data copy or real audit.
 
 This is a review checkpoint, not a merge candidate or real operator acceptance.
+
+## Positive synthetic custody qualification — 2026-11-20
+
+**LOCAL REVIEW DIFF / owner-authorized #57 / risk 3 / SYNTHETIC ONLY.** Scope/DoD:
+controlled writer exit and descriptor closure; simulated positive custody transitions;
+latched STOP for mutation/hardlink/substitution/replay/crash/alias; safe synthetic read;
+explicit real-seal SKIP; focused tests and documentation validation. Only
+[the new test module](../../../../tests/deployment/test_finance_positive_seal.py) and this
+report change. Branch `checkpoint/finance-seal-positive-20261120`; local HEAD and
+`origin/main` both `dae3d5de9735e8ade3c189c8c290f7ffb1fea003`, tree
+`b6f887d12fddb8e695bef61603e4ad2a10e73579` (merged PR #114). Fresh remote verification
+was unavailable because local SSH configuration was rejected; no remote match is claimed.
+
+The fixed unprivileged child creates a tiny SQLite fixture, closes its connection and retained
+writable descriptor (checks EBADF), acknowledges closure and exits. Both zero exit and closure
+acknowledgement are required before COMPLETE. The test-only in-memory protocol advances
+CAPTURING → COMPLETE → SEALED → AUDITING → CLOSED. A fixed read-only/immutable/query-only
+aggregate read returns three synthetic rows only after connection closure and final object/content
+checks; image bytes and directory contents remain unchanged. No Finance audit library is invoked.
+
+Mutation after reading, hardlinks, same-byte inode substitution, leaf/parent symlinks, wrong or
+consumed invocation receipts, and interrupted stages latch STOP with fixed sanitized codes,
+clear simulated READY/result and reject subsequent completion/seal/audit attempts even after
+fixture repair. Hidden writable-descriptor custody loss is an **explicit simulated event**;
+hash/link/identity checks do not discover every alias or exclude unobserved ABA. Receipts and
+READY are in-memory test values, not authenticated authority or durable crash/restart protection.
+All data and mutations stay inside fresh private temporary fixtures; the bounded child is reaped
+before fixture cleanup. No real Finance source, privileges, mounts, credentials or trading access.
+
+Local evidence: new module **17 PASS / 0 FAIL / 1 SKIP** using
+`PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p 'test_finance_positive_seal.py' -v`.
+Existing `test_finance_os_isolation.py`: **8 PASS / 0 FAIL / 2 SKIP** with the same discovery
+command and that filename. `node scripts/verify-documentation.mjs`: **PASS**, 296 Markdown
+files / 57 unique backlog IDs. Whitespace checks for both changed files: **PASS**.
+True OS mount/backing seal and separate-principal enforcement are explicitly
+**SKIP / UNVERIFIED / BLOCKED**. Same-UID simulation is not production readiness;
+the existing real-operator acceptance gates remain unchanged. Independent risk-3 review and
+CI are **PENDING**. No commit, push, merge, deployment or activation is authorized or performed.
