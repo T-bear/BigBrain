@@ -58,6 +58,18 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 | Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; daterad API-komposit och journalräknare redovisas under Release 1 nedan; aktuell runtime är inte omverifierad. G3a/G3b är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
 
+Finance #57, 2026-11-20: efter mergad PR #113 i accepterad main
+`8b81318ab7ad39ef9c11d19ede4f5573b56a33f9` pågår separat
+**risk 3 / SYNTHETIC ONLY** Linux-isoleringsgranskning på
+`checkpoint/finance-os-isolation-20261120`. Codex stannade vid
+användningsgräns; syntetisk testfil och arkitekturrapport bevaras som
+REVIEW CHECKPOINT. Lokala tester: 8 PASS och 2 SKIP för Linux-harnessen;
+deployment Python 275 körda/0 FAIL/3 SKIP; 94/94 offline-audit,
+Release-build, format och dokumentation PASS. Ingen separat UID/mount-grind
+har verifierats. PR-CI och oberoende risk-3-review PENDING; ingen merge,
+deployment, verklig Finance-data, snapshot eller handel.
+[Hotmodell och evidens](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#linux-os-isolation-qualification--2026-11-20).
+
 Finance #57, 2026-11-20: PR #112 är mergad i verifierad GitHub main
 `fcc126478a419d3bb5f5d06aefb3fb196fb12ca1`; detta är ingen deploymentuppgift.
 Nytt ägarauktoriserat **risk-3 / SYNTHETIC ONLY**-uppdrag på

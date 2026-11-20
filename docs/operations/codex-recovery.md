@@ -44,6 +44,22 @@ sessionsoberoende återhämtningsgrindar är inte stängda genom dokumentationsf
 Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återupptagningsprotokoll.
 [Historiska checkpointförlopp](../history/codex-recovery-before-doc-2a-20261024.md#bb-158--sonarr-queue-duration-correction-2026-10-21).
 
+## Finance #57 — Linux-isolering, avbruten Codex-körning 2026-11-20
+
+**INTERRUPTED — SAFE TO RESUME / REVIEW CHECKPOINT, inte driftstart.**
+Ny isolerad branch `checkpoint/finance-os-isolation-20261120` från
+accepterad main `8b81318ab7ad39ef9c11d19ede4f5573b56a33f9`.
+Codex byggde syntetiska negativa Linux-tester och gränsrapport men
+stannade vid användningsgräns innan commit/PR. Oberoende lokal kontroll:
+8 PASS / 2 explicit SKIP, hela Python-testsviten 275 körda/3 SKIP,
+94/94 Finance audit, Release-build och format PASS; dokumentation PASS.
+Separat UID/mount/backing-seal, rättigheter, backup och verkliga 858
+utfall **BLOCKED / NOT READ**. Inga privilegier, verkliga snapshots,
+deployment, merge eller produktionsåtgärder. Fortsättning gäller endast
+publicering av review-checkpoint och oberoende risk 3-granskning,
+aldrig operativ audit. Slutlig GitHub SHA/tree och CI kontrolleras efter
+publicering. [Underlag](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#linux-os-isolation-qualification--2026-11-20).
+
 ## Finance — integration återupptagen, 2026-11-20
 
 **Avstämd 2026-11-20:** integration PR #112 är mergad i verifierad GitHub main
