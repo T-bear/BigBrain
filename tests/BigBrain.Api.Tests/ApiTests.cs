@@ -34,6 +34,27 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(HttpStatusCode.OK, runs.StatusCode); Assert.Equal(HttpStatusCode.OK, experiments.StatusCode); Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode); Assert.Equal(HttpStatusCode.NotFound, missingRun.StatusCode); Assert.Equal(HttpStatusCode.NotFound, missingExperiment.StatusCode);
     }
 
+    [Theory]
+    [InlineData("{\"idempotencyKey\":\"unauthorized-release1\",\"maximumExperiments\":1}")]
+    [InlineData("not-json")]
+    public async Task HttpResearchCannotExecuteOrCreateRunEvenWithSpoofedHeaders(string body)
+    {
+        var before = await _client.GetStringAsync("/api/v1/modules/finance/research/autonomous/runs", TestContext.Current.CancellationToken);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/modules/finance/research/autonomous/run");
+        request.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+        request.Headers.TryAddWithoutValidation("Authorization", "Bearer fixture-not-authority");
+        request.Headers.TryAddWithoutValidation("X-Forwarded-For", "127.0.0.1");
+        var response = await _client.SendAsync(request, TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("finance.research.httpExecutionDisabled", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken), StringComparison.Ordinal);
+        using var original = System.Text.Json.JsonDocument.Parse(before);
+        using var after = System.Text.Json.JsonDocument.Parse(await _client.GetStringAsync("/api/v1/modules/finance/research/autonomous/runs", TestContext.Current.CancellationToken));
+        Assert.Equal(original.RootElement.GetProperty("total").GetInt32(), after.RootElement.GetProperty("total").GetInt32());
+        Assert.Equal(original.RootElement.GetProperty("runs").GetRawText(), after.RootElement.GetProperty("runs").GetRawText());
+        Assert.Equal(HttpStatusCode.OK, (await _client.GetAsync("/api/v1/system/health", TestContext.Current.CancellationToken)).StatusCode);
+    }
+
     [Fact]
     public async Task ResearchSchedulerStatusIsDisabledByDefaultAndHistoryIsBounded()
     {

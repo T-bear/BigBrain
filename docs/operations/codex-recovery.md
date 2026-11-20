@@ -44,18 +44,46 @@ sessionsoberoende återhämtningsgrindar är inte stängda genom dokumentationsf
 Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återupptagningsprotokoll.
 [Historiska checkpointförlopp](../history/codex-recovery-before-doc-2a-20261024.md#bb-158--sonarr-queue-duration-correction-2026-10-21).
 
-## Finance — fryst, skydds- och återhämtningsgrindar kvarstår
+## Finance — integration återupptagen, 2026-11-20
 
-**FROZEN / OWNER DECISION REQUIRED TO RESUME. RESEARCH / 0 SEK / NONE.**
-[Finance-frysningen](finance-freeze-20261016.md) styr före äldre commissioning och fortsättningsnoter.
-G1/G2 är dokumenterade PASS; G3a BLOCKED och G3b NOT RUN. Aktuell host-, journal-, mapping-,
-artefakt- och authority-status är inte omverifierad. Ingen grantförnyelse, inferens eller aktivering.
+**LOKAL INTEGRATION GENOMFÖRD — REVIEW PENDING.** Codex sandbox nekade
+Gitmetadata-skrivning och NuGetåtkomst, men efter Codex avslut slutfördes
+de två upplösta dokumentkonflikterna i den auktoriserade Remote Desktop-miljön.
+PR #81-mergen `48fc3192540c4323566e96f79fb7ef48f44238c6` bevarades;
+PR #111-mergen sparades som `6917cede66e8ca18e516bb2833923ebcfab81faf`.
+Kombinerad Release-build PASS med 0 fel/varningar; 86/86 isolerade audit-tester
+och 84/84 fokuserade Finance API-tester PASS; `dotnet format --verify-no-changes`
+PASS. Kod- och testevidens från båda granskade källor är byteidentisk.
+Dokumentationsmetadata justerades efter lokal verifiering. Ingen produktionsdata
+lästes eller ändrades. Integrationen är publicerad som Draft PR #112; required GitHub CI och
+oberoende risk-3-review måste verifieras på exakt slutkandidat; ingen merge/deployment.
+[Samlad integrationsrapport](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
 
-[Rättigheter, retention, dataintegritet och BB-132K:s disposal-frister](finance-freeze-20261016.md#f-driftinventering--daterad-evidens-ingen-driftmutation)
-kräver fortsatt efterlevnad; faktisk privat deadline/disposal-status är okänd och frysningen
-förlänger inga frister. Inga privata artefakter granskas eller åtgärdas med stöd av DOC-2A.
+Ägaren har återupptagit det kreditavbrutna integrationsuppdraget, risk 3, på
+`checkpoint/finance-integration-20261120` från verifierad main
+`1e3d203477cc81e8b1e58780dd4a758926469b7d`. Endast integration, syntetisk verifiering och
+publicering för oberoende review är auktoriserade. RESEARCH / 0 SEK / NONE består enligt
+[kanoniskt upptiningsbeslut](finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08).
+
+Exakta källor bevaras genom mergehistorik: PR #81 `afcf5d79a62be2831ff002014a9dfe972384f01f`
+(ursprunglig baseline `e63aaa4dc30718f2620f2880a6f2b847e6091d89`) och PR #111
+`1d332cd8c3fc7b97be79718c1462e64c0146b6da` (baseline samma main som ovan).
+Deras brancher och separat PR #82 lämnas orörda. [Release 1-evidens](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11)
+och [offline-auditens evidens och operatörsförslag](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#protected-outcome-audit-design-checkpoint--2026-11-20)
+bevarar tidigare resultat och begränsningar. Nästa tekniska steg följer integrationsuppdraget,
+inte äldre instruktioner att fortsätta PR #81 eller #111 separat.
+
+**INTERRUPTED — MANUAL REVIEW REQUIRED** kvarstår för skyddad produktionsaudit/release/
+återaktivering; inget driftkommando är avbrutet. G3a BLOCKED / G3b NOT RUN, manifest v2 olåst,
+faktisk audit av de historiskt rapporterade 858 utfallen NOT READ. Inga 906 prognoser eller
+858 utfall har ändrats. Daterad ingress-/backupevidens ger inte tillstånd till Finance-release.
+Ingen realdata, snapshot/kopia, operatörskörning, provider/modell/trading, merge till main eller
+deployment. BB-132K-attestering och dess separata dispositionsgrindar bevaras; passerad
+omprövningsdag medger varken automatisk förlängning eller radering. Ingen omkörning av gamla
+paket, journalreset, grantförnyelse eller kringgång av STANDARD:s Finance-spärr.
 [Historiska recoveryförlopp](../history/codex-recovery-before-doc-2a-20261024.md#historical-qwen-integration--2026-10-16)
-är bevarad evidens, inte aktiva exekveringsgodkännanden.
+är fortsatt evidens, inte körorder.
+
 
 ## Övriga öppna verifierings- och acceptansfrågor
 

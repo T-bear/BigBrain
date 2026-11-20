@@ -48,6 +48,18 @@ Prioriterad planering är BB-045/073/082; ingen ny utveckling, forskning, grant,
 datakopiering, migration, merge, deployment, modellkörning eller PAPER/LIVE/AUTO startas
 genom denna statusändring. Befintlig drift lämnas orörd utan separat beslut.
 
+Release 1, 2026-11-11: avgränsad säkerhets-/korrekthetskandidat publiceras för nivå-3-review;
+full BB-045/073-DoD är fortsatt öppen. [Aktuell evidens och konkreta aktiveringshinder](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11).
+Nya verifierade kodfynd: obehörig HTTP-trigger för beständig forskning, statusräknare som
+ignorerar utfall, vardagskalender som inte utesluter börshelgdagar och upprepade felanrop
+som kan överskrida Free-kvoten. Dessa korrigeras i kandidaten, ännu inte i drift.
+Separat auktoriserad uppföljning korrigerar utfallsväljarens kausalitet och bevarar lagrade
+invalideringsorsaker; syntetiska regressioner PASS, inga historiska poster ändrade.
+Kvar: faktisk audit av 858 utfallsrelationer via godkänd skyddad läsväg, låsning av förberett
+manifest v2, extern åtkomstverifiering, BB-132K:s villkor (ägarval A i separat draft PR #82)
+och granskad release-/backupväg. Ingen issueprioritet ändras;
+#54/#59/#60 behåller egna scopes, #56/#58 återöppnas inte och #57 stängs inte.
+
 ### Rättigheter, integritet och vetenskap
 
 - Rättigheter är källa/produkt/marknad/capability-specifika; unknown/expired/mismatched scope avvisas.
@@ -91,6 +103,19 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 [BB-090–095](history/backlog-before-doc-2b-20261024.md#bb-090--fred-macro-and-finance-correctness-stabilization).
 
 ### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
+
+2026-11-20, senare integrationsuppdrag: PR #81 `afcf5d79` och PR #111 `1d332cd8` sammanförs
+endast på ny `checkpoint/finance-integration-20261120`. Integrationens lokala Release-build och 170 fokuserade syntetiska tester är PASS;
+publicerad Draft PR #112; required CI och oberoende granskningsbeslut följs separat; [exakt underlag](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
+Inget BB-ID stängs. De 73 testerna nedan är den första auditcheckpointens daterade resultat;
+86/86 audit-tester är nu även verifierade lokalt på integrationskandidaten. PR #82 förblir separat.
+
+2026-11-20: #57:s separat auktoriserade offline-audit har implementerats och kvalificerats med
+73 syntetiska tester på ny review-checkpoint från main `1e3d2034`. [Underlag och kvarstående
+driftgrind](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#protected-outcome-audit-design-checkpoint--2026-11-20).
+Faktisk 858-utfallsaudit är NOT READ, manifestet olåst och vetenskaplig DoD fortsatt **öppen**.
+PR #81:s kausalitetskorrigering och PR #82 bevaras oförändrade; ingen ny kohort eller aktivering.
+
 
 **ÖPPEN / full DoD inte stängd.** BB-045 prioritet P2, beroenden BB-044/046 och accepterad ADR0021;
 BB-073 prioritet P2, beroende BB-045 samt BB-071 och separat ägarbeslut för externa data.
