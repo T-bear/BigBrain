@@ -724,3 +724,175 @@ review. If drift or a blocking check remains, stop under the existing two-repair
 rule change or privilege workaround was made. [Recovery](../../../operations/codex-recovery.md#finance--integration-återupptagen-2026-11-20)
 is the sole interruption entry point. Actual outcome audit, manifest lock and all operational gates
 remain outside this assignment.
+
+## Synthetic operator-boundary qualification — 2026-11-20
+
+**REVIEW CHECKPOINT / risk 3 / SYNTHETIC ONLY. Independent risk-3 review PENDING.**
+The owner authorized #57's bounded threat model, synthetic regression tests, validation and
+isolated draft publication on `checkpoint/finance-operator-qualification-20261120`, based on
+verified local and GitHub main `fcc126478a419d3bb5f5d06aefb3fb196fb12ca1` (merged PR #112).
+This supersedes the integration section's pre-merge status, without asserting deployment.
+Exact publication SHA/tree belong to Git and the draft PR, not a self-referential document hash.
+The [minimum future route](#minimum-future-protected-operator-route--proposal-not-executable-approval)
+remains a proposal. No production snapshot generator, seal implementation, executable,
+HTTP endpoint, privileged helper, grant issuer or arbitrary-path interface is added.
+
+Authorized DoD: document trusted operator → consistent synthetic SQLite snapshot → sealed offline
+image → existing audit library; cover custody, substitution, completeness, grants and failure;
+exercise safe bounded synthetic cases; retain explicit real-world UNKNOWN/BLOCKED states;
+validate build/format/docs/tests; publish a draft with exact identity and independent review pending.
+Maximum two repair attempts. Stop if privilege or live data becomes technically necessary.
+No real source/snapshot, protected-directory probe, root/sudo/Docker, network service, key,
+model/provider, trading, deployment or merge is authorized. PR #82 remains a separate draft
+at `ab76e7f2431804e0e8e7800429ed213eb7ec3081`; its owner attestation is preserved, not re-certified.
+
+### Trust and custody contract — design only
+
+Assets are source integrity, complete historical population, provider-restricted bytes, authority
+receipts and sanitized results. Threat actors include a compromised ordinary module/audit process,
+an unprivileged local path manipulator, accidental concurrent writer, incorrect operator selection,
+and malformed database content. The proposed trusted computing base is the separately authorized
+operator, verified OS/filesystem boundary, exact reviewed binaries and pinned native SQLite/VFS.
+A malicious privileged operator or compromised OS cannot be excluded by an image digest. Treat
+unknown custody as STOP; do not describe it as an acceptable residual scientific uncertainty.
+
+The logical states below are requirements, not an implemented state machine:
+
+1. **AUTHORIZED:** independently verify exact operator principal, fixed source/storage identity,
+   tool SHA/tree and dependency/native/VFS identity; purpose, provider/product/policy and allowed
+   read/copy/use; finite validity, revocation and invocation budget; protected destination and
+   inventory/retention/disposal plan; required backup/recovery evidence and BB-132K disposition.
+   Source permission does not imply copy permission; copy does not imply audit or publication.
+   The owner authorizes any future operation separately. Missing/stale/conflicting grants stop
+   before opening a source. This task issues or consumes no real grant.
+2. **CAPTURING:** only the trusted generator may access the fixed source and private staging.
+   Use an approved SQLite-consistent snapshot mechanism with a pinned read transaction and an
+   established read before racing commits; bind the actual source transaction to its receipt.
+   A raw DB/WAL/SHM copy, an arbitrary timestamp, or `immutable=1` on a live source is insufficient.
+   A source connection can modify SHM even with SQL read-only; source-side permitted effects
+   need separate review and measured evidence. If strict source no-write cannot be established,
+   stop rather than silently grant it or checkpoint the source. This task's synthetic writer
+   and backup fixture deliberately have write access; they prove no real no-write generator.
+3. **COMPLETE:** backup completion and closed destination handles precede publication. Normalize
+   only the private synthetic destination to rollback journal mode, never the source. Establish
+   source coverage in the SAME pinned transaction: all five audited tables, full populations,
+   identities/revisions and a deterministic content commitment, original schema/version, source
+   epoch/cutoff and counts. Reconcile destination content, not just matching counts. Include
+   missing/invalidated/revised outcomes; no success-only subset or arbitrary row filter. Preserve
+   source rights and all required lineage. A mixed-rights whole-database backup is not a default
+   permitted export: if all copied tables cannot be authorized, stop for a separately reviewed
+   selection/derivation design. Existing audit coverage is five tables, not every Finance store
+   or external payload; checksum/feature-content and prospective-science unknowns remain unknown.
+4. **SEALED:** close writers, flush/complete publication under a reviewed crash-consistency
+   protocol, and bind exact byte length/SHA-256, source commitments, transaction/capture time,
+   grants, schema/tool/native identities and completeness receipt in independently protected
+   custody. An authenticated protected receipt must come from the trusted operator, not the
+   audit caller. Record READY only after data and receipt are durably complete. Partial writes,
+   crash, uncertain completion or mismatched receipt never become READY on retry.
+5. **AUDITING:** the auditor sees only the fixed sealed image plus fixed receipt, with OS-denied
+   writes and no source volume, credential, network, admin, Docker, provider or model access.
+   Its command/query/output contract is fixed; it cannot choose a path, SQL, source or grant.
+   Verify receipt validity/revocation and stable identity immediately before and after use.
+   The existing internal reader still applies its read-only/immutable/query-only/deferred
+   transaction, size/row/schema/integrity/sidecar/digest checks. Only aggregate fixed-label
+   output is released, bound externally to the receipt and candidate identity. Historical audit
+   completion never grants scientific PASS, prospective status, cohort lock or execution.
+6. **CLOSED or STOP:** keep a sanitized outcome and inventory reference. An ambiguous invocation
+   is not automatically retried or refunded. Retention, revocation and disposal remain operator
+   responsibilities under explicit authority; the auditor cannot clean up, restore or repair.
+   An abandoned restricted staging image must remain protected and inventoried pending disposition,
+   never silently copied to Git, logs or generic backup. Synthetic fixture disposal is unrelated.
+
+### OS protection and substitution threats
+
+A seal means an independently enforced immutable custody interval through the LAST read, not a
+filename, `chmod` by the same owner, `FileShare.Read`, a digest, SQL read-only or SQLite's immutable
+flag. The future auditor must lack permissions to change ownership/mode, write file contents,
+modify any path ancestor, rename/unlink targets, create links/sidecars, remount storage, attach a
+debugger to the operator, or replace tools/receipts. Trusted operator access must also prevent
+accidental writes during that interval. A read-only view alone is insufficient if another writable
+alias or pre-existing write handle can still modify the underlying object. No concrete OS seal
+mechanism is selected, installed or certified here; qualification in the exact future environment
+and independent review are required before a real image can be accepted.
+
+| Threat / failure scenario | Required future operator control; existing library limit |
+| --- | --- |
+| WAL-only committed data; missing SHM; writer advances during capture | Approved consistent SQLite backup with established source read transaction and complete receipt. Never strip sidecars or relabel live WAL as immutable. Existing reader rejects WAL headers/sidecars. |
+| File or parent symlink; junction/reparse or mount substitution | Pin protected storage/root and resolve every component under OS-enforced custody; reject aliases or unexpected filesystem object types. Library link checks are preflight only and are vulnerable to a race if ancestors remain writable. |
+| Hardlink or already-open writable handle | Prevent alternate writable aliases, verify link/custody policy and eliminate pre-existing write capabilities before seal. Library does not check link count. A single-link observation alone cannot rule out an open writer or later link. Hardlink/handle isolation is UNKNOWN here. |
+| Rename/path swap after hashing but before SQLite open | The hash stream and SQLite open resolve separately; the stream's post-hash may still refer to the old inode. Protected namespace/object identity throughout use is mandatory. Pre/post hashing is not a TOCTOU defense; no test hook or production race fix is added. |
+| Swap A→B→A between observations, same-byte replacement, altered receipt | Prevent substitutions at OS boundary and authenticate the receipt independently. Digest checks cannot prove custody even when bytes match. Receipt supplied by the same untrusted caller adds no authority. |
+| Consistent but incomplete or wrong-source image | Compare full content/coverage against trusted same-transaction source commitments. A valid SQLite image, zero findings and matching caller digest cannot prove it includes the original population or correct source. |
+| Partial/corrupt/oversized image, row overflow or schema masquerade | Fail the whole report, retain no partial-success counts. No automatic repair/truncation/limit widening. Existing 100-byte–256 MiB image and 100,000-row/table bounds remain. |
+| Resource exhaustion or hostile native input | Fixed tool/native dependencies and independently enforced finite CPU, memory, time, file and output limits. Existing size/row limits are not a hard time/memory sandbox; exact OS limits and kill behavior remain unqualified. |
+| Interrupted creation, seal or audit; expired/revoked grants | No READY/result acceptance from partial/uncertain state; protected invocation/inventory audit and separately authorized reconciliation. Never regenerate authority or infer permission from an old successful run. |
+
+### Synthetic regression evidence and its limits
+
+`OperatorBoundaryTests` uses only fresh `SyntheticLedger` temporary fixtures. The fixtures have
+no user-selectable source path and no connection to a real database. They exercise the existing
+internal library; source and tool implementations are unchanged. Their digest receipts are local
+test values, **not authenticated operator receipts or OS seals**.
+
+| Case | Evidence sought; scope limit |
+| --- | --- |
+| Commit during pinned WAL read | A second SQLite connection commits atomic prediction/outcome deletion after the first read and before backup, while the read transaction stays open. The snapshot retains the original five-table counts and clean historical result. Deterministic interleaving, no scheduling sleep or claim of arbitrary race coverage. |
+| File/parent rename replacement after receipt | A different valid image at the same path is rejected with `image.digest`. Leaf/parent symlink substitution is rejected with `image.link`. These tests swap before entry; they do not prove prevention of mid-read/ABA races. |
+| Same-byte replacement | Accepted historical report deliberately demonstrates that matching digest does not authenticate custody. This documents the pre-existing excluded trust assumption, not an installed defense. |
+| Consistent omitted population | A valid snapshot with both prediction and outcome population removed reports zero rows and no findings. The source still has one outcome. This demonstrates why an external completeness receipt is mandatory. |
+| Oversized image | A sparse fixture one byte above 256 MiB stops with empty counts/findings and unchanged file names/hashes. Existing corrupt/truncated/schema/row-limit tests remain applicable. |
+| WAL/SHM, uncommitted writer, no write | Re-run existing audit suite: absent/present SHM hazards, WAL rejection, consistent backup and uncommitted exclusion, unchanged file sets/hashes, denied DML/DDL/temp writes, malformed/corrupt input and sanitized STOP. File-byte evidence does not certify host access control, metadata/access-time immutability or all VFS behavior. |
+
+Validation results are recorded below after execution; no result in this table is a real-source
+qualification. No broad application/model/provider test or network service is required for this
+test-only delta. The unchanged library still has no executable entry point or application/broker/
+network assembly reference; its existing boundary regression remains in the focused suite.
+
+### Remaining gates
+
+| Gate | Disposition in this checkpoint |
+| --- | --- |
+| Exact OS seal, principal separation, filesystem/mount/link/handle/race protection | **BLOCKED / UNKNOWN**; no protected-directory probes or host qualification. |
+| Real provider/native/VFS behavior and consistent source no-write capture | **BLOCKED / UNKNOWN**; only synthetic SQLite/package behavior can pass here. No real provider transport or credentials. |
+| Real read/copy/use grants, source rights and BB-132K disposition | **BLOCKED / UNKNOWN**; existing owner-reported attestation preserved, no independent rights verification, expiry extension or disposition action. PR #82 untouched. |
+| Current daily/full-Finance backup, restore and rollback readiness | **BLOCKED / UNKNOWN for this route**; dated scoped evidence is not absence of backups and not new copy/restore authority. |
+| Real 858-outcome audit, source population/lineage and completeness receipt | **BLOCKED / NOT READ / UNKNOWN**; 858 is dated metadata, not a remeasured or independently validated population. |
+| #57 manifest/cohort, models/providers/cadence/trading | **NOT LOCKED / NO ACTIVATION**; no new observations, policy or research execution. |
+| Independent review and real execution | Exact new-candidate risk-3 review **PENDING**. This draft does not authorize real capture/audit, deployment or merge. |
+
+### Local validation — 2026-11-20
+
+| Check | Result |
+| --- | --- |
+| `dotnet restore BigBrain.slnx --ignore-failed-sources --disable-parallel -p:NuGetAudit=false` | **PASS** using available packages; this deliberately does not claim a vulnerability audit. No dependency/version change. |
+| `dotnet build BigBrain.slnx --configuration Release --no-restore -m:1` | **PASS**, zero warnings/errors; SDK major 10, minor 0, patch 302. |
+| `dotnet format BigBrain.slnx --verify-no-changes --no-restore` | **PASS**. |
+| `dotnet test tests/BigBrain.Finance.OutcomeAudit.Tests/BigBrain.Finance.OutcomeAudit.Tests.csproj --configuration Release --no-build` (TRX logger) | **PASS: 94 / 0 FAIL / 0 SKIP**, including eight new operator-boundary cases and all 86 existing audit tests. |
+| `node scripts/verify-documentation.mjs` | Initial document delta **PASS**, 296 Markdown files / 57 unique backlog IDs. Final rerun after adding this results section **BLOCKED** by sandbox `spawnSync git EPERM`, reproduced once without changing the validator or permissions. Final exact-document CI remains PENDING. New cross-document anchors separately **PASS**. |
+| Staged whitespace/scope review | **PASS**; one test file and five existing canonical documents, including reconciliation of the completed integration recovery note. No source/library/project/dependency/infrastructure changes. |
+| Local secrets scanner / GitHub required CI | Local gitleaks unavailable: **SKIP**, not PASS. Required CI including secrets **PENDING** at publication; consult exact draft-PR metadata. Manual delta review found only synthetic literals and sanitized documentation. |
+| Independent candidate review | **PENDING**; self-checks and the earlier integration review do not review this candidate. |
+
+No failed build/test/format check and no implementation repair attempt was needed (0/2 used).
+One bounded documentation-verification retry reproduced the sandbox restriction; no bypass or
+privilege escalation was attempted. Observed synthetic provider: Microsoft.Data.Sqlite assembly version (major 10, minor 0, build 10, revision 0),
+SQLite 3.53.3; the existing plain-read-only WAL control changed SHM bytes in this run.
+Tests do not enforce or certify real OS/network isolation. No operational gate above is marked
+PASS by these local checks. There is no automatic next implementation, real snapshot/audit,
+merge or deployment.
+
+### Review-checkpoint publication — 2026-11-20
+
+The branch was published as [Draft PR #113](https://github.com/T-bear/BigBrain/pull/113)
+from verified accepted main fcc126478a419d3bb5f5d06aefb3fb196fb12ca1.
+The initial implementation commit was d4ba4a9d7f5102cf167bbe9dceb65c93c0ed9a33,
+tree 3d9cb3d8de90a5f61421e258fd7e18300048516c.
+During Codex's sandboxed session Git metadata writes and PR creation were
+blocked; publication was completed through the authorized Remote Desktop
+connection without changing privileges or protections. A final documentation
+rerun outside Codex's sandbox caught version numbers that matched the existing
+private-address detector. They were rewritten as explicit version components,
+without weakening the detector. Final candidate SHA/tree and checks must be
+read from the updated Draft PR. Exact-candidate risk-3 independent review and
+GitHub required CI remain separate gates until verified. No real-data read,
+protected snapshot, operator installation, merge or deployment is authorized.

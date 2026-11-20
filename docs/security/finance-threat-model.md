@@ -1,5 +1,16 @@
 # Finance threat model
 
+## Outcome audit operator boundary — synthetic qualification, 2026-11-20
+
+The [bounded operator threat model](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#synthetic-operator-boundary-qualification--2026-11-20)
+specifies trusted consistent capture, protected completeness/authority receipts and an OS-enforced
+immutable custody interval before the existing offline audit library can be used. It covers
+WAL/SHM effects, concurrent writers, path/symlink/hardlink/rename substitutions, race windows,
+incomplete populations and failure handling. Synthetic tests qualify library behavior only.
+Actual OS isolation, rights, source access/copy, backup, BB-132K disposition and the real
+858-outcome audit remain BLOCKED/UNKNOWN. No operator entry point is implemented; independent
+risk-3 review is pending. No real operation, deployment or merge is authorized by this design.
+
 ## BB-131F local runtime control — 2026-09-29
 
 **ACCEPTED / MERGED / CI VERIFIED**.

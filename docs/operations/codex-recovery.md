@@ -46,6 +46,26 @@ Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återup
 
 ## Finance — integration återupptagen, 2026-11-20
 
+**Avstämd 2026-11-20:** integration PR #112 är mergad i verifierad GitHub main
+`fcc126478a419d3bb5f5d06aefb3fb196fb12ca1`. Integrationsavbrottet är avslutat;
+fortsätt inte de äldre integrationsinstruktionerna nedan. Separat ägarauktoriserad
+[syntetisk operatörskvalificering](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#synthetic-operator-boundary-qualification--2026-11-20)
+är publicerad som Draft PR #113 med lokala build/format/test PASS.
+Oberoende risk-3-review och required PR-CI återstår; de är inte driftauktorisering.
+Skyddad audit och övriga driftgrindar nedan kvarstår; ingen verklig driftåtgärd är avbruten.
+Följande integrationsuppgifter är bevarad historik, inte aktuella fortsättningsorder.
+
+**AVBROTT AVSLUTAT — Draft PR #113 publicerad.** Under Codex körning
+blockerade sandboxen Gitmetadata och PR-verktyget krävde en separat approval.
+Implementationscommiten d4ba4a9d7f5102cf167bbe9dceb65c93c0ed9a33
+bevarades. Publicering har därefter genomförts genom auktoriserad Remote
+Desktop utan privilegeändring. De två lokala dokumentuppdateringarna har
+avstämts; slutligt dokumentationsprov utförs före deras commit.
+94/94 syntetiska audit-tester och Release-build/format var lokalt PASS.
+Slutlig kandidat-SHA, required PR-CI och oberoende risk-3-granskning
+måste kontrolleras från PR #113. Inga verkliga data, snapshots,
+driftsåtgärder, deployment eller merge ingår i detta uppdrag.
+
 **LOKAL INTEGRATION GENOMFÖRD — REVIEW PENDING.** Codex sandbox nekade
 Gitmetadata-skrivning och NuGetåtkomst, men efter Codex avslut slutfördes
 de två upplösta dokumentkonflikterna i den auktoriserade Remote Desktop-miljön.

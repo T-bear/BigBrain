@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-20 — Finance-integration sammanförd lokalt och syntetiskt testad; oberoende review/CI återstår.
-- Verifierad mot commit: `1e3d203477cc81e8b1e58780dd4a758926469b7d` (accepterad main); separat integrationscheckpoint är inte accepterad i main.
-- Runtime senast verifierad: ingen runtimekontroll i denna integration; Nov 11-evidens nedan är historisk.
+- Senast uppdaterad: 2026-11-20 — Finance #57 syntetisk operatörsgräns förberedd för risk-3-review; verklig audit fortsatt blockerad.
+- Verifierad mot commit: `fcc126478a419d3bb5f5d06aefb3fb196fb12ca1` (accepterad main); separat operatörskvalificering är reviewarbete.
+- Runtime senast verifierad: ingen runtimekontroll i operatörskvalificeringen; Nov 11-evidens nedan är historisk.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -58,19 +58,17 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 | Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; daterad API-komposit och journalräknare redovisas under Release 1 nedan; aktuell runtime är inte omverifierad. G3a/G3b är inte omverifierade. |
 | BB-158 | **UPPTINAD FÖR UTVECKLING genom ägarbeslut 2026-11-10**. [Beslut](operations/bb158-freeze-20261023.md#aktuellt-ägarbeslut--upptining-2026-11-10). Direktimportens UI döljs i separat kodkandidat, **ej ännu deployat/verifierat**. API-grindar oförändrade. [#70](https://github.com/T-bear/BigBrain/issues/70) skanner/PID och [#71](https://github.com/T-bear/BigBrain/issues/71) Librarrs behörighetsfel öppna. YouTube, ISBN och konvertering saknas. Slut-till-slut, import, scannerhälsa och backup/rollback är inte slutverifierade. |
 
-Finance #57, 2026-11-20: ägarauktoriserad **risk-3-integration** publicerad som
-[Draft PR #112](https://github.com/T-bear/BigBrain/pull/112) på
-`checkpoint/finance-integration-20261120`, separat från accepterad main.
-PR #81:s kausalitetsändring och PR #111:s isolerade offline-audit har sammanförts
-med bevarad historik och båda dokumentkonflikterna lösta. Kod/tester matchar
-källcommits; lokal Release-build och format PASS, 86/86 audit-tester och 84/84
-fokuserade Finance/API-tester PASS. Dokumentationsverifiering PASS.
-Required GitHub CI och oberoende review av den exakta integrationskandidaten
-är separata grindar, inte lokalt självintygade PASS.
-PR #81/#111:s brancher och PR #82 är orörda. De 858 historiska utfallen
-är NOT READ, manifestet olåst och bredare Finance-isolering blockerad.
-Ingen realdata, snapshot, skyddad operatörskörning, provider/modell/trading,
-merge till main eller deployment. [Kanonisk integrationsrapport](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#owner-authorized-integration-checkpoint--2026-11-20).
+Finance #57, 2026-11-20: PR #112 är mergad i verifierad GitHub main
+`fcc126478a419d3bb5f5d06aefb3fb196fb12ca1`; detta är ingen deploymentuppgift.
+Nytt ägarauktoriserat **risk-3 / SYNTHETIC ONLY**-uppdrag på
+`checkpoint/finance-operator-qualification-20261120` dokumenterar hotmodell för skyddad
+snapshot/operatörsgräns och lägger endast till avgränsade syntetiska tester.
+[Kanoniskt underlag och verifieringsresultat](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#synthetic-operator-boundary-qualification--2026-11-20).
+Ingen produktionsoperatör installeras. Oberoende review av den nya kandidaten är PENDING.
+OS-skydd, verklig provider/källåtkomst, rättigheter, backup och BB-132K är BLOCKED/UNKNOWN
+för denna väg; de 858 historiska utfallen är NOT READ och manifestet olåst.
+PR #82 och andra worktrees lämnas orörda. Ingen verklig snapshot, skyddad probe,
+provider/modell/trading, deployment eller merge ingår i detta uppdrag.
 
 Finance-upptiningen beslutades uttryckligen 2026-11-08; gamla fortsättningsinstruktioner
 är inte körorder. Nytt tekniskt scope kräver tillämplig DoD/auktorisering och separata driftbeslut.
