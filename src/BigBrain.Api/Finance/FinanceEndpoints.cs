@@ -73,14 +73,12 @@ public static class FinanceEndpoints
         endpoints.MapGet("/api/v1/modules/finance/research/governor/status", async (IFinanceResearchResourceGovernor governor, TimeProvider clock, CancellationToken token) => Results.Json(await governor.EvaluateAsync(clock.GetUtcNow(), token), JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/research/operations/status", (FinanceResearchOperationsCoordinator operations) => Results.Json(operations.Status(), JsonOptions));
         endpoints.MapGet("/api/v1/modules/finance/research/operations/incidents", (int? offset, int? limit, EodhdMarketMemory memory) => ResearchQuery(() => memory.ResearchOperationalIncidents(offset ?? 0, limit ?? 25)));
-        endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run", (AutonomousResearchRunRequest request, EodhdMarketMemory memory) =>
-        {
-            try { return Results.Json(memory.RunAutonomousResearch(request.IdempotencyKey, request.MaximumExperiments ?? FinanceResearchContracts.MaximumTotalExperimentsPerRun), JsonOptions); }
-            catch (ArgumentException exception) { return Results.Problem(statusCode: 400, title: "Invalid autonomous research request", detail: exception.Message, extensions: new Dictionary<string, object?> { { "code", "finance.research.invalidRequest" } }); }
-            catch (AutonomousResearchBusyException exception) { return Results.Problem(statusCode: 409, title: "Autonomous research already running", detail: "Another bounded research run is active.", extensions: new Dictionary<string, object?> { { "code", "finance.research.alreadyRunning" }, { "currentRunId", exception.CurrentRunId } }); }
-            catch (CurrentResearchEvidenceUnavailableException exception) { return Results.Problem(statusCode: 409, title: "Current research evidence unavailable", detail: "The complete current robustness evidence set is unavailable; no older evidence was substituted.", extensions: new Dictionary<string, object?> { { "code", "finance.research.currentEvidenceUnavailable" }, { "reason", exception.ReasonCode } }); }
-            catch (InvalidOperationException exception) { return Results.Problem(statusCode: 409, title: "Autonomous research unavailable", detail: exception.Message, extensions: new Dictionary<string, object?> { { "code", "finance.research.conflict" } }); }
-        });
+        // Release 1 permits model-free cadence, not caller-triggered autonomous research.
+        // Deny before binding input or resolving storage; loopback/proxy headers grant no authority.
+        endpoints.MapPost("/api/v1/modules/finance/research/autonomous/run", () =>
+            Results.Problem(statusCode: 403, title: "HTTP research execution disabled",
+                detail: "An independently reviewed authenticated execution boundary is required before HTTP research can be enabled.",
+                extensions: new Dictionary<string, object?> { { "code", "finance.research.httpExecutionDisabled" } }));
         return endpoints;
     }
 

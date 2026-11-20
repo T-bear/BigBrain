@@ -28,6 +28,21 @@ remain blocked until separately authorized; stored bytes are not
 automatically destroyed. Voluntary deletion still requires the two-phase
 owner action below.
 
+## Release 1 activation hold — 2026-11-11
+
+[Current checkpoint and required gates](../../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#release-1-checkpoint--2026-11-11):
+EODHD is disabled; no activation or new data acquisition is permitted until actual account,
+network/access, BB-132K disposition where relevant, source mapping/outcome integrity,
+reviewed Finance release/rollback and locked prospective manifest are verified.
+The configuration sequence below is not an instruction to restart the current composite runtime.
+STANDARD's Media exceptions cannot deploy Finance. Independent risk-3 review is required.
+The candidate checks exchange sessions and close, has no cadence transport retries, and counts
+failed attempts toward the one-attempt-per-symbol/day bound. These corrections are **not deployed**.
+Model-free cadence is separate from ObservationRuntime, research scheduler and model workers;
+inspect every effective flag before any approved restart. Emergency suspension must disable the
+EODHD worker through the reviewed release mechanism, preserve all records, and verify cessation;
+the design-only trading emergency-stop runbook is not an implemented EODHD kill switch.
+
 ## Configure the free account
 
 1. Create an EODHD `Free` account without entering payment details.
