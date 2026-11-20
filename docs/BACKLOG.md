@@ -104,6 +104,15 @@ Källor: [B045–058](history/backlog-before-doc-2b-20261024.md#finance-source-e
 
 ### BB-045 / BB-073 — öppna fullständiga data- och forward-evidenskrav
 
+2026-11-20, Linux-operatörsisolering efter accepterad PR #113:
+avgränsad syntetisk test-/hotmodellcheckpoint
+`checkpoint/finance-os-isolation-20261120`, utan produktionsfunktion.
+8 PASS/2 SKIP i Linux-harnessen; separat UID, backing-seal,
+källrättigheter, återställning och verklig 858-utfallsaudit fortsatt
+BLOCKED/UNKNOWN. Codex användningsgräns avbröt publiceringen;
+review/CI PENDING. [Detaljer](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#linux-os-isolation-qualification--2026-11-20).
+Inget befintligt Finance-issue eller forskningskrav stängs.
+
 2026-11-20, senare #57-uppdrag: integration PR #112 är mergad i main `fcc126478a`.
 Separat syntetisk operatörskvalificering på `checkpoint/finance-operator-qualification-20261120`
 dokumenterar hotmodell och testar befintligt offline-bibliotek; [scope, evidens och kvarstående grindar](reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#synthetic-operator-boundary-qualification--2026-11-20).

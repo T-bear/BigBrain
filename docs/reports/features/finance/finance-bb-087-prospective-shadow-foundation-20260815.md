@@ -727,6 +727,11 @@ remain outside this assignment.
 
 ## Synthetic operator-boundary qualification — 2026-11-20
 
+**Reconciled by the next assignment:** PR #113 is accepted in main
+`8b81318ab7ad39ef9c11d19ede4f5573b56a33f9`, verified locally and through GitHub.
+The review/publication states below describe that earlier checkpoint. The separate
+[OS qualification](#linux-os-isolation-qualification--2026-11-20) does not reimplement it.
+
 **REVIEW CHECKPOINT / risk 3 / SYNTHETIC ONLY. Independent risk-3 review PENDING.**
 The owner authorized #57's bounded threat model, synthetic regression tests, validation and
 isolated draft publication on `checkpoint/finance-operator-qualification-20261120`, based on
@@ -896,3 +901,171 @@ without weakening the detector. Final candidate SHA/tree and checks must be
 read from the updated Draft PR. Exact-candidate risk-3 independent review and
 GitHub required CI remain separate gates until verified. No real-data read,
 protected snapshot, operator installation, merge or deployment is authorized.
+
+## Linux OS isolation qualification — 2026-11-20
+
+**REVIEW CHECKPOINT / risk 3 / SYNTHETIC ONLY; independent review PENDING.**
+Owner “This is the way” authorizes this bounded next #57 assignment on
+`checkpoint/finance-os-isolation-20261120` from accepted main
+`8b81318ab7ad39ef9c11d19ede4f5573b56a33f9` (PR #113). The six-part DoD is: precise Linux
+principal/custody design; small unprivileged negative proofs; future operator acceptance/STOP
+matrix; synthetic regression/build/format/docs and required CI including secrets; canonical
+documentation and exact checkpoint identity; no production capability or activation.
+Only a Draft REVIEW CHECKPOINT may be published, never merged or deployed under this mandate.
+Maximum two repair attempts; no next sprint. Administrative thaw grants no operational authority.
+
+### Proposed Linux boundary — not installed or qualified
+
+This refines the accepted [custody contract](#trust-and-custody-contract--design-only), without
+changing architecture, the existing audit library or its five-table coverage. Linux DAC,
+separate UIDs, private mount namespaces and a read-only backing filesystem are feasible design
+facilities on the project's Linux platform; availability and enforcement on the real host are
+**UNVERIFIED/BLOCKED**. No account, mount, namespace, ACL, capability, helper or service is created.
+If provisioning requires administration, stop for a separately authorized, independently reviewed
+operator prerequisite; do not try root, sudo, Docker or an unprivileged-user-namespace workaround.
+
+| Principal / phase | Exact intended boundary; future evidence required |
+| --- | --- |
+| Trusted provisioning/custody operator | Separate administrative trust boundary; narrowly authorized preparation only. Owns all protected path ancestors, immutable tool/runtime configuration, receipt trust anchor and release inventory. Ordinary modules and audit cannot invoke it or modify its configuration. It is trusted against malicious action; compromised administrator/kernel/storage is outside this seal's guarantee and forces STOP. No generic privileged helper is proposed. |
+| Capture process | Dedicated unprivileged UID, distinct from API/Web/Brain/Media and auditor, with explicit supplementary groups. Reads only the approved fixed source through a separately qualified no-write route; writes only fresh restricted staging. No broker/credential/network or signing-key access. Process and all descendants exit before custody transfer; no pooled connections, inherited writable descriptors, mappings or IPC descriptor transfer survive. A separate UID alone does not protect a still-writable shared inode. |
+| Seal custodian | Receives completed staging after capture exit, independently verifies content and handles, and publishes to fresh dedicated storage under exclusive custody. Files and EVERY ancestor belong to a non-auditor principal, with no auditor/ordinary-module write permission or ACL. Seal the backing filesystem read-only, not merely one bind mount. Remove/exclude every writable mount/alias and writable device access for all untrusted principals. No writer is admitted until the last audit read ends. Failure to prove exclusive custody or read-only transition is STOP. |
+| Audit process | Different UID/GID, no shared supplementary writer groups, fixed reviewed binary/native SQLite/VFS, fixed image and authenticated receipt only. A private mount namespace exposes read-only image/receipt/tools and no source, staging, private rights, credentials, admin sockets or backing devices. All permitted/effective/inheritable/ambient/bounding capability sets empty; no_new_privs; no setuid/file-capability route, setns/unshare/mount or ptrace/process-memory/descriptor-transfer route to other principals. No network/IPC with writers. A future reviewed launcher must enforce this before parsing hostile SQLite; none is implemented here. |
+
+Filesystem mode bits deny specific new opens/creates under the current credentials. The owner
+can change them back, and chmod does not revoke an existing writable file description or mapping.
+A private mount namespace isolates names; it does not freeze the underlying inode. A read-only
+bind view can coexist with a writable alias in another namespace. The chosen future design
+therefore requires BOTH separate principal/namespace confinement AND exclusive, read-only backing
+custody. An `st_nlink == 1` observation, `/proc` handle scan, digest, SQLite `immutable=1` or
+`FileShare.Read` alone cannot establish that condition. Handle scans are corroboration only;
+the positive proof is exclusive staging, bounded process/descriptor ownership, writer termination
+and enforced exclusion of new writers through the complete custody interval.
+
+Fixed paths must resolve under custodian-owned ancestors without symlinks, hardlink aliases,
+unexpected mounts or replaceable directories. A leaf `O_NOFOLLOW` check does not cover parents.
+Descriptor-relative resolution with each parent checked, or a reviewed `openat2` policy rejecting
+symlinks and mount crossings, can support admission; neither repairs a writable namespace after
+admission. The existing library hashes an open stream and separately opens the path in SQLite;
+that path must remain the same protected object until BOTH handles close. No library race fix,
+production resolver or new executable is included here.
+
+### Source transaction, sealed image and authenticated receipt
+
+Before source open, bind owner authorization, operator identities, exact source/storage identity,
+provider/product/policy, read/copy/use rights, BB-132K disposition, finite invocation/revocation
+and backup/recovery evidence. ADR0021/0023/0028/0029 remain authoritative. A whole-database copy
+requires permission for every copied table, including tables outside the audit's five; if that
+cannot be demonstrated, STOP for a separately reviewed export design. No rights or expiry are
+inferred from the administrative thaw, prior attestation or this synthetic run.
+
+Capture must establish the source read transaction by an actual read before backup and before
+any competing commit. In THAT SAME transaction, commit to the complete populations of
+`shadow_predictions`, `shadow_outcomes`, `revisions`, `observations`, `feature_revisions`:
+table/schema identity, row count and deterministic full-row content commitment with explicit
+column order, types, null encoding, stable ordering and duplicate multiplicity. Include invalidated,
+pending, revised and missing-outcome populations; no success filter. Record original schema,
+source epoch and knowledge/capture cutoffs. A wall-clock label or matching counts is insufficient.
+Reconcile these commitments against the completed destination before normalization/publication.
+PR #113's pinned-WAL regression is retained; it is not a trusted real-source transaction receipt.
+Feature checksums/content and broader scientific completeness remain separately unknown.
+
+SQLite read-only can write SHM. A live-WAL `immutable=1` open can omit committed content. The future
+generator must demonstrate its exact provider/VFS source-no-write behavior, including sidecars,
+on an authorized representative synthetic operator environment first. Denied writes must stop
+capture, never trigger chmod, source checkpoint, sidecar removal or automatic retry. If a consistent
+strict-no-write source transaction is unavailable, the real route remains BLOCKED; this design
+does not authorize quiescing services, copying real files or restoring backups to work around it.
+
+Use a versioned, authenticated receipt from a separate protected signing/custody authority, with
+the verifier's trust anchor installed outside auditor control. No key or receipt issuer is added.
+Bind invocation ID, source identity/transaction commitments, all five table commitments, image
+length/digest/object identity, schema, code SHA/tree, binary/native hashes, principal/namespace
+evidence, capture/seal interval, grant identity/expiry/revocation and inventory/retention reference.
+The auditor-supplied digest is not authentication. Verify signature, exact expected invocation,
+grant and revocation immediately before admission and again before result release. Old valid
+receipts, caller-selected keys and mismatched images stop; a signature cannot replace OS custody.
+
+The future durable publication protocol must complete data and receipt, close writers, flush file
+and directory metadata, establish the seal, then durably publish READY through the trusted
+custodian. A crash at any earlier stage leaves restricted, inventoried NOT READY material.
+No partial result or success marker is released on uncertainty. The auditor receives bounded
+CPU/memory/time/open-file/output limits enforced outside itself; exact limit values and kill/child
+cleanup behavior require future qualification. Audit output uses existing aggregate fixed labels,
+bound externally to the receipt and candidate. STOP records contain only code, stage, candidate
+identity and opaque evidence references, never rows, raw logs, credentials or sensitive paths.
+
+### Future operator acceptance matrix and STOP evidence
+
+Every row is mandatory before a real capture/audit; **all real-host rows are currently
+UNVERIFIED/BLOCKED**. Synthetic PASS below cannot satisfy them. Evidence must identify exact
+reviewed candidate SHA/tree, environment, time, observer and protected inventory reference.
+Operator evidence is retained privately; Git receives only sanitized status and opaque references.
+
+| Gate | Required acceptance evidence | STOP code / action if absent, denied or inconsistent |
+| --- | --- | --- |
+| Authority and rights | Current scoped owner decision; read, restricted copy, audit use and output separately covered; all copied tables classified; BB-132K resolved; finite invocation and revocation checked. | `authority.unverified`: do not open source or issue/consume a replacement grant. |
+| Backup/recovery | Applicable daily/full-Finance backup coverage and successful isolated restore evidence, provider-tagged copy permission, destination inventory/retention and rollback plan. Dated STANDARD receipt is scoped evidence, not absence of backups or this route's acceptance. | `recovery.unverified`: no real copy/restore or deployment. |
+| Identities and confinement | Operator/capture/custodian/auditor UID/GID/groups, UID mappings, namespace identities, all capability sets, no_new_privs, tool/native identity and protected ancestors/ACLs; actual denied mutation/escalation tests under auditor and ordinary-module principals on dedicated synthetic objects. | `isolation.unverified`: stop launch; same UID or mode-only demo never passes. |
+| Correct source transaction | Independently bound source/storage identity and established pinned transaction; exact SQLite/VFS and same-transaction five-table content commitments reconciled to output; committed WAL retained and later/uncommitted changes excluded. | `source.unverified`: reject entire image, no best-effort subset or inferred population. |
+| Source no-write | Effective read-only source route, sidecar/VFS no-write proof, before/after object inventories and tested denied DML/DDL/file/sidecar operations under the actual future capture principal. | `source.write-risk`: stop, no source repair, checkpoint or permission widening. |
+| Seal and no-open-handle | Exclusive staging provenance; capture/descendant termination; no inherited/transferred writable handles or mappings; controlled link/mount/device inventory; read-only backing plus private read-only audit view throughout last read. | `seal.unverified`: keep NOT READY; one link or a handle scan is insufficient. |
+| Substitution/race | Separate-principal denials of leaf/parent/ancestor replacement, symlink/hardlink creation and writable aliases; adversarial attempts at hash/open/read/release boundaries; stable object/receipt identity throughout. | `custody.changed`: discard result, retain protected STOP/inventory; no ABA/hash-only acceptance. |
+| Receipt and release | Protected trust anchor, authenticated receipt, exact invocation/digest/length/transaction/schema/tool binding, expiry/revocation and replay rejection, durable READY and final recheck. | `receipt.invalid`: no report release or automatic retry/refund. |
+| Resource/failure/cleanup | External finite limits, timeout/kill/child cleanup, interrupted capture/seal/audit cases, no success marker on partial state; independently reviewed disposition of restricted staging and revocation of temporary access. | `operation.incomplete`: keep inventory, cease audit, reconcile only under separate operator authority. |
+
+Rollback here means fail closed and retain protected evidence; it never means rewriting source,
+resetting a journal, restoring a real database, regenerating authority or silently deleting restricted
+staging. Synthetic test cleanup can remove only its own temporary fixtures. No production operation
+is started by this assignment, so no real service/data rollback is needed or attempted.
+
+### Bounded synthetic OS evidence and validation
+
+[Linux test harness](../../../../tests/deployment/test_finance_os_isolation.py) is discovered by
+the existing CI backend Python step; no workflow or deployment artifact changes. It accepts no
+paths and creates unique private temporary directories; all chmod/link/rename/write/delete actions
+stay inside them. Root, effective/permitted/ambient capabilities or unsupported cleanup semantics
+cause explicit BLOCKED/SKIP before fixtures. It reads only its own process capability metadata.
+No child shell, account change, mount, user namespace, network or protected-object probe is used.
+
+| Synthetic case | Observed result and qualification limit |
+| --- | --- |
+| File and directory mode bits | **PASS demonstration:** new write, create, unlink and rename fail with EACCES where actual permissions deny them. Same owner restores mode and writes, so this is not a principal seal. |
+| Leaf/parent symlink | **PASS counterexample:** leaf O_NOFOLLOW fails; parent symlink is followed by a leaf-only check; O_DIRECTORY plus O_NOFOLLOW rejects that parent. Existing audit tests separately check library rejection. |
+| Read-only ancestor swap | **PASS counterexample:** writable containing directory allows replacement of a read-only subtree with another synthetic image. |
+| Hardlink and open writer | **PASS counterexamples:** aliases share inode/mode; removing the alias restores link count one but an already-open writer still changes bytes after chmod. |
+| TOCTOU/ABA and no-write | **PASS counterexample:** deterministic rename interleaving substitutes B during separate path open, restores A, and original stream rehash still matches. Reader writes no bytes; final file set/content is unchanged. This is not an exhaustive race test or integrated library exploit. |
+| Interruption and rollback | **PASS:** injected exception restores only fixture-directory permissions; fd-based cleanup removes partial fixture without following a symlink into a separate test-created witness; witness unchanged and no READY. |
+| Separate principal / mount namespace | **2 explicit SKIP = UNVERIFIED/BLOCKED**, never PASS. No attempt to obtain privileges or establish a real seal. |
+
+Local run: **8 PASS / 0 FAIL / 2 SKIP**, 2026-11-20. This qualifies ordinary Linux semantics
+only. Release build, existing 94-case synthetic audit regression, formatting and documentation
+results are recorded after execution below. Required GitHub CI including secrets and independent
+exact-candidate risk-3 review remain PENDING until separately evidenced. Publication SHA/tree
+are obtained from Git metadata and the Draft PR, avoiding a self-referential hash in this report.
+
+Real Finance data/volume/backup/private rights/credentials and the dated 858 outcomes are **NOT
+READ**; real OS enforcement, source-no-write capture and authenticated custody are **BLOCKED**.
+Manifest/cohort stays unlocked; provider/model/broker/orders, ingress, production entrypoints,
+service changes, activation, merge and deployment are outside scope. No inference of grants.
+
+### Interruption and independently checked local validation
+
+Codex authored the isolated synthetic Python harness and the threat/acceptance
+matrix, but execution stopped at a ChatGPT/Codex usage limit before it could
+publish the checkpoint. No authorization or runtime capability changed.
+ChatGPT then independently inspected the small synthetic-only harness and
+executed the existing local checks through the already-authorized non-root
+Remote Desktop connection:
+
+- Python deployment discovery: 275 tests run, 0 failures, 3 skips.
+  This module alone: 8 pass, 0 fail, 2 explicit unverified skips.
+- Solution Release build: PASS, 0 warnings and 0 errors.
+- dotnet format verify-no-changes: PASS.
+- Focused Finance offline audit: 94 pass, 0 failures, 0 skips.
+- Documentation validator: PASS, 296 Markdown files and 57 backlog IDs.
+- Required GitHub CI, including secrets: PENDING until exact draft commit runs.
+- Independent level-3 exact-candidate review: PENDING.
+- Actual privileged/separate-UID/mount/custody qualification: BLOCKED.
+- No deployment, merge, source access, real data copy or real audit.
+
+This is a review checkpoint, not a merge candidate or real operator acceptance.
