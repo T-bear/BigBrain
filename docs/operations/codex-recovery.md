@@ -46,6 +46,15 @@ Framtida åtgärd kräver nytt avgränsat ägarbeslut enligt frysningens återup
 
 ## Finance — integration återupptagen, 2026-11-20
 
+**Avstämd 2026-11-20:** integration PR #112 är mergad i verifierad GitHub main
+`fcc126478a419d3bb5f5d06aefb3fb196fb12ca1`. Integrationsavbrottet är avslutat;
+fortsätt inte de äldre integrationsinstruktionerna nedan. Separat ägarauktoriserad
+[syntetisk operatörskvalificering](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#synthetic-operator-boundary-qualification--2026-11-20)
+är en draft review-checkpoint med lokala build/format/test PASS, slutlig lokal
+dokumentationskontroll BLOCKED av sandbox och oberoende risk-3-review PENDING.
+Skyddad audit och övriga driftgrindar nedan kvarstår; ingen verklig driftåtgärd är avbruten.
+Följande integrationsuppgifter är bevarad historik, inte aktuella fortsättningsorder.
+
 **LOKAL INTEGRATION GENOMFÖRD — REVIEW PENDING.** Codex sandbox nekade
 Gitmetadata-skrivning och NuGetåtkomst, men efter Codex avslut slutfördes
 de två upplösta dokumentkonflikterna i den auktoriserade Remote Desktop-miljön.
