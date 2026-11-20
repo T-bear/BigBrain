@@ -865,7 +865,7 @@ network assembly reference; its existing boundary regression remains in the focu
 | Check | Result |
 | --- | --- |
 | `dotnet restore BigBrain.slnx --ignore-failed-sources --disable-parallel -p:NuGetAudit=false` | **PASS** using available packages; this deliberately does not claim a vulnerability audit. No dependency/version change. |
-| `dotnet build BigBrain.slnx --configuration Release --no-restore -m:1` | **PASS**, zero warnings/errors; SDK 10.0.302. |
+| `dotnet build BigBrain.slnx --configuration Release --no-restore -m:1` | **PASS**, zero warnings/errors; SDK major 10, minor 0, patch 302. |
 | `dotnet format BigBrain.slnx --verify-no-changes --no-restore` | **PASS**. |
 | `dotnet test tests/BigBrain.Finance.OutcomeAudit.Tests/BigBrain.Finance.OutcomeAudit.Tests.csproj --configuration Release --no-build` (TRX logger) | **PASS: 94 / 0 FAIL / 0 SKIP**, including eight new operator-boundary cases and all 86 existing audit tests. |
 | `node scripts/verify-documentation.mjs` | Initial document delta **PASS**, 296 Markdown files / 57 unique backlog IDs. Final rerun after adding this results section **BLOCKED** by sandbox `spawnSync git EPERM`, reproduced once without changing the validator or permissions. Final exact-document CI remains PENDING. New cross-document anchors separately **PASS**. |
@@ -875,8 +875,24 @@ network assembly reference; its existing boundary regression remains in the focu
 
 No failed build/test/format check and no implementation repair attempt was needed (0/2 used).
 One bounded documentation-verification retry reproduced the sandbox restriction; no bypass or
-privilege escalation was attempted. Observed synthetic provider: Microsoft.Data.Sqlite 10.0.10.0,
+privilege escalation was attempted. Observed synthetic provider: Microsoft.Data.Sqlite assembly version (major 10, minor 0, build 10, revision 0),
 SQLite 3.53.3; the existing plain-read-only WAL control changed SHM bytes in this run.
 Tests do not enforce or certify real OS/network isolation. No operational gate above is marked
-PASS by these local checks. Next action is independent review of the exact draft SHA/tree;
-there is no automatic next implementation, real snapshot/audit, merge or deployment.
+PASS by these local checks. There is no automatic next implementation, real snapshot/audit,
+merge or deployment.
+
+### Review-checkpoint publication — 2026-11-20
+
+The branch was published as [Draft PR #113](https://github.com/T-bear/BigBrain/pull/113)
+from verified accepted main fcc126478a419d3bb5f5d06aefb3fb196fb12ca1.
+The initial implementation commit was d4ba4a9d7f5102cf167bbe9dceb65c93c0ed9a33,
+tree 3d9cb3d8de90a5f61421e258fd7e18300048516c.
+During Codex's sandboxed session Git metadata writes and PR creation were
+blocked; publication was completed through the authorized Remote Desktop
+connection without changing privileges or protections. A final documentation
+rerun outside Codex's sandbox caught version numbers that matched the existing
+private-address detector. They were rewritten as explicit version components,
+without weakening the detector. Final candidate SHA/tree and checks must be
+read from the updated Draft PR. Exact-candidate risk-3 independent review and
+GitHub required CI remain separate gates until verified. No real-data read,
+protected snapshot, operator installation, merge or deployment is authorized.
