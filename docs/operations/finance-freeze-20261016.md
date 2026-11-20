@@ -1,5 +1,49 @@
 # Finance — formell frysning och återupptagning, 2026-10-16
 
+## BB-132K — ägarval A, 2026-11-11
+
+**Ägarens val:** Alternativ A, tidsbegränsat fortsatt skyddat bevarande av den
+befintliga krypterade BB-132K-kopian, **endast i den omfattning som tillämpliga
+källrättigheter och bindande skyddsvillkor tillåter**. Valet är inte en
+källvis rättighetsverifiering eller en retroaktiv förlängning av en passerad frist.
+
+**Intern omprövningspunkt:** senast **2026-11-18 kl. 14.36 Europe/Stockholm**,
+eller tidigare om källvillkor kräver det. Det är en handläggningsfrist, inte
+ett tillstånd att behålla material till dess oberoende av rättigheterna.
+Den ursprungliga dispositionsgranskningens maximala frist
+**2026-11-10 kl. 14.36.45 Europe/Stockholm** har redan passerat och
+behålls oförändrad i historiken.
+
+**Daterat verifierat underlag:** BB-132K:s krypterade arkiv och isolerade
+återställningskontroller dokumenterades 2026-10-12 som tekniskt godkända.
+Tillfällig plaintext låg kvar över natten i strid med beslutad skyddsgräns;
+den inventerade testkatalogen rensades, men secure erase eller avsaknad
+av exponering har inte bevisats. En läsande inventering 2026-11-11 fann
+arkivet kvar med skyddade filbehörigheter och tom drill-katalog.
+Aktuell kryptografisk integritet omverifierades inte.
+
+**Återstående dispositionskrav:**
+1. Kontrollera aktuell privat dispositionsstatus och den exakta arkividentiteten
+   utan dekryptering eller spridning av privata uppgifter.
+2. Bedöm kopierings- och bevaranderätt per ingående källklass;
+   okända eller otillåtna rättigheter får inte förvandlas till PASS.
+3. Bedöm behovet av en separat, rättighetsklassad ersättningsbackup
+   och faktisk återställningsbarhet före eventuellt avvecklingsbeslut.
+4. Om fortsatt bevarande inte är tillåtet: stoppa berörd fortsatt användning
+   och begär separat granskat beslut för exakt inventerad avveckling.
+   Ingen automatisk radering eller borttagning av produktionsdata.
+5. Redovisa nytt daterat ägarbeslut senast vid intern omprövning
+   eller tidigare enligt källvillkor.
+
+**Ingen ny exekveringsauktoritet:** Dokumentationen ändrar inte privat
+retentionsmetadata och tillåter ingen kopia, dekryptering, återställning,
+radering, datainsamling, merge, deployment eller Finance-aktivering.
+PR #81:s releaseblockerare består. **RESEARCH / 0 SEK / NONE** kvarstår.
+Se [BB-132K:s daterade tekniska rapport](https://github.com/T-bear/BigBrain/blob/0e798221debeffdb7f3286114bd1b01383e1af39/docs/reports/features/finance/bb-132k-protected-recovery-execution-20261010.md),
+[backupregistret](backup-restore/README.md) och [Finance Release 1 PR #81](https://github.com/T-bear/BigBrain/pull/81).
+
+---
+
 ## Aktuellt ägarbeslut — administrativ upptining 2026-11-08
 
 **UPPTINAD — ÄGARBESLUT 2026-11-08.** Ägaren har efter den tidigare,
