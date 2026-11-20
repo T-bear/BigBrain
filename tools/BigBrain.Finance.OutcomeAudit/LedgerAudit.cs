@@ -59,7 +59,14 @@ internal static class LedgerAudit
             while (result.Read())
             {
                 var row = new Row();
-                for (var i = 0; i < result.FieldCount; i++) row[result.GetName(i)] = result.IsDBNull(i) ? "" : result.GetString(i);
+                for (var i = 0; i < result.FieldCount; i++)
+                {
+                    // Every selected ledger field has a required TEXT contract. Check actual
+                    // storage before the provider can coerce malformed values into strings.
+                    if (result.IsDBNull(i) || result.GetFieldType(i) != typeof(string))
+                        return AuditReport.Stopped("ledger.storage-type");
+                    row[result.GetName(i)] = result.GetString(i);
+                }
                 rows.Add(row);
             }
             if (rows.Count > MaximumRows) return AuditReport.Stopped("ledger.limit");
