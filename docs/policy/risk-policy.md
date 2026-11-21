@@ -45,6 +45,75 @@ RESEARCH-garanti (automatiska tester i CI):
 
 Ändringar i order-, rättighets-, nyckel- eller skyddskod är nivå 3 oavsett modul. Den tunga vetenskapliga granskningen (framtidsläckage, backtestvalidering, reproducerbarhet) görs vid övergången från RESEARCH till simulerad eller riktig handel, inte vid varje ändring. Finance-ADR:erna gäller i övrigt som tekniska krav. Före simulerad eller riktig handel krävs separat ägarbeslut och förlustgränser som inte enbart beror på strategikod, helst hos brokern (nyckel utan uttagsrätt, litet konto, förlustgräns).
 
+### Föreslagen policyändring – Finance #57 offline-revision, 2026-11-21
+
+**STATUS: FÖRSLAG / EJ IKRAFTTRÄDD / RISK 3.**
+Ägaren har godkänt att denna avgränsade policyändring tas fram för
+granskning. Beslutet godkänner inte implementation, verklig dataläsning,
+datakopiering, merge eller deployment. Publicering av en draft-PR
+aktiverar inte denna revisionsväg.
+
+**Syfte:** Finance ska kunna analysera sina egna historiska resultat
+utan att riskera pengar eller ändra originaldata. Det föreslagna
+revisionsspåret är manuellt beställt, ändligt och offline. Det gäller
+endast de befintliga historiska tabellerna `shadow_predictions`,
+`shadow_outcomes`, `revisions`, `observations` och `feature_revisions`.
+Utdata begränsas till en sanerad, aggregerad kvalitetsrapport.
+
+**Obligatoriska skydd:**
+
+1. **Ingen ekonomisk exekvering.** Inga brokerklienter, order,
+   PAPER/LIVE/AUTO, handelsnycklar, betaltjänster, nya providers,
+   modellkörningar eller nya handels- och forskningsgrants.
+2. **Originaldata ska vara oförändrade.** Verifierad skrivfri läsning
+   och en separat konsistent snapshot eller selektiv export krävs.
+   Källans DB/WAL/SHM och relevanta metadata får inte ändras av
+   revisionen. Nekade skrivförsök och negativ verifiering krävs.
+3. **Verifierbar dataintegritet.** Bevara och kontrollera ursprung,
+   schema, samtliga relevanta rader och kolumner, revisioner,
+   ogiltigförklaringar, tidsgränser och fullständig lineage.
+   Kontrollsummor och fullständighetskontroller ska stämma.
+   Resultatet får inte beskrivas som prospektiv validering.
+4. **Källrättigheter och återställning.** Read/copy/use/output-rätt,
+   providerklassificering, retention och BB-132K ska vara verifierade
+   före verklig läsning eller kopiering. Tillämplig backup- och
+   återställningsevidens krävs. ADR 0028 och ADR 0029 gäller.
+   Okänd rättighet, integritet eller backupstatus innebär STOP.
+5. **Manuell kontroll och fail-closed.** Varje revision kräver ett
+   uttryckligt avgränsat körbeslut, fast scope, verifierad kandidat,
+   betrodd operator, isolering, resursgränser och skyddad logg.
+   Ingen schemaläggning, automatisk retry, tyst reparation eller
+   fortsatt körning efter osäkert tillstånd.
+6. **Oberoende risk-3-granskning.** Exakt kandidat och relevanta
+   säkerhetsgränser ska granskas och testas med syntetiska negativa
+   fall innan en separat auktorisering av verklig exekvering.
+
+**Föreslagen proportionell förenkling:**
+För enbart detta manuella, icke-handlande offline-spår föreslås att
+Option B:s externa engångsvittne, rollback-oberoende highwater,
+fullständiga fs-verity-/custody-kedja och motstånd mot illvillig
+hostadministratör inte ska vara självständiga acceptanskrav.
+Detta innebär inte att dessa garantier är tekniskt uppnådda.
+Betrodd operator, skrivfri källåtkomst, dataintegritet, rättigheter,
+backup och spårbar fail-closed-körning förblir obligatoriska.
+
+Förenklingen gäller inte befintlig recurring research, grants,
+prospektiv evidens, holdout, handelsauktoritet eller andra
+Finance-flöden. Ingen befintlig skyddsmekanism tas bort genom
+detta förslag.
+
+**Normkonflikter och ikraftträdande:**
+Detta är en föreslagen separat revisionsväg, inte ett retroaktivt
+godkännande av Option B. Om den föreslagna förenklingen strider mot
+accepterad ADR, normativ arkitektur eller annat bindande skydd
+krävs ett uttryckligt avgränsat ändringsbeslut i rätt dokument
+innan implementation eller aktivering. Ingen tyst dispens gäller.
+
+Även efter accepterad policyändring krävs separat verifierad
+implementationskandidat, rättighetskontroll, backup, risk-3-review
+och körbeslut. Tills dess gäller **NO-GO för verklig revision**,
+**RESEARCH / 0 SEK / NONE**, och oförändrade existerande grindar.
+
 ### Proportionell arbetsinsats och verifiering
 
 Använd lägsta lämpliga arbetsinsats och eskalera vid konkret behov. LOW/MEDIUM/HIGH beskriver arbetsinsats, inte de tre risknivåerna eller rätt att sänka ett uppdrags granskning.
