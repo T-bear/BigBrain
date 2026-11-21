@@ -97,8 +97,11 @@ Utdata begränsas till en sanerad, aggregerad kvalitetsrapport.
    fall innan en separat auktorisering av verklig exekvering.
 
 **Föreslagen proportionell förenkling:**
-Referens: [Option B one-shot offline audit](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#option-b-one-shot-offline-audit--architectural-proposal-2026-11-21),
-förslaget daterat 2026-11-21, särskilt dess sex acceptansgrindar.
+Publicerad referens: [framtida operatörskrav och STOP-matris](../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#future-operator-acceptance-matrix-and-stop-evidence).
+Det separata **Option B one-shot offline audit — architectural proposal**
+(daterat 2026-11-21, sex föreslagna acceptansgrindar) finns ännu bara i
+ett opublicerat checkpointtillägg till samma rapport. Hänvisningarna till
+grind 4 och 5 nedan avser detta förslag, inte redan accepterad norm.
 
 För enbart detta manuella, icke-handlande offline-spår föreslås
 omprövning av följande fristående Option B-krav:
