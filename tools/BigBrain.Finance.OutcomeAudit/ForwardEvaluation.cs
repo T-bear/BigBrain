@@ -93,9 +93,14 @@ internal static class ForwardEvaluation
                     return Stop("conflicting-revision");
                 revisions[input.Revision] = input;
             }
-            var featureIdentity = Hash(new { row.FeatureChecksum, row.FeatureKnownAt,
-                row.PredictionKey.FeatureDefinitionHash, row.PredictionKey.FeatureEngineVersion,
-                Inputs = row.FeatureInputs.OrderBy(input => input.Revision, StringComparer.Ordinal).ToArray() });
+            var featureIdentity = Hash(new
+            {
+                row.FeatureChecksum,
+                row.FeatureKnownAt,
+                row.PredictionKey.FeatureDefinitionHash,
+                row.PredictionKey.FeatureEngineVersion,
+                Inputs = row.FeatureInputs.OrderBy(input => input.Revision, StringComparer.Ordinal).ToArray()
+            });
             if (features.TryGetValue(row.FeatureRevision, out var previous) && previous != featureIdentity)
                 return Stop("conflicting-feature-revision");
             features[row.FeatureRevision] = featureIdentity;
