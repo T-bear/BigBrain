@@ -64,3 +64,76 @@ skipped. Project-based `dotnet format` was **BLOCKED** by denied named-pipe acce
 **BLOCKED** by local SSH configuration permissions. Local HEAD remains `6951df2`;
 the bridge and tests are uncommitted. No independent review, publication or deployment
 has been performed.
+
+## Prospective commitment waterfall — scoped implementation, 2026-11-27
+
+Owner-authorized DoD: exact identities and hashes; immutable fail-closed commitment;
+complete >=120 named target sessions and causal knowledge boundary; synthetic positive
+and negative verification; isolated internal architecture; no real integration; traceable
+requirements and no fabricated rights. Risk remains **3**. This local change does not
+resolve “no hypotheses” through a model run or grant: it implements only the specified
+synthetic commitment prerequisite. Independent candidate review remains pending.
+
+Design: `ProspectiveCommitment.EvaluateSynthetic` wraps the unchanged
+`ForwardEvaluation`. `FrozenCommitment` snapshots serialized manifest and receipt bytes
+into private arrays, returns fresh manifest copies, and computes SHA256 integrity hashes.
+The existing contract hash (including every forward identity/definition/session) and the
+exact serialized-byte hash are separate claims bound to a distinct receipt identity,
+issuer, clock source, witnessed instant and validity boundary. None is authentication.
+`ICommitmentReceiptVerifier` must verify the exact receipt bytes and every claim against
+an independent trusted witness; the only supplied implementation always returns false.
+The test verifier compares an isolated fixture's exact bytes and claims; it is not a
+signature implementation, trusted clock, external witness or proof of real prospectivity.
+No keys, entropy, source permissions or external attestation are invented.
+
+All logical checks and receipt verification precede evaluator acceptance. A witness must
+be at or after the claimed freeze and no later than any prediction cutoff/creation and
+`asOf`; expired receipts fail. The fixture's validity interval is supplied evidence,
+not a newly invented real issuer freshness policy. Missing, duplicate or mismatched
+receipt identities fail; this is one in-memory commitment with one receipt, not a durable
+cross-process replay registry. Retrospective flags are never cleared, and backdating
+claims cannot bypass the default verifier. Independent custody, clock trust, signed
+claims and cutoff witnesses cannot be established by application-supplied strings.
+
+| Requirement / authority | Implementation and verification trace | Fact versus external constraint |
+| --- | --- | --- |
+| Exact identity, immutable bytes and SHA256 (DoD; ADR 0023) | `FrozenCommitment`; `SnapshotDoesNotExposeMutableManifestOrReceiptBytes`; wrong-manifest, wrong-bytes-hash, tampered, altered-key cases | Byte integrity and copying are testable; a hash authenticates neither author nor time |
+| Witnessed prospective boundary (DoD; ADR 0029) | `ICommitmentReceiptVerifier`, default rejection; forged, default-verifier, wrong-clock, wrong-issuer, wrong-receipt-id, missing cases | Independent issuer/clock authentication remains external and unavailable |
+| No retrospective promotion (ADR 0029) | Freeze <= witness <= cutoff/creation; future-commit, stale, retroactive and retrospective-row cases, even with agreeing synthetic verifier for bad chronology | Fixture chronology only; no claim that historical rows were actually witnessed |
+| Full predeclared cohort (DoD) | Unchanged `ForwardEvaluation`: >=120 named consecutive eligible sessions, exact complete series/session panel; positive and incomplete-cohort cases | Synthetic future-relative-to-commit sequence only; no actual future observation |
+| Causal lineage (ADR 0023/0029) | Unchanged revision/checksum/source/feature/knowledge/cutoff gates; late-feature and evidence-tampered cases plus existing evaluator suite | Payload truth and actual acquisition/cutoff clocks remain unproven |
+| No partial acceptance (DoD) | Failures return NOT_EVALUABLE, UNKNOWN metrics, zero sessions and no groups; all negative cases assert these | Optional unavailable metrics retain existing UNKNOWN semantics |
+| Architecture and truthful reporting (DoD) | Separate internal tool component; no public/production contract edits; every case asserts SYNTHETIC_ONLY, independent NOT_VERIFIED and real admission false | Positive status is only SYNTHETIC_FIXTURE_PROVEN; no real prospective admission |
+
+### Open external gate register
+
+These are existing prerequisites, not newly authorized features or closed gaps:
+
+| External gate | Status / evidence needed |
+| --- | --- |
+| Issuer trusted timestamp or independently signed external receipt | OPEN: verify issuer, receipt identity, exact bound bytes/hash, clock provenance, validity and independent custody; default verifier rejects |
+| Provider entitlement and retention | OPEN: current authoritative permission and artifact lifecycle evidence; this code grants none |
+| Source payload verification | OPEN: actual source revision/checksum, acquisition and knowledge-time evidence, complete feature lineage |
+| Verified host OS isolation G3a/G3b | OPEN: effective host isolation and separately authorized runtime verification; no runtime executed here |
+| Equity, regime and probability capture | OPEN: independently captured, versioned values and regime knowledge time; never infer from direction/returns |
+| Future sessions and cutoff witnesses | OPEN: actual complete precommitted cohort and independent prediction/cutoff witnesses; synthetic dates do not count as real observations |
+
+Local test/format results for this delta are recorded below after execution. The earlier
+bridge verification paragraph above is historical and does not identify this baseline.
+No provider/model/data access, grant, migration, trading, deployment or merge
+is authorized. A review commit and draft PR do not constitute acceptance.
+
+Verification for this delta, 2026-11-27:
+
+- **PASS:** compilation and complete OutcomeAudit unit suite, 187 passed, zero failed/skipped
+  (`dotnet test` command above, after package restore with `--ignore-failed-sources -p:NuGetAudit=false`).
+- **PASS:** `dotnet format whitespace --folder --include` both new C# files with
+  `--verify-no-changes`; `git diff --check`; no changes to production files or `ForwardEvaluation`.
+- **BLOCKED:** project-based `dotnet format --no-restore --verify-no-changes` for the new
+  files: named-pipe connection denied. Semantic formatting is not verified.
+- **BLOCKED:** `node scripts/verify-documentation.mjs`: child-process `spawnSync git EPERM`.
+- **PASS (local only):** initially clean required branch and HEAD/local `origin/main`
+  `02122a088a38a478e8acffdb94f1b60e92349854`, baseline tree
+  `6c822ecf2ef62aa4d428713723dd24a82bf78df1`.
+- **BLOCKED:** remote main verification: SSH configuration permission error. No remote
+  candidate SHA exists for these uncommitted changes. Independent risk-3 review is pending.
