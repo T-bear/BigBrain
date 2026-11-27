@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-20 — Finance #57 syntetisk operatörsgräns förberedd för risk-3-review; verklig audit fortsatt blockerad.
-- Verifierad mot commit: `fcc126478a419d3bb5f5d06aefb3fb196fb12ca1` (accepterad main); separat operatörskvalificering är reviewarbete.
-- Runtime senast verifierad: ingen runtimekontroll i operatörskvalificeringen; Nov 11-evidens nedan är historisk.
+- Senast uppdaterad: 2026-11-27 — Finance RESEARCH CI-fel verifierat; avgränsad paketinstallation förberedd lokalt, ny CI-körning PENDING.
+- Verifierad mot commit: `bb8c4b021dea69a674df92ade79b45d3c440fb6e` (GitHub main); checkpoint `6d31d130bd19e4ce3fa73b4b7cea283f47be92ef` är reviewarbete, CI-reparationen opublicerad.
+- Runtime senast verifierad: ingen runtimekontroll i CI-reparationen; tidigare direktprov och driftuppgifter nedan är daterad evidens.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -56,9 +56,15 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 **Finance RESEARCH-isoleringskvalificering, 2026-11-27 — REVIEW CHECKPOINT / RISK 3:**
 repoändringar från `bb8c4b021dea69a674df92ade79b45d3c440fb6e` lägger till negativa
 beroendekontroller och separat isolerad CI för befintliga syntetiska offlinebibliotek.
-Direkt isolerat på BigBrain efter ägarauktoriserad reparation: 5 Python PASS;
-234 C# PASS / 0 FAIL / 0 SKIP. Hostvillkor 1–5, GitHub CI och
-oberoende risk-3-review PENDING. **Ingen nivå-2-kvalificering eller ägaracceptans.**
+Tidigare direkt isolerat på BigBrain efter ägarauktoriserad reparation: 5 Python PASS;
+234 C# PASS / 0 FAIL / 0 SKIP; detta är inte GitHub-evidens.
+GitHub-jobb `140719681087` för checkpoint `6d31d130bd19e4ce3fa73b4b7cea283f47be92ef`
+gav FAIL med `BWRAP_MISSING` före isolerad teststart; build och beroendekontroller PASS.
+Avgränsad ägarauktoriserad CI-reparation installerar Ubuntu-paketet `bubblewrap` endast
+på disponibel GitHub-hostad `ubuntu-22.04` före fixturtestet. Scriptets non-setid-kontroll
+och säkerhetsgränser är oförändrade. Reparationens publicering och nya GitHub-körning
+PENDING; hostvillkor 1–5 och oberoende risk-3-review PENDING.
+**Ingen nivå-2-kvalificering eller ägaracceptans.**
 Hela Finance omfattas inte av bibliotekstesterna. RESEARCH / 0 SEK / NONE kvarstår.
 [Avgränsning, exakt evidens och skrivskyddad hostprocedur](operations/runbooks/finance-research-isolation-qualification.md).
 

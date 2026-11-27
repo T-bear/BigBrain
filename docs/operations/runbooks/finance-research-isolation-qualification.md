@@ -20,9 +20,12 @@ remain the DoD. No policy change or owner acceptance is recorded.
    compiled-library assertions and a standalone fixture executable in an ephemeral
    bubblewrap namespace. Production code and accepted architecture are unchanged.
 4. Verification: dated results below. Ordinary fixture success is not isolated-test
-   success. Host qualification, GitHub CI and independent risk-3 review remain pending.
+   success. GitHub isolation failed with `BWRAP_MISSING`; the repaired CI run, host
+   qualification and independent risk-3 review remain pending.
 5. Handoff: review checkpoint only; no merge, deployment, classification change,
-   real data, provider traffic, secrets/.env, root/sudo, Docker access or trading.
+   real data, provider traffic, secrets/.env, BigBrain root/sudo, Docker access or trading.
+   The bounded CI repair below permits package installation only on the disposable
+   GitHub-hosted runner.
 
 The candidate boundary is **only the two offline libraries and five linked domain
 sources**. It does not cover API/Hosting, acquisition, recurring research or all Finance
@@ -39,13 +42,18 @@ independent time attestation or prospective admission. No ADR/grant is relaxed.
 | --- | --- | --- |
 | No broker/order/trading client imports | `verify-finance-research-boundary.py` checks both projects, linked sources and transport/dynamic-loading constructs; `--resolved` checks exact restored transitive package/project closure. Compiled tests reject unreviewed nonframework assemblies and network/reflection/process imports. Synthetic package/project/link/build-hook/transport/order/dynamic-load/transitive-client mutations must be rejected. | Local PASS for this slice only. Static scanning is defense in depth, not hostile-code verification. Runtime/SQLite supply-chain trust remains. |
 | Read-only DB; writes fail | Existing `OfflineImage.OpenImmutable` tests attempt UPDATE, DELETE, DDL and temporary DDL, compare bytes, and independently disable `query_only` while expecting `SQLITE_READONLY`. WAL/sidecar/digest-negative tests remain. | Local library tests PASS. Actual custody, metadata and concurrent-source protection remain unverified. |
-| Test environment without network or keys | Separate CI job builds first, stages DLL/SO, exact deps/runtime JSON and three schema source files. Non-setuid bubblewrap creates an empty root, clean environment, private namespaces, dropped capabilities, read-only runtime/artifacts/synthetic source and fresh writable tmpfs. Only the public New York zoneinfo file is added for the existing calendar. No checkout, home, config, private host data or socket mount enters the child. | Initial sandbox launch blocked; direct unprivileged BigBrain run PASS after fixture-only repair; CI PENDING. Fresh runner runtime/system libraries are trusted inputs. Build/restore is outside the isolated test phase. |
+| Test environment without network or keys | Separate CI job builds first, stages DLL/SO, exact deps/runtime JSON and three schema source files. Non-setuid bubblewrap creates an empty root, clean environment, private namespaces, dropped capabilities, read-only runtime/artifacts/synthetic source and fresh writable tmpfs. Only the public New York zoneinfo file is added for the existing calendar. No checkout, home, config, private host data or socket mount enters the child. | Initial sandbox launch blocked; prior direct unprivileged BigBrain run PASS after fixture-only repair; GitHub job 140719681087 FAIL: `BWRAP_MISSING`, suite not started; repaired CI run PENDING. Fresh runner runtime/system libraries are trusted inputs. Build/restore and runner package installation are outside the isolated test phase. |
 | Order/production-write negative test makes CI red if permitted | Tests attempt TCP to TEST-NET and an absent Unix order socket, plus SQL/file create/overwrite/delete on a read-only **synthetic production surrogate**. Unexpected connection/write success fails before any order payload. `-failSkips` makes isolated skips fatal; launch failure is nonzero with no fallback. | Three isolated tests SKIP outside the dedicated runner; all passed inside it on BigBrain. No real production path or order endpoint is addressed. |
 
 The new `Finance RESEARCH synthetic isolation` job follows existing PR/main/dispatch
 triggers, read-only permissions and checkout with credential persistence disabled.
-It requires preinstalled **non-setuid bubblewrap** and working unprivileged namespaces.
-Missing prerequisites make CI red. No package installation or host-policy change is made.
+Before the isolated fixture step, the disposable GitHub-hosted `ubuntu-22.04` runner
+installs Ubuntu's distro `bubblewrap` package with `sudo apt-get update` and
+`sudo apt-get install --yes --no-install-recommends bubblewrap`.
+This is runner preparation only; no package installation or sudo execution on BigBrain.
+The unchanged script still requires **non-setid bubblewrap** and working unprivileged
+namespaces. Missing prerequisites, setuid/setgid binaries or namespace failures make
+CI red. No fallback, setid bypass, namespace-policy or other security-check change.
 GitHub branch-protection required-check configuration is **not verified or changed**.
 The existing candidate-package job remains unchanged and explicitly non-accepting.
 
@@ -82,11 +90,43 @@ ADR 0028 provider tagging, restricted-copy/retention rules and BB-132K remain bi
 
 ## Follow-up verification and checkpoint recovery — 2026-11-27
 
-Owner authorized additional repair resources after the first direct BigBrain run (232 PASS / 2 FAIL / 0 SKIP). One additional bounded repair supplied a synthetic DNS file containing no nameservers and asserted the exact sandbox PWD=/app. No host DNS, privileges, production data or network policy were changed. Direct unprivileged Release build: 0 errors/warnings; isolated suite: 234 PASS / 0 FAIL / 0 SKIP; Python: 5 PASS; resolved dependency closure: PASS (12 files); Git diff checks: PASS. Remote main verified at the original baseline from the existing authorized operator environment. H1–H5, real execution boundary, GitHub CI and independent candidate review remain PENDING. The historical sandbox failures below are retained as historical evidence, superseded for the direct run only.
+Owner authorized additional repair resources after the first direct BigBrain run (232 PASS / 2 FAIL / 0 SKIP). One additional bounded repair supplied a synthetic DNS file containing no nameservers and asserted the exact sandbox PWD=/app. No host DNS, privileges, production data or network policy were changed. Direct unprivileged Release build: 0 errors/warnings; isolated suite: 234 PASS / 0 FAIL / 0 SKIP; Python: 5 PASS; resolved dependency closure: PASS (12 files); Git diff checks: PASS. Remote main verified at the original baseline from the existing authorized operator environment. H1–H5, real execution boundary and independent candidate review remain PENDING. This prior direct-run evidence is not GitHub CI evidence; the later GitHub failure is recorded below. The historical sandbox failures below are retained as historical evidence, superseded for the direct run only.
+
+## Bounded GitHub CI prerequisite repair — 2026-11-27
+
+GitHub job [140719681087](https://github.com/T-bear/BigBrain/actions/runs/46062442703/job/140719681087)
+failed with `BWRAP_MISSING` and exit 1 before the isolated suite started. Its log identifies
+the PR #126 test merge `5ad6c2a85bf7fe227eedf9ce536479185a27c1d8`, combining checkpoint
+`6d31d130bd19e4ce3fa73b4b7cea283f47be92ef` with main
+`bb8c4b021dea69a674df92ade79b45d3c440fb6e`. Dependency checks, 5 Python tests and
+the Release build passed in that job; they do not turn the isolation failure into PASS.
+
+The owner authorized this risk-3 repair only: install the Ubuntu distro package on
+the disposable GitHub-hosted runner before the unchanged fixture command. The new
+GitHub run is **PENDING / NOT RUN** for this repair. The earlier 234/234 direct BigBrain
+result remains separate historical evidence. No additional repair, host change, merge,
+deployment, real-data execution or qualification acceptance is authorized here.
+
+GitHub API verification in this repair confirmed main and checkpoint at the identities
+above; local SSH verification remains blocked by configuration permissions. Publication
+of this repair is pending; local Git metadata is outside the writable workspace.
+
+Local repair checks: **PASS** — 5 focused Python tests, resolved dependency boundary
+(12 source files), `git diff --check`, and YAML parsing with semantic comparison against HEAD.
+Documentation validation passed before the final evidence/metadata edits (298 Markdown
+files / 57 backlog IDs); its final rerun is **BLOCKED** by `spawnSync git EPERM`, not PASS.
+The only
+workflow change is the installation step immediately before the unchanged fixture
+command. The first semantic-comparison attempt was blocked by Node `spawnSync git EPERM`;
+comparison passed using the same baseline read by Git directly. The isolation script
+and existing untracked `scripts/__pycache__/` bytes are unchanged. No local package
+installation, sudo, new C# fixture run or GitHub run was performed for this repair.
 
 ## Verification record
 
-Local results dated 2026-11-27; exact checkpoint identities come from Git metadata.
+Prior local results dated 2026-11-27, before the GitHub failure and bounded CI repair
+above; exact checkpoint identities come from Git metadata. These are retained evidence,
+not verification of the repaired workflow.
 
 | Command/check | Result |
 | --- | --- |
@@ -114,10 +154,10 @@ resolved dependency coverage; (2) the public timezone mount required by the unch
 calendar. No further automatic repair loop in the original mandate. The follow-up owner-authorized repair and direct isolated execution are recorded above.
 
 Historical publication attempt in Codex sandbox: **commit FAIL/BLOCKED** because Git could not create `index.lock`
-on its read-only metadata filesystem. Changes remain in the worktree/index; no candidate
-commit/tree exists. Remote SHA/tree and current main remain **UNVERIFIED** after SSH
-rejection. No push is attempted without the required
-remote baseline check. Independent exact-candidate review and a successful isolated CI run
+on its read-only metadata filesystem. At that attempt, changes remained in the worktree/index,
+no candidate commit/tree existed, and remote SHA/tree and main were unverified after SSH
+rejection. Subsequent publication produced the checkpoint identified above; that historical
+failure is not its current publication state. Independent exact-candidate review and a successful isolated CI run
 remain necessary next evidence, together with H1–H5 and an explicit real execution scope.
 
 Reproduction from the repository root (restore uses the local package cache in this run;
