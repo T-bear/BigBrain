@@ -4,6 +4,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
     <Compile Include="../../src/BigBrain.Modules/Finance/UsMarketCalendar.cs" Link="UsMarketCalendar.cs" />
+    <InternalsVisibleTo Include="BigBrain.Finance.ProvenanceAudit" />
     <InternalsVisibleTo Include="BigBrain.Finance.OutcomeAudit.Tests" />
   </ItemGroup>
 </Project>
