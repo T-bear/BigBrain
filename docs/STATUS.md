@@ -53,6 +53,8 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 
 ## Frysningar och operativa osäkerheter
 
+**Finance KISS – ägarinriktning 2026-11-27 (målbild, ej tekniskt PASS):** en persons privata aktieanalys; proportionerliga kontroller, inte enterprise. Intern RESEARCH kan sikta på risknivå 2 först efter att [riskpolicyns isoleringsvillkor och CI-garantier](policy/risk-policy.md#finance-research-och-isoleringsvillkor) verifierats och ägaren noterat resultatet här. **Ingen sådan statusverifiering registreras med detta beslut; Finance kvarstår nivå 3 för oklassificerat arbete.** Lokal journal/tid kan vara praktisk forskning men är inte oberoende attest enligt ADR 0029; externa trust-krav för den etiketten står kvar. RESEARCH / 0 SEK / NONE, G3a BLOCKED / G3b NOT RUN, ingen drift-/handelstillåtelse.
+
 | Område | Gällande beslut och kvarstående begränsningar |
 | --- | --- |
 | Finance | **UPPTINAD genom ägarbeslut 2026-11-08; RESEARCH / 0 SEK / NONE.** [Kanoniskt aktuellt beslut](operations/finance-freeze-20261016.md#aktuellt-ägarbeslut--administrativ-upptining-2026-11-08) häver den administrativa frysningen. G1/G2 har daterat PASS, **G3a BLOCKED / G3b NOT RUN**; historisk Qwen och recurring research är mergad kod utan ny exekveringsrätt. EODHD-cadence verifierat avstängd 2026-11-11; daterad API-komposit och journalräknare redovisas under Release 1 nedan; aktuell runtime är inte omverifierad. G3a/G3b är inte omverifierade. |

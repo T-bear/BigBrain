@@ -1,5 +1,9 @@
 # Finance module
 
+## Produktprincip – privat Finance KISS (ägarinriktning 2026-11-27)
+
+Finance ska stödja en användares egna aktieanalyser och eventuellt framtida separat godkända affärer. Håll forskning enkel: källrättsligt tillåtna data, deterministiskt versionsbundna förutsägelser, lokala tidsstämplar, append-orienterad journal, spårbar utvärdering och realistiska risk-/kostnadsmått. Intern tidsstämpel är **inte** oberoende tidsbevis; försök inte uppgradera historiska resultat eller syntetiska tester till styrkt prospektiv evidens. Inför inte enterprise-infrastruktur utan konkret skyddsbehov. Samtidigt får isolering, rättigheter, korrekthet, återställbarhet, finansiella nycklar, kapitalgränser och de accepterade evidenskontrakten aldrig kringgås. Risknivå 2 för RESEARCH är [villkorad](../policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27), inte härmed godkänd. Ingen ny dataläsning, handelsrätt eller deployment.
+
 ## BB-132E prospective daily shadow — review implementation, 2026-10-03
 
 Explicit internal daily acquisition → trusted immutable receipt → frozen persisted research identity

@@ -1,5 +1,7 @@
 # Synthetic journal mapping — review preparation
 
+**Finance KISS 2026-11-27:** detta verktygs strikta `NOT_VERIFIED`-/`SYNTHETIC_ONLY`-gräns kvarstår för **oberoende beviskrävande** prospektiv forskning. Privat intern forskning kan dokumentera lokal tid, signerad/hashad journal och mätresultat utan att kalla dem externt attesterade. Detta beslut implementerar inte en ny intern produktionsväg, omklassificerar inte retrospektiv evidens och tar inte bort accepterad ADR 0029. Se [styrande risk- och evidensindelning](../../docs/policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27).
+
 Local implementation for the six owner-approved DoD items, risk level 3. Independent
 review is pending. No runtime registration, API dependency, SQLite access, provider,
 model, trading, persistence or policy changes are introduced by this bridge.

@@ -14,6 +14,8 @@ acceptans är olika saker. Källhänvisningarnas B-nummer pekar på DOC-2B:s urs
 
 ## Frysningar och kvarstående operativa grindar
 
+**Finance KISS – prioriteringsprincip 2026-11-27:** enpersonsverktyg för egen aktieanalys, inte enterprise. Prioritera källrättigheter, datakvalitet, historisk hederlighet, kapitalgränser och enkla testbara flöden före ogrundad attest- eller organisationsinfrastruktur. [Risk-/evidensnivåer](policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27) skiljer intern RESEARCH från oberoende verifierad prospektiv evidens. Den befintliga nivå-2-vägen kräver först verifierad isolering och STATUS-notering; aktuell nivå 3 och blockerade Finance-grindar ändras inte. Detta prioriteringsbeslut avslutar inga befintliga BB-poster och ändrar inga grants eller accepterade ADR:er.
+
 ### BB-158 — Media URL Import & Audio Extraction
 
 **UPPTINAD FÖR UTVECKLING sedan 2026-11-10** enligt

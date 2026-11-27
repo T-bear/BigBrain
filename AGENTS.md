@@ -2,6 +2,8 @@
 
 BigBrain är ett privat hemmaprojekt. Pengar och behörighetsgränser skyddas hårt; resten får gå sönder, rullas tillbaka och återskapas. En regel som inte skyddar mot ekonomisk skada, dataförlust eller överskridna behörighetsgränser ska vara kort eller saknas.
 
+**Finance KISS – ägarinriktning 2026-11-27:** Finance är ett privat forsknings- och investeringsverktyg för en enda ägares egna tillgångar, inte en enterprise- eller revisionsprodukt. Kräv endast kontroller som konkret skyddar kapital, behörigheter, användardata, källrättigheter eller forskningsresultatens riktighet. Separera praktiskt spårbar intern RESEARCH från *oberoende verifierad prospektiv evidens*; lokal tid/NTP, hashkedja och egen journal är inte extern tidsattest. Låt inte evidensambitioner eller organisationsprocesser utan påvisat behov blockera säkert avgränsat forskningsarbete. Finanshandel, nycklar, root och ändringar av skyddsregler förblir nivå 3. Gällande nivå-2-villkor och verifieringskrav står kvar tills de faktiskt är uppfyllda. [Kanonisk avgränsning](docs/policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27).
+
 ## 1. Roller och auktoritet
 
 - Produktägaren (användaren) beslutar om prioritering, scope, UX och acceptans.

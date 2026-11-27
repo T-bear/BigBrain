@@ -4,6 +4,20 @@ Bindande detaljer till [AGENTS.md](../../AGENTS.md); avsnittsnummer avser AGENTS
 
 Princip: skydda pengar och behörighetsgränser hårt. Låt resten av BigBrain vara ett experiment som kan rullas tillbaka.
 
+## Finance – privat KISS-inriktning 2026-11-27
+
+**Ägarens beslut om målbild:** Finance är avsett för en person som analyserar sina egna aktier med sitt eget kapital. Det ska vara ett lättskött privat verktyg, inte ett enterprise- eller myndighetsrevisionssystem. Riskklassificering styrs ändå av *faktisk teknisk förmåga, åtkomst och konsekvens*, inte av antalet användare.
+
+**Proportionerligt arbetssätt:**
+
+- **Nivå 1:** dokumentation, rent syntetiska experiment och isolerade icke-beständiga beräkningar utan väg till privilegier, ekonomiska nycklar, handel eller produktionsdata; enligt ordinarie riskdefinition.
+- **Nivå 2 – önskad för kvalificerad RESEARCH:** historisk analys, lokalt tidsstämplade prognoser, append-only-/versionsbunden forskningsjournal, utvärdering och skyddad lagring som saknar ekonomisk exekveringsväg. Klassningen får användas **först efter** dokumenterad engångsverifiering av samtliga isoleringsvillkor och RESEARCH-tester nedan samt ägarens notering i `docs/STATUS.md`. Fram till dess gäller nivå 3 för Finance.
+- **Nivå 3 utan undantag:** PAPER/LIVE/AUTO, order, kapital- eller brokerbehörigheter, finansiella hemligheter, admin/root/Docker-socket och ändringar av skyddsregler eller en väg från forskning till dessa. Separata uttryckliga mandat, förlustgränser och säkerhetstester krävs.
+
+**Två olika evidensnivåer:** lokal NTP-synkroniserad klocka, oföränderlig/append-orienterad journal, kryptografisk integritetskontroll, versionsbunden lineage och reproducerbar utvärdering är en rimlig *intern forskningsnivå*, förutsatt praktiskt verifierade skydd mot omskrivning och läckage från framtiden. Detta är **inte** en oberoende betrodd tidsattest; samma administratör kan i princip påverka klocka, journal och kopior. Historiskt backfill får aldrig märkas som en faktisk förhandsprognos. Allt som enligt accepterad ADR 0029 eller befintligt prospektivt evidenskontrakt kräver extern utfärdare/tid för statusen *oberoende verifierad*, behåller det kravet tills ett separat godkänt kontraktsbeslut ändrar det. `NOT_VERIFIED` och `RealProspectiveAdmission=false` får inte ändras genom detta dokumentationsbeslut.
+
+**Prioritering:** bevara vetenskaplig kvalitet (korrekta cutoffs, rättigheter, källa, osäkerhet, oföränderlig historia, risk och kostnader), kapital- och åtkomstskydd; avstå från ny trust-tjänst, attestleverantör, behörighetsadministration eller extra godkännanderundor om inget konkret användningsfall kräver dem. Inga nya grants, source rights, datakörningar, automatiska order eller deployment tillåts genom denna målbild. Detta är ett framåtsyftande förtydligande, inte omskrivning av äldre accepterade ADR:er eller automatisk upptining/nedklassning.
+
 ## 3. Riskbaserad arbetsinsats
 
 ### Risknivå för uppdraget
