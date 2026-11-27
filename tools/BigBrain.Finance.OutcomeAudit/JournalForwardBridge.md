@@ -210,3 +210,80 @@ Stage 2 verification, 2026-11-27:
   tree `6cf02e5ad0c9b794e1a30ad8b734ffbf16f49332`. There is no published candidate SHA/tree.
   Four changed files only: verifier, new tests, interface comments and this document.
   No commit, push, merge or deployment; independent risk-3 review remains **PENDING**.
+
+## Trust qualification waterfall stage 3 — STOP without code, 2026-11-27
+
+Owner-authorized risk-3 assessment at accepted baseline
+`4b4c9f66895980a52bb3a90d6a8c1362db03d82c` (PR #123 per owner).
+Local HEAD and local `origin/main` match; the initially clean branch is
+`checkpoint/finance-trust-qualification-20261127`, baseline tree
+`edba4954805e2eccc403ca9728abe53c6833dee1`. Remote verification was blocked
+by SSH configuration permissions. Prior stage review/publication statements above
+are historical; this assessment introduces no new accepted candidate.
+
+### Requirements and design decision before implementation
+
+The supplied DoD requires exact source evidence, a protected invariant, negative
+tests if implemented, regression/format/diff checks, no real admission claims,
+explicit external blockers and uncommitted independent-review material.
+ADR [0023](../../docs/adr/0023-finance-immutable-feature-revisions-and-causal-lineage.md)
+requires immutable causal lineage; ADR
+[0029](../../docs/adr/0029-finance-prospective-knowledge-time-evidence.md)
+requires fail-closed clock integrity and forbids retrospective promotion.
+The existing [custody contract](../../docs/reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#trust-and-custody-contract--design-only)
+is explicitly design-only. Its later OS qualification design requires a trust
+anchor outside auditor control and says no key or receipt issuer is added.
+Neither document supplies a real authority or independently verifiable timestamp.
+
+Protected invariant: every `ProspectiveCommitment.EvaluateSynthetic` result retains
+`IndependentAttestedBoundary=NOT_VERIFIED` and `RealProspectiveAdmission=false`,
+including a valid signature under a caller-supplied key. The default verifier rejects.
+No code delta is warranted by the available evidence. Qualification ends at this
+documented preflight; no new trust API, registry, timestamp profile or policy is defined.
+
+| Gap | Exact existing evidence | Missing authoritative input / disposition |
+| --- | --- | --- |
+| Receipt authenticity and key binding | `SignedCommitmentReceiptVerifier` reconstructs the canonical payload including key ID, issuer, clock and both manifest hashes; .NET verifies P-256 signatures with the explicit copied public point | Already implemented relative to supplied key only. A self-computed fingerprint would identify bytes, not independently authorize them |
+| Independently trusted issuer/key | Constructor accepts caller-selected public point and identities; no authority pin is supplied by this task or the accepted contract | Independently authenticated issuer-to-key binding and owner-approved authority, with an independently protected pin and provenance; OPEN |
+| Key custody | Custody design explicitly treats unknown custody as STOP; no real custody attestation is supplied | Independently verifiable evidence identifying the key, custodian and enforced protection boundary over the relevant interval; custody text or signatures by the same untrusted key are insufficient; OPEN |
+| Key validity, rotation and revocation | Receipt `WitnessedAt`/`ValidUntil` are signed claims, not key lifecycle records; no accepted lifecycle evidence format or authority is specified | Authenticated lifecycle evidence bound to the pinned authority/key, with accepted interval, effective revocation, rotation/conflict and freshness semantics; no locally invented lifetime or revoked flag can close this; OPEN |
+| Independent timestamp | Signed clock-source string and UTC ticks; caller supplies `asOf`; chronology checks only | Actual independently signed timestamp evidence binding the exact commitment, independently pinned timestamp authority and accepted verification/freshness semantics; local time and signer assertions do not establish when signing occurred; OPEN |
+| Genuine prospective admission | `ProspectiveCommitment` hardcodes independent NOT_VERIFIED and real admission false; bridge cannot construct complete `ForwardEvidence` | External gates above plus the existing complete source/cohort/cutoff evidence; no status upgrade or real observation is justified; OPEN |
+
+Rejected alternative: a local lifecycle registry with caller-supplied trust/custody
+flags, or a new fingerprint-only qualification API. Neither could authenticate its
+own inputs. It would add maintenance and review cost and risk being mistaken for
+accepted authority without improving the existing unconditional real-admission
+rejection. An external timestamp implementation also lacks supplied signed material
+and accepted authority semantics; choosing a provider or format here would invent
+scope. No external witness was contacted and no real keys were created.
+
+Existing negative coverage is in `ProspectiveCommitmentTests` (missing, forged,
+duplicate/ambiguous receipt identity and stale claims) and
+`SignedCommitmentReceiptVerifierTests` (substituted key/identity, forged signatures,
+noncanonical payloads and exact expiry boundaries). The signed positive fixture
+also asserts no real admission. **Revoked-key handling is not implemented or tested**:
+there is no authoritative lifecycle input to verify. This is an external blocker,
+not a successful revocation check. No new tests are claimed for this no-code decision.
+
+Stage 3 verification results are recorded below. No runtime, API, provider, database,
+security policy, grants or production keys change. BB-073 remains open; independent
+risk-3 review of this uncommitted assessment is pending. No commit, PR, merge or deployment.
+
+- **PASS:** offline restore from the existing local NuGet cache, after the initial
+  `--no-restore` attempt failed with NETSDK1004 (missing assets).
+- **PASS:** full OutcomeAudit regression suite with the `dotnet test` command above:
+  **230 passed, zero failed/skipped**; affected projects compiled successfully.
+- **PASS:** baseline `node scripts/verify-documentation.mjs` (297 Markdown files,
+  57 unique backlog IDs); `git diff --check`; reviewed diff contains this Markdown file only.
+- **PASS (independent host check):** final `node scripts/verify-documentation.mjs`
+  verified 297 Markdown files and 57 unique backlog IDs after the completed delta;
+  `git diff --check` PASS. Earlier sandbox `spawnSync git EPERM` is resolved by
+  this independent host run.
+- **NOT APPLICABLE:** C# formatting and new lifecycle tests, because no C# changes
+  or lifecycle implementation were made.
+- **PASS (independent host check):** remote GitHub `main` remains
+  `4b4c9f66895980a52bb3a90d6a8c1362db03d82c`. Earlier sandbox SSH error
+  does not affect this verified host result.
+- **PENDING:** independent risk-3 review/publication; all external trust gates above
+  remain OPEN. Synthetic tests do not close them.
