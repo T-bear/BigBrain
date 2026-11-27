@@ -136,7 +136,7 @@ public sealed class ForwardEvaluationTests
     private static DateTimeOffset AsOf(ForwardEvidence[] rows) => rows[^1].EvaluatedAt.AddDays(1);
     private static string Digest(char value) => "sha256:" + new string(value, 64);
 
-    private static (ForwardManifest Manifest, ForwardEvidence[] Rows) Sequence()
+    internal static (ForwardManifest Manifest, ForwardEvidence[] Rows) Sequence()
     {
         var sessions = new List<DateOnly>();
         for (var date = new DateOnly(2026, 1, 5); sessions.Count < 121; date = date.AddDays(1))
