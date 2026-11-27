@@ -4,13 +4,14 @@ using System.Text.Json;
 namespace BigBrain.Finance.OutcomeAudit;
 
 // Claims are NOT authentication. An independent receipt/issuer/clock verifier is an
-// external precondition. This component has no real verifier or admission authority.
+// external precondition. Offline signature verification grants no admission authority.
 internal sealed record CommitmentClaims(string ReceiptId, string Issuer, string ClockSource,
     string ManifestHash, string ManifestBytesHash, DateTimeOffset WitnessedAt, DateTimeOffset ValidUntil);
 
 internal interface ICommitmentReceiptVerifier
 {
-    // Must verify exact bytes AND all claims, identity, trusted clock and validity at asOf.
+    // Verify exact bytes, all claims, configured identity and validity at supplied asOf.
+    // A true result alone does not establish independent key trust or clock provenance.
     bool Verify(CommitmentClaims claims, ReadOnlySpan<byte> receiptBytes, DateTimeOffset asOf);
 }
 

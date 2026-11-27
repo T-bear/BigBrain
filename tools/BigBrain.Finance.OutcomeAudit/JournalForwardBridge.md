@@ -80,11 +80,11 @@ into private arrays, returns fresh manifest copies, and computes SHA256 integrit
 The existing contract hash (including every forward identity/definition/session) and the
 exact serialized-byte hash are separate claims bound to a distinct receipt identity,
 issuer, clock source, witnessed instant and validity boundary. None is authentication.
-`ICommitmentReceiptVerifier` must verify the exact receipt bytes and every claim against
-an independent trusted witness; the only supplied implementation always returns false.
-The test verifier compares an isolated fixture's exact bytes and claims; it is not a
-signature implementation, trusted clock, external witness or proof of real prospectivity.
-No keys, entropy, source permissions or external attestation are invented.
+`ICommitmentReceiptVerifier` checks exact receipt bytes and claims under its configured
+verification contract; its result does not establish independent trust. The default
+`RejectCommitmentReceiptVerifier` always returns false. The original test verifier compares
+isolated fixture bytes and claims. Stage 2 below adds offline signature authentication
+relative to an explicitly supplied public key, without attesting clock provenance.
 
 All logical checks and receipt verification precede evaluator acceptance. A witness must
 be at or after the claimed freeze and no later than any prediction cutoff/creation and
@@ -137,3 +137,76 @@ Verification for this delta, 2026-11-27:
   `6c822ecf2ef62aa4d428713723dd24a82bf78df1`.
 - **BLOCKED:** remote main verification: SSH configuration permission error. No remote
   candidate SHA exists for these uncommitted changes. Independent risk-3 review is pending.
+
+
+## Signed receipt waterfall stage 2 — offline authenticity, 2026-11-27
+
+Risk **3**, owner-authorized offline implementation only, based on main
+`139171d93e039adcbdb6dc791ba1679ddd7f7cfb` after PR #122. Independent review is pending;
+changes remain uncommitted. No runtime registration, network, file I/O, persistence,
+new dependency, credential enrollment, provider/model or trading capability is added.
+
+`SignedCommitmentReceiptVerifier` implements the existing interface using .NET ECDSA
+P-256 / SHA256 and a fixed 64-byte IEEE P1363 signature. Configuration requires an
+explicit 65-byte SEC1 uncompressed P-256 public point (`04 || X[32] || Y[32]`), exact
+issuer, key ID and clock-source identity. It copies the public point and validates it
+on construction; invalid configuration throws. It accepts no private key and generates
+no trust root. Only tests generate ephemeral synthetic signing keys in memory.
+
+The receipt is exactly `canonical payload || signature[64]`. The signed payload is:
+
+1. ASCII `BB073/receipt/v1/ECDSA-P256-SHA256/P1363` followed by one zero byte.
+2. Key ID, receipt ID, issuer, clock source, in that order. Each is a two-byte unsigned
+   big-endian byte length followed by 1–256 visible ASCII bytes (`0x21`–`0x7e`).
+   There is no whitespace, Unicode normalization, replacement encoding or case folding.
+3. Manifest hash and manifest-byte hash, in that order, each 32 raw bytes. Input claims
+   must use exactly `sha256:` plus 64 lowercase hexadecimal characters.
+4. Witnessed instant and valid-until instant, in that order, each an eight-byte signed
+   big-endian .NET UTC tick count (100 ns since 0001-01-01). Nonzero UTC values are
+   mandatory; valid-until must be at least witnessed-at.
+
+Verification reconstructs the canonical payload from all claims and configured key ID,
+requires byte equality and exact total length, then verifies the signature. Receipts
+above 2048 bytes fail before payload allocation; identity/hash lengths are bounded before
+encoding. Malformed signatures, substitutions, alternate layouts and trailing bytes fail
+closed. The supplied UTC `asOf` must fall inclusively within the signed interval. Neither
+`asOf` nor the claimed witnessed instant is an independently trusted clock assertion.
+SHA256 integrity hashes alone are never accepted as authentication.
+
+A valid signature establishes authenticity only relative to the explicitly supplied key.
+It does **not** establish the issuer's independent identity, custody, clock accuracy,
+actual signing time or truth of the signed claims. Real issuer trust, independently
+verified clock/timestamp provenance and key custody remain **OPEN** external gates.
+`EvaluateSynthetic` still unconditionally reports independent boundary `NOT_VERIFIED`
+and `RealProspectiveAdmission=false`; default rejection is unchanged. Duplicate or
+mismatched receipt identities fail at the existing evaluator boundary. Offline signature
+verification is deliberately repeatable and has no durable/cross-call replay registry.
+
+`SignedCommitmentReceiptVerifierTests` pins the binary layout independently and tests
+positive authentication, all seven altered claims, substituted key/key ID/issuer/clock,
+malformed signatures, a digest masquerading as a signature, signed noncanonical payloads,
+invalid encodings and sizes, UTC/expiry boundaries, configuration validation, copied public
+key bytes, duplicate handling and the unchanged synthetic-only admission boundary.
+
+Stage 2 verification, 2026-11-27:
+
+- **PASS:** package restore (`--ignore-failed-sources -p:NuGetAudit=false`); compilation
+  of the full affected test project with analyzers. Initial missing restore assets and
+  CA1870 were resolved before the successful build.
+- **BLOCKED:** requested `dotnet test ... --no-restore -p:UseSharedCompilation=false -m:1`
+  compiled successfully, but VSTest could not open its communication socket (permission
+  denied); no tests ran through that runner.
+- **PASS:** complete affected suite via the built xUnit v3 executable:
+  `dotnet tests/BigBrain.Finance.OutcomeAudit.Tests/bin/Debug/net10.0/BigBrain.Finance.OutcomeAudit.Tests.dll -noLogo`:
+  **230 passed, zero errors/failed/skipped/not-run**, including 43 new signed-receipt cases.
+- **PASS:** whitespace formatted and then verified on all three affected C# files using
+  `dotnet format whitespace --folder --include ... --verify-no-changes`; `git diff --check`.
+- **BLOCKED:** project-based `dotnet format --no-restore --verify-no-changes --include ...`:
+  denied named-pipe connection. Full semantic formatting remains unverified.
+- **BLOCKED:** documentation checker: `spawnSync git EPERM`; remote `git ls-remote`
+  verification: SSH configuration permission error. No permissions were changed.
+- **PASS (local only):** initially clean checkpoint `checkpoint/finance-signed-receipt-20261127`,
+  HEAD/local `origin/main` matching the owner-supplied verified main SHA above; baseline
+  tree `6cf02e5ad0c9b794e1a30ad8b734ffbf16f49332`. There is no published candidate SHA/tree.
+  Four changed files only: verifier, new tests, interface comments and this document.
+  No commit, push, merge or deployment; independent risk-3 review remains **PENDING**.
