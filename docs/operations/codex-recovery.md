@@ -5,6 +5,20 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 [AGENTS avsnitt 9](../../AGENTS.md#9-avbrott-och-blockerad-implementation) styr återupptagning;
 [STATUS](../STATUS.md) skiljer accepterad kod från drift och manuell acceptans.
 
+## Finance RESEARCH nivå-2-kvalificering — opublicerat 2026-11-27
+
+**INTERRUPTED — SAFE TO RESUME / REVIEW CHECKPOINT, inte Merge Candidate.**
+Branch `checkpoint/finance-research-level2-isolation-20261127`, HEAD/baslinje
+`bb8c4b021dea69a674df92ade79b45d3c440fb6e`. Codex sandlådas ursprungliga commit och isolerade start blockerades.
+Direkt BigBrain-verifiering efter ägarens utökade reparationsmandat: remote main PASS,
+Release-build PASS, 5 Python PASS och 234 isolerade C# PASS / 0 FAIL / 0 SKIP.
+Ett extra reparationsförsök använt. Semantisk formatkontroll ännu ej omverifierad.
+H1–H5/CI/oberoende review PENDING.
+[Scope, exakta kontroller och skrivskyddad hostprocedur](runbooks/finance-research-isolation-qualification.md).
+Återuppta med Git/working-tree-verifiering och publicering via redan behörig miljö;
+inga nya privilegier, verkliga data, runtimeåtgärder eller nedklassning följer.
+RESEARCH / 0 SEK / NONE; ingen ägaracceptans, merge eller deployment registrerad.
+
 ## PREDEPLOY — avslutat inom beslutat scope, 2026-11-14
 
 Det tidigare scanneravbrottet är avslutat genom PR90/main942ff65, exakt historisk

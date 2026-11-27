@@ -1,5 +1,11 @@
 # Finance testing and validation strategy
 
+The repository-only [RESEARCH isolation qualification](../../operations/runbooks/finance-research-isolation-qualification.md)
+adds dependency mutations and a separate network/key-free synthetic CI fixture for the
+internal offline audit libraries. It does not qualify API/Hosting or change ADRs, source
+rights, grants, trust/provenance, or Finance's risk-3 classification. Host evidence remains
+pending; see that procedure for exact PASS/FAIL/SKIP and environmental limitations.
+
 Prospective validation uses a deterministic T0/T1 harness: at T0 only session X is knowable and a prediction is committed; at T1 session X+1 arrives and a separate outcome is committed. Negative controls cover clock failure, duplicate cycles, late-start anti-backfill, warmup, missing outcomes and malformed/bounded reads. Synthetic fixtures never enter runtime scorecards.
 
 External datasets are untrusted fixtures at the validation boundary. Ordinary tests never use

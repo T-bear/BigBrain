@@ -53,6 +53,15 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 
 ## Frysningar och operativa osäkerheter
 
+**Finance RESEARCH-isoleringskvalificering, 2026-11-27 — REVIEW CHECKPOINT / RISK 3:**
+repoändringar från `bb8c4b021dea69a674df92ade79b45d3c440fb6e` lägger till negativa
+beroendekontroller och separat isolerad CI för befintliga syntetiska offlinebibliotek.
+Direkt isolerat på BigBrain efter ägarauktoriserad reparation: 5 Python PASS;
+234 C# PASS / 0 FAIL / 0 SKIP. Hostvillkor 1–5, GitHub CI och
+oberoende risk-3-review PENDING. **Ingen nivå-2-kvalificering eller ägaracceptans.**
+Hela Finance omfattas inte av bibliotekstesterna. RESEARCH / 0 SEK / NONE kvarstår.
+[Avgränsning, exakt evidens och skrivskyddad hostprocedur](operations/runbooks/finance-research-isolation-qualification.md).
+
 **Finance KISS – ägarinriktning 2026-11-27 (målbild, ej tekniskt PASS):** en persons privata aktieanalys; proportionerliga kontroller, inte enterprise. Intern RESEARCH kan sikta på risknivå 2 först efter att [riskpolicyns isoleringsvillkor och CI-garantier](policy/risk-policy.md#finance-research-och-isoleringsvillkor) verifierats och ägaren noterat resultatet här. **Ingen sådan statusverifiering registreras med detta beslut; Finance kvarstår nivå 3 för oklassificerat arbete.** Lokal journal/tid kan vara praktisk forskning men är inte oberoende attest enligt ADR 0029; externa trust-krav för den etiketten står kvar. RESEARCH / 0 SEK / NONE, G3a BLOCKED / G3b NOT RUN, ingen drift-/handelstillåtelse.
 
 | Område | Gällande beslut och kvarstående begränsningar |
