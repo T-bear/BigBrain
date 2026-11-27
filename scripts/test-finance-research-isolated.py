@@ -19,16 +19,24 @@ ASSEMBLY = "BigBrain.Finance.OutcomeAudit.Tests"
 OUTPUT = ROOT / "tests" / ASSEMBLY / "bin/Release/net10.0"
 
 
+class IsolationFailure(RuntimeError):
+    """Fixed, sanitized diagnostic code; never contains host values."""
+
+
 def run():
     if sys.platform != "linux" or os.getuid() == 0 or os.geteuid() == 0:
-        raise RuntimeError("requires unprivileged Linux")
+        raise IsolationFailure("UNPRIVILEGED_LINUX_REQUIRED")
     bwrap = shutil.which("bwrap")
     dotnet = shutil.which("dotnet")
-    if not bwrap or not dotnet or Path(bwrap).stat().st_mode & (stat.S_ISUID | stat.S_ISGID):
-        raise RuntimeError("requires non-setuid bubblewrap and dotnet")
+    if not bwrap:
+        raise IsolationFailure("BWRAP_MISSING")
+    if not dotnet:
+        raise IsolationFailure("DOTNET_MISSING")
+    if Path(bwrap).stat().st_mode & (stat.S_ISUID | stat.S_ISGID):
+        raise IsolationFailure("BWRAP_SETID_FORBIDDEN")
     runtime = Path(dotnet).resolve().parent
     if not (OUTPUT / (ASSEMBLY + ".runtimeconfig.json")).is_file():
-        raise RuntimeError("build the Release fixture executable first")
+        raise IsolationFailure("FIXTURE_NOT_BUILT")
     with tempfile.TemporaryDirectory(prefix="bb-research-isolated-", dir="/tmp") as name:
         fixture = Path(name)
         app = fixture / "app"
@@ -38,7 +46,7 @@ def run():
         for path in OUTPUT.rglob("*"):
             relative = path.relative_to(OUTPUT)
             if path.is_symlink():
-                raise RuntimeError("linked build output is not permitted")
+                raise IsolationFailure("FIXTURE_SYMLINK_FORBIDDEN")
             if not path.is_file():
                 continue
             # Never stage .env, runner configuration, credentials, data or Git.
@@ -81,14 +89,22 @@ def run():
         # Empty launcher environment too; close inherited descriptors. Never shell=True.
         result = subprocess.run(command, env={}, close_fds=True, timeout=180, check=False)
         if result.returncode:
-            raise RuntimeError("isolated fixture failed or isolation unavailable; no fallback")
+            raise IsolationFailure(f"ISOLATED_PROCESS_EXIT_{result.returncode}")
         print("PASS: isolated synthetic research fixture; host qualification remains PENDING")
 
 
 if __name__ == "__main__":
     try:
         run()
-    except (RuntimeError, OSError, subprocess.TimeoutExpired) as error:
-        # Fixed messages only; do not print host paths or inherited environment.
-        print("FAIL: isolated synthetic research fixture (no fallback)", file=sys.stderr)
+    except IsolationFailure as error:
+        print(f"FAIL: isolated synthetic research fixture [{error}] (no fallback)", file=sys.stderr)
+        sys.exit(1)
+    except subprocess.TimeoutExpired:
+        print("FAIL: isolated synthetic research fixture [TIMEOUT] (no fallback)", file=sys.stderr)
+        sys.exit(1)
+    except OSError as error:
+        print(f"FAIL: isolated synthetic research fixture [OS_ERROR_{error.errno}] (no fallback)", file=sys.stderr)
+        sys.exit(1)
+    except sqlite3.Error:
+        print("FAIL: isolated synthetic research fixture [SQLITE_FIXTURE_ERROR] (no fallback)", file=sys.stderr)
         sys.exit(1)
