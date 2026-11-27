@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../BigBrain.Finance.OutcomeAudit/BigBrain.Finance.OutcomeAudit.csproj" />
+    <Compile Include="../../src/BigBrain.Modules/Finance/DailyFeatureEngine.cs" Link="DailyFeatureEngine.cs" />
+    <Compile Include="../../src/BigBrain.Modules/Finance/FinancePrimitives.cs" Link="FinancePrimitives.cs" />
+    <Compile Include="../../src/BigBrain.Modules/Finance/MarketData.cs" Link="MarketData.cs" />
+    <Compile Include="../../src/BigBrain.Modules/Finance/MarketDataEntitlements.cs" Link="MarketDataEntitlements.cs" />
+    <InternalsVisibleTo Include="BigBrain.Finance.OutcomeAudit.Tests" />
+  </ItemGroup>
+</Project>

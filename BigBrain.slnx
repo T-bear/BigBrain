@@ -15,6 +15,7 @@
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/BigBrain.Finance.OutcomeAudit/BigBrain.Finance.OutcomeAudit.csproj" />
+    <Project Path="tools/BigBrain.Finance.ProvenanceAudit/BigBrain.Finance.ProvenanceAudit.csproj" />
     <Project Path="tools/BigBrain.Finance.PersistenceBenchmarks/BigBrain.Finance.PersistenceBenchmarks.csproj" />
   </Folder>
 </Solution>
