@@ -1,5 +1,7 @@
 # Finance — formell frysning och återupptagning, 2026-10-16
 
+**Senare produktinriktning 2026-11-27:** Finance ska vara ett personligt forskningsverktyg för en ägares egna aktier, inte enterprise. Se [kanonisk KISS-/riskavgränsning](../policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27). Detta ändrar inte 2026-11-08 års upptining, G3a/G3b, källrättigheter, återställningskrav, den villkorade nivån 2 för RESEARCH, de accepterade ADR:erna eller förbudet mot automatisk handel/deployment.
+
 ## Aktuellt ägarbeslut — administrativ upptining 2026-11-08
 
 **UPPTINAD — ÄGARBESLUT 2026-11-08.** Ägaren har efter den tidigare,

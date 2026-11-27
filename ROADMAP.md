@@ -9,6 +9,8 @@ Ingen ny prioritering, epic eller sprint startas genom konsolideringen. STABILIZ
 
 ## Aktuell beslutad riktning och produktprinciper
 
+**Finance – ägarinriktning 2026-11-27:** ett privat verktyg för en användares egen aktieanalys, inte enterprise. Prioritera enkla testbara forskningsflöden med datakvalitet, ärlig resultatuppföljning och strikt kapital-/behörighetsskydd. Intern lokal journal kan räcka för praktisk RESEARCH men är inte oberoende tidsattest; [riskpolicy och nivå-2-villkor](docs/policy/risk-policy.md#finance--privat-kiss-inriktning-2026-11-27) avgör vad som faktiskt är tillåtet. Ingen befintlig grind för handel, källrättigheter eller verifierad prospektiv evidens upphävs.
+
 - KISS och befintliga modulgränser gäller. Family View är ett koordinationslager över källägande
   moduler, inte en konkurrerande datakälla eller ännu en fristående widgetdashboard. Calendar,
   Meal Planner, Shopping List, skolkällor och hushålls-/medlemskontext behåller ägarskap.
