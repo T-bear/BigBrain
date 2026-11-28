@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-20 — Finance #57 syntetisk operatörsgräns förberedd för risk-3-review; verklig audit fortsatt blockerad.
-- Verifierad mot commit: `fcc126478a419d3bb5f5d06aefb3fb196fb12ca1` (accepterad main); separat operatörskvalificering är reviewarbete.
-- Runtime senast verifierad: ingen runtimekontroll i operatörskvalificeringen; Nov 11-evidens nedan är historisk.
+- Senast uppdaterad: 2026-11-28 — Finance-isolering: ägarrapporterad CI PASS och H1-mountevidens PASS; H2–H5 ofullständiga.
+- Verifierad mot commit: remote main `bb8c4b021dea69a674df92ade79b45d3c440fb6e`, utgångscheckpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; dokumentuppföljning `edca674cc8b7e37f581f85dce49676ee27424016` publicerad och remote-match verifierad. Slutlig avstämningsrevision framgår av Git; ingen merge/acceptans.
+- Runtime senast verifierad: ägarrapporterad operatörsinspektion 2026-11-28 med avgränsningar i runbooken; ingen egen hostkontroll i denna uppföljning.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -52,6 +52,27 @@ sista reparationsförsöket rättar endast testets väntan på samma felmeddelan
 frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår som evidens.
 
 ## Frysningar och operativa osäkerheter
+
+**Finance RESEARCH-isoleringskvalificering, 2026-11-28 — REVIEW CHECKPOINT / RISK 3:**
+ägaren rapporterar alla sex CI-kontroller PASS, isolerat 234/234 och Python 5/5 för
+checkpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; inte ny CI-verifiering här.
+Tidigare `BWRAP_MISSING` och reparationshistorik bevaras i runbooken.
+Operatörsunderlag: 12 containrar, noll socket-/föräldramountöverlapp (**H1 PASS inom
+rapporterat scope**), noll privileged/extra caps/devices/host namespaces. API:s två
+Finance-mounts överlappar inga andra containrar, men API delar nät med nio Media-tjänster
+och ett annat med Web/Sentinel. **H2–H5 ofullständiga:** aktuell nät-/ingressenforcement,
+auktoritativ credentialkapabilitet, effektiv Tailscale-ACL och Finance-backupskydd saknas.
+Nov 19 accepterad ingress har token och loopback; Nov 18 Media HTTP 200 är historik.
+Token är inte nätisolering. Hushållsbackupens skydd bevisar inte Finance-skydd;
+EACCES för operatören bevisar inte att API nekas. Ingen faktisk radering har testats.
+Repoinspektion ger konkreta metadatafält och separationsförslag för H2/H5. Nätändringen
+ryms inte i befintlig releasevägs nätbevarande; backupkonstruktorn skriver/rensar staging.
+Separat granskat ändringsscope krävs före sådan implementation/drift. Denna uppföljning
+ändrar endast dokumentation; inga nya verktyg, runtimeåtgärder eller policyundantag.
+Oberoende kandidatgranskning och verklig exekveringsgräns återstår.
+**Ingen nivå-2-kvalificering eller ägaracceptans.**
+Hela Finance omfattas inte av bibliotekstesterna. RESEARCH / 0 SEK / NONE kvarstår.
+[Avgränsning, exakt evidens och skrivskyddad hostprocedur](operations/runbooks/finance-research-isolation-qualification.md).
 
 **Finance KISS – ägarinriktning 2026-11-27 (målbild, ej tekniskt PASS):** en persons privata aktieanalys; proportionerliga kontroller, inte enterprise. Intern RESEARCH kan sikta på risknivå 2 först efter att [riskpolicyns isoleringsvillkor och CI-garantier](policy/risk-policy.md#finance-research-och-isoleringsvillkor) verifierats och ägaren noterat resultatet här. **Ingen sådan statusverifiering registreras med detta beslut; Finance kvarstår nivå 3 för oklassificerat arbete.** Lokal journal/tid kan vara praktisk forskning men är inte oberoende attest enligt ADR 0029; externa trust-krav för den etiketten står kvar. RESEARCH / 0 SEK / NONE, G3a BLOCKED / G3b NOT RUN, ingen drift-/handelstillåtelse.
 
