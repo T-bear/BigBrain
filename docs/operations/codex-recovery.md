@@ -7,7 +7,7 @@ Detta är ingången för aktiva avbrott och osäkra återhämtningsbehov, inte e
 
 ## Finance RESEARCH nivå-2-kvalificering — dokumentuppföljning 2026-11-28
 
-**INTERRUPTED — SAFE TO RESUME / REVIEW CHECKPOINT, inte Merge Candidate.**
+**PUBLICERAD REVIEW CHECKPOINT; inget aktivt implementationsavbrott, inte Merge Candidate.**
 Branch `checkpoint/finance-research-level2-isolation-20261127`, lokal utgångscheckpoint
 `0b84a6d96dd656daa5772b8233f75d167f524e4e`, tree `1b8ea302374333d5e86e79c7ec8ee993e628a94e`,
 cachad main `bb8c4b021dea69a674df92ade79b45d3c440fb6e`. Ägaren rapporterar checkpointens
@@ -17,10 +17,12 @@ mountkontroll PASS; H2–H5 ofullständiga. Inga nya exekverbara verktyg behövs
 Fokuserat lokalt: 5 beroendetester + 5 syntetiska ingress/backup-tester PASS;
 resolved gränskontroll PASS (12 källfiler). Dokumentationens slutkontroll och publiceringsutfall
 finns i [runbookens aktuella uppföljning](runbooks/finance-research-isolation-qualification.md#bounded-host-evidence-follow-up--2026-11-28).
-Remote-verifiering blockerad av SSH-konfigurationens rättigheter; publicering återstår.
-Bevara `scripts/__pycache__/`. Återuppta endast Git-verifiering/publicering av dokumentdelta
-via redan behörig miljö, därefter oberoende review. Ingen extra reparationsloop eller ändring
-av Git-/SSH-rättigheter; H2/H5-implementation och ägaroperationer kräver separat scope.
+Initial remote-/dokumentkontroll blockerades, men senare push och remote-match lyckades för
+`edca674cc8b7e37f581f85dce49676ee27424016`, tree `936fd4c68857e2ba5ce8d6ceaca5a29c273b34d2`;
+main oförändrad och dokumentkontroll PASS. Slutlig avstämningsrevision framgår av Git.
+`scripts/__pycache__/` är byteidentisk. Nästa steg är oberoende review och metadata enligt
+runbooken, ingen automatisk fortsättning. Inga Git-/SSH-rättigheter ändrades;
+H2/H5-implementation och ägaroperationer kräver separat scope.
 RESEARCH / 0 SEK / NONE; ingen ägaracceptans, merge eller deployment registrerad.
 
 ## PREDEPLOY — avslutat inom beslutat scope, 2026-11-14

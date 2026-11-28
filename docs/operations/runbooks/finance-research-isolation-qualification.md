@@ -13,8 +13,9 @@ remain the DoD. No policy change or owner acceptance is recorded.
 CI/publication and host-evidence status below, without replacing historical results.
 Owner-supplied main is `bb8c4b021dea69a674df92ade79b45d3c440fb6e`; existing checkpoint
 is `0b84a6d96dd656daa5772b8233f75d167f524e4e`. Local HEAD, cached main and ancestry
-match. Remote verification is blocked by local SSH configuration permissions;
-no SSH or privilege configuration was changed. The owner reports all six CI checks
+match. Initial remote verification was blocked by local SSH configuration permissions;
+later push and remote verification succeeded without SSH or privilege changes.
+The owner reports all six CI checks
 PASS, isolated tests 234/234 and Python 5/5 for that checkpoint. These are supplied
 results, not a new CI inspection or evidence for a later revision.
 
@@ -161,19 +162,20 @@ or host access. Local verification on 2026-11-28:
 | `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p 'test_finance_research_boundary.py' -v` | **PASS 5/5**, including synthetic forbidden-dependency mutations. |
 | Existing `test_standard_deployment` tests: three `StandardTests.test_finance_ingress_*` cases for candidate/rollback preservation, rejection and runtime fingerprint; two `BackupHelperTests` cases for no production traversal and alias/nested/missing/duplicate mounts | **PASS 5/5**. Fake Docker and temporary synthetic databases only; no runtime or credential read. Reproduce with `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tests/deployment python3 -m unittest` and the five fully qualified method names from the test source. |
 | `python3 scripts/verify-finance-research-boundary.py --resolved` | **PASS**, 12 source files and cached resolved dependency closure; no restore/network. |
-| `node scripts/verify-documentation.mjs` | Initial **PASS**, 298 Markdown files, 57 unique backlog IDs. Final rerun after evidence/recovery edits **BLOCKED** by `spawnSync git EPERM`; final document tree is not claimed fully validated. Separate targeted new-fragment checks PASS (3 links). |
+| `node scripts/verify-documentation.mjs` | **PASS**, 298 Markdown files, 57 unique backlog IDs. An intermediate rerun was blocked by `spawnSync git EPERM`; after successful publication the unchanged validator passed. Separate targeted new-fragment checks PASS (3 links). |
 | `git diff --check`; source scope; unrelated cache byte comparison | **PASS**; documentation-only delta, existing cache preserved. |
 | Fresh C# isolation / GitHub CI / independent risk-3 review | **NOT RUN**. Executable tree unchanged; reuse owner-supplied checkpoint evidence only within its scope. |
-| Remote main/checkpoint verification | **BLOCKED**, SSH configuration permission failure; no verified current remote SHA/tree. |
+| Remote main/checkpoint verification | Initial SSH permission failure; subsequent push and `git ls-remote` **PASS**: unchanged supplied main, checkpoint `edca674cc8b7e37f581f85dce49676ee27424016`, local tree `936fd4c68857e2ba5ce8d6ceaca5a29c273b34d2`. Final reconciliation identity is in Git/handoff. |
 
-Git publication identities and exact diff are obtained from Git metadata at handoff;
-local staging is permitted, remote publication remains blocked at the SSH boundary.
+Git publication identities and exact diff are obtained from Git metadata at handoff.
+The initial access failures are retained as historical failures, not current blockers;
+no configuration repair or additional implementation loop occurred.
 
 Minimum owner actions: supply the H3 inventory and H4 effective-policy/necessity metadata;
 bind the Nov 28 evidence and existing ingress/backup receipts to runtime/config identities;
 then separately authorize only the necessary H2 network/release-contract and H5 backup
-separation work after those facts are assessed. Complete remote verification/publication
-from the existing authorized environment when SSH permits; no privilege workaround.
+separation work after those facts are assessed. Independent candidate review remains
+pending; publishing this documentation does not authorize those operations.
 
 ## Waterfall phases and scope
 

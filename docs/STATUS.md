@@ -1,7 +1,7 @@
 # BigBrain Status
 
 - Senast uppdaterad: 2026-11-28 — Finance-isolering: ägarrapporterad CI PASS och H1-mountevidens PASS; H2–H5 ofullständiga.
-- Verifierad mot commit: lokalt main-underlag `bb8c4b021dea69a674df92ade79b45d3c440fb6e`, utgångscheckpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; remote-verifiering blockerad av SSH-konfigurationens rättigheter. Dokumentuppföljningen ännu opublicerad.
+- Verifierad mot commit: remote main `bb8c4b021dea69a674df92ade79b45d3c440fb6e`, utgångscheckpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; dokumentuppföljning `edca674cc8b7e37f581f85dce49676ee27424016` publicerad och remote-match verifierad. Slutlig avstämningsrevision framgår av Git; ingen merge/acceptans.
 - Runtime senast verifierad: ägarrapporterad operatörsinspektion 2026-11-28 med avgränsningar i runbooken; ingen egen hostkontroll i denna uppföljning.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
