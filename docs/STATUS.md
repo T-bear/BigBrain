@@ -1,8 +1,8 @@
 # BigBrain Status
 
-- Senast uppdaterad: 2026-11-27 — Finance RESEARCH CI-fel verifierat; avgränsad paketinstallation förberedd lokalt, ny CI-körning PENDING.
-- Verifierad mot commit: `bb8c4b021dea69a674df92ade79b45d3c440fb6e` (GitHub main); checkpoint `6d31d130bd19e4ce3fa73b4b7cea283f47be92ef` är reviewarbete, CI-reparationen opublicerad.
-- Runtime senast verifierad: ingen runtimekontroll i CI-reparationen; tidigare direktprov och driftuppgifter nedan är daterad evidens.
+- Senast uppdaterad: 2026-11-28 — Finance-isolering: ägarrapporterad CI PASS och H1-mountevidens PASS; H2–H5 ofullständiga.
+- Verifierad mot commit: lokalt main-underlag `bb8c4b021dea69a674df92ade79b45d3c440fb6e`, utgångscheckpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; remote-verifiering blockerad av SSH-konfigurationens rättigheter. Dokumentuppföljningen ännu opublicerad.
+- Runtime senast verifierad: ägarrapporterad operatörsinspektion 2026-11-28 med avgränsningar i runbooken; ingen egen hostkontroll i denna uppföljning.
 
 Git visar accepterad implementation; tester/CI visar verifiering för respektive revision.
 Deployment och manuell acceptans kräver separat evidens. Följande ändrar inga backlogbeslut.
@@ -53,17 +53,23 @@ frontend/full-CI är obligatorisk före merge; tidigare rött resultat kvarstår
 
 ## Frysningar och operativa osäkerheter
 
-**Finance RESEARCH-isoleringskvalificering, 2026-11-27 — REVIEW CHECKPOINT / RISK 3:**
-repoändringar från `bb8c4b021dea69a674df92ade79b45d3c440fb6e` lägger till negativa
-beroendekontroller och separat isolerad CI för befintliga syntetiska offlinebibliotek.
-Tidigare direkt isolerat på BigBrain efter ägarauktoriserad reparation: 5 Python PASS;
-234 C# PASS / 0 FAIL / 0 SKIP; detta är inte GitHub-evidens.
-GitHub-jobb `140719681087` för checkpoint `6d31d130bd19e4ce3fa73b4b7cea283f47be92ef`
-gav FAIL med `BWRAP_MISSING` före isolerad teststart; build och beroendekontroller PASS.
-Avgränsad ägarauktoriserad CI-reparation installerar Ubuntu-paketet `bubblewrap` endast
-på disponibel GitHub-hostad `ubuntu-22.04` före fixturtestet. Scriptets non-setid-kontroll
-och säkerhetsgränser är oförändrade. Reparationens publicering och nya GitHub-körning
-PENDING; hostvillkor 1–5 och oberoende risk-3-review PENDING.
+**Finance RESEARCH-isoleringskvalificering, 2026-11-28 — REVIEW CHECKPOINT / RISK 3:**
+ägaren rapporterar alla sex CI-kontroller PASS, isolerat 234/234 och Python 5/5 för
+checkpoint `0b84a6d96dd656daa5772b8233f75d167f524e4e`; inte ny CI-verifiering här.
+Tidigare `BWRAP_MISSING` och reparationshistorik bevaras i runbooken.
+Operatörsunderlag: 12 containrar, noll socket-/föräldramountöverlapp (**H1 PASS inom
+rapporterat scope**), noll privileged/extra caps/devices/host namespaces. API:s två
+Finance-mounts överlappar inga andra containrar, men API delar nät med nio Media-tjänster
+och ett annat med Web/Sentinel. **H2–H5 ofullständiga:** aktuell nät-/ingressenforcement,
+auktoritativ credentialkapabilitet, effektiv Tailscale-ACL och Finance-backupskydd saknas.
+Nov 19 accepterad ingress har token och loopback; Nov 18 Media HTTP 200 är historik.
+Token är inte nätisolering. Hushållsbackupens skydd bevisar inte Finance-skydd;
+EACCES för operatören bevisar inte att API nekas. Ingen faktisk radering har testats.
+Repoinspektion ger konkreta metadatafält och separationsförslag för H2/H5. Nätändringen
+ryms inte i befintlig releasevägs nätbevarande; backupkonstruktorn skriver/rensar staging.
+Separat granskat ändringsscope krävs före sådan implementation/drift. Denna uppföljning
+ändrar endast dokumentation; inga nya verktyg, runtimeåtgärder eller policyundantag.
+Oberoende kandidatgranskning och verklig exekveringsgräns återstår.
 **Ingen nivå-2-kvalificering eller ägaracceptans.**
 Hela Finance omfattas inte av bibliotekstesterna. RESEARCH / 0 SEK / NONE kvarstår.
 [Avgränsning, exakt evidens och skrivskyddad hostprocedur](operations/runbooks/finance-research-isolation-qualification.md).

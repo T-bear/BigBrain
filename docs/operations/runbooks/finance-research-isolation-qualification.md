@@ -7,6 +7,174 @@ The [five host conditions and four CI guarantees](../../policy/risk-policy.md#fi
 remain the DoD. No policy change or owner acceptance is recorded.
 **RESEARCH / 0 SEK / NONE; G3a BLOCKED / G3b NOT RUN.**
 
+## Bounded host-evidence follow-up — 2026-11-28
+
+**REVIEW CHECKPOINT / RISK 3 / NOT QUALIFIED.** This section supersedes the older
+CI/publication and host-evidence status below, without replacing historical results.
+Owner-supplied main is `bb8c4b021dea69a674df92ade79b45d3c440fb6e`; existing checkpoint
+is `0b84a6d96dd656daa5772b8233f75d167f524e4e`. Local HEAD, cached main and ancestry
+match. Remote verification is blocked by local SSH configuration permissions;
+no SSH or privilege configuration was changed. The owner reports all six CI checks
+PASS, isolated tests 234/234 and Python 5/5 for that checkpoint. These are supplied
+results, not a new CI inspection or evidence for a later revision.
+
+### Requirements and design
+
+The authorized follow-up DoD is: (1) establish accepted requirements and source;
+(2) reconcile supplied host evidence with explicit limits; (3) identify H2's accepted
+ingress/release and literal network gap; (4) specify H3/H4 metadata without values or
+provider access; (5) identify H5's accepted architecture and minimum separation;
+(6) verify focused tests/documentation, preserve unrelated cache, and report exact
+delta/publication blockers. Completion of this follow-up does **not** complete the
+five host conditions or the real execution-boundary qualification.
+
+Policy, ADR 0028/0029/0038, Compose, ingress/backup source, deployment rules and the
+referenced accepted evidence are unchanged between supplied main and checkpoint.
+Reuse existing source, metadata views and tests. No new collector, credential scanner,
+runtime verifier or synthetic topology model is needed: none would supply the missing
+effective policy or custody facts. No executable change is made. The designs below
+are proposals for separate scope; they do not change accepted architecture or operations.
+
+### Supplied host observations and their limits
+
+Provenance: owner's summary of separately authorized operator inspection dated
+2026-11-28; this agent performed **no host inspection**. Exact observation UTC,
+runtime/config identities and private receipt references were not supplied here.
+Keep those bindings in the existing private evidence mechanism before final qualification;
+do not publish raw inventories, identities, addresses, secrets or private paths.
+
+| Condition | Concrete supplied evidence | Current conclusion |
+| --- | --- | --- |
+| H1 | 12 running containers; zero Docker socket or ancestor-mount overlaps. | **PASS for the supplied running-container mount inspection**, owner-reported. No new socket access. |
+| H2 | Zero privileged containers, additional capabilities, devices or host PID/IPC/network modes. API has two Finance-labelled mounts, one RW; no other container overlaps. API shares one network with nine Media-related services and another with Web/Sentinel; no dedicated Finance network. | Privilege/mount observations support those subchecks. **Incomplete / NOT QUALIFIED:** shared membership is established; current effective ingress/routing enforcement is not. No claim of a current successful Media HTTP request. |
+| H3 | No authoritative broker credential capability inventory identified. | **PENDING**, not a finding that trading keys exist or that none exist. |
+| H4 | Tailscale Running with three peers; local status lacks effective ACL. | **PENDING**. Peer count/status proves neither permission nor denial. |
+| H5 | Household backup and receipt directories root-owned 0700, ancestors 0755, no mount overlaps; operator denied. API has RW `/finance-data`, no nested backup mount; stat of Finance backup location denied EACCES. | Household evidence supports that scoped boundary only. **Finance protection PENDING**: no effective backup ownership/ACL evidence or deletion test; EACCES for operator is not denial for API. |
+
+### H2 — accepted ingress, release limit and minimum network design
+
+[Accepted source](../../../src/BigBrain.Api/Program.cs) guards the Finance route prefix
+with [FinanceAccessGuard](../../../src/BigBrain.Api/FinanceAccessGuard.cs);
+[Compose](../../../compose.yaml) requires the guard and publishes API on loopback.
+[Accepted dated evidence](../../reports/features/finance/finance-bb-087-prospective-shadow-foundation-20260815.md#reused-evidence-and-current-gates)
+records Nov 19 owner acceptance: direct API loopback, missing/wrong credentials denied,
+authorized Web unlock accepted. The owner-supplied Nov 18 Media HTTP 200 is historical;
+it does not establish today's exposure after that ingress correction. Neither source
+nor the Nov 19 acceptance establishes current enforcement or network isolation.
+
+The existing [STANDARD runner](../../../scripts/deploy-standard.py) has a one-off
+`--finance-ingress-release` pinned to source `38698f3377327dfe8c18ae29ef720935faf24b23`,
+fixed prior runtime revisions and unchanged source/build inputs. Its compatibility
+[contract](../deployment/README.md#bigbrain-101--stöd-för-dubbla-tidigare-privata-releaser-kandidat-2026-11-18)
+preserves API volumes and Media network identity. This is not a generic Finance release
+or network-change route. No old release is rerun; current installed identity is unknown here.
+
+Minimum verification: reuse a sanitized release receipt binding current image/compiled
+revision, port bindings, guard-enabled/token-configured **booleans**, Web proxy route and
+effective host/container forwarding rules. Compare Media → API and Media → Web/proxy
+paths, including published ports and IPv6, with dated expected/observed allow/deny results
+from existing authorized evidence. A 401 establishes authentication, not network denial.
+New probes require a separate bounded operator scope and are not performed here.
+
+Literal policy H2 requires Media without access to Finance networks. Do not treat the
+absence of a network *named* Finance or the bearer token as satisfying it. Minimum
+candidate design keeps the existing API and Finance storage owner: remove the Finance-
+hosting API's shared Media-network attachment, retain an API/Web backend without Media
+members, and enforce denial of Media-initiated access to that backend and all Finance
+proxy/published-port paths. Preserve required API-initiated Media adapter connections
+through explicitly bounded routing with return traffic only; review service discovery,
+ports and legitimate Web access before selecting exact rules. Separate network names
+without enforced routing denial do not suffice. No new Finance service is presumed.
+
+**Implementation stop:** this topology cannot be delivered through the accepted runner's
+network-preservation contract. A separately reviewed network/release-contract change and
+operator scope are needed first; no Compose, runner or firewall change is made here.
+If required Media functionality needs the prohibited inbound path, report that concrete
+conflict before implementation instead of relaxing H2 or assuming a service split.
+
+### H3/H4 — exact owner-provided metadata
+
+Use existing private records/exports; provide sanitized conclusions and opaque references.
+No account login, provider call, secret file/value, credential hash or new inventory service.
+
+| Gap | Minimum owner-provided facts | Decision enabled |
+| --- | --- | --- |
+| H3 credential capability and custody | For each credential label: issuer/product, credential/account class (data-only, broker/account, PAPER/LIVE or unknown), authoritative permission record/reference and date, allowed data/account/order/transfer/withdrawal/admin capabilities, active/revoked status, and all server custody locations by role. State inventory coverage of running/stopped services, config/secret stores, image layers/build caches, volumes, user storage and backups, including old/revoked copies. Give explicit zero/unknown counts and known omissions. | No broker/trading keys on server under literal H3. Broker/account keys do not become data-only because code uses only market-data GETs or a service is disabled. Known broker/trading keys require separate disposition scope; unknown capability/coverage stays PENDING. |
+| H4 effective network policy | Current effective ACL/grants revision and observation time; server principal/tags and expanded group/autogroup/wildcard memberships; owner endpoint labels; subnet, exit-node and shared-device routes; protocol/port allow matrix and existing policy-test results for that same revision. Include public/non-Tailscale account-access paths and credential/session custody from H3. Owner marks each allowed server → owner endpoint/account edge necessary with purpose and exact bounds, or unnecessary. | Compare actual permissions with necessity. Missing identity/route/account coverage stays PENDING; unnecessary allowed edges need separately scoped policy correction. Local three-peer status is not this export. |
+
+The accepted [Alpaca adapter](../../../src/BigBrain.Api/Finance/AlpacaDailyMarketObservations.cs)
+uses a fixed data endpoint and configured key/secret fields. This establishes intended
+client behavior only, not deployed credential presence or provider-side capabilities.
+An issuer/product permission record must support any data-only classification; this task
+does not seek new provider confirmation or repeat previously answered entitlement questions.
+
+### H5 — accepted backup architecture and minimum separation
+
+[ADR 0028](../../adr/0028-finance-provider-tagged-backup-restore-and-cleanup.md) owns
+provider-tagged selections, immutable manifests, staged verification and maintenance-only
+creation/restore. [Backup documentation](../backup-restore/README.md) distinguishes
+WIKI-only eligible backups, restricted EODHD copies, BB-132K and household backups.
+Household's six-database mechanism excludes Finance. It cannot prove Finance coverage.
+
+Compose configures `/finance-data/backups` beneath API's RW Finance mount. The
+[store constructor](../../../src/BigBrain.Api/Finance/FinanceDataProtection.cs) creates
+backup/restore directories and deletes `.staging-*`; the maintenance dispatcher also
+constructs `EodhdMarketMemory`. Consequently `finance-backup-inventory` and
+`finance-backup-verify` are **not safe read-only evidence commands**. Do not run them.
+Checksums/COMPLETE manifests prove integrity at verification, not deletion isolation.
+RW mount plus EACCES does not prove an actual deletable backup: effective configuration,
+backup existence, owner/mode/ACL, parent rights and API UID mapping remain unknown.
+
+First reuse authorized metadata: effective backup directory/config revision, custody
+inventory of completed copies, ownership/ACL and parent traversal/removal rights, API
+UID/GID mapping, all alias/ancestor mounts and any container-accessible deletion interface.
+Keep H5 PENDING until that evidence can decide container authority; no payload or deletion
+test is needed for this read-only follow-up.
+
+Minimum separation proposal if the copies are API-writable: preserve the existing
+provider-tagged format and trusted host maintenance workflow, but place completed backups
+under a protected owner outside every container-writable source/ancestor/alias. Containers
+receive no archive write/delete capability or management credential; expose only read-only
+inventory/archive access if required. Keep export/restore scratch separate. Existing
+completed copies must be included in the reviewed cutover; an extra protected copy alone
+does not establish that all existing backups meet H5. Copy/move/removal is separately
+authorized and must preserve rights, manifests and recovery; none occurs here.
+
+**Implementation stop:** merely making today's backup directory read-only is incompatible
+with constructor cleanup and creation assumptions. A future narrow code change must
+separate read-only inventory from maintenance initialization/cleanup, followed by a reviewed
+storage/maintenance cutover. Only the trusted host operator publishes protected copies;
+no container, including a maintenance container, gets authority to delete that archive.
+No scheduler, remote backup service or generic privilege expansion is proposed. Preserve
+ADR 0028, restricted-copy scope and BB-132K; independently verify the existing daily-backup/
+real-restore gate without substituting synthetic evidence.
+
+### Implementation, verification and handoff
+
+Implementation is documentation only: this runbook, STATUS and reconciliation of the stale
+recovery note. Existing evidence mechanisms suffice; no new executable tooling or tests.
+No independent candidate review is claimed. No merge, runtime change, probe, data operation
+or host access. Local verification on 2026-11-28:
+
+| Check | Result and limit |
+| --- | --- |
+| `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/deployment -p 'test_finance_research_boundary.py' -v` | **PASS 5/5**, including synthetic forbidden-dependency mutations. |
+| Existing `test_standard_deployment` tests: three `StandardTests.test_finance_ingress_*` cases for candidate/rollback preservation, rejection and runtime fingerprint; two `BackupHelperTests` cases for no production traversal and alias/nested/missing/duplicate mounts | **PASS 5/5**. Fake Docker and temporary synthetic databases only; no runtime or credential read. Reproduce with `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tests/deployment python3 -m unittest` and the five fully qualified method names from the test source. |
+| `python3 scripts/verify-finance-research-boundary.py --resolved` | **PASS**, 12 source files and cached resolved dependency closure; no restore/network. |
+| `node scripts/verify-documentation.mjs` | Initial **PASS**, 298 Markdown files, 57 unique backlog IDs. Final rerun after evidence/recovery edits **BLOCKED** by `spawnSync git EPERM`; final document tree is not claimed fully validated. Separate targeted new-fragment checks PASS (3 links). |
+| `git diff --check`; source scope; unrelated cache byte comparison | **PASS**; documentation-only delta, existing cache preserved. |
+| Fresh C# isolation / GitHub CI / independent risk-3 review | **NOT RUN**. Executable tree unchanged; reuse owner-supplied checkpoint evidence only within its scope. |
+| Remote main/checkpoint verification | **BLOCKED**, SSH configuration permission failure; no verified current remote SHA/tree. |
+
+Git publication identities and exact diff are obtained from Git metadata at handoff;
+local staging is permitted, remote publication remains blocked at the SSH boundary.
+
+Minimum owner actions: supply the H3 inventory and H4 effective-policy/necessity metadata;
+bind the Nov 28 evidence and existing ingress/backup receipts to runtime/config identities;
+then separately authorize only the necessary H2 network/release-contract and H5 backup
+separation work after those facts are assessed. Complete remote verification/publication
+from the existing authorized environment when SSH permits; no privilege workaround.
+
 ## Waterfall phases and scope
 
 1. Requirements: HEAD and cached `origin/main` match the supplied baseline; initial
@@ -59,7 +227,7 @@ The existing candidate-package job remains unchanged and explicitly non-acceptin
 
 ## Five host conditions — read-only evidence procedure
 
-**H1–H5 are all PENDING; no host inspection was performed.** A separately authorized
+**Initial 2026-11-27 status: H1–H5 PENDING; superseded by the Nov 28 summary above.** A separately authorized
 operator may use existing approved read-only views/evidence. This procedure authorizes
 no privilege acquisition, root/sudo, Docker socket/group access, container exec, service
 change, secret/.env read, packet probe, data copy, deletion or restore. If the view lacks
